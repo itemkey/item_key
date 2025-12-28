@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Item Key — social</title>
+  <link rel="stylesheet" href="assets/css/styles.css" />
+
+  <style>
+    html, body { background:#fff; }
+    .wrap{
+      width:min(980px, 92vw);
+      margin: 0 auto;
+      padding: clamp(18px, 3.5vw, 34px) 0 28px;
+    }
+    .head{
+      display:flex;
+      align-items:flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid rgba(0,0,0,.12);
+    }
+    .title{ display:grid; gap: 6px; }
+    .title h1{
+      margin:0;
+      font-size: 12px;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+    }
+    .title .sub{
+      font-size: 10px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: rgba(0,0,0,.55);
+    }
+    .panel{
+      margin-top: 18px;
+      border: 1px solid rgba(0,0,0,.14);
+      background: rgba(255,255,255,.95);
+      box-shadow: 0 12px 42px rgba(0,0,0,.06);
+      padding: clamp(14px, 3vw, 22px);
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+    @media (max-width: 720px){
+      .grid{ grid-template-columns: 1fr; }
+    }
+    .card{
+      border: 1px solid rgba(0,0,0,.12);
+      background: rgba(255,255,255,.90);
+      padding: 14px;
+      display:grid;
+      gap: 10px;
+    }
+    .card .k{
+      font-size: 10px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: rgba(0,0,0,.55);
+    }
+    .card .v{
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(0,0,0,.82);
+      word-break: break-word;
+    }
+    .actions{
+      display:flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items:center;
+      margin-top: 10px;
+    }
+    .gtext{ position: relative; }
+    .gtext::before,
+    .gtext::after{
+      content: attr(data-text);
+      position:absolute;
+      inset:0;
+      opacity:.55;
+      pointer-events:none;
+    }
+    .gtext::before{ transform: translate(0.6px, -0.4px); clip-path: inset(0 0 55% 0); }
+    .gtext::after { transform: translate(-0.6px, 0.4px); clip-path: inset(45% 0 0 0); }
+    .title .toplinks{
+      margin-top: 12px;
+      display:flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: flex-start;
+    }
+    .title .toplink{ white-space: nowrap; }
+
+    /* --- CENTER EVERYTHING (requested) --- */
+    .head{
+      justify-content: center;
+      text-align: center;
+    }
+    .title{
+      justify-items: center;
+    }
+    .title .toplinks{
+      justify-content: center;
+    }
+    .panel{
+      display: grid;
+      justify-items: center;
+    }
+    .grid{
+      width: 100%;
+      justify-items: stretch;
+    }
+    .card{
+      text-align: center;
+      justify-items: center;
+    }
+    .actions{
+      justify-content: center;
+    }
+
+  
+/* --- REMOVE COSMETIC BACKGROUND CIRCLES --- */
+.circle, .bg-circle, .orb, .halo, .glow,
+[class*="circle"], [class*="orb"], [class*="halo"], [class*="glow"]{
+  display: none !important;
+}
+body::before, body::after{
+  content: none !important;
+  display: none !important;
+}
+
+</style>
+</head>
+<body class="page-manufacture">
+  <main class="wrap">
+    <div class="head">
+      <div class="title">
+        <h1 class="gtext" data-text="item-manufacture :: social">item-manufacture :: social</h1>
+        <nav class="toplinks">
+          <a class="toplink" href="index.html"><span class="tag">item_key</span></a>
+          <a class="toplink" href="item-manufacture.html"><span class="tag">item-manufacture</span></a>
+        </nav>
+      </div>
+    </div>
+
+    <section class="panel">
+
+
+      <div class="grid">
+        <div class="card">
+          <div class="k">telegram channel</div>
+          <div class="v gtext" data-text="item_view">item_view</div>
+          <div class="actions">
+            <a class="btn btn--primary" href="https://t.me/item_view" target="_blank">open</a>
+            <button class="btn" type="button" data-copy="https://t.me/item_view">copy</button>
+          </div>
+        </div>
+
+        <!-- swapped: tg-manager now before mail -->
+        <div class="card">
+          <div class="k">tg-manager</div>
+          <div class="v gtext" data-text="@item_mngr">@item_mngr</div>
+          <div class="actions">
+            <a class="btn btn--primary" href="https://t.me/item_mngr" target="_blank">open</a>
+            <button class="btn" type="button" data-copy="@item_mngr">copy</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="k">mail</div>
+          <div class="v gtext" data-text="itemkeycontact@gmail.com">itemkeycontact@gmail.com</div>
+          <div class="actions">
+            <a class="btn btn--primary" href="mailto:itemkeycontact@gmail.com">write</a>
+            <button class="btn" type="button" data-copy="itemkeycontact@gmail.com">copy</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="bottombar bottombar--edge">
+    <span class="hint">item-manufacture · social</span>
+    <span class="sep">•</span>
+    <span class="hint">ONO-beta</span>
+  </footer>
+
+  <script>
+    document.addEventListener("click", async (e) => {
+      const btn = e.target.closest("[data-copy]");
+      if (!btn) return;
+      const v = btn.getAttribute("data-copy") || "";
+      try{
+        await navigator.clipboard.writeText(v);
+      }catch{
+        const ta = document.createElement("textarea");
+        ta.value = v;
+        ta.style.position = "fixed";
+        ta.style.left = "-9999px";
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        ta.remove();
+      }
+    });
+  </script>
+</body>
+</html>

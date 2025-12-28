@@ -1,0 +1,1005 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Item Key — Главное меню</title>
+  <link rel="stylesheet" href="assets/css/styles.css" />
+
+<style>
+/* ABSOLUTE KILL OF ANY BACKGROUND CIRCLES / GRADIENTS */
+html, body {
+  background: #ffffff !important;
+  background-image: none !important;
+  filter: none !important;
+}
+
+body::before,
+body::after,
+html::before,
+html::after {
+  content: none !important;
+  display: none !important;
+}
+
+/* Kill any fixed/absolute decorative layers */
+[class*="circle"],
+[class*="ring"],
+[class*="orb"],
+[class*="halo"],
+[class*="glow"] {
+  display: none !important;
+}
+</style>
+
+
+<style>
+  /* CENTER INTRO (glitch stage) */
+  .center-stage{
+    position: relative;
+    min-height: calc(100vh - 160px);
+    padding: 0;
+    overflow: visible;
+  }
+  /* Fullscreen background layer */
+  .intro-stage{
+    position: fixed;
+    inset: 0;
+    z-index: 5;
+    background: #fff;
+    pointer-events: none; /* do not block clicks */
+  }
+  #introCanvas{
+    width: 100vw;
+    height: 100vh;
+    display:block;
+  }
+/* respect reduced motion */
+  @media (prefers-reduced-motion: reduce){
+    .intro-stage{ filter:none !important; }
+  }
+</style>
+
+
+<style>
+  /* --- UNDER DEVELOPMENT OVERLAY (item-security / item-soft) --- */
+  .dev-overlay{
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(2px);
+  }
+  .dev-overlay.is-open{ display:flex; }
+
+  .dev-window{
+    width: min(720px, 96vw);
+    border: 2px solid #000;
+    background: #fff;
+    box-shadow: 0 0 0 6px rgba(0,0,0,0.06);
+    border-radius: 0;
+    position: relative;
+  }
+
+  .dev-window::before{
+    content:"";
+    position:absolute;
+    inset:-2px;
+    pointer-events:none;
+    background:
+      linear-gradient(90deg, rgba(0,0,0,0.14), rgba(0,0,0,0)) ,
+      repeating-linear-gradient(0deg, rgba(0,0,0,0.08) 0 1px, rgba(0,0,0,0) 1px 5px);
+    mix-blend-mode:multiply;
+    opacity: .22;
+  }
+
+  .dev-inner{
+    position: relative;
+    padding: 18px 18px 16px;
+  }
+
+  .dev-title{
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-weight: 800;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    font-size: 14px;
+    margin: 0 0 10px;
+  }
+
+  .dev-line{
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 13px;
+    line-height: 1.55;
+    margin: 0 0 14px;
+  }
+
+  .dev-actions{
+    display:flex;
+    gap: 10px;
+    align-items:center;
+    justify-content:flex-start;
+    flex-wrap: wrap;
+  }
+
+  .dev-btn{
+    appearance: none;
+    border: 2px solid #000;
+    background: #fff;
+    color:#000;
+    padding: 10px 14px;
+    border-radius: 0;
+    cursor: pointer;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-weight: 800;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    font-size: 12px;
+  }
+  .dev-btn:hover{ transform: translateY(-1px); }
+  .dev-btn:active{ transform: translateY(0px); }
+
+  .dev-hint{
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 12px;
+    opacity: .72;
+  }
+</style>
+
+
+<style>
+  /* Center click area: toggle between item_key and manifesto text */
+  .center-toggle{
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: min(520px, 92vw);
+    height: min(180px, calc(100vh - 260px));
+    z-index: 50;
+    background: transparent;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    pointer-events: auto;
+    outline: none;
+  }
+  .center-toggle.is-manifesto{
+    width: min(980px, 94vw);
+    height: min(620px, calc(100vh - 220px));
+  }
+  .center-toggle:focus-visible{
+    outline: 2px solid #000;
+    outline-offset: 6px;
+  }
+</style>
+
+</head>
+<body class="page page-home">
+
+
+  <!-- UNDER DEVELOPMENT OVERLAY -->
+  <div class="dev-overlay" id="devOverlay" role="dialog" aria-modal="true" aria-labelledby="devOverlayTitle" aria-hidden="true">
+    <div class="dev-window" role="document">
+      <div class="dev-inner">
+        <p class="dev-title" id="devOverlayTitle">отсек в разработке</p>
+        <p class="dev-line" id="devOverlayText">Этот отсек ещё не ожил. Возвращайся позже.</p>
+        <div class="dev-actions">
+          <button class="dev-btn" id="devOverlayBack" type="button">вернуться назад</button>
+          <span class="dev-hint">Esc — выйти</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- тонкая рамка по краю (дорого выглядит) -->
+  
+  
+<div class="veil" aria-hidden="true"></div>
+
+  <!-- верхний “герб” -->
+  <header class="topbar topbar--edge">
+    <a class="toplink" href="item-manufacture.html?returnTo=index.html" aria-label="Item Manufacture">
+      <span class="tag">item-manufacture</span>
+    </a>
+  </header>
+
+<main class="center-stage" aria-label="Центр">
+  <div class="intro-stage" aria-hidden="true">
+    <canvas id="introCanvas"></canvas>
+  </div>
+
+  <!-- clickable center area (toggles manifesto text) -->
+  <button class="center-toggle" id="centerToggle" type="button" aria-label="Открыть описание Item Key"></button>
+</main>
+
+
+
+  <footer class="bottombar bottombar--edge">
+    <span class="hint">ты уже здесь был.
+ты просто не помнил.</span>
+    <span class="sep">•</span>
+    <span class="hint">ONO-beta</span>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+
+<script>
+(function(){
+  const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const canvas = document.getElementById('introCanvas');
+  if(!canvas) return;
+
+  
+  const centerToggle = document.getElementById('centerToggle');
+  let uiState = 'intro'; // 'intro' | 'manifesto'
+
+  const MANIFESTO_TEXT = `Item Key - архив человеческого подсознания.
+Это не коллекция вещей.
+Это система наблюдения за человеком через следы, которые он оставляет в материи.
+Item Key создан, чтобы извлекать то, что не поддаётся прямой речи:
+импульсы, искажения, страхи, память, намерения.
+Здесь вещь - не объект, а вывернутое наружу внутреннее.
+Каждый предмет — это зафиксированное состояние разума.
+Форма мысли, ставшая материальной.
+Фрагмент личности, переживший своего носителя.
+Item Key - способ архивации не предмета, а человека.
+Метод сохранить себя вне тела,
+осмыслить собственную структуру
+и передать её дальше - не словами, а присутствием.`;
+
+  function setToggleState(){
+    if(!centerToggle) return;
+    centerToggle.classList.toggle('is-manifesto', uiState === 'manifesto');
+    centerToggle.setAttribute('aria-label', uiState === 'manifesto' ? 'Вернуться к item_key' : 'Открыть описание Item Key');
+  }
+  setToggleState();
+
+  if(centerToggle){
+    centerToggle.addEventListener('click', (e)=>{
+      e.preventDefault();
+      e.stopPropagation();
+      toggleUI();
+    });
+    centerToggle.addEventListener('keydown', (e)=>{
+      if(e.key === 'Enter' || e.key === ' '){
+        e.preventDefault();
+        toggleUI();
+      }
+    });
+  }
+
+const ctx = canvas.getContext('2d', { alpha: true, willReadFrequently: true });
+
+  // Offscreen low-res scene (faster + more "digital")
+  const scene = document.createElement('canvas');
+  const sctx  = scene.getContext('2d', { alpha: true, willReadFrequently: true });
+
+  // Offscreen buffers for morphing
+  const bufA = document.createElement('canvas');
+  const bufB = document.createElement('canvas');
+  const actx = bufA.getContext('2d', { alpha: true });
+  const bctx = bufB.getContext('2d', { alpha: true });
+
+  let dprUsed = 1;
+  let quality = 0.62; // low-res ratio (tweak for vibe/perf)
+
+  function fitCanvas(){
+    const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+    dprUsed = dpr;
+
+    const W = window.innerWidth;
+    const H = window.innerHeight;
+
+    canvas.width  = Math.floor(W * dpr);
+    canvas.height = Math.floor(H * dpr);
+
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+
+    // quality adapts a bit on small screens
+    const short = Math.min(W, H);
+    quality = prefersReduced ? 0.78 : (short < 520 ? 0.58 : 0.64);
+
+    scene.width  = Math.max(220, Math.floor(W * quality));
+    scene.height = Math.max(180, Math.floor(H * quality));
+
+    bufA.width = bufB.width = scene.width;
+    bufA.height = bufB.height = scene.height;
+  }
+
+  function W(){ return canvas.width / dprUsed; }
+  function H(){ return canvas.height / dprUsed; }
+  function SW(){ return scene.width; }
+  function SH(){ return scene.height; }
+
+  // ---------- Utilities ----------
+  function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
+
+  // deterministic hash (for stable glitch bands)
+  function hash01(n){
+    const x = Math.sin(n * 127.1 + 311.7) * 43758.5453;
+    return x - Math.floor(x);
+  }
+
+  const bayer4 = [
+    [ 0,  8,  2, 10],
+    [12,  4, 14,  6],
+    [ 3, 11,  1,  9],
+    [15,  7, 13,  5],
+  ];
+
+  function ditherBWSelective(imageData, strength){
+    const d = imageData.data;
+    const w = imageData.width;
+    const h = imageData.height;
+    const s = clamp(strength, 0, 1);
+
+    for(let y=0; y<h; y++){
+      for(let x=0; x<w; x++){
+        const i = (y*w + x) * 4;
+        const r = d[i], g = d[i+1], b = d[i+2], a = d[i+3];
+
+        const lum = (0.2126*r + 0.7152*g + 0.0722*b);
+
+        // keep background clean
+        if(lum > 250 && a > 200){
+          d[i]=d[i+1]=d[i+2]=255;
+          continue;
+        }
+        if(a === 0) continue;
+
+        const t = (bayer4[y & 3][x & 3] / 16) * 255;
+        const k = lum + (t - 128) * (0.55 + 0.95*s);
+        const out = k > (172 - s*138) ? 255 : 0;
+        d[i]=d[i+1]=d[i+2]=out;
+      }
+    }
+    return imageData;
+  }
+
+  function addGrain(imageData, amount){
+    const d = imageData.data;
+    const a = clamp(amount, 0, 1);
+    const n = a * 58;
+    for(let i=0; i<d.length; i+=4){
+      if(d[i+3] === 0) continue;
+      const rnd = (Math.random()*2 - 1) * n;
+      const v = d[i] + rnd;
+      const out = clamp(v, 0, 255);
+      d[i]=d[i+1]=d[i+2]=out;
+    }
+    return imageData;
+  }
+
+  function sliceGlitch(ctx2d, srcCanvas, w, h, intensity, seed){
+    // strong, banded, stable-ish
+    const bands = 7 + Math.floor(intensity*12);
+    for(let b=0; b<bands; b++){
+      const r1 = hash01(seed + b*11.3);
+      const r2 = hash01(seed + b*29.1);
+      const y  = r1 * h;
+      const sh = 1 + r2 * (8 + intensity*16);
+      const dx = (hash01(seed + b*53.7)*2 - 1) * (18 + intensity*110);
+      ctx2d.drawImage(srcCanvas, 0, y, w, sh, dx, y, w, sh);
+    }
+  }
+
+  // rings drawn in scene space (low-res) but thick enough
+  function drawRings(ctx2d, cx, cy, t, intensity){
+    const w = SW(), h = SH();
+    const maxR = Math.sqrt(w*w + h*h) * 0.62;
+    const rings = 10;
+
+    ctx2d.save();
+    ctx2d.globalCompositeOperation = 'multiply';
+    ctx2d.strokeStyle = 'rgba(0,0,0,1)';
+
+    // thicker rings (scene-space)
+    ctx2d.lineWidth = 2.3 + intensity*1.7;
+
+    for(let i=0;i<rings;i++){
+      const r = (i*maxR/rings) + 22 + Math.sin(t*0.85 + i)*12;
+      ctx2d.globalAlpha = 0.05 + intensity*0.18;
+
+      ctx2d.beginPath();
+      ctx2d.arc(cx, cy, Math.max(0, r), 0, Math.PI*2);
+      ctx2d.stroke();
+
+      // ink second pass
+      ctx2d.globalAlpha *= 0.55;
+      ctx2d.beginPath();
+      ctx2d.arc(cx + Math.sin(t*1.6+i)*0.8, cy + Math.cos(t*1.3+i)*0.8, Math.max(0, r+0.6), 0, Math.PI*2);
+      ctx2d.stroke();
+    }
+    ctx2d.restore();
+  }
+
+  function drawCenteredImage(ctx2d, img, x, y, w, h, rot, alpha){
+    if(!img || !img.complete || !img.naturalWidth) return;
+    ctx2d.save();
+    ctx2d.translate(x, y);
+    ctx2d.rotate(rot);
+    ctx2d.globalAlpha = alpha;
+    ctx2d.imageSmoothingEnabled = true;
+    ctx2d.drawImage(img, -w/2, -h/2, w, h);
+    ctx2d.restore();
+  }
+
+  function drawText(ctx2d, text, x, y, size, alpha, skew){
+    ctx2d.save();
+    ctx2d.translate(x, y);
+    ctx2d.globalAlpha = alpha;
+    ctx2d.fillStyle = '#000';
+    ctx2d.textAlign = 'center';
+    ctx2d.textBaseline = 'middle';
+    ctx2d.font = `900 ${size}px ui-serif, "Times New Roman", Georgia, serif`;
+    ctx2d.transform(1.10, 0, skew, 1, 0, 0);
+    ctx2d.fillText(text, 0, 0);
+    ctx2d.restore();
+  }
+
+  function setSerifFont(ctx2d, size){
+    ctx2d.font = `900 ${size}px ui-serif, "Times New Roman", Georgia, serif`;
+  }
+
+  function wrapLines(ctx2d, text, maxWidth, size){
+    setSerifFont(ctx2d, size);
+    const hard = String(text || '').split('\n');
+    const out = [];
+    for(const segRaw of hard){
+      const seg = (segRaw || '').trim();
+      if(!seg){
+        out.push('');
+        continue;
+      }
+      const words = seg.split(/\s+/);
+      let line = '';
+      for(const w of words){
+        const test = line ? (line + ' ' + w) : w;
+        if(ctx2d.measureText(test).width <= maxWidth || !line){
+          line = test;
+        }else{
+          out.push(line);
+          line = w;
+        }
+      }
+      if(line) out.push(line);
+    }
+    return out;
+  }
+
+  function layoutBlock(ctx2d, text, maxWidth, maxHeight, baseSize){
+    let size = clamp(baseSize, 12, 40);
+    let lines = wrapLines(ctx2d, text, maxWidth, size);
+    let lh = size * 1.45;
+
+    // shrink to fit height (fast iterative)
+    for(let i=0; i<8; i++){
+      const total = lines.length * lh;
+      if(total <= maxHeight) break;
+      const k = Math.max(0.55, (maxHeight / Math.max(1, total)) * 0.96);
+      size = Math.max(12, size * k);
+      lines = wrapLines(ctx2d, text, maxWidth, size);
+      lh = size * 1.45;
+    }
+    return { lines, size, lh };
+  }
+
+  async function loadImageWithFallback(candidates){
+    for(const url of candidates){
+      try{
+        const img = new Image();
+        img.decoding = 'async';
+        img.loading = 'eager';
+        img.src = url;
+        await img.decode();
+        return img;
+      }catch(e){}
+    }
+    const img = new Image();
+    img.src = candidates[0] || '';
+    return img;
+  }
+
+  function fallbacks(name){
+    return [name, `./${name}`, `assets/${name}`, `assets/img/${name}`, `assets/images/${name}`, `images/${name}`, `img/${name}`];
+  }
+
+  // ---------- Interaction ----------
+  let targetPX = 0.5, targetPY = 0.5; // 0..1
+  let px = 0.5, py = 0.5;            // smoothed
+  let scrollBoost = 0;
+
+  window.addEventListener('mousemove', (e)=>{
+    targetPX = clamp(e.clientX / Math.max(1, window.innerWidth), 0, 1);
+    targetPY = clamp(e.clientY / Math.max(1, window.innerHeight), 0, 1);
+  }, { passive:true });
+
+  window.addEventListener('touchmove', (e)=>{
+    const t = e.touches && e.touches[0];
+    if(!t) return;
+    targetPX = clamp(t.clientX / Math.max(1, window.innerWidth), 0, 1);
+    targetPY = clamp(t.clientY / Math.max(1, window.innerHeight), 0, 1);
+  }, { passive:true });
+
+  window.addEventListener('scroll', ()=>{
+    scrollBoost = 1;
+  }, { passive:true });
+
+  // burst on background click (ignore buttons/links/inputs)
+  document.addEventListener('pointerdown', (e)=>{
+    if(e.target && e.target.closest && e.target.closest('button,a,input,textarea,select,[role="button"]')) return;
+    burst(0.95);
+  }, { passive:true });
+
+  // ---------- Modes + Morph (glitch-transform) ----------
+  const WEIGHTS = [
+    { key:'logo', w: 0.46 },
+    { key:'key',  w: 0.46 },
+    { key:'01',   w: 0.04 },
+    { key:'02',   w: 0.04 },
+  ];
+  function pickMode(){
+    const sum = WEIGHTS.reduce((a,b)=>a+b.w,0);
+    let r = Math.random()*sum;
+    for(const it of WEIGHTS){
+      r -= it.w;
+      if(r <= 0) return it.key;
+    }
+    return 'key';
+  }
+
+  let mode = 'logo';
+  let nextMode = 'key';
+
+  let t0 = performance.now();
+  let last = t0;
+
+  // transition state
+  let inTrans = false;
+  let tTransStart = 0;
+  let tTransDur = 0.38;
+  let transSeed = Math.random()*9999;
+
+  // jitter state (held, sharp)
+  let jx=0, jy=0, jr=0, tJitNext=0;
+
+  // extra burst intensity (decays)
+  let burstPow = 0;
+
+  function burst(p=1){
+    burstPow = Math.max(burstPow, clamp(p,0,1));
+    // also force a strong transition soon
+    if(!inTrans && uiState === 'intro'){
+      scheduleNext(performance.now());
+    }
+  }
+
+  
+  function scheduleTo(target, nowMs, dur){
+    nextMode = target;
+
+    transSeed = Math.random()*9999;
+    inTrans = true;
+    tTransStart = (nowMs - t0) / 1000;
+
+    // quick but readable
+    tTransDur = (dur != null) ? dur : (prefersReduced ? 0.50 : (0.28 + Math.random()*0.22));
+  }
+
+  function scheduleNext(nowMs){
+    if(uiState === 'manifesto') return;
+
+    // set next mode and begin transition
+    let nm = pickMode();
+    // avoid repeating too often
+    if(nm === mode && Math.random() < 0.65) nm = (mode === 'logo') ? 'key' : 'logo';
+
+    scheduleTo(nm, nowMs);
+  }
+
+  function setUIState(next){
+    if(next !== 'intro' && next !== 'manifesto') return;
+    if(next === uiState) return;
+
+    // snap out of any running transition for instant response
+    if(inTrans){
+      mode = nextMode;
+      inTrans = false;
+    }
+
+    uiState = next;
+    setToggleState();
+
+    const now = performance.now();
+    if(uiState === 'manifesto'){
+      scheduleTo('manifesto', now, prefersReduced ? 0.55 : 0.42);
+      burst(1);
+    }else{
+      scheduleTo('key', now, prefersReduced ? 0.50 : 0.34);
+      burst(0.85);
+    }
+  }
+
+  function toggleUI(){
+    setUIState(uiState === 'manifesto' ? 'intro' : 'manifesto');
+  }
+
+
+
+  function updateJitter(t, intensity){
+    if(t >= tJitNext){
+      const amp = prefersReduced ? 2.0 : (4 + intensity*14);
+      jx = (Math.random()*2 - 1) * amp;
+      jy = (Math.random()*2 - 1) * amp;
+      jr = (Math.random()*2 - 1) * (0.018 + intensity*0.030);
+      tJitNext = t + (prefersReduced ? 0.24 : (0.08 + Math.random()*0.16));
+    }
+  }
+
+  function easeOutCubic(x){
+    x = clamp(x,0,1);
+    return 1 - Math.pow(1 - x, 3);
+  }
+
+  // Render each mode into a target ctx (scene-size)
+  function renderMode(ctx2d, key, t, cx, cy, driftX, driftY, rot, intensity, imgs){
+    const { imgLogo, img01, img02 } = imgs;
+
+    // base
+    ctx2d.clearRect(0,0,SW(),SH());
+    ctx2d.fillStyle = '#fff';
+    ctx2d.fillRect(0,0,SW(),SH());
+
+    // rings always behind (tied to pointer)
+    if(!prefersReduced){
+      drawRings(ctx2d, cx, cy, t, intensity);
+    }
+
+    // Sizes in scene space
+    const logoW = Math.min(SW()*0.34, 480);
+    const logoH = logoW * (imgLogo && imgLogo.naturalWidth ? (imgLogo.naturalHeight/imgLogo.naturalWidth) : 1);
+    const capW  = Math.min(SW()*0.66, 860);
+    const capW02 = capW * 0.86; // make 02.png slightly smaller (visual balance)
+    const cap01H= capW  * (img01 && img01.naturalWidth ? (img01.naturalHeight/img01.naturalWidth) : 0.18);
+    const cap02H= capW02 * (img02 && img02.naturalWidth ? (img02.naturalHeight/img02.naturalWidth) : 0.18);
+    const fontSize = Math.max(24, Math.min(76, SW()*0.070));
+
+    // “interaction” layering: each mode still hints the other (ghost)
+    const ghost = 0.14 + intensity*0.06;
+
+    if(key === 'logo'){
+      drawCenteredImage(ctx2d, imgLogo, cx + driftX*0.65, cy + Math.min(logoH*0.06, 38) + driftY*0.55 - 30, logoW, logoH, rot, 1);
+      // faint key text behind like a signal
+      drawText(ctx2d, 'item_key', cx + driftX*0.30, cy + driftY*0.30, fontSize*0.9, ghost, Math.sin(t*7)*0.02);
+    }else if(key === 'key'){
+      // key text main
+      drawText(ctx2d, 'item_key', cx + driftX*0.75, cy + driftY*0.75, fontSize, 1, Math.sin(t*11)*0.03);
+      // ghost logo behind
+      drawCenteredImage(ctx2d, imgLogo, cx + driftX*0.30, cy - Math.min(logoH*0.08, 45) + driftY*0.25, logoW*0.92, logoH*0.92, rot*0.55, ghost);
+    }else if(key === '01'){
+      drawCenteredImage(ctx2d, img01, cx + driftX*0.9, cy + driftY*0.9, capW, cap01H, -rot*0.6, 1);
+      drawCenteredImage(ctx2d, imgLogo, cx + driftX*0.10, cy - Math.min(logoH*0.06, 35) + driftY*0.10, logoW*0.78, logoH*0.78, rot*0.4, ghost);
+    }else if(key === '02'){
+      drawCenteredImage(ctx2d, img02, cx + driftX*0.9, cy + driftY*0.9, capW02, cap02H, -rot*0.6, 1);
+      drawText(ctx2d, 'item_key', cx + driftX*0.15, cy + driftY*0.15, fontSize*0.9, ghost, Math.sin(t*8)*0.02);
+    }
+
+    else if(key === 'manifesto'){
+      const maxW = SW() * 0.86;
+      const maxH = SH() * 0.72;
+
+      const baseSize = Math.min(34, Math.max(16, SW() * 0.036));
+      const layout = layoutBlock(ctx2d, MANIFESTO_TEXT, maxW, maxH, baseSize);
+
+      const lines = layout.lines;
+      const fs = layout.size;
+      const lh = layout.lh;
+
+      const y0 = cy - ((lines.length - 1) * lh) / 2;
+
+      const skew0 = Math.sin(t * 8.5) * 0.012;
+
+      for(let i=0; i<lines.length; i++){
+        const line = lines[i];
+        if(!line) continue;
+        const yLine = y0 + i * lh;
+
+        // ghost passes
+        drawText(ctx2d, line, cx + driftX*0.08 + 1, yLine + driftY*0.08 - 1, fs, 0.18 + intensity*0.08,  skew0*1.2);
+        drawText(ctx2d, line, cx + driftX*0.08 - 1, yLine + driftY*0.08 + 1, fs, 0.10 + intensity*0.06, -skew0*1.1);
+
+        // main
+        drawText(ctx2d, line, cx + driftX*0.12, yLine + driftY*0.12, fs, 1, skew0 + Math.sin(t*14 + i)*0.010);
+      }
+
+    }
+  }
+
+  function morphTransform(p, intensity){
+    // p: 0..1
+    const w = SW(), h = SH();
+
+    // start with source as base
+    sctx.clearRect(0,0,w,h);
+    sctx.globalAlpha = 1;
+    sctx.drawImage(bufA, 0, 0);
+
+    // glitch-reveal destination via bands + noise threshold
+    const bands = 18 + Math.floor(intensity*14);
+    for(let b=0; b<bands; b++){
+      const r1 = hash01(transSeed + b*17.1);
+      const r2 = hash01(transSeed + b*31.9);
+      const r3 = hash01(transSeed + b*77.7);
+
+      const y  = r1 * h;
+      const sh = 2 + r2 * (10 + intensity*30);
+
+      // reveal threshold - as p increases, more bands flip
+      const thresh = 0.15 + r3*0.75;
+      const reveal = (p > thresh) ? 1 : 0;
+
+      // offsets collapse as p -> 1 (so it "converges" into new form)
+      const dx = (hash01(transSeed + b*9.7)*2 - 1) * (22 + intensity*105) * (1 - p);
+      const wob = Math.sin((p*6 + b)*2.1) * (4 + intensity*12) * (1 - p);
+
+      if(reveal){
+        // bring in destination slice
+        sctx.drawImage(bufB, 0, y, w, sh, dx, y + wob, w, sh);
+      }else{
+        // distort source slice while waiting
+        const sdx = (hash01(transSeed + b*41.4)*2 - 1) * (16 + intensity*90) * (p);
+        sctx.drawImage(bufA, 0, y, w, sh, sdx, y - wob*0.6, w, sh);
+      }
+    }
+
+    // add a smearing "datamosh" feel during mid-transition
+    if(p < 0.92){
+      sctx.save();
+      sctx.globalCompositeOperation = 'multiply';
+      sctx.globalAlpha = 0.08 + intensity*0.12;
+      const sm = (1 - p) * (7 + intensity*45);
+      for(let k=0;k<3;k++){
+        const ox = (Math.random()*2-1)*sm;
+        const oy = (Math.random()*2-1)*sm*0.35;
+        sctx.drawImage(bufB, ox, oy);
+      }
+      sctx.restore();
+    }
+
+    // settle: gentle full overlay of destination near the end
+    sctx.save();
+    sctx.globalAlpha = clamp(Math.pow(p, 1.8), 0, 1);
+    sctx.drawImage(bufB, 0, 0);
+    sctx.restore();
+  }
+
+  // ---------- Main loop ----------
+  let imgLogo=null, img01=null, img02=null;
+
+  function frame(now){
+    const t = (now - t0) / 1000;
+    const dt = Math.min(0.05, (now - last)/1000);
+    last = now;
+
+    // smooth pointer
+    px += (targetPX - px) * (prefersReduced ? 0.06 : 0.10);
+    py += (targetPY - py) * (prefersReduced ? 0.06 : 0.10);
+
+    // intensity
+    const breath = 0.5 + 0.5*Math.sin(t*0.9);
+    const hit = (Math.sin(t*4.8) > 0.90) ? 1 : 0;
+    // scroll -> short boost
+    scrollBoost = Math.max(0, scrollBoost - dt*1.6);
+    burstPow = Math.max(0, burstPow - dt*0.85);
+
+    let intensity = prefersReduced ? 0.18 : (0.26 + breath*0.25 + hit*0.25 + scrollBoost*0.15 + burstPow*0.38);
+    intensity = clamp(intensity, 0, 1);
+    if(uiState === 'manifesto'){
+      intensity = clamp(0.18 + intensity*0.55, 0, 1);
+    }
+
+
+    // make motion less smooth: quantize time
+    const qt = prefersReduced ? t : (Math.floor(t*14) / 14);
+
+    updateJitter(t, intensity);
+
+    // center moves with pointer (interaction between elements/background)
+    const cx = SW() * (0.5 + (px - 0.5)*0.12);
+    const cy = SH() * (0.5 + (py - 0.5)*0.10);
+
+    // base drift + jitter
+    const driftX = (Math.sin(qt*1.0)*6 + Math.sin(qt*6.2)*2) + jx;
+    const driftY = (Math.cos(qt*0.9)*5 + Math.cos(qt*5.9)*2) + jy;
+    const rot = (Math.sin(qt*0.65)*0.02 + Math.sin(qt*3.0)*0.01) + jr;
+
+    const imgs = { imgLogo, img01, img02 };
+
+    // schedule mode changes periodically (logo/key often; 01/02 rare)
+    // if no transition active and time since last change is large -> schedule
+    if(!inTrans && uiState === 'intro'){
+      // random chance to switch (more often when intensity high)
+      if(!prefersReduced && Math.random() < (0.004 + intensity*0.006)){
+        scheduleNext(now);
+      }
+    }
+
+    if(inTrans){
+      const pRaw = (t - tTransStart) / Math.max(0.001, tTransDur);
+      const p = easeOutCubic(pRaw);
+
+      // render source and destination into buffers
+      renderMode(actx, mode, qt, cx, cy, driftX, driftY, rot, intensity, imgs);
+      renderMode(bctx, nextMode, qt, cx, cy, driftX, driftY, rot, intensity, imgs);
+
+      // morph-transform into scene
+      morphTransform(p, intensity);
+
+      // heavier slice glitch during transform
+      if(!prefersReduced && Math.random() < (0.16 + intensity*0.18)){
+        sliceGlitch(sctx, scene, SW(), SH(), intensity, transSeed + qt*10.0);
+      }
+
+      if(pRaw >= 1){
+        mode = nextMode;
+        inTrans = false;
+        // short burst after settle
+        burstPow = Math.max(burstPow, 0.22);
+      }
+    }else{
+      // normal render into scene
+      renderMode(sctx, mode, qt, cx, cy, driftX, driftY, rot, intensity, imgs);
+
+      // random micro-glitches to feel alive
+      if(!prefersReduced && Math.random() < (0.06 + intensity*0.12)){
+        sliceGlitch(sctx, scene, SW(), SH(), intensity, qt*19.0 + Math.random()*999);
+      }
+    }
+
+    // Postprocess on scene (low-res): dither + grain + scanlines
+    if(!prefersReduced){
+      const id = sctx.getImageData(0,0,SW(),SH());
+      ditherBWSelective(id, 0.52 + intensity*0.22);
+      addGrain(id, 0.10 + intensity*0.18);
+      sctx.putImageData(id, 0, 0);
+
+      // scanlines (stronger, but low-res keeps it nice)
+      sctx.save();
+      sctx.globalCompositeOperation = 'multiply';
+      sctx.globalAlpha = 0.06 + intensity*0.06;
+      for(let y=0; y<SH(); y+=3){
+        const a = (Math.sin(qt*22 + y*0.12) + 1) * 0.5;
+        sctx.fillStyle = `rgba(0,0,0,${0.12*a})`;
+        sctx.fillRect(0, y, SW(), 1);
+      }
+      sctx.restore();
+    }
+
+    // draw scene -> main canvas (scaled up, crisp)
+    ctx.save();
+    ctx.clearRect(0,0,W(),H());
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(scene, 0, 0, SW(), SH(), 0, 0, W(), H());
+
+    // occasional hard "frame tear"
+    if(!prefersReduced && Math.random() < (0.015 + intensity*0.025)){
+      ctx.globalAlpha = 0.08 + intensity*0.06;
+      ctx.globalCompositeOperation = 'multiply';
+      const tearY = Math.random()*H();
+      ctx.drawImage(canvas, 0, tearY, W(), 12, (Math.random()*2-1)*50, tearY, W(), 12);
+    }
+
+    ctx.restore();
+
+    requestAnimationFrame(frame);
+  }
+
+  async function start(){
+    fitCanvas();
+    window.addEventListener('resize', fitCanvas, { passive:true });
+
+    [imgLogo, img01, img02] = await Promise.all([
+      loadImageWithFallback(fallbacks('logo_item.png')),
+      loadImageWithFallback(fallbacks('01.png')),
+      loadImageWithFallback(fallbacks('02.png')),
+    ]);
+
+    // start with an immediate morph so it feels like "birth"
+    mode = 'logo';
+    scheduleTo('key', performance.now(), prefersReduced ? 0.55 : 0.36);
+
+    requestAnimationFrame(frame);
+  }
+
+  start();
+})();
+</script>
+
+
+<script>
+(function(){
+  const overlay = document.getElementById('devOverlay');
+  const btnBack = document.getElementById('devOverlayBack');
+  const textEl = document.getElementById('devOverlayText');
+  if(!overlay || !btnBack) return;
+
+  let lastFocus = null;
+
+  function openOverlay(forKey){
+    lastFocus = document.activeElement;
+
+    // Message can be slightly different per section (optional)
+    const map = {
+      'item-security': 'item-security сейчас в разработке. Доступ закован. Возвращайся позже.',
+      'item-soft': 'item-soft сейчас в разработке. Инструменты ещё не заточены. Возвращайся позже.'
+    };
+    if(textEl) textEl.textContent = map[forKey] || 'Этот отсек ещё не ожил. Возвращайся позже.';
+
+    overlay.classList.add('is-open');
+    overlay.setAttribute('aria-hidden', 'false');
+
+    // prevent background scroll while overlay is open
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+
+    // focus back button
+    btnBack.focus({ preventScroll:true });
+  }
+
+  function closeOverlay(){
+    overlay.classList.remove('is-open');
+    overlay.setAttribute('aria-hidden', 'true');
+
+    document.documentElement.style.overflow = '';
+    document.body.style.overflow = '';
+
+    if(lastFocus && typeof lastFocus.focus === 'function'){
+      lastFocus.focus({ preventScroll:true });
+    }
+  }
+
+  // Close when clicking outside window
+  overlay.addEventListener('pointerdown', (e)=>{
+    const doc = e.target && e.target.closest ? e.target.closest('.dev-window') : null;
+    if(!doc) closeOverlay();
+  });
+
+  btnBack.addEventListener('click', closeOverlay);
+
+  window.addEventListener('keydown', (e)=>{
+    if(!overlay.classList.contains('is-open')) return;
+    if(e.key === 'Escape'){
+      e.preventDefault();
+      closeOverlay();
+    }
+  });
+
+  // Intercept those menu links
+  function hookLink(hrefKey){
+    const link = document.querySelector(`a.rail-link[href="${hrefKey}.html"], a.rail-link[href="${hrefKey}.html#"], a.rail-link[href="${hrefKey}.html?"]`);
+    // More robust: find by title text if href changes
+    const link2 = link || Array.from(document.querySelectorAll('a.rail-link')).find(a=>{
+      const t = a.querySelector('.rail-link__title');
+      return (t && t.textContent.trim() === hrefKey) || (a.getAttribute('href') || '').includes(hrefKey);
+    });
+    if(!link2) return;
+
+    link2.addEventListener('click', (e)=>{
+      e.preventDefault();
+      e.stopPropagation();
+      openOverlay(hrefKey);
+    });
+  }
+})();
+</script>
+
+</body>
+</html>
