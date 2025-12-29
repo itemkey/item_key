@@ -1456,6 +1456,64 @@
     }
   </style>
 
+  <!-- EXTRA mobile fixes: full-width layout, no overlaps, scrollable philosophy on phones -->
+  <style id="mobileManufactureExtra">
+    /* Phones: stop squeezing content into narrow рамки */
+    @media (max-width: 680px){
+      .page-manufacture{
+        --edge-top-space: 84px;
+        --edge-bottom-space: 84px;
+      }
+
+      /* Let the main container breathe full width */
+      .page-manufacture .center-stage{
+        width: 100%;
+        max-width: none !important;
+        padding-left: max(12px, env(safe-area-inset-left, 0px)) !important;
+        padding-right: max(12px, env(safe-area-inset-right, 0px)) !important;
+      }
+      .page-manufacture .shop,
+      .page-manufacture .shop-head,
+      .page-manufacture .shop-body,
+      .page-manufacture .shop-head__inner{
+        width: 100%;
+        max-width: none !important;
+        box-sizing: border-box;
+      }
+
+      /* Fix: top 'item-key' button overlapping H1 */
+      .page-manufacture .shop-head{ padding-top: 6px; }
+      .page-manufacture .shop-title h1{
+        margin: 0;
+        padding-top: 4px;
+        overflow-wrap: anywhere;
+      }
+
+      /* Philosophy/home console: make it scrollable on phones (no cutting) */
+      .page-manufacture #homePanel.home-console{
+        min-height: auto;
+        height: auto;
+        overflow: visible;
+      }
+      .page-manufacture #consoleSurface.console-surface{
+        max-height: calc(100svh - (var(--edge-top-space) + var(--edge-bottom-space) + 18px));
+        overflow: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-right: 2px; /* avoid text under scrollbar */
+      }
+      .page-manufacture #consoleLines.console-lines{
+        overflow: visible;
+      }
+    }
+
+    /* Tiny phones */
+    @media (max-width: 380px){
+      .page-manufacture{
+        --edge-top-space: 92px;
+      }
+    }
+  </style>
+
 </head>
 
 <body class="page page-manufacture">
@@ -1936,13 +1994,17 @@
 
       // ===== Scroll lock only for HOME (дом) =====
       const noScrollStyle = document.getElementById("noScrollStyle");
+      const mqMobile = window.matchMedia("(max-width: 680px), (pointer: coarse)");
       function applyHomeScrollLock(isHome){
-        // When on HOME: disable page scroll so console navigation (arrows) never scrolls the page.
-        // When on ITEM/GUESTS: restore normal scrolling.
+        // Desktop: lock page scroll on HOME so console arrows don't move the page.
+        // Phone/tablet: DO NOT lock (people must be able to scroll long philosophy text).
         if (!noScrollStyle) return;
-        noScrollStyle.disabled = !isHome;
+        const isMobile = !!mqMobile.matches;
+        noScrollStyle.disabled = !(isHome && !isMobile);
       }
+      // init + keep correct on rotate/resize
       applyHomeScrollLock(true);
+      try{ mqMobile.addEventListener("change", () => applyHomeScrollLock(state?.tab === "home")); }catch{ mqMobile.addListener?.(() => applyHomeScrollLock(state?.tab === "home")); }
 
       /* init search visibility */
       try{

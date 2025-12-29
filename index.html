@@ -1660,6 +1660,84 @@ body.page-home{ overflow: hidden; }
 
 </style>
 
+<style id="__mobile_desktop_like">
+  /* Mobile should look like desktop, just scaled to fit the screen */
+  html{
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  /* Keep the same “cathedral” layout on smaller screens by scaling variables smoothly,
+     and do NOT hide the side rails (they were the biggest visual difference). */
+  @media (max-width: 980px){
+    :root{
+      --rail-w: clamp(64px, 10vw, 78px);
+      --safe-x: clamp(96px, 16vw, 120px);
+    }
+  }
+
+  @media (max-width: 640px){
+    :root{
+      --rail-w: clamp(44px, 12vw, 64px);
+      --safe-x: clamp(52px, 18vw, 96px);
+      --top: 14px;
+      --bottom: 14px;
+    }
+
+    /* prevent fixed top/bottom bars from sitting on top of the center */
+    .center-stage{
+      min-height: 100svh;
+      padding-top: calc(var(--top) + 58px + env(safe-area-inset-top, 0px));
+      padding-bottom: calc(var(--bottom) + 58px + env(safe-area-inset-bottom, 0px));
+    }
+
+    /* on phones the plaques should be wide enough (not constrained by safe-x) */
+    .topbar--edge, .bottombar--edge{
+      width: min(860px, calc(100% - 24px));
+    }
+
+    /* never hide the rails on mobile */
+    .rail{ display:flex !important; }
+  }
+
+  @media (max-width: 520px){
+    :root{
+      --rail-w: clamp(40px, 14vw, 52px);
+      --safe-x: clamp(44px, 20vw, 80px);
+      --top: 12px;
+      --bottom: 12px;
+    }
+
+    .outer-frame{ inset: 10px; }
+
+    .rail{
+      display:flex !important;
+      padding: 14px 6px;
+      gap: 14px;
+    }
+    .rail--left::before{ left: 12px; }
+    .rail--right::before{ right: 12px; }
+
+    .rail-link{ padding: 12px 6px 14px; }
+    .rail-link__title{
+      font-size: 10px;
+      letter-spacing: 2.4px;
+    }
+
+    .topbar--edge, .bottombar--edge{
+      padding: 8px 12px;
+      gap: 10px;
+      width: min(860px, calc(100% - 20px));
+    }
+
+    .hint{ font-size: 11px; letter-spacing: 1.6px; }
+    .tag{ font-size: 10px; letter-spacing: 2.2px; }
+
+    /* Prevent accidental horizontal scroll on mobile */
+    body{ overflow-x: clip; }
+  }
+</style>
+
 </head>
 <body class="page page-home">
 
@@ -2492,6 +2570,8 @@ body.page-home{ overflow: hidden; }
 
   
     const isMobile = window.matchMedia && window.matchMedia('(max-width: 720px)').matches;
+    // Make phone UI look like desktop (just smaller), while keeping isMobile for performance toggles.
+    const uiMobile = false;
   const saveData = !!(navigator.connection && navigator.connection.saveData);
 
   // Mobile should still show the intro — just lighter + sharper text.
@@ -2742,8 +2822,8 @@ const ctx = canvas.getContext('2d', { alpha: true, willReadFrequently: true });
   }
 
   function layoutBlock(ctx2d, text, maxWidth, maxHeight, baseSize){
-    const lhFactor = isMobile ? 1.28 : 1.45;
-    let size = clamp(baseSize, isMobile ? 10 : 12, 40);
+    const lhFactor = uiMobile ? 1.28 : 1.45;
+    let size = clamp(baseSize, uiMobile ? 10 : 12, 40);
     let lines = wrapLines(ctx2d, text, maxWidth, size);
     let lh = size * lhFactor;
 
@@ -2960,13 +3040,12 @@ const ctx = canvas.getContext('2d', { alpha: true, willReadFrequently: true });
     }
 
     else if(key === 'manifesto'){
-      const maxW = SW() * (isMobile ? 0.94 : 0.86);
-      const maxH = SH() * (isMobile ? 0.62 : 0.72);
+      // Desktop-like typography on phones (it will still naturally scale down with screen width).
+      const maxW = SW() * 0.86;
+      const maxH = SH() * 0.72;
 
-      const baseSize = isMobile
-        ? Math.min(26, Math.max(11, SW() * 0.030))
-        : Math.min(34, Math.max(16, SW() * 0.036));
-      const layout = layoutBlock(ctx2d, MANIFESTO_TEXT, maxW, maxH, baseSize);
+      const baseSize = Math.min(34, Math.max(16, SW() * 0.036));
+const layout = layoutBlock(ctx2d, MANIFESTO_TEXT, maxW, maxH, baseSize);
 
       const lines = layout.lines;
       const fs = layout.size;
