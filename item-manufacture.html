@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Item Key — item-manufacture</title>
   <link rel="stylesheet" href="assets/css/styles.css" />
 
@@ -999,6 +999,8 @@
     align-items:center;
     justify-content: space-between;
     gap: 10px;
+    flex-wrap: wrap;
+    min-width: 0;
     padding: 0 0 10px 0;
     border-bottom: 1px dashed rgba(0,0,0,.16);
   }
@@ -1016,12 +1018,20 @@
     font-size: 12px;
     opacity: .95;
     text-transform: lowercase;
+    min-width: 0;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    word-break: break-word;
   }
 
   .console-status{
     font-size: 12px;
     opacity: .65;
     white-space: nowrap;
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .console-lines{
@@ -1037,6 +1047,8 @@
     font-size: 14px;
     line-height: 1.38;
     white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
     color: #000;
     opacity: .92;
     position: relative;
@@ -1207,6 +1219,11 @@
   }
 
   .console-help:empty{ display:none; }
+
+  @media (max-width: 520px){
+    .cline{ font-size: 13px; letter-spacing: .02em; }
+    .console-badge, .console-status{ font-size: 11px; }
+  }
 </style>
 
 <style id="noScrollStyle" disabled>
@@ -1223,6 +1240,221 @@
     width: 100%;
   }
 </style>
+
+  <!-- Mobile/performance optimizations -->
+  <style>
+    /* Mobile fit + safe areas (iOS notch, etc.) */
+    html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+    body{
+      padding-top: env(safe-area-inset-top);
+      padding-right: env(safe-area-inset-right);
+      padding-bottom: env(safe-area-inset-bottom);
+      padding-left: env(safe-area-inset-left);
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    /* Make taps easier on small screens */
+    a, button, [role="button"], input, select, textarea { scroll-margin-top: 84px; }
+    button, .btn, a.btn { min-height: 44px; }
+
+    /* Viewport height fixes on mobile browsers */
+    .fullvh { min-height: 100svh; }
+
+    /* Respect accessibility/performance settings */
+    @media (prefers-reduced-motion: reduce){
+      * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+    }
+  </style>
+  <!-- Mobile layout fix for category panel (tabs) + iOS button coloring -->
+  <style id="mobileManufactureFix">
+    /* --- iOS/Safari default blue buttons/links override (scoped to this page) --- */
+    .page-manufacture .tabs .tab,
+    .page-manufacture .chips .chip,
+    .page-manufacture .btn,
+    .page-manufacture .tape-btn,
+    .page-manufacture .tape-overlay{
+      -webkit-appearance: none;
+      appearance: none;
+      -webkit-tap-highlight-color: transparent;
+      font: inherit;
+      text-decoration: none;
+      color: rgba(0,0,0,.86);
+      -webkit-text-fill-color: rgba(0,0,0,.86); /* iOS fix */
+    }
+    .page-manufacture a,
+    .page-manufacture a:visited{
+      color: inherit;
+      -webkit-text-fill-color: currentColor;
+      text-decoration: none;
+    }
+
+    /* --- Desktop/tablet: keep layout stable even when widths get tight --- */
+    .page-manufacture .shop-head__inner{ width: 100%; box-sizing: border-box; }
+    .page-manufacture .shop-title{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .page-manufacture .shop-title .controls{
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .page-manufacture .shop-tools{
+      display: flex !important; /* override any grid rules from global css */
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .page-manufacture .shop-tools > .tabs{
+      display: flex !important;
+      align-items: center;
+      gap: 10px;
+      flex: 0 0 auto;
+      flex-wrap: wrap;
+      min-width: 0;
+    }
+    .page-manufacture .shop-tools > .controls{
+      display: flex !important;
+      align-items: center;
+      gap: 10px;
+      flex: 1 1 260px;
+      min-width: 240px;
+    }
+    .page-manufacture #shopSearch{ width: 100%; min-width: 0; }
+
+    /* Tabs look (force away from UA defaults) */
+    .page-manufacture .tabs .tab{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 12px;
+      min-height: 44px;
+      border: 1px solid rgba(0,0,0,.70);
+      background: rgba(255,255,255,.92);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      font-size: 11px;
+      line-height: 1;
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+    }
+    .page-manufacture .tabs .tab:active{ transform: translateY(1px); }
+    .page-manufacture .tabs .tab:focus-visible{
+      outline: 2px solid rgba(0,0,0,.60);
+      outline-offset: 2px;
+    }
+    .page-manufacture .tabs .tab[aria-selected="true"]{
+      background: rgba(0,0,0,.06);
+    }
+
+    /* Chips: make them behave predictably */
+    .page-manufacture .chips{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .page-manufacture .chip{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 12px;
+      min-height: 44px;
+      border: 1px solid rgba(0,0,0,.20);
+      background: rgba(255,255,255,.88);
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .page-manufacture .chip[data-active="true"]{
+      border-color: rgba(0,0,0,.50);
+      background: rgba(0,0,0,.06);
+    }
+
+    /* --- Phone: stack controls + scrollable tabs/chips (no broken "stack") --- */
+    @media (max-width: 680px){
+      /* Prevent iOS input zoom on focus (font-size >= 16px) */
+      .page-manufacture input,
+      .page-manufacture select,
+      .page-manufacture textarea{
+        font-size: 16px;
+      }
+
+      .page-manufacture .shop-title{
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .page-manufacture .shop-title .controls{
+        width: 100%;
+      }
+      .page-manufacture #currencySelect{ flex: 1 1 140px; min-width: 120px; }
+      .page-manufacture #cartOpen{ flex: 1 1 160px; }
+
+      .page-manufacture .shop-tools{
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
+
+      /* Tabs row: horizontal scroll, never wraps into messy multiple lines */
+      .page-manufacture .shop-tools > .tabs{
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        overscroll-behavior-x: contain;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 2px;
+        margin: 0 -2px;
+        scroll-snap-type: x proximity;
+      }
+      .page-manufacture .shop-tools > .tabs::-webkit-scrollbar{ display: none; }
+      .page-manufacture .tabs .tab{ flex: 0 0 auto; scroll-snap-align: start; }
+
+      .page-manufacture .shop-tools > .controls{
+        width: 100%;
+        min-width: 0;
+        flex: 0 0 auto;
+      }
+      .page-manufacture #shopSearch{ width: 100%; }
+
+      /* Chips row: also scrollable (many categories) */
+      .page-manufacture .chips{
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        overscroll-behavior-x: contain;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 2px;
+        margin: 0 -2px;
+        scroll-snap-type: x proximity;
+      }
+      .page-manufacture .chips::-webkit-scrollbar{ display: none; }
+      .page-manufacture .chip{ flex: 0 0 auto; scroll-snap-align: start; }
+
+      /* Grid: friendly cards on phones (works if .grid is CSS grid) */
+      .page-manufacture #productGrid.grid{
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+    }
+
+    @media (max-width: 420px){
+      .page-manufacture #productGrid.grid{
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 
 </head>
 
@@ -1692,6 +1924,7 @@
         // временные курсы
         rates: { BYN: 1, USD: 0.31, EUR: 0.29, RUB: 29.0 },
         products: [],
+        loadingProducts: true,
         cart: [],
         openProductId: null,
         editProductId: null,
@@ -2176,7 +2409,7 @@
         }
         if (toolbar) toolbar.style.display = (isHome || isTape) ? "none" : "flex";
         if (scopePill) scopePill.textContent = `scope: ${tab}`;
-        if (ownerHidden) ownerHidden.value = (tab === "item" ? "item" : "item");
+        if (ownerHidden) ownerHidden.value = (tab === "guests" ? "guests" : "item");
 
         chipButtons.forEach(c => c.dataset.active = (c.dataset.cat === "all") ? "true" : "false");
 
@@ -2293,6 +2526,16 @@ return `
         if (!grid) return;
         if (state.tab === "home" || state.tab === "tape"){
           grid.innerHTML = "";
+          return;
+        }
+
+        if (state.loadingProducts){
+          grid.innerHTML = `
+            <div class="empty">
+              <b>загрузка…</b>
+              подгружаю карточки.
+            </div>
+          `;
           return;
         }
 
@@ -3150,12 +3393,21 @@ return `
       state.cart = loadJSON(KEY_CART, []);
       state.currency = loadJSON(KEY_CURRENCY, "BYN") || "BYN";
 
+      // set initial UI immediately (don’t wait for DB), and never override user's tab choice
+      setTab("home", { force: true, silent: true, init: true });
+
       (async () => {
-        state.products = await loadProducts();
-        setTab("home", { force: true, silent: true });
-        requestAnimationFrame(() => { booted = true; });
-})();
-    })();
+        try{
+          state.products = await loadProducts();
+        } finally {
+          state.loadingProducts = false;
+          // refresh UI for the current tab (no forced jump back to "data")
+          render();
+          requestAnimationFrame(() => { booted = true; });
+        }
+      })();
+
+      })();
 
 /* =========================
   NAV: remember where item-user was opened from
