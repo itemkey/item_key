@@ -1,0 +1,2219 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Item Key — onoi_notes</title>
+
+  <!-- глобальный стиль сайта -->
+  <link rel="stylesheet" href="../../assets/css/styles.css" />
+
+  <style>
+    /* =========================================================
+       onoi_notes — single-file notes manager (IndexedDB + optional GitHub Sync)
+       ========================================================= */
+    .notes-wrap, .notes-wrap *{ box-sizing: border-box; }
+    :root{
+      --footerH: 56px;
+      --topbarOffset: 74px;
+
+      --bgCard: rgba(255,255,255,.86);
+      --bd: rgba(0,0,0,.14);
+      --bd2: rgba(0,0,0,.26);
+      --muted: rgba(0,0,0,.62);
+
+      --fs-ui: 12px;
+      --fs-note: 16px;
+      --lh-note: 1.7;
+      --font-ui: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;
+      --font-note: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;
+      --accent: rgba(0,0,0,.86);
+      --accentSoft: rgba(0,0,0,.06);
+      --accentSoft2: rgba(0,0,0,.10);
+
+
+      --radius: 0px;
+    }
+
+    .center-stage{
+      padding-top: var(--topbarOffset);
+      padding-bottom: calc(var(--footerH) + 20px + env(safe-area-inset-bottom));
+      overflow-x: hidden;
+    }
+
+    .notes-wrap{
+      width: 100%;
+      max-width: 1320px;
+      margin: 0 auto;
+      display: grid;
+      gap: 14px;
+      padding: 12px 18px 22px;
+      min-width: 0;
+      font-family: var(--font-ui);
+    }
+
+    .n-title{
+      padding: 6px 0 0;
+      text-align: center;
+      display: grid;
+      gap: 8px;
+    }
+    .n-title h1{
+      margin: 0;
+      font-size: 14px;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+    }
+    .n-title .sub{
+      font-size: 11px;
+      letter-spacing: 3.5px;
+      text-transform: uppercase;
+      color: rgba(0,0,0,.55);
+    }
+
+    .n-shell{
+      display: grid;
+      grid-template-columns: minmax(240px, var(--sidebarW, 320px)) 10px minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+      min-width: 0;
+    }
+
+
+    .n-col-left{
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-width: 0;
+    }
+    .n-col-right{ min-width: 0; }
+
+    .v-splitter{
+      width: 10px;
+      align-self: stretch;
+      border-radius: 999px;
+      cursor: col-resize;
+      background: linear-gradient(to bottom, rgba(0,0,0,.10), rgba(0,0,0,.04));
+      border: 1px solid rgba(0,0,0,.10);
+      opacity: .55;
+      user-select: none;
+      touch-action: none;
+    }
+    .v-splitter:hover{ opacity: .85; }
+    .v-splitter:active{ opacity: 1; }
+
+    body.is-sidebar-collapsed .n-col-left{ display:none; }
+    body.is-sidebar-collapsed .v-splitter{ display:none; }
+    body.is-sidebar-collapsed .n-shell{ grid-template-columns: 1fr; }
+    .n-card{
+      border: 1px solid var(--bd);
+      background: var(--bgCard);
+      padding: 12px;
+      border-radius: var(--radius);
+      min-width: 0;
+    }
+    .n-label{
+      font-size: 10px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: rgba(0,0,0,.58);
+      margin-bottom: 8px;
+    }
+
+    /* Top utility bar */
+    .n-topbar{
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 10px;
+      align-items: center;
+    }
+    .n-search{
+      width: 100%;
+      border: 1px solid var(--bd);
+      background: rgba(255,255,255,.92);
+      padding: 10px 12px;
+      font-size: 12px;
+      outline: none;
+      border-radius: 0;
+      height: 40px;
+      min-width: 0;
+    }
+    .n-btn{
+      border: 1px solid var(--bd);
+      background: rgba(255,255,255,.90);
+      padding: 11px 10px;
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: transform .18s ease, border-color .18s ease, opacity .18s ease;
+      border-radius: 0;
+      min-height: 40px;
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+    .n-btn:hover{ transform: translateY(-1px); border-color: rgba(0,0,0,.30); opacity: .98; }
+    .n-btn:disabled{ opacity: .5; cursor: not-allowed; transform: none; }
+    .n-btn:focus-visible{ outline: 2px solid rgba(0,0,0,.55); outline-offset: 2px; }
+
+    .n-pill{
+      border: 1px solid var(--bd);
+      background: rgba(255,255,255,.82);
+      padding: 5px 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-size: 10px;
+      color: rgba(0,0,0,.62);
+      border-radius: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      justify-content: center;
+      min-height: 30px;
+    }
+    .dot{
+      width: 8px; height: 8px;
+      border: 1px solid rgba(0,0,0,.18);
+      background: rgba(0,0,0,.10);
+      border-radius: 0;
+      display: inline-block;
+    }
+    .dot.ok{ background: rgba(0,0,0,.18); }
+    .dot.warn{ background: rgba(255,170,0,.35); border-color: rgba(255,170,0,.6); }
+    .dot.bad{ background: rgba(255,0,0,.25); border-color: rgba(255,0,0,.45); }
+
+    /* Category tree */
+    .tree{
+      display: grid;
+      gap: 6px;
+      user-select: none;
+    }
+    .tree-actions{
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    
+.tree-breadcrumb{
+  margin: 6px 0 10px;
+  padding: 6px 8px;
+  font-size: 12px;
+  color: rgba(0,0,0,.70);
+  border: 1px dashed rgba(0,0,0,.16);
+  background: rgba(255,255,255,.55);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tree ul{
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 4px;
+    }
+    .tree-item{
+  display: grid;
+  grid-template-columns: 22px 1fr auto;
+  gap: 6px;
+  align-items: center;
+  padding: 8px 10px;
+  border: 1px solid rgba(0,0,0,.10);
+  background: rgba(255,255,255,.70);
+  cursor: pointer;
+  min-width: 0;
+  position: relative;
+  transition: background .12s ease, border-color .12s ease, transform .06s ease;
+  outline: none;
+}
+.tree-item:hover{
+  border-color: rgba(0,0,0,.28);
+  background: rgba(255,255,255,.86);
+}
+.tree-item:active{ transform: translateY(1px); }
+
+/* Visually clear selection + navigation context */
+.tree-item.is-active{
+  border-color: rgba(0,0,0,.38);
+  background: var(--accentSoft);
+  box-shadow: inset 4px 0 0 0 var(--accent);
+}
+.tree-item.is-path:not(.is-active){
+  border-color: rgba(0,0,0,.18);
+  background: rgba(0,0,0,.03);
+  box-shadow: inset 2px 0 0 0 rgba(0,0,0,.30);
+}
+.tree-item:focus-visible{
+  box-shadow: 0 0 0 2px rgba(0,0,0,.30), inset 4px 0 0 0 var(--accent);
+  border-color: rgba(0,0,0,.50);
+  background: var(--accentSoft2);
+}
+.tree-tgl{
+      width: 22px;
+      height: 22px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(0,0,0,.12);
+      background: rgba(255,255,255,.9);
+      font-size: 12px;
+      line-height: 1;
+      cursor: pointer;
+      padding: 0;
+      border-radius: 0;
+      appearance: none;
+      -webkit-appearance: none;
+      font-family: inherit;
+      color: inherit;
+    }
+    .tree-tgl:focus-visible{ outline: 2px solid rgba(0,0,0,.55); outline-offset: 2px; }
+
+    .tree-name{
+      font-size: 12px;
+      letter-spacing: 1px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .tree-count{
+      font-size: 10px;
+      color: rgba(0,0,0,.55);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 0 6px;
+    }
+
+    /* Make category vs subcategory visually distinct */
+    .tree-item[data-depth="0"]{
+      background: rgba(255,255,255,.86);
+      border-color: rgba(0,0,0,.18);
+      border-left: 4px solid rgba(0,0,0,.35);
+      padding-left: 10px;
+    }
+    .tree-item[data-depth="0"] .tree-name{
+      font-weight: 750;
+      font-size: 13px;
+      letter-spacing: 1.2px;
+    }
+    .tree-item[data-depth="0"] .tree-name::after{
+      content: "категория";
+      margin-left: 8px;
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      opacity: .38;
+    }
+.tree-item[data-depth="0"] .tree-name{
+  font-weight: 750;
+}
+.tree-item[data-depth="0"] .tree-name::after{
+  padding: 2px 6px;
+  border: 1px solid rgba(0,0,0,.18);
+  background: rgba(0,0,0,.04);
+  border-radius: 999px;
+}
+.tree-item[data-depth]:not([data-depth="0"]) .tree-name{
+  font-weight: 650;
+}
+
+
+    .tree-item[data-depth]:not([data-depth="0"]){
+      background: rgba(255,255,255,.62);
+      border-style: dashed;
+      border-color: rgba(0,0,0,.14);
+    }
+    .tree-item[data-depth]:not([data-depth="0"]) .tree-name{
+      font-weight: 560;
+      font-size: 12px;
+      letter-spacing: 1px;
+      opacity: .92;
+    }
+    .tree-item[data-depth]:not([data-depth="0"]) .tree-name::before{
+      content: "↳ ";
+      opacity: .65;
+    }
+
+
+    .indent{ margin-left: 34px; padding-left: 18px; border-left: 2px dashed rgba(0,0,0,.18); }
+    .indent > li{ position: relative; }
+    .indent > li > .tree-item{ position: relative; }
+    .indent > li > .tree-item::before{ content:''; position:absolute; left:-13px; top:50%; width:10px; border-top:1px dashed rgba(0,0,0,.18); }
+    .indent .tree-item{ background: rgba(255,255,255,.62); } /* (kept for legacy) */
+
+    /* Notes list */
+    .list{
+      display: grid;
+      gap: 8px;
+      min-width: 0;
+    }
+    .list-head{
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+    .list-meta{
+      font-size: 11px;
+      color: rgba(0,0,0,.68);
+      line-height: 1.45;
+      margin: 0;
+    }
+    .note-row{
+      display: grid;
+      gap: 6px;
+      padding: 10px 10px;
+      border: 1px solid rgba(0,0,0,.12);
+      background: rgba(255,255,255,.70);
+      cursor: pointer;
+      min-width: 0;
+    }
+    .note-row:hover{ border-color: rgba(0,0,0,.22); }
+    .note-row.is-active{
+      border-color: rgba(0,0,0,.34);
+      background: rgba(255,255,255,.90);
+    }
+    .note-title{
+      margin: 0;
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .note-snippet{
+      margin: 0;
+      font-size: 11px;
+      line-height: 1.4;
+      color: rgba(0,0,0,.72);
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      word-break: break-word;
+    }
+
+    /* Editor */
+    .editor-head{
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+.editor-head-right{
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      justify-content: flex-end;
+      min-width: 0;
+    }
+    .editor-head-right .crumbs{
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+    .crumbs{
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: rgba(0,0,0,.58);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .toolbar{
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .toolbar-row{
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .tool, .toolsel{
+      border: 1px solid var(--bd);
+      background: rgba(255,255,255,.92);
+      height: 38px;
+      padding: 0 10px;
+      font-size: 12px;
+      outline: none;
+      border-radius: 0;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      letter-spacing: 1px;
+    }
+    .tool:hover, .toolsel:hover{ border-color: rgba(0,0,0,.30); }
+    .tool:focus-visible, .toolsel:focus-visible{ outline: 2px solid rgba(0,0,0,.55); outline-offset: 2px; }
+    .toolsel{ cursor: default; }
+    .tool.is-primary{ font-weight: 700; letter-spacing: 3px; text-transform: uppercase; }
+    .swatch{
+      width: 14px; height: 14px; border: 1px solid rgba(0,0,0,.22);
+      background: #000;
+      display: inline-block;
+    }
+
+    .editor-title{
+      width: 100%;
+      border: 1px solid var(--bd);
+      background: rgba(255,255,255,.92);
+      padding: 10px 12px;
+      font-size: 12px;
+      outline: none;
+      border-radius: 0;
+      height: 40px;
+      min-width: 0;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .editor{
+      border: 1px solid var(--bd);
+      background: rgba(255,255,255,.92);
+      padding: 14px 14px;
+      min-height: 420px;
+      outline: none;
+      border-radius: 0;
+      font-size: var(--fs-note);
+      line-height: var(--lh-note);
+      font-family: var(--font-note);
+      word-break: break-word;
+    }
+    .editor:focus{ border-color: rgba(0,0,0,.34); }
+
+    .editor img{
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 10px 0;
+      border: 1px solid rgba(0,0,0,.10);
+      background: rgba(255,255,255,.70);
+    }
+    .editor blockquote{
+      margin: 10px 0;
+      padding: 10px 12px;
+      border-left: 3px solid rgba(0,0,0,.25);
+      background: rgba(255,255,255,.70);
+    }
+    .editor pre{
+      background: rgba(0,0,0,.04);
+      border: 1px solid rgba(0,0,0,.10);
+      padding: 10px 12px;
+      overflow: auto;
+    }
+
+    .hint{
+      margin: 0;
+      font-size: 11px;
+      line-height: 1.45;
+      color: rgba(0,0,0,.72);
+    }
+
+    /* Modal */
+    .modal{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.25);
+      display: none;
+      z-index: 99999;
+      padding: 16px;
+    }
+    .modal.is-open{ display: grid; place-items: center; }
+    .modal-card{
+      width: min(860px, calc(100% - 8px));
+      max-height: calc(100vh - 40px);
+      overflow: auto;
+      border: 1px solid rgba(0,0,0,.18);
+      background: rgba(255,255,255,.96);
+      padding: 14px 14px 12px;
+      border-radius: 0;
+    }
+    .modal-head{
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .modal-title{
+      margin: 0;
+      font-size: 12px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+    }
+    .modal-grid{
+      display: grid;
+      gap: 12px;
+    }
+    .grid2{
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .field{
+      display: grid;
+      gap: 6px;
+      min-width: 0;
+    }
+    .field label{
+      font-size: 10px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: rgba(0,0,0,.62);
+    }
+    .field input, .field select{
+      width: 100%;
+      border: 1px solid var(--bd);
+      background: rgba(255,255,255,.92);
+      padding: 10px 12px;
+      font-size: 12px;
+      outline: none;
+      border-radius: 0;
+      height: 40px;
+      min-width: 0;
+    }
+    .field input[type="color"]{ padding: 0; height: 40px; }
+    .modal-actions{
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    .warnbox{
+      border: 1px dashed rgba(0,0,0,.22);
+      background: rgba(255,255,255,.78);
+      padding: 10px 12px;
+      font-size: 11px;
+      line-height: 1.45;
+      color: rgba(0,0,0,.72);
+    }
+    code.k{ background: rgba(0,0,0,.06); padding: 1px 4px; }
+
+    /* Responsive */
+    @media (max-width: 1060px){
+      :root{ --topbarOffset: 66px; }
+      .notes-wrap{ padding: 10px 14px 18px; }
+      .n-shell{ grid-template-columns: 1fr; }
+      .editor{ min-height: 360px; }
+      .grid2{ grid-template-columns: 1fr; }
+      .modal-actions{ grid-template-columns: 1fr; }
+      .tree-actions{ grid-template-columns: 1fr; }
+      .n-topbar{ grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body class="page page-crate">
+  <!-- фон/рамки — как в item-key -->
+  <div class="outer-frame" aria-hidden="true"></div>
+  <div class="rays" aria-hidden="true"></div>
+  <div class="veil" aria-hidden="true"></div>
+
+  <!-- верхний “герб” -->
+  <header class="topbar topbar--edge">
+    <a class="toplink" href="../../item-user.html?returnTo=crate/onoi_notes/onoi_notes.html" aria-label="Item User">
+      <span class="tag">item-user</span>
+    </a>
+  </header>
+
+  <!-- левый rail -->
+  <aside class="rail rail--left" aria-label="Левое меню">
+    <a class="rail-link" href="../../index.html">
+      <span class="rail-link__title">item-key</span>
+      <span class="rail-link__meta">главное меню</span>
+    </a>
+    <a class="rail-link" href="../../item-crate.html">
+      <span class="rail-link__title">item-crate</span>
+      <span class="rail-link__meta">назад в хаб</span>
+    </a>
+  </aside>
+
+  <!-- правый rail -->
+  <aside class="rail rail--right" aria-label="Правое меню">
+    <a class="rail-link" href="../../item-soft.html">
+      <span class="rail-link__title">item-soft</span>
+      <span class="rail-link__meta">инструменты / редакторы</span>
+    </a>
+    <a class="rail-link" href="../../item-security.html">
+      <span class="rail-link__title">item-security</span>
+      <span class="rail-link__meta">доступ / защита</span>
+    </a>
+  </aside>
+
+  <main class="center-stage" aria-label="onoi_notes center">
+    <section class="notes-wrap notes-wrap" aria-label="onoi_notes app">
+      <div class="n-title">
+        <h1>onoi_notes</h1>
+        <div class="sub">категории · подкатегории · редактор · whisperer</div>
+      </div>
+
+      <div class="n-card">
+        <div class="n-topbar" aria-label="Панель поиска и действий">
+          <input class="n-search" id="searchInput" placeholder="Поиск по заметкам… (Ctrl+K)" />
+          <button class="n-btn" id="newNoteBtn" type="button">Новая заметка</button>
+          <div class="n-pill" title="Статус синхронизации" aria-label="Статус синхронизации">
+            <span class="dot" id="syncDot"></span>
+            <span id="syncText">local</span>
+          </div>
+        </div>
+        <p class="hint" style="margin-top:10px">
+          Всё сохраняется автоматически. <b>Важно:</b> GitHub Pages — статический хостинг, он сам по себе не умеет хранить ваши изменения “на сайте”.
+          Чтобы изменения автоматически появлялись и на телефоне, нужен “облачный” источник. Я добавил <b>опциональную</b> авто‑синхронизацию через GitHub API (Gist/Repo) — включается в настройках.
+        </p>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px">
+<button class="n-btn" id="settingsBtn" type="button">Настройки</button>
+          <button class="n-btn" id="exportBtn" type="button">Экспорт JSON</button>
+          <button class="n-btn" id="importBtn" type="button">Импорт JSON</button>
+          <input id="importFile" type="file" accept="application/json" hidden />
+</div>
+      </div>
+
+      <div class="n-shell" aria-label="Основной интерфейс">
+        <!-- Categories -->
+        <div class="n-col-left" id="sidebarCol" aria-label="Боковая панель">
+<div class="n-card" aria-label="Категории">
+          <div class="n-label">categories</div>
+
+          <div class="tree-actions">
+            <button class="n-btn" id="addCatBtn" type="button">+ Категория</button>
+            <button class="n-btn" id="addSubCatBtn" type="button">+ Подкатегория</button>
+          </div>
+
+          <div class="tree-breadcrumb" id="catBreadcrumb" aria-label="Текущая категория">Не выбрано</div>
+
+          <div class="tree" id="catTree" aria-label="Дерево категорий"></div>
+
+          <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px">
+            <button class="n-btn" id="renameCatBtn" type="button">Переименовать</button>
+            <button class="n-btn" id="deleteCatBtn" type="button">Удалить</button>
+          </div>
+
+          <p class="hint" style="margin-top:10px">
+            Совет: <b>Enter</b> — переименовать выбранную категорию; <b>Delete</b> — удалить.
+          </p>
+        </div>
+
+        <!-- Notes list -->
+<div class="n-card" aria-label="Список заметок">
+          <div class="n-label">notes</div>
+
+          <div class="list-head">
+            <p class="list-meta" id="listMeta">—</p>
+            <button class="n-btn" id="deleteNoteBtn" type="button">Удалить</button>
+          </div>
+
+          <div class="list" id="notesList" aria-label="Список заметок"></div>
+
+          <p class="hint" style="margin-top:10px">
+            Горячие клавиши: <b>Ctrl+N</b> — новая заметка, <b>Ctrl+S</b> — не нужно (авто), <b>Ctrl+F</b> — поиск.
+          </p>
+        </div>
+
+        <!-- Editor -->
+        </div>
+
+        <div class="v-splitter" id="splitter" role="separator" aria-label="Изменение ширины боковой панели" tabindex="0"></div>
+
+        <div class="n-col-right" aria-label="Редактор">
+<div class="n-card" aria-label="Редактор заметки">
+          <div class="n-label">editor</div>
+
+          <div class="editor-head">
+            <input class="editor-title" id="noteTitle" placeholder="Название заметки…" />
+            <div class="editor-head-right">
+              <div class="crumbs" id="crumbs">—</div>
+              <button class="n-btn is-primary" id="whisperBtn" type="button" title="Отправить текущую заметку в whisperer">Прошептать</button>
+            </div>
+          </div>
+
+          <div class="toolbar" aria-label="Панель форматирования">
+            <div class="toolbar-row">
+              <button class="tool" type="button" data-cmd="bold"><b>B</b></button>
+              <button class="tool" type="button" data-cmd="italic"><i>I</i></button>
+              <button class="tool" type="button" data-cmd="underline"><u>U</u></button>
+              <button class="tool" type="button" data-cmd="strikeThrough"><s>S</s></button>
+
+              <button class="tool" type="button" data-cmd="insertUnorderedList">• list</button>
+              <button class="tool" type="button" data-cmd="insertOrderedList">1. list</button>
+              <button class="tool" type="button" data-cmd="formatBlock" data-arg="blockquote">quote</button>
+              <button class="tool" type="button" data-cmd="formatBlock" data-arg="pre">code</button>
+
+              <button class="tool" type="button" id="linkBtn">link</button>
+              <button class="tool" type="button" id="imgBtn">image</button>
+              <input id="imgFile" type="file" accept="image/*" hidden />
+            </div>
+
+            <div class="toolbar-row">
+              <select class="toolsel" id="fontSelect" title="Шрифт">
+                <option value="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, \"Noto Sans\", sans-serif">Default</option>
+                <option value="\"Times New Roman\", Times, serif">Serif</option>
+                <option value="Georgia, serif">Georgia</option>
+                <option value="\"Courier New\", Courier, monospace">Mono</option>
+                <option value="\"Trebuchet MS\", Trebuchet, sans-serif">Trebuchet</option>
+                <option value="\"Comic Sans MS\", \"Comic Sans\", cursive">Comic</option>
+              </select>
+
+              <select class="toolsel" id="sizeSelect" title="Размер">
+                <option value="14">14px</option>
+                <option value="16" selected>16px</option>
+                <option value="18">18px</option>
+                <option value="20">20px</option>
+                <option value="24">24px</option>
+                <option value="28">28px</option>
+                <option value="32">32px</option>
+              </select>
+
+              <label class="toolsel" style="gap:10px" title="Цвет текста">
+                <span class="swatch" id="colorSwatch"></span>
+                <input id="colorPick" type="color" value="#000000" aria-label="Цвет текста" />
+              </label>
+
+              <label class="toolsel" style="gap:10px" title="Подсветка">
+                <span class="swatch" id="hlSwatch" style="background:#fff59d"></span>
+                <input id="hlPick" type="color" value="#fff59d" aria-label="Подсветка" />
+              </label>
+
+              <button class="tool" type="button" data-cmd="justifyLeft">left</button>
+              <button class="tool" type="button" data-cmd="justifyCenter">center</button>
+              <button class="tool" type="button" data-cmd="justifyRight">right</button>
+
+              <button class="tool" type="button" id="toggleSidebarBtn" title="Свернуть/развернуть боковую панель">sidebar</button>
+              <button class="tool is-primary" type="button" id="focusBtn" title="Режим фокуса">focus</button>
+            </div>
+          </div>
+
+          <div class="editor" id="editor" contenteditable="true" spellcheck="true" aria-label="Текст заметки"></div>
+
+          <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px">
+            <div class="n-pill" title="Автосохранение" aria-label="Автосохранение">
+              <span class="dot ok" id="saveDot"></span>
+              <span id="saveText">saved</span>
+            </div>
+            <div class="n-pill" title="Последнее изменение">
+              <span id="updatedText">—</span>
+            </div>
+          </div>
+
+          <p class="hint" style="margin-top:10px">
+            Вставляй картинки через кнопку <b>image</b> или просто вставкой из буфера. Картинки автоматически становятся адаптивными (100% ширины).
+          </p>
+        </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="bottombar bottombar--edge">
+    <span class="hint">onoi_notes</span>
+    <span class="sep">•</span>
+    <span class="hint">autosave · categories · whisperer</span>
+  </footer>
+
+  <!-- Settings modal -->
+  <div class="modal" id="settingsModal" role="dialog" aria-modal="true" aria-label="Настройки">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2 class="modal-title">settings</h2>
+        <button class="n-btn" id="closeSettings" type="button">Закрыть</button>
+      </div>
+
+      <div class="modal-grid">
+        <div class="warnbox">
+          <b>Почему без сервера не синхронизируется “само”?</b><br/>
+          GitHub Pages отдаёт статические файлы и не может принимать ваши изменения. Поэтому по умолчанию всё хранится в вашем браузере (IndexedDB) — автосохранение без кнопок.
+          Если хочешь, чтобы одна и та же база была и на ПК, и на телефоне — нужно писать в облако через API. Здесь это сделано через <b>GitHub Contents API</b> (файл в репозитории) или через <b>Gist</b>.
+          Токен хранится только у тебя в браузере.
+        </div>
+
+        <div class="grid2">
+          <div class="field">
+            <label>cloud mode</label>
+            <select id="cloudMode">
+              <option value="off" selected>Off (local only)</option>
+              <option value="repo">GitHub Repo file (Contents API)</option>
+              <option value="gist">GitHub Gist (single file)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>poll</label>
+            <select id="pollEvery">
+              <option value="0">No polling</option>
+              <option value="15">15s</option>
+              <option value="30" selected>30s</option>
+              <option value="60">60s</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid2">
+          <div class="field">
+            <label>token (PAT)</label>
+            <input id="ghToken" class="mono" placeholder="github_pat_..." autocomplete="off" />
+          </div>
+          <div class="field">
+            <label>owner / user</label>
+            <input id="ghOwner" class="mono" placeholder="your-username" />
+          </div>
+        </div>
+
+        <div class="grid2" id="repoFields">
+          <div class="field">
+            <label>repo</label>
+            <input id="ghRepo" class="mono" placeholder="item-key" />
+          </div>
+          <div class="field">
+            <label>branch</label>
+            <input id="ghBranch" class="mono" placeholder="main" value="main" />
+          </div>
+          <div class="field" style="grid-column: 1 / -1;">
+            <label>path (json file)</label>
+            <input id="ghPath" class="mono" placeholder="crate/onoi_notes/db.json" value="crate/onoi_notes/db.json" />
+          </div>
+        </div>
+
+        <div class="grid2" id="gistFields" style="display:none">
+          <div class="field">
+            <label>gist id</label>
+            <input id="ghGistId" class="mono" placeholder="xxxxxxxxxxxxxxxxxxxx" />
+          </div>
+          <div class="field">
+            <label>filename</label>
+            <input id="ghGistFile" class="mono" placeholder="onoi_notes_db.json" value="onoi_notes_db.json" />
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button class="n-btn" id="testCloud" type="button">Проверить</button>
+          <button class="n-btn" id="pullCloud" type="button">Pull</button>
+          <button class="n-btn" id="pushCloud" type="button">Push</button>
+        </div>
+
+        <p class="hint">
+          Рекомендация: создай отдельный файл <code class="k">crate/onoi_notes/db.json</code> в репозитории и дай токену права <code class="k">repo</code>.
+          Если боишься токена — используй Gist и права <code class="k">gist</code>.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../assets/js/main.js"></script>
+
+  <script>
+  (function(){
+    // ========= utils =========
+    const $ = (id) => document.getElementById(id);
+    const now = () => Date.now();
+    const uid = () => (crypto && crypto.randomUUID) ? crypto.randomUUID() : ('id-' + Math.random().toString(16).slice(2) + '-' + Date.now());
+    const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
+
+    function htmlToText(html){
+      const d = document.createElement('div');
+      d.innerHTML = html || '';
+      const t = (d.textContent || '').replace(/\s+/g,' ').trim();
+      return t;
+    }
+    function firstLine(html){
+      const t = htmlToText(html);
+      if(!t) return '';
+      return t.split(/\n|\r/)[0].slice(0, 90);
+    }
+    function fmtTime(ts){
+      if(!ts) return '—';
+      const d = new Date(ts);
+      const z = (n) => String(n).padStart(2,'0');
+      return z(d.getDate())+'.'+z(d.getMonth()+1)+'.'+d.getFullYear()+' '+z(d.getHours())+':'+z(d.getMinutes());
+    }
+
+
+    // ========= UI state (sidebar + tree collapse) =========
+    const LS_UI = {
+      sidebarW: 'onoi_notes_sidebar_w_v1',
+      sidebarCollapsed: 'onoi_notes_sidebar_collapsed_v1',
+      catCollapsed: 'onoi_notes_cat_collapsed_v1'
+    };
+
+    function lsGet(key){
+      try{ return localStorage.getItem(key); }catch(e){ return null; }
+    }
+    function lsSet(key, val){
+      try{ localStorage.setItem(key, val); }catch(e){}
+    }
+    function loadCollapsedCats(){
+      try{
+        const raw = lsGet(LS_UI.catCollapsed);
+        const arr = raw ? JSON.parse(raw) : [];
+        return new Set(Array.isArray(arr) ? arr.map(String) : []);
+      }catch(e){
+        return new Set();
+      }
+    }
+    function saveCollapsedCats(set){
+      try{ lsSet(LS_UI.catCollapsed, JSON.stringify(Array.from(set || []))); }catch(e){}
+    }
+
+    function applySidebarUI(){
+      const collapsed = !!state.ui.sidebarCollapsed;
+      document.body.classList.toggle('is-sidebar-collapsed', collapsed);
+      if(!collapsed){
+        document.documentElement.style.setProperty('--sidebarW', state.ui.sidebarW + 'px');
+      }
+    }
+    // ========= IndexedDB =========
+    const DB_NAME = 'itemkey_onoi_notes_db_v1';
+    const DB_VER = 1;
+    const STORE = { meta:'meta', cats:'cats', notes:'notes' };
+
+    function idbOpen(){
+      return new Promise((resolve, reject) => {
+        const req = indexedDB.open(DB_NAME, DB_VER);
+        req.onupgradeneeded = () => {
+          const db = req.result;
+          if(!db.objectStoreNames.contains(STORE.meta)) db.createObjectStore(STORE.meta, { keyPath: 'key' });
+          if(!db.objectStoreNames.contains(STORE.cats)) db.createObjectStore(STORE.cats, { keyPath: 'id' });
+          if(!db.objectStoreNames.contains(STORE.notes)) db.createObjectStore(STORE.notes, { keyPath: 'id' });
+        };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
+    }
+    async function idbTx(mode, stores, fn){
+      const db = await idbOpen();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(stores, mode);
+        const st = {};
+        stores.forEach(s => st[s] = tx.objectStore(s));
+        const res = fn(st);
+        tx.oncomplete = () => { db.close(); resolve(res); };
+        tx.onerror = () => { db.close(); reject(tx.error); };
+        tx.onabort = () => { db.close(); reject(tx.error); };
+      });
+    }
+    const idb = {
+      get: (store, key) => idbTx('readonly',[store], st => new Promise((res, rej)=>{ const r=st[store].get(key); r.onsuccess=()=>res(r.result||null); r.onerror=()=>rej(r.error); })),
+      put: (store, val) => idbTx('readwrite',[store], st => new Promise((res, rej)=>{ const r=st[store].put(val); r.onsuccess=()=>res(true); r.onerror=()=>rej(r.error); })),
+      del: (store, key) => idbTx('readwrite',[store], st => new Promise((res, rej)=>{ const r=st[store].delete(key); r.onsuccess=()=>res(true); r.onerror=()=>rej(r.error); })),
+      all: (store) => idbTx('readonly',[store], st => new Promise((res, rej)=>{ const r=st[store].getAll(); r.onsuccess=()=>res(r.result||[]); r.onerror=()=>rej(r.error); })),
+      clear: (store) => idbTx('readwrite',[store], st => new Promise((res, rej)=>{ const r=st[store].clear(); r.onsuccess=()=>res(true); r.onerror=()=>rej(r.error); })),
+    };
+
+    // ========= state =========
+    const state = {
+      cats: [],
+      notes: [],
+      activeCatId: null,
+      activeNoteId: null,
+      search: '',
+      dirty: false,
+      ui: { sidebarW: 320, sidebarCollapsed: false, collapsedCats: new Set() },
+      saving: false,
+      saveTimer: null,
+      lastSavedAt: 0,
+
+      cloud: {
+        mode: 'off', // off | repo | gist
+        token: '',
+        owner: '',
+        repo: '',
+        branch: 'main',
+        path: 'crate/onoi_notes/db.json',
+        gistId: '',
+        gistFile: 'onoi_notes_db.json',
+        pollEvery: 30,
+        pollTimer: null,
+        lastPullAt: 0,
+        lastPushAt: 0,
+        lastSha: null, // for repo
+        lastGistETag: null
+      }
+    };
+
+    const LS_KEY = 'onoi_notes_cloud_settings_v1';
+
+    function loadCloudSettings(){
+      try{
+        const raw = localStorage.getItem(LS_KEY);
+        if(!raw) return;
+        const v = JSON.parse(raw);
+        if(v && typeof v === 'object'){
+          Object.assign(state.cloud, v);
+        }
+      }catch(e){}
+    }
+    function saveCloudSettings(){
+      try{
+        localStorage.setItem(LS_KEY, JSON.stringify(state.cloud));
+      }catch(e){}
+    }
+
+    // ========= UI refs =========
+    const searchInput = $('searchInput');
+    const newNoteBtn = $('newNoteBtn');
+    const settingsBtn = $('settingsBtn');
+    const exportBtn = $('exportBtn');
+    const importBtn = $('importBtn');
+    const importFile = $('importFile');
+    const whisperBtn = $('whisperBtn');
+
+    const syncDot = $('syncDot');
+    const syncText = $('syncText');
+
+    const addCatBtn = $('addCatBtn');
+    const addSubCatBtn = $('addSubCatBtn');
+    const renameCatBtn = $('renameCatBtn');
+    const deleteCatBtn = $('deleteCatBtn');
+    const catTree = $('catTree');
+    const catBreadcrumb = $('catBreadcrumb');
+
+    const notesList = $('notesList');
+    const listMeta = $('listMeta');
+    const deleteNoteBtn = $('deleteNoteBtn');
+
+    const noteTitle = $('noteTitle');
+    const editor = $('editor');
+    const crumbs = $('crumbs');
+
+    const saveDot = $('saveDot');
+    const saveText = $('saveText');
+    const updatedText = $('updatedText');
+
+    const fontSelect = $('fontSelect');
+    const sizeSelect = $('sizeSelect');
+    const colorPick = $('colorPick');
+    const hlPick = $('hlPick');
+    const colorSwatch = $('colorSwatch');
+    const hlSwatch = $('hlSwatch');
+    const toggleSidebarBtn = $('toggleSidebarBtn');
+    const splitter = $('splitter');
+    const sidebarCol = $('sidebarCol');
+
+    const focusBtn = $('focusBtn');
+    const linkBtn = $('linkBtn');
+    const imgBtn = $('imgBtn');
+    const imgFile = $('imgFile');
+
+    const settingsModal = $('settingsModal');
+    const closeSettings = $('closeSettings');
+    const cloudMode = $('cloudMode');
+    const pollEvery = $('pollEvery');
+    const ghToken = $('ghToken');
+    const ghOwner = $('ghOwner');
+    const ghRepo = $('ghRepo');
+    const ghBranch = $('ghBranch');
+    const ghPath = $('ghPath');
+    const ghGistId = $('ghGistId');
+    const ghGistFile = $('ghGistFile');
+    const repoFields = $('repoFields');
+    const gistFields = $('gistFields');
+    const testCloud = $('testCloud');
+    const pullCloud = $('pullCloud');
+    const pushCloud = $('pushCloud');
+
+    function setSync(status, kind){
+      // status: 'local'|'syncing'|'ok'|'warn'|'bad'
+      syncText.textContent = kind || 'local';
+      syncDot.className = 'dot';
+      if(status === 'ok') syncDot.classList.add('ok');
+      if(status === 'warn') syncDot.classList.add('warn');
+      if(status === 'bad') syncDot.classList.add('bad');
+    }
+    function setSaveStatus(mode){
+      // 'saved'|'saving'|'dirty'
+      if(mode === 'saving'){
+        saveDot.className = 'dot warn';
+        saveText.textContent = 'saving…';
+      } else if(mode === 'dirty'){
+        saveDot.className = 'dot warn';
+        saveText.textContent = 'editing…';
+      } else {
+        saveDot.className = 'dot ok';
+        saveText.textContent = 'saved';
+      }
+    }
+
+    // ========= data helpers =========
+    function ensureDefaults(){
+      // create default category + note if empty
+      if(state.cats.length === 0){
+        const root = { id: uid(), parentId: null, name: 'Inbox', createdAt: now(), updatedAt: now() };
+        state.cats.push(root);
+        state.activeCatId = root.id;
+      }
+      if(state.notes.length === 0){
+        const n = { id: uid(), catId: state.activeCatId, title: 'First note', html: '<p>Привет. Это onoi_notes.</p><p>Нажми <b>image</b> чтобы вставить картинку.</p>', createdAt: now(), updatedAt: now() };
+        state.notes.push(n);
+        state.activeNoteId = n.id;
+      }
+      if(!state.activeCatId){
+        state.activeCatId = state.cats[0]?.id || null;
+      }
+      if(!state.activeNoteId){
+        const nn = state.notes.find(x => x.catId === state.activeCatId) || state.notes[0];
+        state.activeNoteId = nn ? nn.id : null;
+      }
+    }
+
+    function catById(id){ return state.cats.find(c => c.id === id) || null; }
+    function noteById(id){ return state.notes.find(n => n.id === id) || null; }
+
+    function catPath(catId){
+      const path = [];
+      let cur = catById(catId);
+      let guard = 0;
+      while(cur && guard++ < 30){
+        path.unshift(cur.name);
+        cur = cur.parentId ? catById(cur.parentId) : null;
+      }
+      return path.length ? path.join(' / ') : '—';
+    }
+
+    function noteMatchesSearch(note){
+      if(!state.search) return true;
+      const s = state.search.toLowerCase();
+      const t = (note.title || '').toLowerCase();
+      const body = htmlToText(note.html).toLowerCase();
+      return t.includes(s) || body.includes(s);
+    }
+
+    function countNotesInCat(catId, includeChildren=true){
+      let ids = new Set([catId]);
+      if(includeChildren){
+        let changed = true;
+        while(changed){
+          changed = false;
+          for(const c of state.cats){
+            if(c.parentId && ids.has(c.parentId) && !ids.has(c.id)){
+              ids.add(c.id); changed = true;
+            }
+          }
+        }
+      }
+      return state.notes.filter(n => ids.has(n.catId)).length;
+    }
+
+    // ========= render =========
+    function renderTree(){
+      const rootCats = state.cats.filter(c => !c.parentId);
+      const byParent = new Map();
+      for(const c of state.cats){
+        const k = c.parentId || '__root__';
+        if(!byParent.has(k)) byParent.set(k, []);
+        byParent.get(k).push(c);
+      }
+      for(const [k, arr] of byParent.entries()){
+        arr.sort((a,b) => (a.name||'').localeCompare(b.name||''));
+      }
+
+      catTree.innerHTML = '';
+      const wrap = document.createElement('div');
+      wrap.className = 'tree';
+
+      function getCatPathIds(activeId){
+        const out = [];
+        const byId = new Map(state.cats.map(c => [String(c.id), c]));
+        let cur = activeId ? byId.get(String(activeId)) : null;
+        while(cur){
+          out.push(String(cur.id));
+          cur = cur.parentId ? byId.get(String(cur.parentId)) : null;
+        }
+        return out.reverse();
+      }
+
+      const pathArr = getCatPathIds(state.activeCatId);
+      const pathIds = new Set(pathArr);
+      if(catBreadcrumb){
+        if(!pathArr.length) catBreadcrumb.textContent = 'Не выбрано';
+        else {
+          const byId = new Map(state.cats.map(c => [String(c.id), c]));
+          const names = pathArr.map(id => (byId.get(String(id))?.name || '—'));
+          catBreadcrumb.textContent = names.join(' › ');
+        }
+      }
+
+      function buildList(parentId, depth){
+        const ul = document.createElement('ul');
+        const key = parentId || '__root__';
+        const kids = byParent.get(key) || [];
+        kids.forEach(cat => {
+          const li = document.createElement('li');
+
+          const row = document.createElement('div');
+          row.className = 'tree-item' + (cat.id === state.activeCatId ? ' is-active' : '') + (pathIds.has(String(cat.id)) ? ' is-path' : '');
+          row.dataset.id = cat.id;
+          row.tabIndex = 0;
+          row.setAttribute('role','treeitem');
+
+          row.dataset.depth = String(depth);
+const hasChildren = (byParent.get(cat.id) || []).length > 0;
+          const isCollapsed = hasChildren && state.ui.collapsedCats.has(String(cat.id));
+
+          const tgl = document.createElement('button');
+          tgl.type = 'button';
+          tgl.className = 'tree-tgl';
+          tgl.textContent = hasChildren ? (isCollapsed ? '▸' : '▾') : '•';
+          if(hasChildren){
+            tgl.title = isCollapsed ? 'Развернуть' : 'Свернуть';
+            tgl.addEventListener('click', (e) => {
+              e.stopPropagation();
+              const id = String(cat.id);
+              if(state.ui.collapsedCats.has(id)) state.ui.collapsedCats.delete(id);
+              else state.ui.collapsedCats.add(id);
+              saveCollapsedCats(state.ui.collapsedCats);
+              renderTree();
+            });
+          }
+
+          const name = document.createElement('div');
+          name.className = 'tree-name';
+          name.textContent = cat.name || '—';
+
+          const cnt = document.createElement('div');
+          cnt.className = 'tree-count';
+          cnt.textContent = String(countNotesInCat(cat.id, false));
+
+          row.appendChild(tgl);
+          row.appendChild(name);
+          row.appendChild(cnt);
+
+          row.addEventListener('click', (e) => {
+            state.activeCatId = cat.id;
+            // pick first note in cat
+            const list = getVisibleNotes();
+            if(list.length){
+              state.activeNoteId = list[0].id;
+            } else {
+              state.activeNoteId = null;
+            }
+            renderAll();
+          });
+
+          row.addEventListener('keydown', (e) => {
+            if(e.key === 'Enter' || e.key === ' '){
+              e.preventDefault();
+              row.click();
+            }
+            if(e.key === 'ArrowLeft'){
+              if(hasChildren && !isCollapsed){
+                e.preventDefault();
+                const id = String(cat.id);
+                state.ui.collapsedCats.add(id);
+                saveCollapsedCats(state.ui.collapsedCats);
+                renderTree();
+              }
+            }
+            if(e.key === 'ArrowRight'){
+              if(hasChildren && isCollapsed){
+                e.preventDefault();
+                const id = String(cat.id);
+                state.ui.collapsedCats.delete(id);
+                saveCollapsedCats(state.ui.collapsedCats);
+                renderTree();
+              }
+            }
+          });
+
+          li.appendChild(row);
+
+           if(hasChildren && !isCollapsed){
+             const sub = buildList(cat.id, depth+1);
+             sub.classList.add('indent');
+             li.appendChild(sub);
+           }
+
+          ul.appendChild(li);
+        });
+        return ul;
+      }
+
+      wrap.appendChild(buildList(null, 0));
+      catTree.appendChild(wrap);
+    }
+
+    function getVisibleNotes(){
+      const catId = state.activeCatId;
+      const notes = state.notes
+        .filter(n => (catId ? n.catId === catId : true))
+        .filter(noteMatchesSearch)
+        .sort((a,b) => (b.updatedAt||0) - (a.updatedAt||0));
+      return notes;
+    }
+
+    function renderNotesList(){
+      notesList.innerHTML = '';
+      const notes = getVisibleNotes();
+      listMeta.textContent = state.activeCatId ? ('Категория: ' + (catById(state.activeCatId)?.name || '—') + ' · ' + notes.length + ' заметок') : (notes.length + ' заметок');
+
+      if(notes.length === 0){
+        const p = document.createElement('p');
+        p.className = 'hint';
+        p.textContent = state.search ? 'Ничего не найдено.' : 'В этой категории пока нет заметок. Нажми “Новая заметка”.';
+        notesList.appendChild(p);
+        return;
+      }
+
+      notes.forEach(n => {
+        const row = document.createElement('div');
+        row.className = 'note-row' + (n.id === state.activeNoteId ? ' is-active' : '');
+        row.dataset.id = n.id;
+
+        const h = document.createElement('h3');
+        h.className = 'note-title';
+        h.textContent = (n.title || 'без названия').slice(0, 80);
+
+        const sn = document.createElement('p');
+        sn.className = 'note-snippet';
+        sn.textContent = firstLine(n.html || '') || '…';
+
+        row.appendChild(h);
+        row.appendChild(sn);
+
+        row.addEventListener('click', () => {
+          state.activeNoteId = n.id;
+          renderEditor();
+          renderNotesList();
+        });
+
+        notesList.appendChild(row);
+      });
+    }
+
+    function renderEditor(){
+      const note = state.activeNoteId ? noteById(state.activeNoteId) : null;
+      const cat = state.activeCatId ? catById(state.activeCatId) : null;
+
+      crumbs.textContent = state.activeCatId ? catPath(state.activeCatId) : '—';
+
+      if(!note){
+        noteTitle.value = '';
+        editor.innerHTML = '';
+        noteTitle.disabled = true;
+        editor.setAttribute('contenteditable','false');
+        updatedText.textContent = '—';
+        return;
+      }
+
+      noteTitle.disabled = false;
+      editor.setAttribute('contenteditable','true');
+
+      // avoid resetting cursor if already on same note and active element is editor
+      if(noteTitle.value !== (note.title || '')) noteTitle.value = note.title || '';
+      if(editor.dataset.noteId !== note.id){
+        editor.innerHTML = note.html || '';
+        editor.dataset.noteId = note.id;
+      }
+
+      updatedText.textContent = 'updated: ' + fmtTime(note.updatedAt);
+    }
+
+    function renderAll(){
+      renderTree();
+      renderNotesList();
+      renderEditor();
+    }
+
+    // ========= autosave =========
+    async function persistAll(){
+      state.saving = true;
+      setSaveStatus('saving');
+      try{
+        // write cats and notes
+        await idbTx('readwrite',[STORE.cats, STORE.notes], st => {
+          state.cats.forEach(c => st[STORE.cats].put(c));
+          state.notes.forEach(n => st[STORE.notes].put(n));
+        });
+        state.lastSavedAt = now();
+        state.dirty = false;
+        setSaveStatus('saved');
+      }catch(e){
+        setSaveStatus('dirty');
+      }finally{
+        state.saving = false;
+      }
+    }
+
+    function schedulePersist(delay=450){
+      state.dirty = true;
+      setSaveStatus('dirty');
+      if(state.saveTimer) clearTimeout(state.saveTimer);
+      state.saveTimer = setTimeout(async () => {
+        await persistAll();
+        // push cloud after local save
+        if(state.cloud.mode !== 'off'){
+          scheduleCloudPush();
+        }
+      }, delay);
+    }
+
+    // ========= editor commands =========
+    function exec(cmd, arg=null){
+      editor.focus();
+      try{
+        document.execCommand(cmd, false, arg);
+      }catch(e){}
+      schedulePersist();
+    }
+
+    function setFontFamily(ff){
+      document.documentElement.style.setProperty('--font-note', ff);
+      try{ localStorage.setItem('onoi_font_note', ff); }catch(e){}
+    }
+    function setFontSize(px){
+      const v = clamp(Number(px)||16, 12, 40);
+      document.documentElement.style.setProperty('--fs-note', v + 'px');
+      try{ localStorage.setItem('onoi_fs_note', String(v)); }catch(e){}
+    }
+    function applySavedTypography(){
+      try{
+        const ff = localStorage.getItem('onoi_font_note');
+        const fs = localStorage.getItem('onoi_fs_note');
+        if(ff){ setFontFamily(ff); fontSelect.value = ff; }
+        if(fs){ setFontSize(fs); sizeSelect.value = fs; }
+      }catch(e){}
+    }
+
+    // ========= image handling =========
+    async function fileToDataURL(file){
+      return new Promise((resolve, reject) => {
+        const fr = new FileReader();
+        fr.onload = () => resolve(fr.result);
+        fr.onerror = () => reject(fr.error);
+        fr.readAsDataURL(file);
+      });
+    }
+
+    async function insertImageFromFile(file){
+      if(!file) return;
+      const dataUrl = await fileToDataURL(file);
+      editor.focus();
+      // insert at cursor
+      const img = document.createElement('img');
+      img.src = dataUrl;
+      img.alt = file.name || 'image';
+      // Try to insert as HTML
+      const html = '<img src="' + dataUrl.replace(/"/g,'&quot;') + '" alt="' + (img.alt||'image').replace(/"/g,'&quot;') + '" />';
+      document.execCommand('insertHTML', false, html);
+      schedulePersist();
+    }
+
+    editor.addEventListener('paste', async (e) => {
+      // If image in clipboard, insert as data URL
+      const items = e.clipboardData && e.clipboardData.items ? [...e.clipboardData.items] : [];
+      const imgItem = items.find(it => it.type && it.type.startsWith('image/'));
+      if(imgItem){
+        e.preventDefault();
+        const file = imgItem.getAsFile();
+        await insertImageFromFile(file);
+      }
+    });
+
+    // ========= note operations =========
+    async function createNote(){
+      if(!state.activeCatId){
+        alert('Сначала создай категорию.');
+        return;
+      }
+      const n = { id: uid(), catId: state.activeCatId, title: 'New note', html: '<p></p>', createdAt: now(), updatedAt: now() };
+      state.notes.unshift(n);
+      state.activeNoteId = n.id;
+      renderNotesList();
+      renderEditor();
+      noteTitle.focus();
+      noteTitle.select();
+      schedulePersist();
+    }
+
+    async function deleteActiveNote(){
+      const note = state.activeNoteId ? noteById(state.activeNoteId) : null;
+      if(!note) return;
+      if(!confirm('Удалить заметку?')) return;
+
+      state.notes = state.notes.filter(n => n.id !== note.id);
+      await idb.del(STORE.notes, note.id);
+
+      const vis = getVisibleNotes();
+      state.activeNoteId = vis[0]?.id || null;
+      renderAll();
+      schedulePersist(50);
+    }
+
+    async function createCategory(parentId=null){
+      const name = prompt(parentId ? 'Название подкатегории:' : 'Название категории:');
+      if(!name) return;
+      const c = { id: uid(), parentId: parentId, name: name.trim(), createdAt: now(), updatedAt: now() };
+      state.cats.push(c);
+      state.activeCatId = c.id;
+      renderAll();
+      schedulePersist();
+    }
+
+    async function renameActiveCategory(){
+      const c = state.activeCatId ? catById(state.activeCatId) : null;
+      if(!c) return;
+      const name = prompt('Новое имя:', c.name || '');
+      if(!name) return;
+      c.name = name.trim();
+      c.updatedAt = now();
+      renderTree();
+      crumbs.textContent = catPath(state.activeCatId);
+      schedulePersist();
+    }
+
+    async function deleteActiveCategory(){
+      const c = state.activeCatId ? catById(state.activeCatId) : null;
+      if(!c) return;
+      const count = countNotesInCat(c.id, true);
+      if(!confirm('Удалить категорию и всё внутри? Заметок затронется: ' + count)) return;
+
+      // collect cat ids to delete
+      const toDel = new Set([c.id]);
+      let changed = true;
+      while(changed){
+        changed = false;
+        for(const cc of state.cats){
+          if(cc.parentId && toDel.has(cc.parentId) && !toDel.has(cc.id)){
+            toDel.add(cc.id); changed = true;
+          }
+        }
+      }
+      state.cats = state.cats.filter(x => !toDel.has(x.id));
+      state.notes = state.notes.filter(n => !toDel.has(n.catId));
+
+      await idbTx('readwrite',[STORE.cats, STORE.notes], st => {
+        toDel.forEach(id => st[STORE.cats].delete(id));
+        // delete notes in those cats
+        // brute force: clear all notes store then re-put current (simple + safe)
+      });
+
+      // re-sync stores (simple strategy)
+      await idb.clear(STORE.cats);
+      await idb.clear(STORE.notes);
+      await idbTx('readwrite',[STORE.cats, STORE.notes], st => {
+        state.cats.forEach(ca => st[STORE.cats].put(ca));
+        state.notes.forEach(no => st[STORE.notes].put(no));
+      });
+
+      state.activeCatId = state.cats[0]?.id || null;
+      const vis = getVisibleNotes();
+      state.activeNoteId = vis[0]?.id || null;
+      renderAll();
+      schedulePersist(50);
+    }
+
+    // ========= export/import =========
+    function currentDBSnapshot(){
+      return {
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        cats: state.cats,
+        notes: state.notes
+      };
+    }
+
+    function downloadJSON(obj, filename){
+      const blob = new Blob([JSON.stringify(obj, null, 2)], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    async function importJSON(obj){
+      if(!obj || typeof obj !== 'object') throw new Error('Bad JSON');
+      if(!Array.isArray(obj.cats) || !Array.isArray(obj.notes)) throw new Error('No cats/notes arrays');
+
+      // very light validation
+      const cats = obj.cats.map(c => ({
+        id: String(c.id || uid()),
+        parentId: c.parentId ? String(c.parentId) : null,
+        name: String(c.name || '—'),
+        createdAt: Number(c.createdAt || now()),
+        updatedAt: Number(c.updatedAt || now())
+      }));
+      const catIds = new Set(cats.map(c => c.id));
+      const notes = obj.notes.map(n => ({
+        id: String(n.id || uid()),
+        catId: catIds.has(String(n.catId)) ? String(n.catId) : (cats[0]?.id || null),
+        title: String(n.title || '—'),
+        html: String(n.html || ''),
+        createdAt: Number(n.createdAt || now()),
+        updatedAt: Number(n.updatedAt || now())
+      }));
+
+      state.cats = cats;
+      state.notes = notes;
+      ensureDefaults();
+
+      await idb.clear(STORE.cats);
+      await idb.clear(STORE.notes);
+      await idbTx('readwrite',[STORE.cats, STORE.notes], st => {
+        state.cats.forEach(c => st[STORE.cats].put(c));
+        state.notes.forEach(n => st[STORE.notes].put(n));
+      });
+
+      renderAll();
+      schedulePersist(50);
+    }
+
+    // ========= whisperer transport =========
+    function whisperSelectedOrActive(){
+      const note = state.activeNoteId ? noteById(state.activeNoteId) : null;
+      if(!note) return;
+      const text = htmlToText(note.html);
+
+      // Store payload for whisperer (primary transport)
+      const payload = { mode:'single', noteIds:[note.id], text:text, createdAt: now() };
+      try{ localStorage.setItem('onoi_whisper_payload_v1', JSON.stringify(payload)); }catch(e){}
+
+      // Navigate (secondary transport via URL for short texts)
+      try{
+        const u = new URL('../whisperer/whisperer.html', window.location.href);
+        u.searchParams.set('from','onoi_notes');
+        if((text || '').length <= 2000){
+          u.searchParams.set('text', text);
+        }
+        window.location.href = u.toString();
+      }catch(e){
+        window.location.href = '../whisperer/whisperer.html?from=onoi_notes';
+      }
+    }
+
+    // ========= cloud sync =========
+    function cloudHeaders(){
+      const h = { 'Accept': 'application/vnd.github+json' };
+      if(state.cloud.token) h['Authorization'] = 'Bearer ' + state.cloud.token;
+      return h;
+    }
+
+    function setCloudUI(){
+      cloudMode.value = state.cloud.mode;
+      pollEvery.value = String(state.cloud.pollEvery || 0);
+      ghToken.value = state.cloud.token || '';
+      ghOwner.value = state.cloud.owner || '';
+      ghRepo.value = state.cloud.repo || '';
+      ghBranch.value = state.cloud.branch || 'main';
+      ghPath.value = state.cloud.path || 'crate/onoi_notes/db.json';
+      ghGistId.value = state.cloud.gistId || '';
+      ghGistFile.value = state.cloud.gistFile || 'onoi_notes_db.json';
+
+      repoFields.style.display = (state.cloud.mode === 'repo') ? '' : 'none';
+      gistFields.style.display = (state.cloud.mode === 'gist') ? '' : 'none';
+    }
+
+    async function ghRepoGet(){
+      const url = `https://api.github.com/repos/${encodeURIComponent(state.cloud.owner)}/${encodeURIComponent(state.cloud.repo)}/contents/${state.cloud.path}?ref=${encodeURIComponent(state.cloud.branch||'main')}`;
+      const r = await fetch(url, { headers: cloudHeaders() });
+      if(r.status === 404){
+        return { exists:false, sha:null, json:null };
+      }
+      if(!r.ok){
+        const t = await r.text();
+        throw new Error('Repo GET failed: ' + r.status + ' ' + t.slice(0,200));
+      }
+      const data = await r.json();
+      const content = (data && data.content) ? atob(data.content.replace(/\n/g,'')) : '';
+      const json = content ? JSON.parse(content) : null;
+      return { exists:true, sha:data.sha || null, json };
+    }
+
+    async function ghRepoPut(obj, sha){
+      const url = `https://api.github.com/repos/${encodeURIComponent(state.cloud.owner)}/${encodeURIComponent(state.cloud.repo)}/contents/${state.cloud.path}`;
+      const body = {
+        message: 'onoi_notes autosync',
+        content: btoa(unescape(encodeURIComponent(JSON.stringify(obj)))),
+        branch: state.cloud.branch || 'main'
+      };
+      if(sha) body.sha = sha;
+      const r = await fetch(url, { method:'PUT', headers: { ...cloudHeaders(), 'Content-Type':'application/json' }, body: JSON.stringify(body) });
+      const t = await r.text();
+      if(!r.ok){
+        throw new Error('Repo PUT failed: ' + r.status + ' ' + t.slice(0,200));
+      }
+      const data = JSON.parse(t);
+      return { sha: data.content && data.content.sha ? data.content.sha : null };
+    }
+
+    async function ghGistGet(){
+      const url = `https://api.github.com/gists/${encodeURIComponent(state.cloud.gistId)}`;
+      const r = await fetch(url, { headers: cloudHeaders() });
+      if(!r.ok){
+        const t = await r.text();
+        throw new Error('Gist GET failed: ' + r.status + ' ' + t.slice(0,200));
+      }
+      const data = await r.json();
+      const files = data.files || {};
+      const file = files[state.cloud.gistFile] || Object.values(files)[0];
+      if(!file) return { json:null };
+      const content = file.content || '';
+      const json = content ? JSON.parse(content) : null;
+      return { json };
+    }
+
+    async function ghGistPatch(obj){
+      const url = `https://api.github.com/gists/${encodeURIComponent(state.cloud.gistId)}`;
+      const body = {
+        files: {
+          [state.cloud.gistFile]: { content: JSON.stringify(obj, null, 2) }
+        }
+      };
+      const r = await fetch(url, { method:'PATCH', headers:{ ...cloudHeaders(), 'Content-Type':'application/json' }, body: JSON.stringify(body) });
+      const t = await r.text();
+      if(!r.ok){
+        throw new Error('Gist PATCH failed: ' + r.status + ' ' + t.slice(0,200));
+      }
+      return true;
+    }
+
+    function mergeSnapshots(localSnap, remoteSnap){
+      // Merge by ids and updatedAt (last-write-wins per entity).
+      const out = currentDBSnapshot();
+      const mapCats = new Map();
+      const mapNotes = new Map();
+
+      function upsertCat(c){
+        const cur = mapCats.get(c.id);
+        if(!cur || (Number(c.updatedAt||0) > Number(cur.updatedAt||0))) mapCats.set(c.id, c);
+      }
+      function upsertNote(n){
+        const cur = mapNotes.get(n.id);
+        if(!cur || (Number(n.updatedAt||0) > Number(cur.updatedAt||0))) mapNotes.set(n.id, n);
+      }
+
+      (localSnap?.cats || []).forEach(upsertCat);
+      (remoteSnap?.cats || []).forEach(upsertCat);
+      (localSnap?.notes || []).forEach(upsertNote);
+      (remoteSnap?.notes || []).forEach(upsertNote);
+
+      out.cats = [...mapCats.values()];
+      out.notes = [...mapNotes.values()];
+
+      // basic orphan fix
+      const catIds = new Set(out.cats.map(c => c.id));
+      const fallbackCat = out.cats[0]?.id || null;
+      out.notes = out.notes.map(n => catIds.has(n.catId) ? n : ({...n, catId: fallbackCat}));
+
+      return out;
+    }
+
+    let cloudPushTimer = null;
+    function scheduleCloudPush(){
+      if(state.cloud.mode === 'off') return;
+      if(cloudPushTimer) clearTimeout(cloudPushTimer);
+      cloudPushTimer = setTimeout(async () => {
+        try{
+          setSync('warn', 'syncing');
+          const snap = currentDBSnapshot();
+
+          if(state.cloud.mode === 'repo'){
+            const cur = await ghRepoGet();
+            const merged = cur.json ? mergeSnapshots(snap, cur.json) : snap;
+            const res = await ghRepoPut(merged, cur.sha);
+            state.cloud.lastSha = res.sha;
+          } else if(state.cloud.mode === 'gist'){
+            let remote = null;
+            try{ remote = (await ghGistGet()).json; }catch(e){ remote = null; }
+            const merged = remote ? mergeSnapshots(snap, remote) : snap;
+            await ghGistPatch(merged);
+          }
+
+          state.cloud.lastPushAt = now();
+          saveCloudSettings();
+          setSync('ok', 'cloud');
+        }catch(e){
+          setSync('bad', 'cloud err');
+        }
+      }, 1200);
+    }
+
+    async function cloudPull(){
+      if(state.cloud.mode === 'off') return;
+      setSync('warn', 'pulling');
+      const local = currentDBSnapshot();
+      if(state.cloud.mode === 'repo'){
+        const cur = await ghRepoGet();
+        const merged = cur.json ? mergeSnapshots(local, cur.json) : local;
+        state.cloud.lastSha = cur.sha;
+        await importJSON(merged);
+      } else if(state.cloud.mode === 'gist'){
+        const cur = await ghGistGet();
+        const merged = cur.json ? mergeSnapshots(local, cur.json) : local;
+        await importJSON(merged);
+      }
+      state.cloud.lastPullAt = now();
+      saveCloudSettings();
+      setSync('ok', 'cloud');
+    }
+
+    function startPolling(){
+      if(state.cloud.pollTimer){
+        clearInterval(state.cloud.pollTimer);
+        state.cloud.pollTimer = null;
+      }
+      const sec = Number(state.cloud.pollEvery||0);
+      if(state.cloud.mode === 'off' || !sec || sec <= 0) return;
+      state.cloud.pollTimer = setInterval(async () => {
+        try{
+          await cloudPull();
+        }catch(e){
+          setSync('bad', 'cloud err');
+        }
+      }, sec * 1000);
+    }
+
+    async function testCloudConn(){
+      if(state.cloud.mode === 'off'){
+        alert('Cloud mode выключен.');
+        return;
+      }
+      setSync('warn', 'testing');
+      try{
+        if(state.cloud.mode === 'repo'){
+          await ghRepoGet();
+        } else {
+          await ghGistGet();
+        }
+        setSync('ok', 'cloud');
+        alert('OK: доступ есть.');
+      }catch(e){
+        setSync('bad', 'cloud err');
+        alert(String(e.message || e));
+      }
+    }
+
+    // ========= events =========
+    searchInput.addEventListener('input', () => {
+      state.search = (searchInput.value || '').trim();
+      renderNotesList();
+    });
+
+    newNoteBtn.addEventListener('click', createNote);
+    deleteNoteBtn.addEventListener('click', deleteActiveNote);
+
+    addCatBtn.addEventListener('click', () => createCategory(null));
+    addSubCatBtn.addEventListener('click', () => {
+      if(!state.activeCatId){ createCategory(null); return; }
+      createCategory(state.activeCatId);
+    });
+    renameCatBtn.addEventListener('click', renameActiveCategory);
+    deleteCatBtn.addEventListener('click', deleteActiveCategory);
+
+    noteTitle.addEventListener('input', () => {
+      const note = state.activeNoteId ? noteById(state.activeNoteId) : null;
+      if(!note) return;
+      note.title = (noteTitle.value || '').trim() || '—';
+      note.updatedAt = now();
+      updatedText.textContent = 'updated: ' + fmtTime(note.updatedAt);
+      renderNotesList();
+      schedulePersist();
+    });
+
+    editor.addEventListener('input', () => {
+      const note = state.activeNoteId ? noteById(state.activeNoteId) : null;
+      if(!note) return;
+      note.html = editor.innerHTML;
+      note.updatedAt = now();
+      updatedText.textContent = 'updated: ' + fmtTime(note.updatedAt);
+      // auto title if empty
+      if(!noteTitle.value.trim()){
+        const t = firstLine(note.html) || '—';
+        note.title = t.slice(0, 80);
+        noteTitle.value = note.title;
+      }
+      renderNotesList();
+      schedulePersist();
+    });
+
+    document.querySelectorAll('.tool[data-cmd]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const cmd = btn.dataset.cmd;
+        const arg = btn.dataset.arg || null;
+        if(cmd === 'formatBlock' && arg){
+          exec('formatBlock', '<' + arg + '>');
+        } else {
+          exec(cmd, arg);
+        }
+      });
+    });
+
+    fontSelect.addEventListener('change', () => {
+      setFontFamily(fontSelect.value);
+    });
+    sizeSelect.addEventListener('change', () => {
+      setFontSize(sizeSelect.value);
+    });
+
+    function applyColorSwatches(){
+      colorSwatch.style.background = colorPick.value;
+      hlSwatch.style.background = hlPick.value;
+    }
+    applyColorSwatches();
+    colorPick.addEventListener('input', () => {
+      applyColorSwatches();
+      exec('foreColor', colorPick.value);
+    });
+    hlPick.addEventListener('input', () => {
+      applyColorSwatches();
+      // hiliteColor works in most modern browsers; fallback to backColor
+      try{
+        document.execCommand('hiliteColor', false, hlPick.value);
+      }catch(e){
+        exec('backColor', hlPick.value);
+      }
+      schedulePersist();
+    });
+
+    linkBtn.addEventListener('click', () => {
+      const url = prompt('Ссылка (URL):');
+      if(!url) return;
+      exec('createLink', url.trim());
+    });
+
+    imgBtn.addEventListener('click', () => imgFile.click());
+    imgFile.addEventListener('change', async () => {
+      const f = imgFile.files && imgFile.files[0];
+      imgFile.value = '';
+      if(!f) return;
+      await insertImageFromFile(f);
+    });
+
+    focusBtn.addEventListener('click', () => {
+      // simple focus mode: hide left/right rails by toggling body class
+      document.body.classList.toggle('focus-mode');
+      const on = document.body.classList.contains('focus-mode');
+      focusBtn.textContent = on ? 'unfocus' : 'focus';
+    });
+
+
+    // Sidebar toggle + splitter
+    function setSidebarCollapsed(v){
+      state.ui.sidebarCollapsed = !!v;
+      lsSet(LS_UI.sidebarCollapsed, state.ui.sidebarCollapsed ? '1' : '0');
+      applySidebarUI();
+    }
+
+    if(toggleSidebarBtn){
+      toggleSidebarBtn.addEventListener('click', () => {
+        setSidebarCollapsed(!state.ui.sidebarCollapsed);
+      });
+    }
+
+    function setSidebarWidth(px){
+      const v = clamp(Number(px) || 320, 220, 520);
+      state.ui.sidebarW = v;
+      lsSet(LS_UI.sidebarW, String(v));
+      document.documentElement.style.setProperty('--sidebarW', v + 'px');
+    }
+
+    if(splitter){
+      let drag = false;
+
+      splitter.addEventListener('mousedown', (ev) => {
+        ev.preventDefault();
+        drag = true;
+        if(state.ui.sidebarCollapsed) setSidebarCollapsed(false);
+        document.body.classList.add('is-dragging');
+      });
+
+      window.addEventListener('mousemove', (ev) => {
+        if(!drag) return;
+        const shell = document.querySelector('.n-shell');
+        if(!shell) return;
+        const r = shell.getBoundingClientRect();
+        const w = ev.clientX - r.left;
+        setSidebarWidth(w);
+      });
+
+      window.addEventListener('mouseup', () => {
+        if(!drag) return;
+        drag = false;
+        document.body.classList.remove('is-dragging');
+      });
+    }
+
+    // Keyboard: Ctrl+\ — toggle sidebar
+    window.addEventListener('keydown', (e) => {
+      if(e.ctrlKey && (e.key === '\\' || e.code === 'Backslash')){
+        e.preventDefault();
+        setSidebarCollapsed(!state.ui.sidebarCollapsed);
+      }
+    });
+
+
+    settingsBtn.addEventListener('click', () => {
+      settingsModal.classList.add('is-open');
+      setCloudUI();
+      ghToken.focus();
+    });
+    closeSettings.addEventListener('click', () => settingsModal.classList.remove('is-open'));
+    settingsModal.addEventListener('click', (e) => {
+      if(e.target === settingsModal) settingsModal.classList.remove('is-open');
+    });
+
+    cloudMode.addEventListener('change', () => {
+      state.cloud.mode = cloudMode.value;
+      setCloudUI();
+      saveCloudSettings();
+      if(state.cloud.mode === 'off'){ setSync('ok','local'); }
+      startPolling();
+    });
+    pollEvery.addEventListener('change', () => {
+      state.cloud.pollEvery = Number(pollEvery.value||0);
+      saveCloudSettings();
+      startPolling();
+    });
+
+    function syncCloudFieldsFromInputs(){
+      state.cloud.token = ghToken.value.trim();
+      state.cloud.owner = ghOwner.value.trim();
+      state.cloud.repo = ghRepo.value.trim();
+      state.cloud.branch = (ghBranch.value.trim() || 'main');
+      state.cloud.path = (ghPath.value.trim() || 'crate/onoi_notes/db.json');
+      state.cloud.gistId = ghGistId.value.trim();
+      state.cloud.gistFile = (ghGistFile.value.trim() || 'onoi_notes_db.json');
+      saveCloudSettings();
+    }
+    [ghToken, ghOwner, ghRepo, ghBranch, ghPath, ghGistId, ghGistFile].forEach(el => {
+      el.addEventListener('input', () => { syncCloudFieldsFromInputs(); });
+    });
+
+    testCloud.addEventListener('click', async () => {
+      try{
+        syncCloudFieldsFromInputs();
+        await testCloudConn();
+      }catch(e){}
+    });
+    pullCloud.addEventListener('click', async () => {
+      try{
+        syncCloudFieldsFromInputs();
+        await cloudPull();
+        alert('Pull: готово.');
+      }catch(e){
+        alert(String(e.message || e));
+      }
+    });
+    pushCloud.addEventListener('click', async () => {
+      try{
+        syncCloudFieldsFromInputs();
+        setSync('warn','pushing');
+        scheduleCloudPush();
+        alert('Push: отправка запланирована (авто).');
+      }catch(e){
+        alert(String(e.message || e));
+      }
+    });
+
+    exportBtn.addEventListener('click', () => {
+      downloadJSON(currentDBSnapshot(), 'onoi_notes_export.json');
+    });
+    importBtn.addEventListener('click', () => importFile.click());
+    importFile.addEventListener('change', async () => {
+      const f = importFile.files && importFile.files[0];
+      importFile.value = '';
+      if(!f) return;
+      try{
+        const txt = await f.text();
+        const obj = JSON.parse(txt);
+        await importJSON(obj);
+        alert('Импорт: готово.');
+      }catch(e){
+        alert('Ошибка импорта: ' + String(e.message || e));
+      }
+    });
+
+    whisperBtn.addEventListener('click', whisperSelectedOrActive);
+
+    // ========= keyboard shortcuts =========
+    window.addEventListener('keydown', (e) => {
+      const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+      const inEditor = (e.target === editor || tag === 'input' || tag === 'textarea' || tag === 'select' || e.target.isContentEditable);
+
+      if(e.ctrlKey && (e.key.toLowerCase() === 'k')){
+        e.preventDefault();
+        searchInput.focus();
+        searchInput.select();
+        return;
+      }
+      if(e.ctrlKey && (e.key.toLowerCase() === 'n')){
+        e.preventDefault();
+        createNote();
+        return;
+      }
+      if(e.ctrlKey && (e.key.toLowerCase() === 'f')){
+        e.preventDefault();
+        searchInput.focus();
+        searchInput.select();
+        return;
+      }
+      if(e.key === 'Delete' && !inEditor){
+        deleteActiveCategory();
+        return;
+      }
+      if(e.key === 'Enter' && !inEditor){
+        renameActiveCategory();
+        return;
+      }
+    });
+
+    // ========= init =========
+    async function boot(){
+      // UI init
+      const sw = Number(lsGet(LS_UI.sidebarW) || 320);
+      state.ui.sidebarW = clamp(sw, 220, 520);
+      state.ui.sidebarCollapsed = (lsGet(LS_UI.sidebarCollapsed) === '1');
+      state.ui.collapsedCats = loadCollapsedCats();
+      applySidebarUI();
+
+      loadCloudSettings();
+      applySavedTypography();
+
+      // load all from idb
+      state.cats = await idb.all(STORE.cats);
+      state.notes = await idb.all(STORE.notes);
+
+      ensureDefaults();
+
+      // persist defaults if needed
+      await persistAll();
+
+      // render
+      renderAll();
+
+      // set sync indicator
+      if(state.cloud.mode === 'off') setSync('ok', 'local');
+      else setSync('warn', 'cloud');
+
+      // start polling and initial pull (optional)
+      setCloudUI();
+      startPolling();
+
+      // If cloud enabled, try pull once at start (best-effort)
+      if(state.cloud.mode !== 'off'){
+        try{
+          await cloudPull();
+        }catch(e){
+          setSync('bad','cloud err');
+        }
+      }
+    }
+
+    boot();
+  })();
+  </script>
+
+  <style>
+    /* focus mode: hide rails + reduce distractions */
+    body.focus-mode .rail{ display:none !important; }
+    body.focus-mode .notes-wrap{ max-width: 940px; }
+  </style>
+</body>
+</html>
