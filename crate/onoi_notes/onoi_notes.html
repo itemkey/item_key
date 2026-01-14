@@ -123,7 +123,7 @@
     /* Top utility bar */
     .n-topbar{
       display: grid;
-      grid-template-columns: 1fr auto auto;
+      grid-template-columns: 1fr auto auto auto;
       gap: 10px;
       align-items: center;
     }
@@ -608,7 +608,140 @@
       .tree-actions{ grid-template-columns: 1fr; }
       .n-topbar{ grid-template-columns: 1fr; }
     }
-  </style>
+  
+    /* =========================================================
+       Mobile-first improvements (phone UX)
+       - Sidebar becomes off-canvas drawer
+       - Larger touch targets + horizontal scrolling toolbar
+       - Hide rails on small screens to maximize editor space
+       ========================================================= */
+
+    .drawer-overlay{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.35);
+      display: none;
+      z-index: 9997;
+      touch-action: none;
+    }
+    body.drawer-open .drawer-overlay{ display: block; }
+
+    .drawer-head{
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 8px 10px 10px;
+      border: 1px solid rgba(0,0,0,.12);
+      background: rgba(255,255,255,.92);
+    }
+    .drawer-title{
+      font-size: 11px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: rgba(0,0,0,.70);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 900px){
+      /* maximize content area */
+      :root{
+        --topbarOffset: 60px;
+        --footerH: 58px;
+        --fs-ui: 13px;
+      }
+
+      /* hide global rails on phones */
+      .rail{ display: none !important; }
+
+      .notes-wrap{ padding: 10px 10px 18px; }
+      .n-title h1{ letter-spacing: 5px; }
+      .n-title .sub{ letter-spacing: 2.5px; }
+
+      /* Keep editor as primary: sidebar becomes a drawer */
+      .n-shell{ grid-template-columns: 1fr; }
+      .v-splitter{ display: none !important; }
+
+      .n-col-left{
+        position: fixed;
+        left: 0;
+        top: var(--topbarOffset);
+        bottom: calc(var(--footerH) + env(safe-area-inset-bottom));
+        width: min(420px, 92vw);
+        max-width: 92vw;
+        overflow: auto;
+        z-index: 9998;
+        transform: translateX(-110%);
+        transition: transform .18s ease;
+        box-shadow: 10px 0 40px rgba(0,0,0,.18);
+        background: transparent; /* cards inside have their own bg */
+        padding: 10px;
+      }
+      body.drawer-open .n-col-left{ transform: translateX(0); }
+
+      .drawer-head{ display: flex; position: sticky; top: 0; z-index: 1; }
+
+      /* Make the topbar wrap nicely on small screens */
+      .n-topbar{
+        grid-template-columns: 1fr auto;
+        gap: 8px;
+      }
+      #newNoteBtn{ grid-column: 1 / -1; }
+      .n-pill{ grid-column: 1 / -1; justify-content: flex-start; }
+
+      /* Buttons and fields: better touch targets */
+      .n-btn{ min-height: 44px; padding: 12px 12px; letter-spacing: 2px; }
+      .n-search{ height: 44px; font-size: 13px; }
+      .editor-title{ height: 44px; font-size: 12px; }
+
+      /* Toolbar: single-row horizontal scrolling */
+      .toolbar-row{
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+        padding-bottom: 4px;
+      }
+      .toolbar-row::-webkit-scrollbar{ height: 8px; }
+      .tool, .toolsel{
+        flex: 0 0 auto;
+        height: 42px;
+        font-size: 13px;
+      }
+      .tool.is-primary{ letter-spacing: 3px; }
+
+      /* Editor: comfortable height on phones */
+      .editor{
+        min-height: 55vh;
+        padding: 14px 12px;
+      }
+
+      /* Modal: full height comfort */
+      .modal{ padding: 10px; }
+      .modal-card{ width: 100%; max-height: calc(100vh - 20px); }
+    }
+
+    @media (max-width: 520px){
+      .n-title h1{ letter-spacing: 4px; }
+      .n-title .sub{ font-size: 10px; }
+      .editor-head{
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+      .editor-head-right{
+        justify-content: space-between;
+      }
+      .crumbs{ max-width: 62vw; }
+      .n-btn.is-primary{ width: 100%; }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      .n-btn, .n-col-left{ transition: none !important; }
+    }
+
+</style>
 </head>
 
 <body class="page page-crate">
@@ -658,7 +791,8 @@
       <div class="n-card">
         <div class="n-topbar" aria-label="Панель поиска и действий">
           <input class="n-search" id="searchInput" placeholder="Поиск по заметкам… (Ctrl+K)" />
-          <button class="n-btn" id="newNoteBtn" type="button">Новая заметка</button>
+                    <button class="n-btn" id="openDrawerBtn" type="button" title="Открыть меню категорий и заметок">Меню</button>
+<button class="n-btn" id="newNoteBtn" type="button">Новая заметка</button>
           <div class="n-pill" title="Статус синхронизации" aria-label="Статус синхронизации">
             <span class="dot" id="syncDot"></span>
             <span id="syncText">local</span>
@@ -676,9 +810,15 @@
 </div>
       </div>
 
+            <div class="drawer-overlay" id="drawerOverlay" aria-hidden="true"></div>
+
       <div class="n-shell" aria-label="Основной интерфейс">
         <!-- Categories -->
         <div class="n-col-left" id="sidebarCol" aria-label="Боковая панель">
+<div class="drawer-head" aria-label="Мобильное меню">
+  <div class="drawer-title">Меню</div>
+  <button class="n-btn" id="closeDrawerBtn" type="button">Закрыть</button>
+</div>
 <div class="n-card" aria-label="Категории">
           <div class="n-label">categories</div>
 
@@ -1292,6 +1432,7 @@ const hasChildren = (byParent.get(cat.id) || []).length > 0;
               state.activeNoteId = null;
             }
             renderAll();
+            closeDrawerSoon && closeDrawerSoon();
           });
 
           row.addEventListener('keydown', (e) => {
@@ -1378,6 +1519,7 @@ const hasChildren = (byParent.get(cat.id) || []).length > 0;
           state.activeNoteId = n.id;
           renderEditor();
           renderNotesList();
+          closeDrawerSoon && closeDrawerSoon();
         });
 
         notesList.appendChild(row);

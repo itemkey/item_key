@@ -2,17 +2,24 @@
 <html lang="ru">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Item Key — item-crate</title>
 
   <!-- глобальный стиль сайта -->
   <link rel="stylesheet" href="assets/css/styles.css" />
 
-  <!-- локальные стили ТОЛЬКО для меню item-crate (не ломаем весь проект) -->
+  <!-- локальные стили ТОЛЬКО для item-crate (не ломаем весь проект) -->
   <style>
+    :root{
+      --crate-max: 920px;
+      --crate-gap: clamp(10px, 2vw, 14px);
+      --crate-pad: clamp(10px, 2.6vw, 16px);
+      --tap: 44px;
+    }
+
     /* Центр-хаб item-crate */
     .crate-hub{
-      width: min(920px, 92vw);
+      width: min(var(--crate-max), 92vw);
       margin: 0 auto;
       display: grid;
       gap: 16px;
@@ -26,12 +33,12 @@
     }
     .crate-title h1{
       margin: 0;
-      font-size: 14px;
+      font-size: clamp(14px, 1.2vw + 12px, 18px);
       letter-spacing: 5px;
       text-transform: uppercase;
     }
     .crate-title .sub{
-      font-size: 11px;
+      font-size: clamp(11px, 0.7vw + 9px, 12px);
       letter-spacing: 3.5px;
       text-transform: uppercase;
       color: rgba(0,0,0,.55);
@@ -41,14 +48,14 @@
     .crate-grid{
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: clamp(10px, 2vw, 14px);
+      gap: var(--crate-gap);
     }
 
-    /* Карточка-переход (по эстетике как “дорогая рамка”) */
+    /* Карточка-переход */
     .crate-card{
       display: grid;
       gap: 10px;
-      padding: 16px 14px;
+      padding: var(--crate-pad);
       border: 1px solid rgba(0,0,0,.14);
       background: rgba(255,255,255,.86);
       text-decoration: none;
@@ -56,11 +63,22 @@
       transition: transform .18s ease, border-color .18s ease, opacity .18s ease;
       min-height: 138px;
       align-content: start;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      border-radius: 0px;
     }
     .crate-card:hover{
       transform: translateY(-2px);
       border-color: rgba(0,0,0,.22);
       opacity: .98;
+    }
+    .crate-card:active{
+      transform: translateY(0);
+      opacity: 1;
+    }
+    .crate-card:focus-visible{
+      outline: 2px solid rgba(0,0,0,.45);
+      outline-offset: 3px;
     }
 
     .crate-card__kicker{
@@ -74,12 +92,65 @@
       letter-spacing: 3px;
       text-transform: uppercase;
       margin: 0;
+      line-height: 1.2;
     }
     .crate-card__meta{
       font-size: 11px;
       line-height: 1.45;
       color: rgba(0,0,0,.72);
       margin: 0;
+      text-wrap: pretty;
+    }
+
+    /* Мобильная док-навигация (вместо rail'ов) */
+    .mobile-dock{
+      display: none;
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 50;
+      padding: 10px calc(10px + env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) calc(10px + env(safe-area-inset-left));
+      pointer-events: none; /* контейнер не ловит клики, только внутреннее */
+    }
+    .mobile-dock__inner{
+      pointer-events: auto;
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+      border: 1px solid rgba(0,0,0,.14);
+      background: rgba(255,255,255,.92);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      border-radius: 0px;
+      padding: 8px;
+      box-shadow: 0 8px 26px rgba(0,0,0,.10);
+    }
+    .mobile-dock__link{
+      display: grid;
+      gap: 2px;
+      align-content: center;
+      justify-items: center;
+      text-decoration: none;
+      color: inherit;
+      min-height: var(--tap);
+      border-radius: 0px;
+      padding: 6px 6px;
+      border: 1px solid transparent;
+      transition: border-color .18s ease, background .18s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .mobile-dock__link:active{
+      background: rgba(0,0,0,.04);
+      border-color: rgba(0,0,0,.10);
+    }
+    .mobile-dock__label{
+      font-size: 9px;
+      letter-spacing: 2.2px;
+      text-transform: uppercase;
+      line-height: 1.1;
+      text-align: center;
+      opacity: .85;
     }
 
     /* Адаптив: на узких экранах делаем 1-2 колонки */
@@ -88,7 +159,48 @@
     }
     @media (max-width: 620px){
       .crate-grid{ grid-template-columns: 1fr; }
+      .crate-card{ min-height: unset; }
     }
+
+    /* Тач-устройства: отключаем hover-«скачок» */
+    @media (hover: none) and (pointer: coarse){
+      .crate-card:hover{ transform: none; }
+    }
+
+    /* Телефон: убираем боковые rail, добавляем нижний dock, увеличиваем полезную область */
+    @media (max-width: 720px){
+      .rail{ display: none !important; }
+      .mobile-dock{ display: block; }
+
+      /* если в глобальном CSS center-stage/frames имеют фиксированные отступы — слегка страхуемся */
+      .center-stage{
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+        padding-bottom: calc(92px + env(safe-area-inset-bottom)) !important; /* место под dock */
+      }
+
+      .crate-hub{
+        width: min(var(--crate-max), 96vw);
+        gap: 14px;
+      }
+
+      .crate-title{
+        padding: 10px 4px;
+      }
+    }
+
+    /* Очень узкие экраны: 4 пункта + скрываем item-soft */
+    @media (max-width: 360px){
+      .mobile-dock__inner{ grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .mobile-dock__link--soft{ display: none; }
+    }
+    /* Принудительно острые углы для всех интерактивных элементов этой страницы */
+    .crate-card,
+    .mobile-dock__inner,
+    .mobile-dock__link{
+      border-radius: 0 !important;
+    }
+
   </style>
 </head>
 
@@ -139,7 +251,6 @@
       </div>
 
       <div class="crate-grid" role="navigation" aria-label="Разделы item-crate">
-        <!-- пока заглушки: href можно оставить # -->
         <a class="crate-card" href="crate/onoi_notes/onoi_notes.html">
           <div class="crate-card__kicker">module</div>
           <h2 class="crate-card__name">заметки</h2>
@@ -147,18 +258,16 @@
         </a>
 
         <a class="crate-card" href="crate/planning/planning.html">
-  <div class="crate-card__kicker">module</div>
-  <h2 class="crate-card__name">планирование</h2>
-  <p class="crate-card__meta">пока пусто. здесь будет план / трекер / расписание.</p>
-</a>
-
+          <div class="crate-card__kicker">module</div>
+          <h2 class="crate-card__name">планирование</h2>
+          <p class="crate-card__meta">пока пусто. здесь будет план / трекер / расписание.</p>
+        </a>
 
         <a class="crate-card" href="crate/student_helper/student_helper.html">
           <div class="crate-card__kicker">module</div>
           <h2 class="crate-card__name">помощь студентам</h2>
           <p class="crate-card__meta">модуль активен. тренажёр / база / поиск.</p>
         </a>
-      </div>
 
         <a class="crate-card" href="crate/whisperer/whisperer.html">
           <div class="crate-card__kicker">module</div>
@@ -174,6 +283,27 @@
     <span class="sep">•</span>
     <span class="hint">pre-alpha</span>
   </footer>
+
+  <!-- Мобильная навигация (появляется только на телефоне) -->
+  <nav class="mobile-dock" aria-label="Быстрая навигация">
+    <div class="mobile-dock__inner" role="navigation" aria-label="Разделы Item Key">
+      <a class="mobile-dock__link" href="index.html" aria-label="item-key">
+        <span class="mobile-dock__label">item-key</span>
+      </a>
+      <a class="mobile-dock__link" href="item-manufacture.html" aria-label="item-manufacture">
+        <span class="mobile-dock__label">manufacture</span>
+      </a>
+      <a class="mobile-dock__link" href="item-security.html" aria-label="item-security">
+        <span class="mobile-dock__label">security</span>
+      </a>
+      <a class="mobile-dock__link mobile-dock__link--soft" href="item-soft.html" aria-label="item-soft">
+        <span class="mobile-dock__label">item-soft</span>
+      </a>
+      <a class="mobile-dock__link" href="item-user.html?returnTo=item-crate.html" aria-label="item-user">
+        <span class="mobile-dock__label">item-user</span>
+      </a>
+    </div>
+  </nav>
 
   <!-- если общий main.js нужен для эффектов/движения -->
   <script src="assets/js/main.js"></script>
