@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Item Key — item-user</title>
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body class="page page-user">
+
+  <div class="outer-frame"></div>
+
+  <header class="topbar topbar--edge">
+    <a class="toplink" href="index.html">
+      <span class="tag">item-key</span>
+    </a>
+  </header>
+
+  <main class="center-stage">
+
+    <!-- ГОСТЬ -->
+    <section id="authGuest" class="auth-box">
+      <h1>item-user</h1>
+      <p class="muted">доступ к архиву</p>
+
+      <div class="auth-tabs">
+        <button data-tab="login" class="auth-tab is-active">вход</button>
+        <button data-tab="register" class="auth-tab">регистрация</button>
+      </div>
+
+      <!-- ВХОД -->
+      <form id="loginForm" class="auth-form">
+        <input required type="text" placeholder="логин или почта" id="loginName">
+        <input required type="password" placeholder="пароль" id="loginPass">
+        <button class="btn btn--primary" type="submit">войти</button>
+      </form>
+
+      <!-- РЕГИСТРАЦИЯ -->
+      <form id="registerForm" class="auth-form hidden">
+        <input required type="text" placeholder="логин" id="regName">
+        <input required type="email" placeholder="почта" id="regEmail">
+        <input required type="password" placeholder="пароль" id="regPass">
+        <button class="btn btn--primary" type="submit">создать аккаунт</button>
+      </form>
+    </section>
+
+    <!-- ПРОФИЛЬ -->
+    <section id="authProfile" class="auth-box hidden">
+      <h1>профиль</h1>
+
+      <div class="profile-line"><b>логин:</b> <span id="pLogin"></span></div>
+      <div class="profile-line"><b>email:</b> <span id="pEmail"></span></div>
+
+      <button id="logoutBtn" class="btn">выйти</button>
+    </section>
+
+  </main>
+
+  <script>
+    // =========================
+    // NAV: return link depends on where user came from
+    // Reads ?returnTo / ?from, then falls back to session/localStorage keys
+    // =========================
+    (() => {
+      const link = document.querySelector("header .toplink");
+      if (!link) return;
+      const tag = link.querySelector(".tag");
+
+      const params = new URLSearchParams(location.search);
+
+      const getRefFile = () => {
+        const ref = document.referrer || "";
+        if (!ref) return null;
+        try {
+          const u = new URL(ref);
+          const file = (u.pathname || "").split("/").pop();
+          return file || null;
+        } catch (e) {
+          // fallback if referrer isn't a valid absolute URL
+          const file = String(ref).split("?")[0].split("#")[0].split("/").pop();
+          return file || null;
+        }
+      };
+
+      const refFile = getRefFile();
+
+      // Priority:
+      // 1) explicit query (?returnTo / ?from)
+      // 2) real referrer page (when you clicked сюда из другой вкладки)
+      // 3) saved storage values (for edge cases like reloads)
+      const candidate =
+        params.get("returnTo") ||
+        params.get("from") ||
+        (refFile && refFile.toLowerCase() !== "item-user.html" ? refFile : null) ||
+        sessionStorage.getItem("itemkey.user.returnTo") ||
+        localStorage.getItem("itemkey.user.returnTo") ||
+        localStorage.getItem("itemkey.lastPage") ||
+        localStorage.getItem("itemkey.returnTo") ||
+        localStorage.getItem("itemkey.prevPage") ||
+        localStorage.getItem("itemkey.nav.return") ||
+        localStorage.getItem("itemkey.user.from") ||
+        "index.html";
+
+      const safeFile = (v) => {
+        if (!v) return null;
+        const clean = String(v).split("?")[0].split("#")[0].split("/").pop().trim();
+        if (!/^[a-z0-9\-]+\.html$/i.test(clean)) return null;
+        if (clean.toLowerCase() === "item-user.html") return null;
+        return clean;
+      };
+
+      const dest = safeFile(candidate) || "index.html";
+      link.href = dest;
+       // keep last origin in storage (helps when referrer is empty on file://)
+       try { sessionStorage.setItem("itemkey.user.returnTo", dest); } catch(e) {}
+       try { localStorage.setItem("itemkey.user.returnTo", dest); } catch(e) {}
+
+
+      const label =
+        dest.toLowerCase() === "index.html"
+          ? "item-key"
+          : dest.replace(/\.html$/i, "");
+
+      if (tag) tag.textContent = label;
+      link.setAttribute("aria-label", `back to ${label}`);
+    })();
+  </script>
+
+  <script src="assets/js/auth.js"></script>
+</body>
+</html>

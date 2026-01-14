@@ -1,0 +1,584 @@
+/* Декор — только фон, НЕ перехватывает клики */
+.outer-frame, .rays, .veil { pointer-events: none; }
+
+/* Planning layout */
+.planning-shell{
+  width: min(1180px, 94vw);
+  margin: 0 auto;
+  display: grid;
+  gap: 14px;
+}
+
+.planning-head{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0;
+}
+
+.planning-title .kicker{
+  font-size: 10px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: rgba(0,0,0,.55);
+}
+.planning-title h1{
+  margin: 6px 0 0 0;
+  font-size: 14px;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+}
+
+.planning-actions{
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn{
+  border: 1px solid rgba(0,0,0,.14);
+  background: rgba(255,255,255,.86);
+  padding: 10px 12px;
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.btn:hover{ border-color: rgba(0,0,0,.25); }
+
+.planning-toolbar{
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* Filters toolbar: many controls, so keep them a bit tighter */
+.planning-toolbar .ctl{ min-width: 160px; }
+
+.btn--thin{
+  padding: 10px 10px;
+  min-width: 0;
+}
+
+.ctl{
+  border: 1px solid rgba(0,0,0,.14);
+  background: rgba(255,255,255,.86);
+  padding: 10px 12px;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  outline: none;
+  min-width: 180px;
+}
+
+.planning-content{ min-height: 55vh; }
+
+.board{
+  display: grid;
+  grid-template-columns: repeat(4, minmax(240px, 1fr));
+  gap: 12px;
+  overflow: auto;
+  padding-bottom: 6px;
+}
+
+@media (max-width: 980px){
+  .board{ grid-template-columns: repeat(2, minmax(240px, 1fr)); }
+}
+@media (max-width: 620px){
+  .board{ grid-template-columns: 1fr; }
+  .ctl{ min-width: 0; width: 100%; }
+}
+
+.column{
+  border: 1px solid rgba(0,0,0,.14);
+  background: rgba(255,255,255,.86);
+  padding: 10px;
+  display: grid;
+  gap: 10px;
+  min-height: 340px;
+}
+
+.column__head{
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.column__title{
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+.column__count{
+  font-size: 11px;
+  color: rgba(0,0,0,.55);
+}
+
+.column__dropzone{
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  min-height: 260px;
+}
+
+.card{
+  border: 1px solid rgba(0,0,0,.14);
+  background: rgba(255,255,255,.94);
+  padding: 10px;
+  display: grid;
+  gap: 8px;
+  cursor: grab;
+}
+.card:active{ cursor: grabbing; }
+
+.card__name{
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.card__meta{
+  margin: 0;
+  font-size: 11px;
+  color: rgba(0,0,0,.70);
+  line-height: 1.4;
+}
+
+.schedule{
+  border: 1px solid rgba(0,0,0,.14);
+  background: rgba(255,255,255,.86);
+  padding: 12px;
+}
+
+/* Modal — ВСЕГДА поверх всего сайта */
+.modal{
+  position: fixed;
+  inset: 0;
+  z-index: 9999 !important;
+}
+.modal__backdrop{
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,.25);
+}
+.modal__panel{
+  position: relative;
+  width: min(640px, 92vw);
+  margin: 7vh auto;
+  border: 1px solid rgba(0,0,0,.14);
+  background: rgba(255,255,255,.96);
+}
+.modal__head{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  border-bottom: 1px solid rgba(0,0,0,.10);
+}
+.modal__title{
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+.modal__body{ padding: 12px; display: grid; gap: 10px; }
+
+.icon-btn{
+  border: 1px solid rgba(0,0,0,.14);
+  background: rgba(255,255,255,.86);
+  width: 34px; height: 34px;
+  cursor: pointer;
+}
+
+/* Toasts */
+.toast-stack{
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  display: grid;
+  gap: 10px;
+  z-index: 10000 !important;
+}
+.toast{
+  border: 1px solid rgba(0,0,0,.14);
+  background: rgba(255,255,255,.96);
+  padding: 10px 12px;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+/* ===========================
+   PROJECT BAR (chips + actions)
+   =========================== */
+
+.page-planning .projectbar{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  padding: 10px 2px 6px;
+  overflow-x:auto;
+  scrollbar-width:none;
+}
+.page-planning .projectbar::-webkit-scrollbar{ display:none; }
+
+.page-planning .proj-chip{
+  position: relative;
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  padding: 8px 56px 8px 10px; /* space for ⚙ and × */
+  border: 1px solid rgba(0,0,0,.14);
+  background: rgba(255,255,255,.92);
+  border-radius: 10px;
+  cursor:pointer;
+  user-select:none;
+  white-space:nowrap;
+  transition: transform .12s ease, border-color .12s ease, background .12s ease;
+}
+.page-planning .proj-chip:hover{
+  transform: translateY(-1px);
+  border-color: rgba(0,0,0,.28);
+}
+.page-planning .proj-chip.is-active{
+  border-color: rgba(0,0,0,.55);
+}
+.page-planning .proj-chip.is-drop{
+  border-color: rgba(0,0,0,.75);
+  background: rgba(245,245,245,.95);
+}
+
+.page-planning .proj-chip__name{
+  font-size:11px;
+  letter-spacing:2px;
+  text-transform:uppercase;
+}
+.page-planning .proj-chip__count{
+  font-size:11px;
+  opacity:.65;
+}
+
+.page-planning .proj-chip__ctl,
+.page-planning .proj-chip__del{
+  position:absolute;
+  top:50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  border-radius: 8px;
+  border: 1px solid rgba(0,0,0,.14);
+  background: rgba(255,255,255,.90);
+  cursor:pointer;
+  display:grid;
+  place-items:center;
+  font-size: 12px;
+  line-height: 1;
+  opacity: .65;
+  padding: 0;
+}
+.page-planning .proj-chip__ctl{ right: 30px; }
+.page-planning .proj-chip__del{ right: 7px; font-size:14px; }
+
+.page-planning .proj-chip__ctl:hover,
+.page-planning .proj-chip__del:hover{
+  opacity: 1;
+  border-color: rgba(0,0,0,.35);
+}
+
+/* ===========================
+   COLUMNS MODAL (manage)
+   =========================== */
+
+.page-planning .cols-list{
+  display: grid;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.page-planning .cols-row{
+  display: grid;
+  grid-template-columns: 1fr 60px 72px 116px;
+  gap: 10px;
+  align-items: center;
+}
+
+.page-planning .cols-done{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:11px;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  opacity:.75;
+}
+
+.page-planning .cols-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:6px;
+}
+
+@media (max-width: 560px){
+  .page-planning .cols-row{
+    grid-template-columns: 1fr 60px 1fr;
+    grid-template-areas:
+      "name color done"
+      "actions actions actions";
+  }
+  .page-planning .cols-row .cols-name{ grid-area: name; }
+  .page-planning .cols-row .cols-color{ grid-area: color; }
+  .page-planning .cols-row .cols-done{ grid-area: done; }
+  .page-planning .cols-row .cols-actions{ grid-area: actions; justify-content:flex-start; }
+}
+
+/* ===========================
+   BOARD: column dot + card accent
+   =========================== */
+
+.page-planning .col-dot{
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--c);
+  display:inline-block;
+  margin-right: 8px;
+  opacity: .9;
+}
+
+.page-planning .card{
+  position: relative;
+  border: 1px solid rgba(0,0,0,.14);
+  background: rgba(255,255,255,.96);
+  /* override with accent if supported */
+  border-color: color-mix(in srgb, var(--accent, #111111) 22%, black 0%);
+  background: color-mix(in srgb, var(--accent, #111111) 14%, white);
+}
+
+.page-planning .card::before{
+  content:"";
+  position:absolute;
+  left:0; top:0; bottom:0;
+  width:3px;
+  background: color-mix(in srgb, var(--accent, #111111) 70%, white);
+}
+
+.page-planning .card--done .card__name,
+.page-planning .card--done .card__meta{
+  text-decoration: line-through;
+  opacity: .72;
+}
+.page-planning .card--done .btn{
+  opacity: .55;
+}
+.page-planning .card--done .btn:hover{
+  opacity: .75;
+}
+
+/* ===========================
+   MODAL FORMS — HARD OVERRIDES
+   Fixes: overflow / misaligned buttons / broken grids / color picker UI
+   =========================== */
+
+.page-planning .modal__panel{
+  /* prevent inner grids from pushing buttons outside the panel */
+  overflow: hidden;
+}
+
+.page-planning .modal__body{
+  max-height: 72vh;
+  overflow: auto;
+}
+
+/* In toolbars we want min-width, but inside modals it breaks layouts */
+.page-planning .modal .ctl{
+  min-width: 0 !important;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Stable form layout (global styles.css may override .form) */
+.page-planning .modal .form{
+  display: grid;
+  gap: 12px;
+}
+
+.page-planning .modal .form__grid2{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+@media (max-width: 560px){
+  .page-planning .modal .form__grid2{
+    grid-template-columns: 1fr;
+  }
+}
+
+.page-planning .modal .form__actions{
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* Make TEXTAREA behave nicely inside the modal */
+.page-planning .modal textarea.ctl{
+  resize: vertical;
+}
+
+/* ===========================
+   COLUMNS: row sizing + color picker
+   =========================== */
+
+.page-planning .cols-row{
+  /* the previous 60px column + .ctl min-width caused overflow;
+     keep a strict, predictable grid */
+  grid-template-columns: minmax(180px, 1fr) 54px 86px 136px;
+}
+
+/* Color input must be a swatch, not a stretched control */
+.page-planning input[type="color"].cols-color{
+  min-width: 0 !important;
+  width: 54px !important;
+  height: 38px;
+  padding: 0 !important;
+  border: 1px solid rgba(0,0,0,.14);
+  background: rgba(255,255,255,.86);
+  cursor: pointer;
+}
+.page-planning input[type="color"].cols-color::-webkit-color-swatch-wrapper{
+  padding: 4px;
+}
+.page-planning input[type="color"].cols-color::-webkit-color-swatch{
+  border: 1px solid rgba(0,0,0,.18);
+  border-radius: 8px;
+}
+.page-planning input[type="color"].cols-color::-moz-color-swatch{
+  border: 1px solid rgba(0,0,0,.18);
+  border-radius: 8px;
+}
+
+/* Smaller action buttons in rows */
+.page-planning .cols-actions .btn{
+  padding: 10px 10px;
+}
+
+/* ==================================================
+   MODAL LAYOUT V2 — NO HORIZONTAL SCROLL, CLEAN FORMS
+   (overrides aggressive global styles.css rules)
+   ================================================== */
+
+.page-planning *,
+.page-planning *::before,
+.page-planning *::after{ box-sizing: border-box; }
+
+/* Panel width: big enough for 'Columns', responsive everywhere */
+.page-planning .modal__panel{
+  width: min(1040px, calc(100vw - 56px)) !important;
+  margin: 6vh auto !important;
+}
+@media (max-width: 620px){
+  .page-planning .modal__panel{
+    width: calc(100vw - 28px) !important;
+    margin: 4vh auto !important;
+  }
+}
+
+/* Body: only vertical scroll if реально нужно */
+.page-planning .modal__body{
+  max-height: calc(100vh - 170px) !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  padding: 14px !important;
+}
+
+/* Kill any inherited multi-column form layouts inside modals */
+.page-planning .modal .form{
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  grid-auto-flow: row !important;
+  align-items: start !important;
+  justify-items: stretch !important;
+  gap: 12px !important;
+  width: 100% !important;
+}
+.page-planning .modal .form > *{ min-width: 0 !important; }
+
+/* Controls inside modals should never have a forced width */
+.page-planning .modal .ctl{
+  min-width: 0 !important;
+  width: 100% !important;
+}
+
+/* Two-field row (deadline/priority) stays 2 columns on desktop */
+.page-planning .modal .form__grid2{
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 12px !important;
+}
+@media (max-width: 720px){
+  .page-planning .modal .form__grid2{
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Actions: always inside the panel, wraps if needed */
+.page-planning .modal .form__actions{
+  display: flex !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  gap: 10px !important;
+  flex-wrap: wrap !important;
+}
+
+/* Columns modal has "add" on the left, save/close on the right */
+.page-planning .modal [data-cols-form] .form__actions{
+  justify-content: space-between !important;
+}
+
+/* ===== Columns rows: strict grid, no overflow ===== */
+.page-planning .cols-list{ overflow-x: hidden !important; }
+.page-planning .cols-row{
+  grid-template-columns: minmax(240px, 1fr) 64px minmax(96px, 120px) 156px !important;
+  gap: 12px !important;
+}
+@media (max-width: 860px){
+  .page-planning .cols-row{
+    grid-template-columns: 1fr 64px 1fr !important;
+    grid-template-areas:
+      "name color done"
+      "actions actions actions";
+  }
+  .page-planning .cols-row .cols-name{ grid-area: name; }
+  .page-planning .cols-row .cols-color{ grid-area: color; }
+  .page-planning .cols-row .cols-done{ grid-area: done; }
+  .page-planning .cols-row .cols-actions{ grid-area: actions; justify-content: flex-start !important; }
+}
+
+/* Swatch-style color control */
+.page-planning input[type="color"].cols-color{
+  width: 64px !important;
+  height: 40px !important;
+  padding: 0 !important;
+  border-radius: 10px;
+}
+
+/* Row action buttons must be compact, not stretching the grid */
+.page-planning .cols-actions{
+  display: flex !important;
+  justify-content: flex-end !important;
+  gap: 8px !important;
+}
+.page-planning .cols-actions .btn{
+  width: 44px !important;
+  height: 40px !important;
+  padding: 0 !important;
+  letter-spacing: 0 !important;
+  display: grid !important;
+  place-items: center !important;
+}
+

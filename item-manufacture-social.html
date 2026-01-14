@@ -97,61 +97,27 @@
       justify-content: flex-start;
     }
     .title .toplink{ white-space: nowrap; }
-
-    /* --- CENTER EVERYTHING (requested) --- */
-    .head{
-      justify-content: center;
-      text-align: center;
-    }
-    .title{
-      justify-items: center;
-    }
-    .title .toplinks{
-      justify-content: center;
-    }
-    .panel{
-      display: grid;
-      justify-items: center;
-    }
-    .grid{
-      width: 100%;
-      justify-items: stretch;
-    }
-    .card{
-      text-align: center;
-      justify-items: center;
-    }
-    .actions{
-      justify-content: center;
-    }
-
-  
-/* --- REMOVE COSMETIC BACKGROUND CIRCLES --- */
-.circle, .bg-circle, .orb, .halo, .glow,
-[class*="circle"], [class*="orb"], [class*="halo"], [class*="glow"]{
-  display: none !important;
-}
-body::before, body::after{
-  content: none !important;
-  display: none !important;
-}
-
-</style>
+  </style>
 </head>
 <body class="page-manufacture">
   <main class="wrap">
     <div class="head">
       <div class="title">
         <h1 class="gtext" data-text="item-manufacture :: social">item-manufacture :: social</h1>
+        <div class="sub">контакты бренда</div>
         <nav class="toplinks">
           <a class="toplink" href="index.html"><span class="tag">item_key</span></a>
           <a class="toplink" href="item-manufacture.html"><span class="tag">item-manufacture</span></a>
+          <span class="toplink is-active"><span class="tag">social</span></span>
+          <a class="toplink" href="item-user.html"><span class="tag">item-user</span></a>
         </nav>
       </div>
     </div>
 
     <section class="panel">
-
+      <div class="helper">
+        Это не “соцсети”. Это каналы связи с организмом.
+      </div>
 
       <div class="grid">
         <div class="card">
@@ -188,7 +154,7 @@ body::before, body::after{
   <footer class="bottombar bottombar--edge">
     <span class="hint">item-manufacture · social</span>
     <span class="sep">•</span>
-    <span class="hint">ONO-beta</span>
+    <span class="hint">pre-alpha</span>
   </footer>
 
   <script>

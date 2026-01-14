@@ -371,6 +371,44 @@
   .cart__pay .btn{ width: 100%; }
 }
 
+
+/* ===== Market toolbar (admin controls) ===== */
+.market-toolbar{
+  margin: 12px 0 10px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border: 1px solid rgba(0,0,0,.22);
+  background: rgba(255,255,255,.92);
+  backdrop-filter: blur(6px);
+}
+.market-toolbar__left,
+.market-toolbar__right{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.market-toolbar__right{ justify-content:flex-end; }
+.scope-pill{
+  display:inline-flex;
+  align-items:center;
+  padding: 6px 10px;
+  border: 1px solid #000;
+  background:#fff;
+  font-size: 10px;
+  letter-spacing: 2.2px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+@media (max-width: 520px){
+  .market-toolbar{ flex-wrap: wrap; }
+  .market-toolbar__right{ width:100%; justify-content: stretch; }
+  .market-toolbar__right .btn{ width:100%; }
+}
+
 @keyframes panelIn{
   from { opacity: 0; transform: translateY(8px); filter: blur(2px); }
   to   { opacity: 1; transform: translateY(0);  filter: blur(0); }
@@ -1556,7 +1594,7 @@
               <button class="tab" type="button" role="tab" data-tab="home" aria-selected="true">Data</button>
               <button class="tab" type="button" role="tab" data-tab="item" aria-selected="false">item</button>
               <button class="tab" id="goSocial" type="button">social</button>
-                                        <!-- <button class="tab" type="button" role="tab" data-tab="tape" aria-selected="false">tape</button> -->
+              <button class="tab" type="button" role="tab" data-tab="tape" aria-selected="false">tape</button>
 </div>
 
             <div class="controls">
@@ -1669,6 +1707,15 @@
 
 
 <!-- TOOLBAR visible only for item/guests -->
+        <div class="market-toolbar" id="marketToolbar" style="display:none;">
+          <div class="market-toolbar__left">
+            <span id="marketScope" class="scope-pill">scope: item</span>
+          </div>
+          <div class="market-toolbar__right">
+            <button id="addClothBtn" class="btn btn--primary" type="button">add clothing</button>
+            <button id="saveDbBtn" class="btn" type="button">save db</button>
+          </div>
+        </div>
 
 
         <!-- GRID -->

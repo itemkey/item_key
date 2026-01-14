@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Item Key — Planning</title>
+
+  <link rel="stylesheet" href="../../assets/css/styles.css" />
+  <link rel="stylesheet" href="./planning.css" />
+</head>
+
+<body class="page page-planning">
+  <!-- декоративные слои -->
+  <div class="outer-frame" aria-hidden="true"></div>
+  <div class="rays" aria-hidden="true"></div>
+  <div class="veil" aria-hidden="true"></div>
+
+  <header class="topbar topbar--edge">
+    <a class="toplink" href="../../item-user.html?returnTo=crate/planning/planning.html" aria-label="Item User">
+      <span class="tag">item-user</span>
+    </a>
+  </header>
+
+  <aside class="rail rail--left" aria-label="Левое меню">
+    <a class="rail-link" href="../../index.html">
+      <span class="rail-link__title">item-key</span>
+      <span class="rail-link__meta">главное меню</span>
+    </a>
+    <a class="rail-link" href="../../item-crate.html">
+      <span class="rail-link__title">item-crate</span>
+      <span class="rail-link__meta">назад в хаб</span>
+    </a>
+  </aside>
+
+  <main class="center-stage" aria-label="planning center">
+    <section class="planning-shell">
+      <header class="planning-head">
+        <div class="planning-title">
+          <div class="kicker">module</div>
+          <h1>планирование</h1>
+        </div>
+
+        <div class="planning-actions">
+          <button class="btn" id="btnNewProject" type="button">+ project</button>
+          <button class="btn" id="btnNewTask" type="button">+ task</button>
+          <button class="btn" id="btnNewEvent" type="button">+ schedule</button>
+        </div>
+      </header>
+
+      <div class="planning-toolbar">
+        <select id="projectSelect" class="ctl" aria-label="Project"></select>
+        <input id="searchInput" class="ctl" type="search" placeholder="поиск задач…" aria-label="Search" />
+
+        <input id="tagsFilter" class="ctl" type="text" placeholder="tags: study, work" aria-label="Filter by tags" />
+
+        <select id="priorityFilter" class="ctl" aria-label="Filter by priority">
+          <option value="all">priority: all</option>
+          <option value="high">priority: high</option>
+          <option value="mid">priority: mid</option>
+          <option value="low">priority: low</option>
+        </select>
+
+        <select id="deadlineFilter" class="ctl" aria-label="Filter by deadline">
+          <option value="all">deadline: all</option>
+          <option value="today">deadline: today</option>
+          <option value="overdue">deadline: overdue</option>
+          <option value="week">deadline: week</option>
+        </select>
+
+        <select id="sortSelect" class="ctl" aria-label="Sort tasks">
+          <option value="default">sort: default</option>
+          <option value="deadline">sort: deadline</option>
+          <option value="priority">sort: priority</option>
+          <option value="newest">sort: newest</option>
+        </select>
+
+        <button class="btn btn--thin" id="clearFilters" type="button">clear</button>
+        <select id="viewSelect" class="ctl" aria-label="View">
+          <option value="board">board</option>
+          <option value="schedule">schedule</option>
+        </select>
+      </div>
+
+      <div id="projectBar" class="projectbar" aria-label="Projects"></div>
+
+      <section class="planning-content">
+        <div id="boardView" class="board" hidden></div>
+        <div id="scheduleView" class="schedule" hidden></div>
+      </section>
+    </section>
+  </main>
+
+  <footer class="bottombar bottombar--edge">
+    <span class="hint">planning · projects · tasks</span>
+    <span class="sep">•</span>
+    <span class="hint">pre-alpha</span>
+  </footer>
+
+  <!-- ВАЖНО: модалка и тосты вынесены из main и стоят ПЕРЕД script -->
+  <div class="modal" id="modal" hidden>
+    <div class="modal__backdrop" data-close></div>
+    <div class="modal__panel" role="dialog" aria-modal="true">
+      <div class="modal__head">
+        <div class="modal__title" id="modalTitle"></div>
+        <button class="icon-btn" data-close aria-label="Close">×</button>
+      </div>
+      <div class="modal__body" id="modalBody"></div>
+    </div>
+  </div>
+
+  <div class="toast-stack" id="toasts" aria-live="polite"></div>
+
+  <script type="module" src="./planning.js"></script>
+</body>
+</html>
+

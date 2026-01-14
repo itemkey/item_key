@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Item Key — item-crate</title>
+
+  <!-- глобальный стиль сайта -->
+  <link rel="stylesheet" href="assets/css/styles.css" />
+
+  <!-- локальные стили ТОЛЬКО для меню item-crate (не ломаем весь проект) -->
+  <style>
+    /* Центр-хаб item-crate */
+    .crate-hub{
+      width: min(920px, 92vw);
+      margin: 0 auto;
+      display: grid;
+      gap: 16px;
+      text-align: center;
+    }
+
+    .crate-title{
+      display: grid;
+      gap: 8px;
+      padding: 10px 6px;
+    }
+    .crate-title h1{
+      margin: 0;
+      font-size: 14px;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+    }
+    .crate-title .sub{
+      font-size: 11px;
+      letter-spacing: 3.5px;
+      text-transform: uppercase;
+      color: rgba(0,0,0,.55);
+    }
+
+    /* Сетка пунктов меню */
+    .crate-grid{
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: clamp(10px, 2vw, 14px);
+    }
+
+    /* Карточка-переход (по эстетике как “дорогая рамка”) */
+    .crate-card{
+      display: grid;
+      gap: 10px;
+      padding: 16px 14px;
+      border: 1px solid rgba(0,0,0,.14);
+      background: rgba(255,255,255,.86);
+      text-decoration: none;
+      color: inherit;
+      transition: transform .18s ease, border-color .18s ease, opacity .18s ease;
+      min-height: 138px;
+      align-content: start;
+    }
+    .crate-card:hover{
+      transform: translateY(-2px);
+      border-color: rgba(0,0,0,.22);
+      opacity: .98;
+    }
+
+    .crate-card__kicker{
+      font-size: 10px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: rgba(0,0,0,.55);
+    }
+    .crate-card__name{
+      font-size: 12px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin: 0;
+    }
+    .crate-card__meta{
+      font-size: 11px;
+      line-height: 1.45;
+      color: rgba(0,0,0,.72);
+      margin: 0;
+    }
+
+    /* Адаптив: на узких экранах делаем 1-2 колонки */
+    @media (max-width: 920px){
+      .crate-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 620px){
+      .crate-grid{ grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body class="page page-crate">
+  <!-- фон/рамки — как в item-key -->
+  <div class="outer-frame" aria-hidden="true"></div>
+  <div class="rays" aria-hidden="true"></div>
+  <div class="veil" aria-hidden="true"></div>
+
+  <!-- верхний “герб” -->
+  <header class="topbar topbar--edge">
+    <!-- returnTo важен: чтобы item-user мог вернуться обратно -->
+    <a class="toplink" href="item-user.html?returnTo=item-crate.html" aria-label="Item User">
+      <span class="tag">item-user</span>
+    </a>
+  </header>
+
+  <!-- левый rail -->
+  <aside class="rail rail--left" aria-label="Левое меню">
+    <a class="rail-link" href="index.html">
+      <span class="rail-link__title">item-key</span>
+      <span class="rail-link__meta">главное меню</span>
+    </a>
+    <a class="rail-link" href="item-manufacture.html">
+      <span class="rail-link__title">item-manufacture</span>
+      <span class="rail-link__meta">создание / производство</span>
+    </a>
+  </aside>
+
+  <!-- правый rail -->
+  <aside class="rail rail--right" aria-label="Правое меню">
+    <a class="rail-link" href="item-security.html">
+      <span class="rail-link__title">item-security</span>
+      <span class="rail-link__meta">доступ / защита</span>
+    </a>
+    <a class="rail-link" href="item-soft.html">
+      <span class="rail-link__title">item-soft</span>
+      <span class="rail-link__meta">инструменты / редакторы</span>
+    </a>
+  </aside>
+
+  <!-- центр -->
+  <main class="center-stage" aria-label="item-crate center">
+    <section class="crate-hub" aria-label="item-crate menu">
+      <div class="crate-title">
+        <h1>item-crate</h1>
+        <div class="sub">архив · контейнеры · навигация</div>
+      </div>
+
+      <div class="crate-grid" role="navigation" aria-label="Разделы item-crate">
+        <!-- пока заглушки: href можно оставить # -->
+        <a class="crate-card" href="#" aria-disabled="true">
+          <div class="crate-card__kicker">module</div>
+          <h2 class="crate-card__name">заметки</h2>
+          <p class="crate-card__meta">пока пусто. здесь будет быстрый доступ к заметкам и структурам.</p>
+        </a>
+
+        <a class="crate-card" href="crate/planning/planning.html">
+  <div class="crate-card__kicker">module</div>
+  <h2 class="crate-card__name">планирование</h2>
+  <p class="crate-card__meta">пока пусто. здесь будет план / трекер / расписание.</p>
+</a>
+
+
+        <a class="crate-card" href="crate/student_helper/student_helper.html">
+          <div class="crate-card__kicker">module</div>
+          <h2 class="crate-card__name">помощь студентам</h2>
+          <p class="crate-card__meta">модуль активен. тренажёр / база / поиск.</p>
+        </a>
+      </div>
+
+        <a class="crate-card" href="crate/whisperer/whisperer.html">
+          <div class="crate-card__kicker">module</div>
+          <h2 class="crate-card__name">whisperer</h2>
+          <p class="crate-card__meta">диктор для докладов: озвучка текста с подсветкой и гибкими настройками.</p>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="bottombar bottombar--edge">
+    <span class="hint">crate · hub</span>
+    <span class="sep">•</span>
+    <span class="hint">pre-alpha</span>
+  </footer>
+
+  <!-- если общий main.js нужен для эффектов/движения -->
+  <script src="assets/js/main.js"></script>
+</body>
+</html>

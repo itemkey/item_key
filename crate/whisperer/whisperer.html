@@ -1,0 +1,758 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Item Key — whisperer</title>
+
+  <!-- глобальный стиль сайта -->
+  <link rel="stylesheet" href="../../assets/css/styles.css" />
+
+  <!-- локальные стили ТОЛЬКО для whisperer -->
+  <style>
+    /* layout reset (local only) */
+    .whisperer-wrap, .whisperer-wrap * { box-sizing: border-box; }
+
+    /* Ensure page content never hides under fixed topbar (site header) */
+    .center-stage{
+      padding-top: 74px;            /* safe offset for topbar */
+      padding-bottom: calc(84px + env(safe-area-inset-bottom)); /* keep content above fixed bottombar */
+      overflow-x: hidden;           /* prevent horizontal scroll from long selects */
+    }
+
+    .whisperer-wrap{
+      width: 100%;
+      max-width: 1040px;
+      margin: 0 auto;
+      display: grid;
+      gap: 16px;
+      padding: 12px 24px 22px;
+    }
+
+    .w-title{
+      padding: 6px 0 0;
+      text-align: center;
+      display: grid;
+      gap: 8px;
+    }
+    .w-title h1{
+      margin: 0;
+      font-size: 14px;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+    }
+    .w-title .sub{
+      font-size: 11px;
+      letter-spacing: 3.5px;
+      text-transform: uppercase;
+      color: rgba(0,0,0,.58);
+    }
+
+    /* Responsive grid that can shrink without forcing overflow */
+    .w-grid{
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+      gap: 16px;
+      align-items: start;
+    }
+
+    /* Match the site's sharper/industrial edge: no rounding */
+    .w-card, .w-reader, .w-warning{
+      border: 1px solid rgba(0,0,0,.14);
+      background: rgba(255,255,255,.86);
+      padding: 16px;
+      border-radius: 0;
+      box-shadow: none;
+      min-width: 0; /* prevents overflow inside grid cells */
+    }
+
+    .w-label{
+      font-size: 10px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: rgba(0,0,0,.58);
+    }
+
+    textarea.w-text{
+      width: 100%;
+      min-height: 260px;
+      resize: vertical;
+      border: 1px solid rgba(0,0,0,.14);
+      background: rgba(255,255,255,.92);
+      padding: 12px 12px;
+      font-size: 14px;
+      line-height: 1.55;
+      outline: none;
+      border-radius: 0;
+    }
+    textarea.w-text:focus{ border-color: rgba(0,0,0,.28); }
+
+    .w-controls{ display: grid; gap: 14px; }
+
+    .w-row{ display: grid; gap: 8px; }
+
+    .w-inline{
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 12px;
+    }
+
+    .w-field{ display: grid; gap: 8px; min-width: 0; }
+
+    select, input[type="range"], input[type="number"]{
+      width: 100%;
+      border: 1px solid rgba(0,0,0,.14);
+      background: rgba(255,255,255,.92);
+      padding: 10px 12px;
+      font-size: 12px;
+      outline: none;
+      border-radius: 0;
+      height: 40px;
+      min-width: 0;
+    }
+
+    /* Prevent long voice names from breaking layout */
+    select{
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    input[type="range"]{
+      height: 40px;
+      padding: 0 8px;
+    }
+    select:focus, input:focus{ border-color: rgba(0,0,0,.28); }
+
+    .w-hint{
+      font-size: 11px;
+      line-height: 1.45;
+      color: rgba(0,0,0,.70);
+      margin: 0;
+    }
+
+    .w-actions{
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 2px;
+    }
+
+    .w-btn{
+      border: 1px solid rgba(0,0,0,.14);
+      background: rgba(255,255,255,.90);
+      padding: 12px 10px;
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: transform .18s ease, border-color .18s ease, opacity .18s ease;
+      border-radius: 0;
+      min-height: 44px;
+      line-height: 1.2;
+      white-space: normal;
+      text-align: center;
+    }
+    .w-btn:hover{ transform: translateY(-1px); border-color: rgba(0,0,0,.28); opacity: .98; }
+    .w-btn:disabled{ opacity: .5; cursor: not-allowed; transform: none; }
+
+    .w-reader{
+      display: grid;
+      gap: 10px;
+      min-height: 240px;
+    }
+
+    .w-display{
+      font-size: 15px;
+      line-height: 1.75;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      margin: 0;
+      padding: 10px 10px;
+      border-radius: 0;
+      border: 1px dashed rgba(0,0,0,.14);
+      background: rgba(255,255,255,.65);
+      min-width: 0;
+    }
+
+    .w-word{ padding: 0 2px; border-radius: 0; cursor: pointer; }
+    .w-word:hover{ background: rgba(0,0,0,.06); }
+    .w-word.is-active{
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      background: rgba(0,0,0,.08);
+    }
+
+    .w-status{
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      font-size: 11px;
+      color: rgba(0,0,0,.72);
+      margin-top: 2px;
+    }
+    .w-pill{
+      border: 1px solid rgba(0,0,0,.14);
+      background: rgba(255,255,255,.82);
+      padding: 5px 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-size: 10px;
+      color: rgba(0,0,0,.62);
+      border-radius: 0;
+    }
+
+    .w-warning{
+      font-size: 12px;
+      line-height: 1.45;
+      color: rgba(0,0,0,.72);
+    }
+
+    @media (max-width: 980px){
+      .center-stage{
+        padding-top: 66px;
+        padding-bottom: calc(88px + env(safe-area-inset-bottom)); /* extra room for bottombar on small screens */
+      }
+      .whisperer-wrap{ padding: 10px 14px 18px; }
+      .w-grid{ grid-template-columns: 1fr; }
+      .w-inline{ grid-template-columns: 1fr; }
+      .w-actions{ grid-template-columns: 1fr; }
+      textarea.w-text{ min-height: 220px; }
+    }
+    
+  </style>
+</head>
+
+<body class="page page-crate">
+  <!-- фон/рамки — как в item-key -->
+  <div class="outer-frame" aria-hidden="true"></div>
+  <div class="rays" aria-hidden="true"></div>
+  <div class="veil" aria-hidden="true"></div>
+
+  <!-- верхний “герб” -->
+  <header class="topbar topbar--edge">
+    <a class="toplink" href="../../item-user.html?returnTo=crate/whisperer/whisperer.html" aria-label="Item User">
+      <span class="tag">item-user</span>
+    </a>
+  </header>
+
+  <!-- левый rail -->
+  <aside class="rail rail--left" aria-label="Левое меню">
+    <a class="rail-link" href="../../index.html">
+      <span class="rail-link__title">item-key</span>
+      <span class="rail-link__meta">главное меню</span>
+    </a>
+    <a class="rail-link" href="../../item-crate.html">
+      <span class="rail-link__title">item-crate</span>
+      <span class="rail-link__meta">назад в хаб</span>
+    </a>
+  </aside>
+
+  <!-- правый rail -->
+  <aside class="rail rail--right" aria-label="Правое меню">
+    <a class="rail-link" href="../../item-soft.html">
+      <span class="rail-link__title">item-soft</span>
+      <span class="rail-link__meta">инструменты / редакторы</span>
+    </a>
+    <a class="rail-link" href="../../item-security.html">
+      <span class="rail-link__title">item-security</span>
+      <span class="rail-link__meta">доступ / защита</span>
+    </a>
+  </aside>
+
+  <main class="center-stage" aria-label="whisperer center">
+    <section class="whisperer-wrap" aria-label="whisperer app">
+      <div class="w-title">
+        <h1>whisperer</h1>
+        <div class="sub">прошепчи это с удовольствием</div>
+      </div>
+
+      <div class="w-warning" id="supportBox" hidden>
+        Ваш браузер не поддерживает Web Speech API (SpeechSynthesis). Попробуйте Chrome / Edge или обновите браузер.
+      </div>
+
+
+
+
+      <div class="w-grid">
+        <div class="w-card" aria-label="Ввод текста">
+          <div class="w-label">text</div>
+          <textarea class="w-text" id="textInput" placeholder="Вставь сюда текст доклада…"></textarea>
+          <p class="w-hint">
+            Совет: нажми «Подготовить», чтобы увидеть текст в читабельном виде. Затем «Озвучить» — и следи за подчёркиванием.
+          </p>
+        </div>
+
+        <div class="w-card w-controls" aria-label="Настройки">
+          <div class="w-label">settings</div>
+
+          <div class="w-row">
+            <div class="w-inline">
+              <div class="w-field">
+                <div class="w-label">language</div>
+                <select id="langSelect" aria-label="Язык"></select>
+              </div>
+              <div class="w-field">
+                <div class="w-label">voice</div>
+                <select id="voiceSelect" aria-label="Голос"></select>
+              </div>
+            </div>
+            <p class="w-hint">Голоса подгружаются системой. Если список пуст — подожди 1–2 секунды или обнови страницу.</p>
+          </div>
+
+          <div class="w-row">
+            <div class="w-inline">
+              <div class="w-field">
+                <div class="w-label">rate</div>
+                <input id="rateRange" type="range" min="0.5" max="2" step="0.05" value="1" />
+                <div class="w-status"><span class="w-pill" id="rateVal">1.00</span></div>
+              </div>
+              <div class="w-field">
+                <div class="w-label">pitch</div>
+                <input id="pitchRange" type="range" min="0" max="2" step="0.05" value="1" />
+                <div class="w-status"><span class="w-pill" id="pitchVal">1.00</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="w-row">
+            <div class="w-inline">
+              <div class="w-field">
+                <div class="w-label">volume</div>
+                <input id="volumeRange" type="range" min="0" max="1" step="0.05" value="1" />
+                <div class="w-status"><span class="w-pill" id="volumeVal">1.00</span></div>
+              </div>
+              <div class="w-field">
+                <div class="w-label">gap (ms)</div>
+                <input id="gapMs" type="number" min="0" max="5000" step="50" value="0" />
+                <p class="w-hint">Пауза между словами. 0 = читать слитно (быстрее и плавнее).</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="w-actions" aria-label="Кнопки управления">
+            <button class="w-btn" id="prepBtn" type="button">Подготовить</button>
+            <button class="w-btn" id="speakBtn" type="button">Озвучить</button>
+            <button class="w-btn" id="pauseBtn" type="button" disabled>Пауза</button>
+            <button class="w-btn" id="stopBtn" type="button" disabled>Стоп</button>
+          </div>
+
+          <div class="w-status" aria-label="Статус">
+            <span class="w-pill" id="modePill">mode: idle</span>
+            <span class="w-pill" id="posPill">word: —</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="w-reader" aria-label="Текст с подсветкой">
+        <div class="w-label">follow</div>
+        <p class="w-display" id="display"></p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="bottombar bottombar--edge">
+    <span class="hint">whisperer</span>
+    <span class="sep">•</span>
+    <span class="hint">speech · follow</span>
+  </footer>
+
+  <script src="../../assets/js/main.js"></script>
+
+  <script>
+    (function(){
+      const hasSpeech = !!(window.speechSynthesis && window.SpeechSynthesisUtterance);
+      const supportBox = document.getElementById('supportBox');
+      if(!hasSpeech){
+        supportBox.hidden = false;
+        return;
+      }
+
+      // UI
+      const textInput = document.getElementById('textInput');
+      const display = document.getElementById('display');
+
+      const langSelect = document.getElementById('langSelect');
+      const voiceSelect = document.getElementById('voiceSelect');
+
+      const rateRange = document.getElementById('rateRange');
+      const pitchRange = document.getElementById('pitchRange');
+      const volumeRange = document.getElementById('volumeRange');
+      const gapMs = document.getElementById('gapMs');
+
+      const rateVal = document.getElementById('rateVal');
+      const pitchVal = document.getElementById('pitchVal');
+      const volumeVal = document.getElementById('volumeVal');
+
+      const prepBtn = document.getElementById('prepBtn');
+      const speakBtn = document.getElementById('speakBtn');
+      const pauseBtn = document.getElementById('pauseBtn');
+      const stopBtn = document.getElementById('stopBtn');
+
+      const modePill = document.getElementById('modePill');
+      const posPill = document.getElementById('posPill');
+
+      // State
+      let voices = [];
+      let wordSpans = [];
+      let words = [];
+      let wordCharStarts = []; // for continuous mode mapping
+      let activeWordIndex = -1;
+
+      let mode = 'idle'; // idle | speaking | paused
+      let seqTimer = null;
+      let seqIndex = 0;
+      let seqCancelled = false;
+
+      // Helpers
+      function setMode(next){
+        mode = next;
+        modePill.textContent = 'mode: ' + mode;
+      }
+
+      function setWordIndex(i){
+        activeWordIndex = i;
+        posPill.textContent = (i >= 0) ? ('word: ' + (i+1) + '/' + words.length) : 'word: —';
+        wordSpans.forEach((sp, idx) => {
+          sp.classList.toggle('is-active', idx === i);
+        });
+
+        // auto-scroll to active word (gentle)
+        const sp = wordSpans[i];
+        if(sp){
+          sp.scrollIntoView({block: 'center', inline: 'nearest', behavior: 'smooth'});
+        }
+      }
+
+      function normalizeText(t){
+        // keep new lines, but ensure consistent spaces
+        return (t || '').replace(/\r\n/g, '\n');
+      }
+
+      function buildDisplay(){
+        const text = normalizeText(textInput.value);
+        if(!text.trim()){
+          display.textContent = '';
+          wordSpans = [];
+          words = [];
+          wordCharStarts = [];
+          setWordIndex(-1);
+          return;
+        }
+
+        // Build word list while preserving whitespace in display:
+        // We split into tokens: words and whitespace
+        const tokens = text.match(/\S+|\s+/g) || [];
+        display.innerHTML = '';
+        wordSpans = [];
+        words = [];
+        wordCharStarts = [];
+
+        let charPos = 0;
+        let wIndex = 0;
+
+        tokens.forEach(tok => {
+          if(/^\s+$/.test(tok)){
+            // whitespace token
+            display.appendChild(document.createTextNode(tok));
+            charPos += tok.length;
+          } else {
+            // word token
+            const span = document.createElement('span');
+            span.className = 'w-word';
+            span.textContent = tok;
+            span.dataset.index = String(wIndex);
+            display.appendChild(span);
+
+            wordSpans.push(span);
+            words.push(tok);
+            wordCharStarts.push(charPos); // start position of this word in the full text
+            charPos += tok.length;
+            wIndex += 1;
+          }
+        });
+
+        setWordIndex(-1);
+      }
+
+      function updateVals(){
+        rateVal.textContent = Number(rateRange.value).toFixed(2);
+        pitchVal.textContent = Number(pitchRange.value).toFixed(2);
+        volumeVal.textContent = Number(volumeRange.value).toFixed(2);
+      }
+
+      function uniqueLangsFromVoices(vs){
+        const set = new Set();
+        vs.forEach(v => { if(v && v.lang) set.add(v.lang); });
+        return Array.from(set).sort((a,b)=>a.localeCompare(b));
+      }
+
+      function populateVoices(){
+        voices = window.speechSynthesis.getVoices() || [];
+        // Some browsers return empty until async event.
+        if(!voices.length) return;
+
+        // Language dropdown
+        const langs = uniqueLangsFromVoices(voices);
+        const currentLang = langSelect.value || (navigator.language || 'en-US');
+
+        langSelect.innerHTML = '';
+        langs.forEach(l => {
+          const opt = document.createElement('option');
+          opt.value = l;
+          opt.textContent = l;
+          langSelect.appendChild(opt);
+        });
+
+        // Select nearest match
+        const tryLang = (lang) => langs.includes(lang) ? lang : null;
+        const preferred = tryLang(currentLang) || tryLang((currentLang||'').split('-')[0]) || langs[0];
+        if(preferred) langSelect.value = preferred;
+
+        // Voice dropdown
+        populateVoiceListForLang(langSelect.value);
+      }
+
+      function populateVoiceListForLang(lang){
+        const list = voices.filter(v => v.lang === lang) 
+          .concat(voices.filter(v => (v.lang || '').startsWith((lang||'').split('-')[0]) && v.lang !== lang));
+
+        voiceSelect.innerHTML = '';
+
+        list.forEach(v => {
+          const opt = document.createElement('option');
+          opt.value = v.name;
+          opt.textContent = v.name + (v.default ? ' (default)' : '');
+          voiceSelect.appendChild(opt);
+        });
+
+        if(list.length){
+          // Prefer default voice for that lang
+          const def = list.find(v => v.default);
+          voiceSelect.value = def ? def.name : list[0].name;
+        }
+      }
+
+      function getSelectedVoice(){
+        const name = voiceSelect.value;
+        return (voices || []).find(v => v.name === name) || null;
+      }
+
+      function stopAll(){
+        // Stop sequential mode
+        if(seqTimer){
+          clearTimeout(seqTimer);
+          seqTimer = null;
+        }
+        seqCancelled = true;
+        seqIndex = 0;
+
+        // Stop synth
+        try { window.speechSynthesis.cancel(); } catch(e){}
+
+        pauseBtn.textContent = 'Пауза';
+        pauseBtn.disabled = true;
+        stopBtn.disabled = true;
+        speakBtn.disabled = false;
+
+        setMode('idle');
+        setWordIndex(-1);
+      }
+
+      // --- Speaking modes ---
+      function speakContinuous(fullText, startIndex){
+        const baseIndex = Math.max(0, Number(startIndex || 0));
+        const startChar = wordCharStarts[baseIndex] ?? 0;
+
+        // Speak substring starting at the clicked word
+        const restText = fullText.slice(startChar);
+
+        const u = new SpeechSynthesisUtterance(restText);
+
+        u.lang = langSelect.value || 'en-US';
+        const v = getSelectedVoice();
+        if(v) u.voice = v;
+
+        u.rate = Number(rateRange.value);
+        u.pitch = Number(pitchRange.value);
+        u.volume = Number(volumeRange.value);
+
+        // Highlight by charIndex -> word index (offset-aware)
+        u.onboundary = function(ev){
+          if(typeof ev.charIndex !== 'number') return;
+          const ci = ev.charIndex;
+
+          // Find last word start <= (startChar + ci)
+          const absChar = startChar + ci;
+
+          let idx = -1;
+          let lo = baseIndex, hi = wordCharStarts.length - 1;
+          while(lo <= hi){
+            const mid = (lo + hi) >> 1;
+            if(wordCharStarts[mid] <= absChar){
+              idx = mid;
+              lo = mid + 1;
+            } else {
+              hi = mid - 1;
+            }
+          }
+          if(idx !== -1) setWordIndex(idx);
+        };
+
+        u.onend = function(){
+          if(mode !== 'idle'){
+            setMode('idle');
+            pauseBtn.textContent = 'Пауза';
+            pauseBtn.disabled = true;
+            stopBtn.disabled = true;
+            speakBtn.disabled = false;
+            setWordIndex(-1);
+          }
+        };
+
+        u.onerror = function(){
+          stopAll();
+        };
+
+        setMode('speaking');
+        pauseBtn.disabled = false;
+        stopBtn.disabled = false;
+        speakBtn.disabled = true;
+
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(u);
+      }
+
+      function speakWordByWord(fullText, startIndex){
+        const lang = langSelect.value || 'en-US';
+        const v = getSelectedVoice();
+        const rate = Number(rateRange.value);
+        const pitch = Number(pitchRange.value);
+        const volume = Number(volumeRange.value);
+        const gap = Math.max(0, Number(gapMs.value || 0));
+
+        seqCancelled = false;
+        seqIndex = Math.max(0, Number(startIndex || 0));
+
+        setMode('speaking');
+        pauseBtn.disabled = false;
+        stopBtn.disabled = false;
+        speakBtn.disabled = true;
+
+        function next(){
+          if(seqCancelled) return;
+          if(seqIndex >= words.length){
+            setMode('idle');
+            pauseBtn.textContent = 'Пауза';
+            pauseBtn.disabled = true;
+            stopBtn.disabled = true;
+            speakBtn.disabled = false;
+            setWordIndex(-1);
+            return;
+          }
+
+          const w = words[seqIndex];
+          setWordIndex(seqIndex);
+
+          const u = new SpeechSynthesisUtterance(w);
+          u.lang = lang;
+          if(v) u.voice = v;
+          u.rate = rate;
+          u.pitch = pitch;
+          u.volume = volume;
+
+          u.onend = function(){
+            seqIndex += 1;
+            if(seqCancelled) return;
+            seqTimer = setTimeout(next, gap);
+          };
+
+          u.onerror = function(){
+            stopAll();
+          };
+
+          window.speechSynthesis.speak(u);
+        }
+
+        window.speechSynthesis.cancel();
+        next();
+      }
+
+      function startFromIndex(startIndex){
+        const fullText = normalizeText(textInput.value);
+        if(!fullText.trim()) return;
+
+        buildDisplay(); // ensure spans exist
+        const si = Math.max(0, Math.min(Number(startIndex||0), Math.max(0, words.length - 1)));
+
+        if(words.length){
+          setWordIndex(si);
+        }
+
+        const gap = Math.max(0, Number(gapMs.value || 0));
+        if(gap > 0){
+          speakWordByWord(fullText, si);
+        } else {
+          speakContinuous(fullText, si);
+        }
+      }
+
+      function speakFromUI(){
+        startFromIndex(0);
+      }
+
+      function pauseOrResume(){
+
+        if(mode === 'speaking'){
+          window.speechSynthesis.pause();
+          setMode('paused');
+          pauseBtn.textContent = 'Продолжить';
+        } else if(mode === 'paused'){
+          window.speechSynthesis.resume();
+          setMode('speaking');
+          pauseBtn.textContent = 'Пауза';
+        }
+      }
+
+      // Events
+      prepBtn.addEventListener('click', buildDisplay);
+      speakBtn.addEventListener('click', speakFromUI);
+      pauseBtn.addEventListener('click', pauseOrResume);
+      stopBtn.addEventListener('click', stopAll);
+
+      langSelect.addEventListener('change', () => populateVoiceListForLang(langSelect.value));
+      [rateRange, pitchRange, volumeRange].forEach(el => el.addEventListener('input', updateVals));
+
+      // Click any word in FOLLOW to start from it
+      display.addEventListener('click', (e) => {
+        const t = e.target;
+        const span = t && t.closest ? t.closest('.w-word') : null;
+        if(!span) return;
+        const idx = Number(span.dataset.index || 0);
+        stopAll();
+        // start immediately after cancel
+        setTimeout(() => startFromIndex(idx), 0);
+      });
+
+      // If user edits text during playback — stop to avoid desync
+      textInput.addEventListener('input', () => {
+        if(mode !== 'idle') stopAll();
+      });
+
+      // voices load async
+      window.speechSynthesis.onvoiceschanged = populateVoices;
+      populateVoices();
+      updateVals();
+
+      // Initial display (optional)
+      buildDisplay();
+
+      // Cleanup on unload
+      window.addEventListener('beforeunload', () => {
+        try { window.speechSynthesis.cancel(); } catch(e){}
+      });
+    })();
+  </script>
+</body>
+</html>
