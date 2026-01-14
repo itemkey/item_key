@@ -617,12 +617,22 @@
             <div class="w-row">
               <div class="w-field">
                 <div class="w-label">rate</div>
-                <input id="rateRange" type="range" min="0.5" max="2" step="0.05" value="1" />
+                <input id="rateRange" type="range" min="0.10" max="3.00" step="0.01" value="1.00" />
                 <div class="w-status">
                   <span class="w-pill" id="rateVal">1.00×</span>
                   <span class="w-pill" id="chunkVal">chunk: auto</span>
                 </div>
               </div>
+
+              <div class="w-field">
+                <div class="w-label">slow factor</div>
+                <input id="delayScaleRange" type="range" min="1" max="12" step="0.1" value="1" />
+                <div class="w-status">
+                  <span class="w-pill" id="delayScaleVal">slow: 1.0×</span>
+                  <span class="w-pill">gaps × slow</span>
+                </div>
+              </div>
+
 
               <div class="w-field">
                 <div class="w-label">pitch</div>
@@ -640,7 +650,7 @@
 
               <div class="w-field">
                 <div class="w-label">word gap</div>
-                <input id="wordGapRange" type="range" min="0" max="600" step="10" value="0" />
+                <input id="wordGapRange" type="range" min="0" max="4000" step="50" value="0" />
                 <div class="w-status">
                   <span class="w-pill" id="wordGapVal">0ms</span>
                   <span class="w-pill" id="sentGapPill">sentence: 250ms</span>
@@ -649,12 +659,12 @@
 
               <div class="w-field">
                 <div class="w-label">sentence gap</div>
-                <input id="sentGapRange" type="range" min="0" max="2500" step="50" value="250" />
+                <input id="sentGapRange" type="range" min="0" max="20000" step="100" value="250" />
               </div>
 
               <div class="w-field">
                 <div class="w-label">paragraph gap</div>
-                <input id="paraGapRange" type="range" min="0" max="5000" step="100" value="600" />
+                <input id="paraGapRange" type="range" min="0" max="60000" step="250" value="600" />
                 <div class="w-status">
                   <span class="w-pill" id="paraGapVal">600ms</span>
                   <span class="w-pill" id="punctPill">punct: on</span>
@@ -1187,6 +1197,7 @@
       const paraGapRange = document.getElementById('paraGapRange');
       const chunkMode = document.getElementById('chunkMode');
       const punctPause = document.getElementById('punctPause');
+      const delayScaleRange = document.getElementById('delayScaleRange');
 
       const rateVal = document.getElementById('rateVal');
       const pitchVal = document.getElementById('pitchVal');
@@ -1194,6 +1205,7 @@
       const wordGapVal = document.getElementById('wordGapVal');
       const sentGapPill = document.getElementById('sentGapPill');
       const paraGapVal = document.getElementById('paraGapVal');
+      const delayScaleVal = document.getElementById('delayScaleVal');
       const chunkVal = document.getElementById('chunkVal');
       const punctPill = document.getElementById('punctPill');
 
@@ -1257,6 +1269,7 @@
         wordGap: 'whisperer_word_gap_v1',
         sentGap: 'whisperer_sentence_gap_v1',
         paraGap: 'whisperer_paragraph_gap_v1',
+        delayScale: 'whisperer_delay_scale_v1',
         chunkMode: 'whisperer_chunk_mode_v1',
         punctPause: 'whisperer_punct_pause_v1'
       };
@@ -1302,6 +1315,7 @@
         wordGap: 0,     // ms
         sentGap: 250,   // ms
         paraGap: 600,   // ms
+        delayScale: 1.0, // multiplier for all gaps (for ultra-slow playback)
         chunkMode: 'auto',   // auto | phrase | word
         punctPause: true
       };
@@ -1324,6 +1338,7 @@
         if(wordGapVal) wordGapVal.textContent = String(Math.round(tts.wordGap)) + 'ms';
         if(sentGapPill) sentGapPill.textContent = 'sentence: ' + String(Math.round(tts.sentGap)) + 'ms';
         if(paraGapVal) paraGapVal.textContent = String(Math.round(tts.paraGap)) + 'ms';
+        if(delayScaleVal) delayScaleVal.textContent = 'slow: ' + (Math.round(tts.delayScale*10)/10).toFixed(1) + '×';
 
         // Effective mode (auto can resolve to segment/phrase)
         const effective = getEffectiveChunkMode();
@@ -1339,6 +1354,7 @@
         saveSetting(LS.wordGap, String(tts.wordGap));
         saveSetting(LS.sentGap, String(tts.sentGap));
         saveSetting(LS.paraGap, String(tts.paraGap));
+        saveSetting(LS.delayScale, String(tts.delayScale));
         saveSetting(LS.chunkMode, String(tts.chunkMode));
         saveSetting(LS.punctPause, tts.punctPause ? '1' : '0');
       }
@@ -1351,15 +1367,17 @@
         const sg = loadSetting(LS.sentGap);
         const pg = loadSetting(LS.paraGap);
         const cm = loadSetting(LS.chunkMode);
+        const ds = loadSetting(LS.delayScale);
         const pp = loadSetting(LS.punctPause);
 
-        tts.rate = clamp(r != null ? r : TTS_DEFAULTS.rate, 0.5, 2.0);
+        tts.rate = clamp(r != null ? r : TTS_DEFAULTS.rate, 0.10, 3.00);
         tts.pitch = clamp(p != null ? p : TTS_DEFAULTS.pitch, 0.0, 2.0);
         tts.volume = clamp(v != null ? v : TTS_DEFAULTS.volume, 0.0, 1.0);
 
-        tts.wordGap = clamp(wg != null ? wg : TTS_DEFAULTS.wordGap, 0, 600);
-        tts.sentGap = clamp(sg != null ? sg : TTS_DEFAULTS.sentGap, 0, 2500);
-        tts.paraGap = clamp(pg != null ? pg : TTS_DEFAULTS.paraGap, 0, 5000);
+        tts.wordGap = clamp(wg != null ? wg : TTS_DEFAULTS.wordGap, 0, 4000);
+        tts.sentGap = clamp(sg != null ? sg : TTS_DEFAULTS.sentGap, 0, 20000);
+        tts.paraGap = clamp(pg != null ? pg : TTS_DEFAULTS.paraGap, 0, 60000);
+        tts.delayScale = clamp(ds != null ? ds : TTS_DEFAULTS.delayScale, 1.0, 12.0);
 
         tts.chunkMode = (cm === 'word' || cm === 'phrase' || cm === 'auto') ? cm : TTS_DEFAULTS.chunkMode;
         tts.punctPause = (pp == null) ? TTS_DEFAULTS.punctPause : (String(pp) !== '0');
@@ -1371,6 +1389,7 @@
         if(wordGapRange) wordGapRange.value = String(tts.wordGap);
         if(sentGapRange) sentGapRange.value = String(tts.sentGap);
         if(paraGapRange) paraGapRange.value = String(tts.paraGap);
+        if(delayScaleRange) delayScaleRange.value = String(tts.delayScale);
         if(chunkMode) chunkMode.value = String(tts.chunkMode);
         if(punctPause) punctPause.checked = !!tts.punctPause;
 
@@ -1387,13 +1406,14 @@
 
       function onTtsChanged(){
         // Clamp and persist
-        tts.rate = clamp(rateRange ? rateRange.value : tts.rate, 0.5, 2.0);
+        tts.rate = clamp(rateRange ? rateRange.value : tts.rate, 0.10, 3.00);
         tts.pitch = clamp(pitchRange ? pitchRange.value : tts.pitch, 0.0, 2.0);
         tts.volume = clamp(volRange ? volRange.value : tts.volume, 0.0, 1.0);
 
-        tts.wordGap = clamp(wordGapRange ? wordGapRange.value : tts.wordGap, 0, 600);
-        tts.sentGap = clamp(sentGapRange ? sentGapRange.value : tts.sentGap, 0, 2500);
-        tts.paraGap = clamp(paraGapRange ? paraGapRange.value : tts.paraGap, 0, 5000);
+        tts.wordGap = clamp(wordGapRange ? wordGapRange.value : tts.wordGap, 0, 4000);
+        tts.sentGap = clamp(sentGapRange ? sentGapRange.value : tts.sentGap, 0, 20000);
+        tts.paraGap = clamp(paraGapRange ? paraGapRange.value : tts.paraGap, 0, 60000);
+        tts.delayScale = clamp(delayScaleRange ? delayScaleRange.value : tts.delayScale, 1.0, 12.0);
 
         tts.chunkMode = chunkMode ? chunkMode.value : tts.chunkMode;
         tts.punctPause = punctPause ? !!punctPause.checked : tts.punctPause;
@@ -1403,7 +1423,7 @@
       }
 
       // Wire controls
-      [rateRange, pitchRange, volRange, wordGapRange, sentGapRange, paraGapRange].forEach(el => {
+      [rateRange, pitchRange, volRange, wordGapRange, sentGapRange, paraGapRange, delayScaleRange].forEach(el => {
         if(!el) return;
         el.addEventListener('input', onTtsChanged);
         el.addEventListener('change', onTtsChanged);
@@ -1722,7 +1742,7 @@
           if(para || sent){
             const extra = (tts.punctPause && sent) ? tts.sentGap : 0;
             const paraExtra = para ? tts.paraGap : 0;
-            const delay = (tts.wordGap || 0) + Math.max(extra, paraExtra);
+            const delay = ((tts.wordGap || 0) + Math.max(extra, paraExtra)) * (tts.delayScale || 1);
             pushCur(delay);
           }
         }
@@ -1748,7 +1768,7 @@
 
           const extra = (tts.punctPause && sent) ? tts.sentGap : 0;
           const paraExtra = para ? tts.paraGap : 0;
-          const delayAfter = (tts.wordGap || 0) + Math.max(extra, paraExtra);
+          const delayAfter = ((tts.wordGap || 0) + Math.max(extra, paraExtra)) * (tts.delayScale || 1);
 
           out.push({
             text: w + t,
@@ -1779,7 +1799,7 @@
       // Playback engine
       // --------------------------
       function applyUtteranceSettings(u){
-        u.rate = clamp(tts.rate, 0.5, 2.0);
+        u.rate = clamp(tts.rate, 0.10, 3.00);
         u.pitch = clamp(tts.pitch, 0.0, 2.0);
         u.volume = clamp(tts.volume, 0.0, 1.0);
       }
