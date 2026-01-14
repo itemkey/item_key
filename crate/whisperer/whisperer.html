@@ -9,8 +9,7 @@
   <link rel="stylesheet" href="../../assets/css/styles.css" />
 
   <!-- локальные стили ТОЛЬКО для whisperer -->
-  <style>
-    .whisperer-wrap, .whisperer-wrap * { box-sizing: border-box; }
+  <style>.whisperer-wrap, .whisperer-wrap * { box-sizing: border-box; }
 
     :root{
       --footerH: 56px;      /* measured in JS */
@@ -352,7 +351,187 @@
       .modal-list{ max-height: 38vh; }
     }
 
-  </style>
+  
+    
+    
+    /* restore icon when expanded */
+    .w-winbtn.is-on .ico::after{
+      content: "";
+      position: absolute;
+      left: 3px;
+      top: -3px;
+      width: 14px;
+      height: 12px;
+      border: 1px solid rgba(0,0,0,.78);
+      background: transparent;
+    }
+
+    .follow-scrim{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.25);
+      z-index: 89999;
+      display: none;
+    }
+    .follow-scrim.is-on{ display: block; }
+
+    .w-reader.is-full{
+      position: fixed;
+      left: 12px;
+      right: 12px;
+      top: calc(var(--topbarOffset) + 6px);
+      bottom: calc(var(--footerH) + var(--floatH) + 16px + env(safe-area-inset-bottom));
+      z-index: 90000;
+      width: auto;
+      max-width: none;
+      margin: 0;
+      background: rgba(255,255,255,.98);
+      box-shadow: 0 14px 34px rgba(0,0,0,.12);
+      overflow: hidden;
+    }
+    .w-reader.is-full .w-reader-head{
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background: rgba(255,255,255,.98);
+      padding-bottom: 10px;
+      margin-bottom: 6px;
+      border-bottom: 1px dashed rgba(0,0,0,.14);
+    }
+    .w-reader.is-full .w-display{
+      height: 100%;
+      max-height: none;
+      overflow: auto;
+    }
+
+    @media (max-width: 520px){
+      .w-reader.is-full{
+        left: 10px;
+        right: 10px;
+        top: calc(var(--topbarOffset) + 4px);
+      }
+    }
+
+    /* FOLLOW fullscreen (clean, "window" style) */
+    .w-reader-head{
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+    .w-reader-head .w-label{
+      margin: 0;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Caption-style button (Windows-like) */
+    .w-winbtn{
+      width: 44px;
+      height: 32px;
+      border: 1px solid rgba(0,0,0,.18);
+      background: rgba(255,255,255,.92);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      border-radius: 0;
+      transition: background .15s ease, border-color .15s ease, transform .10s ease;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      flex: none;
+    }
+    .w-winbtn:hover{ background: rgba(0,0,0,.06); border-color: rgba(0,0,0,.28); }
+    .w-winbtn:active{ transform: translateY(1px); }
+    .w-winbtn:focus-visible{ outline: 2px solid rgba(0,0,0,.55); outline-offset: 2px; }
+
+    .w-winbtn .ico{
+      position: relative;
+      width: 14px;
+      height: 12px;
+    }
+    .w-winbtn .ico::before{
+      content: "";
+      position: absolute;
+      inset: 0;
+      border: 1px solid rgba(0,0,0,.78);
+      background: transparent;
+    }
+    .w-winbtn.is-on .ico::after{
+      content: "";
+      position: absolute;
+      left: 3px;
+      top: -3px;
+      width: 14px;
+      height: 12px;
+      border: 1px solid rgba(0,0,0,.78);
+      background: transparent;
+    }
+
+    /* Scrim behind the fullscreen window */
+    .follow-scrim{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.30);
+      z-index: 89999;
+      display: none;
+    }
+    .follow-scrim.is-on{ display: block; }
+
+    /* Fullscreen "window" itself */
+    .w-reader.is-full{
+      position: fixed;
+      left: 12px;
+      right: 12px;
+      top: 12px;
+      bottom: calc(var(--floatH) + 12px + env(safe-area-inset-bottom));
+      z-index: 90000;
+
+      margin: 0;
+      padding: 0;
+      border: 1px solid rgba(0,0,0,.20);
+      background: rgba(255,255,255,.98);
+      box-shadow: 0 16px 44px rgba(0,0,0,.18);
+      overflow: hidden;
+
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    /* Title bar */
+    .w-reader.is-full .w-reader-head{
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      padding: 10px 12px;
+      background: rgba(255,255,255,.98);
+      border-bottom: 1px solid rgba(0,0,0,.14);
+    }
+
+    /* Content area */
+    .w-reader.is-full .w-display{
+      flex: 1;
+      overflow: auto;
+      border: none;
+      background: transparent;
+      padding: 14px 16px;
+    }
+
+    @media (max-width: 520px){
+      .w-reader.is-full{
+        left: 10px;
+        right: 10px;
+        top: 10px;
+        bottom: calc(var(--floatH) + 10px + env(safe-area-inset-bottom));
+      }
+      .w-reader.is-full .w-display{ padding: 12px 12px; }
+    }
+
+</style>
 </head>
 
 <body class="page page-crate">
@@ -433,8 +612,79 @@
 
           <button class="w-btn" id="fromNotesBtn" type="button">Из заметок</button>
 
-          <details class="w-adv">
-            <summary>advanced</summary>
+          <details class="w-adv" id="narratorAdv">
+            <summary>narrator</summary>
+            <div class="w-row">
+              <div class="w-field">
+                <div class="w-label">rate</div>
+                <input id="rateRange" type="range" min="0.5" max="2" step="0.05" value="1" />
+                <div class="w-status">
+                  <span class="w-pill" id="rateVal">1.00×</span>
+                  <span class="w-pill" id="chunkVal">chunk: auto</span>
+                </div>
+              </div>
+
+              <div class="w-field">
+                <div class="w-label">pitch</div>
+                <input id="pitchRange" type="range" min="0" max="2" step="0.05" value="1" />
+                <div class="w-status">
+                  <span class="w-pill" id="pitchVal">1.00</span>
+                  <span class="w-pill" id="volPill">vol: 1.00</span>
+                </div>
+              </div>
+
+              <div class="w-field">
+                <div class="w-label">volume</div>
+                <input id="volRange" type="range" min="0" max="1" step="0.05" value="1" />
+              </div>
+
+              <div class="w-field">
+                <div class="w-label">word gap</div>
+                <input id="wordGapRange" type="range" min="0" max="600" step="10" value="0" />
+                <div class="w-status">
+                  <span class="w-pill" id="wordGapVal">0ms</span>
+                  <span class="w-pill" id="sentGapPill">sentence: 250ms</span>
+                </div>
+              </div>
+
+              <div class="w-field">
+                <div class="w-label">sentence gap</div>
+                <input id="sentGapRange" type="range" min="0" max="2500" step="50" value="250" />
+              </div>
+
+              <div class="w-field">
+                <div class="w-label">paragraph gap</div>
+                <input id="paraGapRange" type="range" min="0" max="5000" step="100" value="600" />
+                <div class="w-status">
+                  <span class="w-pill" id="paraGapVal">600ms</span>
+                  <span class="w-pill" id="punctPill">punct: on</span>
+                </div>
+              </div>
+
+              <div class="w-field">
+                <div class="w-label">chunking</div>
+                <select id="chunkMode" aria-label="Chunking mode">
+                  <option value="auto">Auto (smooth)</option>
+                  <option value="phrase">Phrase (punctuation)</option>
+                  <option value="word">Word (precise gaps)</option>
+                </select>
+              </div>
+
+              <div class="w-field">
+                <label class="w-hint" style="display:flex; gap:10px; align-items:center; margin:0;">
+                  <input id="punctPause" type="checkbox" checked style="width:18px; height:18px;">
+                  Add extra pauses after punctuation (., !, ?, …)
+                </label>
+              </div>
+
+              <p class="w-hint">
+                Подсказка: Word-режим даёт точный интервал между словами, но может звучать более «рублено». Auto — максимально плавно.
+              </p>
+            </div>
+          </details>
+
+          <details class="w-adv" id="voicesAdv">
+            <summary>voices</summary>
             <div class="w-row">
               <div class="w-field">
                 <div class="w-label">EN voice (optional)</div>
@@ -465,12 +715,20 @@
         </div>
       </div>
 
-      <div class="w-reader" aria-label="Текст с подсветкой">
-        <div class="w-label">follow</div>
+      <div class="w-reader" id="followCard" aria-label="Текст с подсветкой">
+        <div class="w-reader-head">
+          <div class="w-label">follow</div>
+          <button class="w-winbtn" id="followFullBtn" type="button" aria-label="Развернуть FOLLOW" aria-pressed="false" title="Развернуть FOLLOW">
+            <span class="ico" aria-hidden="true"></span>
+          </button>
+        </div>
         <p class="w-display" id="display"></p>
       </div>
     </section>
   </main>
+
+  <!-- Follow fullscreen scrim -->
+  <div class="follow-scrim" id="followScrim" hidden aria-hidden="true"></div>
 
   <!-- Floating transport bar (ALWAYS visible) -->
   <div class="w-floatbar" id="floatbar" aria-label="Управление озвучкой">
@@ -614,7 +872,114 @@
     @media (max-width: 520px){
       .modal-actions{ grid-template-columns: 1fr; }
     }
-  </style>
+  
+    
+    /* FOLLOW: Windows-style maximize/restore button + fullscreen mode */
+    .w-reader-head{
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+    .w-reader-head .w-label{
+      margin: 0;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .w-winbtn{
+      width: 38px;
+      height: 28px;
+      border: 1px solid rgba(0,0,0,.18);
+      background: rgba(255,255,255,.90);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      border-radius: 0;
+      transition: transform .12s ease, border-color .18s ease, opacity .18s ease;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      flex: none;
+    }
+    .w-winbtn:hover{ transform: translateY(-1px); border-color: rgba(0,0,0,.30); opacity: .98; }
+    .w-winbtn:active{ transform: translateY(0); }
+    .w-winbtn:focus-visible{ outline: 2px solid rgba(0,0,0,.55); outline-offset: 2px; }
+
+    .w-winbtn .ico{
+      position: relative;
+      width: 14px;
+      height: 12px;
+    }
+    .w-winbtn .ico::before{
+      content: "";
+      position: absolute;
+      inset: 0;
+      border: 1px solid rgba(0,0,0,.78);
+      background: transparent;
+    }
+    /* restore icon when expanded */
+    .w-winbtn.is-on .ico::after{
+      content: "";
+      position: absolute;
+      left: 3px;
+      top: -3px;
+      width: 14px;
+      height: 12px;
+      border: 1px solid rgba(0,0,0,.78);
+      background: transparent;
+    }
+
+    .follow-scrim{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.25);
+      z-index: 89999;
+      display: none;
+    }
+    .follow-scrim.is-on{ display: block; }
+
+    .w-reader.is-full{
+      position: fixed;
+      left: 12px;
+      right: 12px;
+      top: calc(var(--topbarOffset) + 6px);
+      bottom: calc(var(--footerH) + var(--floatH) + 16px + env(safe-area-inset-bottom));
+      z-index: 90000;
+      width: auto;
+      max-width: none;
+      margin: 0;
+      background: rgba(255,255,255,.98);
+      box-shadow: 0 14px 34px rgba(0,0,0,.12);
+      overflow: hidden;
+    }
+    .w-reader.is-full .w-reader-head{
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background: rgba(255,255,255,.98);
+      padding-bottom: 10px;
+      margin-bottom: 6px;
+      border-bottom: 1px dashed rgba(0,0,0,.14);
+    }
+    .w-reader.is-full .w-display{
+      height: 100%;
+      max-height: none;
+      overflow: auto;
+    }
+
+    @media (max-width: 520px){
+      .w-reader.is-full{
+        left: 10px;
+        right: 10px;
+        top: calc(var(--topbarOffset) + 4px);
+      }
+    }
+
+</style>
 
   <script src="../../assets/js/main.js"></script>
 
@@ -813,6 +1178,25 @@
 
       const voiceEnSelect = document.getElementById('voiceEnSelect');
       const voiceRuSelect = document.getElementById('voiceRuSelect');
+      // Narrator (TTS) controls
+      const rateRange = document.getElementById('rateRange');
+      const pitchRange = document.getElementById('pitchRange');
+      const volRange = document.getElementById('volRange');
+      const wordGapRange = document.getElementById('wordGapRange');
+      const sentGapRange = document.getElementById('sentGapRange');
+      const paraGapRange = document.getElementById('paraGapRange');
+      const chunkMode = document.getElementById('chunkMode');
+      const punctPause = document.getElementById('punctPause');
+
+      const rateVal = document.getElementById('rateVal');
+      const pitchVal = document.getElementById('pitchVal');
+      const volPill = document.getElementById('volPill');
+      const wordGapVal = document.getElementById('wordGapVal');
+      const sentGapPill = document.getElementById('sentGapPill');
+      const paraGapVal = document.getElementById('paraGapVal');
+      const chunkVal = document.getElementById('chunkVal');
+      const punctPill = document.getElementById('punctPill');
+
 
       const modePill = document.getElementById('modePill');
       const posPill = document.getElementById('posPill');
@@ -820,11 +1204,61 @@
       const footer = document.querySelector('.bottombar');
       const floatbar = document.getElementById('floatbar');
 
+      // Follow fullscreen (maximize/restore)
+      const followCard = document.getElementById('followCard');
+      const followFullBtn = document.getElementById('followFullBtn');
+      const followScrim = document.getElementById('followScrim');
+
+      function setFollowFull(on){
+        if(!followCard || !followFullBtn) return;
+        const next = !!on;
+
+        followCard.classList.toggle('is-full', next);
+        followFullBtn.classList.toggle('is-on', next);
+        followFullBtn.setAttribute('aria-pressed', next ? 'true' : 'false');
+        followFullBtn.setAttribute('aria-label', next ? 'Свернуть FOLLOW' : 'Развернуть FOLLOW');
+        followFullBtn.title = next ? 'Свернуть FOLLOW' : 'Развернуть FOLLOW';
+
+        if(followScrim){
+          followScrim.classList.toggle('is-on', next);
+          followScrim.hidden = !next;
+        }
+
+        // Ensure bottom spacing stays correct (layout changes in fullscreen mode)
+        if(typeof measureBottom === 'function') measureBottom();
+      }
+
+      function toggleFollowFull(){
+        if(!followCard) return;
+        setFollowFull(!followCard.classList.contains('is-full'));
+      }
+
+      if(followFullBtn){
+        followFullBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleFollowFull();
+        }, {capture:true});
+      }
+      if(followScrim){
+        followScrim.addEventListener('click', () => setFollowFull(false));
+      }
+
       // Persisted settings
       const LS = {
         fontSize: 'whisperer_font_size_v2',
         voiceEn: 'whisperer_voice_en_v2',
-        voiceRu: 'whisperer_voice_ru_v2'
+        voiceRu: 'whisperer_voice_ru_v2',
+
+        // Narrator (TTS)
+        rate: 'whisperer_rate_v1',
+        pitch: 'whisperer_pitch_v1',
+        volume: 'whisperer_volume_v1',
+        wordGap: 'whisperer_word_gap_v1',
+        sentGap: 'whisperer_sentence_gap_v1',
+        paraGap: 'whisperer_paragraph_gap_v1',
+        chunkMode: 'whisperer_chunk_mode_v1',
+        punctPause: 'whisperer_punct_pause_v1'
       };
 
       function saveSetting(key, value){
@@ -857,6 +1291,132 @@
       const savedFont = loadSetting(LS.fontSize);
       applyFontSize(savedFont ? Number(savedFont) : Number(fontRange.value));
       fontRange.addEventListener('input', () => applyFontSize(fontRange.value));
+
+      // ==========================
+      // Narrator (TTS) preferences
+      // ==========================
+      const TTS_DEFAULTS = {
+        rate: 1.0,
+        pitch: 1.0,
+        volume: 1.0,
+        wordGap: 0,     // ms
+        sentGap: 250,   // ms
+        paraGap: 600,   // ms
+        chunkMode: 'auto',   // auto | phrase | word
+        punctPause: true
+      };
+
+      const tts = { ...TTS_DEFAULTS };
+
+      function clamp(n, a, b){
+        n = Number(n);
+        if(Number.isNaN(n)) return a;
+        return Math.min(b, Math.max(a, n));
+      }
+
+      function fmt2(n){ return (Math.round(n*100)/100).toFixed(2); }
+
+      function updateTtsUI(){
+        if(rateVal) rateVal.textContent = fmt2(tts.rate) + '×';
+        if(pitchVal) pitchVal.textContent = fmt2(tts.pitch);
+        if(volPill) volPill.textContent = 'vol: ' + fmt2(tts.volume);
+
+        if(wordGapVal) wordGapVal.textContent = String(Math.round(tts.wordGap)) + 'ms';
+        if(sentGapPill) sentGapPill.textContent = 'sentence: ' + String(Math.round(tts.sentGap)) + 'ms';
+        if(paraGapVal) paraGapVal.textContent = String(Math.round(tts.paraGap)) + 'ms';
+
+        // Effective mode (auto can resolve to segment/phrase)
+        const effective = getEffectiveChunkMode();
+        if(chunkVal) chunkVal.textContent = 'chunk: ' + effective;
+
+        if(punctPill) punctPill.textContent = 'punct: ' + (tts.punctPause ? 'on' : 'off');
+      }
+
+      function saveTts(){
+        saveSetting(LS.rate, String(tts.rate));
+        saveSetting(LS.pitch, String(tts.pitch));
+        saveSetting(LS.volume, String(tts.volume));
+        saveSetting(LS.wordGap, String(tts.wordGap));
+        saveSetting(LS.sentGap, String(tts.sentGap));
+        saveSetting(LS.paraGap, String(tts.paraGap));
+        saveSetting(LS.chunkMode, String(tts.chunkMode));
+        saveSetting(LS.punctPause, tts.punctPause ? '1' : '0');
+      }
+
+      function loadTts(){
+        const r = loadSetting(LS.rate);
+        const p = loadSetting(LS.pitch);
+        const v = loadSetting(LS.volume);
+        const wg = loadSetting(LS.wordGap);
+        const sg = loadSetting(LS.sentGap);
+        const pg = loadSetting(LS.paraGap);
+        const cm = loadSetting(LS.chunkMode);
+        const pp = loadSetting(LS.punctPause);
+
+        tts.rate = clamp(r != null ? r : TTS_DEFAULTS.rate, 0.5, 2.0);
+        tts.pitch = clamp(p != null ? p : TTS_DEFAULTS.pitch, 0.0, 2.0);
+        tts.volume = clamp(v != null ? v : TTS_DEFAULTS.volume, 0.0, 1.0);
+
+        tts.wordGap = clamp(wg != null ? wg : TTS_DEFAULTS.wordGap, 0, 600);
+        tts.sentGap = clamp(sg != null ? sg : TTS_DEFAULTS.sentGap, 0, 2500);
+        tts.paraGap = clamp(pg != null ? pg : TTS_DEFAULTS.paraGap, 0, 5000);
+
+        tts.chunkMode = (cm === 'word' || cm === 'phrase' || cm === 'auto') ? cm : TTS_DEFAULTS.chunkMode;
+        tts.punctPause = (pp == null) ? TTS_DEFAULTS.punctPause : (String(pp) !== '0');
+
+        // reflect in controls
+        if(rateRange) rateRange.value = String(tts.rate);
+        if(pitchRange) pitchRange.value = String(tts.pitch);
+        if(volRange) volRange.value = String(tts.volume);
+        if(wordGapRange) wordGapRange.value = String(tts.wordGap);
+        if(sentGapRange) sentGapRange.value = String(tts.sentGap);
+        if(paraGapRange) paraGapRange.value = String(tts.paraGap);
+        if(chunkMode) chunkMode.value = String(tts.chunkMode);
+        if(punctPause) punctPause.checked = !!tts.punctPause;
+
+        updateTtsUI();
+      }
+
+      function getEffectiveChunkMode(){
+        // "auto": smooth segments if gaps are 0; otherwise phrase mode.
+        if(tts.chunkMode === 'word') return 'word';
+        if(tts.chunkMode === 'phrase') return 'phrase';
+        const hasAnyGaps = (tts.wordGap > 0) || (tts.sentGap > 0) || (tts.paraGap > 0);
+        return hasAnyGaps ? 'phrase' : 'auto';
+      }
+
+      function onTtsChanged(){
+        // Clamp and persist
+        tts.rate = clamp(rateRange ? rateRange.value : tts.rate, 0.5, 2.0);
+        tts.pitch = clamp(pitchRange ? pitchRange.value : tts.pitch, 0.0, 2.0);
+        tts.volume = clamp(volRange ? volRange.value : tts.volume, 0.0, 1.0);
+
+        tts.wordGap = clamp(wordGapRange ? wordGapRange.value : tts.wordGap, 0, 600);
+        tts.sentGap = clamp(sentGapRange ? sentGapRange.value : tts.sentGap, 0, 2500);
+        tts.paraGap = clamp(paraGapRange ? paraGapRange.value : tts.paraGap, 0, 5000);
+
+        tts.chunkMode = chunkMode ? chunkMode.value : tts.chunkMode;
+        tts.punctPause = punctPause ? !!punctPause.checked : tts.punctPause;
+
+        saveTts();
+        updateTtsUI();
+      }
+
+      // Wire controls
+      [rateRange, pitchRange, volRange, wordGapRange, sentGapRange, paraGapRange].forEach(el => {
+        if(!el) return;
+        el.addEventListener('input', onTtsChanged);
+        el.addEventListener('change', onTtsChanged);
+      });
+      if(chunkMode){
+        chunkMode.addEventListener('change', onTtsChanged);
+      }
+      if(punctPause){
+        punctPause.addEventListener('change', onTtsChanged);
+      }
+
+      loadTts();
+
 
       // Text parsing / display
       let words = [];         // word tokens only
@@ -1015,9 +1575,26 @@
 
       // Speech queue (supports mixed EN/RU)
       let mode = 'idle'; // idle | speaking | paused
-      let segments = []; // [{text, lang, wordIndices, wordStarts}]
-      let segIdx = 0;
       let cancelled = false;
+
+      // Unified queue of utterances (segments / phrases / words)
+      let queue = []; // [{text, lang, wordIndices, wordStarts, delayAfter}]
+      let qIdx = 0;
+
+      let betweenTimer = null;
+      let betweenDueAt = 0;
+      let waitingBetween = false;
+      let waitingDelay = 0;
+
+      function clearBetween(){
+        if(betweenTimer){
+          try{ clearTimeout(betweenTimer); } catch(e){}
+          betweenTimer = null;
+        }
+        betweenDueAt = 0;
+        waitingBetween = false;
+        waitingDelay = 0;
+      }
 
       function setMode(next){
         mode = next;
@@ -1035,11 +1612,28 @@
 
       function stopAll(){
         cancelled = true;
-        segments = [];
-        segIdx = 0;
+        queue = [];
+        qIdx = 0;
+        clearBetween();
         try{ window.speechSynthesis.cancel(); } catch(e){}
         setMode('idle');
         setWordIndex(-1);
+      }
+
+      // --------------------------
+      // Queue builders
+      // --------------------------
+      function isSentenceEnd(word){
+        const w = String(word || '').trim();
+        if(!w) return false;
+        // strip closing quotes/brackets
+        const cleaned = w.replace(/[\)"'\]\}]+$/g, '');
+        return /[.!?…]+$/.test(cleaned);
+      }
+
+      function isParagraphBreak(trail){
+        const t = String(trail || '');
+        return /\n\s*\n/.test(t);
       }
 
       function buildSegments(fromIndex){
@@ -1052,6 +1646,7 @@
 
         function pushCur(){
           if(cur && cur.text.trim()){
+            cur.delayAfter = 0;
             out.push(cur);
           }
           cur = null;
@@ -1074,7 +1669,6 @@
             cur = { text: '', lang: wl, wordIndices: [], wordStarts: [] };
           }
 
-          // record start offset for this word inside segment
           cur.wordStarts.push(cur.text.length);
           cur.wordIndices.push(i);
           cur.text += w + t;
@@ -1084,43 +1678,181 @@
         return out;
       }
 
+      function buildPhrases(fromIndex){
+        const start = Math.max(0, Math.min(Number(fromIndex) || 0, Math.max(0, words.length - 1)));
+        const maxWords = 14;
+        const maxChars = 260;
+
+        const out = [];
+        let cur = null;
+
+        function pushCur(delayAfter){
+          if(cur && cur.text.trim()){
+            cur.delayAfter = Math.max(0, Number(delayAfter) || 0);
+            out.push(cur);
+          }
+          cur = null;
+        }
+
+        for(let i=start;i<words.length;i++){
+          const wl = wordLang[i] || 'en';
+          const w = words[i];
+          const t = trails[i] || '';
+
+          if(!cur){
+            cur = { text: '', lang: wl, wordIndices: [], wordStarts: [] };
+          }
+
+          // split by language to keep voices consistent
+          const wouldExceed = (cur.wordIndices.length >= maxWords) || ((cur.text + w + t).length > maxChars);
+          const langSplit = (wl !== cur.lang);
+
+          if(langSplit || wouldExceed){
+            pushCur(0);
+            cur = { text: '', lang: wl, wordIndices: [], wordStarts: [] };
+          }
+
+          cur.wordStarts.push(cur.text.length);
+          cur.wordIndices.push(i);
+          cur.text += w + t;
+
+          const para = isParagraphBreak(t);
+          const sent = isSentenceEnd(w);
+
+          if(para || sent){
+            const extra = (tts.punctPause && sent) ? tts.sentGap : 0;
+            const paraExtra = para ? tts.paraGap : 0;
+            const delay = (tts.wordGap || 0) + Math.max(extra, paraExtra);
+            pushCur(delay);
+          }
+        }
+
+        // tail
+        if(cur){
+          pushCur(0);
+        }
+        return out;
+      }
+
+      function buildWordsQueue(fromIndex){
+        const start = Math.max(0, Math.min(Number(fromIndex) || 0, Math.max(0, words.length - 1)));
+        const out = [];
+
+        for(let i=start;i<words.length;i++){
+          const wl = wordLang[i] || 'en';
+          const w = words[i];
+          const t = trails[i] || '';
+
+          const sent = isSentenceEnd(w);
+          const para = isParagraphBreak(t);
+
+          const extra = (tts.punctPause && sent) ? tts.sentGap : 0;
+          const paraExtra = para ? tts.paraGap : 0;
+          const delayAfter = (tts.wordGap || 0) + Math.max(extra, paraExtra);
+
+          out.push({
+            text: w + t,
+            lang: wl,
+            wordIndices: [i],
+            wordStarts: [0],
+            delayAfter: delayAfter
+          });
+        }
+        return out;
+      }
+
+      function buildQueue(fromIndex){
+        const effective = getEffectiveChunkMode();
+
+        // If the user wants any pauses, "auto" resolves to phrases for better control
+        if(effective === 'word'){
+          return buildWordsQueue(fromIndex);
+        }
+        if(effective === 'phrase'){
+          return buildPhrases(fromIndex);
+        }
+        // Smooth mode: classic segments, minimal gaps
+        return buildSegments(fromIndex);
+      }
+
+      // --------------------------
+      // Playback engine
+      // --------------------------
+      function applyUtteranceSettings(u){
+        u.rate = clamp(tts.rate, 0.5, 2.0);
+        u.pitch = clamp(tts.pitch, 0.0, 2.0);
+        u.volume = clamp(tts.volume, 0.0, 1.0);
+      }
+
+      function scheduleNextAfter(delay){
+        clearBetween();
+        const d = Math.max(0, Number(delay) || 0);
+
+        if(d <= 0){
+          // Microtask-like scheduling to avoid deep recursion
+          setTimeout(() => { if(!cancelled) speakNext(); }, 0);
+          return;
+        }
+
+        if(mode === 'paused'){
+          waitingBetween = true;
+          waitingDelay = d;
+          return;
+        }
+
+        betweenDueAt = Date.now() + d;
+        betweenTimer = setTimeout(() => {
+          betweenTimer = null;
+          betweenDueAt = 0;
+          if(cancelled) return;
+          speakNext();
+        }, d);
+      }
+
       function speakNext(){
         if(cancelled) return;
 
-        if(segIdx >= segments.length){
+        if(qIdx >= queue.length){
           setMode('idle');
           setWordIndex(-1);
           return;
         }
 
-        const seg = segments[segIdx];
-        const u = new SpeechSynthesisUtterance(seg.text);
+        const unit = queue[qIdx];
+        const u = new SpeechSynthesisUtterance(unit.text);
 
-        // auto language per segment
-        u.lang = (seg.lang === 'ru') ? 'ru-RU' : 'en-US';
-        const v = bestVoiceFor(seg.lang);
+        u.lang = (unit.lang === 'ru') ? 'ru-RU' : 'en-US';
+        const v = bestVoiceFor(unit.lang);
         if(v) u.voice = v;
 
-        u.onboundary = function(ev){
-          // Highlight the current word (best effort; boundary events vary by browser)
-          if(typeof ev.charIndex !== 'number') return;
+        applyUtteranceSettings(u);
 
-          const ci = ev.charIndex;
-          let local = -1;
-          for(let j=0;j<seg.wordStarts.length;j++){
-            if(seg.wordStarts[j] <= ci) local = j;
-            else break;
-          }
-          if(local >= 0){
-            const globalIndex = seg.wordIndices[local];
-            setWordIndex(globalIndex);
-          }
-        };
+        // Set initial highlight
+        const firstIdx = (unit.wordIndices && unit.wordIndices.length) ? unit.wordIndices[0] : -1;
+        if(firstIdx >= 0) setWordIndex(firstIdx);
+
+        // Boundary highlighting (best effort; varies by engine)
+        if(unit.wordStarts && unit.wordStarts.length > 1){
+          u.onboundary = function(ev){
+            if(typeof ev.charIndex !== 'number') return;
+            const ci = ev.charIndex;
+
+            let local = -1;
+            for(let j=0;j<unit.wordStarts.length;j++){
+              if(unit.wordStarts[j] <= ci) local = j;
+              else break;
+            }
+            if(local >= 0){
+              const globalIndex = unit.wordIndices[local];
+              setWordIndex(globalIndex);
+            }
+          };
+        }
 
         u.onend = function(){
           if(cancelled) return;
-          segIdx += 1;
-          speakNext();
+          qIdx += 1;
+          scheduleNextAfter(unit.delayAfter || 0);
         };
 
         u.onerror = function(){
@@ -1139,8 +1871,10 @@
         stopAll();
         cancelled = false;
 
-        segments = buildSegments(i);
-        segIdx = 0;
+        queue = buildQueue(i);
+        qIdx = 0;
+
+        updateTtsUI();
 
         // Some engines need a short tick after cancel before speaking again
         setTimeout(() => {
@@ -1153,14 +1887,31 @@
         if(mode === 'idle') return;
 
         if(mode === 'speaking'){
+          // If we are between units, pause the timer too
+          if(betweenTimer){
+            const remaining = Math.max(0, betweenDueAt - Date.now());
+            clearBetween();
+            waitingBetween = true;
+            waitingDelay = remaining;
+          }
+
           try{ window.speechSynthesis.pause(); } catch(e){}
           setMode('paused');
-        } else if(mode === 'paused'){
+          return;
+        }
+
+        if(mode === 'paused'){
           try{ window.speechSynthesis.resume(); } catch(e){}
           setMode('speaking');
+
+          if(waitingBetween){
+            const d = waitingDelay;
+            waitingBetween = false;
+            waitingDelay = 0;
+            scheduleNextAfter(d);
+          }
         }
       }
-
       // Buttons
       speakBtn.addEventListener('click', () => speakFromWordIndex(0));
       pauseBtn.addEventListener('click', pauseOrResume);
@@ -1249,6 +2000,13 @@
         const inForm = (tag === 'textarea' || tag === 'input' || tag === 'select');
 
         if(e.key === 'Escape'){
+          // First: exit FOLLOW fullscreen if open; second: stop speech.
+          try{
+            if(followCard && followCard.classList.contains('is-full')){
+              setFollowFull(false);
+              return;
+            }
+          }catch(_){}
           stopAll();
           return;
         }
