@@ -1444,9 +1444,27 @@
       let wordSpans = [];
       let wordLang = [];      // "en" | "ru"
       let activeWordIndex = -1;
+      let preparedText = '';
 
       function normalizeText(t){
-        return (t || '').replace(/\r\n/g, '\n');
+        return (t || '')
+          .replace(/\r\n/g, '\n')
+          .replace(/\r/g, '\n')
+          .replace(/\u00A0/g, ' ');
+      }
+
+      function preprocessForSpeech(raw){
+        let t = normalizeText(raw);
+
+        // Fix glued punctuation: add a space after punctuation when followed immediately by a LETTER (RU/EN).
+        // This keeps decimals/version numbers intact (e.g., 3.14, v2.0).
+        t = t.replace(/([.!?…]+["'”’»)\]\}]+)(?=[A-Za-zА-Яа-яЁё])/g, '$1 ');
+        t = t.replace(/([.!?…]+)(?=[A-Za-zА-Яа-яЁё])/g, '$1 ');
+        t = t.replace(/([,;:]+["'”’»)\]\}]+)(?=[A-Za-zА-Яа-яЁё])/g, '$1 ');
+        t = t.replace(/([,;:]+)(?=[A-Za-zА-Яа-яЁё])/g, '$1 ');
+        t = t.replace(/([—–])(?=[A-Za-zА-Яа-яЁё])/g, '$1 ');
+
+        return t;
       }
 
       function detectLangForWord(w, fallback){
@@ -1472,7 +1490,8 @@
       }
 
       function buildDisplay(){
-        const text = normalizeText(textInput.value);
+        preparedText = preprocessForSpeech(textInput.value);
+        const text = preparedText;
         display.innerHTML = '';
         words = [];
         trails = [];
@@ -1643,17 +1662,75 @@
       // --------------------------
       // Queue builders
       // --------------------------
-      function isSentenceEnd(word){
+      function stripTrailingClosers(word){
         const w = String(word || '').trim();
-        if(!w) return false;
-        // strip closing quotes/brackets
-        const cleaned = w.replace(/[\)"'\]\}]+$/g, '');
-        return /[.!?…]+$/.test(cleaned);
+        // Remove trailing closing quotes/brackets so we can correctly detect punctuation like: "."" or ".»"
+        return w.replace(/[\)\]\}"'»”’]+$/g, '');
+      }
+
+      function countNewlines(trail){
+        const t = String(trail || '');
+        const m = t.match(/\n/g);
+        return m ? m.length : 0;
       }
 
       function isParagraphBreak(trail){
-        const t = String(trail || '');
-        return /\n\s*\n/.test(t);
+        return countNewlines(trail) >= 2;
+      }
+
+      function isLineBreak(trail){
+        return countNewlines(trail) >= 1;
+      }
+
+      const ABBR_SET = new Set([
+        'т.д.','т.п.','т.е.','т.к.','г.','ул.','д.','стр.','рис.','см.','др.','им.',
+        'etc.','e.g.','i.e.','mr.','mrs.','ms.','dr.','prof.','sr.','jr.'
+      ]);
+
+      function isAbbrev(token){
+        const lc = String(token || '').toLowerCase();
+        if(ABBR_SET.has(lc)) return true;
+        // Patterns like "т.д." or "U.S." or "U.S.A."
+        if(/^(?:[a-zа-яё]\.){1,6}$/i.test(lc)) return true;
+        if(/^(?:[a-z]\.){2,6}$/i.test(lc)) return true;
+        return false;
+      }
+
+      function sentenceStrength(word, nextWord){
+        const cleaned = stripTrailingClosers(word);
+        if(!cleaned) return 'none';
+
+        // Hard sentence end: ?, !, … (incl. combos like "?!")
+        if(/[!?…]+$/.test(cleaned)) return 'hard';
+
+        // Period end:
+        if(/[.]+$/.test(cleaned)){
+          // Ellipsis "..." treated as hard.
+          if(/\.\.\.$/.test(cleaned)) return 'hard';
+
+          if(isAbbrev(cleaned)){
+            // If next token starts with a lowercase letter, assume abbreviation inside sentence.
+            const nw = String(nextWord || '').trim();
+            if(nw && /^[A-Za-zА-Яа-яЁё]/.test(nw)){
+              const ch = nw[0];
+              if(ch === ch.toLowerCase()) return 'soft';
+            }
+          }
+          return 'hard';
+        }
+
+        return 'none';
+      }
+
+      function hasSoftPunct(word){
+        const cleaned = stripTrailingClosers(word);
+        if(!cleaned) return false;
+        return /[,;:]+$/.test(cleaned) || /[—–]+$/.test(cleaned);
+      }
+
+      function softGapMs(){
+        const base = Math.round((Number(tts.sentGap) || 0) * 0.35);
+        return Math.min(450, Math.max(80, base));
       }
 
       function buildSegments(fromIndex){
@@ -1676,15 +1753,17 @@
           const wl = wordLang[i] || 'en';
           const w = words[i];
           const t = trails[i] || '';
+          const nextW = words[i+1] || '';
 
           if(!cur){
             cur = { text: '', lang: wl, wordIndices: [], wordStarts: [] };
           }
 
           const nextText = cur.text + w + t;
-          const needSplit = (wl !== cur.lang) || (cur.wordIndices.length >= maxWords) || (nextText.length > maxChars);
+          const wouldExceed = (cur.wordIndices.length >= maxWords) || (nextText.length > maxChars);
+          const langSplit = (wl !== cur.lang);
 
-          if(needSplit){
+          if(langSplit || wouldExceed){
             pushCur();
             cur = { text: '', lang: wl, wordIndices: [], wordStarts: [] };
           }
@@ -1692,6 +1771,16 @@
           cur.wordStarts.push(cur.text.length);
           cur.wordIndices.push(i);
           cur.text += w + t;
+
+          const nl = countNewlines(t);
+          const para = nl >= 2;
+          const line = nl >= 1;
+          const strength = sentenceStrength(w, nextW);
+
+          // Even in "smooth" mode, split on real boundaries so engines don't smear punctuation.
+          if(para || line || strength === 'hard'){
+            pushCur();
+          }
         }
 
         pushCur();
@@ -1718,6 +1807,7 @@
           const wl = wordLang[i] || 'en';
           const w = words[i];
           const t = trails[i] || '';
+          const nextW = words[i+1] || '';
 
           if(!cur){
             cur = { text: '', lang: wl, wordIndices: [], wordStarts: [] };
@@ -1736,13 +1826,32 @@
           cur.wordIndices.push(i);
           cur.text += w + t;
 
-          const para = isParagraphBreak(t);
-          const sent = isSentenceEnd(w);
+          const nl = countNewlines(t);
+          const para = nl >= 2;
+          const line = nl >= 1;
+          const strength = sentenceStrength(w, nextW);
 
-          if(para || sent){
-            const extra = (tts.punctPause && sent) ? tts.sentGap : 0;
-            const paraExtra = para ? tts.paraGap : 0;
-            const delay = ((tts.wordGap || 0) + Math.max(extra, paraExtra)) * (tts.delayScale || 1);
+          // Optional: split on commas/colons/dashes if the phrase becomes too long.
+          const allowSoftSplit = tts.punctPause && hasSoftPunct(w) && !para && !line && strength === 'none' &&
+            ((cur.wordIndices.length >= 10) || (cur.text.length >= 180));
+
+          let add = 0;
+          if(para){
+            add = tts.paraGap;
+          } else if(line){
+            // Line break without punctuation should still behave like a sentence boundary.
+            add = tts.sentGap;
+          } else if(strength === 'hard'){
+            add = tts.punctPause ? tts.sentGap : 0;
+          } else if(strength === 'soft'){
+            add = tts.punctPause ? softGapMs() : 0;
+          } else if(allowSoftSplit){
+            add = softGapMs();
+          }
+
+          // Always split on sentence/line/paragraph boundaries (even if add=0)
+          if(para || line || strength !== 'none' || allowSoftSplit){
+            const delay = ((tts.wordGap || 0) + add) * (tts.delayScale || 1);
             pushCur(delay);
           }
         }
@@ -1762,13 +1871,25 @@
           const wl = wordLang[i] || 'en';
           const w = words[i];
           const t = trails[i] || '';
+          const nextW = words[i+1] || '';
 
-          const sent = isSentenceEnd(w);
-          const para = isParagraphBreak(t);
+          const nl = countNewlines(t);
+          const para = nl >= 2;
+          const line = nl >= 1;
+          const strength = sentenceStrength(w, nextW);
 
-          const extra = (tts.punctPause && sent) ? tts.sentGap : 0;
-          const paraExtra = para ? tts.paraGap : 0;
-          const delayAfter = ((tts.wordGap || 0) + Math.max(extra, paraExtra)) * (tts.delayScale || 1);
+          let add = 0;
+          if(para){
+            add = tts.paraGap;
+          } else if(line){
+            add = tts.sentGap;
+          } else if(strength === 'hard'){
+            add = tts.punctPause ? tts.sentGap : 0;
+          } else if(strength === 'soft'){
+            add = tts.punctPause ? softGapMs() : 0;
+          }
+
+          const delayAfter = ((tts.wordGap || 0) + add) * (tts.delayScale || 1);
 
           out.push({
             text: w + t,
@@ -1885,7 +2006,7 @@
 
       function speakFromWordIndex(i){
         buildDisplay(); // ensure words/lang lists exist
-        const text = normalizeText(textInput.value);
+        const text = preparedText;
         if(!text.trim() || !words.length) return;
 
         stopAll();
