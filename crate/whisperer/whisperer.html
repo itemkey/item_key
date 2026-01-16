@@ -23,8 +23,8 @@
 
     /* Keep content clear of fixed header and fixed bottom UI */
     .center-stage{
-      padding-top: var(--topbarOffset);
-      padding-bottom: calc(var(--footerH) + var(--floatH) + 28px + env(safe-area-inset-bottom));
+      padding-top: calc(var(--topbarOffset) + var(--floatH) + 18px);
+      padding-bottom: calc(var(--footerH) + 28px + env(safe-area-inset-bottom));
       overflow-x: hidden;
     }
 
@@ -222,7 +222,7 @@
       position: fixed;
       left: 50%;
       transform: translateX(-50%);
-      bottom: calc(var(--footerH) + 10px + env(safe-area-inset-bottom));
+      top: calc(var(--topbarOffset) + 8px);
       z-index: 99999; /* must stay above footer + overlays */
       display: flex;
       gap: 10px;
@@ -318,7 +318,7 @@
         flex-direction: column;
         gap: 8px;
         padding: 10px;
-        bottom: calc(var(--footerH) + 10px + env(safe-area-inset-bottom));
+        top: calc(var(--topbarOffset) + 8px);
       }
       .w-floatbar .w-btn{
         min-height: 48px;
@@ -379,8 +379,8 @@
       position: fixed;
       left: 12px;
       right: 12px;
-      top: calc(var(--topbarOffset) + 6px);
-      bottom: calc(var(--footerH) + var(--floatH) + 16px + env(safe-area-inset-bottom));
+      top: calc(var(--topbarOffset) + var(--floatH) + 18px);
+      bottom: calc(var(--footerH) + 16px + env(safe-area-inset-bottom));
       z-index: 90000;
       width: auto;
       max-width: none;
@@ -486,8 +486,8 @@
       position: fixed;
       left: 12px;
       right: 12px;
-      top: 12px;
-      bottom: calc(var(--floatH) + 12px + env(safe-area-inset-bottom));
+      top: calc(var(--topbarOffset) + var(--floatH) + 18px);
+      bottom: calc(var(--footerH) + 12px + env(safe-area-inset-bottom));
       z-index: 90000;
 
       margin: 0;
@@ -526,7 +526,7 @@
         left: 10px;
         right: 10px;
         top: 10px;
-        bottom: calc(var(--floatH) + 10px + env(safe-area-inset-bottom));
+        bottom: calc(var(--footerH) + 10px + env(safe-area-inset-bottom));
       }
       .w-reader.is-full .w-display{ padding: 12px 12px; }
     }
@@ -587,7 +587,7 @@
           <div class="w-label">text</div>
           <textarea class="w-text" id="textInput" placeholder="Вставь сюда текст…"></textarea>
           <p class="w-hint">
-            Клик по слову в FOLLOW — начать чтение с него. Панель «Озвучить / Пауза / Стоп» всегда видна снизу.
+            Клик по слову в FOLLOW — начать чтение с него. Панель «Озвучить / Пауза / Стоп» всегда видна сверху.
           </p>
         </div>
 
@@ -956,8 +956,8 @@
       position: fixed;
       left: 12px;
       right: 12px;
-      top: calc(var(--topbarOffset) + 6px);
-      bottom: calc(var(--footerH) + var(--floatH) + 16px + env(safe-area-inset-bottom));
+      top: calc(var(--topbarOffset) + var(--floatH) + 18px);
+      bottom: calc(var(--footerH) + 16px + env(safe-area-inset-bottom));
       z-index: 90000;
       width: auto;
       max-width: none;
