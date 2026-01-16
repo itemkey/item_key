@@ -130,6 +130,11 @@
       gap: 10px;
     }
 
+    .w-actions--3{ grid-template-columns: repeat(3, 1fr); }
+    @media (max-width: 520px){
+      .w-actions--3{ grid-template-columns: 1fr; }
+    }
+
     .w-btn{
       border: 1px solid rgba(0,0,0,.14);
       background: rgba(255,255,255,.90);
@@ -471,6 +476,28 @@
       background: transparent;
     }
 
+
+
+    /* Rail action buttons (use same look as rail links) */
+    .rail-btn{
+      appearance: none;
+      -webkit-appearance: none;
+      background: transparent;
+      border: none;
+      padding: 0;
+      width: 100%;
+      text-align: left;
+      cursor: pointer;
+      font: inherit;
+      color: inherit;
+    }
+    .rail-btn:disabled{ opacity: .55; cursor: not-allowed; }
+
+    .rail-sep{
+      height: 1px;
+      background: rgba(0,0,0,.12);
+      margin: 12px 0;
+    }
     /* Scrim behind the fullscreen window */
     .follow-scrim{
       position: fixed;
@@ -540,15 +567,16 @@
   <div class="rays" aria-hidden="true"></div>
   <div class="veil" aria-hidden="true"></div>
 
-  <!-- верхний “герб” -->
-  <header class="topbar topbar--edge">
-    <a class="toplink" href="../../item-user.html?returnTo=crate/whisperer/whisperer.html" aria-label="Item User">
-      <span class="tag">item-user</span>
-    </a>
-  </header>
+  <!-- верхний “герб” (пусто, item-user перенесён влево) -->
+  <header class="topbar topbar--edge"></header>
 
   <!-- левый rail -->
   <aside class="rail rail--left" aria-label="Левое меню">
+  <a class="rail-link" href="../../item-user.html?returnTo=crate/whisperer/whisperer.html">
+    <span class="rail-link__title">item-user</span>
+    <span class="rail-link__meta">профиль</span>
+  </a>
+
     <a class="rail-link" href="../../index.html">
       <span class="rail-link__title">item-key</span>
       <span class="rail-link__meta">главное меню</span>
@@ -557,9 +585,12 @@
       <span class="rail-link__title">item-crate</span>
       <span class="rail-link__meta">назад в хаб</span>
     </a>
+
+    <div class="rail-sep" aria-hidden="true"></div>
   </aside>
 
   <!-- правый rail -->
+
   <aside class="rail rail--right" aria-label="Правое меню">
     <a class="rail-link" href="../../item-soft.html">
       <span class="rail-link__title">item-soft</span>
@@ -587,7 +618,7 @@
           <div class="w-label">text</div>
           <textarea class="w-text" id="textInput" placeholder="Вставь сюда текст…"></textarea>
           <p class="w-hint">
-            Клик по слову в FOLLOW — начать чтение с него. Панель «Озвучить / Пауза / Стоп» всегда видна сверху.
+            Клик по слову в FOLLOW — начать чтение с него. Пауза/продолжить всегда видна сверху. «Озвучить», «Стоп» и «Заблокировать» — в блоке кнопок справа.
           </p>
         </div>
 
@@ -611,6 +642,12 @@
           </div>
 
           <button class="w-btn" id="fromNotesBtn" type="button">Из заметок</button>
+
+          <div class="w-actions w-actions--3" aria-label="Управление озвучкой">
+            <button class="w-btn" id="menuSpeakBtn" type="button">Озвучить</button>
+            <button class="w-btn" id="menuStopBtn" type="button" disabled>Стоп</button>
+            <button class="w-btn" id="menuLockBtn" type="button" aria-pressed="false">Заблокировать</button>
+          </div>
 
           <details class="w-adv" id="narratorAdv">
             <summary>narrator</summary>
@@ -720,7 +757,7 @@
           </div>
 
           <p class="w-hint">
-            Горячие клавиши: Ctrl+Enter — озвучить, Space — пауза/продолжить, Esc — стоп.
+            Горячие клавиши: Ctrl+Enter — озвучить, Space — пауза/продолжить, Esc — стоп (если не заблокировано).
           </p>
         </div>
       </div>
@@ -741,10 +778,8 @@
   <div class="follow-scrim" id="followScrim" hidden aria-hidden="true"></div>
 
   <!-- Floating transport bar (ALWAYS visible) -->
-  <div class="w-floatbar" id="floatbar" aria-label="Управление озвучкой">
-    <button class="w-btn w-btn--primary" id="speakBtn" type="button">Озвучить</button>
+  <div class="w-floatbar" id="floatbar" aria-label="Пауза/продолжить">
     <button class="w-btn" id="pauseBtn" type="button" disabled>Пауза</button>
-    <button class="w-btn" id="stopBtn" type="button" disabled>Стоп</button>
   </div>
 
   <footer class="bottombar bottombar--edge">
@@ -1182,9 +1217,27 @@
       }
 
 
-      const speakBtn = document.getElementById('speakBtn');
       const pauseBtn = document.getElementById('pauseBtn');
-      const stopBtn = document.getElementById('stopBtn');
+      const menuSpeakBtn = document.getElementById('menuSpeakBtn');
+      const menuStopBtn = document.getElementById('menuStopBtn');
+      const menuLockBtn = document.getElementById('menuLockBtn');
+
+      let uiLocked = false;
+      function setLocked(on){
+        uiLocked = !!on;
+        try{ if(menuLockBtn) menuLockBtn.setAttribute('aria-pressed', uiLocked ? 'true' : 'false'); }catch(e){}
+        try{
+          if(menuLockBtn){
+            const t = menuLockBtn.querySelector('.rail-link__title');
+            if(t){
+              t.textContent = uiLocked ? 'разблокировать' : 'заблокировать';
+            }else{
+              menuLockBtn.textContent = uiLocked ? 'Разблокировать' : 'Заблокировать';
+            }
+          }
+        }catch(e){}
+        updateControlAvailability();
+      }
 
       const voiceEnSelect = document.getElementById('voiceEnSelect');
       const voiceRuSelect = document.getElementById('voiceRuSelect');
@@ -1638,18 +1691,32 @@
       function setMode(next){
         mode = next;
         modePill.textContent = 'mode: ' + mode;
+        updateControlAvailability();
+      }
 
+      
+
+      function updateControlAvailability(){
         const idle = (mode === 'idle');
         const paused = (mode === 'paused');
 
-        speakBtn.disabled = !idle;
-        pauseBtn.disabled = idle;
-        stopBtn.disabled = idle;
+        // Pause/Resume (top bar)
+        if(pauseBtn){
+          pauseBtn.disabled = idle;
+          pauseBtn.textContent = paused ? 'Продолжить' : 'Пауза';
+        }
 
-        pauseBtn.textContent = paused ? 'Продолжить' : 'Пауза';
+        // Menu buttons
+        if(menuSpeakBtn) menuSpeakBtn.disabled = uiLocked || !idle;
+        if(menuStopBtn) menuStopBtn.disabled = uiLocked || idle;
+
+        // Notes modal: block "speak" button when locked
+        if(typeof speakNotesBtn !== 'undefined' && speakNotesBtn){
+          speakNotesBtn.disabled = uiLocked;
+        }
       }
 
-      function stopAll(){
+function stopAll(){
         cancelled = true;
         queue = [];
         qIdx = 0;
@@ -2054,9 +2121,17 @@
         }
       }
       // Buttons
-      speakBtn.addEventListener('click', () => speakFromWordIndex(0));
-      pauseBtn.addEventListener('click', pauseOrResume);
-      stopBtn.addEventListener('click', stopAll);
+      if(menuSpeakBtn) menuSpeakBtn.addEventListener('click', () => {
+        if(uiLocked) return;
+        speakFromWordIndex(0);
+      });
+      if(menuStopBtn) menuStopBtn.addEventListener('click', () => {
+        if(uiLocked) return;
+        stopAll();
+      });
+      if(menuLockBtn) menuLockBtn.addEventListener('click', () => setLocked(!uiLocked));
+
+      if(pauseBtn) pauseBtn.addEventListener('click', pauseOrResume);
 
       // Click any word in FOLLOW to start from it
       display.addEventListener('click', (e) => {
@@ -2065,6 +2140,7 @@
         if(!span) return;
 
         const idx = Number(span.dataset.index || 0);
+        if(uiLocked) return;
         speakFromWordIndex(idx);
       });
 
@@ -2104,7 +2180,7 @@
           textInput.value = t;
           buildDisplay();
           closeModal();
-          speakFromWordIndex(0);
+          if(!uiLocked) speakFromWordIndex(0);
         });
       }
 
@@ -2141,14 +2217,15 @@
         const inForm = (tag === 'textarea' || tag === 'input' || tag === 'select');
 
         if(e.key === 'Escape'){
-          // First: exit FOLLOW fullscreen if open; second: stop speech.
+          // First: exit FOLLOW fullscreen if open; second: stop speech (если не заблокировано).
           try{
             if(followCard && followCard.classList.contains('is-full')){
               setFollowFull(false);
               return;
             }
-          }catch(_){}
-          stopAll();
+          }catch(_){ }
+
+          if(!uiLocked) stopAll();
           return;
         }
 
@@ -2162,7 +2239,7 @@
 
         if(e.ctrlKey && (e.key === 'Enter' || e.code === 'Enter')){
           e.preventDefault();
-          if(mode === 'idle') speakFromWordIndex(0);
+          if(!uiLocked && mode === 'idle') speakFromWordIndex(0);
           return;
         }
       });
@@ -2170,6 +2247,7 @@
       // Init
       buildDisplay();
       setMode('idle');
+      setLocked(false);
 
       // Keep bottom measurements accurate even after fonts load
       window.addEventListener('load', () => {
