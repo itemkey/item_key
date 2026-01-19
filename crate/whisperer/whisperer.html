@@ -99,7 +99,7 @@
 
     .w-field{ display: grid; gap: 8px; min-width: 0; }
 
-    input[type="range"], select{
+    input[type="range"], input[type="number"], select{
       width: 100%;
       border: 1px solid rgba(0,0,0,.14);
       background: rgba(255,255,255,.92);
@@ -111,6 +111,19 @@
       min-width: 0;
     }
     input[type="range"]{ padding: 0 8px; }
+
+    .w-inline{ display:flex; gap:10px; align-items:center; }
+    .w-inline > *{ min-width:0; }
+
+    input[type=number]{
+      width: 120px;
+      padding: 10px 10px;
+      height: 40px;
+    }
+    input[type=number]::-webkit-outer-spin-button,
+    input[type=number]::-webkit-inner-spin-button{ -webkit-appearance: none; margin: 0; }
+    input[type=number]{ -moz-appearance: textfield; }
+
     select{
       white-space: nowrap;
       overflow: hidden;
@@ -687,7 +700,10 @@
 
               <div class="w-field">
                 <div class="w-label">word gap</div>
-                <input id="wordGapRange" type="range" min="0" max="4000" step="50" value="0" />
+                <div class="w-inline">
+                  <input id="wordGapRange" type="range" min="0" max="4000" step="1" value="0" />
+                  <input id="wordGapNum" type="number" inputmode="numeric" min="0" max="4000" step="1" value="0" aria-label="word gap in ms" />
+                </div>
                 <div class="w-status">
                   <span class="w-pill" id="wordGapVal">0ms</span>
                   <span class="w-pill" id="sentGapPill">sentence: 250ms</span>
@@ -696,12 +712,18 @@
 
               <div class="w-field">
                 <div class="w-label">sentence gap</div>
-                <input id="sentGapRange" type="range" min="0" max="20000" step="100" value="250" />
+                <div class="w-inline">
+                  <input id="sentGapRange" type="range" min="0" max="20000" step="1" value="250" />
+                  <input id="sentGapNum" type="number" inputmode="numeric" min="0" max="20000" step="1" value="250" aria-label="sentence gap in ms" />
+                </div>
               </div>
 
               <div class="w-field">
                 <div class="w-label">paragraph gap</div>
-                <input id="paraGapRange" type="range" min="0" max="60000" step="250" value="600" />
+                <div class="w-inline">
+                  <input id="paraGapRange" type="range" min="0" max="60000" step="1" value="600" />
+                  <input id="paraGapNum" type="number" inputmode="numeric" min="0" max="60000" step="1" value="600" aria-label="paragraph gap in ms" />
+                </div>
                 <div class="w-status">
                   <span class="w-pill" id="paraGapVal">600ms</span>
                   <span class="w-pill" id="punctPill">punct: on</span>
@@ -725,7 +747,7 @@
               </div>
 
               <p class="w-hint">
-                Подсказка: Word-режим даёт точный интервал между словами, но может звучать более «рублено». Auto — максимально плавно.
+                Подсказка: Word gap теперь всегда делает паузу *между любыми словами* (даже в Auto/Phrase). Если звучит слишком «рублено», уменьшай word gap или увеличивай rate.
               </p>
             </div>
           </details>
@@ -1246,8 +1268,11 @@
       const pitchRange = document.getElementById('pitchRange');
       const volRange = document.getElementById('volRange');
       const wordGapRange = document.getElementById('wordGapRange');
+      const wordGapNum = document.getElementById('wordGapNum');
       const sentGapRange = document.getElementById('sentGapRange');
+      const sentGapNum = document.getElementById('sentGapNum');
       const paraGapRange = document.getElementById('paraGapRange');
+      const paraGapNum = document.getElementById('paraGapNum');
       const chunkMode = document.getElementById('chunkMode');
       const punctPause = document.getElementById('punctPause');
       const delayScaleRange = document.getElementById('delayScaleRange');
@@ -1383,14 +1408,26 @@
 
       function fmt2(n){ return (Math.round(n*100)/100).toFixed(2); }
 
+      // WebSpeech engines have a built-in, fairly large gap between utterances.
+      // If we switch to per-word utterances, even a 1ms gap feels long.
+      // Treat ultra-small wordGap values as 0ms so playback stays natural.
+      const MIN_WORD_GAP_MS = 60;
+      function effectiveWordGap(){
+        const g = Number(tts.wordGap) || 0;
+        return (g > 0 && g < MIN_WORD_GAP_MS) ? 0 : g;
+      }
+
       function updateTtsUI(){
         if(rateVal) rateVal.textContent = fmt2(tts.rate) + '×';
         if(pitchVal) pitchVal.textContent = fmt2(tts.pitch);
         if(volPill) volPill.textContent = 'vol: ' + fmt2(tts.volume);
 
         if(wordGapVal) wordGapVal.textContent = String(Math.round(tts.wordGap)) + 'ms';
+        if(wordGapNum) wordGapNum.value = String(Math.round(tts.wordGap));
         if(sentGapPill) sentGapPill.textContent = 'sentence: ' + String(Math.round(tts.sentGap)) + 'ms';
+        if(sentGapNum) sentGapNum.value = String(Math.round(tts.sentGap));
         if(paraGapVal) paraGapVal.textContent = String(Math.round(tts.paraGap)) + 'ms';
+        if(paraGapNum) paraGapNum.value = String(Math.round(tts.paraGap));
         if(delayScaleVal) delayScaleVal.textContent = 'slow: ' + (Math.round(tts.delayScale*10)/10).toFixed(1) + '×';
 
         // Effective mode (auto can resolve to segment/phrase)
@@ -1440,8 +1477,11 @@
         if(pitchRange) pitchRange.value = String(tts.pitch);
         if(volRange) volRange.value = String(tts.volume);
         if(wordGapRange) wordGapRange.value = String(tts.wordGap);
+        if(wordGapNum) wordGapNum.value = String(tts.wordGap);
         if(sentGapRange) sentGapRange.value = String(tts.sentGap);
+        if(sentGapNum) sentGapNum.value = String(tts.sentGap);
         if(paraGapRange) paraGapRange.value = String(tts.paraGap);
+        if(paraGapNum) paraGapNum.value = String(tts.paraGap);
         if(delayScaleRange) delayScaleRange.value = String(tts.delayScale);
         if(chunkMode) chunkMode.value = String(tts.chunkMode);
         if(punctPause) punctPause.checked = !!tts.punctPause;
@@ -1450,11 +1490,15 @@
       }
 
       function getEffectiveChunkMode(){
-        // "auto": smooth segments if gaps are 0; otherwise phrase mode.
+        // Chunking policy:
+        // - 'word' mode is ONLY when user explicitly selects it (because engines add a big built-in gap between utterances).
+        // - In auto/phrase, wordGap is treated as an extra gap on phrase/sentence boundaries.
         if(tts.chunkMode === 'word') return 'word';
         if(tts.chunkMode === 'phrase') return 'phrase';
-        const hasAnyGaps = (tts.wordGap > 0) || (tts.sentGap > 0) || (tts.paraGap > 0);
-        return hasAnyGaps ? 'phrase' : 'auto';
+
+        // Auto mode: if we have any explicit larger gaps (sentence/paragraph), prefer phrases for cleaner boundaries.
+        const hasBigGaps = (tts.sentGap > 0) || (tts.paraGap > 0) || (effectiveWordGap() > 0);
+        return hasBigGaps ? 'phrase' : 'auto';
       }
 
       function onTtsChanged(){
@@ -1463,9 +1507,9 @@
         tts.pitch = clamp(pitchRange ? pitchRange.value : tts.pitch, 0.0, 2.0);
         tts.volume = clamp(volRange ? volRange.value : tts.volume, 0.0, 1.0);
 
-        tts.wordGap = clamp(wordGapRange ? wordGapRange.value : tts.wordGap, 0, 4000);
-        tts.sentGap = clamp(sentGapRange ? sentGapRange.value : tts.sentGap, 0, 20000);
-        tts.paraGap = clamp(paraGapRange ? paraGapRange.value : tts.paraGap, 0, 60000);
+        tts.wordGap = clamp((wordGapNum ? wordGapNum.value : (wordGapRange ? wordGapRange.value : tts.wordGap)), 0, 4000);
+        tts.sentGap = clamp((sentGapNum ? sentGapNum.value : (sentGapRange ? sentGapRange.value : tts.sentGap)), 0, 20000);
+        tts.paraGap = clamp((paraGapNum ? paraGapNum.value : (paraGapRange ? paraGapRange.value : tts.paraGap)), 0, 60000);
         tts.delayScale = clamp(delayScaleRange ? delayScaleRange.value : tts.delayScale, 1.0, 12.0);
 
         tts.chunkMode = chunkMode ? chunkMode.value : tts.chunkMode;
@@ -1476,7 +1520,33 @@
       }
 
       // Wire controls
-      [rateRange, pitchRange, volRange, wordGapRange, sentGapRange, paraGapRange, delayScaleRange].forEach(el => {
+      function bindRangeNumber(rangeEl, numEl){
+        if(!rangeEl || !numEl) return;
+
+        const syncFromRange = () => {
+          numEl.value = String(rangeEl.value);
+        };
+        const syncFromNum = () => {
+          // allow empty while typing
+          if(numEl.value === '') return;
+          rangeEl.value = String(numEl.value);
+        };
+
+        rangeEl.addEventListener('input', () => { syncFromRange(); onTtsChanged(); });
+        rangeEl.addEventListener('change', () => { syncFromRange(); onTtsChanged(); });
+
+        numEl.addEventListener('input', () => { syncFromNum(); onTtsChanged(); });
+        numEl.addEventListener('change', () => { syncFromNum(); onTtsChanged(); });
+
+        // init
+        syncFromRange();
+      }
+
+      bindRangeNumber(wordGapRange, wordGapNum);
+      bindRangeNumber(sentGapRange, sentGapNum);
+      bindRangeNumber(paraGapRange, paraGapNum);
+
+      [rateRange, pitchRange, volRange, delayScaleRange].forEach(el => {
         if(!el) return;
         el.addEventListener('input', onTtsChanged);
         el.addEventListener('change', onTtsChanged);
@@ -1918,7 +1988,7 @@ function stopAll(){
 
           // Always split on sentence/line/paragraph boundaries (even if add=0)
           if(para || line || strength !== 'none' || allowSoftSplit){
-            const delay = ((tts.wordGap || 0) + add) * (tts.delayScale || 1);
+            const delay = (effectiveWordGap() + add) * (tts.delayScale || 1);
             pushCur(delay);
           }
         }
@@ -1956,7 +2026,7 @@ function stopAll(){
             add = tts.punctPause ? softGapMs() : 0;
           }
 
-          const delayAfter = ((tts.wordGap || 0) + add) * (tts.delayScale || 1);
+          const delayAfter = (effectiveWordGap() + add) * (tts.delayScale || 1);
 
           out.push({
             text: w + t,
