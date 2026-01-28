@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Item Key — onoi_notes</title>
+  <title>Item Key - onoi_notes</title>
 
   <!-- глобальный стиль сайта -->
   <link rel="stylesheet" href="../../assets/css/styles.css" />
 
   <style>
     /* =========================================================
-       onoi_notes — single-file notes manager (IndexedDB + optional GitHub Sync)
+       onoi_notes - single-file notes manager (IndexedDB + optional GitHub Sync)
        ========================================================= */
     .notes-wrap, .notes-wrap *{ box-sizing: border-box; }
     :root{
@@ -354,7 +354,23 @@
       align-items: center;
       margin-bottom: 4px;
     }
-    .list-meta{
+    
+    
+    .list-actions{
+      display: inline-flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: flex-end;
+      flex-wrap: nowrap;
+    }
+    /* В остальном проекте .n-btn.is-primary растягивается на всю ширину.
+       В шапке списка заметок нам нужен нормальный "inline" размер. */
+    .list-actions .n-btn.is-primary{ width: auto; }
+    @media (max-width: 520px){
+      .list-head{ grid-template-columns: 1fr; gap: 8px; }
+      .list-actions{ justify-content: flex-start; }
+    }
+.list-meta{
       font-size: 11px;
       color: rgba(0,0,0,.68);
       line-height: 1.45;
@@ -688,8 +704,7 @@
         grid-template-columns: 1fr auto;
         gap: 8px;
       }
-      #newNoteBtn{ grid-column: 1 / -1; }
-      .n-pill{ grid-column: 1 / -1; justify-content: flex-start; }
+.n-pill{ grid-column: 1 / -1; justify-content: flex-start; }
 
       /* Buttons and fields: better touch targets */
       .n-btn{ min-height: 44px; padding: 12px 12px; letter-spacing: 2px; }
@@ -741,11 +756,178 @@
       .n-btn, .n-col-left{ transition: none !important; }
     }
 
+
+    /* =========================================================
+       UX polish (no-tooltips, clearer structure) - 2026-01
+       - No rounded corners preserved
+       - Stronger contrast + clearer selected states
+       ========================================================= */
+
+    :root{
+      --bgCard: rgba(255,255,255,.90);
+      --bd: rgba(0,0,0,.18);
+      --bd2: rgba(0,0,0,.34);
+      --muted: rgba(0,0,0,.66);
+      --fs-ui: 13px;
+      --fs-note: 17px;
+      --lh-note: 1.75;
+    }
+
+    /* Desktop: keep sidebar usable (sticky + scroll) */
+    @media (min-width: 901px){
+      .n-col-left{
+        position: sticky;
+        top: calc(var(--topbarOffset) + 12px);
+        max-height: calc(100vh - var(--topbarOffset) - var(--footerH) - 26px);
+        overflow: auto;
+        padding-right: 6px;
+        scrollbar-width: thin;
+      }
+      .n-col-left::-webkit-scrollbar{ width: 10px; }
+      .n-col-left::-webkit-scrollbar-thumb{ background: rgba(0,0,0,.15); border: 2px solid transparent; background-clip: content-box; }
+    }
+
+    /* Clearer button affordance (still sharp + gothic) */
+    .n-btn{
+      border-color: rgba(0,0,0,.22);
+      background: rgba(255,255,255,.94);
+    }
+    .n-btn:hover{
+      background: rgba(255,255,255,.98);
+      border-color: rgba(0,0,0,.40);
+    }
+    .n-btn.is-primary{
+      border-color: rgba(0,0,0,.50);
+      background: rgba(0,0,0,.03);
+    }
+
+    /* Inputs: stronger focus ring */
+    .n-search:focus-visible,
+    .editor-title:focus-visible,
+    .field input:focus-visible,
+    .field select:focus-visible,
+    .editor:focus-visible{
+      outline: 2px solid rgba(0,0,0,.55);
+      outline-offset: 2px;
+      border-color: rgba(0,0,0,.45);
+    }
+
+    /* Notes rows: more readable */
+    .note-row{
+      padding: 11px 10px;
+      border-color: rgba(0,0,0,.14);
+    }
+    .note-row:hover{ border-color: rgba(0,0,0,.30); }
+    .note-row.is-active{
+      border-color: rgba(0,0,0,.42);
+      box-shadow: inset 4px 0 0 0 rgba(0,0,0,.86);
+    }
+    .note-snippet{ color: rgba(0,0,0,.76); }
+
+    /* Editor: comfortable reading area */
+    .editor{
+      padding: 16px 16px;
+      background: rgba(255,255,255,.94);
+      border-color: rgba(0,0,0,.18);
+    }
+
+    /* Reduce visual noise: keep labels, hide "hint" class if any remain */
+    p.hint{ display: none !important; }
+
+/* =========================================================
+   UX additions: toast + empty states + dialogs (sharp gothic)
+   ========================================================= */
+.toast-wrap{
+  position: fixed;
+  right: 14px;
+  bottom: calc(var(--footerH) + 14px + env(safe-area-inset-bottom));
+  display: grid;
+  gap: 10px;
+  z-index: 100000;
+  pointer-events: none;
+}
+.toast{
+  pointer-events: auto;
+  border: 1px solid rgba(0,0,0,.22);
+  background: rgba(255,255,255,.96);
+  padding: 10px 12px;
+  border-radius: 0;
+  min-width: min(420px, calc(100vw - 28px));
+  max-width: min(520px, calc(100vw - 28px));
+  box-shadow: 0 12px 30px rgba(0,0,0,.18);
+  display: grid;
+  gap: 6px;
+}
+.toast-title{
+  font-size: 11px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin: 0;
+}
+.toast-body{
+  margin: 0;
+  font-size: 12px;
+  color: rgba(0,0,0,.72);
+  line-height: 1.5;
+}
+.toast-actions{
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.empty{
+  border: 1px dashed rgba(0,0,0,.22);
+  background: rgba(255,255,255,.70);
+  padding: 12px;
+  border-radius: 0;
+  display: grid;
+  gap: 10px;
+}
+.empty h3{
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+.empty p{
+  margin: 0;
+  font-size: 12px;
+  color: rgba(0,0,0,.72);
+  line-height: 1.5;
+}
+
+/* Dialog modal - reuse modal shell */
+.dialog-msg{
+  font-size: 12px;
+  color: rgba(0,0,0,.74);
+  line-height: 1.55;
+  margin: 0;
+  white-space: pre-wrap;
+}
+.dialog-input{
+  width: 100%;
+  border: 1px solid var(--bd);
+  background: rgba(255,255,255,.92);
+  padding: 10px 12px;
+  font-size: 12px;
+  outline: none;
+  border-radius: 0;
+  height: 40px;
+  min-width: 0;
+}
+.dialog-input:focus-visible{
+  outline: 2px solid rgba(0,0,0,.55);
+  outline-offset: 2px;
+  border-color: rgba(0,0,0,.45);
+}
+
 </style>
 </head>
 
 <body class="page page-crate">
-  <!-- фон/рамки — как в item-key -->
+  <!-- фон/рамки - как в item-key -->
   <div class="outer-frame" aria-hidden="true"></div>
   <div class="rays" aria-hidden="true"></div>
   <div class="veil" aria-hidden="true"></div>
@@ -782,7 +964,7 @@
   </aside>
 
   <main class="center-stage" aria-label="onoi_notes center">
-    <section class="notes-wrap notes-wrap" aria-label="onoi_notes app">
+    <section class="notes-wrap" aria-label="onoi_notes app">
       <div class="n-title">
         <h1>onoi_notes</h1>
         <div class="sub">категории · подкатегории · редактор · whisperer</div>
@@ -790,19 +972,14 @@
 
       <div class="n-card">
         <div class="n-topbar" aria-label="Панель поиска и действий">
-          <input class="n-search" id="searchInput" placeholder="Поиск по заметкам… (Ctrl+K)" />
-                    <button class="n-btn" id="openDrawerBtn" type="button" title="Открыть меню категорий и заметок">Меню</button>
-<button class="n-btn" id="newNoteBtn" type="button">Новая заметка</button>
-          <div class="n-pill" title="Статус синхронизации" aria-label="Статус синхронизации">
+          <input class="n-search" id="searchInput" placeholder="Поиск по заметкам…" />
+                    <button class="n-btn" id="openDrawerBtn" type="button">Меню</button>
+<div class="n-pill" aria-label="Статус синхронизации">
             <span class="dot" id="syncDot"></span>
             <span id="syncText">local</span>
           </div>
         </div>
-        <p class="hint" style="margin-top:10px">
-          Всё сохраняется автоматически. <b>Важно:</b> GitHub Pages — статический хостинг, он сам по себе не умеет хранить ваши изменения “на сайте”.
-          Чтобы изменения автоматически появлялись и на телефоне, нужен “облачный” источник. Я добавил <b>опциональную</b> авто‑синхронизацию через GitHub API (Gist/Repo) — включается в настройках.
-        </p>
-        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px">
+<div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px">
 <button class="n-btn" id="settingsBtn" type="button">Настройки</button>
           <button class="n-btn" id="exportBtn" type="button">Экспорт JSON</button>
           <button class="n-btn" id="importBtn" type="button">Импорт JSON</button>
@@ -835,27 +1012,22 @@
             <button class="n-btn" id="renameCatBtn" type="button">Переименовать</button>
             <button class="n-btn" id="deleteCatBtn" type="button">Удалить</button>
           </div>
-
-          <p class="hint" style="margin-top:10px">
-            Совет: <b>Enter</b> — переименовать выбранную категорию; <b>Delete</b> — удалить.
-          </p>
-        </div>
+</div>
 
         <!-- Notes list -->
 <div class="n-card" aria-label="Список заметок">
           <div class="n-label">notes</div>
 
           <div class="list-head">
-            <p class="list-meta" id="listMeta">—</p>
-            <button class="n-btn" id="deleteNoteBtn" type="button">Удалить</button>
+            <p class="list-meta" id="listMeta">-</p>
+            <div class="list-actions" aria-label="Действия с заметками">
+              <button class="n-btn is-primary" id="newNoteBtn" type="button">Новая заметка</button>
+              <button class="n-btn" id="deleteNoteBtn" type="button">Удалить</button>
+            </div>
           </div>
 
           <div class="list" id="notesList" aria-label="Список заметок"></div>
-
-          <p class="hint" style="margin-top:10px">
-            Горячие клавиши: <b>Ctrl+N</b> — новая заметка, <b>Ctrl+S</b> — не нужно (авто), <b>Ctrl+F</b> — поиск.
-          </p>
-        </div>
+</div>
 
         <!-- Editor -->
         </div>
@@ -869,8 +1041,8 @@
           <div class="editor-head">
             <input class="editor-title" id="noteTitle" placeholder="Название заметки…" />
             <div class="editor-head-right">
-              <div class="crumbs" id="crumbs">—</div>
-              <button class="n-btn is-primary" id="whisperBtn" type="button" title="Отправить текущую заметку в whisperer">Прошептать</button>
+              <div class="crumbs" id="crumbs">-</div>
+              <button class="n-btn is-primary" id="whisperBtn" type="button">Прошептать</button>
             </div>
           </div>
 
@@ -892,7 +1064,22 @@
             </div>
 
             <div class="toolbar-row">
-              <select class="toolsel" id="fontSelect" title="Шрифт">
+              <button class="tool" type="button" data-cmd="undo">undo</button>
+              <button class="tool" type="button" data-cmd="redo">redo</button>
+              <button class="tool" type="button" id="clearFmtBtn">clear</button>
+
+              <select class="toolsel" id="blockSelect" aria-label="Стиль блока">
+                <option value="p" selected>P</option>
+                <option value="h1">H1</option>
+                <option value="h2">H2</option>
+                <option value="h3">H3</option>
+                <option value="h4">H4</option>
+                <option value="blockquote">quote</option>
+                <option value="pre">code</option>
+              </select>
+
+              <button class="tool" type="button" id="customSizeBtn">size…</button>
+              <select class="toolsel" id="fontSelect">
                 <option value="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, \"Noto Sans\", sans-serif">Default</option>
                 <option value="\"Times New Roman\", Times, serif">Serif</option>
                 <option value="Georgia, serif">Georgia</option>
@@ -901,7 +1088,7 @@
                 <option value="\"Comic Sans MS\", \"Comic Sans\", cursive">Comic</option>
               </select>
 
-              <select class="toolsel" id="sizeSelect" title="Размер">
+              <select class="toolsel" id="sizeSelect">
                 <option value="14">14px</option>
                 <option value="16" selected>16px</option>
                 <option value="18">18px</option>
@@ -911,12 +1098,12 @@
                 <option value="32">32px</option>
               </select>
 
-              <label class="toolsel" style="gap:10px" title="Цвет текста">
+              <label class="toolsel" style="gap:10px">
                 <span class="swatch" id="colorSwatch"></span>
                 <input id="colorPick" type="color" value="#000000" aria-label="Цвет текста" />
               </label>
 
-              <label class="toolsel" style="gap:10px" title="Подсветка">
+              <label class="toolsel" style="gap:10px">
                 <span class="swatch" id="hlSwatch" style="background:#fff59d"></span>
                 <input id="hlPick" type="color" value="#fff59d" aria-label="Подсветка" />
               </label>
@@ -925,27 +1112,23 @@
               <button class="tool" type="button" data-cmd="justifyCenter">center</button>
               <button class="tool" type="button" data-cmd="justifyRight">right</button>
 
-              <button class="tool" type="button" id="toggleSidebarBtn" title="Свернуть/развернуть боковую панель">sidebar</button>
-              <button class="tool is-primary" type="button" id="focusBtn" title="Режим фокуса">focus</button>
+              <button class="tool" type="button" id="toggleSidebarBtn">sidebar</button>
+              <button class="tool is-primary" type="button" id="focusBtn">focus</button>
             </div>
           </div>
 
           <div class="editor" id="editor" contenteditable="true" spellcheck="true" aria-label="Текст заметки"></div>
 
           <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px">
-            <div class="n-pill" title="Автосохранение" aria-label="Автосохранение">
+            <div class="n-pill" aria-label="Автосохранение">
               <span class="dot ok" id="saveDot"></span>
               <span id="saveText">saved</span>
             </div>
-            <div class="n-pill" title="Последнее изменение">
-              <span id="updatedText">—</span>
+            <div class="n-pill">
+              <span id="updatedText">-</span>
             </div>
           </div>
-
-          <p class="hint" style="margin-top:10px">
-            Вставляй картинки через кнопку <b>image</b> или просто вставкой из буфера. Картинки автоматически становятся адаптивными (100% ширины).
-          </p>
-        </div>
+</div>
         </div>
       </div>
     </section>
@@ -957,6 +1140,31 @@
     <span class="hint">autosave · categories · whisperer</span>
   </footer>
 
+<!-- UI modal (prompt/confirm/alert replacement) -->
+<div class="modal" id="uiModal" role="dialog" aria-modal="true" aria-label="Диалог" style="z-index: 100000;">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h2 class="modal-title" id="uiModalTitle">dialog</h2>
+      <button class="n-btn" id="uiModalClose" type="button">Закрыть</button>
+    </div>
+    <div class="modal-grid">
+      <p class="dialog-msg" id="uiModalMsg"></p>
+      <div class="field" id="uiModalField" style="display:none">
+        <label id="uiModalLabel">value</label>
+        <input class="dialog-input mono" id="uiModalInput" autocomplete="off" />
+      </div>
+      <div class="modal-actions" id="uiModalActions" style="grid-template-columns: 1fr 1fr 1fr;">
+        <button class="n-btn" id="uiModalCancel" type="button">Отмена</button>
+        <button class="n-btn" id="uiModalOk" type="button">Ок</button>
+        <button class="n-btn" id="uiModalAlt" type="button" style="display:none">-</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toasts -->
+<div class="toast-wrap" id="toastWrap" aria-live="polite" aria-atomic="true"></div>
+
   <!-- Settings modal -->
   <div class="modal" id="settingsModal" role="dialog" aria-modal="true" aria-label="Настройки">
     <div class="modal-card">
@@ -966,14 +1174,7 @@
       </div>
 
       <div class="modal-grid">
-        <div class="warnbox">
-          <b>Почему без сервера не синхронизируется “само”?</b><br/>
-          GitHub Pages отдаёт статические файлы и не может принимать ваши изменения. Поэтому по умолчанию всё хранится в вашем браузере (IndexedDB) — автосохранение без кнопок.
-          Если хочешь, чтобы одна и та же база была и на ПК, и на телефоне — нужно писать в облако через API. Здесь это сделано через <b>GitHub Contents API</b> (файл в репозитории) или через <b>Gist</b>.
-          Токен хранится только у тебя в браузере.
-        </div>
-
-        <div class="grid2">
+<div class="grid2">
           <div class="field">
             <label>cloud mode</label>
             <select id="cloudMode">
@@ -1035,12 +1236,7 @@
           <button class="n-btn" id="pullCloud" type="button">Pull</button>
           <button class="n-btn" id="pushCloud" type="button">Push</button>
         </div>
-
-        <p class="hint">
-          Рекомендация: создай отдельный файл <code class="k">crate/onoi_notes/db.json</code> в репозитории и дай токену права <code class="k">repo</code>.
-          Если боишься токена — используй Gist и права <code class="k">gist</code>.
-        </p>
-      </div>
+</div>
     </div>
   </div>
 
@@ -1066,7 +1262,7 @@
       return t.split(/\n|\r/)[0].slice(0, 90);
     }
     function fmtTime(ts){
-      if(!ts) return '—';
+      if(!ts) return '-';
       const d = new Date(ts);
       const z = (n) => String(n).padStart(2,'0');
       return z(d.getDate())+'.'+z(d.getMonth()+1)+'.'+d.getFullYear()+' '+z(d.getHours())+':'+z(d.getMinutes());
@@ -1235,6 +1431,10 @@
     const sidebarCol = $('sidebarCol');
 
     const focusBtn = $('focusBtn');
+
+    const clearFmtBtn = $('clearFmtBtn');
+    const blockSelect = $('blockSelect');
+    const customSizeBtn = $('customSizeBtn');
     const linkBtn = $('linkBtn');
     const imgBtn = $('imgBtn');
     const imgFile = $('imgFile');
@@ -1278,26 +1478,201 @@
       }
     }
 
+
+// ========= dialog + toast (replaces alert/prompt/confirm) =========
+const uiModal = $('uiModal');
+const uiModalTitle = $('uiModalTitle');
+const uiModalMsg = $('uiModalMsg');
+const uiModalField = $('uiModalField');
+const uiModalLabel = $('uiModalLabel');
+const uiModalInput = $('uiModalInput');
+const uiModalClose = $('uiModalClose');
+const uiModalCancel = $('uiModalCancel');
+const uiModalOk = $('uiModalOk');
+const uiModalAlt = $('uiModalAlt');
+
+const toastWrap = $('toastWrap');
+
+function toast(title, body, opts={}){
+  try{
+    const t = document.createElement('div');
+    t.className = 'toast';
+    const h = document.createElement('p');
+    h.className = 'toast-title';
+    h.textContent = String(title || 'info');
+    const b = document.createElement('p');
+    b.className = 'toast-body';
+    b.textContent = String(body || '');
+    t.appendChild(h);
+    t.appendChild(b);
+
+    if(opts.actionText && typeof opts.onAction === 'function'){
+      const a = document.createElement('div');
+      a.className = 'toast-actions';
+      const btn = document.createElement('button');
+      btn.className = 'n-btn';
+      btn.type = 'button';
+      btn.textContent = String(opts.actionText);
+      btn.addEventListener('click', () => { try{ opts.onAction(); }catch(e){}; t.remove(); });
+      a.appendChild(btn);
+      t.appendChild(a);
+    }
+
+    toastWrap.appendChild(t);
+    const ttl = Number(opts.ttl || 3200);
+    window.setTimeout(() => { try{ t.remove(); }catch(e){} }, ttl);
+  }catch(e){}
+}
+
+let uiModalResolve = null;
+let uiModalMode = 'alert'; // alert|confirm|prompt
+let uiModalLastFocus = null;
+
+function openUIModal({title='dialog', message='', mode='alert', label='value', value='', placeholder=''} = {}){
+  return new Promise((resolve) => {
+    uiModalResolve = resolve;
+    uiModalMode = mode;
+    uiModalLastFocus = document.activeElement;
+
+    uiModalTitle.textContent = String(title);
+    uiModalMsg.textContent = String(message || '');
+
+    const isPrompt = mode === 'prompt';
+    uiModalField.style.display = isPrompt ? 'grid' : 'none';
+    uiModalLabel.textContent = String(label || 'value');
+    uiModalInput.value = String(value || '');
+    uiModalInput.placeholder = String(placeholder || '');
+
+    uiModalCancel.style.display = (mode === 'alert') ? 'none' : 'inline-flex';
+    uiModalOk.textContent = (mode === 'prompt') ? 'Сохранить' : 'Ок';
+
+    uiModal.classList.add('is-open');
+    document.body.classList.add('modal-open');
+    window.setTimeout(() => {
+      if(isPrompt) uiModalInput.focus();
+      else uiModalOk.focus();
+    }, 0);
+  });
+}
+
+function closeUIModal(result){
+  if(!uiModal.classList.contains('is-open')) return;
+  uiModal.classList.remove('is-open');
+  document.body.classList.remove('modal-open');
+  const r = uiModalResolve;
+  uiModalResolve = null;
+  try{
+    if(uiModalLastFocus && uiModalLastFocus.focus) uiModalLastFocus.focus();
+  }catch(e){}
+  if(r) r(result);
+}
+
+uiModalClose.addEventListener('click', () => closeUIModal(uiModalMode === 'alert' ? true : null));
+uiModalCancel.addEventListener('click', () => closeUIModal(null));
+uiModalOk.addEventListener('click', () => {
+  if(uiModalMode === 'prompt') closeUIModal(String(uiModalInput.value || '').trim());
+  else closeUIModal(true);
+});
+uiModal.addEventListener('click', (e) => {
+  if(e.target === uiModal) closeUIModal(uiModalMode === 'alert' ? true : null);
+});
+window.addEventListener('keydown', (e) => {
+  if(!uiModal.classList.contains('is-open')) return;
+  if(e.key === 'Escape'){
+    e.preventDefault();
+    closeUIModal(uiModalMode === 'alert' ? true : null);
+  }
+  if(uiModalMode === 'prompt' && e.key === 'Enter' && (document.activeElement === uiModalInput)){
+    e.preventDefault();
+    closeUIModal(String(uiModalInput.value || '').trim());
+  }
+});
+
+async function uiAlert(msg, title='info'){
+  await openUIModal({title, message: msg, mode:'alert'});
+  return true;
+}
+async function uiConfirm(msg, title='confirm'){
+  const r = await openUIModal({title, message: msg, mode:'confirm'});
+  return !!r;
+}
+async function uiPrompt(msg, opts={}){
+  const r = await openUIModal({
+    title: opts.title || 'input',
+    message: msg,
+    mode:'prompt',
+    label: opts.label || 'value',
+    value: opts.value || '',
+    placeholder: opts.placeholder || ''
+  });
+  if(r === null) return null;
+  const v = String(r || '').trim();
+  return v ? v : null;
+}
+
+
     // ========= data helpers =========
-    function ensureDefaults(){
-      // create default category + note if empty
-      if(state.cats.length === 0){
-        const root = { id: uid(), parentId: null, name: 'Inbox', createdAt: now(), updatedAt: now() };
-        state.cats.push(root);
-        state.activeCatId = root.id;
+    
+    function getOrCreateMainCat(){
+      let c = state.cats.find(x => x.name === 'main');
+      if(!c){
+        c = { id: uid(), parentId: null, name: 'main', createdAt: now(), updatedAt: now() };
+        state.cats.push(c);
       }
+      state.activeCatId = c.id;
+      return c;
+    }
+
+    function ensureDefaults(){
+      // Ensure there is always a default root category: "main"
+      const ensureMain = () => {
+        let main = state.cats.find(c => (c.parentId === null || c.parentId === undefined) && String(c.name||'').trim().toLowerCase() === 'main');
+        if(!main){
+          main = { id: uid(), parentId: null, name: 'main', createdAt: now(), updatedAt: now() };
+          state.cats.push(main);
+        }
+        return main.id;
+      };
+
+      // If db is empty - create "main"
+      if(state.cats.length === 0){
+        state.activeCatId = ensureMain();
+      }else{
+        // If active cat is missing - point to "main" (create if needed)
+        if(!state.activeCatId || !catById(state.activeCatId)){
+          state.activeCatId = ensureMain();
+        }
+      }
+
+      // If there are no notes yet - start with an empty sheet (no welcome text)
       if(state.notes.length === 0){
-        const n = { id: uid(), catId: state.activeCatId, title: 'First note', html: '<p>Привет. Это onoi_notes.</p><p>Нажми <b>image</b> чтобы вставить картинку.</p>', createdAt: now(), updatedAt: now() };
+        const n = {
+          id: uid(),
+          catId: state.activeCatId || ensureMain(),
+          title: '',
+          html: '',
+          createdAt: now(),
+          updatedAt: now()
+        };
         state.notes.push(n);
         state.activeNoteId = n.id;
       }
-      if(!state.activeCatId){
-        state.activeCatId = state.cats[0]?.id || null;
-      }
+
+
       if(!state.activeNoteId){
         const nn = state.notes.find(x => x.catId === state.activeCatId) || state.notes[0];
         state.activeNoteId = nn ? nn.id : null;
       }
+    }
+
+    function getOrCreateMainCatId(){
+      // Find root "main" (case-insensitive). Create if missing.
+      let main = state.cats.find(c => (c.parentId === null || c.parentId === undefined) && String(c.name||'').trim().toLowerCase() === 'main');
+      if(!main){
+        main = { id: uid(), parentId: null, name: 'main', createdAt: now(), updatedAt: now() };
+        state.cats.push(main);
+      }
+      return main.id;
     }
 
     function catById(id){ return state.cats.find(c => c.id === id) || null; }
@@ -1311,7 +1686,7 @@
         path.unshift(cur.name);
         cur = cur.parentId ? catById(cur.parentId) : null;
       }
-      return path.length ? path.join(' / ') : '—';
+      return path.length ? path.join(' / ') : '-';
     }
 
     function noteMatchesSearch(note){
@@ -1372,7 +1747,7 @@
         if(!pathArr.length) catBreadcrumb.textContent = 'Не выбрано';
         else {
           const byId = new Map(state.cats.map(c => [String(c.id), c]));
-          const names = pathArr.map(id => (byId.get(String(id))?.name || '—'));
+          const names = pathArr.map(id => (byId.get(String(id))?.name || '-'));
           catBreadcrumb.textContent = names.join(' › ');
         }
       }
@@ -1399,8 +1774,7 @@ const hasChildren = (byParent.get(cat.id) || []).length > 0;
           tgl.className = 'tree-tgl';
           tgl.textContent = hasChildren ? (isCollapsed ? '▸' : '▾') : '•';
           if(hasChildren){
-            tgl.title = isCollapsed ? 'Развернуть' : 'Свернуть';
-            tgl.addEventListener('click', (e) => {
+tgl.addEventListener('click', (e) => {
               e.stopPropagation();
               const id = String(cat.id);
               if(state.ui.collapsedCats.has(id)) state.ui.collapsedCats.delete(id);
@@ -1412,7 +1786,7 @@ const hasChildren = (byParent.get(cat.id) || []).length > 0;
 
           const name = document.createElement('div');
           name.className = 'tree-name';
-          name.textContent = cat.name || '—';
+          name.textContent = cat.name || '-';
 
           const cnt = document.createElement('div');
           cnt.className = 'tree-count';
@@ -1432,6 +1806,7 @@ const hasChildren = (byParent.get(cat.id) || []).length > 0;
               state.activeNoteId = null;
             }
             renderAll();
+            setTimeout(() => { try{ editor.focus(); }catch(e){} }, 0);
             closeDrawerSoon && closeDrawerSoon();
           });
 
@@ -1489,24 +1864,58 @@ const hasChildren = (byParent.get(cat.id) || []).length > 0;
     function renderNotesList(){
       notesList.innerHTML = '';
       const notes = getVisibleNotes();
-      listMeta.textContent = state.activeCatId ? ('Категория: ' + (catById(state.activeCatId)?.name || '—') + ' · ' + notes.length + ' заметок') : (notes.length + ' заметок');
+      listMeta.textContent = state.activeCatId ? ('Категория: ' + (catById(state.activeCatId)?.name || '-') + ' · ' + notes.length + ' заметок') : (notes.length + ' заметок');
 
       if(notes.length === 0){
-        const p = document.createElement('p');
-        p.className = 'hint';
-        p.textContent = state.search ? 'Ничего не найдено.' : 'В этой категории пока нет заметок. Нажми “Новая заметка”.';
-        notesList.appendChild(p);
-        return;
-      }
+  const box = document.createElement('div');
+  box.className = 'empty';
+  const h = document.createElement('h3');
+  h.textContent = 'пусто';
+  const p = document.createElement('p');
+  p.textContent = state.search ? 'По запросу ничего не найдено. Попробуй другой поиск.' : 'В этой категории пока нет заметок. Создай первую - и она появится здесь.';
+  const act = document.createElement('div');
+  act.style.display = 'flex';
+  act.style.gap = '10px';
+  act.style.flexWrap = 'wrap';
+
+  const btn = document.createElement('button');
+  btn.className = 'n-btn is-primary';
+  btn.type = 'button';
+  btn.textContent = 'Новая заметка';
+  btn.addEventListener('click', createNote);
+
+  const btn2 = document.createElement('button');
+  btn2.className = 'n-btn';
+  btn2.type = 'button';
+  btn2.textContent = 'Сбросить поиск';
+  btn2.disabled = !state.search;
+  btn2.addEventListener('click', () => {
+    state.search = '';
+    searchInput.value = '';
+    renderNotesList();
+    searchInput.focus();
+  });
+
+  act.appendChild(btn);
+  act.appendChild(btn2);
+
+  box.appendChild(h);
+  box.appendChild(p);
+  box.appendChild(act);
+  notesList.appendChild(box);
+  return;
+}
 
       notes.forEach(n => {
         const row = document.createElement('div');
         row.className = 'note-row' + (n.id === state.activeNoteId ? ' is-active' : '');
         row.dataset.id = n.id;
+        row.tabIndex = 0;
+        row.setAttribute('role','button');
 
         const h = document.createElement('h3');
         h.className = 'note-title';
-        h.textContent = (n.title || 'без названия').slice(0, 80);
+        h.textContent = (n.title && n.title.trim() ? n.title : 'noname').slice(0, 80);
 
         const sn = document.createElement('p');
         sn.className = 'note-snippet';
@@ -1515,11 +1924,18 @@ const hasChildren = (byParent.get(cat.id) || []).length > 0;
         row.appendChild(h);
         row.appendChild(sn);
 
-        row.addEventListener('click', () => {
+        const openNote = () => {
           state.activeNoteId = n.id;
           renderEditor();
           renderNotesList();
           closeDrawerSoon && closeDrawerSoon();
+        };
+        row.addEventListener('click', openNote);
+        row.addEventListener('keydown', (e) => {
+          if(e.key === 'Enter' || e.key === ' '){
+            e.preventDefault();
+            openNote();
+          }
         });
 
         notesList.appendChild(row);
@@ -1530,16 +1946,19 @@ const hasChildren = (byParent.get(cat.id) || []).length > 0;
       const note = state.activeNoteId ? noteById(state.activeNoteId) : null;
       const cat = state.activeCatId ? catById(state.activeCatId) : null;
 
-      crumbs.textContent = state.activeCatId ? catPath(state.activeCatId) : '—';
+      crumbs.textContent = state.activeCatId ? catPath(state.activeCatId) : '-';
 
       if(!note){
         noteTitle.value = '';
-        editor.innerHTML = '';
-        noteTitle.disabled = true;
-        editor.setAttribute('contenteditable','false');
-        updatedText.textContent = '—';
+        // Можно начинать печатать сразу - при первом вводе заметка и категория создадутся автоматически
+        noteTitle.disabled = false;
+        // Не блокируем редактор: пусть пользователь сразу пишет, даже если нет ни одной категории/заметки
+        if(!editor.innerHTML.trim()) editor.innerHTML = '<p></p>';
+        editor.setAttribute('contenteditable', 'true');
+        updatedText.textContent = '-';
         return;
       }
+
 
       noteTitle.disabled = false;
       editor.setAttribute('contenteditable','true');
@@ -1602,7 +2021,127 @@ const hasChildren = (byParent.get(cat.id) || []).length > 0;
       schedulePersist();
     }
 
-    function setFontFamily(ff){
+    
+    // ========= editor selection-based formatting (2026-01) =========
+    function getSelRange(){
+      const sel = window.getSelection ? window.getSelection() : null;
+      if(!sel || sel.rangeCount === 0) return null;
+      const r = sel.getRangeAt(0);
+      // Ensure selection is inside editor
+      const common = r.commonAncestorContainer;
+      const node = (common.nodeType === 1) ? common : common.parentNode;
+      if(!node || !editor.contains(node)) return null;
+      return r;
+    }
+
+    function cssTextFromObj(obj){
+      return Object.entries(obj || {})
+        .filter(([k,v]) => v !== null && v !== undefined && String(v).trim() !== '')
+        .map(([k,v]) => `${k}:${String(v).trim()}`)
+        .join(';');
+    }
+
+    function insertStyledCaretSpan(styles){
+      const r = getSelRange();
+      if(!r) return false;
+
+      // create <span style="...">\u200B</span> and place caret after the ZWSP
+      const span = document.createElement('span');
+      span.setAttribute('style', cssTextFromObj(styles));
+      span.textContent = '\u200B';
+      r.deleteContents();
+      r.insertNode(span);
+
+      const sel = window.getSelection();
+      const nr = document.createRange();
+      nr.setStart(span.firstChild, 1);
+      nr.collapse(true);
+      sel.removeAllRanges();
+      sel.addRange(nr);
+      return true;
+    }
+
+    function wrapRangeWithSpan(range, styles){
+      const span = document.createElement('span');
+      span.setAttribute('style', cssTextFromObj(styles));
+
+      // Extract selected contents, wrap, then insert back
+      const frag = range.extractContents();
+      span.appendChild(frag);
+      range.insertNode(span);
+
+      // Reselect wrapped contents
+      const sel = window.getSelection();
+      const nr = document.createRange();
+      nr.selectNodeContents(span);
+      sel.removeAllRanges();
+      sel.addRange(nr);
+      return span;
+    }
+
+    function applyStyleToSelection(styles, opts={}){
+      editor.focus();
+      const r = getSelRange();
+      if(!r){
+        // selection outside editor: just set defaults if requested
+        if(opts.alsoSetDefault){
+          if(styles['font-family']) setFontFamily(styles['font-family']);
+          if(styles['font-size']) setFontSize(styles['font-size'].replace('px',''));
+        }
+        return;
+      }
+
+      if(r.collapsed){
+        insertStyledCaretSpan(styles);
+      } else {
+        wrapRangeWithSpan(r, styles);
+      }
+
+      // Optionally set defaults for overall editor (so new text feels consistent)
+      if(opts.alsoSetDefault){
+        if(styles['font-family']) setFontFamily(styles['font-family']);
+        if(styles['font-size']) setFontSize(String(styles['font-size']).replace('px',''));
+      }
+
+      schedulePersist();
+    }
+
+    function applyFontSizeToSelection(px, opts={}){
+      const v = clamp(Number(px)||16, 10, 96);
+      applyStyleToSelection({ 'font-size': v + 'px' }, opts);
+    }
+
+    // Normalize: remove leftover <font> tags (from execCommand), and cleanup ZWSP spans if possible
+    function sanitizeEditorHTML(){
+      try{
+        // Replace <font> tags with spans while preserving color/face/size attributes
+        editor.querySelectorAll('font').forEach(f => {
+          const s = document.createElement('span');
+          const styles = [];
+          const color = f.getAttribute('color');
+          const face = f.getAttribute('face');
+          const size = f.getAttribute('size');
+          if(color) styles.push('color:' + color);
+          if(face) styles.push('font-family:' + face);
+          // size is 1-7 (legacy) - ignore; user uses px controls
+          if(styles.length) s.setAttribute('style', styles.join(';'));
+          s.innerHTML = f.innerHTML;
+          f.replaceWith(s);
+        });
+
+        // Remove spans that contain only ZWSP and no other text, after user typed
+        editor.querySelectorAll('span').forEach(sp => {
+          if(sp.textContent === '\u200B'){
+            // keep if it's the caret carrier currently selected
+            const sel = window.getSelection();
+            const node = sel && sel.anchorNode;
+            if(node && sp.contains(node)) return;
+            sp.remove();
+          }
+        });
+      }catch(e){}
+    }
+function setFontFamily(ff){
       document.documentElement.style.setProperty('--font-note', ff);
       try{ localStorage.setItem('onoi_font_note', ff); }catch(e){}
     }
@@ -1656,25 +2195,54 @@ const hasChildren = (byParent.get(cat.id) || []).length > 0;
     });
 
     // ========= note operations =========
-    async function createNote(){
-      if(!state.activeCatId){
-        alert('Сначала создай категорию.');
-        return;
-      }
-      const n = { id: uid(), catId: state.activeCatId, title: 'New note', html: '<p></p>', createdAt: now(), updatedAt: now() };
+    
+
+function ensureCategoryForNewNote(){
+  // Notes must always belong to a real category.
+  // If there are no categories at all - recreate root "main".
+  // If active category is missing (deleted) - fallback to "main".
+  const hadNoCats = state.cats.length === 0;
+  const activeMissing = !state.activeCatId || !catById(state.activeCatId);
+  if(hadNoCats || activeMissing){
+    const mainId = getOrCreateMainCatId();
+    state.activeCatId = mainId;
+    // If we created categories implicitly - update tree + breadcrumbs immediately
+    renderTree();
+    crumbs.textContent = catPath(state.activeCatId);
+  }
+  return state.activeCatId;
+}
+async function createNote(){
+      ensureCategoryForNewNote();
+
+      const n = { id: uid(), catId: state.activeCatId, title: '', html: '<p></p>', createdAt: now(), updatedAt: now() };
       state.notes.unshift(n);
       state.activeNoteId = n.id;
       renderNotesList();
       renderEditor();
-      noteTitle.focus();
-      noteTitle.select();
+      editor.focus();
       schedulePersist();
     }
 
-    async function deleteActiveNote(){
+    function ensureActiveNoteFromDraft(){
+      if(state.activeNoteId) return noteById(state.activeNoteId);
+
+      ensureCategoryForNewNote();
+
+const draftTitle = (noteTitle.value || '').trim();
+      const draftHtml = (editor.innerHTML && editor.innerHTML.trim()) ? editor.innerHTML : '<p></p>';
+      const n = { id: uid(), catId: state.activeCatId, title: draftTitle, html: draftHtml, createdAt: now(), updatedAt: now() };
+      state.notes.unshift(n);
+      state.activeNoteId = n.id;
+      renderNotesList();
+      schedulePersist();
+      return n;
+    }
+
+	async function deleteActiveNote(){
       const note = state.activeNoteId ? noteById(state.activeNoteId) : null;
       if(!note) return;
-      if(!confirm('Удалить заметку?')) return;
+      if(!(await uiConfirm('Удалить заметку?', 'onoi_notes'))) return;
 
       state.notes = state.notes.filter(n => n.id !== note.id);
       await idb.del(STORE.notes, note.id);
@@ -1686,7 +2254,7 @@ const hasChildren = (byParent.get(cat.id) || []).length > 0;
     }
 
     async function createCategory(parentId=null){
-      const name = prompt(parentId ? 'Название подкатегории:' : 'Название категории:');
+      const name = await uiPrompt(parentId ? 'Название подкатегории:' : 'Название категории:', {title:'onoi_notes', label:'Название'});
       if(!name) return;
       const c = { id: uid(), parentId: parentId, name: name.trim(), createdAt: now(), updatedAt: now() };
       state.cats.push(c);
@@ -1698,7 +2266,7 @@ const hasChildren = (byParent.get(cat.id) || []).length > 0;
     async function renameActiveCategory(){
       const c = state.activeCatId ? catById(state.activeCatId) : null;
       if(!c) return;
-      const name = prompt('Новое имя:', c.name || '');
+      const name = await uiPrompt('Новое имя:', c.name || '', {title:'onoi_notes', label:'Название'});
       if(!name) return;
       c.name = name.trim();
       c.updatedAt = now();
@@ -1711,7 +2279,7 @@ const hasChildren = (byParent.get(cat.id) || []).length > 0;
       const c = state.activeCatId ? catById(state.activeCatId) : null;
       if(!c) return;
       const count = countNotesInCat(c.id, true);
-      if(!confirm('Удалить категорию и всё внутри? Заметок затронется: ' + count)) return;
+      if(!(await uiConfirm('Удалить категорию и всё внутри?\nЗаметок затронется: ' + count, 'onoi_notes'))) return;
 
       // collect cat ids to delete
       const toDel = new Set([c.id]);
@@ -1778,7 +2346,7 @@ const hasChildren = (byParent.get(cat.id) || []).length > 0;
       const cats = obj.cats.map(c => ({
         id: String(c.id || uid()),
         parentId: c.parentId ? String(c.parentId) : null,
-        name: String(c.name || '—'),
+        name: String(c.name || '-'),
         createdAt: Number(c.createdAt || now()),
         updatedAt: Number(c.updatedAt || now())
       }));
@@ -1786,7 +2354,7 @@ const hasChildren = (byParent.get(cat.id) || []).length > 0;
       const notes = obj.notes.map(n => ({
         id: String(n.id || uid()),
         catId: catIds.has(String(n.catId)) ? String(n.catId) : (cats[0]?.id || null),
-        title: String(n.title || '—'),
+        title: String(n.title || '-'),
         html: String(n.html || ''),
         createdAt: Number(n.createdAt || now()),
         updatedAt: Number(n.updatedAt || now())
@@ -2014,7 +2582,7 @@ const hasChildren = (byParent.get(cat.id) || []).length > 0;
 
     async function testCloudConn(){
       if(state.cloud.mode === 'off'){
-        alert('Cloud mode выключен.');
+        toast('cloud', 'Cloud mode выключен.', {ttl: 3000});
         return;
       }
       setSync('warn', 'testing');
@@ -2025,10 +2593,10 @@ const hasChildren = (byParent.get(cat.id) || []).length > 0;
           await ghGistGet();
         }
         setSync('ok', 'cloud');
-        alert('OK: доступ есть.');
+        toast('cloud', 'OK: доступ есть.', {ttl: 2600});
       }catch(e){
         setSync('bad', 'cloud err');
-        alert(String(e.message || e));
+        toast('error', String(e.message || e), {ttl: 5200});
       }
     }
 
@@ -2038,7 +2606,7 @@ const hasChildren = (byParent.get(cat.id) || []).length > 0;
       renderNotesList();
     });
 
-    newNoteBtn.addEventListener('click', createNote);
+    if(newNoteBtn) newNoteBtn.addEventListener('click', createNote);
     deleteNoteBtn.addEventListener('click', deleteActiveNote);
 
     addCatBtn.addEventListener('click', () => createCategory(null));
@@ -2050,9 +2618,9 @@ const hasChildren = (byParent.get(cat.id) || []).length > 0;
     deleteCatBtn.addEventListener('click', deleteActiveCategory);
 
     noteTitle.addEventListener('input', () => {
-      const note = state.activeNoteId ? noteById(state.activeNoteId) : null;
+      const note = ensureActiveNoteFromDraft();
       if(!note) return;
-      note.title = (noteTitle.value || '').trim() || '—';
+      note.title = (noteTitle.value || '').trim();
       note.updatedAt = now();
       updatedText.textContent = 'updated: ' + fmtTime(note.updatedAt);
       renderNotesList();
@@ -2060,17 +2628,11 @@ const hasChildren = (byParent.get(cat.id) || []).length > 0;
     });
 
     editor.addEventListener('input', () => {
-      const note = state.activeNoteId ? noteById(state.activeNoteId) : null;
+      const note = ensureActiveNoteFromDraft();
       if(!note) return;
       note.html = editor.innerHTML;
       note.updatedAt = now();
       updatedText.textContent = 'updated: ' + fmtTime(note.updatedAt);
-      // auto title if empty
-      if(!noteTitle.value.trim()){
-        const t = firstLine(note.html) || '—';
-        note.title = t.slice(0, 80);
-        noteTitle.value = note.title;
-      }
       renderNotesList();
       schedulePersist();
     });
@@ -2087,35 +2649,103 @@ const hasChildren = (byParent.get(cat.id) || []).length > 0;
       });
     });
 
-    fontSelect.addEventListener('change', () => {
-      setFontFamily(fontSelect.value);
-    });
-    sizeSelect.addEventListener('change', () => {
-      setFontSize(sizeSelect.value);
+    
+    
+    // Extra editor tools
+    if(clearFmtBtn){
+      clearFmtBtn.addEventListener('click', () => {
+        editor.focus();
+        try{ document.execCommand('removeFormat', false, null); }catch(e){}
+        try{ document.execCommand('unlink', false, null); }catch(e){}
+        sanitizeEditorHTML();
+        schedulePersist();
+      });
+    }
+
+    if(blockSelect){
+      blockSelect.addEventListener('change', () => {
+        const v = blockSelect.value || 'p';
+        if(v === 'p') exec('formatBlock', '<p>');
+        else if(v === 'pre') exec('formatBlock', '<pre>');
+        else if(v === 'blockquote') exec('formatBlock', '<blockquote>');
+        else exec('formatBlock', '<' + v + '>');
+        schedulePersist();
+      });
+    }
+
+    if(customSizeBtn){
+      customSizeBtn.addEventListener('click', async () => {
+        const v = await uiPrompt('Размер шрифта в px (например: 15, 17, 22)', { title: 'Размер текста', label: 'px', value: String(sizeSelect.value || 16) });
+        if(!v) return;
+        const n = Number(String(v).replace(',', '.'));
+        if(!Number.isFinite(n)) return;
+        const px = clamp(n, 8, 160);
+        applyFontSizeToSelection(px, { alsoSetDefault: false });
+      });
+    }
+
+    // Smarter paste: default to plain text (Shift+Paste keeps formatting)
+    editor.addEventListener('paste', (e) => {
+      if(e.shiftKey) return; // keep rich paste
+      e.preventDefault();
+      const text = (e.clipboardData || window.clipboardData).getData('text/plain') || '';
+      const lines = text.replace(/\r/g,'').split('\n');
+      const html = lines.map(line => line
+        .replace(/&/g,'&amp;')
+        .replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;')
+        .replace(/'/g,'&#039;') || '<br>').join('<br>');
+      const r = getSelRange();
+      if(r){
+        r.deleteContents();
+        const tmp = document.createElement('div');
+        tmp.innerHTML = html;
+        const frag = document.createDocumentFragment();
+        while(tmp.firstChild) frag.appendChild(tmp.firstChild);
+        r.insertNode(frag);
+        // move caret to end
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        const nr = document.createRange();
+        nr.selectNodeContents(editor);
+        nr.collapse(false);
+        sel.addRange(nr);
+      }else{
+        try{ document.execCommand('insertHTML', false, html); }catch(err){}
+      }
+      sanitizeEditorHTML();
+      schedulePersist();
     });
 
-    function applyColorSwatches(){
+    // Keep HTML tidy
+    editor.addEventListener('input', () => {
+      sanitizeEditorHTML();
+    });
+
+fontSelect.addEventListener('change', () => {
+      applyStyleToSelection({ 'font-family': fontSelect.value }, { alsoSetDefault: true });
+    });
+    sizeSelect.addEventListener('change', () => {
+      const px = clamp(Number(sizeSelect.value)||16, 10, 96);
+      applyFontSizeToSelection(px, { alsoSetDefault: true });
+    });
+
+function applyColorSwatches(){
       colorSwatch.style.background = colorPick.value;
       hlSwatch.style.background = hlPick.value;
     }
     applyColorSwatches();
     colorPick.addEventListener('input', () => {
       applyColorSwatches();
-      exec('foreColor', colorPick.value);
+      applyStyleToSelection({ color: colorPick.value });
     });
     hlPick.addEventListener('input', () => {
       applyColorSwatches();
-      // hiliteColor works in most modern browsers; fallback to backColor
-      try{
-        document.execCommand('hiliteColor', false, hlPick.value);
-      }catch(e){
-        exec('backColor', hlPick.value);
-      }
-      schedulePersist();
+      applyStyleToSelection({ 'background-color': hlPick.value });
     });
-
-    linkBtn.addEventListener('click', () => {
-      const url = prompt('Ссылка (URL):');
+    linkBtn.addEventListener('click', async () => {
+      const url = await uiPrompt('Ссылка (URL):', {title:'link', label:'URL', placeholder:'https://...'});
       if(!url) return;
       exec('createLink', url.trim());
     });
@@ -2182,7 +2812,7 @@ const hasChildren = (byParent.get(cat.id) || []).length > 0;
       });
     }
 
-    // Keyboard: Ctrl+\ — toggle sidebar
+    // Keyboard: Ctrl+\ - toggle sidebar
     window.addEventListener('keydown', (e) => {
       if(e.ctrlKey && (e.key === '\\' || e.code === 'Backslash')){
         e.preventDefault();
@@ -2238,9 +2868,9 @@ const hasChildren = (byParent.get(cat.id) || []).length > 0;
       try{
         syncCloudFieldsFromInputs();
         await cloudPull();
-        alert('Pull: готово.');
+        toast('cloud', 'Pull: готово.', {ttl: 2600});
       }catch(e){
-        alert(String(e.message || e));
+        toast('error', String(e.message || e), {ttl: 5200});
       }
     });
     pushCloud.addEventListener('click', async () => {
@@ -2248,9 +2878,9 @@ const hasChildren = (byParent.get(cat.id) || []).length > 0;
         syncCloudFieldsFromInputs();
         setSync('warn','pushing');
         scheduleCloudPush();
-        alert('Push: отправка запланирована (авто).');
+        toast('cloud', 'Push: отправка запланирована (авто).', {ttl: 3000});
       }catch(e){
-        alert(String(e.message || e));
+        toast('error', String(e.message || e), {ttl: 5200});
       }
     });
 
@@ -2266,9 +2896,9 @@ const hasChildren = (byParent.get(cat.id) || []).length > 0;
         const txt = await f.text();
         const obj = JSON.parse(txt);
         await importJSON(obj);
-        alert('Импорт: готово.');
+        toast('import', 'Импорт: готово.', {ttl: 2600});
       }catch(e){
-        alert('Ошибка импорта: ' + String(e.message || e));
+        toast('import', 'Ошибка импорта: ' + String(e.message || e), {ttl: 5200});
       }
     });
 

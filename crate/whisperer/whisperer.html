@@ -116,7 +116,7 @@
     .w-inline > *{ min-width:0; }
 
     input[type=number]{
-      width: 120px;
+      width: 100%;
       padding: 10px 10px;
       height: 40px;
     }
@@ -631,7 +631,7 @@
           <div class="w-label">text</div>
           <textarea class="w-text" id="textInput" placeholder="Вставь сюда текст…"></textarea>
           <p class="w-hint">
-            Клик по слову в FOLLOW — начать чтение с него. Пауза/продолжить всегда видна сверху. «Озвучить», «Стоп» и «Заблокировать» — в блоке кнопок справа.
+            Клик по слову в FOLLOW - начать чтение с него. Пауза/продолжить - всегда сверху.
           </p>
         </div>
 
@@ -641,7 +641,7 @@
           <div class="w-row">
             <div class="w-field">
               <div class="w-label">text size</div>
-              <input id="fontRange" type="range" min="12" max="30" step="1" value="16" />
+              <input id="fontRange" type="number" min="12" max="30" step="1" value="16" />
               <div class="w-status">
                 <span class="w-pill" id="fontVal">16px</span>
                 <span class="w-pill" id="langPill">lang: auto</span>
@@ -650,107 +650,38 @@
           </div>
 
           <div class="w-actions" aria-label="Инструменты">
-            <button class="w-btn" id="prepBtn" type="button">Подготовить</button>
             <button class="w-btn" id="clearBtn" type="button">Очистить</button>
+            <button class="w-btn" id="fromNotesBtn" type="button">Из заметок</button>
           </div>
+<details class="w-adv" id="narratorAdv">
+  <summary>narrator</summary>
+  <div class="w-row">
+    <div class="w-field">
+      <div class="w-label">speed</div>
+      <input id="rateRange" type="number" min="0.50" max="2.50" step="0.01" value="1.00" />
+      <div class="w-status">
+        <span class="w-pill" id="rateVal">1.00×</span>
+</div>
+    </div>
+<div class="w-field">
+      <div class="w-label">tone</div>
+      <input id="pitchRange" type="number" min="0" max="2" step="0.05" value="1" />
+      <div class="w-status">
+        <span class="w-pill" id="pitchVal">1.00</span>
+        <span class="w-pill" id="volPill">vol: 1.00</span>
+      </div>
+    </div>
 
-          <button class="w-btn" id="fromNotesBtn" type="button">Из заметок</button>
+    <div class="w-field">
+      <div class="w-label">volume</div>
+      <input id="volRange" type="number" min="0" max="1" step="0.05" value="1" />
+    </div>
 
-          <div class="w-actions w-actions--3" aria-label="Управление озвучкой">
-            <button class="w-btn" id="menuSpeakBtn" type="button">Озвучить</button>
-            <button class="w-btn" id="menuStopBtn" type="button" disabled>Стоп</button>
-            <button class="w-btn" id="menuLockBtn" type="button" aria-pressed="false">Заблокировать</button>
-          </div>
-
-          <details class="w-adv" id="narratorAdv">
-            <summary>narrator</summary>
-            <div class="w-row">
-              <div class="w-field">
-                <div class="w-label">rate</div>
-                <input id="rateRange" type="range" min="0.10" max="3.00" step="0.01" value="1.00" />
-                <div class="w-status">
-                  <span class="w-pill" id="rateVal">1.00×</span>
-                  <span class="w-pill" id="chunkVal">chunk: auto</span>
-                </div>
-              </div>
-
-              <div class="w-field">
-                <div class="w-label">slow factor</div>
-                <input id="delayScaleRange" type="range" min="1" max="12" step="0.1" value="1" />
-                <div class="w-status">
-                  <span class="w-pill" id="delayScaleVal">slow: 1.0×</span>
-                  <span class="w-pill">gaps × slow</span>
-                </div>
-              </div>
-
-
-              <div class="w-field">
-                <div class="w-label">pitch</div>
-                <input id="pitchRange" type="range" min="0" max="2" step="0.05" value="1" />
-                <div class="w-status">
-                  <span class="w-pill" id="pitchVal">1.00</span>
-                  <span class="w-pill" id="volPill">vol: 1.00</span>
-                </div>
-              </div>
-
-              <div class="w-field">
-                <div class="w-label">volume</div>
-                <input id="volRange" type="range" min="0" max="1" step="0.05" value="1" />
-              </div>
-
-              <div class="w-field">
-                <div class="w-label">word gap</div>
-                <div class="w-inline">
-                  <input id="wordGapRange" type="range" min="0" max="4000" step="1" value="0" />
-                  <input id="wordGapNum" type="number" inputmode="numeric" min="0" max="4000" step="1" value="0" aria-label="word gap in ms" />
-                </div>
-                <div class="w-status">
-                  <span class="w-pill" id="wordGapVal">0ms</span>
-                  <span class="w-pill" id="sentGapPill">sentence: 250ms</span>
-                </div>
-              </div>
-
-              <div class="w-field">
-                <div class="w-label">sentence gap</div>
-                <div class="w-inline">
-                  <input id="sentGapRange" type="range" min="0" max="20000" step="1" value="250" />
-                  <input id="sentGapNum" type="number" inputmode="numeric" min="0" max="20000" step="1" value="250" aria-label="sentence gap in ms" />
-                </div>
-              </div>
-
-              <div class="w-field">
-                <div class="w-label">paragraph gap</div>
-                <div class="w-inline">
-                  <input id="paraGapRange" type="range" min="0" max="60000" step="1" value="600" />
-                  <input id="paraGapNum" type="number" inputmode="numeric" min="0" max="60000" step="1" value="600" aria-label="paragraph gap in ms" />
-                </div>
-                <div class="w-status">
-                  <span class="w-pill" id="paraGapVal">600ms</span>
-                  <span class="w-pill" id="punctPill">punct: on</span>
-                </div>
-              </div>
-
-              <div class="w-field">
-                <div class="w-label">chunking</div>
-                <select id="chunkMode" aria-label="Chunking mode">
-                  <option value="auto">Auto (smooth)</option>
-                  <option value="phrase">Phrase (punctuation)</option>
-                  <option value="word">Word (precise gaps)</option>
-                </select>
-              </div>
-
-              <div class="w-field">
-                <label class="w-hint" style="display:flex; gap:10px; align-items:center; margin:0;">
-                  <input id="punctPause" type="checkbox" checked style="width:18px; height:18px;">
-                  Add extra pauses after punctuation (., !, ?, …)
-                </label>
-              </div>
-
-              <p class="w-hint">
-                Подсказка: Word gap теперь всегда делает паузу *между любыми словами* (даже в Auto/Phrase). Если звучит слишком «рублено», уменьшай word gap или увеличивай rate.
-              </p>
-            </div>
-          </details>
+    <p class="w-hint">
+      Если звучит слишком быстро - уменьшай speed. Если звучит "без дыхания" - добавь pauses. Паузы после абзацев делаются длиннее автоматически.
+    </p>
+  </div>
+</details>
 
           <details class="w-adv" id="voicesAdv">
             <summary>voices</summary>
@@ -775,7 +706,7 @@
 
           <div class="w-status" aria-label="Статус">
             <span class="w-pill" id="modePill">mode: idle</span>
-            <span class="w-pill" id="posPill">word: —</span>
+            <span class="w-pill" id="posPill">word: -</span>
           </div>
 
           <p class="w-hint">
@@ -800,8 +731,11 @@
   <div class="follow-scrim" id="followScrim" hidden aria-hidden="true"></div>
 
   <!-- Floating transport bar (ALWAYS visible) -->
-  <div class="w-floatbar" id="floatbar" aria-label="Пауза/продолжить">
+  <div class="w-floatbar" id="floatbar" aria-label="Управление озвучкой">
+    <button class="w-btn w-btn--primary" id="speakBtn" type="button">Озвучить</button>
     <button class="w-btn" id="pauseBtn" type="button" disabled>Пауза</button>
+    <button class="w-btn" id="stopBtn" type="button" disabled>Стоп</button>
+    <button class="w-btn" id="lockBtn" type="button" aria-pressed="false" title="Блокировка управления">Заблокировать</button>
   </div>
 
   <footer class="bottombar bottombar--edge">
@@ -1066,9 +1000,7 @@
       const fontRange = document.getElementById('fontRange');
       const fontVal = document.getElementById('fontVal');
       const langPill = document.getElementById('langPill');
-
-      const prepBtn = document.getElementById('prepBtn');
-      const clearBtn = document.getElementById('clearBtn');
+const clearBtn = document.getElementById('clearBtn');
 
       // Notes bridge
       const fromNotesBtn = document.getElementById('fromNotesBtn');
@@ -1101,7 +1033,7 @@
       }
 
       function fmtTime(ts){
-        if(!ts) return '—';
+        if(!ts) return '-';
         const d = new Date(ts);
         const z = (n) => String(n).padStart(2,'0');
         return z(d.getDate())+'.'+z(d.getMonth()+1)+'.'+d.getFullYear()+' '+z(d.getHours())+':'+z(d.getMinutes());
@@ -1230,7 +1162,7 @@
           return (title ? (title + '\n') : '') + body;
         });
 
-        return parts.join('\n\n———\n\n').trim();
+        return parts.join('\n\n---\n\n').trim();
       }
 
       async function openNotesPicker(){
@@ -1239,23 +1171,19 @@
       }
 
 
+      const speakBtn = document.getElementById('speakBtn');
       const pauseBtn = document.getElementById('pauseBtn');
-      const menuSpeakBtn = document.getElementById('menuSpeakBtn');
-      const menuStopBtn = document.getElementById('menuStopBtn');
-      const menuLockBtn = document.getElementById('menuLockBtn');
+      const stopBtn = document.getElementById('stopBtn');
+      const lockBtn = document.getElementById('lockBtn');
 
       let uiLocked = false;
       function setLocked(on){
         uiLocked = !!on;
-        try{ if(menuLockBtn) menuLockBtn.setAttribute('aria-pressed', uiLocked ? 'true' : 'false'); }catch(e){}
+        try{ if(lockBtn) lockBtn.setAttribute('aria-pressed', uiLocked ? 'true' : 'false'); }catch(e){}
         try{
-          if(menuLockBtn){
-            const t = menuLockBtn.querySelector('.rail-link__title');
-            if(t){
-              t.textContent = uiLocked ? 'разблокировать' : 'заблокировать';
-            }else{
-              menuLockBtn.textContent = uiLocked ? 'Разблокировать' : 'Заблокировать';
-            }
+          if(lockBtn){
+            lockBtn.textContent = uiLocked ? 'Разблокировать' : 'Заблокировать';
+            lockBtn.title = uiLocked ? 'Управление заблокировано' : 'Блокировка управления';
           }
         }catch(e){}
         updateControlAvailability();
@@ -1263,32 +1191,13 @@
 
       const voiceEnSelect = document.getElementById('voiceEnSelect');
       const voiceRuSelect = document.getElementById('voiceRuSelect');
-      // Narrator (TTS) controls
-      const rateRange = document.getElementById('rateRange');
-      const pitchRange = document.getElementById('pitchRange');
-      const volRange = document.getElementById('volRange');
-      const wordGapRange = document.getElementById('wordGapRange');
-      const wordGapNum = document.getElementById('wordGapNum');
-      const sentGapRange = document.getElementById('sentGapRange');
-      const sentGapNum = document.getElementById('sentGapNum');
-      const paraGapRange = document.getElementById('paraGapRange');
-      const paraGapNum = document.getElementById('paraGapNum');
-      const chunkMode = document.getElementById('chunkMode');
-      const punctPause = document.getElementById('punctPause');
-      const delayScaleRange = document.getElementById('delayScaleRange');
 
-      const rateVal = document.getElementById('rateVal');
-      const pitchVal = document.getElementById('pitchVal');
-      const volPill = document.getElementById('volPill');
-      const wordGapVal = document.getElementById('wordGapVal');
-      const sentGapPill = document.getElementById('sentGapPill');
-      const paraGapVal = document.getElementById('paraGapVal');
-      const delayScaleVal = document.getElementById('delayScaleVal');
-      const chunkVal = document.getElementById('chunkVal');
-      const punctPill = document.getElementById('punctPill');
-
-
-      const modePill = document.getElementById('modePill');
+// Narrator (TTS) controls (simplified)
+const rateRange = document.getElementById('rateRange');
+const pitchRange = document.getElementById('pitchRange');
+const volRange = document.getElementById('volRange');
+const rateVal = document.getElementById('rateVal');
+const modePill = document.getElementById('modePill');
       const posPill = document.getElementById('posPill');
 
       const footer = document.querySelector('.bottombar');
@@ -1344,13 +1253,7 @@
         rate: 'whisperer_rate_v1',
         pitch: 'whisperer_pitch_v1',
         volume: 'whisperer_volume_v1',
-        wordGap: 'whisperer_word_gap_v1',
-        sentGap: 'whisperer_sentence_gap_v1',
-        paraGap: 'whisperer_paragraph_gap_v1',
-        delayScale: 'whisperer_delay_scale_v1',
-        chunkMode: 'whisperer_chunk_mode_v1',
-        punctPause: 'whisperer_punct_pause_v1'
-      };
+};
 
       function saveSetting(key, value){
         try{ localStorage.setItem(key, value); } catch(e){}
@@ -1383,185 +1286,71 @@
       applyFontSize(savedFont ? Number(savedFont) : Number(fontRange.value));
       fontRange.addEventListener('input', () => applyFontSize(fontRange.value));
 
-      // ==========================
-      // Narrator (TTS) preferences
-      // ==========================
-      const TTS_DEFAULTS = {
-        rate: 1.0,
-        pitch: 1.0,
-        volume: 1.0,
-        wordGap: 0,     // ms
-        sentGap: 250,   // ms
-        paraGap: 600,   // ms
-        delayScale: 1.0, // multiplier for all gaps (for ultra-slow playback)
-        chunkMode: 'auto',   // auto | phrase | word
-        punctPause: true
-      };
+// ==========================
+// Narrator (TTS) preferences
+// ==========================
+const TTS_DEFAULTS = {
+  rate: 1.0,
+  pitch: 1.0,
+  volume: 1.0
+};
 
-      const tts = { ...TTS_DEFAULTS };
+const tts = {
+  ...TTS_DEFAULTS
+};
 
-      function clamp(n, a, b){
-        n = Number(n);
-        if(Number.isNaN(n)) return a;
-        return Math.min(b, Math.max(a, n));
-      }
+function clamp(n, a, b){
+  n = Number(n);
+  if(Number.isNaN(n)) return a;
+  return Math.min(b, Math.max(a, n));
+}
 
-      function fmt2(n){ return (Math.round(n*100)/100).toFixed(2); }
-
-      // WebSpeech engines have a built-in, fairly large gap between utterances.
-      // If we switch to per-word utterances, even a 1ms gap feels long.
-      // Treat ultra-small wordGap values as 0ms so playback stays natural.
-      const MIN_WORD_GAP_MS = 60;
-      function effectiveWordGap(){
-        const g = Number(tts.wordGap) || 0;
-        return (g > 0 && g < MIN_WORD_GAP_MS) ? 0 : g;
-      }
-
-      function updateTtsUI(){
-        if(rateVal) rateVal.textContent = fmt2(tts.rate) + '×';
-        if(pitchVal) pitchVal.textContent = fmt2(tts.pitch);
-        if(volPill) volPill.textContent = 'vol: ' + fmt2(tts.volume);
-
-        if(wordGapVal) wordGapVal.textContent = String(Math.round(tts.wordGap)) + 'ms';
-        if(wordGapNum) wordGapNum.value = String(Math.round(tts.wordGap));
-        if(sentGapPill) sentGapPill.textContent = 'sentence: ' + String(Math.round(tts.sentGap)) + 'ms';
-        if(sentGapNum) sentGapNum.value = String(Math.round(tts.sentGap));
-        if(paraGapVal) paraGapVal.textContent = String(Math.round(tts.paraGap)) + 'ms';
-        if(paraGapNum) paraGapNum.value = String(Math.round(tts.paraGap));
-        if(delayScaleVal) delayScaleVal.textContent = 'slow: ' + (Math.round(tts.delayScale*10)/10).toFixed(1) + '×';
-
-        // Effective mode (auto can resolve to segment/phrase)
-        const effective = getEffectiveChunkMode();
-        if(chunkVal) chunkVal.textContent = 'chunk: ' + effective;
-
-        if(punctPill) punctPill.textContent = 'punct: ' + (tts.punctPause ? 'on' : 'off');
-      }
-
-      function saveTts(){
-        saveSetting(LS.rate, String(tts.rate));
-        saveSetting(LS.pitch, String(tts.pitch));
-        saveSetting(LS.volume, String(tts.volume));
-        saveSetting(LS.wordGap, String(tts.wordGap));
-        saveSetting(LS.sentGap, String(tts.sentGap));
-        saveSetting(LS.paraGap, String(tts.paraGap));
-        saveSetting(LS.delayScale, String(tts.delayScale));
-        saveSetting(LS.chunkMode, String(tts.chunkMode));
-        saveSetting(LS.punctPause, tts.punctPause ? '1' : '0');
-      }
-
-      function loadTts(){
-        const r = loadSetting(LS.rate);
-        const p = loadSetting(LS.pitch);
-        const v = loadSetting(LS.volume);
-        const wg = loadSetting(LS.wordGap);
-        const sg = loadSetting(LS.sentGap);
-        const pg = loadSetting(LS.paraGap);
-        const cm = loadSetting(LS.chunkMode);
-        const ds = loadSetting(LS.delayScale);
-        const pp = loadSetting(LS.punctPause);
-
-        tts.rate = clamp(r != null ? r : TTS_DEFAULTS.rate, 0.10, 3.00);
-        tts.pitch = clamp(p != null ? p : TTS_DEFAULTS.pitch, 0.0, 2.0);
-        tts.volume = clamp(v != null ? v : TTS_DEFAULTS.volume, 0.0, 1.0);
-
-        tts.wordGap = clamp(wg != null ? wg : TTS_DEFAULTS.wordGap, 0, 4000);
-        tts.sentGap = clamp(sg != null ? sg : TTS_DEFAULTS.sentGap, 0, 20000);
-        tts.paraGap = clamp(pg != null ? pg : TTS_DEFAULTS.paraGap, 0, 60000);
-        tts.delayScale = clamp(ds != null ? ds : TTS_DEFAULTS.delayScale, 1.0, 12.0);
-
-        tts.chunkMode = (cm === 'word' || cm === 'phrase' || cm === 'auto') ? cm : TTS_DEFAULTS.chunkMode;
-        tts.punctPause = (pp == null) ? TTS_DEFAULTS.punctPause : (String(pp) !== '0');
-
-        // reflect in controls
-        if(rateRange) rateRange.value = String(tts.rate);
-        if(pitchRange) pitchRange.value = String(tts.pitch);
-        if(volRange) volRange.value = String(tts.volume);
-        if(wordGapRange) wordGapRange.value = String(tts.wordGap);
-        if(wordGapNum) wordGapNum.value = String(tts.wordGap);
-        if(sentGapRange) sentGapRange.value = String(tts.sentGap);
-        if(sentGapNum) sentGapNum.value = String(tts.sentGap);
-        if(paraGapRange) paraGapRange.value = String(tts.paraGap);
-        if(paraGapNum) paraGapNum.value = String(tts.paraGap);
-        if(delayScaleRange) delayScaleRange.value = String(tts.delayScale);
-        if(chunkMode) chunkMode.value = String(tts.chunkMode);
-        if(punctPause) punctPause.checked = !!tts.punctPause;
-
-        updateTtsUI();
-      }
-
-      function getEffectiveChunkMode(){
-        // Chunking policy:
-        // - 'word' mode is ONLY when user explicitly selects it (because engines add a big built-in gap between utterances).
-        // - In auto/phrase, wordGap is treated as an extra gap on phrase/sentence boundaries.
-        if(tts.chunkMode === 'word') return 'word';
-        if(tts.chunkMode === 'phrase') return 'phrase';
-
-        // Auto mode: if we have any explicit larger gaps (sentence/paragraph), prefer phrases for cleaner boundaries.
-        const hasBigGaps = (tts.sentGap > 0) || (tts.paraGap > 0) || (effectiveWordGap() > 0);
-        return hasBigGaps ? 'phrase' : 'auto';
-      }
-
-      function onTtsChanged(){
-        // Clamp and persist
-        tts.rate = clamp(rateRange ? rateRange.value : tts.rate, 0.10, 3.00);
-        tts.pitch = clamp(pitchRange ? pitchRange.value : tts.pitch, 0.0, 2.0);
-        tts.volume = clamp(volRange ? volRange.value : tts.volume, 0.0, 1.0);
-
-        tts.wordGap = clamp((wordGapNum ? wordGapNum.value : (wordGapRange ? wordGapRange.value : tts.wordGap)), 0, 4000);
-        tts.sentGap = clamp((sentGapNum ? sentGapNum.value : (sentGapRange ? sentGapRange.value : tts.sentGap)), 0, 20000);
-        tts.paraGap = clamp((paraGapNum ? paraGapNum.value : (paraGapRange ? paraGapRange.value : tts.paraGap)), 0, 60000);
-        tts.delayScale = clamp(delayScaleRange ? delayScaleRange.value : tts.delayScale, 1.0, 12.0);
-
-        tts.chunkMode = chunkMode ? chunkMode.value : tts.chunkMode;
-        tts.punctPause = punctPause ? !!punctPause.checked : tts.punctPause;
-
-        saveTts();
-        updateTtsUI();
-      }
-
-      // Wire controls
-      function bindRangeNumber(rangeEl, numEl){
-        if(!rangeEl || !numEl) return;
-
-        const syncFromRange = () => {
-          numEl.value = String(rangeEl.value);
-        };
-        const syncFromNum = () => {
-          // allow empty while typing
-          if(numEl.value === '') return;
-          rangeEl.value = String(numEl.value);
-        };
-
-        rangeEl.addEventListener('input', () => { syncFromRange(); onTtsChanged(); });
-        rangeEl.addEventListener('change', () => { syncFromRange(); onTtsChanged(); });
-
-        numEl.addEventListener('input', () => { syncFromNum(); onTtsChanged(); });
-        numEl.addEventListener('change', () => { syncFromNum(); onTtsChanged(); });
-
-        // init
-        syncFromRange();
-      }
-
-      bindRangeNumber(wordGapRange, wordGapNum);
-      bindRangeNumber(sentGapRange, sentGapNum);
-      bindRangeNumber(paraGapRange, paraGapNum);
-
-      [rateRange, pitchRange, volRange, delayScaleRange].forEach(el => {
-        if(!el) return;
-        el.addEventListener('input', onTtsChanged);
-        el.addEventListener('change', onTtsChanged);
-      });
-      if(chunkMode){
-        chunkMode.addEventListener('change', onTtsChanged);
-      }
-      if(punctPause){
-        punctPause.addEventListener('change', onTtsChanged);
-      }
-
-      loadTts();
+function fmt2(n){ return (Math.round(n*100)/100).toFixed(2); }
 
 
-      // Text parsing / display
+function updateTtsUI(){
+  if(rateVal) rateVal.textContent = fmt2(tts.rate) + '×';
+}
+
+function saveTts(){
+  saveSetting(LS.rate, String(tts.rate));
+  saveSetting(LS.pitch, String(tts.pitch));
+  saveSetting(LS.volume, String(tts.volume));
+}
+
+function loadTts(){
+  const r = loadSetting(LS.rate);
+  const p = loadSetting(LS.pitch);
+  const v = loadSetting(LS.volume);
+
+  tts.rate = clamp(r != null ? r : TTS_DEFAULTS.rate, 0.10, 3.00);
+  tts.pitch = clamp(p != null ? p : TTS_DEFAULTS.pitch, 0.0, 2.0);
+  tts.volume = clamp(v != null ? v : TTS_DEFAULTS.volume, 0.0, 1.0);
+
+  // reflect in controls
+  if(rateRange) rateRange.value = String(tts.rate);
+  if(pitchRange) pitchRange.value = String(tts.pitch);
+  if(volRange) volRange.value = String(tts.volume);
+
+  updateTtsUI();
+}
+
+function onTtsChanged(){
+  tts.rate = clamp(rateRange ? rateRange.value : tts.rate, 0.10, 3.00);
+  tts.pitch = clamp(pitchRange ? pitchRange.value : tts.pitch, 0.0, 2.0);
+  tts.volume = clamp(volRange ? volRange.value : tts.volume, 0.0, 1.0);
+  saveTts();
+  updateTtsUI();
+}
+
+[rateRange, pitchRange, volRange].forEach(el => {
+  if(!el) return;
+  el.addEventListener('input', onTtsChanged);
+  el.addEventListener('change', onTtsChanged);
+});
+
+loadTts();
+// Text parsing / display
       let words = [];         // word tokens only
       let trails = [];        // trailing whitespace after each word
       let wordSpans = [];
@@ -1602,7 +1391,7 @@
 
       function setWordIndex(i){
         activeWordIndex = i;
-        posPill.textContent = (i >= 0) ? ('word: ' + (i+1) + '/' + words.length) : 'word: —';
+        posPill.textContent = (i >= 0) ? ('word: ' + (i+1) + '/' + words.length) : 'word: -';
         for(let k=0;k<wordSpans.length;k++){
           wordSpans[k].classList.toggle('is-active', k === i);
         }
@@ -1670,9 +1459,7 @@
         buildTimer = setTimeout(() => { buildDisplay(); }, 120);
       }
       textInput.addEventListener('input', scheduleBuild);
-      prepBtn.addEventListener('click', buildDisplay);
-
-      // Voices
+// Voices
       let voices = [];
       function getVoices(){
         voices = window.speechSynthesis.getVoices() || [];
@@ -1738,6 +1525,10 @@
       // Speech queue (supports mixed EN/RU)
       let mode = 'idle'; // idle | speaking | paused
       let cancelled = false;
+      // Token to invalidate stale SpeechSynthesis callbacks (cancel/pause can fire delayed events)
+      let playToken = 0;
+      // Where to resume after an instant pause (word index)
+      let pausedResumeIndex = 0;
 
       // Unified queue of utterances (segments / phrases / words)
       let queue = []; // [{text, lang, wordIndices, wordStarts, delayAfter}]
@@ -1777,16 +1568,16 @@
         }
 
         // Menu buttons
-        if(menuSpeakBtn) menuSpeakBtn.disabled = uiLocked || !idle;
-        if(menuStopBtn) menuStopBtn.disabled = uiLocked || idle;
+        if(speakBtn) speakBtn.disabled = uiLocked || !idle;
+        if(stopBtn) stopBtn.disabled = uiLocked || idle;
 
         // Notes modal: block "speak" button when locked
-        if(typeof speakNotesBtn !== 'undefined' && speakNotesBtn){
-          speakNotesBtn.disabled = uiLocked;
-        }
+        if(speakNotesBtn) speakNotesBtn.disabled = uiLocked;
       }
 
 function stopAll(){
+        // Invalidate any pending callbacks immediately
+        playToken += 1;
         cancelled = true;
         queue = [];
         qIdx = 0;
@@ -1837,37 +1628,26 @@ function stopAll(){
         const cleaned = stripTrailingClosers(word);
         if(!cleaned) return 'none';
 
-        // Hard sentence end: ?, !, … (incl. combos like "?!")
-        if(/[!?…]+$/.test(cleaned)) return 'hard';
-
-        // Period end:
+        // Sentence ends - ONLY by a period (.)
         if(/[.]+$/.test(cleaned)){
-          // Ellipsis "..." treated as hard.
+          // Ellipsis "..." is also a sentence end.
           if(/\.\.\.$/.test(cleaned)) return 'hard';
 
+          // Abbreviation like "т.д." or "e.g." - do NOT treat as sentence end
           if(isAbbrev(cleaned)){
-            // If next token starts with a lowercase letter, assume abbreviation inside sentence.
             const nw = String(nextWord || '').trim();
             if(nw && /^[A-Za-zА-Яа-яЁё]/.test(nw)){
               const ch = nw[0];
-              if(ch === ch.toLowerCase()) return 'soft';
+              if(ch === ch.toLowerCase()) return 'none';
             }
           }
           return 'hard';
         }
 
-        return 'none';
-      }
+        // Other strong punctuation ends a sentence
+  if(/[!?…]+$/.test(cleaned)) return 'hard';
 
-      function hasSoftPunct(word){
-        const cleaned = stripTrailingClosers(word);
-        if(!cleaned) return false;
-        return /[,;:]+$/.test(cleaned) || /[—–]+$/.test(cleaned);
-      }
-
-      function softGapMs(){
-        const base = Math.round((Number(tts.sentGap) || 0) * 0.35);
-        return Math.min(450, Math.max(80, base));
+  return 'none';
       }
 
       function buildSegments(fromIndex){
@@ -1880,8 +1660,7 @@ function stopAll(){
 
         function pushCur(){
           if(cur && cur.text.trim()){
-            cur.delayAfter = 0;
-            out.push(cur);
+out.push(cur);
           }
           cur = null;
         }
@@ -1924,17 +1703,23 @@ function stopAll(){
         return out;
       }
 
-      function buildPhrases(fromIndex){
+            function buildPhrases(fromIndex){
         const start = Math.max(0, Math.min(Number(fromIndex) || 0, Math.max(0, words.length - 1)));
-        const maxWords = 14;
-        const maxChars = 260;
+
+        // Make utterances long to avoid "engine minimum gaps" between chunks.
+        // We split only on:
+        // - language change (EN/RU),
+        // - hard layout boundaries (line/paragraph breaks),
+        // - safety size limits.
+        const maxWords = 80;
+        const maxChars = 1400;
 
         const out = [];
         let cur = null;
 
-        function pushCur(delayAfter){
+        function pushCur(breakType){
           if(cur && cur.text.trim()){
-            cur.delayAfter = Math.max(0, Number(delayAfter) || 0);
+            cur.breakType = breakType || 'none';
             out.push(cur);
           }
           cur = null;
@@ -1944,18 +1729,17 @@ function stopAll(){
           const wl = wordLang[i] || 'en';
           const w = words[i];
           const t = trails[i] || '';
-          const nextW = words[i+1] || '';
 
           if(!cur){
             cur = { text: '', lang: wl, wordIndices: [], wordStarts: [] };
           }
 
-          // split by language to keep voices consistent
           const wouldExceed = (cur.wordIndices.length >= maxWords) || ((cur.text + w + t).length > maxChars);
           const langSplit = (wl !== cur.lang);
 
           if(langSplit || wouldExceed){
-            pushCur(0);
+            // size/language split - do NOT add any artificial pause
+            pushCur('none');
             cur = { text: '', lang: wl, wordIndices: [], wordStarts: [] };
           }
 
@@ -1966,36 +1750,23 @@ function stopAll(){
           const nl = countNewlines(t);
           const para = nl >= 2;
           const line = nl >= 1;
-          const strength = sentenceStrength(w, nextW);
 
-          // Optional: split on commas/colons/dashes if the phrase becomes too long.
-          const allowSoftSplit = tts.punctPause && hasSoftPunct(w) && !para && !line && strength === 'none' &&
-            ((cur.wordIndices.length >= 10) || (cur.text.length >= 180));
-
-          let add = 0;
+          // Split on real layout boundaries so paragraph/line pauses are stable and predictable.
           if(para){
-            add = tts.paraGap;
+            pushCur('para');
           } else if(line){
-            // Line break without punctuation should still behave like a sentence boundary.
-            add = tts.sentGap;
-          } else if(strength === 'hard'){
-            add = tts.punctPause ? tts.sentGap : 0;
-          } else if(strength === 'soft'){
-            add = tts.punctPause ? softGapMs() : 0;
-          } else if(allowSoftSplit){
-            add = softGapMs();
-          }
-
-          // Always split on sentence/line/paragraph boundaries (even if add=0)
-          if(para || line || strength !== 'none' || allowSoftSplit){
-            const delay = (effectiveWordGap() + add) * (tts.delayScale || 1);
-            pushCur(delay);
+            pushCur('line');
+          } else {
+            // Sentence pause: ONLY after a period (.) (and "..."), respecting abbreviations.
+            const nextW = (i + 1 < words.length) ? words[i+1] : '';
+            if(sentenceStrength(w, nextW) === 'hard'){
+              pushCur('hard');
+            }
           }
         }
 
-        // tail
         if(cur){
-          pushCur(0);
+          pushCur('none');
         }
         return out;
       }
@@ -2015,42 +1786,37 @@ function stopAll(){
           const line = nl >= 1;
           const strength = sentenceStrength(w, nextW);
 
-          let add = 0;
+          let breakType = 'none';
           if(para){
-            add = tts.paraGap;
+            breakType = 'para';
           } else if(line){
-            add = tts.sentGap;
+            breakType = 'line';
           } else if(strength === 'hard'){
-            add = tts.punctPause ? tts.sentGap : 0;
+            breakType = 'hard';
           } else if(strength === 'soft'){
-            add = tts.punctPause ? softGapMs() : 0;
+            breakType = 'soft';
           }
 
-          const delayAfter = (effectiveWordGap() + add) * (tts.delayScale || 1);
-
+          // IMPORTANT:
+          // - Speak ONLY the word token. Do not include trailing whitespace/newlines into the utterance text,
+          //   otherwise the engine may "invent" its own delays and paragraph pauses will become unpredictable.
+          // - All pauses are handled by our scheduler (computeDelayAfterUnit).
           out.push({
-            text: w + t,
+            text: String(w),
             lang: wl,
             wordIndices: [i],
             wordStarts: [0],
-            delayAfter: delayAfter
+            breakType: breakType
           });
         }
         return out;
       }
 
       function buildQueue(fromIndex){
-        const effective = getEffectiveChunkMode();
-
-        // If the user wants any pauses, "auto" resolves to phrases for better control
-        if(effective === 'word'){
-          return buildWordsQueue(fromIndex);
-        }
-        if(effective === 'phrase'){
-          return buildPhrases(fromIndex);
-        }
-        // Smooth mode: classic segments, minimal gaps
-        return buildSegments(fromIndex);
+        // Always build phrase chunks for natural flow.
+        // Word pauses (if any) are implemented via onboundary pause/resume inside each utterance,
+        // which avoids the inherent ~80-150ms gaps caused by per-word utterances.
+        return buildPhrases(fromIndex);
       }
 
       // --------------------------
@@ -2061,6 +1827,13 @@ function stopAll(){
         u.pitch = clamp(tts.pitch, 0.0, 2.0);
         u.volume = clamp(tts.volume, 0.0, 1.0);
       }
+
+      function computeDelayAfterUnit(unit){
+  // Pauses settings removed: we don't schedule artificial delays between chunks.
+  return 0;
+}
+
+
 
       function scheduleNextAfter(delay){
         clearBetween();
@@ -2096,52 +1869,91 @@ function stopAll(){
           return;
         }
 
-        const unit = queue[qIdx];
-        const u = new SpeechSynthesisUtterance(unit.text);
+        const token = playToken;
+        const unit0 = queue[qIdx];
 
-        u.lang = (unit.lang === 'ru') ? 'ru-RU' : 'en-US';
-        const v = bestVoiceFor(unit.lang);
-        if(v) u.voice = v;
+        const speakUnit = (unit) => {
+          if(cancelled) return;
+          if(token !== playToken) return;
 
-        applyUtteranceSettings(u);
+          const u = new SpeechSynthesisUtterance(unit.text);
 
-        // Set initial highlight
-        const firstIdx = (unit.wordIndices && unit.wordIndices.length) ? unit.wordIndices[0] : -1;
-        if(firstIdx >= 0) setWordIndex(firstIdx);
+          u.lang = (unit.lang === 'ru') ? 'ru-RU' : 'en-US';
+          const v = bestVoiceFor(unit.lang);
+          if(v) u.voice = v;
 
-        // Boundary highlighting (best effort; varies by engine)
-        if(unit.wordStarts && unit.wordStarts.length > 1){
-          u.onboundary = function(ev){
-            if(typeof ev.charIndex !== 'number') return;
-            const ci = ev.charIndex;
+          applyUtteranceSettings(u);
 
-            let local = -1;
-            for(let j=0;j<unit.wordStarts.length;j++){
-              if(unit.wordStarts[j] <= ci) local = j;
-              else break;
-            }
-            if(local >= 0){
+          // Set initial highlight
+          const firstIdx = (unit.wordIndices && unit.wordIndices.length) ? unit.wordIndices[0] : -1;
+          if(firstIdx >= 0) setWordIndex(firstIdx);
+
+          let ignoreEnd = false;
+
+          // Boundary highlighting (no artificial pauses)
+          if(unit.wordStarts && unit.wordStarts.length > 1){
+            let lastLocal = -1;
+
+            u.onboundary = function(ev){
+              if(cancelled) return;
+              if(token !== playToken) return;
+              if(!ev) return;
+              if(ev.name && ev.name !== 'word') return;
+              if(typeof ev.charIndex !== 'number') return;
+
+              const ci = ev.charIndex;
+
+              let local = -1;
+              for(let j=0;j<unit.wordStarts.length;j++){
+                if(unit.wordStarts[j] <= ci) local = j;
+                else break;
+              }
+              if(local < 0) return;
+              if(local === lastLocal) return;
+              lastLocal = local;
+
               const globalIndex = unit.wordIndices[local];
               setWordIndex(globalIndex);
+            };
+          }
+
+          u.onend = function(){
+            if(cancelled) return;
+            if(token !== playToken) return;
+            if(ignoreEnd) return;
+
+            const d = computeDelayAfterUnit(unit);
+            qIdx++;
+
+            if(qIdx >= queue.length){
+              setMode('idle');
+              setWordIndex(-1);
+              return;
+            }
+
+            if(d > 0){
+              setTimeout(() => {
+                if(cancelled) return;
+                speakNext();
+              }, d);
+            } else {
+              speakNext();
             }
           };
-        }
 
-        u.onend = function(){
-          if(cancelled) return;
-          qIdx += 1;
-          scheduleNextAfter(unit.delayAfter || 0);
+          u.onerror = function(){
+            if(token !== playToken) return;
+            stopAll();
+          };
+
+          setMode('speaking');
+          window.speechSynthesis.speak(u);
         };
 
-        u.onerror = function(){
-          stopAll();
-        };
-
-        setMode('speaking');
-        window.speechSynthesis.speak(u);
+        speakUnit(unit0);
       }
 
-      function speakFromWordIndex(i){
+function speakFromWordIndex(i){
         buildDisplay(); // ensure words/lang lists exist
         const text = preparedText;
         if(!text.trim() || !words.length) return;
@@ -2164,46 +1976,45 @@ function stopAll(){
       function pauseOrResume(){
         if(mode === 'idle') return;
 
+        // INSTANT PAUSE: cancel текущую речь и сохраняем позицию по слову.
+        // SpeechSynthesis.pause() часто "липкий" и срабатывает с задержкой - поэтому делаем как Stop, но с resume.
         if(mode === 'speaking'){
-          // If we are between units, pause the timer too
-          if(betweenTimer){
-            const remaining = Math.max(0, betweenDueAt - Date.now());
-            clearBetween();
-            waitingBetween = true;
-            waitingDelay = remaining;
-          }
+          // Pick best-known current word index
+          const cur = (betweenTimer && queue[qIdx] && queue[qIdx].wordIndices && queue[qIdx].wordIndices.length)
+            ? queue[qIdx].wordIndices[0]
+            : ((activeWordIndex >= 0) ? activeWordIndex : (
+                (queue[qIdx] && queue[qIdx].wordIndices && queue[qIdx].wordIndices.length) ? queue[qIdx].wordIndices[0] : 0
+              ));
+          pausedResumeIndex = Math.max(0, Math.min(cur, Math.max(0, words.length - 1)));
 
-          try{ window.speechSynthesis.pause(); } catch(e){}
+          // Invalidate callbacks + stop any pending delay
+          playToken += 1;
+          clearBetween();
+          try{ window.speechSynthesis.cancel(); }catch(e){}
           setMode('paused');
           return;
         }
 
+        // RESUME: начинаем заново с сохраненного слова
         if(mode === 'paused'){
-          try{ window.speechSynthesis.resume(); } catch(e){}
-          setMode('speaking');
-
-          if(waitingBetween){
-            const d = waitingDelay;
-            waitingBetween = false;
-            waitingDelay = 0;
-            scheduleNextAfter(d);
-          }
+          const idx = Math.max(0, Math.min(Number(pausedResumeIndex) || 0, Math.max(0, words.length - 1)));
+          speakFromWordIndex(idx);
         }
       }
+
       // Buttons
-      if(menuSpeakBtn) menuSpeakBtn.addEventListener('click', () => {
+      if(speakBtn) speakBtn.addEventListener('click', () => {
         if(uiLocked) return;
         speakFromWordIndex(0);
       });
-      if(menuStopBtn) menuStopBtn.addEventListener('click', () => {
+      if(stopBtn) stopBtn.addEventListener('click', () => {
         if(uiLocked) return;
         stopAll();
       });
-      if(menuLockBtn) menuLockBtn.addEventListener('click', () => setLocked(!uiLocked));
+      if(lockBtn) lockBtn.addEventListener('click', () => setLocked(!uiLocked));
 
       if(pauseBtn) pauseBtn.addEventListener('click', pauseOrResume);
-
-      // Click any word in FOLLOW to start from it
+// Click any word in FOLLOW to start from it
       display.addEventListener('click', (e) => {
         const t = e.target;
         const span = t && t.closest ? t.closest('.w-word') : null;
