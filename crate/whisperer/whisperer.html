@@ -993,6 +993,33 @@
         return;
       }
 
+      // Some browsers (especially iOS/iPadOS Safari) can mute/route TTS oddly (e.g., ignoring headphones)
+      // until the page "unlocks" audio in a user gesture.
+      const ua = navigator.userAgent || '';
+      const isIOS = /iPad|iPhone|iPod/.test(ua) || (ua.includes('Mac') && ('ontouchend' in document));
+      let audioCtx = null;
+      let audioUnlocked = false;
+
+      async function unlockAudio(){
+        if(audioUnlocked) return;
+        audioUnlocked = true;
+        try{
+          const Ctx = window.AudioContext || window.webkitAudioContext;
+          if(!Ctx) return;
+          audioCtx = new Ctx();
+          if(audioCtx.state === 'suspended'){
+            try{ await audioCtx.resume(); }catch(e){}
+          }
+          // Play a tiny silent buffer to force an audio session and correct routing.
+          const buffer = audioCtx.createBuffer(1, 1, 22050);
+          const src = audioCtx.createBufferSource();
+          src.buffer = buffer;
+          src.connect(audioCtx.destination);
+          try{ src.start(0); src.stop(0); }catch(e){}
+        }catch(e){}
+      }
+
+
       // Elements
       const textInput = document.getElementById('textInput');
       const display = document.getElementById('display');
@@ -1954,6 +1981,9 @@ out.push(cur);
       }
 
 function speakFromWordIndex(i){
+        // Ensure audio is unlocked (important for iOS/iPadOS + headphones).
+        unlockAudio();
+
         buildDisplay(); // ensure words/lang lists exist
         const text = preparedText;
         if(!text.trim() || !words.length) return;
@@ -1966,11 +1996,15 @@ function speakFromWordIndex(i){
 
         updateTtsUI();
 
-        // Some engines need a short tick after cancel before speaking again
+        // Some engines need a short tick after cancel before speaking again.
+        // iOS/iPadOS Safari is especially sensitive here, so we wait a bit longer.
+        const kick = isIOS ? 90 : 0;
         setTimeout(() => {
           if(cancelled) return;
+          // iOS sometimes returns an empty voices list until the first user-gesture speech attempt.
+          try{ onVoicesChanged(); }catch(e){}
           speakNext();
-        }, 0);
+        }, kick);
       }
 
       function pauseOrResume(){
