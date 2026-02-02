@@ -2,12 +2,13 @@
 <html lang="ru">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>item - key</title>
 
   <style>
     :root{
-      --bg:#fff;
+      
+      --vh: 1vh;--bg:#fff;
       --fg:#000;
       --line:#000;
       --muted:rgba(0,0,0,.70);
@@ -61,7 +62,7 @@
     .topbar{
       position:fixed;
       top:0; left:0; right:0;
-      height:var(--top);
+
       z-index:10;
       display:flex;
       align-items:center;
@@ -71,6 +72,16 @@
       backdrop-filter: blur(2px);
       border-bottom:2px solid var(--line);
       gap:10px;
+
+      height:auto;
+      min-height:var(--top);
+      padding:
+        calc(10px + env(safe-area-inset-top, 0px))
+        calc(12px + env(safe-area-inset-right, 0px))
+        10px
+        calc(12px + env(safe-area-inset-left, 0px));
+      flex-wrap:wrap;
+
     }
 
     .leftgroup{
@@ -132,7 +143,7 @@
     .bottombar{
       position:fixed;
       left:0; right:0; bottom:0;
-      height:var(--bot);
+
       z-index:10;
       display:flex;
       align-items:center;
@@ -142,6 +153,16 @@
       backdrop-filter: blur(2px);
       border-top:2px solid var(--line);
       gap:10px;
+
+      height:auto;
+      min-height:var(--bot);
+      padding:
+        10px
+        calc(12px + env(safe-area-inset-right, 0px))
+        calc(10px + env(safe-area-inset-bottom, 0px))
+        calc(12px + env(safe-area-inset-left, 0px));
+      flex-wrap:wrap;
+
     }
     .status{
       font-size:11px;
@@ -160,7 +181,7 @@
       z-index:3;
       padding-top:var(--top);
       padding-bottom:var(--bot);
-      min-height:100vh;
+      min-height:calc(var(--vh, 1vh) * 100);
     }
     .view{ display:none; }
     .view.is-active{ display:block; }
@@ -168,7 +189,7 @@
     /* FACE gallery */
     .slides{
       scroll-snap-type:y proximity;
-      height: calc(100vh - var(--top) - var(--bot));
+      height: calc((var(--vh, 1vh) * 100) - var(--top) - var(--bot));
       overflow-y:auto;
       overflow-x:hidden;
       -webkit-overflow-scrolling:touch;
@@ -180,7 +201,7 @@
 
     .slide{
       position:relative;
-      height: calc(100vh - var(--top) - var(--bot));
+      height: calc((var(--vh, 1vh) * 100) - var(--top) - var(--bot));
       width:100%;
       scroll-snap-align:start;
       border-top:2px solid var(--line);
@@ -202,7 +223,7 @@
     }
     .slide-ritual .ritual{
       border-top:0;
-      min-height: calc(100vh - var(--top) - var(--bot));
+      min-height: calc((var(--vh, 1vh) * 100) - var(--top) - var(--bot));
     }
 
 .slide img{
@@ -285,7 +306,7 @@
 
     /* SHAP-TERS - ritual list */
     .ritual{
-      min-height: calc(100vh - var(--top) - var(--bot));
+      min-height: calc((var(--vh, 1vh) * 100) - var(--top) - var(--bot));
       padding: 18px 14px 22px;
       border-top:2px solid var(--line);
       background:#fff;
@@ -402,13 +423,13 @@
 
     /* EDWARD PAGE */
     .edward{
-      min-height: calc(100vh - var(--top) - var(--bot));
+      min-height: calc((var(--vh, 1vh) * 100) - var(--top) - var(--bot));
       border-top:2px solid var(--line);
       background:#fff;
     }
     .hero{
       position:relative;
-      height: calc(100vh - var(--top) - var(--bot));
+      height: calc((var(--vh, 1vh) * 100) - var(--top) - var(--bot));
       overflow:hidden;
       border-bottom:2px solid var(--line);
     }
@@ -734,7 +755,7 @@
 
     /* PRODUCT VIEW */
     .prodview{
-      min-height: calc(100vh - var(--top) - var(--bot));
+      min-height: calc((var(--vh, 1vh) * 100) - var(--top) - var(--bot));
       border-top:2px solid var(--line);
       background:#fff;
       position:relative;
@@ -836,7 +857,7 @@
 
     /* CART */
     .cart{
-      min-height: calc(100vh - var(--top) - var(--bot));
+      min-height: calc((var(--vh, 1vh) * 100) - var(--top) - var(--bot));
       border-top:2px solid var(--line);
       background:#fff;
       padding:18px 14px 26px;
@@ -941,6 +962,49 @@
       .navbtn:hover, .sigil:hover, .btn:hover, .product:hover, .tiny:hover{ transform:none; }
       .slide img, .hero img, .product .thumb img, .shot img{ transform:none; }
     }
+
+/* --- RESPONSIVE IMPROVEMENTS (auto-fit any screen) --- */
+html{
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+body{
+  line-height: 1.35;
+}
+/* Better tap targets without changing aesthetic */
+.navbtn, .btn, .tiny, .sigil, .back{
+  touch-action: manipulation;
+}
+/* Keep fixed bars readable when wrapping */
+.topbar .nav{ flex: 1 1 320px; justify-content:flex-end; }
+@media (max-width: 520px){
+  .topbar{ align-items:flex-start; }
+  .topbar .nav{ width:100%; justify-content:space-between; }
+  .navbtn{ flex: 1 1 auto; text-align:center; }
+  .brand{ width:100%; justify-content:space-between; }
+  .status{ max-width: 100%; }
+}
+@media (max-width: 360px){
+  .navbtn{ font-size:11px; padding:10px 8px; }
+  .brand{ padding:8px 8px; }
+}
+/* Fluid card widths */
+.badge, .blade, .hero-card, .prod-hero-top .block, .cart-box, .ritual-title, .catalog-head .title{
+  max-width: min(980px, calc(100% - 20px));
+}
+/* Avoid iOS overscroll rubber-band glow on inner scroller */
+.slides{
+  overscroll-behavior: contain;
+}
+/* Support dynamic viewport units when available */
+@supports (height: 100dvh){
+  .stage{ min-height:100dvh; }
+  .slides{ height: calc(100dvh - var(--top) - var(--bot)); }
+  .slide{ height: calc(100dvh - var(--top) - var(--bot)); }
+  .slide-ritual .ritual{ min-height: calc(100dvh - var(--top) - var(--bot)); }
+  .edward, .ritual, .prodview, .cart{ min-height: calc(100dvh - var(--top) - var(--bot)); }
+  .hero{ height: calc(100dvh - var(--top) - var(--bot)); }
+}
   </style>
 </head>
 
@@ -983,13 +1047,14 @@
           </div>
 
           <div class="ritual-grid" role="list" aria-label="Список сущностей">
-            <button class="sigil goth is-locked" type="button" aria-disabled="true" title="sealed" role="listitem">
-              <span class="left">
-                <span class="name">unregistered</span>
-                <span class="meta"><span>status: unknown</span><span>access: denied</span></span>
-              </span>
-              <span class="tag">sealed</span>
-            </button>
+            
+<button class="sigil goth" type="button" id="goUnregistered" role="listitem">
+  <span class="left">
+    <span class="name">unregistered</span>
+    <span class="meta"><span>status: active</span><span>catalog: 05</span></span>
+  </span>
+  <span class="tag">enter</span>
+</button>
 
             <button class="sigil goth" type="button" id="goEdward" role="listitem">
               <span class="left">
@@ -1046,6 +1111,32 @@
         </section>
       </div>
     </section>
+
+    
+<!-- VIEW: UNREGISTERED -->
+<section class="view" id="view-unregistered" aria-label="unregistered">
+  <div class="edward">
+    <section class="hero" aria-label="Презентация мутанта">
+      <img src="assets/img/face/face_unregistered.jpg" alt="face_unregistered" />
+      <div class="hero-card">
+        <h2 class="goth">unregistered</h2>
+      </div>
+    </section>
+
+    <section class="catalog" aria-label="Каталог одежды">
+      <div class="catalog-inner">
+        <div class="catalog-head">
+          <div class="title">
+            <h3 class="goth">Wardrobe Catalog</h3>
+          </div>
+          <button class="back goth" type="button" id="backToShaptersFromUnreg">ritual</button>
+        </div>
+
+        <div class="products" id="unregProducts" aria-label="Список товаров"></div>
+      </div>
+    </section>
+  </div>
+</section>
 
     <!-- VIEW: PRODUCT -->
     <section class="view" id="view-product" aria-label="Просмотр товара">
@@ -1104,6 +1195,46 @@
   <script>
     (function(){
   const prefersReduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+
+// --- RESPONSIVE LAYOUT SYNC (dynamic bars + mobile viewport) ---
+function setVhUnit(){
+  // Use innerHeight to match visible viewport on mobile browsers.
+  const vh = (window.innerHeight || document.documentElement.clientHeight || 0) * 0.01;
+  document.documentElement.style.setProperty("--vh", vh ? (vh + "px") : "1vh");
+}
+
+function syncBars(){
+  const top = document.querySelector(".topbar");
+  const bot = document.querySelector(".bottombar");
+  if(top){
+    const h = Math.max(44, Math.round(top.getBoundingClientRect().height));
+    document.documentElement.style.setProperty("--top", h + "px");
+  }
+  if(bot){
+    const h = Math.max(44, Math.round(bot.getBoundingClientRect().height));
+    document.documentElement.style.setProperty("--bot", h + "px");
+  }
+}
+
+function syncLayout(){
+  setVhUnit();
+  syncBars();
+}
+
+// Initial sync + updates
+syncLayout();
+window.addEventListener("resize", ()=>{ syncLayout(); }, { passive:true });
+window.addEventListener("orientationchange", ()=>{ setTimeout(syncLayout, 60); }, { passive:true });
+
+if("ResizeObserver" in window){
+  const ro = new ResizeObserver(()=>{ syncBars(); });
+  const top = document.querySelector(".topbar");
+  const bot = document.querySelector(".bottombar");
+  if(top) ro.observe(top);
+  if(bot) ro.observe(bot);
+}
+
 
   // Keep top-level document at top (some browsers restore scroll on refresh)
   try { window.scrollTo(0,0); document.documentElement.scrollTop = 0; document.body.scrollTop = 0; } catch(_){}
@@ -1319,6 +1450,7 @@
   const views = {
     face: document.getElementById("view-face"),
     edward: document.getElementById("view-edward"),
+    unregistered: document.getElementById("view-unregistered"),
     product: document.getElementById("view-product"),
     cart: document.getElementById("view-cart"),
   };
@@ -1344,10 +1476,15 @@
 
   // Shap-ters actions
   const goEdward = document.getElementById("goEdward");
+  const goUnregistered = document.getElementById("goUnregistered");
 
   // Edward products
   const edwardProducts = document.getElementById("edwardProducts");
   const backToShapters = document.getElementById("backToShapters");
+
+  // Unregistered products
+  const unregProducts = document.getElementById("unregProducts");
+  const backToShaptersFromUnreg = document.getElementById("backToShaptersFromUnreg");
 
   // Product view
   const prodTitle = document.getElementById("prodTitle");
@@ -1362,13 +1499,18 @@
   const cartClear = document.getElementById("cartClear");
   const cartTotal = document.getElementById("cartTotal");
 
-  // Data
-  const DB = {
+  
+// Data
+const DB_COLLECTIONS = {
+  edward: {
+    key: "edward",
     owner: "Edward Phillips",
+    hero: "assets/img/face/face_edph.png",
     products: [
       {
         id: "celestial-assistant",
         title: "Celestial Assistant",
+        owner: "Edward Phillips",
         images: [
           "assets/img/images_db/Edward_Phillips/Celestial_Assistant01.png",
           "assets/img/images_db/Edward_Phillips/Celestial_Assistant02.png"
@@ -1377,6 +1519,7 @@
       {
         id: "void-stitch",
         title: "void stitch",
+        owner: "Edward Phillips",
         images: [
           "assets/img/images_db/Edward_Phillips/void-stitch01.png",
           "assets/img/images_db/Edward_Phillips/void-stitch02.png"
@@ -1385,6 +1528,7 @@
       {
         id: "cartel-hatchling",
         title: "Cartel Hatchling",
+        owner: "Edward Phillips",
         images: [
           "assets/img/images_db/Edward_Phillips/CartelHatchling01.png",
           "assets/img/images_db/Edward_Phillips/CartelHatchling02.png",
@@ -1392,10 +1536,74 @@
         ]
       }
     ]
-  };
+  },
 
-  // Attach prices (from embedded DB_PRICES) to our products
-  DB.products.forEach(p=>{
+  unregistered: {
+    key: "unregistered",
+    owner: "unregistered",
+    hero: "assets/img/face/face_unregistered.jpg",
+    products: [
+      {
+        id: "unreg-heliostice",
+        title: "hELIOSTICE",
+        owner: "unregistered",
+        images: [
+          "assets/img/images_db/unregistered/hELIOSTICE01.png",
+          "assets/img/images_db/unregistered/hELIOSTICE02.png",
+          "assets/img/images_db/unregistered/hELIOSTICE03.png"
+        ]
+      },
+      {
+        id: "unreg-balaclava01",
+        title: "balaclava01",
+        owner: "unregistered",
+        images: [
+          "assets/img/images_db/unregistered/balaclava01_01.png",
+          "assets/img/images_db/unregistered/balaclava01_02.png"
+        ]
+      },
+      {
+        id: "unreg-desshBAgg01",
+        title: "desshBAgg01",
+        owner: "unregistered",
+        images: [
+          "assets/img/images_db/unregistered/desshBAgg01_01.png",
+          "assets/img/images_db/unregistered/desshBAgg01_02.png",
+          "assets/img/images_db/unregistered/desshBAgg01_03.png",
+          "assets/img/images_db/unregistered/desshBAgg01_04.png",
+          "assets/img/images_db/unregistered/desshBAgg01_05.png"
+        ]
+      },
+      {
+        id: "unreg-glmr-empress-skrt",
+        title: "GLMR-EMPRESS_SKRT",
+        owner: "unregistered",
+        images: [
+          "assets/img/images_db/unregistered/GLMR-EMPRESS_SKRT_01.png",
+          "assets/img/images_db/unregistered/GLMR-EMPRESS_SKRT_02.png"
+        ]
+      },
+      {
+        id: "unreg-drk-skrt",
+        title: "DRK-SKRT",
+        owner: "unregistered",
+        images: [
+          "assets/img/images_db/unregistered/DRK-SKRT_01.png",
+          "assets/img/images_db/unregistered/DRK-SKRT_02.png"
+        ]
+      }
+    ]
+  }
+};
+
+// Flattened products for routing/product view/cart
+const DB_ALL_PRODUCTS = [
+  ...DB_COLLECTIONS.edward.products,
+  ...DB_COLLECTIONS.unregistered.products
+];
+
+  // Attach prices (from embedded DB_PRICES) to Edward products
+  DB_COLLECTIONS.edward.products.forEach(p=>{
     const hit = findPriceByName(p.title);
     const byn = hit ? hit.priceBYN : 0;
     p.priceBYN = byn;
@@ -1403,6 +1611,16 @@
     p.inStock = hit ? !!hit.inStock : true;
     p.dbId = hit ? hit.id : "";
   });
+
+
+
+// Defaults for unregistered products (no price DB)
+DB_COLLECTIONS.unregistered.products.forEach(p=>{
+  p.priceBYN = 0;
+  p.priceUSD = 0;
+  p.inStock = true;
+  p.dbId = "unregistered";
+});
 
   // Cart state
   const CART_KEY = "item_cart_v2";
@@ -1422,7 +1640,7 @@
       cart.push({
         id:item.id,
         title:item.title,
-        owner:DB.owner,
+        owner:item.owner || "unknown",
         priceUSD: Math.round((Number(item.priceUSD)||0)*100)/100,
         inStock: !!item.inStock
       });
@@ -1495,7 +1713,7 @@
 
     // Fallbacks when there's no trail
     if(views.product.classList.contains("is-active")){ location.hash = "#edward"; return; }
-    if(views.edward.classList.contains("is-active")){ location.hash = "#shap-ters"; return; }
+    if(views.edward.classList.contains("is-active") || views.unregistered.classList.contains("is-active")){ location.hash = "#shap-ters"; return; }
     if(views.cart.classList.contains("is-active")){ location.hash = lastNonCart || "#face"; return; }
 
     scrollToFaceTop("auto");
@@ -1507,7 +1725,7 @@
   // Nav highlight
   function setCurrentNav(key){
     btnFace.setAttribute("aria-current", key === "face" ? "true" : "false");
-    btnSh.setAttribute("aria-current", (key === "shapters" || key === "edward" || key === "product") ? "true" : "false");
+    btnSh.setAttribute("aria-current", (key === "shapters" || key === "edward" || key === "unregistered" || key === "product") ? "true" : "false");
     btnCart.setAttribute("aria-current", key === "cart" ? "true" : "false");
   }
 
@@ -1518,6 +1736,7 @@
     }
     if(key === "shapters"){ statusLeft.textContent = "shap-ters"; return; }
     if(key === "edward"){ statusLeft.textContent = "Edward Phillips"; return; }
+    if(key === "unregistered"){ statusLeft.textContent = "unregistered"; return; }
     if(key === "product"){ statusLeft.textContent = "specimen"; return; }
     if(key === "cart"){ statusLeft.textContent = "cart"; return; }
     statusLeft.textContent = "ready";
@@ -1530,6 +1749,16 @@
     // shap-ters is embedded inside face
     const actual = (key === "shapters") ? "face" : key;
     views[actual].classList.add("is-active");
+
+    // Fix: when browser zoom is not 100% some engines restore page scroll to a mid position
+    // for non-face views (product/cards). We keep the page pinned to the very top.
+    if(actual !== "face"){
+      requestAnimationFrame(()=>{
+        try { window.scrollTo({ top:0, left:0, behavior:"auto" }); } catch(_){}
+        try { document.documentElement.scrollTop = 0; } catch(_){}
+        try { document.body.scrollTop = 0; } catch(_){}
+      });
+    }
 
     setCurrentNav(key);
     updateStatus(key);
@@ -1563,9 +1792,13 @@
       showView("edward");
       return;
     }
+    if(root === "unregistered"){
+      showView("unregistered");
+      return;
+    }
     if(root === "product"){
       const id = parts[1] || "";
-      const item = DB.products.find(p => p.id === id);
+      const item = DB_ALL_PRODUCTS.find(p => p.id === id);
       if(!item){ location.hash = "#edward"; return; }
       renderProduct(item);
       showView("product");
@@ -1591,6 +1824,8 @@
 
   // Internal nav
   goEdward.addEventListener("click", ()=>navigateTo("#edward"));
+  if(goUnregistered){ goUnregistered.addEventListener("click", ()=>navigateTo("#unregistered")); }
+  if(backToShaptersFromUnreg){ backToShaptersFromUnreg.addEventListener("click", ()=>navigateTo("#shap-ters")); }
   backToShapters.addEventListener("click", ()=>navigateTo("#shap-ters"));
 
   prodBack.addEventListener("click", goBack);
@@ -1778,58 +2013,62 @@
     scrollToFaceTop("auto");
   }
 
-  // Edward catalog render
-  function renderEdwardCatalog(){
-    edwardProducts.innerHTML = "";
-    const frag = document.createDocumentFragment();
+  
+// Catalog render (generic)
+function renderCatalog(collectionKey, targetEl){
+  const col = DB_COLLECTIONS[collectionKey];
+  if(!col || !targetEl) return;
 
-    DB.products.forEach((p)=>{
-      const card = document.createElement("article");
-      card.className = "product";
-      card.setAttribute("role", "button");
-      card.tabIndex = 0;
+  targetEl.innerHTML = "";
+  const frag = document.createDocumentFragment();
 
-      const firstImg = p.images[0] || "";
-      const price = moneyUSD(p.priceUSD);
+  col.products.forEach((p)=>{
+    const card = document.createElement("article");
+    card.className = "product";
+    card.setAttribute("role", "button");
+    card.tabIndex = 0;
 
-      card.innerHTML = `
-        <div class="thumb">
-          <img src="${firstImg}" alt="${escapeHtml(p.title)}" loading="eager" decoding="async">
-          <div class="thumb-veil" aria-hidden="true"></div>
+    const firstImg = p.images[0] || "";
+    const price = moneyUSD(p.priceUSD);
 
-          <div class="runes" aria-hidden="true">
-            <span class="rune goth">${price}</span>
-            <span class="rune goth ${p.inStock ? "" : "dark"}">${p.inStock ? "in stock" : "sold out"}</span>
-          </div>
+    card.innerHTML = `
+      <div class="thumb">
+        <img src="${firstImg}" alt="${escapeHtml(p.title)}" loading="eager" decoding="async">
+        <div class="thumb-veil" aria-hidden="true"></div>
 
-          <span class="stamp goth ${p.inStock ? "" : "sold"}">${p.inStock ? "catalog" : "sold"}</span>
+        <div class="runes" aria-hidden="true">
+          <span class="rune goth">${price}</span>
+          <span class="rune goth ${p.inStock ? "" : "dark"}">${p.inStock ? "in stock" : "sold out"}</span>
         </div>
 
-        <div class="info">
-          <div class="stack">
-            <h4 class="goth">${escapeHtml(p.title)}</h4>
-            <p class="meta">
-              <span class="chip">${p.images.length} frames</span>
-              <span class="chip">owner: edp</span>
-            </p>
-          </div>
+        <span class="stamp goth ${p.inStock ? "" : "sold"}">${p.inStock ? "catalog" : "sold"}</span>
+      </div>
 
-          <div class="card-actions" aria-hidden="true">
-            <span class="seal goth">open</span>
-            <span class="dbmark">db: ${escapeHtml((p.dbId || "").slice(0, 12) || "local")}</span>
-          </div>
+      <div class="info">
+        <div class="stack">
+          <h4 class="goth">${escapeHtml(p.title)}</h4>
+          <p class="meta">
+            <span class="chip">${p.images.length} frames</span>
+            <span class="chip">owner: ${escapeHtml(collectionKey === "edward" ? "edp" : "unreg")}</span>
+          </p>
         </div>
-      `;
 
-      function go(){ navigateTo("#product/" + encodeURIComponent(p.id)); }
-      card.addEventListener("click", go);
-      card.addEventListener("keydown", (e)=>{ if(e.key === "Enter" || e.key === " "){ e.preventDefault(); go(); } });
+        <div class="card-actions" aria-hidden="true">
+          <span class="seal goth">open</span>
+          <span class="dbmark">db: ${escapeHtml((p.dbId || "").slice(0, 12) || "local")}</span>
+        </div>
+      </div>
+    `;
 
-      frag.appendChild(card);
-    });
+    function go(){ navigateTo("#product/" + encodeURIComponent(p.id)); }
+    card.addEventListener("click", go);
+    card.addEventListener("keydown", (e)=>{ if(e.key === "Enter" || e.key === " "){ e.preventDefault(); go(); } });
 
-    edwardProducts.appendChild(frag);
-  }
+    frag.appendChild(card);
+  });
+
+  targetEl.appendChild(frag);
+}
 
   // Product view render
   function renderProduct(item){
@@ -1938,7 +2177,8 @@
     try { faceSlides.scrollTop = 0; } catch(_){}
   }
 
-  renderEdwardCatalog();
+  renderCatalog("edward", edwardProducts);
+  renderCatalog("unregistered", unregProducts);
   setupEmbeddedSync();
 
   window.addEventListener("hashchange", route);
