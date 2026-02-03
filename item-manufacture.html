@@ -5,7 +5,9 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>item - key</title>
 
-  <style>
+  
+  <link rel="preload" as="image" href="assets/img/face/face_01.png" fetchpriority="high">
+<style>
     :root{
       
       --vh: 1vh;--bg:#fff;
@@ -1005,6 +1007,26 @@ body{
   .edward, .ritual, .prodview, .cart{ min-height: calc(100dvh - var(--top) - var(--bot)); }
   .hero{ height: calc(100dvh - var(--top) - var(--bot)); }
 }
+
+/* --- IMAGE LOADING: hide "loading" and avoid flicker --- */
+.img-fade{ opacity:0; transition: opacity .22s linear; }
+.img-fade.is-loaded{ opacity:1; }
+
+/* Subtle fallback textures while images are loading */
+.thumb{ background:#fff; position:relative; }
+.thumb::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:
+    radial-gradient(700px 280px at 30% 25%, rgba(0,0,0,08), rgba(0,0,0,0) 62%),
+    repeating-linear-gradient(0deg, rgba(0,0,0,06) 0 1px, rgba(0,0,0,0) 1px 10px);
+  opacity:.14;
+  mix-blend-mode:multiply;
+}
+.slide{ background:#fff; }
+
   </style>
 </head>
 
@@ -1036,7 +1058,17 @@ body{
 
       <div class="slides" id="faceSlides" tabindex="0" aria-label="Галерея face">
       <div class="sentinel" id="sentinelFaceTop" aria-hidden="true"></div>
-      <!-- FACE slides are injected here by JS -->
+      
+      <!-- FIRST FACE frame is in HTML so it starts loading immediately (before JS) -->
+      <section class="slide" id="faceFirst" data-kind="face" aria-label="face">
+        <img class="img-fade" src="assets/img/face/face_01.png" alt="face_01" draggable="false" decoding="async" loading="eager" fetchpriority="high"
+             onload="this.classList.add('is-loaded');" />
+        <div class="badge">
+          <p class="t goth">face</p>
+          <p class="m"><span>face_01</span></p>
+        </div>
+      </section>
+<!-- FACE slides are injected here by JS -->
 
       <!-- SLIDE: SHAP-TERS (embedded after FACE) -->
       <section class="slide slide-ritual" id="slide-shapters" data-kind="shapters" aria-label="Категория shap-ters">
@@ -1899,6 +1931,9 @@ DB_COLLECTIONS.unregistered.products.forEach(p=>{
     img.src = url;
     img.draggable = false;
     img.decoding = "async";
+    img.className = "img-fade";
+    img.addEventListener("load", ()=>{ img.classList.add("is-loaded"); }, { once:true });
+    img.addEventListener("error", ()=>{ img.classList.add("is-loaded"); }, { once:true });
     img.loading = (idx <= 2) ? "eager" : "lazy";
     if (idx === 1) img.fetchPriority = "high";
 
@@ -1922,317 +1957,144 @@ DB_COLLECTIONS.unregistered.products.forEach(p=>{
     return slide;
   }
 
-  
-  // --- IMAGE SPEEDUP LAYER (preload + warm cache) ---
-  // NOTE: "instant" over network is physically impossible on the very first visit,
-  // but we can make it feel instant by:
-  // 1) avoiding sequential probes that block other downloads
-  // 2) preloading critical images early
-  // 3) warming cache for all catalog/product images in the background (idle time)
-
-  const _preloadMap = new Map(); // url -> Promise<boolean>
-
-  function preloadImage(url, opts){
-    const u = String(url || "").trim();
-    if(!u) return Promise.resolve(false);
-    if(_preloadMap.has(u)) return _preloadMap.get(u);
-
-    const p = new Promise((resolve)=>{
+  function probeImage(url){
+    return new Promise((resolve)=>{
       const img = new Image();
       img.decoding = "async";
-      // fetchPriority is supported in Chromium-based browsers
-      try{
-        if(opts && opts.fetchPriority) img.fetchPriority = opts.fetchPriority;
-      }catch(_){}
       img.onload = ()=>resolve(true);
       img.onerror = ()=>resolve(false);
-      img.src = u;
+      // No cache-buster: lets browser cache and prevents slow "re-download every boot"
+      img.src = url;
     });
-
-    _preloadMap.set(u, p);
-    return p;
   }
 
-  function preloadBatch(urls, opts){
-    (urls || []).forEach(u=>preloadImage(u, opts));
-  }
 
-  function whenIdle(fn){
-    if("requestIdleCallback" in window){
-      requestIdleCallback(()=>fn(), { timeout: 1500 });
+  // --- IMAGE LOADING HELPERS ---
+  const BLANK_SVG = "data:image/svg+xml;charset=utf-8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="2" height="2"><rect width="100%" height="100%" fill="white"/></svg>');
+
+  function enhanceImg(img){
+    if(!img) return;
+    if(!img.classList.contains("img-fade")) img.classList.add("img-fade");
+    if(img.complete && img.naturalWidth > 0){
+      img.classList.add("is-loaded");
     }else{
-      setTimeout(fn, 250);
+      img.addEventListener("load", ()=>img.classList.add("is-loaded"), { once:true });
+      img.addEventListener("error", ()=>img.classList.add("is-loaded"), { once:true });
     }
   }
 
-  function setupServiceWorker(precache){
-    // Works only on https:// or http://localhost/
-    if(!("serviceWorker" in navigator)) return;
+  function lazyBindImages(rootEl, opts){
+    const root = (opts && opts.root) || null;
+    const rootMargin = (opts && opts.rootMargin) || "700px 0px";
+    const selector = (opts && opts.selector) || "img[data-src]";
+    const imgs = Array.from((rootEl || document).querySelectorAll(selector));
+    if(!imgs.length) return;
 
-    try{
-      const swCode = `
-        const CACHE = "itemkey-img-v1";
-        const PRECACHE = ${JSON.stringify((precache || []).filter(Boolean))};
+    if(!("IntersectionObserver" in window)){
+      imgs.forEach(img=>{
+        const src = img.getAttribute("data-src");
+        if(src){ img.src = src; img.removeAttribute("data-src"); }
+        enhanceImg(img);
+      });
+      return;
+    }
 
-        self.addEventListener("install", (evt)=>{
-          evt.waitUntil((async ()=>{
-            const c = await caches.open(CACHE);
-            // Cache what exists; ignore missing (404) so install doesn't fail.
-            await Promise.all(PRECACHE.map(async (u)=>{
-              try{
-                const r = await fetch(u, { cache: "reload" });
-                if(r && r.ok) await c.put(u, r);
-              }catch(_){}
-            }));
-            self.skipWaiting();
-          })());
-        });
+    const io = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{
+        if(!e.isIntersecting) return;
+        const img = e.target;
+        io.unobserve(img);
+        const src = img.getAttribute("data-src");
+        if(src){
+          img.src = src;
+          img.removeAttribute("data-src");
+        }
+        enhanceImg(img);
+      });
+    }, { root, rootMargin, threshold: 0.01 });
 
-        self.addEventListener("activate", (evt)=>{
-          evt.waitUntil((async ()=>{
-            const keys = await caches.keys();
-            await Promise.all(keys.map(k => (k === CACHE) ? null : caches.delete(k)));
-            await self.clients.claim();
-          })());
-        });
-
-        self.addEventListener("fetch", (evt)=>{
-          const req = evt.request;
-          if(req.method !== "GET") return;
-          const url = new URL(req.url);
-
-          // Only same-origin assets (keeps it safe and predictable)
-          if(url.origin !== self.location.origin) return;
-
-          // Only cache images and the logo
-          const isImg = req.destination === "image" || /\.(png|jpg|jpeg|webp|gif|avif|svg)$/i.test(url.pathname);
-          if(!isImg) return;
-
-          evt.respondWith((async ()=>{
-            const cache = await caches.open(CACHE);
-            const cached = await cache.match(req, { ignoreSearch:true });
-            if(cached) return cached;
-
-            try{
-              const res = await fetch(req);
-              if(res && res.ok){
-                cache.put(req, res.clone()).catch(()=>{});
-              }
-              return res;
-            }catch(e){
-              return cached || Response.error();
-            }
-          })());
-        });
-      `;
-      const blob = new Blob([swCode], { type:"text/javascript" });
-      const url = URL.createObjectURL(blob);
-      navigator.serviceWorker.register(url).catch(()=>{});
-    }catch(_){}
-  }
-
-  // Face gallery builder (fast, parallel requests)
-  function pad2(n){ return String(n).padStart(2,"0"); }
-
-  function makeFaceSlide(url, idx){
-    const slide = document.createElement("section");
-    slide.className = "slide";
-    slide.setAttribute("data-kind","face");
-    slide.setAttribute("aria-label", "face");
-
-    const img = document.createElement("img");
-    img.alt = "face_" + pad2(idx);
-    img.src = url;
-    img.draggable = false;
-    img.decoding = "async";
-    img.loading = (idx <= 3) ? "eager" : "lazy";
-    try{ if (idx === 1) img.fetchPriority = "high"; }catch(_){}
-
-    const badge = document.createElement("div");
-    badge.className = "badge";
-    badge.innerHTML = `
-      <p class="t goth">face</p>
-      <p class="m"><span>${img.alt}</span></p>
-    `;
-
-    // click -> summon logo glitch (anchored to this frame)
-    img.addEventListener("click", (e)=>{
-      e.preventDefault();
-      e.stopPropagation();
-      glitchLogoOn(slide);
+    imgs.forEach(img=>{
+      enhanceImg(img);
+      io.observe(img);
     });
-
-    slide.appendChild(img);
-    slide.appendChild(badge);
-    return { slide, img };
   }
+
 
   async function loadFaceGallery(){
     const base = "assets/img/face/";
     const maxTry = 80;
 
-    // Remove old face slides and show a placeholder immediately
-    faceSlides.querySelectorAll(".slide[data-kind='face']").forEach(n=>n.remove());
+    // Keep the first face frame that is already in HTML for instant paint
+    const first = document.getElementById("faceFirst");
 
-    const placeholder = document.createElement("section");
-    placeholder.className = "slide";
-    placeholder.setAttribute("data-kind","face");
-    placeholder.innerHTML = `
-      <div class="badge">
-        <p class="t goth">face</p>
-        <p class="m"><span>loading</span></p>
-      </div>
-    `;
-    const anchor = document.getElementById("slide-shapters");
-    if(anchor){ faceSlides.insertBefore(placeholder, anchor); } else { faceSlides.appendChild(placeholder); }
+    // Remove old generated face slides, but keep #faceFirst if present
+    faceSlides.querySelectorAll(".slide[data-kind='face']").forEach(n=>{
+      if(first && n === first) return;
+      n.remove();
+    });
+
+    // If the first frame exists, it counts as ready content immediately
+    faceCount = first ? 1 : 0;
+    faceReady = !!first;
+    updateStatus("face");
 
     faceCount = 0;
     faceReady = false;
     updateStatus("face");
 
-    // Keep at top while first frames are appearing
+    // Always stay at the top while first frames are appearing
     scrollToFaceTop("auto");
 
-    let firstRealSlide = null;
+    const found = [];
+    for(let i=(first?2:1); i<=maxTry; i++){
+      const file = "face_" + pad2(i) + ".png";
+      const url = base + file;
+      const ok = await probeImage(url);
 
-    // Build and insert all candidates immediately (browser will request in parallel)
-    const frag = document.createDocumentFragment();
-    const slides = [];
-
-    for(let i=1; i<=maxTry; i++){
-      const url = base + ("face_" + pad2(i) + ".png");
-      const pack = makeFaceSlide(url, i);
-      slides.push(pack);
-      frag.appendChild(pack.slide);
-    }
-
-    // Replace placeholder with the whole fragment at once
-    placeholder.replaceWith(frag);
-
-    // Insert before the ritual slide if it exists (keep order)
-    const shAnchor = document.getElementById("slide-shapters");
-    if(shAnchor){
-      // Move all created face slides before shAnchor
-      slides.forEach(({slide})=>{
-        if(slide.nextSibling === shAnchor) return;
-        faceSlides.insertBefore(slide, shAnchor);
-      });
-    }
-
-    // Count only successfully loaded images; remove missing to avoid broken icons
-    let loaded = 0;
-    let missing = 0;
-
-    slides.forEach(({ slide, img }, idx)=>{
-      const n = idx + 1;
-
-      img.addEventListener("load", ()=>{
-        loaded++;
-        faceCount = loaded;
-        updateStatus("face");
-
-        if(!firstRealSlide){
-          firstRealSlide = slide;
-          faceReady = true;
-
-          // First entry: show logo glitch centered on face_01 (1s, then fades)
-          requestAnimationFrame(()=>{ glitchLogoOn(firstRealSlide, { durationMs: 1000 }); });
-
-          // Warm next frames fast
-          const nextUrls = [];
-          for(let k=2; k<=12; k++){
-            nextUrls.push(base + ("face_" + pad2(k) + ".png"));
-          }
-          preloadBatch(nextUrls, { fetchPriority:"high" });
-          scrollToFaceTop("auto");
-        }
-      }, { once:true });
-
-      img.addEventListener("error", ()=>{
-        missing++;
-        slide.remove();
-        // If nothing loads at all, show a clear error state after a short delay
-        if(n === maxTry){
-          setTimeout(()=>{
-            if(loaded === 0){
-              faceReady = true;
-              faceCount = 0;
-              updateStatus("face");
-
-              const err = document.createElement("section");
-              err.className = "slide";
-              err.setAttribute("data-kind","face");
-              err.innerHTML = `
-                <div class="badge">
-                  <p class="t goth">face</p>
-                  <p class="m"><span>missing assets/img/face/face_01.png</span></p>
-                </div>
-              `;
-              const sh = document.getElementById("slide-shapters");
-              if(sh){ faceSlides.insertBefore(err, sh); } else { faceSlides.appendChild(err); }
-              scrollToFaceTop("auto");
-            }
-          }, 400);
-        }
-      }, { once:true });
-
-      // Hint preloader (first few frames)
-      if(n <= 6) preloadImage(img.src, { fetchPriority:"high" });
-    });
-
-    // Final pin
-    scrollToFaceTop("auto");
-
-    // Background warm-up for everything else (catalog + product images)
-    whenIdle(()=>{
-      const urls = new Set();
-
-      // Logo candidates + hero images
-      ITEMKEY_LOGO_CANDIDATES.forEach(u=>urls.add(u));
-      urls.add("assets/img/face/face_edph.png");
-      urls.add("assets/img/face/face_unregistered.jpg");
-
-      // Catalog/product images
-      try{
-        Object.values(DB_COLLECTIONS).forEach(col=>{
-          if(col && col.hero) urls.add(col.hero);
-          (col.products || []).forEach(p=>{
-            (p.images || []).forEach(u=>urls.add(u));
-          });
-        });
-      }catch(_){}
-
-      // Warm face frames in chunks to avoid freezing
-      const faceUrls = [];
-      for(let i=1; i<=maxTry; i++){
-        faceUrls.push(base + ("face_" + pad2(i) + ".png"));
+      if(!ok){
+        if(found.length > 0) break;
+        if(i < 6) continue;
+        break;
       }
 
-      // Precache a safe subset for SW (avoid lots of 404s breaking install)
-      setupServiceWorker([
-        ...ITEMKEY_LOGO_CANDIDATES,
-        "assets/img/face/face_01.png",
-        "assets/img/face/face_02.png",
-        "assets/img/face/face_03.png",
-        "assets/img/face/face_edph.png",
-        "assets/img/face/face_unregistered.jpg",
-        ...Array.from(urls).filter(u=>/assets\/img\/images_db\//.test(u))
-      ]);
+      found.push({ url, idx: i });
 
-      // Warm in two phases: critical (catalog) then face frames
-      preloadBatch(Array.from(urls), { fetchPriority:"low" });
+      // Add slides progressively
+      if(found.length === 1 && !first){
+        const firstSlide = makeFaceSlide(url, i);
+        const shAnchor = document.getElementById("slide-shapters");
+        if(shAnchor){ faceSlides.insertBefore(firstSlide, shAnchor); } else { faceSlides.appendChild(firstSlide); }
 
-      let i = 0;
-      (function chunk(){
-        const batch = faceUrls.slice(i, i+10);
-        preloadBatch(batch, { fetchPriority:"low" });
-        i += 10;
-        if(i < faceUrls.length) whenIdle(chunk);
-      })();
-    });
+        requestAnimationFrame(()=>{ glitchLogoOn(firstSlide, { durationMs: 1000 }); });
+        faceReady = true;
+        faceCount = 1;
+        updateStatus("face");
+        scrollToFaceTop("auto");
+      }else{
+        const slide = makeFaceSlide(url, i);
+        const shAnchor = document.getElementById("slide-shapters");
+        if(shAnchor){ faceSlides.insertBefore(slide, shAnchor); } else { faceSlides.appendChild(slide); }
+        faceCount = (first ? (1 + found.length) : found.length);
+        faceReady = true;
+        updateStatus("face");
+      }
+    }
+
+    // No additional images found (keep #faceFirst if present)
+    if(found.length === 0 && !first){
+      faceReady = true;
+      faceCount = 0;
+      updateStatus("face");
+      scrollToFaceTop("auto");
+      return;
+    }
+
+    // Ensure we are exactly at top once scanning is done
+    scrollToFaceTop("auto");
   }
 
-  // Catalog render (generic)
+  
+// Catalog render (generic)
 function renderCatalog(collectionKey, targetEl){
   const col = DB_COLLECTIONS[collectionKey];
   if(!col || !targetEl) return;
@@ -2251,7 +2113,7 @@ function renderCatalog(collectionKey, targetEl){
 
     card.innerHTML = `
       <div class="thumb">
-        <img src="${firstImg}" alt="${escapeHtml(p.title)}" loading="eager" decoding="async">
+        <img src="${BLANK_SVG}" data-src="${firstImg}" alt="${escapeHtml(p.title)}" loading="lazy" decoding="async">
         <div class="thumb-veil" aria-hidden="true"></div>
 
         <div class="runes" aria-hidden="true">
@@ -2286,7 +2148,12 @@ function renderCatalog(collectionKey, targetEl){
   });
 
   targetEl.appendChild(frag);
+
+  // Start loading thumbnails slightly before they enter the viewport
+  lazyBindImages(targetEl, { root: null, rootMargin: "900px 0px", selector: "img[data-src]" });
+  targetEl.querySelectorAll("img").forEach(enhanceImg);
 }
+
 
   // Product view render
   function renderProduct(item){
@@ -2306,11 +2173,19 @@ function renderCatalog(collectionKey, targetEl){
       const cell = document.createElement("div");
       cell.className = "shot";
       const pri = (i === 0) ? ' fetchpriority="high"' : "";
-      cell.innerHTML = `<img src="${src}" alt="${escapeHtml(item.title)}" loading="eager" decoding="async"${pri}>`;
+      if(i < 2){
+        cell.innerHTML = `<img class="img-fade" src="${src}" alt="${escapeHtml(item.title)}" loading="eager" decoding="async"${pri}>`;
+      }else{
+        cell.innerHTML = `<img class="img-fade" src="${BLANK_SVG}" data-src="${src}" alt="${escapeHtml(item.title)}" loading="lazy" decoding="async">`;
+      }
       frag.appendChild(cell);
     });
     prodGallery.appendChild(frag);
 
+
+    // Load remaining frames just before they appear
+    lazyBindImages(prodGallery, { root: null, rootMargin: "1200px 0px", selector: "img[data-src]" });
+    prodGallery.querySelectorAll("img").forEach(enhanceImg);
     prodToCart.onclick = () => {
       addToCart(item);
       navigateTo("#cart");
