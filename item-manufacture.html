@@ -1027,7 +1027,38 @@ body{
 }
 .slide{ background:#fff; }
 
-  </style>
+  
+
+/* --- FIX: product cards - remove lined background + fit images fully --- */
+.product::before{
+  content:none !important;
+  background:none !important;
+  opacity:0 !important;
+}
+.thumb-veil{
+  display:none !important;
+  background:none !important;
+}
+.thumb::before{
+  content:none !important;
+  background:none !important;
+  opacity:0 !important;
+}
+/* Center items and show full garment without cropping */
+.product .thumb{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#fff;
+}
+.product .thumb img{
+  object-fit:contain !important;
+  transform:none !important;
+  width:100%;
+  height:100%;
+}
+
+</style>
 </head>
 
 <body>
