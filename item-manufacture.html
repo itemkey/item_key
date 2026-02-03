@@ -1922,15 +1922,149 @@ DB_COLLECTIONS.unregistered.products.forEach(p=>{
     return slide;
   }
 
-  function probeImage(url){
-    return new Promise((resolve)=>{
+  
+  // --- IMAGE SPEEDUP LAYER (preload + warm cache) ---
+  // NOTE: "instant" over network is physically impossible on the very first visit,
+  // but we can make it feel instant by:
+  // 1) avoiding sequential probes that block other downloads
+  // 2) preloading critical images early
+  // 3) warming cache for all catalog/product images in the background (idle time)
+
+  const _preloadMap = new Map(); // url -> Promise<boolean>
+
+  function preloadImage(url, opts){
+    const u = String(url || "").trim();
+    if(!u) return Promise.resolve(false);
+    if(_preloadMap.has(u)) return _preloadMap.get(u);
+
+    const p = new Promise((resolve)=>{
       const img = new Image();
       img.decoding = "async";
+      // fetchPriority is supported in Chromium-based browsers
+      try{
+        if(opts && opts.fetchPriority) img.fetchPriority = opts.fetchPriority;
+      }catch(_){}
       img.onload = ()=>resolve(true);
       img.onerror = ()=>resolve(false);
-      // No cache-buster: lets browser cache and prevents slow "re-download every boot"
-      img.src = url;
+      img.src = u;
     });
+
+    _preloadMap.set(u, p);
+    return p;
+  }
+
+  function preloadBatch(urls, opts){
+    (urls || []).forEach(u=>preloadImage(u, opts));
+  }
+
+  function whenIdle(fn){
+    if("requestIdleCallback" in window){
+      requestIdleCallback(()=>fn(), { timeout: 1500 });
+    }else{
+      setTimeout(fn, 250);
+    }
+  }
+
+  function setupServiceWorker(precache){
+    // Works only on https:// or http://localhost/
+    if(!("serviceWorker" in navigator)) return;
+
+    try{
+      const swCode = `
+        const CACHE = "itemkey-img-v1";
+        const PRECACHE = ${JSON.stringify((precache || []).filter(Boolean))};
+
+        self.addEventListener("install", (evt)=>{
+          evt.waitUntil((async ()=>{
+            const c = await caches.open(CACHE);
+            // Cache what exists; ignore missing (404) so install doesn't fail.
+            await Promise.all(PRECACHE.map(async (u)=>{
+              try{
+                const r = await fetch(u, { cache: "reload" });
+                if(r && r.ok) await c.put(u, r);
+              }catch(_){}
+            }));
+            self.skipWaiting();
+          })());
+        });
+
+        self.addEventListener("activate", (evt)=>{
+          evt.waitUntil((async ()=>{
+            const keys = await caches.keys();
+            await Promise.all(keys.map(k => (k === CACHE) ? null : caches.delete(k)));
+            await self.clients.claim();
+          })());
+        });
+
+        self.addEventListener("fetch", (evt)=>{
+          const req = evt.request;
+          if(req.method !== "GET") return;
+          const url = new URL(req.url);
+
+          // Only same-origin assets (keeps it safe and predictable)
+          if(url.origin !== self.location.origin) return;
+
+          // Only cache images and the logo
+          const isImg = req.destination === "image" || /\.(png|jpg|jpeg|webp|gif|avif|svg)$/i.test(url.pathname);
+          if(!isImg) return;
+
+          evt.respondWith((async ()=>{
+            const cache = await caches.open(CACHE);
+            const cached = await cache.match(req, { ignoreSearch:true });
+            if(cached) return cached;
+
+            try{
+              const res = await fetch(req);
+              if(res && res.ok){
+                cache.put(req, res.clone()).catch(()=>{});
+              }
+              return res;
+            }catch(e){
+              return cached || Response.error();
+            }
+          })());
+        });
+      `;
+      const blob = new Blob([swCode], { type:"text/javascript" });
+      const url = URL.createObjectURL(blob);
+      navigator.serviceWorker.register(url).catch(()=>{});
+    }catch(_){}
+  }
+
+  // Face gallery builder (fast, parallel requests)
+  function pad2(n){ return String(n).padStart(2,"0"); }
+
+  function makeFaceSlide(url, idx){
+    const slide = document.createElement("section");
+    slide.className = "slide";
+    slide.setAttribute("data-kind","face");
+    slide.setAttribute("aria-label", "face");
+
+    const img = document.createElement("img");
+    img.alt = "face_" + pad2(idx);
+    img.src = url;
+    img.draggable = false;
+    img.decoding = "async";
+    img.loading = (idx <= 3) ? "eager" : "lazy";
+    try{ if (idx === 1) img.fetchPriority = "high"; }catch(_){}
+
+    const badge = document.createElement("div");
+    badge.className = "badge";
+    badge.innerHTML = `
+      <p class="t goth">face</p>
+      <p class="m"><span>${img.alt}</span></p>
+    `;
+
+    // click -> summon logo glitch (anchored to this frame)
+    img.addEventListener("click", (e)=>{
+      e.preventDefault();
+      e.stopPropagation();
+      glitchLogoOn(slide);
+    });
+
+    slide.appendChild(img);
+    slide.appendChild(badge);
+    return { slide, img };
   }
 
   async function loadFaceGallery(){
@@ -1956,65 +2090,149 @@ DB_COLLECTIONS.unregistered.products.forEach(p=>{
     faceReady = false;
     updateStatus("face");
 
-    // Always stay at the top while first frames are appearing
+    // Keep at top while first frames are appearing
     scrollToFaceTop("auto");
 
-    const found = [];
+    let firstRealSlide = null;
+
+    // Build and insert all candidates immediately (browser will request in parallel)
+    const frag = document.createDocumentFragment();
+    const slides = [];
+
     for(let i=1; i<=maxTry; i++){
-      const file = "face_" + pad2(i) + ".png";
-      const url = base + file;
-      const ok = await probeImage(url);
-
-      if(!ok){
-        if(found.length > 0) break;
-        if(i < 6) continue;
-        break;
-      }
-
-      found.push({ url, idx: i });
-
-      // As soon as we have the first real image - replace placeholder
-      if(found.length === 1){
-        const firstSlide = makeFaceSlide(url, i);
-        placeholder.replaceWith(firstSlide);
-
-        // first entry: show itemkey_logo glitch centered on face_01 (1s, then fades)
-        requestAnimationFrame(()=>{ glitchLogoOn(firstSlide, { durationMs: 1000 }); });
-        faceReady = true;
-        faceCount = 1;
-        updateStatus("face");
-        scrollToFaceTop("auto");
-      }else{
-        const slide = makeFaceSlide(url, i);
-        const shAnchor = document.getElementById("slide-shapters");
-        if(shAnchor){ faceSlides.insertBefore(slide, shAnchor); } else { faceSlides.appendChild(slide); }
-        faceCount = found.length;
-        updateStatus("face");
-      }
+      const url = base + ("face_" + pad2(i) + ".png");
+      const pack = makeFaceSlide(url, i);
+      slides.push(pack);
+      frag.appendChild(pack.slide);
     }
 
-    // No images found - keep a clear error state
-    if(found.length === 0){
-      faceReady = true;
-      faceCount = 0;
-      updateStatus("face");
+    // Replace placeholder with the whole fragment at once
+    placeholder.replaceWith(frag);
 
-      placeholder.innerHTML = `
-        <div class="badge">
-          <p class="t goth">face</p>
-          <p class="m"><span>missing assets/img/face/face_01.png</span></p>
-        </div>
-      `;
-      scrollToFaceTop("auto");
-      return;
+    // Insert before the ritual slide if it exists (keep order)
+    const shAnchor = document.getElementById("slide-shapters");
+    if(shAnchor){
+      // Move all created face slides before shAnchor
+      slides.forEach(({slide})=>{
+        if(slide.nextSibling === shAnchor) return;
+        faceSlides.insertBefore(slide, shAnchor);
+      });
     }
 
-    // Ensure we are exactly at top once scanning is done
+    // Count only successfully loaded images; remove missing to avoid broken icons
+    let loaded = 0;
+    let missing = 0;
+
+    slides.forEach(({ slide, img }, idx)=>{
+      const n = idx + 1;
+
+      img.addEventListener("load", ()=>{
+        loaded++;
+        faceCount = loaded;
+        updateStatus("face");
+
+        if(!firstRealSlide){
+          firstRealSlide = slide;
+          faceReady = true;
+
+          // First entry: show logo glitch centered on face_01 (1s, then fades)
+          requestAnimationFrame(()=>{ glitchLogoOn(firstRealSlide, { durationMs: 1000 }); });
+
+          // Warm next frames fast
+          const nextUrls = [];
+          for(let k=2; k<=12; k++){
+            nextUrls.push(base + ("face_" + pad2(k) + ".png"));
+          }
+          preloadBatch(nextUrls, { fetchPriority:"high" });
+          scrollToFaceTop("auto");
+        }
+      }, { once:true });
+
+      img.addEventListener("error", ()=>{
+        missing++;
+        slide.remove();
+        // If nothing loads at all, show a clear error state after a short delay
+        if(n === maxTry){
+          setTimeout(()=>{
+            if(loaded === 0){
+              faceReady = true;
+              faceCount = 0;
+              updateStatus("face");
+
+              const err = document.createElement("section");
+              err.className = "slide";
+              err.setAttribute("data-kind","face");
+              err.innerHTML = `
+                <div class="badge">
+                  <p class="t goth">face</p>
+                  <p class="m"><span>missing assets/img/face/face_01.png</span></p>
+                </div>
+              `;
+              const sh = document.getElementById("slide-shapters");
+              if(sh){ faceSlides.insertBefore(err, sh); } else { faceSlides.appendChild(err); }
+              scrollToFaceTop("auto");
+            }
+          }, 400);
+        }
+      }, { once:true });
+
+      // Hint preloader (first few frames)
+      if(n <= 6) preloadImage(img.src, { fetchPriority:"high" });
+    });
+
+    // Final pin
     scrollToFaceTop("auto");
+
+    // Background warm-up for everything else (catalog + product images)
+    whenIdle(()=>{
+      const urls = new Set();
+
+      // Logo candidates + hero images
+      ITEMKEY_LOGO_CANDIDATES.forEach(u=>urls.add(u));
+      urls.add("assets/img/face/face_edph.png");
+      urls.add("assets/img/face/face_unregistered.jpg");
+
+      // Catalog/product images
+      try{
+        Object.values(DB_COLLECTIONS).forEach(col=>{
+          if(col && col.hero) urls.add(col.hero);
+          (col.products || []).forEach(p=>{
+            (p.images || []).forEach(u=>urls.add(u));
+          });
+        });
+      }catch(_){}
+
+      // Warm face frames in chunks to avoid freezing
+      const faceUrls = [];
+      for(let i=1; i<=maxTry; i++){
+        faceUrls.push(base + ("face_" + pad2(i) + ".png"));
+      }
+
+      // Precache a safe subset for SW (avoid lots of 404s breaking install)
+      setupServiceWorker([
+        ...ITEMKEY_LOGO_CANDIDATES,
+        "assets/img/face/face_01.png",
+        "assets/img/face/face_02.png",
+        "assets/img/face/face_03.png",
+        "assets/img/face/face_edph.png",
+        "assets/img/face/face_unregistered.jpg",
+        ...Array.from(urls).filter(u=>/assets\/img\/images_db\//.test(u))
+      ]);
+
+      // Warm in two phases: critical (catalog) then face frames
+      preloadBatch(Array.from(urls), { fetchPriority:"low" });
+
+      let i = 0;
+      (function chunk(){
+        const batch = faceUrls.slice(i, i+10);
+        preloadBatch(batch, { fetchPriority:"low" });
+        i += 10;
+        if(i < faceUrls.length) whenIdle(chunk);
+      })();
+    });
   }
 
-  
-// Catalog render (generic)
+  // Catalog render (generic)
 function renderCatalog(collectionKey, targetEl){
   const col = DB_COLLECTIONS[collectionKey];
   if(!col || !targetEl) return;
