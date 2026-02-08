@@ -479,7 +479,14 @@
                   <option value="__auto__">Auto</option>
                 </select>
               </div>
-              <p class="w-hint">Авто сам выбирает язык (EN/RU) по тексту. Эти списки - только если хочешь закрепить голос.</p>
+              <div class="w-field">
+                <div class="w-label">BE voice</div>
+                <select id="voiceBeSelect" aria-label="Belarusian voice">
+                  <option value="__auto__">Auto</option>
+                </select>
+              </div>
+
+              <p class="w-hint">Авто сам выбирает язык (EN/RU/BE) по тексту. Эти списки - только если хочешь закрепить голос.</p>
             </div>
           </details>
 
@@ -676,6 +683,7 @@ const menuSpeakBtn = document.getElementById('menuSpeakBtn');
 
       const voiceEnSelect = document.getElementById('voiceEnSelect');
       const voiceRuSelect = document.getElementById('voiceRuSelect');
+      const voiceBeSelect = document.getElementById('voiceBeSelect');
 
       const langPill = document.getElementById('langPill');
       const modePill = document.getElementById('modePill');
@@ -722,7 +730,8 @@ const menuSpeakBtn = document.getElementById('menuSpeakBtn');
         pitch: 'whisperer_pitch_simple_v1',
         volume: 'whisperer_volume_simple_v1',
         voiceEn: 'whisperer_voice_en_simple_v1',
-        voiceRu: 'whisperer_voice_ru_simple_v1'
+        voiceRu: 'whisperer_voice_ru_simple_v1',
+        voiceBe: 'whisperer_voice_be_simple_v1'
       };
       function saveSetting(key, value){ try{ localStorage.setItem(key, String(value)); }catch(e){} }
       function loadSetting(key){ try{ return localStorage.getItem(key); }catch(e){ return null; } }
@@ -783,6 +792,7 @@ const menuSpeakBtn = document.getElementById('menuSpeakBtn');
         getVoices();
         populateVoiceSelect(voiceEnSelect, 'en', LS.voiceEn);
         populateVoiceSelect(voiceRuSelect, 'ru', LS.voiceRu);
+        populateVoiceSelect(voiceBeSelect, 'be', LS.voiceBe);
       }
       window.speechSynthesis.onvoiceschanged = onVoicesChanged;
       onVoicesChanged();
@@ -794,18 +804,26 @@ const menuSpeakBtn = document.getElementById('menuSpeakBtn');
 
       voiceEnSelect.addEventListener('change', () => { stopOnVoiceChange(); saveSetting(LS.voiceEn, voiceEnSelect.value); });
       voiceRuSelect.addEventListener('change', () => { stopOnVoiceChange(); saveSetting(LS.voiceRu, voiceRuSelect.value); });
+      voiceBeSelect.addEventListener('change', () => { stopOnVoiceChange(); saveSetting(LS.voiceBe, voiceBeSelect.value); });
 
       function bestVoiceFor(lang){
+        const isBe = (lang === 'be');
         const isRu = (lang === 'ru');
-        const selectEl = isRu ? voiceRuSelect : voiceEnSelect;
-        const prefix = isRu ? 'ru' : 'en';
 
-        const forced = selectEl.value;
+        const selectEl = isBe ? voiceBeSelect : (isRu ? voiceRuSelect : voiceEnSelect);
+        const prefix = isBe ? 'be' : (isRu ? 'ru' : 'en');
+
+        const forced = selectEl && selectEl.value;
         if(forced && forced !== '__auto__'){
           return (voices || []).find(v => v.name === forced) || null;
         }
 
-        const list = (voices || []).filter(v => (v.lang || '').toLowerCase().startsWith(prefix));
+        let list = (voices || []).filter(v => (v.lang || '').toLowerCase().startsWith(prefix));
+        // If Belarusian voice is not available - fall back to Russian.
+        if(isBe && !list.length){
+          list = (voices || []).filter(v => (v.lang || '').toLowerCase().startsWith('ru'));
+        }
+
         const def = list.find(v => v.default);
         return def || list[0] || null;
       }
@@ -841,11 +859,19 @@ const menuSpeakBtn = document.getElementById('menuSpeakBtn');
       }
 
       function detectLangForWord(w, fallback){
-        const hasCyr = /[\u0400-\u04FF]/.test(w);
-        const hasLat = /[A-Za-z]/.test(w);
-        if(hasCyr && !hasLat) return 'ru';
+        const s = String(w || '');
+
+        const hasCyr = /[\u0400-\u04FF]/.test(s);
+        const hasLat = /[A-Za-z]/.test(s);
+
+        // Belarusian specific letters: ў, і (Russian doesn't use them)
+        const hasBeLetters = /[ўЎіІ]/.test(s);
+
+        if(hasCyr && !hasLat) return hasBeLetters ? 'be' : 'ru';
         if(hasLat && !hasCyr) return 'en';
+        // Mixed scripts - treat as EN (usually codes/names)
         if(hasCyr && hasLat) return 'en';
+
         return fallback || 'en';
       }
 
@@ -915,7 +941,15 @@ const menuSpeakBtn = document.getElementById('menuSpeakBtn');
 
         const hasRu = wordLang.includes('ru');
         const hasEn = wordLang.includes('en');
-        langPill.textContent = hasRu && hasEn ? 'lang: auto (EN+RU)' : (hasRu ? 'lang: auto (RU)' : 'lang: auto (EN)');
+        const hasBe = wordLang.includes('be');
+
+        if(hasEn && hasRu && hasBe) langPill.textContent = 'lang: auto (EN+RU+BE)';
+        else if(hasEn && hasRu) langPill.textContent = 'lang: auto (EN+RU)';
+        else if(hasRu && hasBe) langPill.textContent = 'lang: auto (RU+BE)';
+        else if(hasEn && hasBe) langPill.textContent = 'lang: auto (EN+BE)';
+        else if(hasBe) langPill.textContent = 'lang: auto (BE)';
+        else if(hasRu) langPill.textContent = 'lang: auto (RU)';
+        else langPill.textContent = 'lang: auto (EN)';
       }
 
       // Debounced live build
@@ -1025,13 +1059,19 @@ const menuSpeakBtn = document.getElementById('menuSpeakBtn');
       }
 
       function segmentLang(start, end){
-        // majority script in range
-        let ru = 0, en = 0;
+        // majority language in range (EN/RU/BE)
+        let ru = 0, en = 0, be = 0;
         for(let i=start;i<=end;i++){
-          if(wordLang[i] === 'ru') ru++;
+          if(wordLang[i] === 'be') be++;
+          else if(wordLang[i] === 'ru') ru++;
           else en++;
         }
-        return (ru > en) ? 'ru' : 'en';
+        const max = Math.max(ru, en, be);
+
+        // tie-breaks: prefer BE (if present) over RU over EN
+        if(be === max && be > 0) return 'be';
+        if(ru === max) return 'ru';
+        return 'en';
       }
 
       function buildSegments(fromWordIndex){
