@@ -1,0 +1,380 @@
+{
+  "schema": "student_helper_dictionary_section",
+  "schemaVersion": 1,
+  "exportedAt": "2026-02-11T00:00:00Z",
+  "section": "Destination B1 Unit 6",
+  "words": [
+    {
+      "en": "in favour of",
+      "ru": "в пользу, в защиту"
+    },
+    {
+      "en": "to achieve",
+      "ru": "добиваться, достигать"
+    },
+    {
+      "en": "brain",
+      "ru": "мозг"
+    },
+    {
+      "en": "clever",
+      "ru": "умный"
+    },
+    {
+      "en": "to concentrate on",
+      "ru": "концентрироваться на"
+    },
+    {
+      "en": "to consider",
+      "ru": "рассматривать, обдумывать"
+    },
+    {
+      "en": "course",
+      "ru": "курс"
+    },
+    {
+      "en": "expert (adj)",
+      "ru": "экспертный, квалифицированный"
+    },
+    {
+      "en": "degree",
+      "ru": "степень"
+    },
+    {
+      "en": "experience (n)",
+      "ru": "опыт"
+    },
+    {
+      "en": "to experience",
+      "ru": "испытывать, переживать"
+    },
+    {
+      "en": "expert (n)",
+      "ru": "эксперт, специалист"
+    },
+    {
+      "en": "to fail",
+      "ru": "провалить"
+    },
+    {
+      "en": "guess (v)",
+      "ru": "догадываться"
+    },
+    {
+      "en": "guess (n)",
+      "ru": "предположение"
+    },
+    {
+      "en": "to hesitate",
+      "ru": "колебаться"
+    },
+    {
+      "en": "instruction",
+      "ru": "инструкция, обучение"
+    },
+    {
+      "en": "to make progress",
+      "ru": "делать прогресс"
+    },
+    {
+      "en": "to make sure",
+      "ru": "убедиться"
+    },
+    {
+      "en": "mark (n)",
+      "ru": "оценка"
+    },
+    {
+      "en": "mark (v)",
+      "ru": "ставить оценку"
+    },
+    {
+      "en": "mental",
+      "ru": "умственный"
+    },
+    {
+      "en": "to pass",
+      "ru": "сдать экзамен"
+    },
+    {
+      "en": "to take an exam",
+      "ru": "сдавать экзамен"
+    },
+    {
+      "en": "qualification",
+      "ru": "квалификация, диплом"
+    },
+    {
+      "en": "to remind",
+      "ru": "напомнить"
+    },
+    {
+      "en": "report",
+      "ru": "отчёт"
+    },
+    {
+      "en": "to revise",
+      "ru": "повторять материал"
+    },
+    {
+      "en": "to search",
+      "ru": "искать"
+    },
+    {
+      "en": "skill",
+      "ru": "навык"
+    },
+    {
+      "en": "smart",
+      "ru": "умный, сообразительный"
+    },
+    {
+      "en": "subject",
+      "ru": "предмет"
+    },
+    {
+      "en": "talented",
+      "ru": "талантливый"
+    },
+    {
+      "en": "term",
+      "ru": "семестр"
+    },
+    {
+      "en": "to wonder",
+      "ru": "интересоваться, желать знать"
+    },
+    {
+      "en": "to cross out",
+      "ru": "зачёркивать"
+    },
+    {
+      "en": "to look up",
+      "ru": "искать (в справочнике)"
+    },
+    {
+      "en": "to point out",
+      "ru": "указывать"
+    },
+    {
+      "en": "to read out",
+      "ru": "читать вслух"
+    },
+    {
+      "en": "to rip up",
+      "ru": "рвать на кусочки"
+    },
+    {
+      "en": "to rub out",
+      "ru": "стирать"
+    },
+    {
+      "en": "rubber",
+      "ru": "ластик"
+    },
+    {
+      "en": "to turn over",
+      "ru": "перевернуть"
+    },
+    {
+      "en": "to write down",
+      "ru": "записать"
+    },
+    {
+      "en": "to begin",
+      "ru": "начинать"
+    },
+    {
+      "en": "beginner",
+      "ru": "новичок"
+    },
+    {
+      "en": "beginning",
+      "ru": "начало"
+    },
+    {
+      "en": "at the beginning of",
+      "ru": "в начале чего-либо"
+    },
+    {
+      "en": "in the beginning",
+      "ru": "вначале"
+    },
+    {
+      "en": "in the end",
+      "ru": "в конце концов"
+    },
+    {
+      "en": "at the end of",
+      "ru": "в конце чего-либо"
+    },
+    {
+      "en": "brave",
+      "ru": "храбрый"
+    },
+    {
+      "en": "bravery",
+      "ru": "храбрость"
+    },
+    {
+      "en": "correct (v)",
+      "ru": "исправлять"
+    },
+    {
+      "en": "correct (adj)",
+      "ru": "правильный"
+    },
+    {
+      "en": "correction",
+      "ru": "исправление"
+    },
+    {
+      "en": "incorrect",
+      "ru": "неправильный"
+    },
+    {
+      "en": "to divide",
+      "ru": "делить"
+    },
+    {
+      "en": "division",
+      "ru": "деление"
+    },
+    {
+      "en": "to educate",
+      "ru": "обучать"
+    },
+    {
+      "en": "education",
+      "ru": "образование"
+    },
+    {
+      "en": "to instruct",
+      "ru": "инструктировать, обучать"
+    },
+    {
+      "en": "instructor",
+      "ru": "инструктор"
+    },
+    {
+      "en": "memory",
+      "ru": "память"
+    },
+    {
+      "en": "to memorise",
+      "ru": "запоминать"
+    },
+    {
+      "en": "memorial",
+      "ru": "мемориал"
+    },
+    {
+      "en": "to refer",
+      "ru": "ссылаться, обращаться, упоминать, направлять"
+    },
+    {
+      "en": "reference",
+      "ru": "ссылка, рекомендация"
+    },
+    {
+      "en": "silent",
+      "ru": "тихий"
+    },
+    {
+      "en": "please keep silent",
+      "ru": "пожалуйста, не шумите"
+    },
+    {
+      "en": "silence",
+      "ru": "тишина"
+    },
+    {
+      "en": "silently",
+      "ru": "тихо"
+    },
+    {
+      "en": "simple",
+      "ru": "простой"
+    },
+    {
+      "en": "to simplify",
+      "ru": "упрощать"
+    },
+    {
+      "en": "simplicity",
+      "ru": "простота"
+    },
+    {
+      "en": "to be capable of",
+      "ru": "быть способным на"
+    },
+    {
+      "en": "to be talented at",
+      "ru": "быть талантливым в"
+    },
+    {
+      "en": "to cheat at/in",
+      "ru": "жульничать"
+    },
+    {
+      "en": "to confuse with",
+      "ru": "перепутать"
+    },
+    {
+      "en": "to continue with",
+      "ru": "продолжить"
+    },
+    {
+      "en": "to cope with",
+      "ru": "справляться с"
+    },
+    {
+      "en": "to help with",
+      "ru": "помочь с"
+    },
+    {
+      "en": "to know about",
+      "ru": "знать о"
+    },
+    {
+      "en": "to learn about",
+      "ru": "узнавать о"
+    },
+    {
+      "en": "to succeed in",
+      "ru": "преуспеть в"
+    },
+    {
+      "en": "an opinion about/of",
+      "ru": "мнение о"
+    },
+    {
+      "en": "a question about",
+      "ru": "вопрос о"
+    },
+    {
+      "en": "by heart",
+      "ru": "наизусть"
+    },
+    {
+      "en": "for instance",
+      "ru": "например"
+    },
+    {
+      "en": "in conclusion",
+      "ru": "в заключение"
+    },
+    {
+      "en": "in fact",
+      "ru": "на самом деле"
+    },
+    {
+      "en": "in general",
+      "ru": "в целом, обычно"
+    },
+    {
+      "en": "be in favour of",
+      "ru": "поддерживать, быть сторонником"
+    }
+  ]
+}

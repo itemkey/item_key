@@ -1,0 +1,170 @@
+{
+  "schema": "student_helper_db_export",
+  "schemaVersion": 1,
+  "type": "noun_to_adj",
+  "category": "Prefixes",
+  "exportedAt": "2026-02-10T17:23:32Z",
+  "dbName": "student_helper_db__noun_to_adj",
+  "tasks": [
+    {
+      "type": "noun_to_adj",
+      "category": "Prefixes",
+      "en_noun": "legal",
+      "en_adj": "illegal",
+      "ru_noun": "закон",
+      "ru_adj": "незаконный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "Prefixes",
+      "en_noun": "literate",
+      "en_adj": "illiterate",
+      "ru_noun": "грамотность",
+      "ru_adj": "неграмотный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "Prefixes",
+      "en_noun": "logic",
+      "en_adj": "illogical",
+      "ru_noun": "логика",
+      "ru_adj": "нелогичный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "Prefixes",
+      "en_noun": "mature",
+      "en_adj": "immature",
+      "ru_noun": "зрелость",
+      "ru_adj": "незрелый"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "Prefixes",
+      "en_noun": "patient",
+      "en_adj": "impatient",
+      "ru_noun": "терпение",
+      "ru_adj": "нетерпеливый"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "Prefixes",
+      "en_noun": "polite",
+      "en_adj": "impolite",
+      "ru_noun": "вежливость",
+      "ru_adj": "невежливый"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "Prefixes",
+      "en_noun": "possible",
+      "en_adj": "impossible",
+      "ru_noun": "возможность",
+      "ru_adj": "невозможный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "Prefixes",
+      "en_noun": "practical",
+      "en_adj": "impractical",
+      "ru_noun": "практичность",
+      "ru_adj": "непрактичный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "Prefixes",
+      "en_noun": "probable",
+      "en_adj": "improbable",
+      "ru_noun": "вероятность",
+      "ru_adj": "маловероятный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "Prefixes",
+      "en_noun": "rational",
+      "en_adj": "irrational",
+      "ru_noun": "рациональность",
+      "ru_adj": "иррациональный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "Prefixes",
+      "en_noun": "regular",
+      "en_adj": "irregular",
+      "ru_noun": "регулярность",
+      "ru_adj": "нерегулярный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "Prefixes",
+      "en_noun": "relevant",
+      "en_adj": "irrelevant",
+      "ru_noun": "релевантность",
+      "ru_adj": "нерелевантный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "Prefixes",
+      "en_noun": "resist",
+      "en_adj": "irresistible",
+      "ru_noun": "сопротивление",
+      "ru_adj": "неотразимый"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "Prefixes",
+      "en_noun": "responsible",
+      "en_adj": "irresponsible",
+      "ru_noun": "ответственность",
+      "ru_adj": "безответственный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "Prefixes",
+      "en_noun": "lead",
+      "en_adj": "misleading",
+      "ru_noun": "лидерство",
+      "ru_adj": "вводящий в заблуждение"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "Prefixes",
+      "en_noun": "accurate",
+      "en_adj": "inaccurate",
+      "ru_noun": "точность",
+      "ru_adj": "неточный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "Prefixes",
+      "en_noun": "correct",
+      "en_adj": "incorrect",
+      "ru_noun": "правильность",
+      "ru_adj": "неправильный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "Prefixes",
+      "en_noun": "complete",
+      "en_adj": "incomplete",
+      "ru_noun": "завершённость",
+      "ru_adj": "неполный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "Prefixes",
+      "en_noun": "secure",
+      "en_adj": "insecure",
+      "ru_noun": "безопасность",
+      "ru_adj": "неуверенный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "Prefixes",
+      "en_noun": "adequate",
+      "en_adj": "inadequate",
+      "ru_noun": "достаточность",
+      "ru_adj": "недостаточный"
+    }
+  ]
+}

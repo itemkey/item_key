@@ -1,0 +1,355 @@
+{
+  "schema": "student_helper_db_export",
+  "schemaVersion": 1,
+  "type": "noun_to_adj",
+  "category": "Suffixes",
+  "exportedAt": "2026-02-11T12:09:12Z",
+  "dbName": "student_helper_db__noun_to_adj",
+  "tasks": [
+    {
+      "type": "noun_to_adj",
+      "en_noun": "fantasy",
+      "en_adj": "fantastic",
+      "ru_noun": "фантазия",
+      "ru_adj": "фантастический"
+    },
+    {
+      "type": "noun_to_adj",
+      "en_noun": "fashion",
+      "en_adj": "fashionable",
+      "ru_noun": "мода",
+      "ru_adj": "модный"
+    },
+    {
+      "type": "noun_to_adj",
+      "en_noun": "flex",
+      "en_adj": "flexible",
+      "ru_noun": "гибкость",
+      "ru_adj": "гибкий"
+    },
+    {
+      "type": "noun_to_adj",
+      "en_noun": "fury",
+      "en_adj": "furious",
+      "ru_noun": "ярость",
+      "ru_adj": "яростный"
+    },
+    {
+      "type": "noun_to_adj",
+      "en_noun": "generosity",
+      "en_adj": "generous",
+      "ru_noun": "щедрость",
+      "ru_adj": "щедрый"
+    },
+    {
+      "type": "noun_to_adj",
+      "en_noun": "glamour",
+      "en_adj": "glamorous",
+      "ru_noun": "гламур",
+      "ru_adj": "гламурный"
+    },
+    {
+      "type": "noun_to_adj",
+      "en_noun": "grass",
+      "en_adj": "grassy",
+      "ru_noun": "трава",
+      "ru_adj": "травяной"
+    },
+    {
+      "type": "noun_to_adj",
+      "en_noun": "guilt",
+      "en_adj": "guilty",
+      "ru_noun": "вина",
+      "ru_adj": "виновный"
+    },
+    {
+      "type": "noun_to_adj",
+      "en_noun": "harm",
+      "en_adj": "harmful",
+      "ru_noun": "вред",
+      "ru_adj": "вредный"
+    },
+    {
+      "type": "noun_to_adj",
+      "en_noun": "health",
+      "en_adj": "healthy",
+      "ru_noun": "здоровье",
+      "ru_adj": "здоровый"
+    },
+    {
+      "type": "noun_to_adj",
+      "en_noun": "help",
+      "en_adj": "helpful",
+      "ru_noun": "помощь",
+      "ru_adj": "полезный"
+    },
+    {
+      "type": "noun_to_adj",
+      "en_noun": "history",
+      "en_adj": "historic",
+      "ru_noun": "история",
+      "ru_adj": "исторический"
+    },
+    {
+      "type": "noun_to_adj",
+      "en_noun": "horror",
+      "en_adj": "horrible",
+      "ru_noun": "ужас",
+      "ru_adj": "ужасный"
+    },
+    {
+      "type": "noun_to_adj",
+      "en_noun": "humor",
+      "en_adj": "humorous",
+      "ru_noun": "юмор",
+      "ru_adj": "юмористический"
+    },
+    {
+      "type": "noun_to_adj",
+      "en_noun": "hunger",
+      "en_adj": "hungry",
+      "ru_noun": "голод",
+      "ru_adj": "голодный"
+    },
+    {
+      "type": "noun_to_adj",
+      "en_noun": "icon",
+      "en_adj": "iconic",
+      "ru_noun": "икона",
+      "ru_adj": "культовый"
+    },
+    {
+      "type": "noun_to_adj",
+      "en_noun": "ice",
+      "en_adj": "icy",
+      "ru_noun": "лёд",
+      "ru_adj": "ледяной"
+    },
+    {
+      "type": "noun_to_adj",
+      "en_noun": "impress",
+      "en_adj": "impressive",
+      "ru_noun": "впечатление",
+      "ru_adj": "впечатляющий"
+    },
+    {
+      "type": "noun_to_adj",
+      "en_noun": "impulse",
+      "en_adj": "impulsive",
+      "ru_noun": "импульс",
+      "ru_adj": "импульсивный"
+    },
+    {
+      "type": "noun_to_adj",
+      "en_noun": "like",
+      "en_adj": "likely",
+      "ru_noun": "вероятность",
+      "ru_adj": "вероятный"
+    },
+    {
+      "type": "noun_to_adj",
+      "en_noun": "luck",
+      "en_adj": "lucky",
+      "ru_noun": "удача",
+      "ru_adj": "удачливый"
+    },
+    {
+      "type": "noun_to_adj",
+      "en_noun": "luxury",
+      "en_adj": "luxurious",
+      "ru_noun": "роскошь",
+      "ru_adj": "роскошный"
+    },
+    {
+      "type": "noun_to_adj",
+      "en_noun": "mass",
+      "en_adj": "massive",
+      "ru_noun": "масса",
+      "ru_adj": "массивный"
+    },
+    {
+      "type": "noun_to_adj",
+      "en_noun": "medicine",
+      "en_adj": "medical",
+      "ru_noun": "медицина",
+      "ru_adj": "медицинский"
+    },
+    {
+      "type": "noun_to_adj",
+      "en_noun": "memory",
+      "en_adj": "memorable",
+      "ru_noun": "память",
+      "ru_adj": "запоминающийся"
+    },
+    {
+      "type": "noun_to_adj",
+      "en_noun": "mess",
+      "en_adj": "messy",
+      "ru_noun": "беспорядок",
+      "ru_adj": "неряшливый"
+    },
+    {
+      "type": "noun_to_adj",
+      "en_noun": "misery",
+      "en_adj": "miserable",
+      "ru_noun": "несчастье",
+      "ru_adj": "несчастный"
+    },
+    {
+      "type": "noun_to_adj",
+      "en_noun": "mystery",
+      "en_adj": "mysterious",
+      "ru_noun": "тайна",
+      "ru_adj": "загадочный"
+    },
+    {
+      "type": "noun_to_adj",
+      "en_noun": "nerve",
+      "en_adj": "nervous",
+      "ru_noun": "нерв",
+      "ru_adj": "нервный"
+    },
+    {
+      "type": "noun_to_adj",
+      "en_noun": "number",
+      "en_adj": "numerous",
+      "ru_noun": "число",
+      "ru_adj": "многочисленный"
+    },
+    {
+      "type": "noun_to_adj",
+      "en_noun": "offence",
+      "en_adj": "offensive",
+      "ru_noun": "оскорбление",
+      "ru_adj": "оскорбительный"
+    },
+    {
+      "type": "noun_to_adj",
+      "en_noun": "optimism",
+      "en_adj": "optimistic",
+      "ru_noun": "оптимизм",
+      "ru_adj": "оптимистичный"
+    },
+    {
+      "type": "noun_to_adj",
+      "en_noun": "pain",
+      "en_adj": "painful",
+      "ru_noun": "боль",
+      "ru_adj": "болезненный"
+    },
+    {
+      "type": "noun_to_adj",
+      "en_noun": "peace",
+      "en_adj": "peaceful",
+      "ru_noun": "мир",
+      "ru_adj": "мирный"
+    },
+    {
+      "type": "noun_to_adj",
+      "en_noun": "pessimism",
+      "en_adj": "pessimistic",
+      "ru_noun": "пессимизм",
+      "ru_adj": "пессимистичный"
+    },
+    {
+      "type": "noun_to_adj",
+      "en_noun": "poison",
+      "en_adj": "poisonous",
+      "ru_noun": "яд",
+      "ru_adj": "ядовитый"
+    },
+    {
+      "type": "noun_to_adj",
+      "en_noun": "power",
+      "en_adj": "powerful",
+      "ru_noun": "сила",
+      "ru_adj": "мощный"
+    },
+    {
+      "type": "noun_to_adj",
+      "en_noun": "prefer",
+      "en_adj": "preferable",
+      "ru_noun": "предпочтение",
+      "ru_adj": "предпочтительный"
+    },
+    {
+      "type": "noun_to_adj",
+      "en_noun": "prestige",
+      "en_adj": "prestigious",
+      "ru_noun": "престиж",
+      "ru_adj": "престижный"
+    },
+    {
+      "type": "noun_to_adj",
+      "en_noun": "problem",
+      "en_adj": "problematic",
+      "ru_noun": "проблема",
+      "ru_adj": "проблемный"
+    },
+    {
+      "type": "noun_to_adj",
+      "en_noun": "profit",
+      "en_adj": "profitable",
+      "ru_noun": "прибыль",
+      "ru_adj": "прибыльный"
+    },
+    {
+      "type": "noun_to_adj",
+      "en_noun": "prosper",
+      "en_adj": "prosperous",
+      "ru_noun": "процветание",
+      "ru_adj": "процветающий"
+    },
+      { "type": "noun_to_adj", "en_noun": "psychology", "en_adj": "psychological", "ru_noun": "психология", "ru_adj": "психологический" },
+  { "type": "noun_to_adj", "en_noun": "rain", "en_adj": "rainy", "ru_noun": "дождь", "ru_adj": "дождливый" },
+  { "type": "noun_to_adj", "en_noun": "reality", "en_adj": "realistic", "ru_noun": "реальность", "ru_adj": "реалистичный" },
+  { "type": "noun_to_adj", "en_noun": "reason", "en_adj": "reasonable", "ru_noun": "причина", "ru_adj": "разумный" },
+  { "type": "noun_to_adj", "en_noun": "rely", "en_adj": "reliable", "ru_noun": "зависимость", "ru_adj": "надёжный" },
+  { "type": "noun_to_adj", "en_noun": "religion", "en_adj": "religious", "ru_noun": "религия", "ru_adj": "религиозный" },
+  { "type": "noun_to_adj", "en_noun": "remark", "en_adj": "remarkable", "ru_noun": "замечание", "ru_adj": "замечательный" },
+  { "type": "noun_to_adj", "en_noun": "respect", "en_adj": "respectful", "ru_noun": "уважение", "ru_adj": "уважительный" },
+  { "type": "noun_to_adj", "en_noun": "response", "en_adj": "responsible", "ru_noun": "ответственность", "ru_adj": "ответственный" },
+  { "type": "noun_to_adj", "en_noun": "risk", "en_adj": "risky", "ru_noun": "риск", "ru_adj": "рискованный" },
+  { "type": "noun_to_adj", "en_noun": "rock", "en_adj": "rocky", "ru_noun": "скала", "ru_adj": "каменистый" },
+  { "type": "noun_to_adj", "en_noun": "science", "en_adj": "scientific", "ru_noun": "наука", "ru_adj": "научный" },
+  { "type": "noun_to_adj", "en_noun": "sense", "en_adj": "sensible", "ru_noun": "смысл", "ru_adj": "разумный" },
+  { "type": "noun_to_adj", "en_noun": "sleep", "en_adj": "sleepy", "ru_noun": "сон", "ru_adj": "сонный" },
+  { "type": "noun_to_adj", "en_noun": "society", "en_adj": "sociable", "ru_noun": "общество", "ru_adj": "общительный" },
+  { "type": "noun_to_adj", "en_noun": "space", "en_adj": "spacious", "ru_noun": "пространство", "ru_adj": "просторный" },
+  { "type": "noun_to_adj", "en_noun": "stress", "en_adj": "stressful", "ru_noun": "стресс", "ru_adj": "стрессовый" },
+  { "type": "noun_to_adj", "en_noun": "success", "en_adj": "successful", "ru_noun": "успех", "ru_adj": "успешный" },
+  { "type": "noun_to_adj", "en_noun": "suit", "en_adj": "suitable", "ru_noun": "костюм", "ru_adj": "подходящий" },
+  { "type": "noun_to_adj", "en_noun": "sun", "en_adj": "sunny", "ru_noun": "солнце", "ru_adj": "солнечный" },
+  { "type": "noun_to_adj", "en_noun": "suspect", "en_adj": "suspicious", "ru_noun": "подозрение", "ru_adj": "подозрительный" },
+  { "type": "noun_to_adj", "en_noun": "sympathy", "en_adj": "sympathetic", "ru_noun": "сочувствие", "ru_adj": "сочувствующий" },
+  { "type": "noun_to_adj", "en_noun": "taste", "en_adj": "tasty", "ru_noun": "вкус", "ru_adj": "вкусный" },
+  { "type": "noun_to_adj", "en_noun": "technology", "en_adj": "technological", "ru_noun": "технология", "ru_adj": "технологический" },
+  { "type": "noun_to_adj", "en_noun": "thank", "en_adj": "thankful", "ru_noun": "благодарность", "ru_adj": "благодарный" },
+  { "type": "noun_to_adj", "en_noun": "thought", "en_adj": "thoughtful", "ru_noun": "мысль", "ru_adj": "вдумчивый" },
+  { "type": "noun_to_adj", "en_noun": "type", "en_adj": "typical", "ru_noun": "тип", "ru_adj": "типичный" },
+  { "type": "noun_to_adj", "en_noun": "understand", "en_adj": "understandable", "ru_noun": "понимание", "ru_adj": "понятный" },
+  { "type": "noun_to_adj", "en_noun": "use", "en_adj": "useful", "ru_noun": "использование", "ru_adj": "полезный" },
+  { "type": "noun_to_adj", "en_noun": "value", "en_adj": "valuable", "ru_noun": "ценность", "ru_adj": "ценный" },
+  { "type": "noun_to_adj", "en_noun": "vary", "en_adj": "various", "ru_noun": "разнообразие", "ru_adj": "разнообразный" },
+  { "type": "noun_to_adj", "en_noun": "see", "en_adj": "visible", "ru_noun": "зрение", "ru_adj": "видимый" },
+  { "type": "noun_to_adj", "en_noun": "wonder", "en_adj": "wonderful", "ru_noun": "чудо", "ru_adj": "замечательный" },
+  { "type": "noun_to_adj", "en_noun": "aim", "en_adj": "aimless", "ru_noun": "цель", "ru_adj": "бесцельный" },
+  { "type": "noun_to_adj", "en_noun": "care", "en_adj": "careless", "ru_noun": "забота", "ru_adj": "небрежный" },
+  { "type": "noun_to_adj", "en_noun": "count", "en_adj": "countless", "ru_noun": "счёт", "ru_adj": "бесчисленный" },
+  { "type": "noun_to_adj", "en_noun": "effort", "en_adj": "effortless", "ru_noun": "усилие", "ru_adj": "лёгкий" },
+  { "type": "noun_to_adj", "en_noun": "end", "en_adj": "endless", "ru_noun": "конец", "ru_adj": "бесконечный" },
+  { "type": "noun_to_adj", "en_noun": "ground", "en_adj": "groundless", "ru_noun": "основание", "ru_adj": "беспочвенный" },
+  { "type": "noun_to_adj", "en_noun": "harm", "en_adj": "harmful", "ru_noun": "вред", "ru_adj": "вредный" },
+  { "type": "noun_to_adj", "en_noun": "help", "en_adj": "helpless", "ru_noun": "помощь", "ru_adj": "беспомощный" },
+  { "type": "noun_to_adj", "en_noun": "meaning", "en_adj": "meaningless", "ru_noun": "значение", "ru_adj": "бессмысленный" },
+  { "type": "noun_to_adj", "en_noun": "pain", "en_adj": "painless", "ru_noun": "боль", "ru_adj": "безболезненный" },
+  { "type": "noun_to_adj", "en_noun": "point", "en_adj": "pointless", "ru_noun": "смысл", "ru_adj": "бессмысленный" },
+  { "type": "noun_to_adj", "en_noun": "price", "en_adj": "priceless", "ru_noun": "цена", "ru_adj": "бесценный" },
+  { "type": "noun_to_adj", "en_noun": "sleep", "en_adj": "sleepless", "ru_noun": "сон", "ru_adj": "бессонный" },
+  { "type": "noun_to_adj", "en_noun": "thought", "en_adj": "thoughtless", "ru_noun": "мысль", "ru_adj": "бездумный" },
+  { "type": "noun_to_adj", "en_noun": "use", "en_adj": "useless", "ru_noun": "использование", "ru_adj": "бесполезный" },
+  { "type": "noun_to_adj", "en_noun": "value", "en_adj": "valueless", "ru_noun": "ценность", "ru_adj": "бесполезный" },
+  { "type": "noun_to_adj", "en_noun": "weight", "en_adj": "weightless", "ru_noun": "вес", "ru_adj": "невесомый" },
+  { "type": "noun_to_adj", "en_noun": "worth", "en_adj": "worthless", "ru_noun": "ценность", "ru_adj": "бесполезный" }
+  ]
+}
