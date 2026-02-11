@@ -1798,7 +1798,7 @@ if(e.key.toLowerCase() === 't'){ if(inText) return; toggleTranslate(); return; }
   }
 
   const DICT_DIR = 'db/dictionary/';
-const DICT_MANIFEST = `${DICT_DIR}manifest.json`;
+const DICT_MANIFESTS = ['db/manifest.json', `${DICT_DIR}manifest.json`];
 const DICT_FILE_PREFIX = 'student_helper_db__dictionary_';
 const DICT_DEFAULT_FILES = [
   `${DICT_FILE_PREFIX}Destination_B1_Unit_3.json`,
@@ -2438,8 +2438,24 @@ async function dictSyncFromFolder(opts){
 
   let files = [];
   try{
-    const man = await fetchJson(DICT_MANIFEST);
+    let man = null;
+    let manifestUsed = null;
+    const manifestErrors = [];
+    for(const mp of DICT_MANIFESTS){
+      try{
+        // eslint-disable-next-line no-await-in-loop
+        man = await fetchJson(mp);
+        manifestUsed = mp;
+        break;
+      }catch(e){
+        manifestErrors.push(`${mp} - ${e && (e.message || e)}`);
+      }
+    }
+
     if(Array.isArray(man)) files = man;
+    else if(man && Array.isArray(man.dictionary)) files = man.dictionary;
+    else if(man && man.dictionary && Array.isArray(man.dictionary.files)) files = man.dictionary.files;
+    else if(man && man.dictionary && Array.isArray(man.dictionary.dbs)) files = man.dictionary.dbs;
     else if(man && Array.isArray(man.files)) files = man.files;
     else if(man && Array.isArray(man.dbs)) files = man.dbs;
   }catch(_){
@@ -2477,7 +2493,7 @@ async function dictSyncFromFolder(opts){
     }
   }
 
-  return { okFiles, failFiles, filesCount: files.length };
+  return { okFiles, failFiles, filesCount: files.length, manifestUsed, manifestErrors };
 }
 
   async function dictExportSection(){
@@ -2570,14 +2586,14 @@ if(sync.okFiles.length){
   const okPart = sync.failFiles.length ? 'partial' : 'ok';
   elDictSeedBadge.textContent = `json: ${okPart} (${sync.okFiles.length}/${sync.filesCount || sync.okFiles.length})`;
   elDictSeedBadge.title =
-    `ok:\n- ${sync.okFiles.join('\n- ')}\n\nfail:\n- ${sync.failFiles.length ? sync.failFiles.join('\n- ') : 'none'}\n\nhint: для GitHub Pages нужен db/dictionary/manifest.json (список файлов)`;
+    `manifest: ${sync.manifestUsed || 'none'}\n\nok:\n- ${sync.okFiles.join('\n- ')}\n\nfail:\n- ${sync.failFiles.length ? sync.failFiles.join('\n- ') : 'none'}\n\nhint: для GitHub Pages нужен db/manifest.json (или db/dictionary/manifest.json) со списком файлов`;
 }else if(sync.failFiles.length){
   elDictSeedBadge.textContent = 'json: failed';
   elDictSeedBadge.title =
-    `fail:\n- ${sync.failFiles.join('\n- ')}\n\nhint: проверь пути (GitHub Pages добавляет /<repo>/ в URL) и регистр папок (db vs DB).`;
+    `manifest tried:\n- ${(sync.manifestErrors && sync.manifestErrors.length) ? sync.manifestErrors.join('\n- ') : 'n/a'}\n\nfail:\n- ${sync.failFiles.join('\n- ')}\n\nhint: проверь пути (GitHub Pages добавляет /<repo>/ в URL) и регистр папок (db vs DB).`;
 }else{
   elDictSeedBadge.textContent = 'json: none';
-  elDictSeedBadge.title = 'manifest.json не найден и DICT_DEFAULT_FILES пустой.';
+  elDictSeedBadge.title = 'manifest не найден и DICT_DEFAULT_FILES пустой.';
 }
 
       await dictRefreshAll();

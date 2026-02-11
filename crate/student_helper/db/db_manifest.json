@@ -1,0 +1,14 @@
+{
+  "dictionary": {
+    "files": [
+      "student_helper_db__dictionary_Destination_B1_Unit_3.json",
+      "student_helper_db__dictionary_Destination_B1_Unit_6.json"
+    ]
+  },
+  "word_transformation": {
+    "noun_to_adj": {
+      "prefixes": "student_helper_db__noun_to_adj_Prefixes.json",
+      "suffixes": "student_helper_db__noun_to_adj_Suffixes.json"
+    }
+  }
+}
