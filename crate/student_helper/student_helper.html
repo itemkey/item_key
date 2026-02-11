@@ -687,8 +687,8 @@
   const DB_VERSION = 4;
   const STORE_TASKS = 'tasks';
 
-  const N2A_SUFFIX_FILE = 'student_helper_db__noun_to_adj_Suffixes.json';
-  const N2A_PREFIX_FILE = 'student_helper_db__noun_to_adj_Prefixes.json';
+  const N2A_SUFFIX_FILE = 'db/word_transformation/student_helper_db__noun_to_adj_Suffixes.json';
+  const N2A_PREFIX_FILE = 'db/word_transformation/student_helper_db__noun_to_adj_Prefixes.json';
 
   function idbSupported(){ return typeof indexedDB !== 'undefined'; }
   function dbNameFor(type){ return `${DB_PREFIX}${type}`; }
@@ -965,11 +965,62 @@
     return { added, skipped };
   }
 
-  async function fetchJson(filename){
-    const resp = await fetch(`./${filename}`, { cache:'no-store' });
-    if(!resp.ok) throw new Error(`HTTP ${resp.status}`);
-    return resp.json();
+  function _uniq(arr){ return Array.from(new Set(arr)); }
+
+function _guessSiteRoots(){
+  const roots = [];
+  try{
+    const origin = location.origin;
+    roots.push(origin + '/');
+
+    // GitHub Pages project site: https://user.github.io/<repo>/
+    const parts = location.pathname.split('/').filter(Boolean);
+    if(location.hostname.endsWith('github.io') && parts.length >= 1){
+      roots.push(origin + '/' + parts[0] + '/');
+    }
+  }catch(_){/* ignore */}
+  return _uniq(roots);
+}
+
+function _buildUrlCandidates(relPath){
+  const raw = String(relPath || '');
+  const cleaned = raw.replace(/^\.?\/+/, '').replace(/^\/+/, '');
+  const out = [];
+
+  // relative to current document
+  try{ out.push(new URL(cleaned, document.baseURI).href); }catch(_){/* ignore */}
+  try{ out.push(new URL(raw, document.baseURI).href); }catch(_){/* ignore */}
+
+  // relative to likely site roots
+  for(const root of _guessSiteRoots()){
+    try{ out.push(new URL(cleaned, root).href); }catch(_){/* ignore */}
   }
+
+  return _uniq(out);
+}
+
+function _basename(p){ return String(p || '').split('/').filter(Boolean).pop() || ''; }
+
+async function fetchJson(relPath){
+  const urls = _buildUrlCandidates(relPath);
+  let lastErr = null;
+
+  for(const url of urls){
+    try{
+      const resp = await fetch(url, { cache:'no-store' });
+      if(!resp.ok){
+        lastErr = new Error(`HTTP ${resp.status}`);
+        continue;
+      }
+      return await resp.json();
+    }catch(e){
+      lastErr = e;
+    }
+  }
+
+  const tried = urls.slice(0, 6).join(' | ');
+  throw new Error(`JSON fetch failed: ${relPath}. tried: ${tried}. ${lastErr && (lastErr.message || lastErr)}`);
+}
 
   async function autoLoadIfEmpty(type){
     const n = await countAllTasks(db);
@@ -1029,8 +1080,8 @@
   function exportFilenameFor(type, category){
     if(type === 'noun_to_adj'){
       const c = normCategory(category);
-      if(c === 'Suffixes') return N2A_SUFFIX_FILE;
-      if(c === 'Prefixes') return N2A_PREFIX_FILE;
+      if(c === 'Suffixes') return _basename(N2A_SUFFIX_FILE);
+      if(c === 'Prefixes') return _basename(N2A_PREFIX_FILE);
       return 'student_helper_db__noun_to_adj_All.json';
     }
     return `${dbNameFor(type)}.json`;
@@ -1746,7 +1797,27 @@ if(e.key.toLowerCase() === 't'){ if(inText) return; toggleTranslate(); return; }
     });
   }
 
-  const DICT_JSON_FILE = `${dictDbName()}.json`;
+  const DICT_DIR = 'db/dictionary/';
+const DICT_MANIFEST = `${DICT_DIR}manifest.json`;
+const DICT_FILE_PREFIX = 'student_helper_db__dictionary_';
+const DICT_DEFAULT_FILES = [
+  `${DICT_FILE_PREFIX}Destination_B1_Unit_3.json`,
+  `${DICT_FILE_PREFIX}Destination_B1_Unit_6.json`,
+];
+
+function dictSlug(name){
+  return String(name || '')
+    .trim()
+    .replace(/\s+/g, '_')
+    .replace(/[^A-Za-z0-9_]/g, '')
+    .replace(/_+/g, '_')
+    .replace(/^_+|_+$/g, '');
+}
+
+function dictFilenameForSection(sectionName){
+  const slug = dictSlug(sectionName) || 'section';
+  return `${DICT_FILE_PREFIX}${slug}.json`;
+}
 
   
   // Dict app state
@@ -2247,60 +2318,204 @@ if(e.key.toLowerCase() === 't'){ if(inText) return; toggleTranslate(); return; }
     renderSectionsUI();
   }
 
-  async function dictAutoLoadIfEmpty(){
-    const n = await dictCount(dictDb, DICT_STORE_SECTIONS);
-    if(n > 0) return { loaded:false, reason:'not_empty', okFiles:[], failFiles:[], count:n };
+  function dictJsonToSections(data, fallbackName){
+  if(!data) return [];
+  const fb = String(fallbackName || '').trim();
 
-    // Auto-load JSON located next to the HTML (same behavior as word transformation)
+  if(Array.isArray(data.sections)){
+    return data.sections
+      .map(s => ({
+        name: String((s && (s.name || s.sectionName || s.section)) || fb).trim(),
+        words: Array.isArray(s && s.words) ? s.words : []
+      }))
+      .filter(s => s.name);
+  }
+
+  const name = String((data.sectionName || data.name || data.section) || fb).trim();
+  if(name && Array.isArray(data.words)){
+    return [{ name, words: data.words }];
+  }
+
+  return [];
+}
+
+function dictSectionExistsByName(name){
+  const key = normalize(name || '');
+  return dictSections.find(x => x.nameKey === key) || null;
+}
+
+function dictClearWordsInSection(dbx, sid){
+  const sectionId = Number(sid || 0);
+  return new Promise((resolve, reject) => {
+    const t = dbx.transaction([DICT_STORE_WORDS], 'readwrite');
+    const wStore = t.objectStore(DICT_STORE_WORDS);
+
     try{
-      // Ensure in-memory caches are empty before import
-      dictSections = [];
-      dictWordsAll = [];
-      const data = await fetchJson(DICT_JSON_FILE);
-      await dictImportFromObject(data || {}, true);
+      const idx = wStore.index('sectionId');
+      const cur = idx.openCursor(IDBKeyRange.only(sectionId));
+      cur.onsuccess = (e) => {
+        const c = e.target.result;
+        if(!c) return;
+        c.delete();
+        c.continue();
+      };
+    }catch(err){
+      reject(err || new Error('Failed to clear section words'));
+      return;
+    }
 
-      const cS = await dictCount(dictDb, DICT_STORE_SECTIONS);
-      const cW = await dictCount(dictDb, DICT_STORE_WORDS);
-      return { loaded:true, okFiles:[DICT_JSON_FILE], failFiles:[], count:{ sections:cS, words:cW } };
-    }catch(e){
-      return { loaded:false, reason:'fetch_failed', okFiles:[], failFiles:[DICT_JSON_FILE], error:String(e && (e.message || e)) };
+    t.oncomplete = () => resolve(true);
+    t.onerror = () => reject(t.error || new Error('Failed to clear section words'));
+  });
+}
+
+async function dictImportSectionFile(data, opts){
+  const replaceExisting = !!(opts && opts.replaceExisting);
+  const mergeExisting = !!(opts && opts.mergeExisting);
+  const fallbackName = (opts && opts.fallbackName) || '';
+
+  const secs = dictJsonToSections(data, fallbackName);
+  if(!secs.length) return { imported:0, skipped:0 };
+
+  if(!dictDb) throw new Error('dict db not ready');
+
+  if(!dictSections.length) await dictRefreshAll();
+
+  let imported = 0;
+  let skipped = 0;
+
+  for(const s of secs){
+    const name = String(s && s.name || '').trim();
+    if(!name){ skipped += 1; continue; }
+
+    const exist = dictSectionExistsByName(name);
+
+    if(exist && !replaceExisting && !mergeExisting){
+      skipped += 1;
+      continue;
+    }
+
+    let sid = exist ? exist.id : null;
+
+    if(!sid){
+      // eslint-disable-next-line no-await-in-loop
+      const resS = await dictAddSection(dictDb, name);
+      sid = resS && resS.ok ? resS.id : null;
+      if(!sid){
+        // refresh cache and try find again
+        // eslint-disable-next-line no-await-in-loop
+        await dictRefreshAll();
+        const exist2 = dictSectionExistsByName(name);
+        sid = exist2 ? exist2.id : null;
+      }
+    }
+
+    if(!sid){ skipped += 1; continue; }
+
+    if(exist && replaceExisting){
+      // eslint-disable-next-line no-await-in-loop
+      await dictClearWordsInSection(dictDb, sid);
+    }
+
+    const words = Array.isArray(s.words) ? s.words : [];
+    for(const w of words){
+      if(!w || !w.en || !w.ru) continue;
+      // eslint-disable-next-line no-await-in-loop
+      const resW = await dictAddWord(dictDb, sid, w.en, w.ru);
+      if(resW && resW.ok) imported += 1;
     }
   }
 
-  function dictExportPayload(){
-    const sections = dictSections
-      .slice()
-      .sort((a,b)=> a.name.localeCompare(b.name, 'ru'))
-      .map(s => ({
-        name: s.name,
-        words: dictWordsAll
-          .filter(w => Number(w.sectionId) === Number(s.id))
-          .sort((a,b)=> (a.en || '').localeCompare((b.en || ''), 'en'))
-          .map(w => ({ en:w.en, ru:w.ru }))
-      }));
+  return { imported, skipped };
+}
 
-    return {
-      schema: 'student_helper_dict_export',
-      schemaVersion: 1,
-      exportedAt: new Date().toISOString(),
-      dbName: dictDbName(),
-      sections
-    };
+async function dictSyncFromFolder(opts){
+  const replaceExisting = !!(opts && opts.replaceExisting);
+  const mergeExisting = !!(opts && opts.mergeExisting);
+
+  const okFiles = [];
+  const failFiles = [];
+
+  let files = [];
+  try{
+    const man = await fetchJson(DICT_MANIFEST);
+    if(Array.isArray(man)) files = man;
+    else if(man && Array.isArray(man.files)) files = man.files;
+    else if(man && Array.isArray(man.dbs)) files = man.dbs;
+  }catch(_){
+    // no manifest - use defaults
   }
 
-  async function dictExport(){
-    const payload = dictExportPayload();
-    const filename = `${dictDbName()}.json`;
-    const blob = new Blob([JSON.stringify(payload, null, 2)], { type:'application/json' });
-
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(a.href);
+  if(!Array.isArray(files) || !files.length){
+    files = DICT_DEFAULT_FILES;
   }
+
+  files = files.map(x => String(x || '').trim()).filter(Boolean);
+
+  // refresh caches
+  await dictRefreshAll();
+
+  for(const f of files){
+    const rel = f.includes('/') ? f : `${DICT_DIR}${f}`;
+    try{
+      const data = await fetchJson(rel);
+      // eslint-disable-next-line no-await-in-loop
+      await dictImportSectionFile(data, {
+        replaceExisting,
+        mergeExisting,
+        fallbackName: _basename(f)
+          .replace(/^student_helper_db__dictionary_/, '')
+          .replace(/\.json$/i, '')
+          .replaceAll('_', ' ')
+      });
+
+      okFiles.push(rel);
+      // eslint-disable-next-line no-await-in-loop
+      await dictRefreshAll();
+    }catch(e){
+      failFiles.push(`${rel} - ${e && (e.message || e)}`);
+    }
+  }
+
+  return { okFiles, failFiles, filesCount: files.length };
+}
+
+  async function dictExportSection(){
+  const sid = Number(elSectionBuilder.value || 0);
+  if(!sid){
+    alert('Выбери section в constructor.');
+    return;
+  }
+  const sec = dictSections.find(x => Number(x.id) === sid);
+  if(!sec){
+    alert('Section не найден.');
+    return;
+  }
+
+  const words = dictWordsAll
+    .filter(w => Number(w.sectionId) === sid)
+    .sort((a,b)=> (a.en || '').localeCompare((b.en || ''), 'en'))
+    .map(w => ({ en:w.en, ru:w.ru }));
+
+  const payload = {
+    schema: 'student_helper_dict_section',
+    schemaVersion: 1,
+    exportedAt: new Date().toISOString(),
+    sectionName: sec.name,
+    words
+  };
+
+  const filename = dictFilenameForSection(sec.name);
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type:'application/json' });
+
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(a.href);
+}
 
   async function dictImportFromObject(data, replace){
     const sections = Array.isArray(data && data.sections) ? data.sections : [];
@@ -2342,28 +2557,28 @@ if(e.key.toLowerCase() === 't'){ if(inText) return; toggleTranslate(); return; }
     // refresh to have current nameKey
     await dictRefreshAll();
 
-    await dictImportFromObject(parsed.data || {}, replace);
+    await dictImportSectionFile(parsed.data || {}, { replaceExisting: !!replace, mergeExisting: !replace });
   }
 
   async function dictBoot(){
     try{
       elDictDbStatus.textContent = 'opening...';
       dictDb = await dictOpenDB();
-      elDictDbStatus.textContent = 'ok';
+      elDictDbStatus.textContent = 'ok';const sync = await dictSyncFromFolder({ replaceExisting:false, mergeExisting:false });
 
-      const report = await dictAutoLoadIfEmpty();
-      if(report.loaded){
-        elDictSeedBadge.textContent = 'json: loaded';
-        elDictSeedBadge.title = `loaded: ./${DICT_JSON_FILE}`;
-      }else{
-        if(report.reason === 'not_empty'){
-          elDictSeedBadge.textContent = 'json: skip';
-          elDictSeedBadge.title = 'Данные уже есть';
-        }else{
-          elDictSeedBadge.textContent = 'json: failed';
-          elDictSeedBadge.title = `Не удалось загрузить ./${DICT_JSON_FILE}. Если открываешь как file://, браузер может блокировать fetch. Тогда нажми load db и выбери файл вручную.`;
-        }
-      }
+if(sync.okFiles.length){
+  const okPart = sync.failFiles.length ? 'partial' : 'ok';
+  elDictSeedBadge.textContent = `json: ${okPart} (${sync.okFiles.length}/${sync.filesCount || sync.okFiles.length})`;
+  elDictSeedBadge.title =
+    `ok:\n- ${sync.okFiles.join('\n- ')}\n\nfail:\n- ${sync.failFiles.length ? sync.failFiles.join('\n- ') : 'none'}\n\nhint: для GitHub Pages нужен db/dictionary/manifest.json (список файлов)`;
+}else if(sync.failFiles.length){
+  elDictSeedBadge.textContent = 'json: failed';
+  elDictSeedBadge.title =
+    `fail:\n- ${sync.failFiles.join('\n- ')}\n\nhint: проверь пути (GitHub Pages добавляет /<repo>/ в URL) и регистр папок (db vs DB).`;
+}else{
+  elDictSeedBadge.textContent = 'json: none';
+  elDictSeedBadge.title = 'manifest.json не найден и DICT_DEFAULT_FILES пустой.';
+}
 
       await dictRefreshAll();
       renderWordsUI();
@@ -2499,7 +2714,7 @@ if(e.key.toLowerCase() === 't'){ if(inText) return; toggleTranslate(); return; }
     }
   });
 
-  btnDictExport.addEventListener('click', dictExport);
+  btnDictExport.addEventListener('click', dictExportSection);
 
   btnDictImport.addEventListener('click', ()=>{
     elDictFileImport.value = '';
