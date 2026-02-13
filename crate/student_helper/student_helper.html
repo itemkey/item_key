@@ -196,6 +196,8 @@
       border-top:1px solid rgba(0,0,0,0.14);
     }
     .ik-list li:first-child{ border-top:none; }
+    .ik-list li.is-clickable{ cursor:pointer; }
+    .ik-list li.is-clickable:hover{ background: rgba(0,0,0,0.04); }
     .ik-itemline{
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
       font-size:12px; line-height:1.35; margin:0;
@@ -329,6 +331,24 @@
 
             <div class="ik-divider"></div>
 
+            <section class="ik-ex" id="dictFirstPick" aria-label="Выбор раздела">
+              <p class="ik-title">dictionary</p>
+              <p class="ik-sub">выбери раздел чтобы начать</p>
+
+              <div class="ik-row" style="margin-top:8px;">
+                <input class="ik-input" id="dictFirstPickSearch" type="text" placeholder="поиск..." />
+                <span class="ik-spacer" aria-hidden="true"></span>
+                <button class="ik-btn" id="dictFirstPickOpenConstructor" type="button" title="Открыть constructor">constructor</button>
+              </div>
+
+              <div class="ik-divider"></div>
+
+              <ul class="ik-list" id="dictFirstPickList" aria-label="Список разделов"></ul>
+
+              <p class="ik-footnote">подсказка: позже можно сменить раздел через кнопку "разделы" в cards/learn</p>
+            </section>
+
+            <div id="dictSubtabsWrap" hidden>
             <div class="ik-tabs" role="tablist" aria-label="Режимы dictionary">
               <button class="ik-tab" id="dict-tab-cards" role="tab" aria-selected="true" aria-controls="dict-panel-cards" type="button">cards</button>
               <button class="ik-tab" id="dict-tab-quiz" role="tab" aria-selected="false" aria-controls="dict-panel-quiz" type="button">learn</button>
@@ -360,6 +380,7 @@
 
                   <label class="ik-label" for="dictSectionCards">section</label>
                   <select class="ik-select" id="dictSectionCards" style="min-width: 260px;"></select>
+                  <button class="ik-btn" id="dictCardsChooseSection" type="button" title="Выбрать раздел">разделы</button>
                 </div>
 
                 <div class="ik-divider"></div>
@@ -404,6 +425,7 @@
 
                   <label class="ik-label" for="dictSectionQuiz">section</label>
                   <select class="ik-select" id="dictSectionQuiz" style="min-width: 260px;"></select>
+                  <button class="ik-btn" id="dictQuizChooseSection" type="button" title="Выбрать раздел">разделы</button>
                 </div>
 
                 <div class="ik-divider"></div>
@@ -491,6 +513,8 @@
                 <p class="ik-sub">слова в разделе</p>
                 <ul class="ik-list" id="dictWordList" aria-label="Список слов"></ul>
               </section>
+            </div>
+
             </div>
 
           </div>
@@ -1864,6 +1888,14 @@ function dictFilenameForSection(sectionName){
   const elSectionList = document.getElementById('dictSectionList');
   const elWordList = document.getElementById('dictWordList');
 
+  const elDictFirstPick = document.getElementById('dictFirstPick');
+  const elDictSubtabsWrap = document.getElementById('dictSubtabsWrap');
+  const elFirstPickList = document.getElementById('dictFirstPickList');
+  const elFirstPickSearch = document.getElementById('dictFirstPickSearch');
+  const btnFirstPickOpenConstructor = document.getElementById('dictFirstPickOpenConstructor');
+  const btnCardsChooseSection = document.getElementById('dictCardsChooseSection');
+  const btnQuizChooseSection = document.getElementById('dictQuizChooseSection');
+
   const elCardsRandom = document.getElementById('dictCardsRandom');
   const elCardsFront = document.getElementById('dictCardsFront');
   const btnCardsPrev = document.getElementById('dictCardsPrev');
@@ -1956,6 +1988,117 @@ function dictFilenameForSection(sectionName){
     elDictCountBadge.textContent = `words: ${dictWordsAll.length}`;
   }
 
+  function dictShowFirstPick(){
+    if(elDictFirstPick) elDictFirstPick.hidden = false;
+    if(elDictSubtabsWrap) elDictSubtabsWrap.hidden = true;
+    if(elFirstPickSearch){
+      elFirstPickSearch.value = '';
+      renderFirstPickUI();
+      try{ elFirstPickSearch.focus({ preventScroll:true }); }catch(_){}
+    }else{
+      renderFirstPickUI();
+    }
+  }
+
+  function dictOpenConstructorFromPick(){
+    if(elDictFirstPick) elDictFirstPick.hidden = true;
+    if(elDictSubtabsWrap) elDictSubtabsWrap.hidden = false;
+    dictSetSubtab('builder');
+    renderWordsUI();
+  }
+
+  function dictEnterSection(sectionValue, startTab){
+    const v = String(sectionValue || '').trim();
+    if(!v) return;
+
+    if(elSectionCards) elSectionCards.value = v;
+    if(elSectionQuiz) elSectionQuiz.value = v;
+    if(elSectionBuilder && v !== 'All') elSectionBuilder.value = v;
+
+    if(elDictFirstPick) elDictFirstPick.hidden = true;
+    if(elDictSubtabsWrap) elDictSubtabsWrap.hidden = false;
+
+    if(startTab === 'quiz'){
+      dictSetSubtab('quiz');
+      dictResetQuiz();
+      return;
+    }
+    if(startTab === 'builder'){
+      dictSetSubtab('builder');
+      renderWordsUI();
+      return;
+    }
+
+    dictSetSubtab('cards');
+    dictResetCards();
+  }
+
+  function renderFirstPickUI(){
+    if(!elFirstPickList) return;
+
+    const q = String(elFirstPickSearch && elFirstPickSearch.value || '').trim().toLowerCase();
+
+    const items = [];
+    items.push({ sid:'All', name:'All (все разделы)', count: dictWordsAll.length });
+
+    dictSections
+      .slice()
+      .sort((a,b)=> a.name.localeCompare(b.name, 'ru'))
+      .forEach((s)=>{
+        const sid = String(s.id);
+        const count = dictCounts.get(Number(s.id)) || 0;
+        items.push({ sid, name:s.name, count });
+      });
+
+    const filtered = items.filter(it => !q || String(it.name).toLowerCase().includes(q));
+
+    elFirstPickList.innerHTML = '';
+    if(!filtered.length){
+      const li = document.createElement('li');
+      li.innerHTML = `<p class="ik-itemline"><b>ничего не найдено</b></p>`;
+      elFirstPickList.appendChild(li);
+      return;
+    }
+
+    for(const it of filtered){
+      const li = document.createElement('li');
+      li.className = 'is-clickable';
+
+      const left = document.createElement('div');
+      left.innerHTML = `<p class="ik-itemline"><b>${escapeHTML(it.name)}</b> <span class="ik-muted">(${it.count})</span></p>`;
+
+      const right = document.createElement('div');
+      right.className = 'ik-mini';
+
+      const btnCards = document.createElement('button');
+      btnCards.className = 'ik-btn ik-btn--black';
+      btnCards.type = 'button';
+      btnCards.textContent = 'cards';
+      btnCards.addEventListener('click', (e)=>{
+        e.stopPropagation();
+        dictEnterSection(it.sid, 'cards');
+      });
+
+      const btnLearn = document.createElement('button');
+      btnLearn.className = 'ik-btn';
+      btnLearn.type = 'button';
+      btnLearn.textContent = 'learn';
+      btnLearn.addEventListener('click', (e)=>{
+        e.stopPropagation();
+        dictEnterSection(it.sid, 'quiz');
+      });
+
+      right.appendChild(btnCards);
+      right.appendChild(btnLearn);
+
+      li.appendChild(left);
+      li.appendChild(right);
+      li.addEventListener('click', ()=> dictEnterSection(it.sid, 'cards'));
+
+      elFirstPickList.appendChild(li);
+    }
+  }
+
   function renderSectionsUI(){
     const opts = [];
     for(const s of dictSections){
@@ -1967,6 +2110,12 @@ function dictFilenameForSection(sectionName){
     function fillSelect(sel, includeAll){
       const prev = sel.value;
       sel.innerHTML = '';
+
+      const ph = document.createElement('option');
+      ph.value = '';
+      ph.textContent = 'choose section...';
+      sel.appendChild(ph);
+
       if(includeAll){
         const o = document.createElement('option');
         o.value = 'All';
@@ -1979,16 +2128,19 @@ function dictFilenameForSection(sectionName){
         o.textContent = odef.label;
         sel.appendChild(o);
       }
+
       if(prev && Array.from(sel.options).some(o => o.value === prev)){
         sel.value = prev;
       }else{
-        sel.value = includeAll ? (opts[0] ? opts[0].value : 'All') : (opts[0] ? opts[0].value : '');
+        sel.value = '';
       }
     }
 
     fillSelect(elSectionCards, true);
     fillSelect(elSectionQuiz, true);
     fillSelect(elSectionBuilder, false);
+
+    renderFirstPickUI();
 
     elSectionList.innerHTML = '';
     if(!dictSections.length){
@@ -2030,8 +2182,11 @@ function dictFilenameForSection(sectionName){
   }
 
   function wordsForSelection(value){
-    if(value === 'All') return [...dictWordsAll];
-    const sid = Number(value);
+    const v = String(value || '').trim();
+    if(!v) return [];
+    if(v === 'All') return [...dictWordsAll];
+    const sid = Number(v);
+    if(!sid) return [];
     return dictWordsAll.filter(w => Number(w.sectionId) === sid);
   }
 
@@ -2103,8 +2258,14 @@ function dictFilenameForSection(sectionName){
     cardsSetFlipped(false);
 
     if(!item){
-      elCardFront.textContent = 'нет слов';
-      elCardBack.textContent = 'добавь слова в constructor';
+      const sel = String((elSectionCards && elSectionCards.value) || '').trim();
+      if(!sel){
+        elCardFront.textContent = 'выбери section';
+        elCardBack.textContent = 'сначала выбери раздел';
+      }else{
+        elCardFront.textContent = 'нет слов';
+        elCardBack.textContent = 'добавь слова в constructor';
+      }
       elCardFrontLang.textContent = '';
       elCardBackLang.textContent = '';
       elCardsMeta.textContent = '';
@@ -2167,7 +2328,7 @@ function dictFilenameForSection(sectionName){
   }
 
   function dictResetCards(){
-    cardsDeck = wordsForSelection(elSectionCards.value || 'All');
+    cardsDeck = wordsForSelection(elSectionCards.value);
     cardsHistory = [];
     cardsPos = -1;
     cardsSeq = -1;
@@ -2211,11 +2372,18 @@ function dictFilenameForSection(sectionName){
     elQuizInput.value = '';
 
     if(!quizCurrent){
-      elQuizFront.textContent = 'нет слов';
-      elQuizBack.textContent = 'добавь слова в constructor';
+      const sel = String((elSectionQuiz && elSectionQuiz.value) || '').trim();
+      if(!sel){
+        elQuizFront.textContent = 'выбери section';
+        elQuizBack.textContent = 'сначала выбери раздел';
+        quizSetFeedback('idle', 'pick', 'сначала выбери section');
+      }else{
+        elQuizFront.textContent = 'нет слов';
+        elQuizBack.textContent = 'добавь слова в constructor';
+        quizSetFeedback('idle', 'empty', 'добавь слова в constructor');
+      }
       elQuizFrontLang.textContent = '';
       elQuizBackLang.textContent = '';
-      quizSetFeedback('idle', 'empty', 'добавь слова и выбери section');
       setQuizMode('check');
       return;
     }
@@ -2241,7 +2409,7 @@ function dictFilenameForSection(sectionName){
   }
 
   function dictResetQuiz(){
-    quizDeck = wordsForSelection(elSectionQuiz.value || 'All');
+    quizDeck = wordsForSelection(elSectionQuiz.value);
     quizQueue = shuffle(quizDeck);
     quizTotal = 0;
     quizCorrect = 0;
@@ -2598,10 +2766,11 @@ if(sync.okFiles.length){
 
       await dictRefreshAll();
       renderWordsUI();
-      dictResetCards();
-      dictResetQuiz();
 
-      quizSetFeedback('idle', 'ready', 'введи перевод и нажми check');
+      dictShowFirstPick();
+      cardsShow(null, 'en');
+      quizShow(null);
+      quizSetFeedback('idle', 'pick', 'выбери section');
     }catch(e){
       elDictDbStatus.textContent = 'failed';
       console.error(e);
@@ -2612,6 +2781,11 @@ if(sync.okFiles.length){
   dictTabCards.addEventListener('click', ()=> dictSetSubtab('cards'));
   dictTabQuiz.addEventListener('click', ()=> dictSetSubtab('quiz'));
   dictTabBuilder.addEventListener('click', ()=> dictSetSubtab('builder'));
+
+  if(btnCardsChooseSection) btnCardsChooseSection.addEventListener('click', dictShowFirstPick);
+  if(btnQuizChooseSection) btnQuizChooseSection.addEventListener('click', dictShowFirstPick);
+  if(btnFirstPickOpenConstructor) btnFirstPickOpenConstructor.addEventListener('click', dictOpenConstructorFromPick);
+  if(elFirstPickSearch) elFirstPickSearch.addEventListener('input', renderFirstPickUI);
 
   btnCardsPrev.addEventListener('click', cardsGoPrev);
   btnCardsNext.addEventListener('click', cardsGoNext);
