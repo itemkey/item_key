@@ -8,280 +8,7 @@
   <!-- Match main site look -->
   <link rel="stylesheet" href="../../assets/css/styles.css" />
 
-  <style>
-    html, body { background:#fff !important; background-image:none !important; filter:none !important; }
-    body::before, body::after, html::before, html::after { content:none !important; display:none !important; }
-    [class*="circle"], [class*="ring"], [class*="orb"], [class*="halo"], [class*="glow"] { display:none !important; }
-
-    body.page-learning{ min-height:100vh; display:flex; flex-direction:column; }
-    main.learn-stage{ flex:1 1 auto; padding:64px 16px 72px; }
-    .learn-wrap{ width:min(980px,100%); margin:0 auto; }
-
-    .ik-card{
-      border:2px solid #000; background:#fff;
-      box-shadow:0 0 0 6px rgba(0,0,0,0.06);
-      border-radius:0; position:relative;
-    }
-    .ik-card::before{
-      content:""; position:absolute; inset:-2px; pointer-events:none;
-      background:
-        linear-gradient(90deg, rgba(0,0,0,0.12), rgba(0,0,0,0)),
-        repeating-linear-gradient(0deg, rgba(0,0,0,0.08) 0 1px, rgba(0,0,0,0) 1px 5px);
-      mix-blend-mode:multiply; opacity:.18;
-    }
-    .ik-inner{ position:relative; padding:18px; }
-
-    .ik-title{
-      margin:0 0 10px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-weight:900; letter-spacing:.06em; text-transform:uppercase;
-      font-size:13px;
-    }
-    .ik-sub{
-      margin:0 0 8px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size:12px; opacity:.8; line-height:1.5;
-    }
-    .ik-footnote{
-      margin:8px 0 0;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size:11px; opacity:.75; line-height:1.45;
-    }
-
-    .ik-row{ display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
-    .ik-divider{ height:1px; background:rgba(0,0,0,0.14); margin:14px 0; }
-    .ik-spacer{ flex: 1 1 auto; }
-
-    .ik-tabs{ display:flex; gap:10px; flex-wrap:wrap; margin:0 0 12px; }
-    .ik-tab{
-      appearance:none; border:2px solid #000;
-      background:#fff; color:#000;
-      padding:10px 14px; border-radius:0;
-      cursor:pointer;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-weight:900; letter-spacing:.04em; text-transform:uppercase;
-      font-size:12px; user-select:none;
-    }
-    .ik-tab[aria-selected="true"]{ background:#000; color:#fff; }
-    .ik-tab:active{ transform:translateY(1px); }
-
-    .ik-pill{
-      display:inline-flex; align-items:center; gap:8px;
-      border:2px solid #000; padding:8px 10px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-weight:900; letter-spacing:.04em; text-transform:uppercase;
-      font-size:12px;
-    }
-
-    .ik-btn{
-      appearance:none; border:2px solid #000; background:#fff; color:#000;
-      padding:10px 14px; border-radius:0; cursor:pointer;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-weight:900; letter-spacing:.04em; text-transform:uppercase;
-      font-size:12px;
-    }
-    .ik-btn.ik-btn--black{ background:#000; color:#fff; }
-    .ik-btn:hover{ transform:translateY(-1px); }
-    .ik-btn:active{ transform:translateY(0); }
-    .ik-btn[disabled]{ opacity:.55; cursor:not-allowed; transform:none !important; }
-
-    .ik-input, .ik-select{
-      border:2px solid #000; border-radius:0; background:#fff;
-      padding:10px 12px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size:13px; outline:none; min-width:240px;
-      transition: background-color .12s ease-out;
-    }
-    .ik-input:focus, .ik-select:focus{ box-shadow:0 0 0 4px rgba(0,0,0,0.10); }
-    .ik-input.is-ok{ background: rgba(0, 180, 60, 0.14); }
-    .ik-input.is-bad{ background: rgba(220, 20, 60, 0.14); }
-
-    .ik-label{
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size:12px; opacity:.85; margin:0;
-    }
-
-    .ik-ex{ border:2px solid #000; padding:16px; background:#fff; }
-    .ik-prompt{
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-weight:900; letter-spacing:.04em; text-transform:uppercase;
-      font-size:12px; margin:0 0 6px;
-    }
-
-    .ik-wordbar{
-      display:flex;
-      align-items:flex-end;
-      justify-content:space-between;
-      gap:12px;
-      flex-wrap:wrap;
-    }
-    .ik-word{
-      font-family: ui-serif, "Times New Roman", Georgia, serif;
-      font-weight:900;
-      font-size:clamp(30px, 5.2vw, 52px);
-      margin:0; line-height:1.05;
-    }
-    .ik-ru{
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size:12px; opacity:.78; margin:6px 0 0;
-    }
-
-    .ik-badge{
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size:11px; border:2px solid #000; padding:6px 8px;
-      text-transform:uppercase; letter-spacing:.04em; font-weight:900; opacity:.9;
-    }
-    .ik-muted{ opacity:.72; }
-
-    .ik-top-actions{
-      display:flex; justify-content:space-between; align-items:center;
-      gap:10px; flex-wrap:wrap; margin-bottom:12px;
-    }
-    .ik-back{ display:inline-flex; align-items:center; gap:8px; text-decoration:none; }
-
-    .ik-feedback{
-      border:2px solid #000;
-      background:#fff;
-      padding:12px;
-      display:flex;
-      gap:12px;
-      align-items:flex-start;
-    }
-    .ik-feedback__stamp{
-      border:2px solid #000;
-      padding:6px 10px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-weight:900; letter-spacing:.04em; text-transform:uppercase;
-      font-size:12px;
-      user-select:none;
-      white-space:nowrap;
-    }
-    .ik-feedback__line{
-      margin:0;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size:12px; line-height:1.5;
-    }
-    .ik-feedback[data-state="idle"] .ik-feedback__stamp{ background:#fff; color:#000; }
-    .ik-feedback[data-state="correct"] .ik-feedback__stamp{ background:#000; color:#fff; }
-    .ik-feedback[data-state="wrong"] .ik-feedback__stamp{ background:#fff; color:#000; }
-
-    .ik-rule{
-      border:2px solid #000;
-      padding:12px;
-      background:#fff;
-      display:none;
-      margin-top:12px;
-    }
-    .ik-rule.is-open{ display:block; }
-    .ik-chips{ display:flex; flex-wrap:wrap; gap:8px; }
-    .ik-chip{
-      border:2px solid #000;
-      padding:6px 8px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-weight:900;
-      font-size:11px;
-      letter-spacing:.04em;
-      text-transform:uppercase;
-    }
-
-    .ik-list{
-      border:2px solid #000; background:#fff;
-      padding:0; margin:0; list-style:none;
-      max-height:420px; overflow:auto;
-    }
-    .ik-list li{
-      display:flex; justify-content:space-between; align-items:flex-start;
-      gap:10px;
-      padding:10px 12px;
-      border-top:1px solid rgba(0,0,0,0.14);
-    }
-    .ik-list li:first-child{ border-top:none; }
-    .ik-list li.is-clickable{ cursor:pointer; }
-    .ik-list li.is-clickable:hover{ background: rgba(0,0,0,0.04); }
-    .ik-itemline{
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size:12px; line-height:1.35; margin:0;
-    }
-    .ik-itemline b{ font-weight:900; }
-    .ik-mini{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
-
-    @media (prefers-reduced-motion: no-preference){
-      .ik-shake{ animation: ikshake .28s linear; }
-      @keyframes ikshake{
-        0%{ transform: translateX(0); }
-        25%{ transform: translateX(-3px); }
-        50%{ transform: translateX(3px); }
-        75%{ transform: translateX(-2px); }
-        100%{ transform: translateX(0); }
-      }
-      .ik-pop{ animation: ikpop .18s ease-out; }
-      @keyframes ikpop{
-        from{ transform: scale(0.985); }
-        to{ transform: scale(1); }
-      }
-    }
-
-
-    /* -----------------------------
-       Dictionary flip cards
-       ----------------------------- */
-    .ik-flip-stage{ perspective: 1200px; -webkit-perspective: 1200px; }
-    .ik-flip-card{
-      width:100%;
-      max-width:860px;
-      height:300px;
-      margin:0 auto;
-      position:relative;
-      cursor:pointer;
-      user-select:none;
-    }
-    .ik-flip-card:focus{ outline:none; box-shadow:0 0 0 4px rgba(0,0,0,0.10); }
-
-    .ik-flip-inner{
-      position:absolute;
-      inset:0;
-      transform-style:preserve-3d;
-      -webkit-transform-style:preserve-3d;
-      transition: transform .48s cubic-bezier(.2,.8,.2,1);
-    }
-    .ik-flip-card.is-flipped .ik-flip-inner{ transform: rotateY(180deg); -webkit-transform: rotateY(180deg); }
-
-    .ik-flip-face{
-      position:absolute;
-      inset:0;
-      backface-visibility:hidden;
-      -webkit-backface-visibility:hidden;
-      border:2px solid #000;
-      background:#fff;
-      box-shadow:0 0 0 6px rgba(0,0,0,0.06);
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      padding:18px;
-      text-align:center;
-    }
-    .ik-flip-face::before{
-      content:"";
-      position:absolute;
-      inset:-2px;
-      pointer-events:none;
-      background:
-        linear-gradient(90deg, rgba(0,0,0,0.12), rgba(0,0,0,0)),
-        repeating-linear-gradient(0deg, rgba(0,0,0,0.08) 0 1px, rgba(0,0,0,0) 1px 5px);
-      mix-blend-mode:multiply;
-      opacity:.16;
-    }
-    .ik-flip-face > *{ position:relative; }
-
-    .ik-flip-front{ transform: rotateY(0deg) translateZ(0.1px); -webkit-transform: rotateY(0deg) translateZ(0.1px); }
-    .ik-flip-back{ transform: rotateY(180deg) translateZ(0.1px); -webkit-transform: rotateY(180deg) translateZ(0.1px); }
-
-    @media (prefers-reduced-motion: reduce){
-      .ik-flip-inner{ transition:none; }
-    }
-
-  </style>
+  <link rel="stylesheet" href="./student_helper.css" />
 </head>
 
 <body class="page page-learning">
@@ -302,18 +29,56 @@
           <span>назад в index</span>
         </a>
 
+        <button class="ik-btn" id="shHomeBtn" type="button" title="Главное меню">меню</button>
+
         <span class="ik-pill" title="Локальная база IndexedDB (в браузере)">
           <span>db</span>
           <span id="dbStatus" class="ik-muted">...</span>
         </span>
       </div>
 
-      <section class="ik-card" aria-label="Меню обучения">
+      <section id="shLobby" class="ik-card sh-lobby" aria-label="Главное меню">
+        <div class="ik-inner">
+          <p class="ik-title">student helper</p>
+          <p class="ik-sub">выбери раздел, чтобы начать</p>
+
+          <div class="sh-grid" role="list">
+            <button class="sh-tile" id="shGoDict" type="button" role="listitem" aria-label="Открыть dictionary">
+              <div class="sh-tile__head">dictionary</div>
+              <div class="sh-tile__body">карточки, practice, learn, constructor</div>
+              <div class="sh-tile__foot">перейти</div>
+            </button>
+
+            <button class="sh-tile" id="shGoStruct" type="button" role="listitem" aria-label="Открыть structure">
+              <div class="sh-tile__head">structure</div>
+              <div class="sh-tile__body">грамматика: правила + практика</div>
+              <div class="sh-tile__foot">перейти</div>
+            </button>
+
+            <button class="sh-tile" id="shGoWT" type="button" role="listitem" aria-label="Открыть word transformation">
+              <div class="sh-tile__head">word transformation</div>
+              <div class="sh-tile__body">practice и constructor для word forms</div>
+              <div class="sh-tile__foot">перейти</div>
+            </button>
+          </div>
+
+          <div class="ik-divider"></div>
+
+          <div class="ik-row sh-lobby-row">
+            <button class="ik-btn" id="shContinue" type="button" hidden>продолжить</button>
+            <span class="ik-spacer" aria-hidden="true"></span>
+            <p class="ik-footnote sh-lobby-note">можно вернуться сюда кнопкой "меню" сверху</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="shApp" class="ik-card" aria-label="Меню обучения" hidden>
         <div class="ik-inner">
           <p class="ik-title">обучение</p>
 
           <div class="ik-tabs" role="tablist" aria-label="Разделы">
             <button class="ik-tab" id="tab-dict" role="tab" aria-selected="false" aria-controls="panel-dict" type="button">dictionary</button>
+            <button class="ik-tab" id="tab-struct" role="tab" aria-selected="false" aria-controls="panel-struct" type="button">structure</button>
             <button class="ik-tab" id="tab-wt" role="tab" aria-selected="true" aria-controls="panel-wt" type="button">word transformation</button>
           </div>
 
@@ -345,14 +110,15 @@
 
               <ul class="ik-list" id="dictFirstPickList" aria-label="Список разделов"></ul>
 
-              <p class="ik-footnote">подсказка: позже можно сменить раздел через кнопку "разделы" в cards/learn</p>
+              <p class="ik-footnote">подсказка: позже можно сменить раздел через кнопку "разделы" в cards</p>
             </section>
 
             <div id="dictSubtabsWrap" hidden>
             <div class="ik-tabs" role="tablist" aria-label="Режимы dictionary">
               <button class="ik-tab" id="dict-tab-cards" role="tab" aria-selected="true" aria-controls="dict-panel-cards" type="button">cards</button>
-              <button class="ik-tab" id="dict-tab-quiz" role="tab" aria-selected="false" aria-controls="dict-panel-quiz" type="button">learn</button>
-              <button class="ik-tab" id="dict-tab-builder" role="tab" aria-selected="false" aria-controls="dict-panel-builder" type="button">constructor</button>
+              <button class="ik-tab" id="dict-tab-quiz" role="tab" aria-selected="false" aria-controls="dict-panel-quiz" type="button">practice</button>
+                            <button class="ik-tab" id="dict-tab-learn" role="tab" aria-selected="false" aria-controls="dict-panel-learn" type="button">learn</button>
+<button class="ik-tab" id="dict-tab-builder" role="tab" aria-selected="false" aria-controls="dict-panel-builder" type="button">constructor</button>
             </div>
 
             <!-- CARDS -->
@@ -406,20 +172,19 @@
               </section>
             </div>
 
-            <!-- QUIZ -->
+            <!-- PRACTICE -->
             <div id="dict-panel-quiz" role="tabpanel" aria-labelledby="dict-tab-quiz" hidden>
-              <section class="ik-ex" aria-label="Заучивание">
-                <p class="ik-title">заучивание</p>
+              <section class="ik-ex" aria-label="Практика">
+                <p class="ik-title">практика</p>
 
                 <div class="ik-row">
-                  <label class="ik-label" for="dictQuizMode">спросить</label>
+                  <label class="ik-label" for="dictQuizMode">направление</label>
                   <select class="ik-select" id="dictQuizMode" style="min-width: 180px;">
-                    <option value="en">только англ</option>
-                    <option value="ru">только рус</option>
-                    <option value="mix">mix</option>
-                  </select>
+                    <option value="en">EN -> RU</option><option value="ru">RU -> EN</option><option value="mix">mix</option><option value="weak">по слабым</option></select>
 
                   <span class="ik-badge" id="dictQuizScore">0/0</span>
+
+                  <button class="ik-btn" id="dictPracticeSettingsBtn" type="button" title="Настройки practice">⚙</button>
 
                   <span class="ik-spacer" aria-hidden="true"></span>
 
@@ -428,7 +193,32 @@
                   <button class="ik-btn" id="dictQuizChooseSection" type="button" title="Выбрать раздел">разделы</button>
                 </div>
 
-                <div class="ik-divider"></div>
+                <div id="dictPracticeSettings" style="display:none; margin: 10px 0 6px 0;">
+  <div class="ik-row" style="gap:12px; flex-wrap:wrap;">
+    <label class="ik-label" for="dictPracticeSession">сессия</label>
+    <select class="ik-select" id="dictPracticeSession" style="min-width: 120px;">
+      <option value="10">10</option>
+      <option value="20" selected>20</option>
+      <option value="50">50</option>
+      <option value="all">all</option>
+    </select>
+    <label class="ik-label" style="display:flex; align-items:center; gap:8px;">
+      <input type="checkbox" id="dictPracticeTypos" checked />
+      опечатки
+    </label>
+    <label class="ik-label" style="display:flex; align-items:center; gap:8px;">
+      <input type="checkbox" id="dictPracticeIgnoreTo" checked />
+      "to" не обяз.
+    </label>
+    <label class="ik-label" style="display:flex; align-items:center; gap:8px;">
+      <input type="checkbox" id="dictPracticeIgnoreArticles" checked />
+      артикли не обяз.
+    </label>
+  </div>
+  <p class="ik-footnote" style="margin-top:6px;">настройки сохраняются в браузере</p>
+</div>
+
+<div class="ik-divider"></div>
 
                 <p class="ik-prompt" id="dictQuizPromptLabel">переведи</p>
 
@@ -450,21 +240,150 @@
                 <div class="ik-row" style="margin-top:12px;">
                   <input class="ik-input" id="dictQuizInput" type="text" autocomplete="off" spellcheck="false" placeholder="Ответ" />
                   <button class="ik-btn ik-btn--black" id="dictQuizCheckNext" type="button" title="Check (Enter)">check</button>
-                  <button class="ik-btn" id="dictQuizSkip" type="button" title="Пропустить (не считается)">skip</button>
+                  <button class="ik-btn" id="dictPracticeHint" type="button" title="Подсказка">hint</button>
+                  <button class="ik-btn" id="dictQuizSkip" type="button" title="Показать ответ (считается ошибкой)">сдаюсь</button>
                 </div>
 
                 <div class="ik-divider"></div>
 
                 <div class="ik-feedback" id="dictQuizFeedback" data-state="idle" aria-live="polite">
                   <div class="ik-feedback__stamp" id="dictQuizStamp">ready</div>
-                  <p class="ik-feedback__line" id="dictQuizLine">введи перевод и нажми check</p>
+                  
+                <div class="ik-row" id="dictPracticeFuzzyActions" style="display:none; justify-content:center; gap:10px; margin-top:10px;">
+                  <button class="ik-btn ik-btn--black" id="dictPracticeFuzzyAccept" type="button">засчитать</button>
+                  <button class="ik-btn" id="dictPracticeFuzzyReject" type="button">не засчитывать</button>
+                </div>
+<p class="ik-feedback__line" id="dictQuizLine">введи перевод и нажми check</p>
                 </div>
 
-                <p class="ik-footnote">правило: если ответ неверный - переписать нельзя, только далее. неверные слова вернутся через пару карточек.</p>
+                <p class="ik-footnote">правило: после проверки переписать нельзя - только далее. неверные слова вернутся через пару заданий.</p>
               </section>
             </div>
 
-            <!-- BUILDER -->
+            
+            <!-- LEARN -->
+            <div id="dict-panel-learn" role="tabpanel" aria-labelledby="dict-tab-learn" hidden>
+              <section class="ik-ex" aria-label="Заучивание">
+                <p class="ik-title">заучивание</p>
+
+                <div class="ik-row">
+                  <span class="ik-badge" id="dictLearnProgress">0/0</span>
+
+                  <button class="ik-btn" id="dictLearnSettingsBtn" type="button" title="Настройки learn">⚙</button>
+
+                  <span class="ik-spacer" aria-hidden="true"></span>
+
+                  <label class="ik-label" for="dictSectionLearn">section</label>
+                  <select class="ik-select" id="dictSectionLearn" style="min-width: 260px;"></select>
+                  <button class="ik-btn" id="dictLearnChooseSection" type="button" title="Выбрать раздел">разделы</button>
+                </div>
+
+                <div id="dictLearnSettings" style="display:none; margin: 10px 0 6px 0;">
+                  <div class="ik-row" style="gap:12px; flex-wrap:wrap;">
+                    <label class="ik-label" for="dictLearnSource">источник</label>
+                    <select class="ik-select" id="dictLearnSource" style="min-width: 180px;">
+                      <option value="new" selected>новые</option>
+                      <option value="due">пора повторить</option>
+                      <option value="weak">слабые</option>
+                      <option value="all">все</option>
+                    </select>
+
+                    <label class="ik-label" for="dictLearnPortion">порция</label>
+                    <select class="ik-select" id="dictLearnPortion" style="min-width: 120px;">
+                      <option value="5">5</option>
+                      <option value="8" selected>8</option>
+                      <option value="10">10</option>
+                      <option value="12">12</option>
+                    </select>
+
+                    <label class="ik-label" for="dictLearnDir">направление</label>
+                    <select class="ik-select" id="dictLearnDir" style="min-width: 180px;">
+                      <option value="ru" selected>RU -> EN</option>
+                      <option value="en">EN -> RU</option>
+                      <option value="mix">mix</option>
+                      <option value="weak">по слабым</option>
+                    </select>
+
+                    <label class="ik-label" for="dictLearnGoal">цель</label>
+                    <select class="ik-select" id="dictLearnGoal" style="min-width: 180px;">
+                      <option value="fast" selected>быстро запомнить</option>
+                      <option value="long">закрепить надолго</option>
+                    </select>
+
+                    <label class="ik-label" for="dictLearnStrict">строгость</label>
+                    <select class="ik-select" id="dictLearnStrict" style="min-width: 140px;">
+                      <option value="soft" selected>мягко</option>
+                      <option value="strict">строго</option>
+                    </select>
+
+                    <label class="ik-label" style="display:flex; align-items:center; gap:8px;">
+                      <input type="checkbox" id="dictLearnTypos" checked />
+                      опечатки
+                    </label>
+
+                    <label class="ik-label" style="display:flex; align-items:center; gap:8px;">
+                      <input type="checkbox" id="dictLearnForms" checked />
+                      формы (EN)
+                    </label>
+
+                    <label class="ik-label" style="display:flex; align-items:center; gap:8px;">
+                      <input type="checkbox" id="dictLearnIgnoreTo" checked />
+                      "to" не обяз.
+                    </label>
+
+                    <label class="ik-label" style="display:flex; align-items:center; gap:8px;">
+                      <input type="checkbox" id="dictLearnIgnoreArticles" checked />
+                      артикли не обяз.
+                    </label>
+
+                    <label class="ik-label" style="display:flex; align-items:center; gap:8px;">
+                      <input type="checkbox" id="dictLearnHints" checked />
+                      подсказки
+                    </label>
+
+                    <button class="ik-btn ik-btn--black" id="dictLearnRestart" type="button" title="Начать заново">start</button>
+                  </div>
+                  <p class="ik-footnote" style="margin-top:6px;">заучивание: быстрый показ -> ввод -> умные повторы</p>
+                </div>
+
+                <div class="ik-divider"></div>
+
+                <p class="ik-prompt" id="dictLearnPromptLabel">...</p>
+
+                <div class="ik-flip-stage" aria-label="Learn card">
+                  <div class="ik-flip-card" id="dictLearnCard" tabindex="0" role="button" aria-pressed="false" title="Нажми чтобы перевернуть (после проверки)">
+                    <div class="ik-flip-inner">
+                      <div class="ik-flip-face ik-flip-front">
+                        <p class="ik-word" id="dictLearnFront">...</p>
+                        <p class="ik-sub ik-muted" id="dictLearnFrontLang">...</p>
+                      </div>
+                      <div class="ik-flip-face ik-flip-back">
+                        <p class="ik-word" id="dictLearnBack">...</p>
+                        <p class="ik-sub ik-muted" id="dictLearnBackLang">...</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="ik-row" id="dictLearnAnswerRow" style="margin-top:12px;">
+                  <input class="ik-input" id="dictLearnInput" type="text" autocomplete="off" spellcheck="false" placeholder="Введите перевод..." />
+                  <button class="ik-btn ik-btn--black" id="dictLearnCheckNext" type="button" title="Check (Enter)">check</button>
+                  <button class="ik-btn" id="dictLearnHint" type="button" title="Подсказка">hint</button>
+                  <button class="ik-btn" id="dictLearnGiveUp" type="button" title="Показать ответ (считается ошибкой)">сдаюсь</button>
+                </div>
+
+                <div class="ik-divider"></div>
+
+                <div class="ik-feedback" id="dictLearnFeedback" data-state="idle" aria-live="polite">
+                  <div class="ik-feedback__stamp" id="dictLearnStamp">ready</div>
+                  <p class="ik-feedback__line" id="dictLearnLine">нажми start или выбери section</p>
+                </div>
+
+                <p class="ik-footnote">слово считается выученным в сессии, если 2 раза подряд ответил верно без подсказок и между ответами было хотя бы 10 заданий.</p>
+              </section>
+            </div>
+
+<!-- BUILDER -->
             <div id="dict-panel-builder" role="tabpanel" aria-labelledby="dict-tab-builder" hidden>
               <section class="ik-ex" aria-label="Конструктор dictionary">
                 <p class="ik-title">разделы</p>
@@ -519,7 +438,68 @@
 
           </div>
 
-          <div id="panel-wt" role="tabpanel" aria-labelledby="tab-wt">
+          
+          <div id="panel-struct" role="tabpanel" aria-labelledby="tab-struct" hidden>
+            <div class="ik-row">
+              <span class="ik-badge" id="structCountBadge">structures: 0</span>
+              <span class="ik-spacer" aria-hidden="true"></span>
+              <span class="ik-pill" title="Прогресс хранится в браузере (localStorage)">
+                <span>structure</span>
+                <span id="structStatus" class="ik-muted">ready</span>
+              </span>
+            </div>
+
+            <div class="ik-divider"></div>
+
+            <!-- LIST -->
+            <section class="ik-ex" id="structListView" aria-label="Structure list">
+              <p class="ik-title">structure</p>
+              <p class="ik-sub">выбери грамматическую тему</p>
+
+              <ul class="ik-list" id="structList" aria-label="Список структур"></ul>
+
+              <p class="ik-footnote">структуры - это мини-курсы: правило + практика + прогресс</p>
+            </section>
+
+            <!-- DETAIL -->
+            <section class="ik-ex" id="structDetailView" aria-label="Structure detail" hidden>
+              <div class="ik-row">
+                <button class="ik-btn" id="structBackToList" type="button">назад</button>
+                <span class="ik-spacer" aria-hidden="true"></span>
+                <span class="ik-badge" id="structMasteryBadge">mastery 0/5</span>
+              </div>
+
+              <div class="ik-divider"></div>
+
+              <div class="ik-row" style="align-items:flex-end;">
+                <div>
+                  <p class="ik-title" id="structTitle">...</p>
+                  <p class="ik-sub" id="structSubtitle">...</p>
+                </div>
+                <span class="ik-spacer" aria-hidden="true"></span>
+                <button class="ik-btn ik-btn--black" id="structStartPracticeTop" type="button">start practice</button>
+              </div>
+
+              <div class="ik-divider"></div>
+
+              <div class="ik-tabs" role="tablist" aria-label="Structure tabs">
+                <button class="ik-tab" id="struct-tab-rule" role="tab" aria-selected="true" aria-controls="struct-panel-rule" type="button">rule</button>
+                <button class="ik-tab" id="struct-tab-practice" role="tab" aria-selected="false" aria-controls="struct-panel-practice" type="button">practice</button>
+              </div>
+
+              <!-- RULE -->
+              <div id="struct-panel-rule" role="tabpanel" aria-labelledby="struct-tab-rule">
+                <div id="structRuleBody" class="sh-struct-rule" aria-label="Rule content"></div>
+              </div>
+
+              <!-- PRACTICE -->
+              <div id="struct-panel-practice" role="tabpanel" aria-labelledby="struct-tab-practice" hidden>
+                <div id="structPracticeBody" class="sh-struct-practice" aria-label="Practice content"></div>
+              </div>
+            </section>
+          </div>
+
+<div id="panel-wt" role="tabpanel" aria-labelledby="tab-wt">
             <div class="ik-row">
               <label class="ik-label" for="transformType">тип</label>
               <select class="ik-select" id="transformType" style="min-width: 260px;">
@@ -666,2271 +646,11 @@
     <span class="hint">pre-alpha</span>
   </footer>
 
-  <script>
-  // -----------------------------
-  // Tabs
-  // -----------------------------
-  (function(){
-    const tabDict = document.getElementById('tab-dict');
-    const tabWT   = document.getElementById('tab-wt');
-    const panelDict = document.getElementById('panel-dict');
-    const panelWT   = document.getElementById('panel-wt');
-
-    function setTab(which){
-      const isDict = which === 'dict';
-      tabDict.setAttribute('aria-selected', String(isDict));
-      tabWT.setAttribute('aria-selected', String(!isDict));
-      panelDict.hidden = !isDict;
-      panelWT.hidden   = isDict;
-    }
-    tabDict.addEventListener('click', ()=> setTab('dict'));
-    tabWT.addEventListener('click', ()=> setTab('wt'));
-  })();
-
-  (function(){
-    const a = document.getElementById('subtab-practice');
-    const b = document.getElementById('subtab-builder');
-    const pa = document.getElementById('panel-practice');
-    const pb = document.getElementById('panel-builder');
-
-    function set(which){
-      const isA = which === 'practice';
-      a.setAttribute('aria-selected', String(isA));
-      b.setAttribute('aria-selected', String(!isA));
-      pa.hidden = !isA;
-      pb.hidden = isA;
-    }
-    a.addEventListener('click', ()=> set('practice'));
-    b.addEventListener('click', ()=> set('builder'));
-  })();
-
-  // -----------------------------
-  // IndexedDB
-  // -----------------------------
-  const DB_PREFIX = 'student_helper_db__';
-  const DB_VERSION = 4;
-  const STORE_TASKS = 'tasks';
-
-  const N2A_SUFFIX_FILE = 'db/word_transformation/student_helper_db__noun_to_adj_Suffixes.json';
-  const N2A_PREFIX_FILE = 'db/word_transformation/student_helper_db__noun_to_adj_Prefixes.json';
-
-  function idbSupported(){ return typeof indexedDB !== 'undefined'; }
-  function dbNameFor(type){ return `${DB_PREFIX}${type}`; }
-  function normalize(s){ return (s || '').trim().toLowerCase(); }
-  function normCategory(cat){
-    const c = String(cat || '').trim();
-    if(!c) return 'Suffixes';
-    const lc = c.toLowerCase();
-    if(lc === 'suffixes') return 'Suffixes';
-    if(lc === 'prefixes') return 'Prefixes';
-    if(lc === 'all') return 'All';
-    return c;
-  }
-  function makePairKey(t){
-    return `${normalize(t.en_noun)}|${normalize(t.en_adj)}|${normalize(t.type)}|${normalize(normCategory(t.category))}`;
-  }
-
-  function openDBForType(type){
-    return new Promise((resolve, reject)=>{
-      if(!idbSupported()){
-        reject(new Error('IndexedDB not supported'));
-        return;
-      }
-      const name = dbNameFor(type);
-      const req = indexedDB.open(name, DB_VERSION);
-
-      req.onupgradeneeded = (event)=>{
-        const db = req.result;
-        let store;
-
-        if(!db.objectStoreNames.contains(STORE_TASKS)){
-          store = db.createObjectStore(STORE_TASKS, { keyPath:'id', autoIncrement:true });
-        }else{
-          store = req.transaction.objectStore(STORE_TASKS);
-        }
-
-        if(!store.indexNames.contains('type')) store.createIndex('type', 'type', { unique:false });
-        if(!store.indexNames.contains('category')) store.createIndex('category', 'category', { unique:false });
-
-        // pairKey - we recreate to ensure correct uniqueness with category
-        if(store.indexNames.contains('pairKey')){
-          try{ store.deleteIndex('pairKey'); }catch(_){}
-        }
-        store.createIndex('pairKey', 'pairKey', { unique:true });
-
-        // migrate existing records: add category + pairKey
-        const cursorReq = store.openCursor();
-        cursorReq.onsuccess = (e)=>{
-          const cursor = e.target.result;
-          if(!cursor) return;
-
-          const v = cursor.value || {};
-          if(!v.type) v.type = type;
-          if(!v.category) v.category = 'Suffixes';
-          v.category = normCategory(v.category);
-
-          v.en_noun = normalize(v.en_noun);
-          v.en_adj  = normalize(v.en_adj);
-
-          v.pairKey = makePairKey(v);
-
-          cursor.update(v);
-          cursor.continue();
-        };
-      };
-
-      req.onsuccess = ()=> resolve(req.result);
-      req.onerror = ()=> reject(req.error || new Error('Failed to open DB'));
-    });
-  }
-
-  function tx(db, mode='readonly'){
-    return db.transaction([STORE_TASKS], mode).objectStore(STORE_TASKS);
-  }
-  function getAllTasks(db){
-    return new Promise((resolve, reject)=>{
-      const store = tx(db, 'readonly');
-      const req = store.getAll();
-      req.onsuccess = ()=> resolve(req.result || []);
-      req.onerror = ()=> reject(req.error || new Error('Failed to get tasks'));
-    });
-  }
-  function countAllTasks(db){
-    return new Promise((resolve, reject)=>{
-      const store = tx(db, 'readonly');
-      const req = store.count();
-      req.onsuccess = ()=> resolve(req.result || 0);
-      req.onerror = ()=> reject(req.error || new Error('Failed to count'));
-    });
-  }
-  function clearAll(db){
-    return new Promise((resolve, reject)=>{
-      const store = tx(db, 'readwrite');
-      const req = store.clear();
-      req.onsuccess = ()=> resolve(true);
-      req.onerror = ()=> reject(req.error || new Error('Failed to clear'));
-    });
-  }
-  function addTask(db, task){
-    const now = Date.now();
-    const payload = {
-      type: task.type,
-      category: normCategory(task.category),
-      en_noun: normalize(task.en_noun),
-      en_adj: normalize(task.en_adj),
-      ru_noun: String(task.ru_noun || '').trim(),
-      ru_adj: String(task.ru_adj || '').trim(),
-      createdAt: now,
-      updatedAt: now
-    };
-    payload.pairKey = makePairKey(payload);
-
-    return new Promise((resolve, reject)=>{
-      const store = tx(db, 'readwrite');
-      const req = store.add(payload);
-      req.onsuccess = ()=> resolve({ ok:true, id:req.result });
-      req.onerror = ()=> {
-        const err = req.error;
-        if(err && err.name === 'ConstraintError'){
-          resolve({ ok:false, skipped:true, reason:'duplicate' });
-          return;
-        }
-        reject(err || new Error('Failed to add task'));
-      };
-    });
-  }
-  function deleteTask(db, id){
-    return new Promise((resolve, reject)=>{
-      const store = tx(db, 'readwrite');
-      const req = store.delete(id);
-      req.onsuccess = ()=> resolve(true);
-      req.onerror = ()=> reject(req.error || new Error('Failed to delete task'));
-    });
-  }
-  function escapeHTML(str){
-    return String(str || '')
-      .replaceAll('&','&amp;')
-      .replaceAll('<','&lt;')
-      .replaceAll('>','&gt;')
-      .replaceAll('"','&quot;')
-      .replaceAll("'","&#039;");
-  }
-  function safeParseJSON(text){
-    try{ return { ok:true, data: JSON.parse(text) }; }
-    catch(e){ return { ok:false, error:e }; }
-  }
-
-  // -----------------------------
-  // Rules
-  // -----------------------------
-  const RULES = {
-    Suffixes: {
-      title: 'Suffixes (added to the end)',
-      chips: ['-ful','-less','-ous','-ive','-able','-ible','-al','-ical','-y','-ic']
-    },
-    Prefixes: {
-      title: '- Negative Prefixes (added to the start)',
-      chips: ['in- (general)','il- (before l)','im- (before m, p)','ir- (before r)','mis-']
-    }
-  };
-
-  const rulePanel = document.getElementById('rulePanel');
-  const ruleTitle = document.getElementById('ruleTitle');
-  const ruleBody = document.getElementById('ruleBody');
-
-  function renderRule(category){
-    const c = normCategory(category);
-    ruleBody.innerHTML = '';
-
-    if(c === 'All'){
-      ruleTitle.textContent = 'rules';
-
-      const topT = document.createElement('p');
-      topT.className = 'ik-sub';
-      topT.textContent = RULES.Suffixes.title;
-      ruleBody.appendChild(topT);
-
-      const chips1 = document.createElement('div');
-      chips1.className = 'ik-chips';
-      for(const s of RULES.Suffixes.chips){
-        const el = document.createElement('span');
-        el.className = 'ik-chip';
-        el.textContent = s;
-        chips1.appendChild(el);
-      }
-      ruleBody.appendChild(chips1);
-
-      const div = document.createElement('div');
-      div.className = 'ik-divider';
-      ruleBody.appendChild(div);
-
-      const botT = document.createElement('p');
-      botT.className = 'ik-sub';
-      botT.textContent = RULES.Prefixes.title;
-      ruleBody.appendChild(botT);
-
-      const chips2 = document.createElement('div');
-      chips2.className = 'ik-chips';
-      for(const s of RULES.Prefixes.chips){
-        const el = document.createElement('span');
-        el.className = 'ik-chip';
-        el.textContent = s;
-        chips2.appendChild(el);
-      }
-      ruleBody.appendChild(chips2);
-      return;
-    }
-
-    const def = RULES[c] || RULES.Suffixes;
-    ruleTitle.textContent = 'rule';
-
-    const t = document.createElement('p');
-    t.className = 'ik-sub';
-    t.textContent = def.title;
-    ruleBody.appendChild(t);
-
-    const chips = document.createElement('div');
-    chips.className = 'ik-chips';
-    for(const s of def.chips){
-      const el = document.createElement('span');
-      el.className = 'ik-chip';
-      el.textContent = s;
-      chips.appendChild(el);
-    }
-    ruleBody.appendChild(chips);
-  }
-
-  function toggleRule(){
-    const open = rulePanel.classList.toggle('is-open');
-    rulePanel.setAttribute('aria-hidden', String(!open));
-  }
-
-  // -----------------------------
-  // Import / Export
-  // -----------------------------
-  let db = null;
-
-  async function importFromObject(data, opts){
-    const type = (opts && opts.type) || 'noun_to_adj';
-    const replace = !!(opts && opts.replace);
-    const silent = !!(opts && opts.silent);
-    const defaultCategory = normCategory((opts && opts.defaultCategory) || data.category || 'Suffixes');
-
-    const list = Array.isArray(data && data.tasks) ? data.tasks : [];
-
-    if(replace){
-      await clearAll(db);
-    }
-
-    let added = 0;
-    let skipped = 0;
-
-    for(const t of list){
-      if(!t) continue;
-
-      const enNoun = normalize(t.en_noun);
-      const enAdj  = normalize(t.en_adj);
-      const ruNoun = String(t.ru_noun || '').trim();
-      const ruAdj  = String(t.ru_adj || '').trim();
-      const cat = normCategory(t.category || defaultCategory);
-
-      if(!enNoun || !enAdj || !ruNoun || !ruAdj) continue;
-
-      // eslint-disable-next-line no-await-in-loop
-      const res = await addTask(db, { type, category: cat, en_noun: enNoun, en_adj: enAdj, ru_noun: ruNoun, ru_adj: ruAdj });
-      if(res && res.ok) added += 1;
-      else skipped += 1;
-    }
-
-    if(!silent){
-      const mode = replace ? 'replace' : 'merge';
-      setFeedback('idle', 'import', `Импорт ${mode}: +${added}, skip ${skipped}`);
-    }
-    return { added, skipped };
-  }
-
-  function _uniq(arr){ return Array.from(new Set(arr)); }
-
-function _guessSiteRoots(){
-  const roots = [];
-  try{
-    const origin = location.origin;
-    roots.push(origin + '/');
-
-    // GitHub Pages project site: https://user.github.io/<repo>/
-    const parts = location.pathname.split('/').filter(Boolean);
-    if(location.hostname.endsWith('github.io') && parts.length >= 1){
-      roots.push(origin + '/' + parts[0] + '/');
-    }
-  }catch(_){/* ignore */}
-  return _uniq(roots);
-}
-
-function _buildUrlCandidates(relPath){
-  const raw = String(relPath || '');
-  const cleaned = raw.replace(/^\.?\/+/, '').replace(/^\/+/, '');
-  const out = [];
-
-  // relative to current document
-  try{ out.push(new URL(cleaned, document.baseURI).href); }catch(_){/* ignore */}
-  try{ out.push(new URL(raw, document.baseURI).href); }catch(_){/* ignore */}
-
-  // relative to likely site roots
-  for(const root of _guessSiteRoots()){
-    try{ out.push(new URL(cleaned, root).href); }catch(_){/* ignore */}
-  }
-
-  return _uniq(out);
-}
-
-function _basename(p){ return String(p || '').split('/').filter(Boolean).pop() || ''; }
-
-async function fetchJson(relPath){
-  const urls = _buildUrlCandidates(relPath);
-  let lastErr = null;
-
-  for(const url of urls){
-    try{
-      const resp = await fetch(url, { cache:'no-store' });
-      if(!resp.ok){
-        lastErr = new Error(`HTTP ${resp.status}`);
-        continue;
-      }
-      return await resp.json();
-    }catch(e){
-      lastErr = e;
-    }
-  }
-
-  const tried = urls.slice(0, 6).join(' | ');
-  throw new Error(`JSON fetch failed: ${relPath}. tried: ${tried}. ${lastErr && (lastErr.message || lastErr)}`);
-}
-
-  async function autoLoadIfEmpty(type){
-    const n = await countAllTasks(db);
-    if(n > 0) return { loaded:false, reason:'not_empty', count:n };
-
-    // FIX: noun_to_adj loads BOTH files automatically
-    if(type === 'noun_to_adj'){
-      const okFiles = [];
-      const failFiles = [];
-      let added = 0;
-      let skipped = 0;
-
-      // clear just in case
-      await clearAll(db);
-
-      // suffixes
-      try{
-        const data = await fetchJson(N2A_SUFFIX_FILE);
-        const res = await importFromObject(data, { type, replace:false, silent:true, defaultCategory:'Suffixes' });
-        okFiles.push(N2A_SUFFIX_FILE);
-        added += res.added; skipped += res.skipped;
-      }catch(e){
-        failFiles.push(N2A_SUFFIX_FILE);
-      }
-
-      // prefixes
-      try{
-        const data = await fetchJson(N2A_PREFIX_FILE);
-        const res = await importFromObject(data, { type, replace:false, silent:true, defaultCategory:'Prefixes' });
-        okFiles.push(N2A_PREFIX_FILE);
-        added += res.added; skipped += res.skipped;
-      }catch(e){
-        failFiles.push(N2A_PREFIX_FILE);
-      }
-
-      const after = await countAllTasks(db);
-      return {
-        loaded: okFiles.length > 0,
-        okFiles, failFiles,
-        imported: { added, skipped },
-        count: after
-      };
-    }
-
-    // other types - single file
-    const filename = `${dbNameFor(type)}.json`;
-    try{
-      const data = await fetchJson(filename);
-      const res = await importFromObject(data, { type, replace:true, silent:true });
-      const after = await countAllTasks(db);
-      return { loaded:true, okFiles:[filename], failFiles:[], imported:res, count:after };
-    }catch(e){
-      return { loaded:false, reason:'fetch_failed', okFiles:[], failFiles:[filename], error:String(e && (e.message || e)) };
-    }
-  }
-
-  function exportFilenameFor(type, category){
-    if(type === 'noun_to_adj'){
-      const c = normCategory(category);
-      if(c === 'Suffixes') return _basename(N2A_SUFFIX_FILE);
-      if(c === 'Prefixes') return _basename(N2A_PREFIX_FILE);
-      return 'student_helper_db__noun_to_adj_All.json';
-    }
-    return `${dbNameFor(type)}.json`;
-  }
-
-  async function exportDb(type, category, tasks){
-    const payload = {
-      schema: 'student_helper_db_export',
-      schemaVersion: 1,
-      type,
-      category: normCategory(category),
-      exportedAt: new Date().toISOString(),
-      dbName: dbNameFor(type),
-      tasks: tasks.map(t => ({
-        type: t.type,
-        category: normCategory(t.category),
-        en_noun: t.en_noun,
-        en_adj: t.en_adj,
-        ru_noun: t.ru_noun,
-        ru_adj: t.ru_adj
-      }))
-    };
-
-    const filename = exportFilenameFor(type, category);
-    const blob = new Blob([JSON.stringify(payload, null, 2)], { type:'application/json' });
-
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(a.href);
-
-    setFeedback('idle', 'save', filename);
-  }
-
-  function inferDefaultCategoryFromFilename(name){
-    const n = String(name || '').toLowerCase();
-    if(n.includes('_suffixes')) return 'Suffixes';
-    if(n.includes('_prefixes')) return 'Prefixes';
-    return 'Suffixes';
-  }
-
-  async function importFromFile(file, replace){
-    const text = await file.text();
-    const parsed = safeParseJSON(text);
-    if(!parsed.ok){
-      alert('Файл не является корректным JSON.');
-      return;
-    }
-    const data = parsed.data || {};
-    const type = data.type || 'noun_to_adj';
-    const defCat = data.category ? normCategory(data.category) : inferDefaultCategoryFromFilename(file.name);
-
-    await importFromObject(data, { type, replace, silent:true, defaultCategory:defCat });
-  }
-
-  // -----------------------------
-  // App state + UI
-  // -----------------------------
-  let tasksAll = [];
-  let tasksActive = [];
-  let current = null;
-
-  let revealRu = false;
-  let sessionTotal = 0;
-  let sessionCorrect = 0;
-
-  let history = [];
-  let historyPos = -1;
-  let seqIndex = -1;
-
-  let checkMode = 'check'; // 'check' | 'next'
-
-  const elDbStatus = document.getElementById('dbStatus');
-  const elTaskCount = document.getElementById('taskCountBadge');
-  const elSeedBadge = document.getElementById('seedBadge');
-  const elDbNameLine = document.getElementById('dbNameLine');
-
-  const elPromptEn = document.getElementById('promptEn');
-  const elPromptRu = document.getElementById('promptRu');
-  const elPromptLabel = document.getElementById('promptLabel');
-
-  const elAnswer = document.getElementById('answerInput');
-  const elScore = document.getElementById('sessionScore');
-  const elQ = document.getElementById('qBadge');
-
-  const elFeedbackBox = document.getElementById('feedbackBox');
-  const elFeedbackStamp = document.getElementById('feedbackStamp');
-  const elFeedbackLine = document.getElementById('feedbackLine');
-
-  const elRandom = document.getElementById('randomOrder');
-  const elPracticeCategory = document.getElementById('practiceCategory');
-
-  const elViewCategory = document.getElementById('viewCategory');
-  const elAddCategory = document.getElementById('addCategory');
-
-  const elTaskList = document.getElementById('taskList');
-  const elImportReplace = document.getElementById('importReplace');
-  const elFileImport = document.getElementById('fileImport');
-
-  const btnPrev = document.getElementById('btnPrev');
-  const btnNext = document.getElementById('btnNext');
-  const btnRule = document.getElementById('btnRule');
-  const btnReveal = document.getElementById('btnReveal');
-  const btnCheckNext = document.getElementById('btnCheckNext');
-  const btnShowAnswer = document.getElementById('btnShowAnswer');
-
-  function pulse(el, cls){
-    if(!el) return;
-    el.classList.remove(cls);
-    void el.offsetWidth;
-    el.classList.add(cls);
-  }
-  function setFeedback(state, stamp, line){
-    elFeedbackBox.dataset.state = state || 'idle';
-    elFeedbackStamp.textContent = stamp || 'info';
-    elFeedbackLine.textContent = line || '';
-    pulse(elFeedbackBox, 'ik-pop');
-  }
-  function updateScore(){ elScore.textContent = `${sessionCorrect}/${sessionTotal}`; }
-  function updateQ(){ elQ.textContent = `q: ${historyPos >= 0 ? (historyPos + 1) : 0}`; }
-  function updateCountBadge(){ elTaskCount.textContent = `tasks: ${tasksAll.length}`; }
-
-  function clearInputState(){ elAnswer.classList.remove('is-ok','is-bad'); }
-
-  function setCheckMode(mode){
-    checkMode = mode;
-    if(mode === 'next'){
-      btnCheckNext.textContent = 'далее';
-      btnCheckNext.title = 'Далее (Enter)';
-    }else{
-      btnCheckNext.textContent = 'check';
-      btnCheckNext.title = 'Check (Enter)';
-    }
-  }
-
-  function resetPracticeSession(){
-    history = [];
-    historyPos = -1;
-    seqIndex = -1;
-    updateQ();
-    setCheckMode('check');
-    clearInputState();
-  }
-
-  function promptTextForCategory(cat){
-    const c = normCategory(cat);
-    if(c === 'Prefixes') return 'Образуй отрицательное прилагательное от данного слова';
-    return 'Образуй прилагательное из данного слова';
-  }
-
-  function updatePromptLabel(){
-    const selected = normCategory(elPracticeCategory.value || 'All');
-    if(selected === 'All'){
-      const curCat = current ? normCategory(current.category || 'Suffixes') : 'Suffixes';
-      elPromptLabel.textContent = promptTextForCategory(curCat);
-    }else{
-      elPromptLabel.textContent = promptTextForCategory(selected);
-    }
-  }
-
-  function updateActiveTasks(){
-    const cat = normCategory(elPracticeCategory.value || 'All');
-    if(cat === 'All') tasksActive = [...tasksAll];
-    else tasksActive = tasksAll.filter(t => normCategory(t.category) === cat);
-
-    tasksActive.sort((a,b)=> (a.en_noun || '').localeCompare((b.en_noun || ''), 'en'));
-
-    updatePromptLabel();
-    renderRule(cat);
-  }
-
-  function showTask(t){
-    current = t || null;
-    updatePromptLabel();
-    revealRu = false;
-    if(elPromptRu) elPromptRu.hidden = true;
-
-    clearInputState();
-    setCheckMode('check');
-
-    if(!current){
-      elPromptEn.textContent = 'нет заданий';
-      elAnswer.value = '';
-      setFeedback('idle', 'empty', 'добавь задания или load db');
-      return;
-    }
-
-    elPromptEn.textContent = current.en_noun;
-    elPromptRu.textContent = `перевод: ${current.ru_noun}`;
-    elPromptRu.hidden = true;
-
-    elAnswer.value = '';
-    elAnswer.focus({ preventScroll:true });
-    setFeedback('idle', 'ready', 'введи ответ и нажми check');
-  }
-
-  function pickNewTask(){
-    if(!tasksActive.length) return null;
-    const random = !!elRandom.checked;
-    if(random){
-      return tasksActive[Math.floor(Math.random() * tasksActive.length)];
-    }
-    seqIndex = (seqIndex + 1) % tasksActive.length;
-    return tasksActive[seqIndex];
-  }
-
-  function goNext(){
-    if(!tasksActive.length){ showTask(null); return; }
-
-    if(historyPos < history.length - 1){
-      historyPos += 1;
-      updateQ();
-      showTask(history[historyPos]);
-      return;
-    }
-
-    const t = pickNewTask();
-    history.push(t);
-    historyPos = history.length - 1;
-    updateQ();
-    showTask(t);
-  }
-
-  function goPrev(){
-    if(historyPos <= 0) return;
-    historyPos -= 1;
-    updateQ();
-    showTask(history[historyPos]);
-  }
-
-  function toggleTranslate(){
-    if(!current) return;
-    revealRu = !revealRu;
-    elPromptRu.hidden = !revealRu;
-  }
-
-  function checkOrNext(){
-    if(!current) return;
-
-    if(checkMode === 'next'){
-      goNext();
-      return;
-    }
-
-    const user = normalize(elAnswer.value);
-    const correct = normalize(current.en_adj);
-
-    if(!user){
-      setFeedback('idle', 'type', 'введи ответ');
-      pulse(elAnswer, 'ik-shake');
-      return;
-    }
-
-    sessionTotal += 1;
-
-    if(user === correct){
-      sessionCorrect += 1;
-      updateScore();
-      setFeedback('correct', 'ok', `${current.en_noun} -> ${current.en_adj}`);
-      clearInputState();
-      elAnswer.classList.add('is-ok');
-      setCheckMode('next');
-    }else{
-      updateScore();
-      setFeedback('wrong', 'no', 'неверно');
-      clearInputState();
-      elAnswer.classList.add('is-bad');
-      elAnswer.focus({ preventScroll:true });
-      elAnswer.select();
-      setCheckMode('check');
-    }
-  }
-
-  function showAnswer(){
-    if(!current) return;
-    setFeedback('idle', 'answer', `${current.en_adj} | ${current.ru_adj}`);
-  }
-
-  async function refreshTasks(){
-    const all = await getAllTasks(db);
-    tasksAll = all
-      .filter(t => t.type === 'noun_to_adj')
-      .map(t => ({
-        ...t,
-        category: normCategory(t.category || 'Suffixes')
-      }))
-      .sort((a,b)=> (a.en_noun || '').localeCompare((b.en_noun || ''), 'en'));
-
-    updateCountBadge();
-    renderTaskList();
-  }
-
-  function renderTaskList(){
-    const view = normCategory(elViewCategory.value || 'All');
-    const list = (view === 'All') ? tasksAll : tasksAll.filter(t => normCategory(t.category) === view);
-
-    elTaskList.innerHTML = '';
-    if(!list.length){
-      const li = document.createElement('li');
-      li.innerHTML = `<p class="ik-itemline"><b>пусто</b></p>`;
-      elTaskList.appendChild(li);
-      return;
-    }
-
-    for(const t of list){
-      const li = document.createElement('li');
-
-      const left = document.createElement('div');
-      left.innerHTML = `
-        <p class="ik-itemline">
-          <b>${escapeHTML(t.en_noun)}</b> -> <b>${escapeHTML(t.en_adj)}</b>
-          <span class="ik-muted"> | ${escapeHTML(t.ru_noun)} -> ${escapeHTML(t.ru_adj)}</span>
-          <span class="ik-muted"> | ${escapeHTML(normCategory(t.category))}</span>
-        </p>
-      `;
-
-      const right = document.createElement('div');
-      right.className = 'ik-mini';
-
-      const btnDel = document.createElement('button');
-      btnDel.className = 'ik-btn';
-      btnDel.type = 'button';
-      btnDel.textContent = 'удалить';
-      btnDel.addEventListener('click', async ()=>{
-        try{
-          await deleteTask(db, t.id);
-          await refreshTasks();
-          updateActiveTasks();
-          resetPracticeSession();
-          goNext();
-        }catch(e){
-          alert(`Ошибка удаления: ${e.message || e}`);
-        }
-      });
-
-      right.appendChild(btnDel);
-      li.appendChild(left);
-      li.appendChild(right);
-      elTaskList.appendChild(li);
-    }
-  }
-
-  async function boot(){
-    try{
-      elDbStatus.textContent = 'opening...';
-      elDbNameLine.textContent = `db: ${dbNameFor('noun_to_adj')}`;
-
-      db = await openDBForType('noun_to_adj');
-      elDbStatus.textContent = 'ok';
-
-      const report = await autoLoadIfEmpty('noun_to_adj');
-
-      if(report.loaded){
-        elSeedBadge.textContent = 'json: loaded';
-        elSeedBadge.title = report.okFiles.join(', ');
-      }else{
-        elSeedBadge.textContent = report.reason === 'not_empty' ? 'json: skip' : 'json: fail';
-        elSeedBadge.title = report.reason === 'not_empty'
-          ? 'Данные уже есть'
-          : 'Автозагрузка не сработала. Если это file://, нажми load db';
-      }
-
-      await refreshTasks();
-      updateActiveTasks();
-      updateScore();
-      updateQ();
-      goNext();
-    }catch(e){
-      elDbStatus.textContent = 'failed';
-      setFeedback('idle', 'fail', 'IndexedDB недоступен');
-      console.error(e);
-    }
-  }
-
-  // -----------------------------
-  // Events
-  // -----------------------------
-  btnRule.addEventListener('click', toggleRule);
-  btnPrev.addEventListener('click', goPrev);
-  btnNext.addEventListener('click', goNext);
-  btnReveal.addEventListener('click', toggleTranslate);
-  btnCheckNext.addEventListener('click', checkOrNext);
-  btnShowAnswer.addEventListener('click', showAnswer);
-
-  elAnswer.addEventListener('keydown', (e)=>{
-    if(e.key === 'Enter'){
-      e.preventDefault();
-      checkOrNext();
-    }
-  });
-
-  document.addEventListener('keydown', (e)=>{
-    const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
-    const inText = tag === 'input' || tag === 'textarea';
-if(e.key.toLowerCase() === 't'){ if(inText) return; toggleTranslate(); return; }
-    if(e.key.toLowerCase() === 'r'){ if(inText) return; toggleRule(); return; }
-  });
-
-  elPracticeCategory.addEventListener('change', ()=>{
-    updateActiveTasks();
-    resetPracticeSession();
-    goNext();
-  });
-
-  elViewCategory.addEventListener('change', renderTaskList);
-
-  document.getElementById('btnAddTask').addEventListener('click', async ()=>{
-    const cat = normCategory(elAddCategory.value || 'Suffixes');
-
-    const enWord = normalize(document.getElementById('inEnWord').value);
-    const enAns  = normalize(document.getElementById('inEnAnswer').value);
-    const ruWord = (document.getElementById('inRuWord').value || '').trim();
-    const ruAns  = (document.getElementById('inRuAnswer').value || '').trim();
-
-    if(!enWord || !enAns || !ruWord || !ruAns){
-      alert('Заполни все 4 поля.');
-      return;
-    }
-
-    try{
-      const res = await addTask(db, { type:'noun_to_adj', category: cat, en_noun: enWord, en_adj: enAns, ru_noun: ruWord, ru_adj: ruAns });
-      if(res && res.skipped){
-        alert('Такое задание уже есть (дубликат).');
-        return;
-      }
-
-      document.getElementById('inEnWord').value = '';
-      document.getElementById('inEnAnswer').value = '';
-      document.getElementById('inRuWord').value = '';
-      document.getElementById('inRuAnswer').value = '';
-
-      await refreshTasks();
-      updateActiveTasks();
-      resetPracticeSession();
-      goNext();
-
-      setFeedback('idle', 'saved', cat);
-    }catch(e){
-      alert(`Ошибка сохранения: ${e.message || e}`);
-    }
-  });
-
-  document.getElementById('btnResetFromJson').addEventListener('click', async ()=>{
-    try{
-      await clearAll(db);
-
-      const s = await fetchJson(N2A_SUFFIX_FILE);
-      await importFromObject(s, { type:'noun_to_adj', replace:false, silent:true, defaultCategory:'Suffixes' });
-
-      const p = await fetchJson(N2A_PREFIX_FILE);
-      await importFromObject(p, { type:'noun_to_adj', replace:false, silent:true, defaultCategory:'Prefixes' });
-
-      await refreshTasks();
-      updateActiveTasks();
-      resetPracticeSession();
-      goNext();
-
-      elSeedBadge.textContent = 'json: loaded';
-      elSeedBadge.title = `${N2A_SUFFIX_FILE}, ${N2A_PREFIX_FILE}`;
-      setFeedback('idle', 'reset', 'ok');
-    }catch(e){
-      alert('Не удалось загрузить json рядом с HTML. Если открываешь как file://, браузер может блокировать fetch. Тогда нажми load db и выбери файлы вручную.');
-    }
-  });
-
-  document.getElementById('btnExportDb').addEventListener('click', async ()=>{
-    const view = normCategory(elViewCategory.value || 'All');
-    const list = (view === 'All') ? tasksAll : tasksAll.filter(t => normCategory(t.category) === view);
-    await exportDb('noun_to_adj', view, list);
-  });
-
-  document.getElementById('btnImportDb').addEventListener('click', ()=>{
-    elFileImport.value = '';
-    elFileImport.click();
-  });
-
-  elFileImport.addEventListener('change', async ()=>{
-    const file = elFileImport.files && elFileImport.files[0];
-    if(!file) return;
-    try{
-      await importFromFile(file, !!elImportReplace.checked);
-      await refreshTasks();
-      updateActiveTasks();
-      resetPracticeSession();
-      goNext();
-      setFeedback('idle', 'import', 'ok');
-    }catch(e){
-      alert(`Ошибка импорта: ${e.message || e}`);
-    }
-  });
-
-  // -----------------------------
-  // Dictionary (sections + words)
-  // -----------------------------
-  const DICT_DB_VERSION = 1;
-  const DICT_STORE_SECTIONS = 'sections';
-  const DICT_STORE_WORDS = 'words';
-  const DICT_REASK_GAP = 3;
-
-  function dictDbName(){ return dbNameFor('dictionary'); }
-
-  function normSpaces(s){ return String(s || '').trim().replace(/\s+/g, ' '); }
-  function normEnCmp(s){ return normSpaces(s).toLowerCase(); }
-  function normRuCmp(s){ return normSpaces(s).toLowerCase().replaceAll('ё', 'е'); }
-  function normRuLoose(s){
-    return normRuCmp(s)
-      .replace(/[.,!?;:()"'«»\[\]{}<>]/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim();
-  }
-  function ruVariants(ru){
-    const base = String(ru || '').trim();
-    if(!base) return [];
-    const parts = base.split(/[;\n]+/).flatMap(x => x.split(/,/));
-    const out = [];
-    for(const p of parts){
-      const v = normRuLoose(p);
-      if(v) out.push(v);
-    }
-    const whole = normRuLoose(base);
-    if(whole) out.push(whole);
-    return Array.from(new Set(out));
-  }
-  function shuffle(arr){
-    const a = [...arr];
-    for(let i = a.length - 1; i > 0; i--){
-      const j = Math.floor(Math.random() * (i + 1));
-      [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
-  }
-
-  function dictOpenDB(){
-    return new Promise((resolve, reject) => {
-      if(!idbSupported()){
-        reject(new Error('IndexedDB not supported'));
-        return;
-      }
-      const req = indexedDB.open(dictDbName(), DICT_DB_VERSION);
-
-      req.onupgradeneeded = () => {
-        const dbx = req.result;
-
-        if(!dbx.objectStoreNames.contains(DICT_STORE_SECTIONS)){
-          const s = dbx.createObjectStore(DICT_STORE_SECTIONS, { keyPath:'id', autoIncrement:true });
-          s.createIndex('nameKey', 'nameKey', { unique:true });
-        }
-        if(!dbx.objectStoreNames.contains(DICT_STORE_WORDS)){
-          const w = dbx.createObjectStore(DICT_STORE_WORDS, { keyPath:'id', autoIncrement:true });
-          w.createIndex('sectionId', 'sectionId', { unique:false });
-          w.createIndex('pairKey', 'pairKey', { unique:true });
-        }
-
-        // Backfill keys for older data (if any)
-        const txu = req.transaction;
-        try{
-          const sStore = txu.objectStore(DICT_STORE_SECTIONS);
-          if(!sStore.indexNames.contains('nameKey')) sStore.createIndex('nameKey', 'nameKey', { unique:true });
-          const curS = sStore.openCursor();
-          curS.onsuccess = (e) => {
-            const c = e.target.result;
-            if(!c) return;
-            const v = c.value || {};
-            if(!v.nameKey) v.nameKey = normalize(v.name || '');
-            c.update(v);
-            c.continue();
-          };
-        }catch(_){/* ignore */}
-
-        try{
-          const wStore = txu.objectStore(DICT_STORE_WORDS);
-          if(!wStore.indexNames.contains('sectionId')) wStore.createIndex('sectionId', 'sectionId', { unique:false });
-          if(!wStore.indexNames.contains('pairKey')) wStore.createIndex('pairKey', 'pairKey', { unique:true });
-          const curW = wStore.openCursor();
-          curW.onsuccess = (e) => {
-            const c = e.target.result;
-            if(!c) return;
-            const v = c.value || {};
-            v.sectionId = Number(v.sectionId || 0);
-            v.en = normSpaces(v.en || '');
-            v.ru = String(v.ru || '').trim();
-            v.enKey = v.enKey || normEnCmp(v.en);
-            v.ruKey = v.ruKey || normRuCmp(v.ru);
-            v.pairKey = v.pairKey || `${v.sectionId}|${v.enKey}|${v.ruKey}`;
-            c.update(v);
-            c.continue();
-          };
-        }catch(_){/* ignore */}
-      };
-
-      req.onsuccess = () => resolve(req.result);
-      req.onerror = () => reject(req.error || new Error('Failed to open dict db'));
-    });
-  }
-
-  function dictGetAll(dbx, store){
-    return new Promise((resolve, reject) => {
-      const t = dbx.transaction([store], 'readonly');
-      const os = t.objectStore(store);
-      const req = os.getAll();
-      req.onsuccess = () => resolve(req.result || []);
-      req.onerror = () => reject(req.error || new Error('Failed to getAll'));
-    });
-  }
-  function dictCount(dbx, store){
-    return new Promise((resolve, reject) => {
-      const t = dbx.transaction([store], 'readonly');
-      const os = t.objectStore(store);
-      const req = os.count();
-      req.onsuccess = () => resolve(req.result || 0);
-      req.onerror = () => reject(req.error || new Error('Failed to count'));
-    });
-  }
-  function dictClear(dbx){
-    return new Promise((resolve, reject) => {
-      const t = dbx.transaction([DICT_STORE_WORDS, DICT_STORE_SECTIONS], 'readwrite');
-      t.objectStore(DICT_STORE_WORDS).clear();
-      t.objectStore(DICT_STORE_SECTIONS).clear();
-      t.oncomplete = () => resolve(true);
-      t.onerror = () => reject(t.error || new Error('Failed to clear dict db'));
-    });
-  }
-
-  function dictAddSection(dbx, name){
-    const n = String(name || '').trim();
-    if(!n) return Promise.resolve({ ok:false, reason:'empty' });
-    const payload = { name:n, nameKey: normalize(n), createdAt: Date.now(), updatedAt: Date.now() };
-
-    return new Promise((resolve, reject) => {
-      const t = dbx.transaction([DICT_STORE_SECTIONS], 'readwrite');
-      const os = t.objectStore(DICT_STORE_SECTIONS);
-      const req = os.add(payload);
-      req.onsuccess = () => resolve({ ok:true, id:req.result });
-      req.onerror = () => {
-        const err = req.error;
-        if(err && err.name === 'ConstraintError'){
-          resolve({ ok:false, reason:'duplicate' });
-          return;
-        }
-        reject(err || new Error('Failed to add section'));
-      };
-    });
-  }
-
-  function dictAddWord(dbx, sectionId, en, ru){
-    const sid = Number(sectionId || 0);
-    const enS = normSpaces(en);
-    const ruS = String(ru || '').trim();
-    if(!sid || !enS || !ruS) return Promise.resolve({ ok:false, reason:'empty' });
-
-    const payload = {
-      sectionId: sid,
-      en: enS,
-      enKey: normEnCmp(enS),
-      ru: ruS,
-      ruKey: normRuCmp(ruS),
-      createdAt: Date.now(),
-      updatedAt: Date.now()
-    };
-    payload.pairKey = `${payload.sectionId}|${payload.enKey}|${payload.ruKey}`;
-
-    return new Promise((resolve, reject) => {
-      const t = dbx.transaction([DICT_STORE_WORDS], 'readwrite');
-      const os = t.objectStore(DICT_STORE_WORDS);
-      const req = os.add(payload);
-      req.onsuccess = () => resolve({ ok:true, id:req.result });
-      req.onerror = () => {
-        const err = req.error;
-        if(err && err.name === 'ConstraintError'){
-          resolve({ ok:false, reason:'duplicate' });
-          return;
-        }
-        reject(err || new Error('Failed to add word'));
-      };
-    });
-  }
-
-  function dictDeleteWord(dbx, id){
-    return new Promise((resolve, reject) => {
-      const t = dbx.transaction([DICT_STORE_WORDS], 'readwrite');
-      const os = t.objectStore(DICT_STORE_WORDS);
-      const req = os.delete(id);
-      req.onsuccess = () => resolve(true);
-      req.onerror = () => reject(req.error || new Error('Failed to delete word'));
-    });
-  }
-
-  function dictDeleteSection(dbx, sectionId){
-    const sid = Number(sectionId || 0);
-    return new Promise((resolve, reject) => {
-      const t = dbx.transaction([DICT_STORE_SECTIONS, DICT_STORE_WORDS], 'readwrite');
-      const sStore = t.objectStore(DICT_STORE_SECTIONS);
-      const wStore = t.objectStore(DICT_STORE_WORDS);
-
-      try{
-        const idx = wStore.index('sectionId');
-        const cur = idx.openCursor(IDBKeyRange.only(sid));
-        cur.onsuccess = (e) => {
-          const c = e.target.result;
-          if(!c) return;
-          c.delete();
-          c.continue();
-        };
-      }catch(_){/* ignore */}
-
-      sStore.delete(sid);
-
-      t.oncomplete = () => resolve(true);
-      t.onerror = () => reject(t.error || new Error('Failed to delete section'));
-    });
-  }
-
-  const DICT_DIR = 'db/dictionary/';
-const DICT_MANIFESTS = ['db/manifest.json', `${DICT_DIR}manifest.json`];
-const DICT_FILE_PREFIX = 'student_helper_db__dictionary_';
-const DICT_DEFAULT_FILES = [
-  `${DICT_FILE_PREFIX}Destination_B1_Unit_3.json`,
-  `${DICT_FILE_PREFIX}Destination_B1_Unit_6.json`,
-];
-
-function dictSlug(name){
-  return String(name || '')
-    .trim()
-    .replace(/\s+/g, '_')
-    .replace(/[^A-Za-z0-9_]/g, '')
-    .replace(/_+/g, '_')
-    .replace(/^_+|_+$/g, '');
-}
-
-function dictFilenameForSection(sectionName){
-  const slug = dictSlug(sectionName) || 'section';
-  return `${DICT_FILE_PREFIX}${slug}.json`;
-}
-
-  
-  // Dict app state
-  let dictDb = null;
-  let dictSections = [];
-  let dictWordsAll = [];
-  let dictCounts = new Map();
-
-  // Cards state
-  let cardsDeck = [];
-  let cardsHistory = [];
-  let cardsPos = -1;
-  let cardsSeq = -1;
-
-  
-  let cardsSeen = new Set();
-// Quiz state
-  let quizDeck = [];
-  let quizQueue = [];
-  let quizCurrent = null;
-  let quizAskLang = 'en';
-  let quizCheckMode = 'check';
-  let quizTotal = 0;
-  let quizCorrect = 0;
-
-  
-  let quizSeen = new Set();
-// UI
-  const elDictDbStatus = document.getElementById('dictDbStatus');
-  const elDictSeedBadge = document.getElementById('dictSeedBadge');
-  const elDictDbNameLine = document.getElementById('dictDbNameLine');
-  const elDictCountBadge = document.getElementById('dictCountBadge');
-
-  const dictTabCards = document.getElementById('dict-tab-cards');
-  const dictTabQuiz = document.getElementById('dict-tab-quiz');
-  const dictTabBuilder = document.getElementById('dict-tab-builder');
-  const dictPanelCards = document.getElementById('dict-panel-cards');
-  const dictPanelQuiz = document.getElementById('dict-panel-quiz');
-  const dictPanelBuilder = document.getElementById('dict-panel-builder');
-
-  const elSectionCards = document.getElementById('dictSectionCards');
-  const elSectionQuiz = document.getElementById('dictSectionQuiz');
-  const elSectionBuilder = document.getElementById('dictBuilderSection');
-  const elSectionList = document.getElementById('dictSectionList');
-  const elWordList = document.getElementById('dictWordList');
-
-  const elDictFirstPick = document.getElementById('dictFirstPick');
-  const elDictSubtabsWrap = document.getElementById('dictSubtabsWrap');
-  const elFirstPickList = document.getElementById('dictFirstPickList');
-  const elFirstPickSearch = document.getElementById('dictFirstPickSearch');
-  const btnFirstPickOpenConstructor = document.getElementById('dictFirstPickOpenConstructor');
-  const btnCardsChooseSection = document.getElementById('dictCardsChooseSection');
-  const btnQuizChooseSection = document.getElementById('dictQuizChooseSection');
-
-  const elCardsRandom = document.getElementById('dictCardsRandom');
-  const elCardsFront = document.getElementById('dictCardsFront');
-  const btnCardsPrev = document.getElementById('dictCardsPrev');
-  const btnCardsNext = document.getElementById('dictCardsNext');
-  const elFlipCard = document.getElementById('dictFlipCard');
-  const elCardFront = document.getElementById('dictCardFront');
-  const elCardBack = document.getElementById('dictCardBack');
-  const elCardFrontLang = document.getElementById('dictCardFrontLang');
-  const elCardBackLang = document.getElementById('dictCardBackLang');
-  const elCardsMeta = document.getElementById('dictCardsMeta');
-
-  const elQuizMode = document.getElementById('dictQuizMode');
-  const elQuizScore = document.getElementById('dictQuizScore');
-  const elQuizPromptLabel = document.getElementById('dictQuizPromptLabel');
-  const elQuizCard = document.getElementById('dictQuizCard');
-  const elQuizFront = document.getElementById('dictQuizFront');
-  const elQuizBack = document.getElementById('dictQuizBack');
-  const elQuizFrontLang = document.getElementById('dictQuizFrontLang');
-  const elQuizBackLang = document.getElementById('dictQuizBackLang');
-  const elQuizInput = document.getElementById('dictQuizInput');
-  const btnQuizCheckNext = document.getElementById('dictQuizCheckNext');
-  const btnQuizSkip = document.getElementById('dictQuizSkip');
-  const elQuizFeedback = document.getElementById('dictQuizFeedback');
-  const elQuizStamp = document.getElementById('dictQuizStamp');
-  const elQuizLine = document.getElementById('dictQuizLine');
-
-  const elNewSectionName = document.getElementById('dictNewSectionName');
-  const btnAddSection = document.getElementById('dictAddSection');
-  const btnDeleteSection = document.getElementById('dictDeleteSection');
-  const elEnInput = document.getElementById('dictEnInput');
-  const elRuInput = document.getElementById('dictRuInput');
-  const btnAddWord = document.getElementById('dictAddWord');
-  const btnDictExport = document.getElementById('dictExportDb');
-  const btnDictImport = document.getElementById('dictImportDb');
-  const elDictImportReplace = document.getElementById('dictImportReplace');
-  const elDictFileImport = document.getElementById('dictFileImport');
-
-  function dictSetSubtab(which){
-    const isCards = which === 'cards';
-    const isQuiz = which === 'quiz';
-    dictTabCards.setAttribute('aria-selected', String(isCards));
-    dictTabQuiz.setAttribute('aria-selected', String(isQuiz));
-    dictTabBuilder.setAttribute('aria-selected', String(!isCards && !isQuiz));
-    dictPanelCards.hidden = !isCards;
-    dictPanelQuiz.hidden = !isQuiz;
-    dictPanelBuilder.hidden = isCards || isQuiz;
-  }
-
-  function quizSetFeedback(state, stamp, line){
-    elQuizFeedback.dataset.state = state || 'idle';
-    elQuizStamp.textContent = stamp || 'info';
-    elQuizLine.textContent = line || '';
-    pulse(elQuizFeedback, 'ik-pop');
-  }
-  function quizUpdateScore(){
-    const denom = quizDeck.length || 0;
-    const prog = denom ? quizSeen.size : 0;
-    elQuizScore.textContent = `${prog}/${denom} | ${quizCorrect}/${quizTotal}`;
-  }
-
-  function setQuizMode(mode){
-    quizCheckMode = mode;
-    if(mode === 'next'){
-      btnQuizCheckNext.textContent = 'далее';
-      btnQuizCheckNext.title = 'Далее (Enter)';
-    }else{
-      btnQuizCheckNext.textContent = 'check';
-      btnQuizCheckNext.title = 'Check (Enter)';
-    }
-  }
-
-  function buildCounts(){
-    dictCounts = new Map();
-    for(const s of dictSections){
-      dictCounts.set(Number(s.id), 0);
-    }
-    for(const w of dictWordsAll){
-      const sid = Number(w.sectionId);
-      dictCounts.set(sid, (dictCounts.get(sid) || 0) + 1);
-    }
-  }
-
-  function getSectionNameById(id){
-    const s = dictSections.find(x => Number(x.id) === Number(id));
-    return s ? s.name : 'section';
-  }
-
-  function updateGlobalBadges(){
-    elDictDbNameLine.textContent = `db: ${dictDbName()}`;
-    elDictCountBadge.textContent = `words: ${dictWordsAll.length}`;
-  }
-
-  function dictShowFirstPick(){
-    if(elDictFirstPick) elDictFirstPick.hidden = false;
-    if(elDictSubtabsWrap) elDictSubtabsWrap.hidden = true;
-    if(elFirstPickSearch){
-      elFirstPickSearch.value = '';
-      renderFirstPickUI();
-      try{ elFirstPickSearch.focus({ preventScroll:true }); }catch(_){}
-    }else{
-      renderFirstPickUI();
-    }
-  }
-
-  function dictOpenConstructorFromPick(){
-    if(elDictFirstPick) elDictFirstPick.hidden = true;
-    if(elDictSubtabsWrap) elDictSubtabsWrap.hidden = false;
-    dictSetSubtab('builder');
-    renderWordsUI();
-  }
-
-  function dictEnterSection(sectionValue, startTab){
-    const v = String(sectionValue || '').trim();
-    if(!v) return;
-
-    if(elSectionCards) elSectionCards.value = v;
-    if(elSectionQuiz) elSectionQuiz.value = v;
-    if(elSectionBuilder && v !== 'All') elSectionBuilder.value = v;
-
-    if(elDictFirstPick) elDictFirstPick.hidden = true;
-    if(elDictSubtabsWrap) elDictSubtabsWrap.hidden = false;
-
-    if(startTab === 'quiz'){
-      dictSetSubtab('quiz');
-      dictResetQuiz();
-      return;
-    }
-    if(startTab === 'builder'){
-      dictSetSubtab('builder');
-      renderWordsUI();
-      return;
-    }
-
-    dictSetSubtab('cards');
-    dictResetCards();
-  }
-
-  function renderFirstPickUI(){
-    if(!elFirstPickList) return;
-
-    const q = String(elFirstPickSearch && elFirstPickSearch.value || '').trim().toLowerCase();
-
-    const items = [];
-    items.push({ sid:'All', name:'All (все разделы)', count: dictWordsAll.length });
-
-    dictSections
-      .slice()
-      .sort((a,b)=> a.name.localeCompare(b.name, 'ru'))
-      .forEach((s)=>{
-        const sid = String(s.id);
-        const count = dictCounts.get(Number(s.id)) || 0;
-        items.push({ sid, name:s.name, count });
-      });
-
-    const filtered = items.filter(it => !q || String(it.name).toLowerCase().includes(q));
-
-    elFirstPickList.innerHTML = '';
-    if(!filtered.length){
-      const li = document.createElement('li');
-      li.innerHTML = `<p class="ik-itemline"><b>ничего не найдено</b></p>`;
-      elFirstPickList.appendChild(li);
-      return;
-    }
-
-    for(const it of filtered){
-      const li = document.createElement('li');
-      li.className = 'is-clickable';
-
-      const left = document.createElement('div');
-      left.innerHTML = `<p class="ik-itemline"><b>${escapeHTML(it.name)}</b> <span class="ik-muted">(${it.count})</span></p>`;
-
-      const right = document.createElement('div');
-      right.className = 'ik-mini';
-
-      const btnCards = document.createElement('button');
-      btnCards.className = 'ik-btn ik-btn--black';
-      btnCards.type = 'button';
-      btnCards.textContent = 'cards';
-      btnCards.addEventListener('click', (e)=>{
-        e.stopPropagation();
-        dictEnterSection(it.sid, 'cards');
-      });
-
-      const btnLearn = document.createElement('button');
-      btnLearn.className = 'ik-btn';
-      btnLearn.type = 'button';
-      btnLearn.textContent = 'learn';
-      btnLearn.addEventListener('click', (e)=>{
-        e.stopPropagation();
-        dictEnterSection(it.sid, 'quiz');
-      });
-
-      right.appendChild(btnCards);
-      right.appendChild(btnLearn);
-
-      li.appendChild(left);
-      li.appendChild(right);
-      li.addEventListener('click', ()=> dictEnterSection(it.sid, 'cards'));
-
-      elFirstPickList.appendChild(li);
-    }
-  }
-
-  function renderSectionsUI(){
-    const opts = [];
-    for(const s of dictSections){
-      const sid = Number(s.id);
-      const count = dictCounts.get(sid) || 0;
-      opts.push({ value: String(sid), label: `${s.name} (${count})` });
-    }
-
-    function fillSelect(sel, includeAll){
-      const prev = sel.value;
-      sel.innerHTML = '';
-
-      const ph = document.createElement('option');
-      ph.value = '';
-      ph.textContent = 'choose section...';
-      sel.appendChild(ph);
-
-      if(includeAll){
-        const o = document.createElement('option');
-        o.value = 'All';
-        o.textContent = `All (${dictWordsAll.length})`;
-        sel.appendChild(o);
-      }
-      for(const odef of opts){
-        const o = document.createElement('option');
-        o.value = odef.value;
-        o.textContent = odef.label;
-        sel.appendChild(o);
-      }
-
-      if(prev && Array.from(sel.options).some(o => o.value === prev)){
-        sel.value = prev;
-      }else{
-        sel.value = '';
-      }
-    }
-
-    fillSelect(elSectionCards, true);
-    fillSelect(elSectionQuiz, true);
-    fillSelect(elSectionBuilder, false);
-
-    renderFirstPickUI();
-
-    elSectionList.innerHTML = '';
-    if(!dictSections.length){
-      const li = document.createElement('li');
-      li.innerHTML = `<p class="ik-itemline"><b>пусто</b></p>`;
-      elSectionList.appendChild(li);
-      return;
-    }
-
-    dictSections
-      .slice()
-      .sort((a,b)=> a.name.localeCompare(b.name, 'ru'))
-      .forEach((s)=>{
-        const sid = Number(s.id);
-        const count = dictCounts.get(sid) || 0;
-        const li = document.createElement('li');
-
-        const left = document.createElement('div');
-        left.innerHTML = `<p class="ik-itemline"><b>${escapeHTML(s.name)}</b> <span class="ik-muted">(${count})</span></p>`;
-
-        const right = document.createElement('div');
-        right.className = 'ik-mini';
-
-        const btnOpen = document.createElement('button');
-        btnOpen.className = 'ik-btn ik-btn--black';
-        btnOpen.type = 'button';
-        btnOpen.textContent = 'open';
-        btnOpen.addEventListener('click', ()=>{
-          elSectionBuilder.value = String(sid);
-          renderWordsUI();
-          dictSetSubtab('builder');
-        });
-
-        right.appendChild(btnOpen);
-        li.appendChild(left);
-        li.appendChild(right);
-        elSectionList.appendChild(li);
-      });
-  }
-
-  function wordsForSelection(value){
-    const v = String(value || '').trim();
-    if(!v) return [];
-    if(v === 'All') return [...dictWordsAll];
-    const sid = Number(v);
-    if(!sid) return [];
-    return dictWordsAll.filter(w => Number(w.sectionId) === sid);
-  }
-
-  function renderWordsUI(){
-    const sid = Number(elSectionBuilder.value || 0);
-    const list = dictWordsAll
-      .filter(w => Number(w.sectionId) === sid)
-      .sort((a,b)=> (a.en || '').localeCompare((b.en || ''), 'en'));
-
-    elWordList.innerHTML = '';
-
-    if(!sid){
-      const li = document.createElement('li');
-      li.innerHTML = `<p class="ik-itemline"><b>выбери раздел</b></p>`;
-      elWordList.appendChild(li);
-      return;
-    }
-
-    if(!list.length){
-      const li = document.createElement('li');
-      li.innerHTML = `<p class="ik-itemline"><b>пусто</b> <span class="ik-muted">добавь слова выше</span></p>`;
-      elWordList.appendChild(li);
-      return;
-    }
-
-    for(const w of list){
-      const li = document.createElement('li');
-
-      const left = document.createElement('div');
-      left.innerHTML = `<p class="ik-itemline"><b>${escapeHTML(w.en)}</b> - ${escapeHTML(w.ru)}</p>`;
-
-      const right = document.createElement('div');
-      right.className = 'ik-mini';
-
-      const btnDel = document.createElement('button');
-      btnDel.className = 'ik-btn';
-      btnDel.type = 'button';
-      btnDel.textContent = 'удалить';
-      btnDel.addEventListener('click', async ()=>{
-        try{
-          await dictDeleteWord(dictDb, w.id);
-          await dictRefreshAll();
-          renderWordsUI();
-          dictResetCards();
-          dictResetQuiz();
-        }catch(e){
-          alert(`Ошибка удаления: ${e.message || e}`);
-        }
-      });
-
-      right.appendChild(btnDel);
-      li.appendChild(left);
-      li.appendChild(right);
-      elWordList.appendChild(li);
-    }
-  }
-
-  function cardsSetFlipped(flipped){
-    if(flipped){
-      elFlipCard.classList.add('is-flipped');
-      elFlipCard.setAttribute('aria-pressed', 'true');
-    }else{
-      elFlipCard.classList.remove('is-flipped');
-      elFlipCard.setAttribute('aria-pressed', 'false');
-    }
-  }
-
-  function cardsShow(item, frontLang){
-    cardsSetFlipped(false);
-
-    if(!item){
-      const sel = String((elSectionCards && elSectionCards.value) || '').trim();
-      if(!sel){
-        elCardFront.textContent = 'выбери section';
-        elCardBack.textContent = 'сначала выбери раздел';
-      }else{
-        elCardFront.textContent = 'нет слов';
-        elCardBack.textContent = 'добавь слова в constructor';
-      }
-      elCardFrontLang.textContent = '';
-      elCardBackLang.textContent = '';
-      elCardsMeta.textContent = '';
-      return;
-    }
-
-    const frontIsEn = frontLang === 'en';
-    elCardFront.textContent = frontIsEn ? item.en : item.ru;
-    elCardBack.textContent = frontIsEn ? item.ru : item.en;
-    elCardFrontLang.textContent = frontIsEn ? 'EN' : 'RU';
-    elCardBackLang.textContent = frontIsEn ? 'RU' : 'EN';
-
-    const secName = getSectionNameById(item.sectionId);
-    // progress: unique seen / total in current deck
-    if(item && item.id != null) cardsSeen.add(String(item.id));
-    const denom = cardsDeck.length || 0;
-    const prog = denom ? cardsSeen.size : 0;
-    elCardsMeta.textContent = `section: ${secName} | ${prog}/${denom}`;
-}
-
-  function cardsPick(){
-    if(!cardsDeck.length) return null;
-    if(elCardsRandom.checked){
-      return cardsDeck[Math.floor(Math.random() * cardsDeck.length)];
-    }
-    cardsSeq = (cardsSeq + 1) % cardsDeck.length;
-    return cardsDeck[cardsSeq];
-  }
-
-  function cardsGoNext(){
-    if(!cardsDeck.length){ cardsShow(null, 'en'); return; }
-
-    if(cardsPos < cardsHistory.length - 1){
-      cardsPos += 1;
-      const h = cardsHistory[cardsPos];
-      cardsShow(h.item, h.frontLang);
-      return;
-    }
-
-    const item = cardsPick();
-    const pref = String(elCardsFront.value || 'en');
-    const frontLang = pref === 'mix' ? (Math.random() < 0.5 ? 'en' : 'ru') : pref;
-
-    cardsHistory.push({ item, frontLang });
-    cardsPos = cardsHistory.length - 1;
-
-    cardsShow(item, frontLang);
-  }
-
-  function cardsGoPrev(){
-    if(cardsPos <= 0) return;
-    cardsPos -= 1;
-    const h = cardsHistory[cardsPos];
-    cardsShow(h.item, h.frontLang);
-  }
-
-  function cardsToggleFlip(){
-    const flipped = elFlipCard.classList.contains('is-flipped');
-    cardsSetFlipped(!flipped);
-  }
-
-  function dictResetCards(){
-    cardsDeck = wordsForSelection(elSectionCards.value);
-    cardsHistory = [];
-    cardsPos = -1;
-    cardsSeq = -1;
-    cardsSeen = new Set();
-    cardsGoNext();
-  }
-
-  function quizSetFlipped(flipped){
-    if(flipped){
-      elQuizCard.classList.add('is-flipped');
-      elQuizCard.setAttribute('aria-pressed', 'true');
-    }else{
-      elQuizCard.classList.remove('is-flipped');
-      elQuizCard.setAttribute('aria-pressed', 'false');
-    }
-  }
-
-  function quizPickAskLang(){
-    const pref = String(elQuizMode.value || 'en');
-    if(pref === 'mix') return Math.random() < 0.5 ? 'en' : 'ru';
-    return pref;
-  }
-
-  function quizRenderPromptLabel(askLang){
-    elQuizPromptLabel.textContent = askLang === 'en' ? 'переведи на русский' : 'переведи на английский';
-  }
-
-  function quizShow(item){
-    quizCurrent = item || null;
-    if(quizCurrent && quizCurrent.id != null){
-      quizSeen.add(String(quizCurrent.id));
-      quizUpdateScore();
-    }
-    quizAskLang = quizPickAskLang();
-    quizRenderPromptLabel(quizAskLang);
-
-    quizSetFlipped(false);
-
-    elQuizInput.classList.remove('is-ok', 'is-bad');
-    elQuizInput.disabled = false;
-    elQuizInput.value = '';
-
-    if(!quizCurrent){
-      const sel = String((elSectionQuiz && elSectionQuiz.value) || '').trim();
-      if(!sel){
-        elQuizFront.textContent = 'выбери section';
-        elQuizBack.textContent = 'сначала выбери раздел';
-        quizSetFeedback('idle', 'pick', 'сначала выбери section');
-      }else{
-        elQuizFront.textContent = 'нет слов';
-        elQuizBack.textContent = 'добавь слова в constructor';
-        quizSetFeedback('idle', 'empty', 'добавь слова в constructor');
-      }
-      elQuizFrontLang.textContent = '';
-      elQuizBackLang.textContent = '';
-      setQuizMode('check');
-      return;
-    }
-
-    const frontIsEn = quizAskLang === 'en';
-    elQuizFront.textContent = frontIsEn ? quizCurrent.en : quizCurrent.ru;
-    elQuizBack.textContent = frontIsEn ? quizCurrent.ru : quizCurrent.en;
-    elQuizFrontLang.textContent = frontIsEn ? 'EN' : 'RU';
-    elQuizBackLang.textContent = frontIsEn ? 'RU' : 'EN';
-
-    elQuizInput.focus({ preventScroll:true });
-    quizSetFeedback('idle', 'ready', 'введи перевод и нажми check');
-    setQuizMode('check');
-  }
-
-  function quizNext(){
-    if(!quizQueue.length){
-      quizShow(null);
-      return;
-    }
-    const item = quizQueue.shift();
-    quizShow(item);
-  }
-
-  function dictResetQuiz(){
-    quizDeck = wordsForSelection(elSectionQuiz.value);
-    quizQueue = shuffle(quizDeck);
-    quizTotal = 0;
-    quizCorrect = 0;
-    quizSeen = new Set();
-    quizUpdateScore();
-    quizNext();
-  }
-
-  function quizLockAfterCheck(isCorrect){
-    if(isCorrect) elQuizInput.classList.add('is-ok');
-    else{
-      elQuizInput.classList.add('is-bad');
-      pulse(elQuizInput, 'ik-shake');
-    }
-    elQuizInput.disabled = true;
-    quizSetFlipped(true); // show answer
-    setQuizMode('next');
-  }
-
-  function quizCheckOrNext(){
-    if(quizCheckMode === 'next'){
-      quizNext();
-      return;
-    }
-    if(!quizCurrent) return;
-
-    const raw = elQuizInput.value || '';
-    if(!String(raw).trim()){
-      quizSetFeedback('idle', 'type', 'введи ответ');
-      pulse(elQuizInput, 'ik-shake');
-      return;
-    }
-
-    let ok = false;
-    if(quizAskLang === 'en'){
-      const user = normRuLoose(raw);
-      ok = ruVariants(quizCurrent.ru).includes(user);
-    }else{
-      const user = normEnCmp(raw);
-      ok = user === normEnCmp(quizCurrent.en);
-    }
-
-    quizTotal += 1;
-    if(ok) quizCorrect += 1;
-    quizUpdateScore();
-
-    if(ok){
-      quizSetFeedback('correct', 'ok', 'верно');
-      quizLockAfterCheck(true);
-      return;
-    }
-
-    // wrong - re-ask after a few cards
-    const insertAt = Math.min(quizQueue.length, DICT_REASK_GAP);
-    quizQueue.splice(insertAt, 0, quizCurrent);
-
-    quizSetFeedback('wrong', 'no', 'неверно - смотри ответ и жми далее');
-    quizLockAfterCheck(false);
-  }
-
-  function quizSkip(){
-    if(!quizCurrent) return;
-    const insertAt = Math.min(quizQueue.length, DICT_REASK_GAP);
-    quizQueue.splice(insertAt, 0, quizCurrent);
-    quizSetFeedback('idle', 'skip', 'пропуск - слово вернется позже');
-    quizLockAfterCheck(false);
-  }
-
-  async function dictRefreshAll(){
-    dictSections = await dictGetAll(dictDb, DICT_STORE_SECTIONS);
-    dictWordsAll = await dictGetAll(dictDb, DICT_STORE_WORDS);
-    buildCounts();
-    updateGlobalBadges();
-    renderSectionsUI();
-  }
-
-  function dictJsonToSections(data, fallbackName){
-  if(!data) return [];
-  const fb = String(fallbackName || '').trim();
-
-  if(Array.isArray(data.sections)){
-    return data.sections
-      .map(s => ({
-        name: String((s && (s.name || s.sectionName || s.section)) || fb).trim(),
-        words: Array.isArray(s && s.words) ? s.words : []
-      }))
-      .filter(s => s.name);
-  }
-
-  const name = String((data.sectionName || data.name || data.section) || fb).trim();
-  if(name && Array.isArray(data.words)){
-    return [{ name, words: data.words }];
-  }
-
-  return [];
-}
-
-function dictSectionExistsByName(name){
-  const key = normalize(name || '');
-  return dictSections.find(x => x.nameKey === key) || null;
-}
-
-function dictClearWordsInSection(dbx, sid){
-  const sectionId = Number(sid || 0);
-  return new Promise((resolve, reject) => {
-    const t = dbx.transaction([DICT_STORE_WORDS], 'readwrite');
-    const wStore = t.objectStore(DICT_STORE_WORDS);
-
-    try{
-      const idx = wStore.index('sectionId');
-      const cur = idx.openCursor(IDBKeyRange.only(sectionId));
-      cur.onsuccess = (e) => {
-        const c = e.target.result;
-        if(!c) return;
-        c.delete();
-        c.continue();
-      };
-    }catch(err){
-      reject(err || new Error('Failed to clear section words'));
-      return;
-    }
-
-    t.oncomplete = () => resolve(true);
-    t.onerror = () => reject(t.error || new Error('Failed to clear section words'));
-  });
-}
-
-async function dictImportSectionFile(data, opts){
-  const replaceExisting = !!(opts && opts.replaceExisting);
-  const mergeExisting = !!(opts && opts.mergeExisting);
-  const fallbackName = (opts && opts.fallbackName) || '';
-
-  const secs = dictJsonToSections(data, fallbackName);
-  if(!secs.length) return { imported:0, skipped:0 };
-
-  if(!dictDb) throw new Error('dict db not ready');
-
-  if(!dictSections.length) await dictRefreshAll();
-
-  let imported = 0;
-  let skipped = 0;
-
-  for(const s of secs){
-    const name = String(s && s.name || '').trim();
-    if(!name){ skipped += 1; continue; }
-
-    const exist = dictSectionExistsByName(name);
-
-    if(exist && !replaceExisting && !mergeExisting){
-      skipped += 1;
-      continue;
-    }
-
-    let sid = exist ? exist.id : null;
-
-    if(!sid){
-      // eslint-disable-next-line no-await-in-loop
-      const resS = await dictAddSection(dictDb, name);
-      sid = resS && resS.ok ? resS.id : null;
-      if(!sid){
-        // refresh cache and try find again
-        // eslint-disable-next-line no-await-in-loop
-        await dictRefreshAll();
-        const exist2 = dictSectionExistsByName(name);
-        sid = exist2 ? exist2.id : null;
-      }
-    }
-
-    if(!sid){ skipped += 1; continue; }
-
-    if(exist && replaceExisting){
-      // eslint-disable-next-line no-await-in-loop
-      await dictClearWordsInSection(dictDb, sid);
-    }
-
-    const words = Array.isArray(s.words) ? s.words : [];
-    for(const w of words){
-      if(!w || !w.en || !w.ru) continue;
-      // eslint-disable-next-line no-await-in-loop
-      const resW = await dictAddWord(dictDb, sid, w.en, w.ru);
-      if(resW && resW.ok) imported += 1;
-    }
-  }
-
-  return { imported, skipped };
-}
-
-async function dictSyncFromFolder(opts){
-  const replaceExisting = !!(opts && opts.replaceExisting);
-  const mergeExisting = !!(opts && opts.mergeExisting);
-
-  const okFiles = [];
-  const failFiles = [];
-
-  let files = [];
-  try{
-    let man = null;
-    let manifestUsed = null;
-    const manifestErrors = [];
-    for(const mp of DICT_MANIFESTS){
-      try{
-        // eslint-disable-next-line no-await-in-loop
-        man = await fetchJson(mp);
-        manifestUsed = mp;
-        break;
-      }catch(e){
-        manifestErrors.push(`${mp} - ${e && (e.message || e)}`);
-      }
-    }
-
-    if(Array.isArray(man)) files = man;
-    else if(man && Array.isArray(man.dictionary)) files = man.dictionary;
-    else if(man && man.dictionary && Array.isArray(man.dictionary.files)) files = man.dictionary.files;
-    else if(man && man.dictionary && Array.isArray(man.dictionary.dbs)) files = man.dictionary.dbs;
-    else if(man && Array.isArray(man.files)) files = man.files;
-    else if(man && Array.isArray(man.dbs)) files = man.dbs;
-  }catch(_){
-    // no manifest - use defaults
-  }
-
-  if(!Array.isArray(files) || !files.length){
-    files = DICT_DEFAULT_FILES;
-  }
-
-  files = files.map(x => String(x || '').trim()).filter(Boolean);
-
-  // refresh caches
-  await dictRefreshAll();
-
-  for(const f of files){
-    const rel = f.includes('/') ? f : `${DICT_DIR}${f}`;
-    try{
-      const data = await fetchJson(rel);
-      // eslint-disable-next-line no-await-in-loop
-      await dictImportSectionFile(data, {
-        replaceExisting,
-        mergeExisting,
-        fallbackName: _basename(f)
-          .replace(/^student_helper_db__dictionary_/, '')
-          .replace(/\.json$/i, '')
-          .replaceAll('_', ' ')
-      });
-
-      okFiles.push(rel);
-      // eslint-disable-next-line no-await-in-loop
-      await dictRefreshAll();
-    }catch(e){
-      failFiles.push(`${rel} - ${e && (e.message || e)}`);
-    }
-  }
-
-  return { okFiles, failFiles, filesCount: files.length, manifestUsed, manifestErrors };
-}
-
-  async function dictExportSection(){
-  const sid = Number(elSectionBuilder.value || 0);
-  if(!sid){
-    alert('Выбери section в constructor.');
-    return;
-  }
-  const sec = dictSections.find(x => Number(x.id) === sid);
-  if(!sec){
-    alert('Section не найден.');
-    return;
-  }
-
-  const words = dictWordsAll
-    .filter(w => Number(w.sectionId) === sid)
-    .sort((a,b)=> (a.en || '').localeCompare((b.en || ''), 'en'))
-    .map(w => ({ en:w.en, ru:w.ru }));
-
-  const payload = {
-    schema: 'student_helper_dict_section',
-    schemaVersion: 1,
-    exportedAt: new Date().toISOString(),
-    sectionName: sec.name,
-    words
-  };
-
-  const filename = dictFilenameForSection(sec.name);
-  const blob = new Blob([JSON.stringify(payload, null, 2)], { type:'application/json' });
-
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(a.href);
-}
-
-  async function dictImportFromObject(data, replace){
-    const sections = Array.isArray(data && data.sections) ? data.sections : [];
-    if(replace) await dictClear(dictDb);
-
-    for(const s of sections){
-      if(!s || !s.name) continue;
-
-      // eslint-disable-next-line no-await-in-loop
-      const resS = await dictAddSection(dictDb, s.name);
-      let sid = resS.ok ? resS.id : null;
-
-      if(!sid){
-        // duplicate - find existing
-        const key = normalize(s.name);
-        const exist = dictSections.find(x => x.nameKey === key);
-        sid = exist ? exist.id : null;
-      }
-
-      if(!sid) continue;
-
-      const words = Array.isArray(s.words) ? s.words : [];
-      for(const w of words){
-        if(!w || !w.en || !w.ru) continue;
-        // eslint-disable-next-line no-await-in-loop
-        await dictAddWord(dictDb, sid, w.en, w.ru);
-      }
-    }
-  }
-
-  async function dictImportFromFile(file, replace){
-    const text = await file.text();
-    const parsed = safeParseJSON(text);
-    if(!parsed.ok){
-      alert('Файл не является корректным JSON.');
-      return;
-    }
-
-    // refresh to have current nameKey
-    await dictRefreshAll();
-
-    await dictImportSectionFile(parsed.data || {}, { replaceExisting: !!replace, mergeExisting: !replace });
-  }
-
-  async function dictBoot(){
-    try{
-      elDictDbStatus.textContent = 'opening...';
-      dictDb = await dictOpenDB();
-      elDictDbStatus.textContent = 'ok';const sync = await dictSyncFromFolder({ replaceExisting:false, mergeExisting:false });
-
-if(sync.okFiles.length){
-  const okPart = sync.failFiles.length ? 'partial' : 'ok';
-  elDictSeedBadge.textContent = `json: ${okPart} (${sync.okFiles.length}/${sync.filesCount || sync.okFiles.length})`;
-  elDictSeedBadge.title =
-    `manifest: ${sync.manifestUsed || 'none'}\n\nok:\n- ${sync.okFiles.join('\n- ')}\n\nfail:\n- ${sync.failFiles.length ? sync.failFiles.join('\n- ') : 'none'}\n\nhint: для GitHub Pages нужен db/manifest.json (или db/dictionary/manifest.json) со списком файлов`;
-}else if(sync.failFiles.length){
-  elDictSeedBadge.textContent = 'json: failed';
-  elDictSeedBadge.title =
-    `manifest tried:\n- ${(sync.manifestErrors && sync.manifestErrors.length) ? sync.manifestErrors.join('\n- ') : 'n/a'}\n\nfail:\n- ${sync.failFiles.join('\n- ')}\n\nhint: проверь пути (GitHub Pages добавляет /<repo>/ в URL) и регистр папок (db vs DB).`;
-}else{
-  elDictSeedBadge.textContent = 'json: none';
-  elDictSeedBadge.title = 'manifest не найден и DICT_DEFAULT_FILES пустой.';
-}
-
-      await dictRefreshAll();
-      renderWordsUI();
-
-      dictShowFirstPick();
-      cardsShow(null, 'en');
-      quizShow(null);
-      quizSetFeedback('idle', 'pick', 'выбери section');
-    }catch(e){
-      elDictDbStatus.textContent = 'failed';
-      console.error(e);
-    }
-  }
-
-  // Dictionary events
-  dictTabCards.addEventListener('click', ()=> dictSetSubtab('cards'));
-  dictTabQuiz.addEventListener('click', ()=> dictSetSubtab('quiz'));
-  dictTabBuilder.addEventListener('click', ()=> dictSetSubtab('builder'));
-
-  if(btnCardsChooseSection) btnCardsChooseSection.addEventListener('click', dictShowFirstPick);
-  if(btnQuizChooseSection) btnQuizChooseSection.addEventListener('click', dictShowFirstPick);
-  if(btnFirstPickOpenConstructor) btnFirstPickOpenConstructor.addEventListener('click', dictOpenConstructorFromPick);
-  if(elFirstPickSearch) elFirstPickSearch.addEventListener('input', renderFirstPickUI);
-
-  btnCardsPrev.addEventListener('click', cardsGoPrev);
-  btnCardsNext.addEventListener('click', cardsGoNext);
-  elCardsFront.addEventListener('change', dictResetCards);
-  elCardsRandom.addEventListener('change', dictResetCards);
-  elSectionCards.addEventListener('change', dictResetCards);
-
-  elFlipCard.addEventListener('click', cardsToggleFlip);
-  elFlipCard.addEventListener('keydown', (e)=>{
-    if(e.key === 'Enter' || e.key === ' '){
-      e.preventDefault();
-      cardsToggleFlip();
-    }
-  });
-
-  elSectionQuiz.addEventListener('change', dictResetQuiz);
-  elQuizMode.addEventListener('change', dictResetQuiz);
-
-  btnQuizCheckNext.addEventListener('click', quizCheckOrNext);
-  elQuizInput.addEventListener('keydown', (e)=>{
-    if(e.key === 'Enter'){
-      e.preventDefault();
-      quizCheckOrNext();
-    }
-  });
-
-  btnQuizSkip.addEventListener('click', quizSkip);
-
-  // Quiz card flips only after check
-  elQuizCard.addEventListener('click', ()=>{
-    if(quizCheckMode !== 'next') return;
-    const flipped = elQuizCard.classList.contains('is-flipped');
-    quizSetFlipped(!flipped);
-  });
-  elQuizCard.addEventListener('keydown', (e)=>{
-    if(quizCheckMode !== 'next') return;
-    if(e.key === 'Enter' || e.key === ' '){
-      e.preventDefault();
-      const flipped = elQuizCard.classList.contains('is-flipped');
-      quizSetFlipped(!flipped);
-    }
-  });
-
-  btnAddSection.addEventListener('click', async ()=>{
-    const name = (elNewSectionName.value || '').trim();
-    if(!name){
-      alert('Название раздела пустое.');
-      return;
-    }
-    try{
-      const res = await dictAddSection(dictDb, name);
-      if(!res.ok && res.reason === 'duplicate'){
-        alert('Такой раздел уже есть.');
-        return;
-      }
-      elNewSectionName.value = '';
-      await dictRefreshAll();
-      if(res.ok) elSectionBuilder.value = String(res.id);
-      renderWordsUI();
-      dictResetCards();
-      dictResetQuiz();
-      dictSetSubtab('builder');
-    }catch(e){
-      alert(`Ошибка сохранения: ${e.message || e}`);
-    }
-  });
-
-  btnDeleteSection.addEventListener('click', async ()=>{
-    const sid = Number(elSectionBuilder.value || 0);
-    if(!sid){
-      alert('Выбери раздел.');
-      return;
-    }
-    const name = getSectionNameById(sid);
-    if(!confirm(`Удалить раздел "${name}" и все слова внутри?`)) return;
-
-    try{
-      await dictDeleteSection(dictDb, sid);
-      await dictRefreshAll();
-      renderWordsUI();
-      dictResetCards();
-      dictResetQuiz();
-    }catch(e){
-      alert(`Ошибка удаления: ${e.message || e}`);
-    }
-  });
-
-  elSectionBuilder.addEventListener('change', renderWordsUI);
-
-  btnAddWord.addEventListener('click', async ()=>{
-    const sid = Number(elSectionBuilder.value || 0);
-    if(!sid){
-      alert('Сначала выбери раздел.');
-      return;
-    }
-    const en = (elEnInput.value || '').trim();
-    const ru = (elRuInput.value || '').trim();
-    if(!en || !ru){
-      alert('Заполни EN и RU.');
-      return;
-    }
-    try{
-      const res = await dictAddWord(dictDb, sid, en, ru);
-      if(!res.ok && res.reason === 'duplicate'){
-        alert('Такое слово уже есть (дубликат).');
-        return;
-      }
-      elEnInput.value = '';
-      elRuInput.value = '';
-      await dictRefreshAll();
-      renderWordsUI();
-      dictResetCards();
-      dictResetQuiz();
-    }catch(e){
-      alert(`Ошибка сохранения: ${e.message || e}`);
-    }
-  });
-
-  btnDictExport.addEventListener('click', dictExportSection);
-
-  btnDictImport.addEventListener('click', ()=>{
-    elDictFileImport.value = '';
-    elDictFileImport.click();
-  });
-
-  elDictFileImport.addEventListener('change', async ()=>{
-    const file = elDictFileImport.files && elDictFileImport.files[0];
-    if(!file) return;
-    try{
-      await dictImportFromFile(file, !!elDictImportReplace.checked);
-      await dictRefreshAll();
-      renderWordsUI();
-      dictResetCards();
-      dictResetQuiz();
-      alert('Импорт: ok');
-    }catch(e){
-      alert(`Ошибка импорта: ${e.message || e}`);
-    }
-  });
-
-  window.dictBoot = dictBoot;
-
-
-  boot();
-  dictBoot();
-  </script>
+    <script src="./js/tabs.js"></script>
+  <script src="./js/lobby.js"></script>
+  <script src="./js/structure_data.js"></script>
+  <script src="./js/structure.js"></script>
+  <script src="./js/word_transformation.js"></script>
+  <script src="./js/dictionary.js"></script>
 </body>
 </html>

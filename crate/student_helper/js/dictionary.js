@@ -1,0 +1,3672 @@
+// Dictionary (sections + words)
+  // -----------------------------
+  const DICT_DB_VERSION = 1;
+  const DICT_STORE_SECTIONS = 'sections';
+  const DICT_STORE_WORDS = 'words';
+  const DICT_REASK_GAP = 3;
+
+  function dictDbName(){ return dbNameFor('dictionary'); }
+
+  function normSpaces(s){ return String(s || '').trim().replace(/\s+/g, ' '); }
+  function normEnCmp(s){ return normSpaces(s).toLowerCase(); }
+  function normRuCmp(s){ return normSpaces(s).toLowerCase().replaceAll('ё', 'е'); }
+  function stripParenMeta(s){
+    return String(s || '').replace(/\([^)]*\)/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+
+  function normEnLoose(s){
+    // for practice compare (EN answers)
+    let t = stripParenMeta(normSpaces(s).toLowerCase());
+    t = t.replace(/[.,!?;:]+$/g, '').trim();
+    t = t.replace(/[“”„"]/g, '"').replace(/[’‘]/g, "'");
+    t = t.replace(/[-\u2013\u2014]/g, '-');
+    t = t.replace(/\s+/g, ' ').trim();
+    return t;
+  }
+
+  function normRuLoose(s){
+    return stripParenMeta(normRuCmp(s))
+      .replace(/[.,!?;:()"'«»\[\]{}<>]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  function splitVariants(raw, lang){
+    const base = String(raw || '').trim();
+    if(!base) return [];
+    const sep = lang === 'ru'
+      ? /(?:\n|;|\/|\s+или\s+|,)/i
+      : /(?:\n|;|\/|\s+or\s+|,)/i;
+    return base.split(sep).map(x=> String(x||'').trim()).filter(Boolean);
+  }
+
+  function ruVariants(ru){
+    const out = [];
+    for(const p of splitVariants(ru, 'ru')){
+      const v = normRuLoose(p);
+      if(v) out.push(v);
+    }
+    const whole = normRuLoose(ru);
+    if(whole) out.push(whole);
+    return Array.from(new Set(out));
+  }
+
+  function enVariants(en, cfg){
+    const out = [];
+    for(const p of splitVariants(en, 'en')){
+      let v = normEnLoose(p);
+      if(!v) continue;
+      out.push(v);
+
+      if(cfg && cfg.ignoreTo){
+        if(v.startsWith('to ')) out.push(v.replace(/^to\s+/, '').trim());
+      }
+      if(cfg && cfg.ignoreArticles){
+        out.push(v.replace(/^(a|an|the)\s+/, '').trim());
+      }
+    }
+    const whole = normEnLoose(en);
+    if(whole) out.push(whole);
+    
+    // optional: accept simple EN forms (for learn)
+    if(cfg && cfg.acceptForms){
+      const raw = stripParenMeta(normSpaces(en).toLowerCase());
+      let lemma = raw;
+      if(cfg.ignoreTo && lemma.startsWith('to ')) lemma = lemma.replace(/^to\s+/, '').trim();
+      lemma = lemma.replace(/^(a|an|the)\s+/, '').trim();
+
+      const mpos = String(en || '').toLowerCase().match(/\((v|n|adj)\)/);
+      const pos = mpos ? mpos[1] : '';
+
+      const add = (s)=>{ const v = normEnLoose(s); if(v) out.push(v); };
+
+      if(pos === 'v' && lemma){
+        // very simple verb forms (regular)
+        add(lemma + 's');
+        add(lemma + 'ed');
+        add(lemma + 'ing');
+
+        // y -> ies/ied (try)
+        if(lemma.endsWith('y') && lemma.length>2 && !'aeiou'.includes(lemma[lemma.length-2])){
+          add(lemma.slice(0,-1) + 'ies');
+          add(lemma.slice(0,-1) + 'ied');
+        }
+        // e -> ed/ing
+        if(lemma.endsWith('e') && lemma.length>2){
+          add(lemma + 'd');
+          add(lemma.slice(0,-1) + 'ing');
+        }
+      }else if(pos === 'n' && lemma){
+        // simple plural
+        add(lemma + 's');
+        if(/[sxz]$/.test(lemma) || /ch$/.test(lemma) || /sh$/.test(lemma)) add(lemma + 'es');
+        if(lemma.endsWith('y') && lemma.length>2 && !'aeiou'.includes(lemma[lemma.length-2])){
+          add(lemma.slice(0,-1) + 'ies');
+        }
+      }else if(pos === 'adj' && lemma){
+        add(lemma + 'er');
+        add(lemma + 'est');
+      }
+    }
+
+    return Array.from(new Set(out.filter(Boolean)));
+
+  }
+
+  function userTokens(raw, lang, cfg){
+    const tokens = splitVariants(raw, lang);
+    if(!tokens.length) return [];
+    if(lang === 'ru') return tokens.map(normRuLoose).filter(Boolean);
+
+    return tokens.map(t=>{
+      let v = normEnLoose(t);
+      if(cfg && cfg.ignoreTo) v = v.replace(/^to\s+/, '').trim();
+      if(cfg && cfg.ignoreArticles) v = v.replace(/^(a|an|the)\s+/, '').trim();
+      return v;
+    }).filter(Boolean);
+  }
+
+  function levenshtein(a,b){
+    const s = String(a||''); const t = String(b||'');
+    const n = s.length; const m = t.length;
+    if(n === 0) return m;
+    if(m === 0) return n;
+    const dp = new Array(m+1);
+    for(let j=0;j<=m;j++) dp[j]=j;
+    for(let i=1;i<=n;i++){
+      let prev = dp[0];
+      dp[0]=i;
+      for(let j=1;j<=m;j++){
+        const tmp = dp[j];
+        const cost = s[i-1] === t[j-1] ? 0 : 1;
+        dp[j] = Math.min(dp[j] + 1, dp[j-1] + 1, prev + cost);
+        prev = tmp;
+      }
+    }
+    return dp[m];
+  }
+
+  function typoThreshold(str){
+    const x = String(str||'').replace(/\s+/g,'');
+    const L = x.length;
+    if(L <= 4) return 0;
+    if(L <= 6) return 1;
+    if(L <= 10) return 2;
+    return 3;
+  }
+
+  function shuffle(arr){
+    const a = [...arr];
+    for(let i = a.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+// -----------------------------
+// Multiple Choice (MCQ) helpers
+// -----------------------------
+const MCQ_CONFUSIONS_KEY = 'student_helper_dict_confusions_v1';
+
+let mcqPosBagQuiz = [];
+let mcqPosBagLearn = [];
+
+function extractPos(raw){
+  const m = String(raw || '').toLowerCase().match(/\((v|n|adj|adv)\)/);
+  return m ? m[1] : '';
+}
+function mcqWordCount(s){
+  return String(s || '').trim().split(/\s+/).filter(Boolean).length;
+}
+function mcqDisplayEn(raw){
+  let t = stripParenMeta(normSpaces(raw));
+  t = t.replace(/^to\s+/i, '').trim();
+  t = t.replace(/^(a|an|the)\s+/i, '').trim();
+  return t;
+}
+function mcqDisplayRu(raw){
+  return stripParenMeta(String(raw || '').trim());
+}
+function mcqNormForLang(s, lang){
+  return (lang === 'ru') ? normRuLoose(s) : normEnLoose(s);
+}
+function mcqCanonical(item, answerLang){
+  const rawAll = answerLang === 'en' ? (item && item.en) : (item && item.ru);
+  const parts = splitVariants(rawAll, answerLang === 'en' ? 'en' : 'ru');
+  const first = (parts && parts.length) ? parts[0] : (rawAll || '');
+  const pos = extractPos(first) || extractPos(rawAll);
+  const display = (answerLang === 'en') ? mcqDisplayEn(first) : mcqDisplayRu(first);
+  const norm = mcqNormForLang(display, answerLang === 'en' ? 'en' : 'ru');
+  return { raw:first, display, norm, pos, wc: mcqWordCount(display) };
+}
+function mcqAllAcceptedNorms(item, answerLang, cfg){
+  if(answerLang === 'en'){
+    const vars = enVariants(item && item.en, cfg);
+    // enVariants are already normalized to normEnLoose
+    return new Set(vars || []);
+  }
+  const vars = ruVariants(item && item.ru);
+  return new Set(vars || []);
+}
+
+function mcqLoadConfusions(){
+  const raw = localStorage.getItem(MCQ_CONFUSIONS_KEY);
+  return safeJsonParse(raw, {}) || {};
+}
+function mcqSaveConfusions(obj){
+  try{ localStorage.setItem(MCQ_CONFUSIONS_KEY, JSON.stringify(obj || {})); }catch(_){}
+}
+function mcqBumpConfusion(item, askLang, chosenNorm, correctNorm){
+  // store only when user selected a wrong option
+  if(!item) return;
+  if(!chosenNorm || chosenNorm === correctNorm) return;
+  const key = practiceKey(item);
+  if(!key) return;
+  const dir = (askLang === 'en') ? 'en2ru' : 'ru2en';
+  const all = mcqLoadConfusions();
+  if(!all[dir]) all[dir] = {};
+  if(!all[dir][key]) all[dir][key] = {};
+  if(!all[dir][key][chosenNorm]) all[dir][key][chosenNorm] = 0;
+  all[dir][key][chosenNorm] += 1;
+  mcqSaveConfusions(all);
+}
+function mcqTopConfusions(item, askLang, limit){
+  const key = practiceKey(item);
+  if(!key) return [];
+  const dir = (askLang === 'en') ? 'en2ru' : 'ru2en';
+  const all = mcqLoadConfusions();
+  const map = (all && all[dir] && all[dir][key]) ? all[dir][key] : null;
+  if(!map) return [];
+  const arr = Object.entries(map).sort((a,b)=> (b[1]||0) - (a[1]||0));
+  return arr.slice(0, Math.max(0, limit||0)).map(x=> x[0]);
+}
+
+function mcqPickPos(bag, n){
+  const k = Math.max(2, Math.min(8, Number(n) || 4));
+  if(!Array.isArray(bag) || !bag.length){
+    const fresh = [];
+    for(let i=0;i<k;i++) fresh.push(i);
+    // shuffle bag
+    for(let i=fresh.length-1;i>0;i--){
+      const j = Math.floor(Math.random() * (i+1));
+      [fresh[i], fresh[j]] = [fresh[j], fresh[i]];
+    }
+    bag.splice(0, bag.length, ...fresh);
+  }
+  const x = bag.shift();
+  return (x >= 0 && x < k) ? x : Math.floor(Math.random() * k);
+}
+
+function mcqBuildOptions(targetItem, askLang, answerLang, count, itemsPool, cfg){
+  const n = Math.max(2, Math.min(8, Number(count) || 4));
+  const correct = mcqCanonical(targetItem, answerLang);
+  const excluded = mcqAllAcceptedNorms(targetItem, answerLang, cfg);
+  if(correct && correct.norm) excluded.add(correct.norm);
+
+  const preferNorms = mcqTopConfusions(targetItem, askLang, Math.max(2, n));
+  const wantDistr = n - 1;
+
+  const candidates = [];
+  for(const it of (itemsPool || [])){
+    if(!it) continue;
+    // skip same word
+    if(targetItem && it.id != null && targetItem.id != null && String(it.id) === String(targetItem.id)) continue;
+    const c = mcqCanonical(it, answerLang);
+    if(!c || !c.norm) continue;
+    if(excluded.has(c.norm)) continue;
+    candidates.push(c);
+  }
+
+  // de-dup candidates by norm
+  const seen = new Set();
+  const uniq = [];
+  for(const c of candidates){
+    if(seen.has(c.norm)) continue;
+    seen.add(c.norm);
+    uniq.push(c);
+  }
+
+  // phrase preference
+  const targetWc = correct.wc || 1;
+  const preferPhrase = targetWc > 1;
+  const samePos = correct.pos ? uniq.filter(x => x.pos && x.pos === correct.pos) : [];
+  const anyPos = uniq.slice();
+
+  const pickFrom = (pool, need)=>{
+    const out = [];
+    const bag = pool.slice();
+    while(out.length < need && bag.length){
+      const idx = Math.floor(Math.random() * bag.length);
+      out.push(bag[idx]);
+      bag.splice(idx, 1);
+    }
+    return out;
+  };
+
+  const chosen = [];
+  const pushIf = (cand)=>{
+    if(!cand || !cand.norm) return;
+    if(chosen.find(x => x.norm === cand.norm)) return;
+    chosen.push(cand);
+  };
+
+  // 1) add top confusions if present in pools
+  for(const norm of preferNorms){
+    const hit = uniq.find(x => x.norm === norm);
+    if(hit) pushIf(hit);
+    if(chosen.length >= wantDistr) break;
+  }
+
+  // 2) prefer same POS and similar phrase-ness
+  if(chosen.length < wantDistr){
+    let pool = samePos.length ? samePos : anyPos;
+    if(preferPhrase){
+      const ph = pool.filter(x => (x.wc||1) > 1);
+      if(ph.length >= Math.min(2, wantDistr)) pool = ph;
+    }
+    const rest = pickFrom(pool.filter(x => !chosen.find(y=>y.norm===x.norm)), wantDistr - chosen.length);
+    for(const r of rest) pushIf(r);
+  }
+
+  // 3) fill from any
+  if(chosen.length < wantDistr){
+    const rest = pickFrom(anyPos.filter(x => !chosen.find(y=>y.norm===x.norm)), wantDistr - chosen.length);
+    for(const r of rest) pushIf(r);
+  }
+
+  // final options without revealing order
+  const opts = new Array(n).fill(null);
+  return { correct, distractors: chosen.slice(0, wantDistr), n, opts };
+}
+
+  function dictOpenDB(){
+    return new Promise((resolve, reject) => {
+      if(!idbSupported()){
+        reject(new Error('IndexedDB not supported'));
+        return;
+      }
+      const req = indexedDB.open(dictDbName(), DICT_DB_VERSION);
+
+      req.onupgradeneeded = () => {
+        const dbx = req.result;
+
+        if(!dbx.objectStoreNames.contains(DICT_STORE_SECTIONS)){
+          const s = dbx.createObjectStore(DICT_STORE_SECTIONS, { keyPath:'id', autoIncrement:true });
+          s.createIndex('nameKey', 'nameKey', { unique:true });
+        }
+        if(!dbx.objectStoreNames.contains(DICT_STORE_WORDS)){
+          const w = dbx.createObjectStore(DICT_STORE_WORDS, { keyPath:'id', autoIncrement:true });
+          w.createIndex('sectionId', 'sectionId', { unique:false });
+          w.createIndex('pairKey', 'pairKey', { unique:true });
+        }
+
+        // Backfill keys for older data (if any)
+        const txu = req.transaction;
+        try{
+          const sStore = txu.objectStore(DICT_STORE_SECTIONS);
+          if(!sStore.indexNames.contains('nameKey')) sStore.createIndex('nameKey', 'nameKey', { unique:true });
+          const curS = sStore.openCursor();
+          curS.onsuccess = (e) => {
+            const c = e.target.result;
+            if(!c) return;
+            const v = c.value || {};
+            if(!v.nameKey) v.nameKey = normalize(v.name || '');
+            c.update(v);
+            c.continue();
+          };
+        }catch(_){/* ignore */}
+
+        try{
+          const wStore = txu.objectStore(DICT_STORE_WORDS);
+          if(!wStore.indexNames.contains('sectionId')) wStore.createIndex('sectionId', 'sectionId', { unique:false });
+          if(!wStore.indexNames.contains('pairKey')) wStore.createIndex('pairKey', 'pairKey', { unique:true });
+          const curW = wStore.openCursor();
+          curW.onsuccess = (e) => {
+            const c = e.target.result;
+            if(!c) return;
+            const v = c.value || {};
+            v.sectionId = Number(v.sectionId || 0);
+            v.en = normSpaces(v.en || '');
+            v.ru = String(v.ru || '').trim();
+            v.enKey = v.enKey || normEnCmp(v.en);
+            v.ruKey = v.ruKey || normRuCmp(v.ru);
+            v.pairKey = v.pairKey || `${v.sectionId}|${v.enKey}|${v.ruKey}`;
+            c.update(v);
+            c.continue();
+          };
+        }catch(_){/* ignore */}
+      };
+
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error || new Error('Failed to open dict db'));
+    });
+  }
+
+  function dictGetAll(dbx, store){
+    return new Promise((resolve, reject) => {
+      const t = dbx.transaction([store], 'readonly');
+      const os = t.objectStore(store);
+      const req = os.getAll();
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = () => reject(req.error || new Error('Failed to getAll'));
+    });
+  }
+  function dictCount(dbx, store){
+    return new Promise((resolve, reject) => {
+      const t = dbx.transaction([store], 'readonly');
+      const os = t.objectStore(store);
+      const req = os.count();
+      req.onsuccess = () => resolve(req.result || 0);
+      req.onerror = () => reject(req.error || new Error('Failed to count'));
+    });
+  }
+  function dictClear(dbx){
+    return new Promise((resolve, reject) => {
+      const t = dbx.transaction([DICT_STORE_WORDS, DICT_STORE_SECTIONS], 'readwrite');
+      t.objectStore(DICT_STORE_WORDS).clear();
+      t.objectStore(DICT_STORE_SECTIONS).clear();
+      t.oncomplete = () => resolve(true);
+      t.onerror = () => reject(t.error || new Error('Failed to clear dict db'));
+    });
+  }
+
+  function dictAddSection(dbx, name){
+    const n = String(name || '').trim();
+    if(!n) return Promise.resolve({ ok:false, reason:'empty' });
+    const payload = { name:n, nameKey: normalize(n), createdAt: Date.now(), updatedAt: Date.now() };
+
+    return new Promise((resolve, reject) => {
+      const t = dbx.transaction([DICT_STORE_SECTIONS], 'readwrite');
+      const os = t.objectStore(DICT_STORE_SECTIONS);
+      const req = os.add(payload);
+      req.onsuccess = () => resolve({ ok:true, id:req.result });
+      req.onerror = () => {
+        const err = req.error;
+        if(err && err.name === 'ConstraintError'){
+          resolve({ ok:false, reason:'duplicate' });
+          return;
+        }
+        reject(err || new Error('Failed to add section'));
+      };
+    });
+  }
+
+  function dictAddWord(dbx, sectionId, en, ru){
+    const sid = Number(sectionId || 0);
+    const enS = normSpaces(en);
+    const ruS = String(ru || '').trim();
+    if(!sid || !enS || !ruS) return Promise.resolve({ ok:false, reason:'empty' });
+
+    const payload = {
+      sectionId: sid,
+      en: enS,
+      enKey: normEnCmp(enS),
+      ru: ruS,
+      ruKey: normRuCmp(ruS),
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    };
+    payload.pairKey = `${payload.sectionId}|${payload.enKey}|${payload.ruKey}`;
+
+    return new Promise((resolve, reject) => {
+      const t = dbx.transaction([DICT_STORE_WORDS], 'readwrite');
+      const os = t.objectStore(DICT_STORE_WORDS);
+      const req = os.add(payload);
+      req.onsuccess = () => resolve({ ok:true, id:req.result });
+      req.onerror = () => {
+        const err = req.error;
+        if(err && err.name === 'ConstraintError'){
+          resolve({ ok:false, reason:'duplicate' });
+          return;
+        }
+        reject(err || new Error('Failed to add word'));
+      };
+    });
+  }
+
+  function dictDeleteWord(dbx, id){
+    return new Promise((resolve, reject) => {
+      const t = dbx.transaction([DICT_STORE_WORDS], 'readwrite');
+      const os = t.objectStore(DICT_STORE_WORDS);
+      const req = os.delete(id);
+      req.onsuccess = () => resolve(true);
+      req.onerror = () => reject(req.error || new Error('Failed to delete word'));
+    });
+  }
+
+  function dictDeleteSection(dbx, sectionId){
+    const sid = Number(sectionId || 0);
+    return new Promise((resolve, reject) => {
+      const t = dbx.transaction([DICT_STORE_SECTIONS, DICT_STORE_WORDS], 'readwrite');
+      const sStore = t.objectStore(DICT_STORE_SECTIONS);
+      const wStore = t.objectStore(DICT_STORE_WORDS);
+
+      try{
+        const idx = wStore.index('sectionId');
+        const cur = idx.openCursor(IDBKeyRange.only(sid));
+        cur.onsuccess = (e) => {
+          const c = e.target.result;
+          if(!c) return;
+          c.delete();
+          c.continue();
+        };
+      }catch(_){/* ignore */}
+
+      sStore.delete(sid);
+
+      t.oncomplete = () => resolve(true);
+      t.onerror = () => reject(t.error || new Error('Failed to delete section'));
+    });
+  }
+
+  const DICT_DIR = 'db/dictionary/';
+const DICT_MANIFESTS = ['db/manifest.json', `${DICT_DIR}manifest.json`];
+const DICT_FILE_PREFIX = 'student_helper_db__dictionary_';
+const DICT_DEFAULT_FILES = [
+  `${DICT_FILE_PREFIX}Destination_B1_Unit_3.json`,
+  `${DICT_FILE_PREFIX}Destination_B1_Unit_6.json`,
+];
+
+function dictSlug(name){
+  return String(name || '')
+    .trim()
+    .replace(/\s+/g, '_')
+    .replace(/[^A-Za-z0-9_]/g, '')
+    .replace(/_+/g, '_')
+    .replace(/^_+|_+$/g, '');
+}
+
+function dictFilenameForSection(sectionName){
+  const slug = dictSlug(sectionName) || 'section';
+  return `${DICT_FILE_PREFIX}${slug}.json`;
+}
+
+  
+  // Dict app state
+  let dictDb = null;
+  let dictSections = [];
+  let dictWordsAll = [];
+  let dictCounts = new Map();
+
+  // Cards state
+  let cardsDeck = [];
+  let cardsHistory = [];
+  let cardsPos = -1;
+  let cardsSeq = -1;
+
+  
+  let cardsSeen = new Set();
+// Quiz state
+  let quizDeck = [];
+  let quizQueue = [];
+  let quizCurrent = null;
+  let quizAskLang = 'en';
+  let quizCheckMode = 'check';
+  let quizTotal = 0;
+  let quizCorrect = 0;
+
+  
+  let quizSeen = new Set();
+  // MCQ runtime state (practice)
+  let quizTaskKind = 'input'; // input | mcq
+  let quizMcqState = null; // { options, correctIdx, selectedIdx, locked, askLang, answerLang }
+  let quizModeOverrides = {}; // practiceKey -> 'input' | 'mcq' for next appearance
+
+
+  // Practice (active recall) persistence
+  const PRACTICE_CFG_KEY = 'student_helper_dict_practice_cfg_v1';
+  const PRACTICE_STATS_KEY = 'student_helper_dict_practice_stats_v1';
+
+  let practiceCfg = null;
+  let practiceStats = null; // object map
+  let quizSessionTarget = 0;
+
+  let practiceHintLevel = 0;
+  let practiceHintUsed = false;
+  let practicePendingFuzzy = null;
+
+  function safeJsonParse(s, fb){
+    try{ return JSON.parse(s); }catch(_){ return fb; }
+  }
+  function loadPracticeCfg(){
+    const def = {
+      session:'20',
+      typos:true,
+      ignoreTo:true,
+      ignoreArticles:true,
+      taskMode:'mix', // input | mcq | mix
+      mixInputPct:60, // for mix
+      mcqCount:4,
+      showPos:false,
+      softMcq:true
+    };
+    const raw = localStorage.getItem(PRACTICE_CFG_KEY);
+    const cfg = safeJsonParse(raw, def) || def;
+    cfg.session = String(cfg.session || def.session);
+    cfg.typos = cfg.typos !== false;
+    cfg.ignoreTo = cfg.ignoreTo !== false;
+    cfg.ignoreArticles = cfg.ignoreArticles !== false;
+
+    cfg.taskMode = String(cfg.taskMode || def.taskMode);
+    if(!['input','mcq','mix'].includes(cfg.taskMode)) cfg.taskMode = def.taskMode;
+
+    const mp = Number(cfg.mixInputPct);
+    cfg.mixInputPct = Number.isFinite(mp) ? Math.max(0, Math.min(100, Math.round(mp))) : def.mixInputPct;
+
+    const mc = Number(cfg.mcqCount);
+    cfg.mcqCount = Number.isFinite(mc) ? Math.max(2, Math.min(8, Math.round(mc))) : def.mcqCount;
+
+    cfg.showPos = !!cfg.showPos;
+    cfg.softMcq = cfg.softMcq !== false;
+
+    practiceCfg = cfg;
+    return cfg;
+  }
+  function savePracticeCfg(cfg){
+    practiceCfg = cfg;
+    try{ localStorage.setItem(PRACTICE_CFG_KEY, JSON.stringify(cfg)); }catch(_){}
+  }
+  function cfgFromUI(){
+    const base = loadPracticeCfg();
+    if(elPracticeSession) base.session = String(elPracticeSession.value || base.session);
+    if(elPracticeTypos) base.typos = !!elPracticeTypos.checked;
+    if(elPracticeIgnoreTo) base.ignoreTo = !!elPracticeIgnoreTo.checked;
+    if(elPracticeIgnoreArticles) base.ignoreArticles = !!elPracticeIgnoreArticles.checked;
+
+    if(typeof elPracticeTaskMode !== 'undefined' && elPracticeTaskMode) base.taskMode = String(elPracticeTaskMode.value || base.taskMode);
+    if(typeof elPracticeMixInputPct !== 'undefined' && elPracticeMixInputPct) base.mixInputPct = Number(elPracticeMixInputPct.value || base.mixInputPct);
+    if(typeof elPracticeMcqCount !== 'undefined' && elPracticeMcqCount) base.mcqCount = Number(elPracticeMcqCount.value || base.mcqCount);
+    if(typeof elPracticeShowPos !== 'undefined' && elPracticeShowPos) base.showPos = !!elPracticeShowPos.checked;
+    if(typeof elPracticeSoftMcq !== 'undefined' && elPracticeSoftMcq) base.softMcq = !!elPracticeSoftMcq.checked;
+
+    return base;
+  }
+  function applyCfgToUI(cfg){
+    if(!cfg) return;
+    if(elPracticeSession) elPracticeSession.value = String(cfg.session || '20');
+    if(elPracticeTypos) elPracticeTypos.checked = !!cfg.typos;
+    if(elPracticeIgnoreTo) elPracticeIgnoreTo.checked = !!cfg.ignoreTo;
+    if(elPracticeIgnoreArticles) elPracticeIgnoreArticles.checked = !!cfg.ignoreArticles;
+
+    if(typeof elPracticeTaskMode !== 'undefined' && elPracticeTaskMode) elPracticeTaskMode.value = String(cfg.taskMode || 'mix');
+    if(typeof elPracticeMixInputPct !== 'undefined' && elPracticeMixInputPct) elPracticeMixInputPct.value = String(cfg.mixInputPct != null ? cfg.mixInputPct : 60);
+    if(typeof elPracticeMcqCount !== 'undefined' && elPracticeMcqCount) elPracticeMcqCount.value = String(cfg.mcqCount != null ? cfg.mcqCount : 4);
+    if(typeof elPracticeShowPos !== 'undefined' && elPracticeShowPos) elPracticeShowPos.checked = !!cfg.showPos;
+    if(typeof elPracticeSoftMcq !== 'undefined' && elPracticeSoftMcq) elPracticeSoftMcq.checked = !!cfg.softMcq;
+  }
+
+  function loadPracticeStats(){
+    const raw = localStorage.getItem(PRACTICE_STATS_KEY);
+    const st = safeJsonParse(raw, {}) || {};
+    practiceStats = st;
+    return st;
+  }
+  function savePracticeStats(){
+    try{ localStorage.setItem(PRACTICE_STATS_KEY, JSON.stringify(practiceStats || {})); }catch(_){}
+  }
+  function practiceKey(item){
+    if(!item) return '';
+    const enK = normEnCmp(stripParenMeta(item.en || ''));
+    const ruK = normRuCmp(stripParenMeta(item.ru || ''));
+    return `${item.sectionId}|${enK}|${ruK}`;
+  }
+  function practiceGetStat(item){
+    const key = practiceKey(item);
+    if(!key) return null;
+    if(!practiceStats) loadPracticeStats();
+    if(!practiceStats[key]){
+      practiceStats[key] = {
+        en2ru:{ c:0, w:0, h:0 },
+        ru2en:{ c:0, w:0, h:0 }
+      };
+    }
+    return practiceStats[key];
+  }
+  function practiceBump(item, askLang, outcome){
+    // askLang: 'en' => EN->RU, 'ru' => RU->EN
+    const st = practiceGetStat(item);
+    if(!st) return;
+    const k = askLang === 'en' ? 'en2ru' : 'ru2en';
+    if(outcome === 'correct') st[k].c += 1;
+    else if(outcome === 'hard') st[k].h += 1;
+    else st[k].w += 1;
+    savePracticeStats();
+  }
+
+
+  // -----------------------------
+  // Learn (spaced + recall)
+  // -----------------------------
+  const LEARN_CFG_KEY = 'student_helper_dict_learn_cfg_v1';
+
+  let learnCfg = null;
+
+  let learnSession = null; // { items, queue, idx, doneTests, portion, learnedCount, mode }
+  let learnCurrent = null; // current task
+  let learnCheckMode = 'check'; // 'check' | 'next'
+  let learnAskLang = 'ru'; // ask on RU by default (RU->EN)
+  let learnHintLevel = 0;
+  let learnHintUsed = false;
+  let learnTaskCounter = 0;
+
+  // MCQ runtime state (learn intro)
+  let learnMcqState = null; // { options, correctIdx, selectedIdx, locked, askLang, answerLang, item }
+ // counts answered test tasks
+
+  const LEARN_SRS_FAST = [1,2,4,7];
+  const LEARN_SRS_LONG = [1,3,7,14,30];
+
+  function loadLearnCfg(){
+    const def = {
+      source:'new',
+      portion:'8',
+      dir:'ru',
+      goal:'fast',
+      strict:'soft',
+      typos:true,
+      acceptForms:true,
+      ignoreTo:true,
+      ignoreArticles:true,
+      hints:true,
+      introMode:'card', // card | mcq (only for stage 1 intro)
+      introMcqCount:4,
+      introShowPos:false
+    };
+    const raw = localStorage.getItem(LEARN_CFG_KEY);
+    const cfg = safeJsonParse(raw, def) || def;
+
+    cfg.source = String(cfg.source || def.source);
+    cfg.portion = String(cfg.portion || def.portion);
+    cfg.dir = String(cfg.dir || def.dir);
+    cfg.goal = String(cfg.goal || def.goal);
+    cfg.strict = String(cfg.strict || def.strict);
+
+    cfg.typos = cfg.typos !== false;
+    cfg.acceptForms = cfg.acceptForms !== false;
+    cfg.ignoreTo = cfg.ignoreTo !== false;
+    cfg.ignoreArticles = cfg.ignoreArticles !== false;
+    cfg.hints = cfg.hints !== false;
+
+    cfg.introMode = String(cfg.introMode || def.introMode);
+    if(!['card','mcq'].includes(cfg.introMode)) cfg.introMode = def.introMode;
+    const ic = Number(cfg.introMcqCount);
+    cfg.introMcqCount = Number.isFinite(ic) ? Math.max(2, Math.min(8, Math.round(ic))) : def.introMcqCount;
+    cfg.introShowPos = !!cfg.introShowPos;
+
+    // strict overrides
+    if(cfg.strict === 'strict'){
+      cfg.typos = false;
+      cfg.acceptForms = false;
+      cfg.ignoreTo = false;
+      cfg.ignoreArticles = false;
+    }
+
+    learnCfg = cfg;
+    return cfg;
+  }
+  function saveLearnCfg(cfg){
+    learnCfg = cfg;
+    try{ localStorage.setItem(LEARN_CFG_KEY, JSON.stringify(cfg)); }catch(_){}
+  }
+  function learnCfgFromUI(){
+    const cfg = loadLearnCfg();
+    if(elLearnSource) cfg.source = String(elLearnSource.value || cfg.source);
+    if(elLearnPortion) cfg.portion = String(elLearnPortion.value || cfg.portion);
+    if(elLearnDir) cfg.dir = String(elLearnDir.value || cfg.dir);
+    if(elLearnGoal) cfg.goal = String(elLearnGoal.value || cfg.goal);
+    if(elLearnStrict) cfg.strict = String(elLearnStrict.value || cfg.strict);
+
+    if(elLearnTypos) cfg.typos = !!elLearnTypos.checked;
+    if(elLearnForms) cfg.acceptForms = !!elLearnForms.checked;
+    if(elLearnIgnoreTo) cfg.ignoreTo = !!elLearnIgnoreTo.checked;
+    if(elLearnIgnoreArticles) cfg.ignoreArticles = !!elLearnIgnoreArticles.checked;
+    if(elLearnHints) cfg.hints = !!elLearnHints.checked;
+
+    if(typeof elLearnIntroMode !== 'undefined' && elLearnIntroMode) cfg.introMode = String(elLearnIntroMode.value || cfg.introMode);
+    if(typeof elLearnIntroMcqCount !== 'undefined' && elLearnIntroMcqCount) cfg.introMcqCount = Number(elLearnIntroMcqCount.value || cfg.introMcqCount);
+    if(typeof elLearnIntroShowPos !== 'undefined' && elLearnIntroShowPos) cfg.introShowPos = !!elLearnIntroShowPos.checked;
+
+    if(cfg.strict === 'strict'){
+      cfg.typos = false;
+      cfg.acceptForms = false;
+      cfg.ignoreTo = false;
+      cfg.ignoreArticles = false;
+    }
+
+    learnCfg = cfg;
+    return cfg;
+  }
+  function applyLearnCfgToUI(cfg){
+    if(!cfg) return;
+    if(elLearnSource) elLearnSource.value = String(cfg.source || 'new');
+    if(elLearnPortion) elLearnPortion.value = String(cfg.portion || '8');
+    if(elLearnDir) elLearnDir.value = String(cfg.dir || 'ru');
+    if(elLearnGoal) elLearnGoal.value = String(cfg.goal || 'fast');
+    if(elLearnStrict) elLearnStrict.value = String(cfg.strict || 'soft');
+
+    if(elLearnTypos) elLearnTypos.checked = !!cfg.typos;
+    if(elLearnForms) elLearnForms.checked = !!cfg.acceptForms;
+    if(elLearnIgnoreTo) elLearnIgnoreTo.checked = !!cfg.ignoreTo;
+    if(elLearnIgnoreArticles) elLearnIgnoreArticles.checked = !!cfg.ignoreArticles;
+    if(elLearnHints) elLearnHints.checked = !!cfg.hints;
+
+    if(typeof elLearnIntroMode !== 'undefined' && elLearnIntroMode) elLearnIntroMode.value = String(cfg.introMode || 'card');
+    if(typeof elLearnIntroMcqCount !== 'undefined' && elLearnIntroMcqCount) elLearnIntroMcqCount.value = String(cfg.introMcqCount != null ? cfg.introMcqCount : 4);
+    if(typeof elLearnIntroShowPos !== 'undefined' && elLearnIntroShowPos) elLearnIntroShowPos.checked = !!cfg.introShowPos;
+  }
+
+  function learnSetFeedback(state, stamp, line){
+    if(!elLearnFeedback) return;
+    elLearnFeedback.dataset.state = state || 'idle';
+    if(elLearnStamp) elLearnStamp.textContent = stamp || 'info';
+    if(elLearnLine) elLearnLine.textContent = line || '';
+    pulse(elLearnFeedback, 'ik-pop');
+  }
+  function learnUpdateProgress(){
+    if(!elLearnProgress){
+      return;
+    }
+    const total = learnSession ? (learnSession.portion || 0) : 0;
+    const learned = learnSession ? (learnSession.learnedCount || 0) : 0;
+    const attempts = learnSession ? (learnSession.doneTests || 0) : 0;
+    elLearnProgress.textContent = total ? `${learned}/${total} | попыток: ${attempts}` : '0/0';
+  }
+
+  function learnChooseAskLang(item, cfg){
+    const dir = cfg.dir || 'ru';
+    if(dir === 'en') return 'en';
+    if(dir === 'ru') return 'ru';
+    if(dir === 'mix') return Math.random() < 0.5 ? 'en' : 'ru';
+
+    // weak direction: ask more where errors are higher
+    const st = practiceGetStat(item);
+    if(!st) return Math.random() < 0.5 ? 'en' : 'ru';
+    const a = st.en2ru; const b = st.ru2en;
+    const wa = (a.w + a.h*0.5);
+    const wb = (b.w + b.h*0.5);
+    if(wa === wb) return Math.random() < 0.5 ? 'en' : 'ru';
+    return (wa > wb) ? 'en' : 'ru';
+  }
+
+  function learnEnsureSrs(item){
+    const st = practiceGetStat(item);
+    if(!st) return null;
+    if(!st.srs) st.srs = {};
+    return st;
+  }
+
+  function learnSrsScheduleDays(cfg){
+    return (cfg.goal === 'long') ? LEARN_SRS_LONG : LEARN_SRS_FAST;
+  }
+
+  function learnOnSrsCorrect(item, cfg){
+    const st = learnEnsureSrs(item);
+    if(!st) return;
+    const sched = learnSrsScheduleDays(cfg);
+    let step = Number.isFinite(st.srs.step) ? st.srs.step : 0;
+    step = Math.min(step + 1, sched.length - 1);
+    st.srs.step = step;
+    st.srs.due = Date.now() + sched[step] * 24*60*60*1000;
+    savePracticeStats();
+  }
+
+  function learnOnSrsNewLearned(item, cfg){
+    const st = learnEnsureSrs(item);
+    if(!st) return;
+    const sched = learnSrsScheduleDays(cfg);
+    st.srs.step = 0;
+    st.srs.due = Date.now() + sched[0] * 24*60*60*1000;
+    savePracticeStats();
+  }
+
+  function learnOnSrsWrong(item, cfg){
+    const st = learnEnsureSrs(item);
+    if(!st) return;
+    const sched = learnSrsScheduleDays(cfg);
+    st.srs.step = 0;
+    st.srs.due = Date.now() + sched[0] * 24*60*60*1000;
+    savePracticeStats();
+  }
+
+  function learnCandidateFilter(items, cfg){
+    const now = Date.now();
+    const out = [];
+    for(const it of items){
+      const st = practiceGetStat(it) || {};
+      const srs = st.srs || null;
+      if(cfg.source === 'new'){
+        if(!srs || srs.step === undefined) out.push(it);
+      }else if(cfg.source === 'due'){
+        if(srs && Number(srs.due || 0) > 0 && Number(srs.due) <= now) out.push(it);
+      }else if(cfg.source === 'weak'){
+        out.push(it);
+      }else{
+        out.push(it);
+      }
+    }
+    if(cfg.source === 'weak'){
+      out.sort((a,b)=> practiceWeight(b) - practiceWeight(a));
+    }else{
+      shuffle(out);
+    }
+    return out;
+  }
+
+  function learnBuildQueue(picked, cfg){
+    const portion = picked.length;
+    const chunkSize = 6;
+    const queue = [];
+    let index = 0;
+    const introMode = String(cfg.introMode || 'card');
+    let mixFlip = false;
+    while(index < portion){
+      const chunk = picked.slice(index, index + chunkSize);
+      index += chunkSize;
+
+      // intro for chunk
+      for(const it of chunk){
+        const al = learnChooseAskLang(it, cfg);
+        let introKind = introMode;
+        if(introMode === 'mix'){
+          mixFlip = !mixFlip;
+          introKind = mixFlip ? 'mcq' : 'card';
+        }
+        queue.push({ type:'intro', item:it, askLang: al, introKind });
+      }
+
+      // first tests shuffled inside chunk
+      const tests = shuffle(chunk.slice()).map(it => ({ type:'test', item:it, round:1 }));
+      queue.push(...tests);
+    }
+    return queue;
+  }
+
+  function learnStartSession(auto){
+    const cfg = learnCfgFromUI();
+    saveLearnCfg(cfg);
+
+    learnMcqState = null;
+    mcqPosBagLearn = [];
+    if(elLearnMcqWrap) elLearnMcqWrap.style.display = 'none';
+    if(btnLearnGiveUp){ btnLearnGiveUp.textContent = 'сдаюсь'; btnLearnGiveUp.title = 'Показать ответ (считается ошибкой)'; }
+
+    const sel = String(elSectionLearn && elSectionLearn.value || '').trim();
+    if(!sel){
+      learnShow(null);
+      learnSetFeedback('idle', 'pick', 'выбери section');
+      return;
+    }
+
+    const all = wordsForSelection(sel);
+    if(!all.length){
+      learnShow(null);
+      learnSetFeedback('idle', 'empty', 'нет слов - добавь в constructor');
+      return;
+    }
+
+    const candidates = learnCandidateFilter(all, cfg);
+    const want = Math.min(Number(cfg.portion || 8) || 8, candidates.length || 0);
+    const picked = candidates.slice(0, want);
+
+    if(!picked.length){
+      learnShow(null);
+      learnSetFeedback('idle', 'empty', cfg.source === 'new' ? 'нет новых слов' : 'нет слов для этого источника');
+      return;
+    }
+
+    learnSession = {
+      cfg,
+      portion: picked.length,
+      items: picked,
+      queue: learnBuildQueue(picked, cfg),
+      doneTests: 0,
+      learnedCount: 0,
+      wordState: {}, // key -> { streak, lastOkAt, firstOkAt, learned }
+    };
+    learnTaskCounter = 0;
+
+    learnNext();
+    if(auto){
+      // focus input in test mode, no-op for intro
+      if(elLearnInput) elLearnInput.focus({ preventScroll:true });
+    }
+  }
+
+  function learnWordState(item){
+    if(!learnSession) return null;
+    const k = practiceKey(item);
+    if(!learnSession.wordState[k]){
+      learnSession.wordState[k] = { streak:0, firstOkAt:-1, lastOkAt:-1, learned:false };
+    }
+    return learnSession.wordState[k];
+  }
+
+  function learnSetFlipped(flipped){
+    if(!elLearnCard) return;
+    elLearnCard.classList.toggle('is-flipped', !!flipped);
+    elLearnCard.setAttribute('aria-pressed', String(!!flipped));
+  }
+
+  function learnSetIntroUi(isIntro){
+    if(!elLearnAnswerRow) return;
+    if(isIntro){
+      if(elLearnInput) elLearnInput.style.display = 'none';
+      if(btnLearnHint) btnLearnHint.style.display = 'none';
+      if(btnLearnGiveUp) btnLearnGiveUp.style.display = 'none';
+      elLearnAnswerRow.style.justifyContent = 'center';
+      elLearnAnswerRow.style.gap = '12px';
+    }else{
+      if(elLearnInput) elLearnInput.style.display = '';
+      if(btnLearnHint) btnLearnHint.style.display = '';
+      if(btnLearnGiveUp) btnLearnGiveUp.style.display = '';
+      elLearnAnswerRow.style.justifyContent = '';
+      elLearnAnswerRow.style.gap = '';
+    }
+  }
+
+
+  function learnShow(task){
+    learnCurrent = task;
+    learnHintLevel = 0;
+    learnHintUsed = false;
+    learnSetFlipped(false);
+    learnSetIntroUi(false);
+
+    if(elLearnMcqWrap) elLearnMcqWrap.style.display = 'none';
+    learnMcqState = null;
+    if(btnLearnGiveUp){ btnLearnGiveUp.textContent = 'сдаюсь'; btnLearnGiveUp.title = 'Показать ответ (считается ошибкой)'; }
+
+    if(!task){
+      if(elLearnFront) elLearnFront.textContent = 'выбери section';
+      if(elLearnBack) elLearnBack.textContent = 'нажми start';
+      if(elLearnFrontLang) elLearnFrontLang.textContent = '';
+      if(elLearnBackLang) elLearnBackLang.textContent = '';
+      if(elLearnPromptLabel) elLearnPromptLabel.textContent = 'заучивание';
+      if(elLearnInput){ elLearnInput.value=''; elLearnInput.disabled = true; elLearnInput.classList.remove('is-ok','is-bad'); }
+      if(btnLearnCheckNext){ btnLearnCheckNext.textContent = 'check'; btnLearnCheckNext.title = 'Check (Enter)'; }
+      learnCheckMode = 'check';
+      learnUpdateProgress();
+      return;
+    }
+
+    const cfg = learnSession ? learnSession.cfg : loadLearnCfg();
+
+if(task.type === 'intro'){
+  // Stage 1: quick introduction (Card or MCQ)
+  const cfg = learnCfg || loadLearnCfg();
+  const introModeCfg = String(cfg.introMode || 'card');
+  const introMode = (introModeCfg === 'mix') ? String(task.introKind || 'card') : introModeCfg;
+
+  learnSetIntroUi(true);
+  if(elLearnMcqWrap) elLearnMcqWrap.style.display = 'none';
+  learnMcqState = null;
+
+  if(introMode === 'mcq'){
+    // MCQ intro: show question on one side + options
+    if(btnLearnGiveUp){
+      btnLearnGiveUp.style.display = '';
+      btnLearnGiveUp.textContent = 'не знаю';
+      btnLearnGiveUp.title = 'Показать правильный ответ (считается ошибкой)';
+    }
+
+    const askLang = task.askLang || learnChooseAskLang(task.item, cfg);
+    const askIsEn = (askLang === 'en');
+    const front = askIsEn ? stripParenMeta(task.item.en) : stripParenMeta(task.item.ru);
+    const back = askIsEn ? stripParenMeta(task.item.ru) : stripParenMeta(task.item.en);
+
+    if(elLearnFront) elLearnFront.textContent = front;
+    if(elLearnBack) elLearnBack.textContent = back;
+    if(elLearnFrontLang) elLearnFrontLang.textContent = askIsEn ? 'EN' : 'RU';
+    if(elLearnBackLang) elLearnBackLang.textContent = askIsEn ? 'RU' : 'EN';
+    if(elLearnPromptLabel) elLearnPromptLabel.textContent = 'выбери правильный перевод';
+
+    if(elLearnInput){
+      elLearnInput.value = '';
+      elLearnInput.disabled = true;
+      elLearnInput.classList.remove('is-ok','is-bad');
+    }
+
+    learnSetFlipped(false);
+    learnRenderIntroMcq(task, cfg);
+
+    learnSetFeedback('idle', 'ready', 'выбери вариант');
+    learnCheckMode = 'check';
+    if(btnLearnCheckNext){ btnLearnCheckNext.textContent = 'далее'; btnLearnCheckNext.title = 'Далее (Enter)'; }
+  }else{
+    // Card intro: show both sides (no input)
+    if(btnLearnGiveUp) btnLearnGiveUp.style.display = 'none';
+
+    if(elLearnFront) elLearnFront.textContent = task.item.en;
+    if(elLearnBack) elLearnBack.textContent = task.item.ru;
+    if(elLearnFrontLang) elLearnFrontLang.textContent = 'EN';
+    if(elLearnBackLang) elLearnBackLang.textContent = 'RU';
+    if(elLearnPromptLabel) elLearnPromptLabel.textContent = 'быстрый показ - запомни связку';
+
+    if(elLearnInput){
+      elLearnInput.value = '';
+      elLearnInput.disabled = true;
+      elLearnInput.classList.remove('is-ok','is-bad');
+    }
+
+    learnSetFeedback('idle', 'intro', 'нажми далее');
+    learnCheckMode = 'next';
+    if(btnLearnCheckNext){ btnLearnCheckNext.textContent = 'далее'; btnLearnCheckNext.title = 'Далее (Enter)'; }
+  }
+
+  learnUpdateProgress();
+  return;
+}
+
+    // test / retype
+    const askLang = learnChooseAskLang(task.item, cfg);
+    learnAskLang = askLang;
+
+    const frontIsEn = (askLang === 'en');
+    if(elLearnFront) elLearnFront.textContent = frontIsEn ? task.item.en : task.item.ru;
+    if(elLearnBack) elLearnBack.textContent = frontIsEn ? task.item.ru : task.item.en;
+    if(elLearnFrontLang) elLearnFrontLang.textContent = frontIsEn ? 'EN' : 'RU';
+    if(elLearnBackLang) elLearnBackLang.textContent = frontIsEn ? 'RU' : 'EN';
+
+    const hintText = frontIsEn ? 'переведи на русский' : 'переведи на английский';
+    if(elLearnPromptLabel) elLearnPromptLabel.textContent = (task.type === 'retype') ? 'введи правильный ответ' : hintText;
+
+    if(elLearnInput){
+      elLearnInput.disabled = false;
+      elLearnInput.value = '';
+      elLearnInput.classList.remove('is-ok','is-bad');
+      elLearnInput.placeholder = (task.type === 'retype') ? 'Введите правильный ответ...' : 'Введите перевод...';
+      elLearnInput.focus({ preventScroll:true });
+    }
+
+    learnSetFeedback('idle', 'ready', 'введи ответ и нажми check');
+    learnCheckMode = 'check';
+    if(btnLearnCheckNext){ btnLearnCheckNext.textContent = 'check'; btnLearnCheckNext.title = 'Check (Enter)'; }
+    learnUpdateProgress();
+  }
+
+  function learnInsertTask(task, gapMin, gapMax){
+    if(!learnSession) return;
+    const gap = gapMin + Math.floor(Math.random() * Math.max(1, (gapMax-gapMin+1)));
+    const idx = Math.min(learnSession.queue.length, gap);
+    learnSession.queue.splice(idx, 0, task);
+  }
+
+  function learnNext(){
+    if(!learnSession || !learnSession.queue.length){
+      learnShow(null);
+      if(learnSession){
+        learnSetFeedback('correct', 'done', `сессия завершена: выучено ${learnSession.learnedCount}/${learnSession.portion}`);
+      }
+      return;
+    }
+    const task = learnSession.queue.shift();
+    learnShow(task);
+  }
+
+  function learnEvaluateAnswer(raw, item, askLang, cfg){
+    const exp = practiceExpected(item, askLang, cfg);
+    const tokens = userTokens(raw, exp.lang, cfg);
+    if(!tokens.length) return { status:'empty', exp, cfg };
+
+    for(const tk of tokens){
+      if(exp.expectedVariants.includes(tk)){
+        return { status:'correct', exp, cfg };
+      }
+    }
+
+    if(cfg.typos){
+      let bestDist = Infinity;
+      let bestExp = null;
+      for(const tk of tokens){
+        for(const ev of exp.expectedVariants){
+          const d = levenshtein(tk, ev);
+          if(d < bestDist){
+            bestDist = d;
+            bestExp = ev;
+          }
+        }
+      }
+      const thr = typoThreshold(bestExp);
+      if(bestExp && bestDist > 0 && bestDist <= thr){
+        return { status:'almost', exp, cfg, dist: bestDist, best:bestExp };
+      }
+    }
+    return { status:'wrong', exp, cfg };
+  }
+
+  function learnLockAfterCheck(isCorrect){
+if(elLearnInput){
+  // IMPORTANT: keep red in retype until correct
+  if(isCorrect){
+    elLearnInput.classList.remove('is-bad');
+    elLearnInput.classList.add('is-ok');
+  }else{
+    elLearnInput.classList.remove('is-ok');
+    elLearnInput.classList.add('is-bad');
+    pulse(elLearnInput, 'ik-shake');
+  }
+  elLearnInput.disabled = true;
+}
+learnSetFlipped(true);
+learnCheckMode = 'next';
+if(btnLearnCheckNext){ btnLearnCheckNext.textContent = 'далее'; btnLearnCheckNext.title = 'Далее (Enter)'; }
+  }
+
+
+  function learnEnterRetypeAfterWrong(task, cfg){
+    // keep answer visible and force one correct retype before moving on
+    learnCurrent = { type:'retype', item: task.item };
+    learnHintLevel = 0;
+    learnHintUsed = true;
+    learnCheckMode = 'check';
+
+    // show same card (already set) and flip to answer
+    learnSetFlipped(true);
+
+    if(elLearnPromptLabel) elLearnPromptLabel.textContent = 'введи правильный ответ';
+    if(elLearnInput){
+      elLearnInput.disabled = false;
+      elLearnInput.value = '';
+      elLearnInput.placeholder = 'Введите правильный ответ...';
+      elLearnInput.classList.remove('is-ok');
+      elLearnInput.classList.add('is-bad');
+      elLearnInput.focus({ preventScroll:true });
+    }
+    if(btnLearnCheckNext){
+      btnLearnCheckNext.textContent = 'check';
+      btnLearnCheckNext.title = 'Check (Enter)';
+    }
+    learnSetFeedback('wrong', 'fix', 'введи правильно чтобы продолжить');
+  }
+
+
+  function learnHandleCorrect(task, cfg){
+    if(!learnSession) return;
+
+    learnSession.doneTests += 1;
+    learnTaskCounter += 1;
+
+    // update practice stats
+    practiceBump(task.item, learnAskLang, learnHintUsed ? 'hard' : 'correct');
+
+    const ws = learnWordState(task.item);
+    if(!ws.learned){
+      if(learnHintUsed){
+        // hints break streak
+        ws.streak = 0;
+      }else{
+        ws.streak += 1;
+        if(ws.streak === 1) ws.firstOkAt = learnTaskCounter;
+        ws.lastOkAt = learnTaskCounter;
+
+        // schedule second check after 10-20 tasks
+        if(ws.streak === 1){
+          learnInsertTask({ type:'test', item:task.item, round:(task.round||1)+1 }, 10, 20);
+        }else if(ws.streak >= 2){
+          // require at least 10 tasks since first ok
+          if(ws.firstOkAt >= 0 && (learnTaskCounter - ws.firstOkAt) >= 10){
+            ws.learned = true;
+            learnSession.learnedCount += 1;
+
+            // mark as learned for SRS if new
+            const st = practiceGetStat(task.item) || {};
+            const srs = st.srs || null;
+            if(!srs || srs.step === undefined){
+              learnOnSrsNewLearned(task.item, cfg);
+            }else{
+              learnOnSrsCorrect(task.item, cfg);
+            }
+          }else{
+            // not enough spacing yet - ask again later
+            ws.streak = 1;
+            ws.firstOkAt = learnTaskCounter;
+            learnInsertTask({ type:'test', item:task.item, round:(task.round||1)+1 }, 10, 20);
+          }
+        }
+      }
+    }else{
+      // already learned - still update SRS if it was a due review source
+      if(cfg.source === 'due') learnOnSrsCorrect(task.item, cfg);
+    }
+
+    learnUpdateProgress();
+    learnSetFeedback('correct', 'ok', learnHintUsed ? 'верно (с подсказкой)' : 'верно');
+    learnLockAfterCheck(true);
+  }
+
+  function learnHandleWrong(task, cfg){
+    if(!learnSession) return;
+
+    learnSession.doneTests += 1;
+    learnTaskCounter += 1;
+
+    // update stats
+    practiceBump(task.item, learnAskLang, 'wrong');
+    learnOnSrsWrong(task.item, cfg);
+
+    const ws = learnWordState(task.item);
+    ws.streak = 0;
+
+    // schedule the word again soon (быстрое повторение)
+    learnInsertTask({ type:'test', item:task.item, round:(task.round||1)+1 }, 3, 8);
+
+    learnUpdateProgress();
+    learnSetFeedback('wrong', 'no', 'неверно - смотри ответ');
+
+    // enter retype right now (обязательный ввод правильного)
+    learnLockAfterCheck(false);
+    learnEnterRetypeAfterWrong(task, cfg);
+  }
+
+  function learnCheckOrNext(){
+    if(!learnCurrent){
+      learnStartSession(true);
+      return;
+    }
+    if(learnCheckMode === 'next'){
+      learnNext();
+      return;
+    }
+    const task = learnCurrent;
+
+    // Intro stage (Card or MCQ)
+    if(task.type === 'intro'){
+      const cfgIntro = learnSession ? learnSession.cfg : loadLearnCfg();
+      const introMode = String(cfgIntro.introMode || 'card');
+
+      if(introMode === 'mcq'){
+        if(learnMcqState && learnMcqState.locked){
+          learnNext();
+          return;
+        }
+        learnSetFeedback('idle', 'pick', 'выбери вариант или нажми не знаю');
+        if(elLearnCard) pulse(elLearnCard, 'ik-shake');
+        return;
+      }
+
+      // card intro -> just go next
+      learnNext();
+      return;
+    }
+
+    if(task.type !== 'test' && task.type !== 'retype'){
+      learnNext();
+      return;
+    }
+
+    const cfg = learnSession ? learnSession.cfg : loadLearnCfg();
+    const raw = (elLearnInput && elLearnInput.value) ? elLearnInput.value : '';
+    if(!String(raw).trim()){
+      learnSetFeedback('idle', 'type', 'введи ответ');
+      if(elLearnInput) pulse(elLearnInput, 'ik-shake');
+      return;
+    }
+
+    const res = learnEvaluateAnswer(raw, task.item, learnAskLang, cfg);
+    if(res.status === 'correct'){
+      if(task.type === 'retype'){
+        // retype correct - move on
+        learnSetFeedback('correct', 'ok', 'принято - жми далее');
+        learnLockAfterCheck(true);
+        return;
+      }
+      learnHandleCorrect(task, cfg);
+      return;
+    }
+
+    // almost -> count as wrong but with softer feedback
+    if(res.status === 'almost'){
+      if(task.type === 'retype'){
+        learnSetFeedback('wrong', 'almost', 'почти - попробуй еще раз (нужно точно)');
+        if(elLearnInput){
+          elLearnInput.classList.remove('is-ok');
+          elLearnInput.classList.add('is-bad');
+          pulse(elLearnInput, 'ik-shake');
+        }
+        return;
+      }
+      learnHintUsed = true; // treat as hard
+      learnSetFeedback('idle', 'almost', `почти! опечатка примерно в ${res.dist} символ(ах)`);
+      // still lock + require retype
+      learnHandleWrong(task, cfg);
+      return;
+    }
+
+    // wrong
+    if(task.type === 'retype'){
+      learnSetFeedback('wrong', 'no', 'нужно ввести правильно, чтобы продолжить');
+      if(elLearnInput){
+        elLearnInput.classList.remove('is-ok');
+        elLearnInput.classList.add('is-bad');
+        pulse(elLearnInput, 'ik-shake');
+      }
+      return;
+    }
+    learnHandleWrong(task, cfg);
+  }
+
+  function learnHint(){
+    const cfg = learnSession ? learnSession.cfg : loadLearnCfg();
+    if(!cfg.hints){
+      learnSetFeedback('idle', 'hint', 'подсказки выключены в настройках');
+      return;
+    }
+    if(!learnCurrent || (learnCurrent.type !== 'test' && learnCurrent.type !== 'retype')) return;
+    const exp = practiceExpected(learnCurrent.item, learnAskLang, cfg);
+    const target = (exp.expectedRaw || '').trim();
+    if(!target){
+      learnSetFeedback('idle', 'hint', 'нет ответа');
+      return;
+    }
+    learnHintUsed = true;
+    learnHintLevel += 1;
+
+    if(learnHintLevel === 1){
+      const base = stripParenMeta(target).trim();
+      const first = base.slice(0, Math.min(2, base.length));
+      const mask = first + ' ' + '_'.repeat(Math.max(0, base.length - first.length));
+      learnSetFeedback('idle', 'hint', mask);
+      return;
+    }
+    if(learnHintLevel === 2){
+      const base = stripParenMeta(target).trim();
+      learnSetFeedback('idle', 'hint', `длина: ${base.length}`);
+      return;
+    }
+
+    // level 3 -> show answer (counts as give up)
+    learnGiveUp();
+  }
+
+  function learnGiveUp(){
+    // Intro MCQ uses "не знаю"
+    if(learnCurrent && learnCurrent.type === 'intro'){
+      if(learnMcqState && !learnMcqState.locked){
+        learnIntroMcqGiveUp();
+        return;
+      }
+      // If already answered in intro, "не знаю" acts like next
+      learnNext();
+      return;
+    }
+
+    if(!learnCurrent || (learnCurrent.type !== 'test' && learnCurrent.type !== 'retype')) return;
+    const cfg = learnSession ? learnSession.cfg : loadLearnCfg();
+    learnHintUsed = true;
+    if(learnCurrent.type === 'retype'){
+      learnSetFeedback('wrong', 'no', 'введи правильно, чтобы продолжить');
+      if(elLearnInput){
+        elLearnInput.classList.remove('is-ok');
+        elLearnInput.classList.add('is-bad');
+        pulse(elLearnInput, 'ik-shake');
+      }
+      return;
+    }
+    learnHandleWrong(learnCurrent, cfg);
+  }
+
+
+// UI
+  const elDictDbStatus = document.getElementById('dictDbStatus');
+  const elDictSeedBadge = document.getElementById('dictSeedBadge');
+  const elDictDbNameLine = document.getElementById('dictDbNameLine');
+  const elDictCountBadge = document.getElementById('dictCountBadge');
+
+  const dictTabCards = document.getElementById('dict-tab-cards');
+  const dictTabQuiz = document.getElementById('dict-tab-quiz');
+  const dictTabLearn = document.getElementById('dict-tab-learn');
+  const dictTabBuilder = document.getElementById('dict-tab-builder');
+  const dictPanelCards = document.getElementById('dict-panel-cards');
+  const dictPanelQuiz = document.getElementById('dict-panel-quiz');
+  const dictPanelLearn = document.getElementById('dict-panel-learn');
+  const dictPanelBuilder = document.getElementById('dict-panel-builder');
+
+  const elSectionCards = document.getElementById('dictSectionCards');
+  const elSectionQuiz = document.getElementById('dictSectionQuiz');
+  const elSectionLearn = document.getElementById('dictSectionLearn');
+  const elSectionBuilder = document.getElementById('dictBuilderSection');
+  const elSectionList = document.getElementById('dictSectionList');
+  const elWordList = document.getElementById('dictWordList');
+
+  const elDictFirstPick = document.getElementById('dictFirstPick');
+  const elDictSubtabsWrap = document.getElementById('dictSubtabsWrap');
+  const elFirstPickList = document.getElementById('dictFirstPickList');
+  const elFirstPickSearch = document.getElementById('dictFirstPickSearch');
+  const btnFirstPickOpenConstructor = document.getElementById('dictFirstPickOpenConstructor');
+  const btnCardsChooseSection = document.getElementById('dictCardsChooseSection');
+  const btnQuizChooseSection = document.getElementById('dictQuizChooseSection');
+  const btnLearnChooseSection = document.getElementById('dictLearnChooseSection');
+
+  const elCardsRandom = document.getElementById('dictCardsRandom');
+  const elCardsFront = document.getElementById('dictCardsFront');
+  const btnCardsPrev = document.getElementById('dictCardsPrev');
+  const btnCardsNext = document.getElementById('dictCardsNext');
+
+
+// Move cards prev/next under the flashcard (centered)
+(function(){
+  const meta = document.getElementById('dictCardsMeta');
+  const stage = document.querySelector('#dict-panel-cards .ik-flip-stage');
+  if(!meta || !stage || !btnCardsPrev || !btnCardsNext) return;
+  const nav = document.createElement('div');
+  nav.className = 'ik-row';
+  nav.style.justifyContent = 'center';
+  nav.style.marginTop = '12px';
+  nav.appendChild(btnCardsPrev);
+  nav.appendChild(btnCardsNext);
+  meta.parentNode.insertBefore(nav, meta);
+})();
+
+  const elFlipCard = document.getElementById('dictFlipCard');
+  const elCardFront = document.getElementById('dictCardFront');
+  const elCardBack = document.getElementById('dictCardBack');
+  const elCardFrontLang = document.getElementById('dictCardFrontLang');
+  const elCardBackLang = document.getElementById('dictCardBackLang');
+  const elCardsMeta = document.getElementById('dictCardsMeta');
+
+  const elQuizMode = document.getElementById('dictQuizMode');
+  const elQuizScore = document.getElementById('dictQuizScore');
+  const elQuizPromptLabel = document.getElementById('dictQuizPromptLabel');
+  const elQuizCard = document.getElementById('dictQuizCard');
+  const elQuizFront = document.getElementById('dictQuizFront');
+  const elQuizBack = document.getElementById('dictQuizBack');
+  const elQuizFrontLang = document.getElementById('dictQuizFrontLang');
+  const elQuizBackLang = document.getElementById('dictQuizBackLang');
+  const elQuizInput = document.getElementById('dictQuizInput');
+  const btnQuizCheckNext = document.getElementById('dictQuizCheckNext');
+  const btnQuizSkip = document.getElementById('dictQuizSkip');
+  const elQuizFeedback = document.getElementById('dictQuizFeedback');
+  const elQuizStamp = document.getElementById('dictQuizStamp');
+  const elQuizLine = document.getElementById('dictQuizLine');
+  // Learn UI
+  const elLearnProgress = document.getElementById('dictLearnProgress');
+  const btnLearnSettingsBtn = document.getElementById('dictLearnSettingsBtn');
+  const elLearnSettings = document.getElementById('dictLearnSettings');
+
+  const elLearnSource = document.getElementById('dictLearnSource');
+  const elLearnPortion = document.getElementById('dictLearnPortion');
+  const elLearnDir = document.getElementById('dictLearnDir');
+  const elLearnGoal = document.getElementById('dictLearnGoal');
+  const elLearnStrict = document.getElementById('dictLearnStrict');
+
+  const elLearnTypos = document.getElementById('dictLearnTypos');
+  const elLearnForms = document.getElementById('dictLearnForms');
+  const elLearnIgnoreTo = document.getElementById('dictLearnIgnoreTo');
+  const elLearnIgnoreArticles = document.getElementById('dictLearnIgnoreArticles');
+  const elLearnHints = document.getElementById('dictLearnHints');
+  const btnLearnRestart = document.getElementById('dictLearnRestart');
+
+  const elLearnPromptLabel = document.getElementById('dictLearnPromptLabel');
+  const elLearnCard = document.getElementById('dictLearnCard');
+  const elLearnFront = document.getElementById('dictLearnFront');
+  const elLearnBack = document.getElementById('dictLearnBack');
+  const elLearnFrontLang = document.getElementById('dictLearnFrontLang');
+  const elLearnBackLang = document.getElementById('dictLearnBackLang');
+  const elLearnInput = document.getElementById('dictLearnInput');
+  const btnLearnCheckNext = document.getElementById('dictLearnCheckNext');
+  const btnLearnHint = document.getElementById('dictLearnHint');
+  const btnLearnGiveUp = document.getElementById('dictLearnGiveUp');
+  const elLearnFeedback = document.getElementById('dictLearnFeedback');
+  const elLearnStamp = document.getElementById('dictLearnStamp');
+  const elLearnLine = document.getElementById('dictLearnLine');
+  const elLearnAnswerRow = document.getElementById('dictLearnAnswerRow');
+
+  const btnPracticeSettingsBtn = document.getElementById('dictPracticeSettingsBtn');
+  const elPracticeSettings = document.getElementById('dictPracticeSettings');
+  const elPracticeSession = document.getElementById('dictPracticeSession');
+  const elPracticeTypos = document.getElementById('dictPracticeTypos');
+  const elPracticeIgnoreTo = document.getElementById('dictPracticeIgnoreTo');
+  const elPracticeIgnoreArticles = document.getElementById('dictPracticeIgnoreArticles');
+  const btnPracticeHint = document.getElementById('dictPracticeHint');
+  const elPracticeFuzzyActions = document.getElementById('dictPracticeFuzzyActions');
+  const btnPracticeFuzzyAccept = document.getElementById('dictPracticeFuzzyAccept');
+  const btnPracticeFuzzyReject = document.getElementById('dictPracticeFuzzyReject');
+
+
+// Extra settings (injected via JS, so IDs might not exist in HTML)
+let elPracticeTaskMode = null;
+let elPracticeMixInputPct = null;
+let elPracticeMcqCount = null;
+let elPracticeShowPos = null;
+let elPracticeSoftMcq = null;
+
+let elLearnIntroMode = null;
+let elLearnIntroMcqCount = null;
+let elLearnIntroShowPos = null;
+
+// MCQ UI containers
+let elQuizMcqWrap = null;
+let elQuizMcqMeta = null;
+let elQuizMcqButtons = null;
+
+let elLearnMcqWrap = null;
+let elLearnMcqMeta = null;
+let elLearnMcqButtons = null;
+
+
+  const elNewSectionName = document.getElementById('dictNewSectionName');
+  const btnAddSection = document.getElementById('dictAddSection');
+  const btnDeleteSection = document.getElementById('dictDeleteSection');
+  const elEnInput = document.getElementById('dictEnInput');
+  const elRuInput = document.getElementById('dictRuInput');
+  const btnAddWord = document.getElementById('dictAddWord');
+  const btnDictExport = document.getElementById('dictExportDb');
+  const btnDictImport = document.getElementById('dictImportDb');
+  const elDictImportReplace = document.getElementById('dictImportReplace');
+  const elDictFileImport = document.getElementById('dictFileImport');
+
+  function dictSetSubtab(which){
+    const isCards = which === 'cards';
+    const isPractice = (which === 'quiz' || which === 'practice');
+    const isLearn = which === 'learn';
+
+    dictTabCards.setAttribute('aria-selected', String(isCards));
+    dictTabQuiz.setAttribute('aria-selected', String(isPractice));
+    if(dictTabLearn) dictTabLearn.setAttribute('aria-selected', String(isLearn));
+    dictTabBuilder.setAttribute('aria-selected', String(!isCards && !isPractice && !isLearn));
+
+    dictPanelCards.hidden = !isCards;
+    dictPanelQuiz.hidden = !isPractice;
+    if(dictPanelLearn) dictPanelLearn.hidden = !isLearn;
+    dictPanelBuilder.hidden = isCards || isPractice || isLearn;
+  }
+
+  function quizSetFeedback(state, stamp, line){
+    elQuizFeedback.dataset.state = state || 'idle';
+    elQuizStamp.textContent = stamp || 'info';
+    elQuizLine.textContent = line || '';
+    pulse(elQuizFeedback, 'ik-pop');
+  }
+  function quizUpdateScore(){
+    const denom = (quizSessionTarget || quizDeck.length || 0);
+    const prog = denom ? Math.min(quizSeen.size, denom) : 0;
+    elQuizScore.textContent = `${prog}/${denom} | ${quizCorrect}/${quizTotal}`;
+  }
+
+  function setQuizMode(mode){
+    quizCheckMode = mode;
+    if(mode === 'next'){
+      btnQuizCheckNext.textContent = 'далее';
+      btnQuizCheckNext.title = 'Далее (Enter)';
+    }else{
+      btnQuizCheckNext.textContent = 'check';
+      btnQuizCheckNext.title = 'Check (Enter)';
+    }
+  }
+
+
+// -----------------------------
+// MCQ UI injection + renderers
+// -----------------------------
+function mcqPosLabel(pos){
+  if(pos === 'v') return 'v (verb)';
+  if(pos === 'n') return 'n (noun)';
+  if(pos === 'adj') return 'adj';
+  if(pos === 'adv') return 'adv';
+  return pos || '';
+}
+
+function ensurePracticeExtraSettingsUI(){
+  if(!elPracticeSettings) return;
+
+  // inject only once
+  if(document.getElementById('dictPracticeTaskMode')){
+    elPracticeTaskMode = document.getElementById('dictPracticeTaskMode');
+    elPracticeMixInputPct = document.getElementById('dictPracticeMixInputPct');
+    elPracticeMcqCount = document.getElementById('dictPracticeMcqCount');
+    elPracticeShowPos = document.getElementById('dictPracticeShowPos');
+    elPracticeSoftMcq = document.getElementById('dictPracticeSoftMcq');
+    return;
+  }
+
+  const wrap = document.createElement('div');
+  wrap.className = 'ik-row';
+  wrap.style.gap = '12px';
+  wrap.style.flexWrap = 'wrap';
+  wrap.style.marginTop = '10px';
+
+  const mkLabel = (text)=>{
+    const l = document.createElement('label');
+    l.className = 'ik-label';
+    l.textContent = text;
+    return l;
+  };
+
+  const modeLabel = mkLabel('тип заданий');
+  modeLabel.setAttribute('for', 'dictPracticeTaskMode');
+
+  const modeSel = document.createElement('select');
+  modeSel.className = 'ik-select';
+  modeSel.id = 'dictPracticeTaskMode';
+  modeSel.style.minWidth = '220px';
+  modeSel.innerHTML =
+    '<option value="input">Написание ответа</option>' +
+    '<option value="mcq">Выбор правильного ответа</option>' +
+    '<option value="mix">Микс</option>';
+
+  const mixLabel = mkLabel('в миксе: % ввод');
+  mixLabel.setAttribute('for', 'dictPracticeMixInputPct');
+
+  const mixSel = document.createElement('select');
+  mixSel.className = 'ik-select';
+  mixSel.id = 'dictPracticeMixInputPct';
+  mixSel.style.minWidth = '120px';
+  mixSel.innerHTML =
+    '<option value="50">50</option>' +
+    '<option value="60">60</option>' +
+    '<option value="70">70</option>' +
+    '<option value="80">80</option>';
+
+  const cntLabel = mkLabel('вариантов');
+  cntLabel.setAttribute('for', 'dictPracticeMcqCount');
+
+  const cntSel = document.createElement('select');
+  cntSel.className = 'ik-select';
+  cntSel.id = 'dictPracticeMcqCount';
+  cntSel.style.minWidth = '120px';
+  cntSel.innerHTML =
+    '<option value="2">2</option>' +
+    '<option value="3">3</option>' +
+    '<option value="4">4</option>' +
+    '<option value="5">5</option>' +
+    '<option value="6">6</option>' +
+    '<option value="7">7</option>' +
+    '<option value="8">8</option>';
+
+  const showPosLabel = document.createElement('label');
+  showPosLabel.className = 'ik-label';
+  showPosLabel.style.display = 'flex';
+  showPosLabel.style.alignItems = 'center';
+  showPosLabel.style.gap = '8px';
+  const showPosCb = document.createElement('input');
+  showPosCb.type = 'checkbox';
+  showPosCb.id = 'dictPracticeShowPos';
+  showPosLabel.appendChild(showPosCb);
+  showPosLabel.appendChild(document.createTextNode('показывать (v)/(n)'));
+
+  const softLabel = document.createElement('label');
+  softLabel.className = 'ik-label';
+  softLabel.style.display = 'flex';
+  softLabel.style.alignItems = 'center';
+  softLabel.style.gap = '8px';
+  const softCb = document.createElement('input');
+  softCb.type = 'checkbox';
+  softCb.id = 'dictPracticeSoftMcq';
+  softCb.checked = true;
+  softLabel.appendChild(softCb);
+  softLabel.appendChild(document.createTextNode('MCQ влияет мягче'));
+
+  wrap.appendChild(modeLabel);
+  wrap.appendChild(modeSel);
+  wrap.appendChild(mixLabel);
+  wrap.appendChild(mixSel);
+  wrap.appendChild(cntLabel);
+  wrap.appendChild(cntSel);
+  wrap.appendChild(showPosLabel);
+  wrap.appendChild(softLabel);
+
+  // insert before the footnote inside settings
+  const foot = elPracticeSettings.querySelector('.ik-footnote');
+  if(foot) elPracticeSettings.insertBefore(wrap, foot);
+  else elPracticeSettings.appendChild(wrap);
+
+  elPracticeTaskMode = modeSel;
+  elPracticeMixInputPct = mixSel;
+  elPracticeMcqCount = cntSel;
+  elPracticeShowPos = showPosCb;
+  elPracticeSoftMcq = softCb;
+
+  const applyVis = ()=>{
+    const v = String(elPracticeTaskMode.value || 'mix');
+    const showMix = (v === 'mix');
+    if(mixLabel) mixLabel.style.display = showMix ? '' : 'none';
+    if(mixSel) mixSel.style.display = showMix ? '' : 'none';
+    const showMcq = (v === 'mcq' || v === 'mix');
+    if(cntLabel) cntLabel.style.display = showMcq ? '' : 'none';
+    if(cntSel) cntSel.style.display = showMcq ? '' : 'none';
+    if(showPosLabel) showPosLabel.style.display = showMcq ? '' : 'none';
+    if(softLabel) softLabel.style.display = showMcq ? '' : 'none';
+  };
+  modeSel.addEventListener('change', applyVis);
+  applyVis();
+}
+
+function ensureLearnExtraSettingsUI(){
+  if(!elLearnSettings) return;
+
+  if(document.getElementById('dictLearnIntroMode')){
+    elLearnIntroMode = document.getElementById('dictLearnIntroMode');
+    elLearnIntroMcqCount = document.getElementById('dictLearnIntroMcqCount');
+    elLearnIntroShowPos = document.getElementById('dictLearnIntroShowPos');
+    return;
+  }
+
+  const row = document.createElement('div');
+  row.className = 'ik-row';
+  row.style.gap = '12px';
+  row.style.flexWrap = 'wrap';
+  row.style.marginTop = '10px';
+
+  const mkLabel = (text)=>{
+    const l = document.createElement('label');
+    l.className = 'ik-label';
+    l.textContent = text;
+    return l;
+  };
+
+  const introLabel = mkLabel('этап 1');
+  introLabel.setAttribute('for', 'dictLearnIntroMode');
+
+  const introSel = document.createElement('select');
+  introSel.className = 'ik-select';
+  introSel.id = 'dictLearnIntroMode';
+  introSel.style.minWidth = '220px';
+  introSel.innerHTML =
+    '<option value="card">Card</option>' +
+    '<option value="mcq">Выбор правильного ответа</option>' +
+    '<option value="mix">Mix</option>';
+
+  const cntLabel = mkLabel('вариантов');
+  cntLabel.setAttribute('for', 'dictLearnIntroMcqCount');
+
+  const cntSel = document.createElement('select');
+  cntSel.className = 'ik-select';
+  cntSel.id = 'dictLearnIntroMcqCount';
+  cntSel.style.minWidth = '120px';
+  cntSel.innerHTML =
+    '<option value="2">2</option>' +
+    '<option value="3">3</option>' +
+    '<option value="4">4</option>' +
+    '<option value="5">5</option>' +
+    '<option value="6">6</option>' +
+    '<option value="7">7</option>' +
+    '<option value="8">8</option>';
+
+  const showPosLabel = document.createElement('label');
+  showPosLabel.className = 'ik-label';
+  showPosLabel.style.display = 'flex';
+  showPosLabel.style.alignItems = 'center';
+  showPosLabel.style.gap = '8px';
+  const showPosCb = document.createElement('input');
+  showPosCb.type = 'checkbox';
+  showPosCb.id = 'dictLearnIntroShowPos';
+  showPosLabel.appendChild(showPosCb);
+  showPosLabel.appendChild(document.createTextNode('показывать (v)/(n)'));
+
+  row.appendChild(introLabel);
+  row.appendChild(introSel);
+  row.appendChild(cntLabel);
+  row.appendChild(cntSel);
+  row.appendChild(showPosLabel);
+
+  // insert before the footnote inside settings
+  const foot = elLearnSettings.querySelector('.ik-footnote');
+  if(foot) elLearnSettings.insertBefore(row, foot);
+  else elLearnSettings.appendChild(row);
+
+
+  // UI polish: move START button under the "этап 1" row
+  (function(){
+    const btn = document.getElementById('dictLearnRestart');
+    if(!btn) return;
+    if(btn.parentElement && btn.parentElement.id === 'dictLearnStartRow') return;
+
+    const startRow = document.createElement('div');
+    startRow.className = 'ik-row';
+    startRow.id = 'dictLearnStartRow';
+    startRow.style.justifyContent = 'flex-start';
+    startRow.style.gap = '12px';
+    startRow.style.marginTop = '10px';
+
+    startRow.appendChild(btn);
+
+    const foot2 = elLearnSettings.querySelector('.ik-footnote');
+    if(foot2) elLearnSettings.insertBefore(startRow, foot2);
+    else elLearnSettings.appendChild(startRow);
+  })();
+
+  elLearnIntroMode = introSel;
+  elLearnIntroMcqCount = cntSel;
+  elLearnIntroShowPos = showPosCb;
+
+  const applyVis = ()=>{
+    const v = String(elLearnIntroMode.value || 'card');
+    const show = (v === 'mcq' || v === 'mix');
+    cntLabel.style.display = show ? '' : 'none';
+    cntSel.style.display = show ? '' : 'none';
+    showPosLabel.style.display = show ? '' : 'none';
+  };
+  introSel.addEventListener('change', applyVis);
+  applyVis();
+}
+
+function ensureMcqContainers(){
+  // Practice
+  if(elQuizInput && !document.getElementById('dictQuizMcqWrap')){
+    const wrap = document.createElement('div');
+    wrap.id = 'dictQuizMcqWrap';
+    wrap.style.display = 'none';
+    wrap.style.marginTop = '10px';
+
+    const meta = document.createElement('p');
+    meta.id = 'dictQuizMcqMeta';
+    meta.className = 'ik-footnote ik-muted';
+    meta.style.margin = '0';
+
+    const btns = document.createElement('div');
+    btns.id = 'dictQuizMcqButtons';
+    btns.style.display = 'flex';
+    btns.style.flexDirection = 'column';
+    btns.style.gap = '8px';
+    btns.style.marginTop = '8px';
+
+    wrap.appendChild(meta);
+    wrap.appendChild(btns);
+
+    const row = elQuizInput.parentElement;
+    if(row && row.parentNode) row.parentNode.insertBefore(wrap, row);
+
+    elQuizMcqWrap = wrap;
+    elQuizMcqMeta = meta;
+    elQuizMcqButtons = btns;
+  }else{
+    elQuizMcqWrap = document.getElementById('dictQuizMcqWrap');
+    elQuizMcqMeta = document.getElementById('dictQuizMcqMeta');
+    elQuizMcqButtons = document.getElementById('dictQuizMcqButtons');
+  }
+
+  // Learn
+  if(elLearnAnswerRow && !document.getElementById('dictLearnMcqWrap')){
+    const wrap = document.createElement('div');
+    wrap.id = 'dictLearnMcqWrap';
+    wrap.style.display = 'none';
+    wrap.style.marginTop = '10px';
+
+    const meta = document.createElement('p');
+    meta.id = 'dictLearnMcqMeta';
+    meta.className = 'ik-footnote ik-muted';
+    meta.style.margin = '0';
+
+    const btns = document.createElement('div');
+    btns.id = 'dictLearnMcqButtons';
+    btns.style.display = 'flex';
+    btns.style.flexDirection = 'column';
+    btns.style.gap = '8px';
+    btns.style.marginTop = '8px';
+
+    wrap.appendChild(meta);
+    wrap.appendChild(btns);
+
+    if(elLearnAnswerRow.parentNode) elLearnAnswerRow.parentNode.insertBefore(wrap, elLearnAnswerRow);
+
+    elLearnMcqWrap = wrap;
+    elLearnMcqMeta = meta;
+    elLearnMcqButtons = btns;
+  }else{
+    elLearnMcqWrap = document.getElementById('dictLearnMcqWrap');
+    elLearnMcqMeta = document.getElementById('dictLearnMcqMeta');
+    elLearnMcqButtons = document.getElementById('dictLearnMcqButtons');
+  }
+}
+
+function mcqBtnApplyState(btn, state){
+  if(!btn) return;
+  // reset
+  btn.style.border = '';
+  btn.style.background = '';
+  btn.style.opacity = '';
+  if(state === 'correct'){
+    btn.style.border = '2px solid #2ecc71';
+    btn.style.background = 'rgba(46,204,113,0.16)';
+  }else if(state === 'wrong'){
+    btn.style.border = '2px solid #e74c3c';
+    btn.style.background = 'rgba(231,76,60,0.16)';
+  }else if(state === 'dim'){
+    btn.style.opacity = '0.75';
+  }
+}
+
+function quizDecideTaskKind(item, cfg){
+  const key = practiceKey(item);
+  if(key && quizModeOverrides && quizModeOverrides[key]){
+    const v = quizModeOverrides[key];
+    delete quizModeOverrides[key];
+    return v;
+  }
+  const mode = String(cfg.taskMode || 'mix');
+  if(mode === 'input') return 'input';
+  if(mode === 'mcq') return 'mcq';
+  // mix
+  const pct = Number(cfg.mixInputPct);
+  const p = Number.isFinite(pct) ? Math.max(0, Math.min(100, pct)) : 60;
+  return (Math.random() * 100 < p) ? 'input' : 'mcq';
+}
+
+function quizSetTaskUi(kind, cfg){
+  quizTaskKind = kind;
+
+  // default texts
+  if(btnQuizSkip){
+    btnQuizSkip.textContent = (kind === 'mcq') ? 'не знаю' : 'сдаюсь';
+    btnQuizSkip.title = (kind === 'mcq')
+      ? 'Показать правильный ответ (считается ошибкой)'
+      : 'Показать ответ (считается ошибкой)';
+  }
+
+  if(kind === 'mcq'){
+    if(elQuizMcqWrap) elQuizMcqWrap.style.display = '';
+    if(elQuizInput) elQuizInput.style.display = 'none';
+    if(btnPracticeHint) btnPracticeHint.style.display = 'none';
+    if(elPracticeFuzzyActions) elPracticeFuzzyActions.style.display = 'none';
+
+    // use "далее" button even in check mode
+    quizCheckMode = 'check';
+    btnQuizCheckNext.textContent = 'далее';
+    btnQuizCheckNext.title = 'Далее (Enter)';
+  }else{
+    if(elQuizMcqWrap) elQuizMcqWrap.style.display = 'none';
+    if(elQuizInput) elQuizInput.style.display = '';
+    if(btnPracticeHint) btnPracticeHint.style.display = '';
+    // button back to check
+    setQuizMode('check');
+  }
+}
+
+function quizRenderMcq(item, askLang, cfg){
+  ensureMcqContainers();
+  if(!elQuizMcqButtons || !elQuizMcqWrap) return;
+
+  const answerLang = (askLang === 'en') ? 'ru' : 'en';
+  const itemsPool = wordsForSelection(elSectionQuiz && elSectionQuiz.value);
+
+  const built = mcqBuildOptions(item, askLang, answerLang, cfg.mcqCount, itemsPool, cfg);
+  const n = built.n;
+  const correct = built.correct;
+  const distractors = shuffle(built.distractors || []);
+
+  const correctIdx = mcqPickPos(mcqPosBagQuiz, n);
+  const options = new Array(n);
+
+  // place distractors
+  let di = 0;
+  for(let i=0;i<n;i++){
+    if(i === correctIdx){
+      options[i] = correct;
+    }else{
+      options[i] = distractors[di] || correct;
+      di += 1;
+    }
+  }
+
+  elQuizMcqButtons.innerHTML = '';
+  const showPos = !!cfg.showPos;
+  elQuizMcqMeta.textContent = showPos && correct.pos ? `часть речи: ${mcqPosLabel(correct.pos)}` : '';
+
+  quizMcqState = { options, correctIdx, selectedIdx:-1, locked:false, askLang, answerLang, item };
+
+  for(let i=0;i<n;i++){
+    const opt = options[i];
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'ik-btn';
+    btn.dataset.idx = String(i);
+    const num = i + 1;
+    btn.textContent = `${num}. ${opt.display || ''}`;
+    btn.addEventListener('click', ()=> quizMcqSelect(i));
+    elQuizMcqButtons.appendChild(btn);
+  }
+
+  quizSetFeedback('idle', 'ready', 'выбери вариант');
+}
+
+function quizMcqLock(){
+  if(!quizMcqState) return;
+  quizMcqState.locked = true;
+  // disable buttons
+  if(elQuizMcqButtons){
+    const btns = Array.from(elQuizMcqButtons.querySelectorAll('button'));
+    for(const b of btns) b.disabled = true;
+  }
+  quizSetFlipped(true);
+  quizCheckMode = 'next';
+  btnQuizCheckNext.textContent = 'далее';
+  btnQuizCheckNext.title = 'Далее (Enter)';
+}
+
+function quizMcqSelect(idx){
+  if(!quizCurrent || !quizMcqState || quizMcqState.locked) return;
+
+  const cfg = cfgFromUI();
+  const i = Number(idx);
+  quizMcqState.selectedIdx = i;
+
+  const correctIdx = quizMcqState.correctIdx;
+  const correctOpt = quizMcqState.options[correctIdx];
+  const chosenOpt = quizMcqState.options[i];
+
+  // highlight
+  if(elQuizMcqButtons){
+    const btns = Array.from(elQuizMcqButtons.querySelectorAll('button'));
+    for(let k=0;k<btns.length;k++){
+      if(k === correctIdx) mcqBtnApplyState(btns[k], 'correct');
+      else if(k === i && i !== correctIdx) mcqBtnApplyState(btns[k], 'wrong');
+      else mcqBtnApplyState(btns[k], 'dim');
+    }
+  }
+
+  const isOk = (i === correctIdx);
+
+  quizTotal += 1;
+  if(isOk) quizCorrect += 1;
+  quizUpdateScore();
+
+  if(isOk){
+    // MCQ counts weaker by default
+    const bumpAs = (cfg.softMcq !== false) ? 'hard' : 'correct';
+    practiceBump(quizCurrent, quizAskLang, bumpAs);
+    quizSetFeedback('correct', 'ok', 'верно');
+  }else{
+    practiceBump(quizCurrent, quizAskLang, 'wrong');
+
+    // remember confusion
+    mcqBumpConfusion(quizCurrent, quizAskLang, chosenOpt && chosenOpt.norm, correctOpt && correctOpt.norm);
+
+    // return later
+    const insertAt = Math.min(quizQueue.length, DICT_REASK_GAP);
+    quizQueue.splice(insertAt, 0, quizCurrent);
+
+    // in mix: after wrong MCQ, force next attempt as input
+    const k = practiceKey(quizCurrent);
+    if(k && String(cfg.taskMode || 'mix') === 'mix') quizModeOverrides[k] = 'input';
+
+    quizSetFeedback('wrong', 'no', 'неверно - смотри ответ и жми далее');
+  }
+
+  quizMcqLock();
+}
+
+function quizMcqGiveUp(){
+  if(!quizCurrent || !quizMcqState || quizMcqState.locked) return;
+
+  const cfg = cfgFromUI();
+  const correctIdx = quizMcqState.correctIdx;
+  const correctOpt = quizMcqState.options[correctIdx];
+
+  // highlight only correct
+  if(elQuizMcqButtons){
+    const btns = Array.from(elQuizMcqButtons.querySelectorAll('button'));
+    for(let k=0;k<btns.length;k++){
+      if(k === correctIdx) mcqBtnApplyState(btns[k], 'correct');
+      else mcqBtnApplyState(btns[k], 'dim');
+    }
+  }
+
+  quizTotal += 1;
+  quizUpdateScore();
+
+  practiceBump(quizCurrent, quizAskLang, 'wrong');
+
+  const insertAt = Math.min(quizQueue.length, DICT_REASK_GAP);
+  quizQueue.splice(insertAt, 0, quizCurrent);
+
+  const k = practiceKey(quizCurrent);
+  if(k && String(cfg.taskMode || 'mix') === 'mix') quizModeOverrides[k] = 'input';
+
+  quizSetFeedback('wrong', 'giveup', 'ответ показан - слово вернется позже');
+
+  quizMcqLock();
+}
+
+function learnRenderIntroMcq(task, cfg){
+  ensureMcqContainers();
+  if(!elLearnMcqWrap || !elLearnMcqButtons || !task || !task.item) return;
+
+  const askLang = task.askLang || learnChooseAskLang(task.item, cfg);
+  const answerLang = (askLang === 'en') ? 'ru' : 'en';
+
+  const itemsPool = wordsForSelection(elSectionLearn && elSectionLearn.value);
+  const built = mcqBuildOptions(task.item, askLang, answerLang, cfg.introMcqCount, itemsPool, cfg);
+  const n = built.n;
+  const correct = built.correct;
+  const distractors = shuffle(built.distractors || []);
+
+  const correctIdx = mcqPickPos(mcqPosBagLearn, n);
+  const options = new Array(n);
+
+  let di = 0;
+  for(let i=0;i<n;i++){
+    if(i === correctIdx) options[i] = correct;
+    else{
+      options[i] = distractors[di] || correct;
+      di += 1;
+    }
+  }
+
+  elLearnMcqButtons.innerHTML = '';
+  elLearnMcqMeta.textContent = (cfg.introShowPos && correct.pos) ? `часть речи: ${mcqPosLabel(correct.pos)}` : '';
+
+  learnMcqState = { options, correctIdx, selectedIdx:-1, locked:false, askLang, answerLang, item: task.item };
+
+  for(let i=0;i<n;i++){
+    const opt = options[i];
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'ik-btn';
+    btn.dataset.idx = String(i);
+    const num = i + 1;
+    btn.textContent = `${num}. ${opt.display || ''}`;
+    btn.addEventListener('click', ()=> learnIntroMcqSelect(i));
+    elLearnMcqButtons.appendChild(btn);
+  }
+
+  if(elLearnMcqWrap) elLearnMcqWrap.style.display = '';
+}
+
+function learnIntroMcqLock(){
+  if(!learnMcqState) return;
+  learnMcqState.locked = true;
+
+  if(elLearnMcqButtons){
+    const btns = Array.from(elLearnMcqButtons.querySelectorAll('button'));
+    for(const b of btns) b.disabled = true;
+  }
+
+  learnSetFlipped(true);
+  learnCheckMode = 'next';
+  if(btnLearnCheckNext){ btnLearnCheckNext.textContent = 'далее'; btnLearnCheckNext.title = 'Далее (Enter)'; }
+}
+
+function learnIntroMcqSelect(idx){
+  if(!learnCurrent || learnCurrent.type !== 'intro' || !learnMcqState || learnMcqState.locked) return;
+
+  const i = Number(idx);
+  learnMcqState.selectedIdx = i;
+
+  const correctIdx = learnMcqState.correctIdx;
+  const correctOpt = learnMcqState.options[correctIdx];
+  const chosenOpt = learnMcqState.options[i];
+
+  // highlight
+  if(elLearnMcqButtons){
+    const btns = Array.from(elLearnMcqButtons.querySelectorAll('button'));
+    for(let k=0;k<btns.length;k++){
+      if(k === correctIdx) mcqBtnApplyState(btns[k], 'correct');
+      else if(k === i && i !== correctIdx) mcqBtnApplyState(btns[k], 'wrong');
+      else mcqBtnApplyState(btns[k], 'dim');
+    }
+  }
+
+  const isOk = (i === correctIdx);
+
+  // intro MCQ does NOT mark learned, but it does affect future ordering
+  const ws = learnWordState(learnCurrent.item);
+  if(ws){
+    ws.introSeen = true;
+    ws.introWrong = ws.introWrong || 0;
+    if(!isOk) ws.introWrong += 1;
+  }
+
+  if(isOk){
+    learnSetFeedback('correct', 'ok', 'верно');
+  }else{
+    mcqBumpConfusion(learnCurrent.item, learnMcqState.askLang, chosenOpt && chosenOpt.norm, correctOpt && correctOpt.norm);
+    learnSetFeedback('wrong', 'no', 'неверно - запомни и дальше');
+    // make it appear earlier and more often in stage 2
+    learnInsertTask({ type:'test', item: learnCurrent.item, round:1 }, 0, 2);
+    learnInsertTask({ type:'test', item: learnCurrent.item, round:1 }, 6, 10);
+  }
+
+  learnIntroMcqLock();
+}
+
+function learnIntroMcqGiveUp(){
+  if(!learnCurrent || learnCurrent.type !== 'intro' || !learnMcqState || learnMcqState.locked) return;
+
+  const correctIdx = learnMcqState.correctIdx;
+
+  if(elLearnMcqButtons){
+    const btns = Array.from(elLearnMcqButtons.querySelectorAll('button'));
+    for(let k=0;k<btns.length;k++){
+      if(k === correctIdx) mcqBtnApplyState(btns[k], 'correct');
+      else mcqBtnApplyState(btns[k], 'dim');
+    }
+  }
+
+  const ws = learnWordState(learnCurrent.item);
+  if(ws){
+    ws.introSeen = true;
+    ws.introWrong = (ws.introWrong || 0) + 1;
+  }
+
+  learnSetFeedback('wrong', 'giveup', 'ответ показан - дальше');
+  learnInsertTask({ type:'test', item: learnCurrent.item, round:1 }, 0, 2);
+  learnInsertTask({ type:'test', item: learnCurrent.item, round:1 }, 6, 10);
+
+  learnIntroMcqLock();
+}
+
+function isPracticePanelActive(){
+  return dictPanelQuiz && !dictPanelQuiz.hidden;
+}
+function isLearnPanelActive(){
+  return dictPanelLearn && !dictPanelLearn.hidden;
+}
+
+function handleMcqHotkeys(e){
+  const key = e.key;
+
+  // number keys for MCQ selection
+  if(key >= '1' && key <= '8'){
+    const num = Number(key);
+    if(isPracticePanelActive() && quizTaskKind === 'mcq' && quizMcqState && !quizMcqState.locked){
+      e.preventDefault();
+      const idx = num - 1;
+      if(idx >= 0 && idx < (quizMcqState.options || []).length) quizMcqSelect(idx);
+      return;
+    }
+    if(isLearnPanelActive() && learnCurrent && learnCurrent.type === 'intro' && learnMcqState && !learnMcqState.locked){
+      e.preventDefault();
+      const idx = num - 1;
+      if(idx >= 0 && idx < (learnMcqState.options || []).length) learnIntroMcqSelect(idx);
+      return;
+    }
+  }
+
+  // Enter -> next in MCQ
+  if(key === 'Enter'){
+    if(isPracticePanelActive() && quizTaskKind === 'mcq'){
+      // let button handler run
+      return;
+    }
+    if(isLearnPanelActive() && learnCurrent && learnCurrent.type === 'intro' && learnMcqState){
+      // let button handler run
+      return;
+    }
+  }
+}
+
+  function buildCounts(){
+    dictCounts = new Map();
+    for(const s of dictSections){
+      dictCounts.set(Number(s.id), 0);
+    }
+    for(const w of dictWordsAll){
+      const sid = Number(w.sectionId);
+      dictCounts.set(sid, (dictCounts.get(sid) || 0) + 1);
+    }
+  }
+
+  function getSectionNameById(id){
+    const s = dictSections.find(x => Number(x.id) === Number(id));
+    return s ? s.name : 'section';
+  }
+
+  function updateGlobalBadges(){
+    elDictDbNameLine.textContent = `db: ${dictDbName()}`;
+    elDictCountBadge.textContent = `words: ${dictWordsAll.length}`;
+  }
+
+  function dictShowFirstPick(){
+    if(elDictFirstPick) elDictFirstPick.hidden = false;
+    if(elDictSubtabsWrap) elDictSubtabsWrap.hidden = true;
+    if(elFirstPickSearch){
+      elFirstPickSearch.value = '';
+      renderFirstPickUI();
+      try{ elFirstPickSearch.focus({ preventScroll:true }); }catch(_){}
+    }else{
+      renderFirstPickUI();
+    }
+  }
+
+  function dictOpenConstructorFromPick(){
+    if(elDictFirstPick) elDictFirstPick.hidden = true;
+    if(elDictSubtabsWrap) elDictSubtabsWrap.hidden = false;
+    dictSetSubtab('builder');
+    renderWordsUI();
+  }
+
+  
+  let dictCurrentSection = '';
+
+  function dictSetCurrentSection(sectionValue){
+    const v = String(sectionValue || '').trim();
+    if(!v) return;
+    dictCurrentSection = v;
+    try{ localStorage.setItem('dict_last_section', v); }catch(_e){}
+
+    if(elSectionCards && elSectionCards.value !== v) elSectionCards.value = v;
+    if(elSectionQuiz && elSectionQuiz.value !== v) elSectionQuiz.value = v;
+    if(elSectionLearn && elSectionLearn.value !== v) elSectionLearn.value = v;
+    if(elSectionBuilder && v !== 'All' && elSectionBuilder.value !== v) elSectionBuilder.value = v;
+  }
+
+function dictEnterSection(sectionValue, startTab){
+    const v = String(sectionValue || '').trim();
+    if(!v) return;
+
+    dictSetCurrentSection(v);
+
+    if(elDictFirstPick) elDictFirstPick.hidden = true;
+    if(elDictSubtabsWrap) elDictSubtabsWrap.hidden = false;
+
+    if(startTab === 'practice' || startTab === 'quiz'){
+      dictSetSubtab('practice');
+      dictResetQuiz();
+      return;
+    }
+    if(startTab === 'learn'){
+      dictSetSubtab('learn');
+      learnStartSession(true);
+      return;
+    }
+    if(startTab === 'builder'){
+      dictSetSubtab('builder');
+      renderWordsUI();
+      return;
+    }
+
+    dictSetSubtab('cards');
+    dictResetCards();
+  }
+
+  function renderFirstPickUI(){
+    if(!elFirstPickList) return;
+
+    const q = String(elFirstPickSearch && elFirstPickSearch.value || '').trim().toLowerCase();
+
+    const items = [];
+    items.push({ sid:'All', name:'All (все разделы)', count: dictWordsAll.length });
+
+    dictSections
+      .slice()
+      .sort((a,b)=> a.name.localeCompare(b.name, 'ru'))
+      .forEach((s)=>{
+        const sid = String(s.id);
+        const count = dictCounts.get(Number(s.id)) || 0;
+        items.push({ sid, name:s.name, count });
+      });
+
+    const filtered = items.filter(it => !q || String(it.name).toLowerCase().includes(q));
+
+    elFirstPickList.innerHTML = '';
+    if(!filtered.length){
+      const li = document.createElement('li');
+      li.innerHTML = `<p class="ik-itemline"><b>ничего не найдено</b></p>`;
+      elFirstPickList.appendChild(li);
+      return;
+    }
+
+    for(const it of filtered){
+      const li = document.createElement('li');
+      li.className = 'is-clickable';
+
+      const left = document.createElement('div');
+      left.innerHTML = `<p class="ik-itemline"><b>${escapeHTML(it.name)}</b> <span class="ik-muted">(${it.count})</span></p>`;
+
+      const right = document.createElement('div');
+      right.className = 'ik-mini';
+
+      const btnCards = document.createElement('button');
+      btnCards.className = 'ik-btn ik-btn--black';
+      btnCards.type = 'button';
+      btnCards.textContent = 'cards';
+      btnCards.addEventListener('click', (e)=>{
+        e.stopPropagation();
+        dictEnterSection(it.sid, 'cards');
+      });
+
+            right.appendChild(btnCards);
+      const btnPractice = document.createElement('button');
+      btnPractice.className = 'ik-btn';
+      btnPractice.type = 'button';
+      btnPractice.textContent = 'practice';
+      btnPractice.addEventListener('click', (e)=>{
+        e.stopPropagation();
+        dictEnterSection(it.sid, 'practice');
+      });
+
+      right.appendChild(btnPractice);
+
+
+      const btnLearn = document.createElement('button');
+      btnLearn.className = 'ik-btn';
+      btnLearn.type = 'button';
+      btnLearn.textContent = 'learn';
+      btnLearn.addEventListener('click', (e)=>{
+        e.stopPropagation();
+        dictEnterSection(it.sid, 'learn');
+      });
+      right.appendChild(btnLearn);
+li.appendChild(left);
+      li.appendChild(right);
+      li.addEventListener('click', ()=> dictEnterSection(it.sid, 'cards'));
+
+      elFirstPickList.appendChild(li);
+    }
+  }
+
+  function renderSectionsUI(){
+    const opts = [];
+    for(const s of dictSections){
+      const sid = Number(s.id);
+      const count = dictCounts.get(sid) || 0;
+      opts.push({ value: String(sid), label: `${s.name} (${count})` });
+    }
+
+    function fillSelect(sel, includeAll){
+      const prev = sel.value;
+      sel.innerHTML = '';
+
+      const ph = document.createElement('option');
+      ph.value = '';
+      ph.textContent = 'choose section...';
+      sel.appendChild(ph);
+
+      if(includeAll){
+        const o = document.createElement('option');
+        o.value = 'All';
+        o.textContent = `All (${dictWordsAll.length})`;
+        sel.appendChild(o);
+      }
+      for(const odef of opts){
+        const o = document.createElement('option');
+        o.value = odef.value;
+        o.textContent = odef.label;
+        sel.appendChild(o);
+      }
+
+      if(prev && Array.from(sel.options).some(o => o.value === prev)){
+        sel.value = prev;
+      }else{
+        sel.value = '';
+      }
+    }
+
+    fillSelect(elSectionCards, true);
+    fillSelect(elSectionQuiz, true);
+    fillSelect(elSectionLearn, true);
+    fillSelect(elSectionBuilder, false);
+
+    renderFirstPickUI();
+
+    elSectionList.innerHTML = '';
+    if(!dictSections.length){
+      const li = document.createElement('li');
+      li.innerHTML = `<p class="ik-itemline"><b>пусто</b></p>`;
+      elSectionList.appendChild(li);
+      return;
+    }
+
+    dictSections
+      .slice()
+      .sort((a,b)=> a.name.localeCompare(b.name, 'ru'))
+      .forEach((s)=>{
+        const sid = Number(s.id);
+        const count = dictCounts.get(sid) || 0;
+        const li = document.createElement('li');
+
+        const left = document.createElement('div');
+        left.innerHTML = `<p class="ik-itemline"><b>${escapeHTML(s.name)}</b> <span class="ik-muted">(${count})</span></p>`;
+
+        const right = document.createElement('div');
+        right.className = 'ik-mini';
+
+        const btnOpen = document.createElement('button');
+        btnOpen.className = 'ik-btn ik-btn--black';
+        btnOpen.type = 'button';
+        btnOpen.textContent = 'open';
+        btnOpen.addEventListener('click', ()=>{
+          elSectionBuilder.value = String(sid);
+          renderWordsUI();
+          dictSetSubtab('builder');
+        });
+
+        right.appendChild(btnOpen);
+        li.appendChild(left);
+        li.appendChild(right);
+        elSectionList.appendChild(li);
+      });
+  }
+
+  function wordsForSelection(value){
+    const v = String(value || '').trim();
+    if(!v) return [];
+    if(v === 'All') return [...dictWordsAll];
+    const sid = Number(v);
+    if(!sid) return [];
+    return dictWordsAll.filter(w => Number(w.sectionId) === sid);
+  }
+
+  function renderWordsUI(){
+    const sid = Number(elSectionBuilder.value || 0);
+    const list = dictWordsAll
+      .filter(w => Number(w.sectionId) === sid)
+      .sort((a,b)=> (a.en || '').localeCompare((b.en || ''), 'en'));
+
+    elWordList.innerHTML = '';
+
+    if(!sid){
+      const li = document.createElement('li');
+      li.innerHTML = `<p class="ik-itemline"><b>выбери раздел</b></p>`;
+      elWordList.appendChild(li);
+      return;
+    }
+
+    if(!list.length){
+      const li = document.createElement('li');
+      li.innerHTML = `<p class="ik-itemline"><b>пусто</b> <span class="ik-muted">добавь слова выше</span></p>`;
+      elWordList.appendChild(li);
+      return;
+    }
+
+    for(const w of list){
+      const li = document.createElement('li');
+
+      const left = document.createElement('div');
+      left.innerHTML = `<p class="ik-itemline"><b>${escapeHTML(w.en)}</b> - ${escapeHTML(w.ru)}</p>`;
+
+      const right = document.createElement('div');
+      right.className = 'ik-mini';
+
+      const btnDel = document.createElement('button');
+      btnDel.className = 'ik-btn';
+      btnDel.type = 'button';
+      btnDel.textContent = 'удалить';
+      btnDel.addEventListener('click', async ()=>{
+        try{
+          await dictDeleteWord(dictDb, w.id);
+          await dictRefreshAll();
+          renderWordsUI();
+          dictResetCards();
+          dictResetQuiz();
+        }catch(e){
+          alert(`Ошибка удаления: ${e.message || e}`);
+        }
+      });
+
+      right.appendChild(btnDel);
+      li.appendChild(left);
+      li.appendChild(right);
+      elWordList.appendChild(li);
+    }
+  }
+
+  function cardsSetFlipped(flipped){
+    if(flipped){
+      elFlipCard.classList.add('is-flipped');
+      elFlipCard.setAttribute('aria-pressed', 'true');
+    }else{
+      elFlipCard.classList.remove('is-flipped');
+      elFlipCard.setAttribute('aria-pressed', 'false');
+    }
+  }
+
+  function cardsShow(item, frontLang){
+    cardsSetFlipped(false);
+
+    if(!item){
+      const sel = String((elSectionCards && elSectionCards.value) || '').trim();
+      if(!sel){
+        elCardFront.textContent = 'выбери section';
+        elCardBack.textContent = 'сначала выбери раздел';
+      }else{
+        elCardFront.textContent = 'нет слов';
+        elCardBack.textContent = 'добавь слова в constructor';
+      }
+      elCardFrontLang.textContent = '';
+      elCardBackLang.textContent = '';
+      elCardsMeta.textContent = '';
+      return;
+    }
+
+    const frontIsEn = frontLang === 'en';
+    elCardFront.textContent = frontIsEn ? item.en : item.ru;
+    elCardBack.textContent = frontIsEn ? item.ru : item.en;
+    elCardFrontLang.textContent = frontIsEn ? 'EN' : 'RU';
+    elCardBackLang.textContent = frontIsEn ? 'RU' : 'EN';
+
+    const secName = getSectionNameById(item.sectionId);
+    // progress: unique seen / total in current deck
+    if(item && item.id != null) cardsSeen.add(String(item.id));
+    const denom = cardsDeck.length || 0;
+    const prog = denom ? cardsSeen.size : 0;
+    elCardsMeta.textContent = `section: ${secName} | ${prog}/${denom}`;
+}
+
+  function cardsPick(){
+    if(!cardsDeck.length) return null;
+    if(elCardsRandom.checked){
+      return cardsDeck[Math.floor(Math.random() * cardsDeck.length)];
+    }
+    cardsSeq = (cardsSeq + 1) % cardsDeck.length;
+    return cardsDeck[cardsSeq];
+  }
+
+  function cardsGoNext(){
+    if(!cardsDeck.length){ cardsShow(null, 'en'); return; }
+
+    if(cardsPos < cardsHistory.length - 1){
+      cardsPos += 1;
+      const h = cardsHistory[cardsPos];
+      cardsShow(h.item, h.frontLang);
+      return;
+    }
+
+    const item = cardsPick();
+    const pref = String(elCardsFront.value || 'en');
+    const frontLang = pref === 'mix' ? (Math.random() < 0.5 ? 'en' : 'ru') : pref;
+
+    cardsHistory.push({ item, frontLang });
+    cardsPos = cardsHistory.length - 1;
+
+    cardsShow(item, frontLang);
+  }
+
+  function cardsGoPrev(){
+    if(cardsPos <= 0) return;
+    cardsPos -= 1;
+    const h = cardsHistory[cardsPos];
+    cardsShow(h.item, h.frontLang);
+  }
+
+  function cardsToggleFlip(){
+    const flipped = elFlipCard.classList.contains('is-flipped');
+    cardsSetFlipped(!flipped);
+  }
+
+  function dictResetCards(){
+    cardsDeck = wordsForSelection(elSectionCards.value);
+    cardsHistory = [];
+    cardsPos = -1;
+    cardsSeq = -1;
+    cardsSeen = new Set();
+    cardsGoNext();
+  }
+
+  function quizSetFlipped(flipped){
+    if(flipped){
+      elQuizCard.classList.add('is-flipped');
+      elQuizCard.setAttribute('aria-pressed', 'true');
+    }else{
+      elQuizCard.classList.remove('is-flipped');
+      elQuizCard.setAttribute('aria-pressed', 'false');
+    }
+  }
+
+  function quizPickAskLang(item){
+    const pref = String(elQuizMode.value || 'en');
+    if(pref === 'mix') return Math.random() < 0.5 ? 'en' : 'ru';
+    if(pref === 'weak'){
+      const st = practiceGetStat(item);
+      if(!st) return Math.random() < 0.5 ? 'en' : 'ru';
+      const a = st.en2ru; const b = st.ru2en;
+      const wa = (a.w + a.h*0.5) / Math.max(1, (a.c + a.w + a.h));
+      const wb = (b.w + b.h*0.5) / Math.max(1, (b.c + b.w + b.h));
+      if(wa === wb) return Math.random() < 0.5 ? 'en' : 'ru';
+      return wa > wb ? 'en' : 'ru';
+    }
+    return pref; // 'en' or 'ru'
+  }
+
+  function quizRenderPromptLabel(askLang){
+    elQuizPromptLabel.textContent = askLang === 'en' ? 'переведи на русский' : 'переведи на английский';
+  }
+
+  function practiceHint(){
+    if(!quizCurrent) return;
+    if(quizCheckMode === 'next') return;
+
+    const cfg = cfgFromUI();
+    const exp = practiceExpected(quizCurrent, quizAskLang, cfg);
+    const vars = exp.expectedVariants || [];
+    const primary = vars.length ? vars[0] : (exp.expectedRaw || '');
+    if(!primary) return;
+
+    practiceHintUsed = true;
+    practiceHintLevel += 1;
+
+    if(practiceHintLevel === 1){
+      const first = primary.slice(0,1);
+      const masked = first + ' ' + '_'.repeat(Math.max(0, primary.length - 1));
+      quizSetFeedback('idle', 'hint', `подсказка: ${masked}`);
+      return;
+    }
+
+    // level 2+: show answer (counts as give up)
+    elQuizInput.value = '';
+    quizSkip();
+  }
+
+  function quizShow(item){
+    quizCurrent = item || null;
+    if(quizCurrent && quizCurrent.id != null){
+      quizSeen.add(String(quizCurrent.id));
+      quizUpdateScore();
+    }
+    quizAskLang = quizPickAskLang(quizCurrent);
+    practiceHintLevel = 0;
+    practiceHintUsed = false;
+    practicePendingFuzzy = null;
+    if(elPracticeFuzzyActions) elPracticeFuzzyActions.style.display = 'none';
+    quizRenderPromptLabel(quizAskLang);
+
+    quizSetFlipped(false);
+
+    elQuizInput.classList.remove('is-ok', 'is-bad');
+    elQuizInput.disabled = false;
+    elQuizInput.value = '';
+
+    if(!quizCurrent){
+      const sel = String((elSectionQuiz && elSectionQuiz.value) || '').trim();
+      if(!sel){
+        elQuizFront.textContent = 'выбери section';
+        elQuizBack.textContent = 'сначала выбери раздел';
+        quizSetFeedback('idle', 'pick', 'сначала выбери section');
+      }else{
+        elQuizFront.textContent = 'нет слов';
+        elQuizBack.textContent = 'добавь слова в constructor';
+        quizSetFeedback('idle', 'empty', 'добавь слова в constructor');
+      }
+      elQuizFrontLang.textContent = '';
+      elQuizBackLang.textContent = '';
+      if(elQuizMcqWrap) elQuizMcqWrap.style.display = 'none';
+      if(elQuizInput) elQuizInput.style.display = '';
+      if(btnPracticeHint) btnPracticeHint.style.display = '';
+      if(btnQuizSkip){ btnQuizSkip.textContent = 'сдаюсь'; btnQuizSkip.title = 'Показать ответ (считается ошибкой)'; }
+      setQuizMode('check');
+      return;
+    }
+
+    const frontIsEn = quizAskLang === 'en';
+    elQuizFront.textContent = frontIsEn ? quizCurrent.en : quizCurrent.ru;
+    elQuizBack.textContent = frontIsEn ? quizCurrent.ru : quizCurrent.en;
+    elQuizFrontLang.textContent = frontIsEn ? 'EN' : 'RU';
+    elQuizBackLang.textContent = frontIsEn ? 'RU' : 'EN';
+
+    const cfg = cfgFromUI();
+    const kind = quizDecideTaskKind(quizCurrent, cfg);
+    quizSetTaskUi(kind, cfg);
+
+    if(kind === 'mcq'){
+      quizRenderMcq(quizCurrent, quizAskLang, cfg);
+    }else{
+      elQuizInput.focus({ preventScroll:true });
+      quizSetFeedback('idle', 'ready', 'введи перевод и нажми check');
+      setQuizMode('check');
+    }
+  }
+
+  function quizNext(){
+    if(!quizQueue.length){
+      quizShow(null);
+      return;
+    }
+    const item = quizQueue.shift();
+    quizShow(item);
+  }
+
+  function weightedPickNoReplace(items, n, weightFn){
+    const pool = items.slice();
+    const out = [];
+    const k = Math.min(n, pool.length);
+    for(let i=0;i<k;i++){
+      let totalW = 0;
+      const weights = pool.map(it=>{
+        const w = Math.max(0.0001, Number(weightFn(it)) || 0.0001);
+        totalW += w;
+        return w;
+      });
+      let r = Math.random() * totalW;
+      let idx = 0;
+      for(let j=0;j<pool.length;j++){
+        r -= weights[j];
+        if(r <= 0){ idx = j; break; }
+      }
+      out.push(pool[idx]);
+      pool.splice(idx, 1);
+    }
+    return out;
+  }
+
+  function practiceWeight(item){
+    const st = practiceGetStat(item);
+    if(!st) return 1;
+    const a = st.en2ru; const b = st.ru2en;
+    const wrong = (a.w + b.w);
+    const hard = (a.h + b.h);
+    const correct = (a.c + b.c);
+    // more wrong/hard => show earlier
+    return 1 + wrong*3 + hard*1.5 - Math.min(2, correct*0.15);
+  }
+
+  function dictResetQuiz(){
+    const cfg = cfgFromUI();
+    savePracticeCfg(cfg);
+
+    quizMcqState = null;
+    quizTaskKind = 'input';
+    quizModeOverrides = {};
+    mcqPosBagQuiz = [];
+    if(elQuizMcqWrap) elQuizMcqWrap.style.display = 'none';
+    if(elQuizInput) elQuizInput.style.display = '';
+
+    const all = wordsForSelection(elSectionQuiz.value);
+    let target = 20;
+    if(cfg.session === 'all') target = all.length;
+    else{
+      const n = Number(cfg.session || 20);
+      target = Number.isFinite(n) ? Math.max(1, Math.floor(n)) : 20;
+      target = Math.min(target, all.length || target);
+    }
+    quizSessionTarget = target || 0;
+
+    if(!all.length){
+      quizDeck = [];
+      quizQueue = [];
+      quizTotal = 0;
+      quizCorrect = 0;
+      quizSeen = new Set();
+      quizUpdateScore();
+      quizShow(null);
+      return;
+    }
+
+    // pick session words with weights (weak words appear earlier)
+    const picked = target && target < all.length
+      ? weightedPickNoReplace(all, target, practiceWeight)
+      : all.slice();
+
+    quizDeck = picked;
+    quizQueue = shuffle(picked);
+
+    quizTotal = 0;
+    quizCorrect = 0;
+    quizSeen = new Set();
+    quizUpdateScore();
+    quizNext();
+  }
+
+  function quizLockAfterCheck(isCorrect){
+    if(isCorrect) elQuizInput.classList.add('is-ok');
+    else{
+      elQuizInput.classList.add('is-bad');
+      pulse(elQuizInput, 'ik-shake');
+    }
+    elQuizInput.disabled = true;
+    quizSetFlipped(true); // show answer
+    setQuizMode('next');
+  }
+
+  function practiceExpected(item, askLang, cfg){
+    if(!item) return { lang:'en', expectedRaw:'', expectedVariants:[] };
+    if(askLang === 'en'){
+      return { lang:'ru', expectedRaw:item.ru, expectedVariants: ruVariants(item.ru) };
+    }
+    return { lang:'en', expectedRaw:item.en, expectedVariants: enVariants(item.en, cfg) };
+  }
+
+  function practiceEvaluateAnswer(raw, item, askLang){
+    const cfg = cfgFromUI();
+    const exp = practiceExpected(item, askLang, cfg);
+    const tokens = userTokens(raw, exp.lang, cfg);
+    if(!tokens.length) return { status:'empty', exp, cfg };
+
+    // exact match: any user token matches any expected variant
+    for(const tk of tokens){
+      if(exp.expectedVariants.includes(tk)){
+        return { status:'correct', exp, cfg };
+      }
+    }
+
+    // fuzzy (typos)
+    if(cfg.typos){
+      let bestDist = Infinity;
+      let bestExp = null;
+      for(const tk of tokens){
+        for(const ev of exp.expectedVariants){
+          const d = levenshtein(tk, ev);
+          if(d < bestDist){
+            bestDist = d;
+            bestExp = ev;
+          }
+        }
+      }
+      const thr = typoThreshold(bestExp);
+      if(bestExp && bestDist > 0 && bestDist <= thr){
+        return { status:'almost', exp, cfg, dist: bestDist };
+      }
+    }
+
+    return { status:'wrong', exp, cfg };
+  }
+
+  function practiceResolveFuzzy(accept){
+    if(!practicePendingFuzzy) return;
+    const p = practicePendingFuzzy;
+    practicePendingFuzzy = null;
+    if(elPracticeFuzzyActions) elPracticeFuzzyActions.style.display='none';
+
+    quizTotal += 1;
+    if(accept) quizCorrect += 1;
+    quizUpdateScore();
+
+    if(accept){
+      practiceBump(p.item, p.askLang, 'hard');
+      quizSetFeedback('correct', 'ok', `засчитано (опечатка ~${p.dist})`);
+      return;
+    }
+
+    practiceBump(p.item, p.askLang, 'wrong');
+    const insertAt = Math.min(quizQueue.length, DICT_REASK_GAP);
+    quizQueue.splice(insertAt, 0, p.item);
+    quizSetFeedback('wrong', 'no', 'не засчитано - слово вернется позже');
+  }
+
+  function quizCheckOrNext(){
+    if(quizCheckMode === 'next'){
+      if(practicePendingFuzzy){
+        practiceResolveFuzzy(false);
+      }
+      quizNext();
+      return;
+    }
+    if(!quizCurrent) return;
+
+    // MCQ: selection grades immediately, button is just 'далее'
+    if(quizTaskKind === 'mcq'){
+      if(!quizMcqState || quizMcqState.selectedIdx == null || quizMcqState.selectedIdx < 0){
+        quizSetFeedback('idle', 'choose', 'выбери вариант');
+        if(elQuizMcqWrap) pulse(elQuizMcqWrap, 'ik-shake');
+        return;
+      }
+      // normally we are already in next mode
+      quizMcqLock();
+      return;
+    }
+
+    const raw = elQuizInput.value || '';
+    if(!String(raw).trim()){
+      quizSetFeedback('idle', 'type', 'введи ответ');
+      pulse(elQuizInput, 'ik-shake');
+      return;
+    }
+
+    const res = practiceEvaluateAnswer(raw, quizCurrent, quizAskLang);
+
+    if(res.status === 'correct'){
+      quizTotal += 1;
+      quizCorrect += 1;
+      quizUpdateScore();
+
+      practiceBump(quizCurrent, quizAskLang, practiceHintUsed ? 'hard' : 'correct');
+
+      quizSetFeedback('correct', 'ok', practiceHintUsed ? 'верно (с подсказкой)' : 'верно');
+      quizLockAfterCheck(true);
+      return;
+    }
+
+    if(res.status === 'almost'){
+      practicePendingFuzzy = { item: quizCurrent, askLang: quizAskLang, dist: res.dist };
+      quizSetFeedback('idle', 'almost', `почти! опечатка примерно в ${res.dist} символ(ах)`);
+      if(elPracticeFuzzyActions) elPracticeFuzzyActions.style.display = 'flex';
+      quizLockAfterCheck(false);
+      return;
+    }
+
+    // wrong
+    quizTotal += 1;
+    quizUpdateScore();
+
+    practiceBump(quizCurrent, quizAskLang, 'wrong');
+
+    const insertAt = Math.min(quizQueue.length, DICT_REASK_GAP);
+    quizQueue.splice(insertAt, 0, quizCurrent);
+
+    quizSetFeedback('wrong', 'no', 'неверно - смотри ответ и жми далее');
+    quizLockAfterCheck(false);
+  }
+
+  function quizSkip(){
+    if(!quizCurrent) return;
+
+    if(practicePendingFuzzy){
+      practiceResolveFuzzy(false);
+      return;
+    }
+
+    if(quizTaskKind === 'mcq'){
+      quizMcqGiveUp();
+      return;
+    }
+
+    quizTotal += 1;
+    quizUpdateScore();
+
+    practiceBump(quizCurrent, quizAskLang, 'wrong');
+
+    const insertAt = Math.min(quizQueue.length, DICT_REASK_GAP);
+    quizQueue.splice(insertAt, 0, quizCurrent);
+
+    quizSetFeedback('wrong', 'giveup', 'ответ показан - слово вернется позже');
+    quizLockAfterCheck(false);
+  }
+
+  async function dictRefreshAll(){
+    dictSections = await dictGetAll(dictDb, DICT_STORE_SECTIONS);
+    dictWordsAll = await dictGetAll(dictDb, DICT_STORE_WORDS);
+    buildCounts();
+    updateGlobalBadges();
+    renderSectionsUI();
+  }
+
+  function dictJsonToSections(data, fallbackName){
+  if(!data) return [];
+  const fb = String(fallbackName || '').trim();
+
+  if(Array.isArray(data.sections)){
+    return data.sections
+      .map(s => ({
+        name: String((s && (s.name || s.sectionName || s.section)) || fb).trim(),
+        words: Array.isArray(s && s.words) ? s.words : []
+      }))
+      .filter(s => s.name);
+  }
+
+  const name = String((data.sectionName || data.name || data.section) || fb).trim();
+  if(name && Array.isArray(data.words)){
+    return [{ name, words: data.words }];
+  }
+
+  return [];
+}
+
+function dictSectionExistsByName(name){
+  const key = normalize(name || '');
+  return dictSections.find(x => x.nameKey === key) || null;
+}
+
+function dictClearWordsInSection(dbx, sid){
+  const sectionId = Number(sid || 0);
+  return new Promise((resolve, reject) => {
+    const t = dbx.transaction([DICT_STORE_WORDS], 'readwrite');
+    const wStore = t.objectStore(DICT_STORE_WORDS);
+
+    try{
+      const idx = wStore.index('sectionId');
+      const cur = idx.openCursor(IDBKeyRange.only(sectionId));
+      cur.onsuccess = (e) => {
+        const c = e.target.result;
+        if(!c) return;
+        c.delete();
+        c.continue();
+      };
+    }catch(err){
+      reject(err || new Error('Failed to clear section words'));
+      return;
+    }
+
+    t.oncomplete = () => resolve(true);
+    t.onerror = () => reject(t.error || new Error('Failed to clear section words'));
+  });
+}
+
+async function dictImportSectionFile(data, opts){
+  const replaceExisting = !!(opts && opts.replaceExisting);
+  const mergeExisting = !!(opts && opts.mergeExisting);
+  const fallbackName = (opts && opts.fallbackName) || '';
+
+  const secs = dictJsonToSections(data, fallbackName);
+  if(!secs.length) return { imported:0, skipped:0 };
+
+  if(!dictDb) throw new Error('dict db not ready');
+
+  if(!dictSections.length) await dictRefreshAll();
+
+  let imported = 0;
+  let skipped = 0;
+
+  for(const s of secs){
+    const name = String(s && s.name || '').trim();
+    if(!name){ skipped += 1; continue; }
+
+    const exist = dictSectionExistsByName(name);
+
+    if(exist && !replaceExisting && !mergeExisting){
+      skipped += 1;
+      continue;
+    }
+
+    let sid = exist ? exist.id : null;
+
+    if(!sid){
+      // eslint-disable-next-line no-await-in-loop
+      const resS = await dictAddSection(dictDb, name);
+      sid = resS && resS.ok ? resS.id : null;
+      if(!sid){
+        // refresh cache and try find again
+        // eslint-disable-next-line no-await-in-loop
+        await dictRefreshAll();
+        const exist2 = dictSectionExistsByName(name);
+        sid = exist2 ? exist2.id : null;
+      }
+    }
+
+    if(!sid){ skipped += 1; continue; }
+
+    if(exist && replaceExisting){
+      // eslint-disable-next-line no-await-in-loop
+      await dictClearWordsInSection(dictDb, sid);
+    }
+
+    const words = Array.isArray(s.words) ? s.words : [];
+    for(const w of words){
+      if(!w || !w.en || !w.ru) continue;
+      // eslint-disable-next-line no-await-in-loop
+      const resW = await dictAddWord(dictDb, sid, w.en, w.ru);
+      if(resW && resW.ok) imported += 1;
+    }
+  }
+
+  return { imported, skipped };
+}
+
+async function dictSyncFromFolder(opts){
+  const replaceExisting = !!(opts && opts.replaceExisting);
+  const mergeExisting = !!(opts && opts.mergeExisting);
+
+  const okFiles = [];
+  const failFiles = [];
+
+  let files = [];
+  try{
+    let man = null;
+    let manifestUsed = null;
+    const manifestErrors = [];
+    for(const mp of DICT_MANIFESTS){
+      try{
+        // eslint-disable-next-line no-await-in-loop
+        man = await fetchJson(mp);
+        manifestUsed = mp;
+        break;
+      }catch(e){
+        manifestErrors.push(`${mp} - ${e && (e.message || e)}`);
+      }
+    }
+
+    if(Array.isArray(man)) files = man;
+    else if(man && Array.isArray(man.dictionary)) files = man.dictionary;
+    else if(man && man.dictionary && Array.isArray(man.dictionary.files)) files = man.dictionary.files;
+    else if(man && man.dictionary && Array.isArray(man.dictionary.dbs)) files = man.dictionary.dbs;
+    else if(man && Array.isArray(man.files)) files = man.files;
+    else if(man && Array.isArray(man.dbs)) files = man.dbs;
+  }catch(_){
+    // no manifest - use defaults
+  }
+
+  if(!Array.isArray(files) || !files.length){
+    files = DICT_DEFAULT_FILES;
+  }
+
+  files = files.map(x => String(x || '').trim()).filter(Boolean);
+
+  // refresh caches
+  await dictRefreshAll();
+
+  for(const f of files){
+    const rel = f.includes('/') ? f : `${DICT_DIR}${f}`;
+    try{
+      const data = await fetchJson(rel);
+      // eslint-disable-next-line no-await-in-loop
+      await dictImportSectionFile(data, {
+        replaceExisting,
+        mergeExisting,
+        fallbackName: _basename(f)
+          .replace(/^student_helper_db__dictionary_/, '')
+          .replace(/\.json$/i, '')
+          .replaceAll('_', ' ')
+      });
+
+      okFiles.push(rel);
+      // eslint-disable-next-line no-await-in-loop
+      await dictRefreshAll();
+    }catch(e){
+      failFiles.push(`${rel} - ${e && (e.message || e)}`);
+    }
+  }
+
+  return { okFiles, failFiles, filesCount: files.length, manifestUsed, manifestErrors };
+}
+
+  async function dictExportSection(){
+  const sid = Number(elSectionBuilder.value || 0);
+  if(!sid){
+    alert('Выбери section в constructor.');
+    return;
+  }
+  const sec = dictSections.find(x => Number(x.id) === sid);
+  if(!sec){
+    alert('Section не найден.');
+    return;
+  }
+
+  const words = dictWordsAll
+    .filter(w => Number(w.sectionId) === sid)
+    .sort((a,b)=> (a.en || '').localeCompare((b.en || ''), 'en'))
+    .map(w => ({ en:w.en, ru:w.ru }));
+
+  const payload = {
+    schema: 'student_helper_dict_section',
+    schemaVersion: 1,
+    exportedAt: new Date().toISOString(),
+    sectionName: sec.name,
+    words
+  };
+
+  const filename = dictFilenameForSection(sec.name);
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type:'application/json' });
+
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(a.href);
+}
+
+  async function dictImportFromObject(data, replace){
+    const sections = Array.isArray(data && data.sections) ? data.sections : [];
+    if(replace) await dictClear(dictDb);
+
+    for(const s of sections){
+      if(!s || !s.name) continue;
+
+      // eslint-disable-next-line no-await-in-loop
+      const resS = await dictAddSection(dictDb, s.name);
+      let sid = resS.ok ? resS.id : null;
+
+      if(!sid){
+        // duplicate - find existing
+        const key = normalize(s.name);
+        const exist = dictSections.find(x => x.nameKey === key);
+        sid = exist ? exist.id : null;
+      }
+
+      if(!sid) continue;
+
+      const words = Array.isArray(s.words) ? s.words : [];
+      for(const w of words){
+        if(!w || !w.en || !w.ru) continue;
+        // eslint-disable-next-line no-await-in-loop
+        await dictAddWord(dictDb, sid, w.en, w.ru);
+      }
+    }
+  }
+
+  async function dictImportFromFile(file, replace){
+    const text = await file.text();
+    const parsed = safeParseJSON(text);
+    if(!parsed.ok){
+      alert('Файл не является корректным JSON.');
+      return;
+    }
+
+    // refresh to have current nameKey
+    await dictRefreshAll();
+
+    await dictImportSectionFile(parsed.data || {}, { replaceExisting: !!replace, mergeExisting: !replace });
+  }
+
+  async function dictBoot(){
+    try{
+      elDictDbStatus.textContent = 'opening...';
+      dictDb = await dictOpenDB();
+      elDictDbStatus.textContent = 'ok';const sync = await dictSyncFromFolder({ replaceExisting:false, mergeExisting:false });
+
+if(sync.okFiles.length){
+  const okPart = sync.failFiles.length ? 'partial' : 'ok';
+  elDictSeedBadge.textContent = `json: ${okPart} (${sync.okFiles.length}/${sync.filesCount || sync.okFiles.length})`;
+  elDictSeedBadge.title =
+    `manifest: ${sync.manifestUsed || 'none'}\n\nok:\n- ${sync.okFiles.join('\n- ')}\n\nfail:\n- ${sync.failFiles.length ? sync.failFiles.join('\n- ') : 'none'}\n\nhint: для GitHub Pages нужен db/manifest.json (или db/dictionary/manifest.json) со списком файлов`;
+}else if(sync.failFiles.length){
+  elDictSeedBadge.textContent = 'json: failed';
+  elDictSeedBadge.title =
+    `manifest tried:\n- ${(sync.manifestErrors && sync.manifestErrors.length) ? sync.manifestErrors.join('\n- ') : 'n/a'}\n\nfail:\n- ${sync.failFiles.join('\n- ')}\n\nhint: проверь пути (GitHub Pages добавляет /<repo>/ в URL) и регистр папок (db vs DB).`;
+}else{
+  elDictSeedBadge.textContent = 'json: none';
+  elDictSeedBadge.title = 'manifest не найден и DICT_DEFAULT_FILES пустой.';
+}
+
+      await dictRefreshAll();
+      renderWordsUI();
+
+      dictShowFirstPick();
+      cardsShow(null, 'en');
+      quizShow(null);
+      learnShow(null);
+      quizSetFeedback('idle', 'pick', 'выбери section');
+    }catch(e){
+      elDictDbStatus.textContent = 'failed';
+      console.error(e);
+    }
+  }
+
+  // Dictionary events
+  // Practice init (persisted settings)
+  ensurePracticeExtraSettingsUI();
+  ensureLearnExtraSettingsUI();
+  ensureMcqContainers();
+  applyCfgToUI(loadPracticeCfg());
+  loadPracticeStats();
+
+  dictTabCards.addEventListener('click', ()=>{ dictSetSubtab('cards'); dictSetCurrentSection((elSectionCards && elSectionCards.value) || dictCurrentSection || 'All'); dictResetCards(); });
+  dictTabQuiz.addEventListener('click', ()=>{ dictSetSubtab('practice'); dictSetCurrentSection((elSectionQuiz && elSectionQuiz.value) || dictCurrentSection || 'All'); dictResetQuiz(); });
+  dictTabLearn && dictTabLearn.addEventListener('click', ()=>{ dictSetSubtab('learn'); dictSetCurrentSection((elSectionLearn && elSectionLearn.value) || dictCurrentSection || 'All'); learnStartSession(true); });
+  dictTabBuilder.addEventListener('click', ()=>{ dictSetSubtab('builder'); dictSetCurrentSection((elSectionBuilder && elSectionBuilder.value) || dictCurrentSection || 'All'); renderWordsUI(); });
+
+  if(btnCardsChooseSection) btnCardsChooseSection.addEventListener('click', dictShowFirstPick);
+  if(btnQuizChooseSection) btnQuizChooseSection.addEventListener('click', dictShowFirstPick);
+  if(btnLearnChooseSection) btnLearnChooseSection.addEventListener('click', dictShowFirstPick);
+  if(btnFirstPickOpenConstructor) btnFirstPickOpenConstructor.addEventListener('click', dictOpenConstructorFromPick);
+  if(elFirstPickSearch) elFirstPickSearch.addEventListener('input', renderFirstPickUI);
+
+  btnCardsPrev.addEventListener('click', cardsGoPrev);
+  btnCardsNext.addEventListener('click', cardsGoNext);
+  elCardsFront.addEventListener('change', dictResetCards);
+  elCardsRandom.addEventListener('change', dictResetCards);
+  elSectionCards.addEventListener('change', ()=>{ dictSetCurrentSection(elSectionCards.value); dictResetCards(); });
+
+  elFlipCard.addEventListener('click', cardsToggleFlip);
+  elFlipCard.addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter' || e.key === ' '){
+      e.preventDefault();
+      cardsToggleFlip();
+    }
+  });
+
+  elSectionQuiz.addEventListener('change', ()=>{ dictSetCurrentSection(elSectionQuiz.value); dictResetQuiz(); });
+  if(elSectionLearn) elSectionLearn.addEventListener('change', ()=>{ dictSetCurrentSection(elSectionLearn.value); learnStartSession(true); });
+  elQuizMode.addEventListener('change', dictResetQuiz);
+
+  btnQuizCheckNext.addEventListener('click', quizCheckOrNext);
+  elQuizInput.addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter'){
+      e.preventDefault();
+      quizCheckOrNext();
+    }
+  });
+
+  btnQuizSkip.addEventListener('click', quizSkip);
+  if(btnPracticeHint) btnPracticeHint.addEventListener('click', practiceHint);
+
+  if(btnPracticeSettingsBtn && elPracticeSettings){
+    btnPracticeSettingsBtn.addEventListener('click', ()=>{
+      const shown = elPracticeSettings.style.display !== 'none';
+      elPracticeSettings.style.display = shown ? 'none' : 'block';
+    });
+  }
+
+
+  // Learn init (persisted settings)
+  applyLearnCfgToUI(loadLearnCfg());
+
+  if(btnLearnSettingsBtn && elLearnSettings){
+    btnLearnSettingsBtn.addEventListener('click', ()=>{
+      const shown = elLearnSettings.style.display !== 'none';
+      elLearnSettings.style.display = shown ? 'none' : 'block';
+    });
+  }
+
+  const learnCfgChanged = ()=>{
+    const cfg = learnCfgFromUI();
+    saveLearnCfg(cfg);
+  };
+  if(elLearnSource) elLearnSource.addEventListener('change', learnCfgChanged);
+  if(elLearnPortion) elLearnPortion.addEventListener('change', learnCfgChanged);
+  if(elLearnDir) elLearnDir.addEventListener('change', learnCfgChanged);
+  if(elLearnGoal) elLearnGoal.addEventListener('change', learnCfgChanged);
+  if(elLearnStrict) elLearnStrict.addEventListener('change', ()=>{
+    learnCfgChanged();
+    applyLearnCfgToUI(loadLearnCfg());
+  });
+  if(elLearnTypos) elLearnTypos.addEventListener('change', learnCfgChanged);
+  if(elLearnForms) elLearnForms.addEventListener('change', learnCfgChanged);
+  if(elLearnIgnoreTo) elLearnIgnoreTo.addEventListener('change', learnCfgChanged);
+  if(elLearnIgnoreArticles) elLearnIgnoreArticles.addEventListener('change', learnCfgChanged);
+  if(elLearnHints) elLearnHints.addEventListener('change', learnCfgChanged);
+  if(elLearnIntroMode) elLearnIntroMode.addEventListener('change', learnCfgChanged);
+  if(elLearnIntroMcqCount) elLearnIntroMcqCount.addEventListener('change', learnCfgChanged);
+  if(elLearnIntroShowPos) elLearnIntroShowPos.addEventListener('change', learnCfgChanged);
+
+  if(btnLearnRestart) btnLearnRestart.addEventListener('click', ()=> learnStartSession(true));
+
+  if(btnLearnCheckNext) btnLearnCheckNext.addEventListener('click', learnCheckOrNext);
+  if(elLearnInput) elLearnInput.addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter'){
+      e.preventDefault();
+      learnCheckOrNext();
+    }
+  });
+  if(btnLearnHint) btnLearnHint.addEventListener('click', learnHint);
+  if(btnLearnGiveUp) btnLearnGiveUp.addEventListener('click', learnGiveUp);
+
+  // MCQ hotkeys (1-8) for practice and learn
+  window.addEventListener('keydown', handleMcqHotkeys);
+
+  // Learn card flips only after check
+  if(elLearnCard){
+    elLearnCard.addEventListener('click', ()=>{
+      if(learnCheckMode !== 'next') return;
+      const flipped = elLearnCard.classList.contains('is-flipped');
+      learnSetFlipped(!flipped);
+    });
+    elLearnCard.addEventListener('keydown', (e)=>{
+      if(learnCheckMode !== 'next') return;
+      if(e.key === 'Enter' || e.key === ' '){
+        e.preventDefault();
+        const flipped = elLearnCard.classList.contains('is-flipped');
+        learnSetFlipped(!flipped);
+      }
+    });
+  }
+
+  // Practice settings changes -> save + reset session
+  const practiceCfgChanged = ()=>{
+    const cfg = cfgFromUI();
+    savePracticeCfg(cfg);
+    // only reset if section selected
+    if(elSectionQuiz && String(elSectionQuiz.value || '').trim()){
+      dictResetQuiz();
+    }
+  };
+  if(elPracticeSession) elPracticeSession.addEventListener('change', practiceCfgChanged);
+  if(elPracticeTypos) elPracticeTypos.addEventListener('change', practiceCfgChanged);
+  if(elPracticeIgnoreTo) elPracticeIgnoreTo.addEventListener('change', practiceCfgChanged);
+  if(elPracticeIgnoreArticles) elPracticeIgnoreArticles.addEventListener('change', practiceCfgChanged);
+  if(elPracticeTaskMode) elPracticeTaskMode.addEventListener('change', practiceCfgChanged);
+  if(elPracticeMixInputPct) elPracticeMixInputPct.addEventListener('change', practiceCfgChanged);
+  if(elPracticeMcqCount) elPracticeMcqCount.addEventListener('change', practiceCfgChanged);
+  if(elPracticeShowPos) elPracticeShowPos.addEventListener('change', practiceCfgChanged);
+  if(elPracticeSoftMcq) elPracticeSoftMcq.addEventListener('change', practiceCfgChanged);
+
+  if(btnPracticeFuzzyAccept) btnPracticeFuzzyAccept.addEventListener('click', ()=> practiceResolveFuzzy(true));
+  if(btnPracticeFuzzyReject) btnPracticeFuzzyReject.addEventListener('click', ()=> practiceResolveFuzzy(false));
+
+
+  // Quiz card flips only after check
+  elQuizCard.addEventListener('click', ()=>{
+    if(quizCheckMode !== 'next') return;
+    const flipped = elQuizCard.classList.contains('is-flipped');
+    quizSetFlipped(!flipped);
+  });
+  elQuizCard.addEventListener('keydown', (e)=>{
+    if(quizCheckMode !== 'next') return;
+    if(e.key === 'Enter' || e.key === ' '){
+      e.preventDefault();
+      const flipped = elQuizCard.classList.contains('is-flipped');
+      quizSetFlipped(!flipped);
+    }
+  });
+
+  btnAddSection.addEventListener('click', async ()=>{
+    const name = (elNewSectionName.value || '').trim();
+    if(!name){
+      alert('Название раздела пустое.');
+      return;
+    }
+    try{
+      const res = await dictAddSection(dictDb, name);
+      if(!res.ok && res.reason === 'duplicate'){
+        alert('Такой раздел уже есть.');
+        return;
+      }
+      elNewSectionName.value = '';
+      await dictRefreshAll();
+      if(res.ok) elSectionBuilder.value = String(res.id);
+      renderWordsUI();
+      dictResetCards();
+      dictResetQuiz();
+      dictSetSubtab('builder');
+    }catch(e){
+      alert(`Ошибка сохранения: ${e.message || e}`);
+    }
+  });
+
+  btnDeleteSection.addEventListener('click', async ()=>{
+    const sid = Number(elSectionBuilder.value || 0);
+    if(!sid){
+      alert('Выбери раздел.');
+      return;
+    }
+    const name = getSectionNameById(sid);
+    if(!confirm(`Удалить раздел "${name}" и все слова внутри?`)) return;
+
+    try{
+      await dictDeleteSection(dictDb, sid);
+      await dictRefreshAll();
+      renderWordsUI();
+      dictResetCards();
+      dictResetQuiz();
+    }catch(e){
+      alert(`Ошибка удаления: ${e.message || e}`);
+    }
+  });
+
+  elSectionBuilder.addEventListener('change', renderWordsUI);
+
+  btnAddWord.addEventListener('click', async ()=>{
+    const sid = Number(elSectionBuilder.value || 0);
+    if(!sid){
+      alert('Сначала выбери раздел.');
+      return;
+    }
+    const en = (elEnInput.value || '').trim();
+    const ru = (elRuInput.value || '').trim();
+    if(!en || !ru){
+      alert('Заполни EN и RU.');
+      return;
+    }
+    try{
+      const res = await dictAddWord(dictDb, sid, en, ru);
+      if(!res.ok && res.reason === 'duplicate'){
+        alert('Такое слово уже есть (дубликат).');
+        return;
+      }
+      elEnInput.value = '';
+      elRuInput.value = '';
+      await dictRefreshAll();
+      renderWordsUI();
+      dictResetCards();
+      dictResetQuiz();
+    }catch(e){
+      alert(`Ошибка сохранения: ${e.message || e}`);
+    }
+  });
+
+  btnDictExport.addEventListener('click', dictExportSection);
+
+  btnDictImport.addEventListener('click', ()=>{
+    elDictFileImport.value = '';
+    elDictFileImport.click();
+  });
+
+  elDictFileImport.addEventListener('change', async ()=>{
+    const file = elDictFileImport.files && elDictFileImport.files[0];
+    if(!file) return;
+    try{
+      await dictImportFromFile(file, !!elDictImportReplace.checked);
+      await dictRefreshAll();
+      renderWordsUI();
+      dictResetCards();
+      dictResetQuiz();
+      alert('Импорт: ok');
+    }catch(e){
+      alert(`Ошибка импорта: ${e.message || e}`);
+    }
+  });
+
+  window.dictBoot = dictBoot;
+
+
+  dictBoot();

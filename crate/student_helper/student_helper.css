@@ -1,0 +1,603 @@
+/* student_helper.css + student_helper_extra.css (merged) */
+/* -------------------------------------------- */
+
+html, body { background:#fff !important; background-image:none !important; filter:none !important; }
+    body::before, body::after, html::before, html::after { content:none !important; display:none !important; }
+    [class*="circle"], [class*="ring"], [class*="orb"], [class*="halo"], [class*="glow"] { display:none !important; }
+
+    body.page-learning{ min-height:100vh; display:flex; flex-direction:column; }
+    main.learn-stage{ flex:1 1 auto; padding:64px 16px 72px; }
+    .learn-wrap{ width:min(980px,100%); margin:0 auto; }
+
+    .ik-card{
+      border:2px solid #000; background:#fff;
+      box-shadow:0 0 0 6px rgba(0,0,0,0.06);
+      border-radius:0; position:relative;
+    }
+    .ik-card::before{
+      content:""; position:absolute; inset:-2px; pointer-events:none;
+      background:
+        linear-gradient(90deg, rgba(0,0,0,0.12), rgba(0,0,0,0)),
+        repeating-linear-gradient(0deg, rgba(0,0,0,0.08) 0 1px, rgba(0,0,0,0) 1px 5px);
+      mix-blend-mode:multiply; opacity:.18;
+    }
+    .ik-inner{ position:relative; padding:18px; }
+
+    .ik-title{
+      margin:0 0 10px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-weight:900; letter-spacing:.06em; text-transform:uppercase;
+      font-size:13px;
+    }
+    .ik-sub{
+      margin:0 0 8px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size:12px; opacity:.8; line-height:1.5;
+    }
+    .ik-footnote{
+      margin:8px 0 0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size:11px; opacity:.75; line-height:1.45;
+    }
+
+    .ik-row{ display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+    .ik-divider{ height:1px; background:rgba(0,0,0,0.14); margin:14px 0; }
+    .ik-spacer{ flex: 1 1 auto; }
+
+    .ik-tabs{ display:flex; gap:10px; flex-wrap:wrap; margin:0 0 12px; }
+    .ik-tab{
+      appearance:none; border:2px solid #000;
+      background:#fff; color:#000;
+      padding:10px 14px; border-radius:0;
+      cursor:pointer;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-weight:900; letter-spacing:.04em; text-transform:uppercase;
+      font-size:12px; user-select:none;
+    }
+    .ik-tab[aria-selected="true"]{ background:#000; color:#fff; }
+    .ik-tab:active{ transform:translateY(1px); }
+
+    .ik-pill{
+      display:inline-flex; align-items:center; gap:8px;
+      border:2px solid #000; padding:8px 10px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-weight:900; letter-spacing:.04em; text-transform:uppercase;
+      font-size:12px;
+    }
+
+    .ik-btn{
+      appearance:none; border:2px solid #000; background:#fff; color:#000;
+      padding:10px 14px; border-radius:0; cursor:pointer;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-weight:900; letter-spacing:.04em; text-transform:uppercase;
+      font-size:12px;
+    }
+    .ik-btn.ik-btn--black{ background:#000; color:#fff; }
+    .ik-btn:hover{ transform:translateY(-1px); }
+    .ik-btn:active{ transform:translateY(0); }
+    .ik-btn[disabled]{ opacity:.55; cursor:not-allowed; transform:none !important; }
+
+    .ik-input, .ik-select{
+      border:2px solid #000; border-radius:0; background:#fff;
+      padding:10px 12px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size:13px; outline:none; min-width:240px;
+      transition: background-color .12s ease-out;
+    }
+    .ik-input:focus, .ik-select:focus{ box-shadow:0 0 0 4px rgba(0,0,0,0.10); }
+    .ik-input.is-ok{ background: rgba(0, 180, 60, 0.14); }
+    .ik-input.is-bad{ background: rgba(220, 20, 60, 0.14); }
+
+    .ik-label{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size:12px; opacity:.85; margin:0;
+    }
+
+    .ik-ex{ border:2px solid #000; padding:16px; background:#fff; }
+    .ik-prompt{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-weight:900; letter-spacing:.04em; text-transform:uppercase;
+      font-size:12px; margin:0 0 6px;
+    }
+
+    .ik-wordbar{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    .ik-word{
+      font-family: ui-serif, "Times New Roman", Georgia, serif;
+      font-weight:900;
+      font-size:clamp(30px, 5.2vw, 52px);
+      margin:0; line-height:1.05;
+    }
+    .ik-ru{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size:12px; opacity:.78; margin:6px 0 0;
+    }
+
+    .ik-badge{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size:11px; border:2px solid #000; padding:6px 8px;
+      text-transform:uppercase; letter-spacing:.04em; font-weight:900; opacity:.9;
+    }
+    .ik-muted{ opacity:.72; }
+
+    .ik-top-actions{
+      display:flex; justify-content:space-between; align-items:center;
+      gap:10px; flex-wrap:wrap; margin-bottom:12px;
+    }
+    .ik-back{ display:inline-flex; align-items:center; gap:8px; text-decoration:none; }
+
+    .ik-feedback{
+      border:2px solid #000;
+      background:#fff;
+      padding:12px;
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+    }
+    .ik-feedback__stamp{
+      border:2px solid #000;
+      padding:6px 10px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-weight:900; letter-spacing:.04em; text-transform:uppercase;
+      font-size:12px;
+      user-select:none;
+      white-space:nowrap;
+    }
+    .ik-feedback__line{
+      margin:0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size:12px; line-height:1.5;
+    }
+    .ik-feedback[data-state="idle"] .ik-feedback__stamp{ background:#fff; color:#000; }
+    .ik-feedback[data-state="correct"] .ik-feedback__stamp{ background:#000; color:#fff; }
+    .ik-feedback[data-state="wrong"] .ik-feedback__stamp{ background:#fff; color:#000; }
+
+    .ik-rule{
+      border:2px solid #000;
+      padding:12px;
+      background:#fff;
+      display:none;
+      margin-top:12px;
+    }
+    .ik-rule.is-open{ display:block; }
+    .ik-chips{ display:flex; flex-wrap:wrap; gap:8px; }
+    .ik-chip{
+      border:2px solid #000;
+      padding:6px 8px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-weight:900;
+      font-size:11px;
+      letter-spacing:.04em;
+      text-transform:uppercase;
+    }
+
+    .ik-list{
+      border:2px solid #000; background:#fff;
+      padding:0; margin:0; list-style:none;
+      max-height:420px; overflow:auto;
+    }
+    .ik-list li{
+      display:flex; justify-content:space-between; align-items:flex-start;
+      gap:10px;
+      padding:10px 12px;
+      border-top:1px solid rgba(0,0,0,0.14);
+    }
+    .ik-list li:first-child{ border-top:none; }
+    .ik-list li.is-clickable{ cursor:pointer; }
+    .ik-list li.is-clickable:hover{ background: rgba(0,0,0,0.04); }
+    .ik-itemline{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size:12px; line-height:1.35; margin:0;
+    }
+    .ik-itemline b{ font-weight:900; }
+    .ik-mini{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+
+    @media (prefers-reduced-motion: no-preference){
+      .ik-shake{ animation: ikshake .28s linear; }
+      @keyframes ikshake{
+        0%{ transform: translateX(0); }
+        25%{ transform: translateX(-3px); }
+        50%{ transform: translateX(3px); }
+        75%{ transform: translateX(-2px); }
+        100%{ transform: translateX(0); }
+      }
+      .ik-pop{ animation: ikpop .18s ease-out; }
+      @keyframes ikpop{
+        from{ transform: scale(0.985); }
+        to{ transform: scale(1); }
+      }
+    }
+
+
+    /* -----------------------------
+       Dictionary flip cards
+       ----------------------------- */
+    .ik-flip-stage{ perspective: 1200px; -webkit-perspective: 1200px; }
+    .ik-flip-card{
+      width:100%;
+      max-width:860px;
+      height:300px;
+      margin:0 auto;
+      position:relative;
+      cursor:pointer;
+      user-select:none;
+    }
+    .ik-flip-card:focus{ outline:none; box-shadow:0 0 0 4px rgba(0,0,0,0.10); }
+
+    .ik-flip-inner{
+      position:absolute;
+      inset:0;
+      transform-style:preserve-3d;
+      -webkit-transform-style:preserve-3d;
+      transition: transform .48s cubic-bezier(.2,.8,.2,1);
+    }
+    .ik-flip-card.is-flipped .ik-flip-inner{ transform: rotateY(180deg); -webkit-transform: rotateY(180deg); }
+
+    .ik-flip-face{
+      position:absolute;
+      inset:0;
+      backface-visibility:hidden;
+      -webkit-backface-visibility:hidden;
+      border:2px solid #000;
+      background:#fff;
+      box-shadow:0 0 0 6px rgba(0,0,0,0.06);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+      text-align:center;
+    }
+    .ik-flip-face::before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      pointer-events:none;
+      background:
+        linear-gradient(90deg, rgba(0,0,0,0.12), rgba(0,0,0,0)),
+        repeating-linear-gradient(0deg, rgba(0,0,0,0.08) 0 1px, rgba(0,0,0,0) 1px 5px);
+      mix-blend-mode:multiply;
+      opacity:.16;
+    }
+    .ik-flip-face > *{ position:relative; }
+
+    .ik-flip-front{ transform: rotateY(0deg) translateZ(0.1px); -webkit-transform: rotateY(0deg) translateZ(0.1px); }
+    .ik-flip-back{ transform: rotateY(180deg) translateZ(0.1px); -webkit-transform: rotateY(180deg) translateZ(0.1px); }
+
+    @media (prefers-reduced-motion: reduce){
+      .ik-flip-inner{ transition:none; }
+    }
+
+    /* dictionary: practice is enabled */
+
+/* -------------------------------------------- */
+/* Extra UI layer: lobby + responsive tweaks */
+/* -------------------------------------------- */
+
+/* Extra UI layer: lobby + responsive tweaks */
+
+/* Lobby */
+.sh-lobby .sh-grid{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.sh-tile{
+  border: 2px solid #000;
+  background: #fff;
+  padding: 16px;
+  border-radius: 0;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 140px;
+  text-align: left;
+  transition: transform 80ms ease, background 120ms ease, color 120ms ease;
+}
+
+/* Hover feedback in the site's black/white style */
+@media (hover: hover) and (pointer: fine){
+  .sh-tile:hover{
+    background: #000;
+    color: #fff;
+    transform: translateY(-1px);
+  }
+}
+
+.sh-tile:active{
+  transform: translateY(0px);
+}
+
+.sh-tile:focus{
+  outline: 3px solid #000;
+  outline-offset: 2px;
+}
+
+
+.sh-tile__head{
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.sh-tile__body{
+  font-size: 14px;
+  opacity: 0.75;
+  line-height: 1.35;
+}
+
+.sh-tile__foot{
+  margin-top: auto;
+  font-weight: 700;
+}
+
+.sh-lobby-row{
+  align-items: center;
+}
+
+.sh-lobby-note{
+  margin: 0;
+  text-align: right;
+}
+
+/* Responsive */
+@media (max-width: 900px){
+  .learn-wrap{ padding: 10px; }
+}
+
+@media (max-width: 720px){
+  .sh-lobby .sh-grid{ grid-template-columns: 1fr; }
+
+  .ik-row{ flex-wrap: wrap !important; gap: 8px !important; }
+
+  /* Allow controls to fit on small screens */
+  .ik-select, .ik-input{
+    min-width: 0 !important;
+    width: 100% !important;
+  }
+
+  /* Tabs: allow horizontal scroll instead of wrapping into chaos */
+  .ik-tabs{
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    gap: 8px;
+  }
+  .ik-tab{ flex: 0 0 auto; }
+
+  /* Big words: scale down naturally */
+  .ik-word{ font-size: clamp(24px, 9vw, 56px); }
+
+  /* Make large blocks avoid side overflow */
+  .ik-flip-stage, .ik-flip-card{ width: 100%; max-width: 100%; }
+}
+
+/* -------------------------------------------- */
+/* Top action bar symmetry fix (back | menu | db) */
+/* -------------------------------------------- */
+.ik-top-actions{
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.ik-top-actions .ik-back{ justify-self: start; }
+.ik-top-actions #shHomeBtn{ justify-self: center; }
+.ik-top-actions .ik-pill{ justify-self: end; }
+
+/* Small screens: keep it neat */
+@media (max-width: 520px){
+  .ik-top-actions{
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "back db"
+      "menu menu";
+    row-gap: 10px;
+  }
+  .ik-top-actions .ik-back{ grid-area: back; }
+  .ik-top-actions #shHomeBtn{ grid-area: menu; justify-self: center; width: 100%; }
+  .ik-top-actions .ik-pill{ grid-area: db; justify-self: end; }
+}
+
+/* -------------------------------------------- */
+/* Fix: topbar + menu overlap */
+/* -------------------------------------------- */
+
+/* Give breathing room between the global topbar (from styles.css) and app controls */
+.ik-top-actions{
+  margin-top: 14px;
+}
+
+/* On small screens the topbar usually becomes taller */
+@media (max-width: 520px){
+  .ik-top-actions{ margin-top: 18px; }
+}
+
+/* Extra safety: keep the menu button from touching the topbar border */
+#shHomeBtn{
+  margin-top: 6px;
+}
+@media (max-width: 520px){
+  #shHomeBtn{ margin-top: 0; }
+}
+
+/* -------------------------------------------- */
+/* Word transformation: affix hints inside word */
+/* -------------------------------------------- */
+#promptEn .wt-dots{
+  display:inline-block;
+  opacity:.55;
+  font-size:.72em;
+  letter-spacing:.18em;
+  margin: 0 .08em;
+  transform: translateY(-0.03em);
+}
+#promptEn .wt-core{
+  display:inline-block;
+}
+
+/* -------------------------------------------- */
+/* Structure section */
+/* -------------------------------------------- */
+
+.sh-struct-rule h3.sh-rule-h{
+  margin: 14px 0 8px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-weight: 900;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+
+.sh-struct-rule p.sh-rule-p{
+  margin: 6px 0 10px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 12px;
+  line-height: 1.55;
+  opacity: .9;
+}
+
+.sh-table-wrap{
+  border: 2px solid #000;
+  padding: 12px;
+  margin: 10px 0 14px;
+  overflow-x: auto;
+  background: #fff;
+}
+
+.sh-table-cap{
+  margin: 0 0 8px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-weight: 900;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.sh-table{
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 720px;
+}
+
+.sh-table th, .sh-table td{
+  border-top: 1px solid rgba(0,0,0,0.18);
+  padding: 10px 10px;
+  vertical-align: top;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.sh-table thead th{
+  border-top: none;
+  background: rgba(0,0,0,0.03);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.sh-examples{
+  border: 2px solid #000;
+  padding: 12px;
+  margin: 10px 0 14px;
+  background: #fff;
+}
+
+.sh-ex-list{
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.sh-ex-en{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-weight: 900;
+  font-size: 12px;
+}
+
+.sh-ex-ru{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 12px;
+  opacity: .8;
+  margin-top: 2px;
+}
+
+.sh-highlight{
+  border: 2px solid #000;
+  padding: 12px;
+  margin: 10px 0 14px;
+  background: rgba(0,0,0,0.03);
+}
+
+.sh-highlight-title{
+  margin: 0 0 8px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  font-size: 12px;
+}
+
+.sh-highlight-list{
+  margin: 0;
+  padding-left: 18px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.sh-run-card{
+  border: 2px solid #000;
+  padding: 14px;
+  background: #fff;
+}
+
+.sh-run-prompt{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.sh-choice-list{
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.sh-choice{
+  transition: background 120ms ease, box-shadow 120ms ease, transform 80ms ease;
+}
+
+.sh-choice.is-picked{
+  background: rgba(0,0,0,0.08);
+  box-shadow: inset 0 0 0 2px rgba(0,0,0,0.75);
+}
+
+/* tiny 'press' feel on click - keeps your existing hover behavior */
+.sh-choice.is-picked:active{
+  transform: translateY(1px);
+}
+
+
+.sh-choice.is-correct{
+  background: rgba(0, 180, 60, 0.14);
+}
+
+.sh-choice.is-wrong{
+  background: rgba(220, 20, 60, 0.14);
+}
+
+@media (max-width: 720px){
+  .sh-table{ min-width: 640px; }
+}
