@@ -1,0 +1,16 @@
+[
+  {
+    "id": "pastSimple",
+    "title": "Past Simple",
+    "subtitle": "факт - действие завершено",
+    "hint": "законченное действие • цепочка • привычки",
+    "file": "pastSimple.json"
+  },
+  {
+    "id": "pastContinuous",
+    "title": "Past Continuous",
+    "subtitle": "процесс - действие в моменте",
+    "hint": "процесс • параллельно • фон • always/constantly",
+    "file": "pastContinuous.json"
+  }
+]

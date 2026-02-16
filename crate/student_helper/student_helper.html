@@ -55,7 +55,14 @@
               <div class="sh-tile__foot">перейти</div>
             </button>
 
-            <button class="sh-tile" id="shGoWT" type="button" role="listitem" aria-label="Открыть word transformation">
+            
+            <button class="sh-tile" id="shGoTenses" type="button" role="listitem" aria-label="Открыть tenses">
+              <div class="sh-tile__head">tenses</div>
+              <div class="sh-tile__body">времена: теория + упражнения</div>
+              <div class="sh-tile__foot">перейти</div>
+            </button>
+
+<button class="sh-tile" id="shGoWT" type="button" role="listitem" aria-label="Открыть word transformation">
               <div class="sh-tile__head">word transformation</div>
               <div class="sh-tile__body">practice и constructor для word forms</div>
               <div class="sh-tile__foot">перейти</div>
@@ -79,7 +86,8 @@
           <div class="ik-tabs" role="tablist" aria-label="Разделы">
             <button class="ik-tab" id="tab-dict" role="tab" aria-selected="false" aria-controls="panel-dict" type="button">dictionary</button>
             <button class="ik-tab" id="tab-struct" role="tab" aria-selected="false" aria-controls="panel-struct" type="button">structure</button>
-            <button class="ik-tab" id="tab-wt" role="tab" aria-selected="true" aria-controls="panel-wt" type="button">word transformation</button>
+                        <button class="ik-tab" id="tab-tenses" role="tab" aria-selected="false" aria-controls="panel-tenses" type="button">tenses</button>
+<button class="ik-tab" id="tab-wt" role="tab" aria-selected="true" aria-controls="panel-wt" type="button">word transformation</button>
           </div>
 
           <div id="panel-dict" role="tabpanel" aria-labelledby="tab-dict" hidden>
@@ -499,6 +507,126 @@
             </section>
           </div>
 
+
+          <div id="panel-tenses" role="tabpanel" aria-labelledby="tab-tenses" hidden>
+            <div class="ik-row">
+              <span class="ik-badge" id="tensesCountBadge">tenses: 0</span>
+              <span class="ik-spacer" aria-hidden="true"></span>
+              <span class="ik-pill" title="Прогресс хранится в браузере (localStorage)">
+                <span>tenses</span>
+                <span id="tensesStatus" class="ik-muted">ready</span>
+              </span>
+            </div>
+
+            <div class="ik-divider"></div>
+
+            <!-- HOME -->
+            <section class="ik-ex" id="tensesHomeView" aria-label="Tenses home">
+              <p class="ik-title">tenses</p>
+              <p class="ik-sub">выбери режим</p>
+
+              <div class="sh-grid" role="list">
+                <button class="sh-tile" id="tensesGoTheory" type="button" role="listitem" aria-label="Открыть времена (теория)">
+                  <div class="sh-tile__head">времена</div>
+                  <div class="sh-tile__body">правила, формулы, маркеры, ошибки</div>
+                  <div class="sh-tile__foot">открыть</div>
+                </button>
+
+                <button class="sh-tile" id="tensesGoPractice" type="button" role="listitem" aria-label="Открыть упражнения по временам">
+                  <div class="sh-tile__head">упражнения</div>
+                  <div class="sh-tile__body">закрепление по целям и смешанные тренировки</div>
+                  <div class="sh-tile__foot">открыть</div>
+                </button>
+              </div>
+
+              <p class="ik-footnote">подсказка: вернуться сюда можно кнопкой "меню" сверху</p>
+            </section>
+
+            <!-- LIST -->
+            <section class="ik-ex" id="tensesListView" aria-label="Tenses list" hidden>
+              <div class="ik-row">
+                <button class="ik-btn" id="tensesBackToHomeFromList" type="button">назад</button>
+                <span class="ik-spacer" aria-hidden="true"></span>
+              </div>
+
+              <div class="ik-divider"></div>
+
+              <p class="ik-title">времена</p>
+              <p class="ik-sub">выбери время</p>
+
+              <ul class="ik-list" id="tensesList" aria-label="Список времен"></ul>
+            </section>
+
+            <!-- DETAIL -->
+            <section class="ik-ex" id="tensesDetailView" aria-label="Tense detail" hidden>
+              <div class="ik-row">
+                <button class="ik-btn" id="tensesBackToList" type="button">назад</button>
+                <span class="ik-spacer" aria-hidden="true"></span>
+                <button class="ik-btn ik-btn--black" id="tensesGoPracticeFromDetail" type="button">упражнения</button>
+              </div>
+
+              <div class="ik-divider"></div>
+
+              <div class="ik-row" style="align-items:flex-end;">
+                <div>
+                  <p class="ik-title" id="tenseTitle">...</p>
+                  <p class="ik-sub" id="tenseSubtitle">...</p>
+                </div>
+                <span class="ik-spacer" aria-hidden="true"></span>
+                <span class="ik-badge" id="tenseMasteryBadge">mastery 0/5</span>
+              </div>
+
+              <div class="ik-divider"></div>
+
+              <div id="tenseRuleBody" class="sh-struct-rule" aria-label="Theory content"></div>
+
+              <div class="ik-divider"></div>
+
+              <div class="ik-row">
+                <span class="ik-spacer" aria-hidden="true"></span>
+                <button class="ik-btn ik-btn--black" id="tensesGoPracticeBottom" type="button">перейти к упражнениям</button>
+              </div>
+            </section>
+
+            <!-- PRACTICE -->
+            <section class="ik-ex" id="tensesPracticeView" aria-label="Tenses practice" hidden>
+              <div class="ik-row">
+                <button class="ik-btn" id="tensesBackToHomeFromPractice" type="button">назад</button>
+                <span class="ik-spacer" aria-hidden="true"></span>
+                <span class="ik-badge" id="tensesPracticeMeta">0/0</span>
+              </div>
+
+              <div class="ik-divider"></div>
+
+              <p class="ik-title">упражнения по временам</p>
+              <p class="ik-sub">выбери цель и время (или mixed)</p>
+
+              <div class="ik-row" style="margin-top:8px;">
+                <label class="ik-label" for="tensesGoalSelect">цель</label>
+                <select class="ik-select" id="tensesGoalSelect" style="min-width: 260px;"></select>
+
+                <label class="ik-label" for="tensesTenseSelect">время</label>
+                <select class="ik-select" id="tensesTenseSelect" style="min-width: 240px;"></select>
+
+                <button class="ik-btn ik-btn--black" id="tensesStartBtn" type="button">start</button>
+                <button class="ik-btn" id="tensesRetryMistakesBtn" type="button">retry mistakes</button>
+
+                <span class="ik-spacer" aria-hidden="true"></span>
+
+                <label class="ik-label" style="display:flex; align-items:center; gap:8px;">
+                  <input type="checkbox" id="tensesShowAfterEach" checked />
+                  show answers after each
+                </label>
+              </div>
+
+              <div class="ik-divider"></div>
+
+              <div id="tensesPracticeBody" class="sh-struct-practice" aria-label="Practice content"></div>
+
+              <p class="ik-footnote">enter - check/next • esc - выйти в меню</p>
+            </section>
+          </div>
+
 <div id="panel-wt" role="tabpanel" aria-labelledby="tab-wt">
             <div class="ik-row">
               <label class="ik-label" for="transformType">тип</label>
@@ -646,10 +774,11 @@
     <span class="hint">pre-alpha</span>
   </footer>
 
-    <script src="./js/tabs.js"></script>
+  <script src="./js/tabs.js"></script>
   <script src="./js/lobby.js"></script>
   <script src="./js/structure_data.js"></script>
   <script src="./js/structure.js"></script>
+  <script src="./js/tenses.js"></script>
   <script src="./js/word_transformation.js"></script>
   <script src="./js/dictionary.js"></script>
 </body>

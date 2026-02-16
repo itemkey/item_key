@@ -1,0 +1,720 @@
+{
+  "id": "mixed",
+  "title": "Mixed",
+  "subtitle": "смешанная тренировка: Past Simple + Past Continuous",
+  "isMixed": true,
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Mixed"
+    },
+    {
+      "type": "text",
+      "text": "Смешанные упражнения по двум временам. Идея: быстро отличать 'факт' и 'процесс' и применять правила в контексте."
+    },
+    {
+      "type": "table",
+      "caption": "Супер-правило",
+      "columns": [
+        "Past Simple",
+        "Past Continuous"
+      ],
+      "rows": [
+        [
+          "событие/факт (точка)",
+          "процесс/фон (линия)"
+        ],
+        [
+          "I watched this movie yesterday.",
+          "At 7 o’clock yesterday I was watching TV."
+        ]
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": [
+      {
+        "id": "meaning",
+        "title": "Определи время (Identify tense)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "mx_m_1",
+            "instruction": "Выбери время",
+            "prompt": "I watched this movie yesterday.",
+            "options": [
+              "Past Simple",
+              "Past Continuous"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "mx_m_2",
+            "instruction": "Выбери время",
+            "prompt": "At 7 o’clock yesterday I was watching TV.",
+            "options": [
+              "Past Simple",
+              "Past Continuous"
+            ],
+            "correctIndex": 1
+          },
+          {
+            "id": "mx_m_3",
+            "instruction": "Выбери время",
+            "prompt": "I got up, brushed my teeth and had breakfast.",
+            "options": [
+              "Past Simple",
+              "Past Continuous"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "mx_m_4",
+            "instruction": "Выбери время",
+            "prompt": "People were chatting, music was playing.",
+            "options": [
+              "Past Simple",
+              "Past Continuous"
+            ],
+            "correctIndex": 1
+          },
+          {
+            "id": "mx_m_5",
+            "instruction": "Выбери время",
+            "prompt": "Yesterday I met my teacher.",
+            "options": [
+              "Past Simple",
+              "Past Continuous"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "mx_m_6",
+            "instruction": "Выбери время",
+            "prompt": "I was watching TV at 8 pm yesterday.",
+            "options": [
+              "Past Simple",
+              "Past Continuous"
+            ],
+            "correctIndex": 1
+          },
+          {
+            "id": "mx_m_7",
+            "instruction": "Выбери время",
+            "prompt": "She called me two days ago.",
+            "options": [
+              "Past Simple",
+              "Past Continuous"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "mx_m_8",
+            "instruction": "Выбери время",
+            "prompt": "They were playing outside all evening.",
+            "options": [
+              "Past Simple",
+              "Past Continuous"
+            ],
+            "correctIndex": 1
+          },
+          {
+            "id": "mx_m_9",
+            "instruction": "Выбери время",
+            "prompt": "He didn't go to work yesterday.",
+            "options": [
+              "Past Simple",
+              "Past Continuous"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "mx_m_10",
+            "instruction": "Выбери время",
+            "prompt": "Was she sleeping at 10 pm?",
+            "options": [
+              "Past Simple",
+              "Past Continuous"
+            ],
+            "correctIndex": 1
+          },
+          {
+            "id": "mx_m_11",
+            "instruction": "Выбери время",
+            "prompt": "Did you see him last week?",
+            "options": [
+              "Past Simple",
+              "Past Continuous"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "mx_m_12",
+            "instruction": "Выбери время",
+            "prompt": "We were not listening to the teacher.",
+            "options": [
+              "Past Simple",
+              "Past Continuous"
+            ],
+            "correctIndex": 1
+          }
+        ]
+      },
+      {
+        "id": "formula",
+        "title": "Вставь оба времени (2 blanks)",
+        "kind": "multi_input",
+        "items": [
+          {
+            "id": "mx_f_1",
+            "instruction": "Заполни 2 формы",
+            "prompt": "I ________ (read) when the phone ________ (ring).",
+            "inputs": [
+              {
+                "placeholder": "(read)",
+                "accepted": [
+                  "was reading"
+                ]
+              },
+              {
+                "placeholder": "(ring)",
+                "accepted": [
+                  "rang"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "mx_f_2",
+            "instruction": "Заполни 2 формы",
+            "prompt": "While I ________ (study), he ________ (play) games.",
+            "inputs": [
+              {
+                "placeholder": "(study)",
+                "accepted": [
+                  "was studying"
+                ]
+              },
+              {
+                "placeholder": "(play)",
+                "accepted": [
+                  "was playing"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "mx_f_3",
+            "instruction": "Заполни 2 формы",
+            "prompt": "She ________ (cook) when he ________ (arrive).",
+            "inputs": [
+              {
+                "placeholder": "(cook)",
+                "accepted": [
+                  "was cooking"
+                ]
+              },
+              {
+                "placeholder": "(arrive)",
+                "accepted": [
+                  "arrived"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "mx_f_4",
+            "instruction": "Заполни 2 формы",
+            "prompt": "They ________ (walk) in the park when it ________ (start) to rain.",
+            "inputs": [
+              {
+                "placeholder": "(walk)",
+                "accepted": [
+                  "were walking"
+                ]
+              },
+              {
+                "placeholder": "(start)",
+                "accepted": [
+                  "started"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "mx_f_5",
+            "instruction": "Заполни 2 формы",
+            "prompt": "While we ________ (study), our friends ________ (play) basketball.",
+            "inputs": [
+              {
+                "placeholder": "(study)",
+                "accepted": [
+                  "were studying"
+                ]
+              },
+              {
+                "placeholder": "(play)",
+                "accepted": [
+                  "were playing"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "mx_f_6",
+            "instruction": "Заполни 2 формы",
+            "prompt": "I ________ (read) when you ________ (call).",
+            "inputs": [
+              {
+                "placeholder": "(read)",
+                "accepted": [
+                  "was reading"
+                ]
+              },
+              {
+                "placeholder": "(call)",
+                "accepted": [
+                  "called"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "mx_f_7",
+            "instruction": "Заполни 2 формы",
+            "prompt": "We ________ (watch) TV while it ________ (rain).",
+            "inputs": [
+              {
+                "placeholder": "(watch)",
+                "accepted": [
+                  "watched"
+                ]
+              },
+              {
+                "placeholder": "(rain)",
+                "accepted": [
+                  "was raining"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "markers",
+        "title": "К каким временам относится маркер? (Multi-select)",
+        "kind": "multi",
+        "items": [
+          {
+            "id": "mx_mark_1",
+            "instruction": "Можно выбрать несколько",
+            "prompt": "when",
+            "options": [
+              "Past Simple",
+              "Past Continuous"
+            ],
+            "correctIndices": [
+              0,
+              1
+            ]
+          },
+          {
+            "id": "mx_mark_2",
+            "instruction": "Можно выбрать несколько",
+            "prompt": "while",
+            "options": [
+              "Past Simple",
+              "Past Continuous"
+            ],
+            "correctIndices": [
+              1
+            ]
+          },
+          {
+            "id": "mx_mark_3",
+            "instruction": "Можно выбрать несколько",
+            "prompt": "yesterday",
+            "options": [
+              "Past Simple",
+              "Past Continuous"
+            ],
+            "correctIndices": [
+              0
+            ]
+          },
+          {
+            "id": "mx_mark_4",
+            "instruction": "Можно выбрать несколько",
+            "prompt": "at 7 o’clock yesterday",
+            "options": [
+              "Past Simple",
+              "Past Continuous"
+            ],
+            "correctIndices": [
+              1
+            ]
+          },
+          {
+            "id": "mx_mark_5",
+            "instruction": "Можно выбрать несколько",
+            "prompt": "all night",
+            "options": [
+              "Past Simple",
+              "Past Continuous"
+            ],
+            "correctIndices": [
+              1
+            ]
+          },
+          {
+            "id": "mx_mark_6",
+            "instruction": "Можно выбрать несколько",
+            "prompt": "last year",
+            "options": [
+              "Past Simple",
+              "Past Continuous"
+            ],
+            "correctIndices": [
+              0
+            ]
+          },
+          {
+            "id": "mx_mark_7",
+            "instruction": "Можно выбрать несколько",
+            "prompt": "at that moment",
+            "options": [
+              "Past Simple",
+              "Past Continuous"
+            ],
+            "correctIndices": [
+              1
+            ]
+          },
+          {
+            "id": "mx_mark_8",
+            "instruction": "Можно выбрать несколько",
+            "prompt": "two days ago",
+            "options": [
+              "Past Simple",
+              "Past Continuous"
+            ],
+            "correctIndices": [
+              0
+            ]
+          },
+          {
+            "id": "mx_mark_9",
+            "instruction": "Можно выбрать несколько",
+            "prompt": "in 2015",
+            "options": [
+              "Past Simple",
+              "Past Continuous"
+            ],
+            "correctIndices": [
+              0
+            ]
+          },
+          {
+            "id": "mx_mark_10",
+            "instruction": "Можно выбрать несколько",
+            "prompt": "all day",
+            "options": [
+              "Past Simple",
+              "Past Continuous"
+            ],
+            "correctIndices": [
+              1
+            ]
+          },
+          {
+            "id": "mx_mark_11",
+            "instruction": "Можно выбрать несколько",
+            "prompt": "yesterday at 7 pm",
+            "options": [
+              "Past Simple",
+              "Past Continuous"
+            ],
+            "correctIndices": [
+              1
+            ]
+          },
+          {
+            "id": "mx_mark_12",
+            "instruction": "Можно выбрать несколько",
+            "prompt": "when",
+            "options": [
+              "Past Simple",
+              "Past Continuous"
+            ],
+            "correctIndices": [
+              0,
+              1
+            ]
+          }
+        ]
+      },
+      {
+        "id": "mistakes",
+        "title": "Исправь ошибки (Mixed)",
+        "kind": "correction",
+        "items": [
+          {
+            "id": "mx_err_1",
+            "instruction": "Исправь ошибку",
+            "prompt": "Did you went there?",
+            "accepted": [
+              "Did you go there?",
+              "Did you go there"
+            ]
+          },
+          {
+            "id": "mx_err_2",
+            "instruction": "Исправь ошибку",
+            "prompt": "I was read a book.",
+            "accepted": [
+              "I was reading a book.",
+              "I was reading a book"
+            ]
+          },
+          {
+            "id": "mx_err_3",
+            "instruction": "Исправь ошибку",
+            "prompt": "We was playing.",
+            "accepted": [
+              "We were playing.",
+              "We were playing"
+            ]
+          },
+          {
+            "id": "mx_err_4",
+            "instruction": "Исправь ошибку",
+            "prompt": "I didn't went home.",
+            "accepted": [
+              "I didn't go home.",
+              "I did not go home.",
+              "I didn't go home",
+              "I did not go home"
+            ],
+            "acceptedShort": [
+              "go"
+            ]
+          },
+          {
+            "id": "mx_err_5",
+            "instruction": "Исправь was/were",
+            "prompt": "She were sleeping at 10 pm.",
+            "accepted": [
+              "She was sleeping at 10 pm.",
+              "She was sleeping at 10 pm"
+            ],
+            "acceptedShort": [
+              "was"
+            ]
+          },
+          {
+            "id": "mx_err_6",
+            "instruction": "Исправь was/were",
+            "prompt": "They was playing outside.",
+            "accepted": [
+              "They were playing outside.",
+              "They were playing outside"
+            ],
+            "acceptedShort": [
+              "were"
+            ]
+          },
+          {
+            "id": "mx_err_7",
+            "instruction": "Исправь ошибку (irregular)",
+            "prompt": "Did you saw it?",
+            "accepted": [
+              "Did you see it?",
+              "Did you see it"
+            ],
+            "acceptedShort": [
+              "see"
+            ]
+          },
+          {
+            "id": "mx_err_8",
+            "instruction": "Исправь форму глагола",
+            "prompt": "I was read when you called.",
+            "accepted": [
+              "I was reading when you called.",
+              "I was reading when you called"
+            ],
+            "acceptedShort": [
+              "reading"
+            ]
+          },
+          {
+            "id": "mx_err_9",
+            "instruction": "Исправь ошибку",
+            "prompt": "We didn't watched a movie.",
+            "accepted": [
+              "We didn't watch a movie.",
+              "We did not watch a movie.",
+              "We didn't watch a movie",
+              "We did not watch a movie"
+            ],
+            "acceptedShort": [
+              "watch"
+            ]
+          },
+          {
+            "id": "mx_err_10",
+            "instruction": "Исправь отрицание",
+            "prompt": "He didn't listening to me.",
+            "accepted": [
+              "He wasn't listening to me.",
+              "He was not listening to me.",
+              "He wasn't listening to me",
+              "He was not listening to me"
+            ],
+            "acceptedShort": [
+              "wasn't listening",
+              "was not listening"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "compare",
+        "title": "Выбери правило (Mixed)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "mx_cmp_1",
+            "instruction": "Выбери правило",
+            "prompt": "I was reading when the phone rang.",
+            "options": [
+              "цепочка",
+              "процесс",
+              "фон",
+              "привычка",
+              "прерванное"
+            ],
+            "correctIndex": 4
+          },
+          {
+            "id": "mx_cmp_2",
+            "instruction": "Выбери правило",
+            "prompt": "I played football every Sunday.",
+            "options": [
+              "цепочка",
+              "процесс",
+              "фон",
+              "привычка",
+              "прерванное"
+            ],
+            "correctIndex": 3
+          },
+          {
+            "id": "mx_cmp_3",
+            "instruction": "Выбери правило",
+            "prompt": "People were chatting, music was playing...",
+            "options": [
+              "цепочка",
+              "процесс",
+              "фон",
+              "привычка",
+              "прерванное"
+            ],
+            "correctIndex": 2
+          },
+          {
+            "id": "mx_cmp_4",
+            "instruction": "Выбери правило",
+            "prompt": "I opened the window, looked outside and smiled.",
+            "options": [
+              "цепочка",
+              "процесс",
+              "фон",
+              "привычка",
+              "прерванное"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "mx_cmp_5",
+            "instruction": "Выбери правило",
+            "prompt": "At 8 pm yesterday I was doing my homework.",
+            "options": [
+              "цепочка",
+              "процесс",
+              "фон",
+              "привычка",
+              "прерванное"
+            ],
+            "correctIndex": 1
+          },
+          {
+            "id": "mx_cmp_6",
+            "instruction": "Выбери правило",
+            "prompt": "He often went to the cinema.",
+            "options": [
+              "цепочка",
+              "процесс",
+              "фон",
+              "привычка",
+              "прерванное"
+            ],
+            "correctIndex": 3
+          },
+          {
+            "id": "mx_cmp_7",
+            "instruction": "Выбери правило",
+            "prompt": "She was taking a shower when the phone rang.",
+            "options": [
+              "цепочка",
+              "процесс",
+              "фон",
+              "привычка",
+              "прерванное"
+            ],
+            "correctIndex": 4
+          },
+          {
+            "id": "mx_cmp_8",
+            "instruction": "Выбери правило",
+            "prompt": "It was raining, and cars were moving slowly.",
+            "options": [
+              "цепочка",
+              "процесс",
+              "фон",
+              "привычка",
+              "прерванное"
+            ],
+            "correctIndex": 2
+          },
+          {
+            "id": "mx_cmp_9",
+            "instruction": "Выбери правило",
+            "prompt": "We were walking in the street.",
+            "options": [
+              "цепочка",
+              "процесс",
+              "фон",
+              "привычка",
+              "прерванное"
+            ],
+            "correctIndex": 1
+          },
+          {
+            "id": "mx_cmp_10",
+            "instruction": "Выбери правило",
+            "prompt": "He came in, sat down and started talking.",
+            "options": [
+              "цепочка",
+              "процесс",
+              "фон",
+              "привычка",
+              "прерванное"
+            ],
+            "correctIndex": 0
+          }
+        ]
+      }
+    ]
+  }
+}

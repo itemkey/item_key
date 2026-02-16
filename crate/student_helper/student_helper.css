@@ -87,6 +87,8 @@ html, body { background:#fff !important; background-image:none !important; filte
     .ik-input:focus, .ik-select:focus{ box-shadow:0 0 0 4px rgba(0,0,0,0.10); }
     .ik-input.is-ok{ background: rgba(0, 180, 60, 0.14); }
     .ik-input.is-bad{ background: rgba(220, 20, 60, 0.14); }
+    .ik-select.is-ok{ background: rgba(0, 180, 60, 0.14); }
+    .ik-select.is-bad{ background: rgba(220, 20, 60, 0.14); }
 
     .ik-label{
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;

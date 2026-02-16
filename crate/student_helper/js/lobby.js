@@ -5,6 +5,7 @@
   const btnHome = document.getElementById('shHomeBtn');
   const btnDict = document.getElementById('shGoDict');
   const btnStruct = document.getElementById('shGoStruct');
+  const btnTenses = document.getElementById('shGoTenses');
   const btnWT = document.getElementById('shGoWT');
   const btnContinue = document.getElementById('shContinue');
 
@@ -26,6 +27,7 @@
       btnContinue.hidden = !last;
       if (last === 'dict') btnContinue.textContent = 'продолжить: dictionary';
       if (last === 'struct') btnContinue.textContent = 'продолжить: structure';
+      if (last === 'tenses') btnContinue.textContent = 'продолжить: tenses';
       if (last === 'wt') btnContinue.textContent = 'продолжить: word transformation';
     }
 
@@ -34,7 +36,12 @@
   }
 
   function openModule(mod){
-    const module = (mod === 'wt') ? 'wt' : (mod === 'struct' ? 'struct' : 'dict');
+    const module =
+      (mod === 'wt') ? 'wt' :
+      (mod === 'struct') ? 'struct' :
+      (mod === 'tenses') ? 'tenses' :
+      'dict';
+
     localStorage.setItem(KEY_LAST, module);
 
     setVisible(lobby, false);
@@ -49,6 +56,7 @@
 
   btnDict.addEventListener('click', ()=> openModule('dict'));
   if (btnStruct) btnStruct.addEventListener('click', ()=> openModule('struct'));
+  if (btnTenses) btnTenses.addEventListener('click', ()=> openModule('tenses'));
   btnWT.addEventListener('click', ()=> openModule('wt'));
   btnHome.addEventListener('click', showLobby);
 
@@ -60,11 +68,12 @@
     });
   }
 
-  // Hash controls: #dict, #struct, #wt, #menu
+  // Hash controls: #dict, #struct, #tenses, #wt, #menu
   function applyHash(){
     const h = (location.hash || '').replace('#', '').trim();
     if (h === 'dict') return openModule('dict');
     if (h === 'struct') return openModule('struct');
+    if (h === 'tenses') return openModule('tenses');
     if (h === 'wt') return openModule('wt');
     if (h === 'menu') return showLobby();
   }

@@ -1,0 +1,697 @@
+{
+  "id": "pastSimple",
+  "title": "Past Simple",
+  "subtitle": "прошлое как факт - действие завершено (точка)",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Когда используем Past Simple"
+    },
+    {
+      "type": "text",
+      "text": "Past Simple - 'время-факт' в прошлом. Ставим штамп: выполнено."
+    },
+    {
+      "type": "highlight",
+      "title": "3 главных случая",
+      "lines": [
+        "Законченное действие в прошлом (yesterday, last year, in 2010...)",
+        "Последовательность действий (цепочка событий)",
+        "Привычки в прошлом (повторялось раньше)"
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        {
+          "en": "I watched this movie yesterday.",
+          "ru": "Я посмотрел этот фильм вчера."
+        },
+        {
+          "en": "I got up, brushed my teeth and had breakfast.",
+          "ru": "Я встал, почистил зубы и позавтракал."
+        },
+        {
+          "en": "I played football every Sunday.",
+          "ru": "Я играл в футбол каждое воскресенье."
+        }
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Мини-заметка",
+      "lines": [
+        "Past Simple - 'рабочая лошадка' прошлого: чаще всего, когда рассказываем о том, что было."
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Формула Past Simple"
+    },
+    {
+      "type": "table",
+      "caption": "Past Simple - базовые формулы",
+      "columns": [
+        "Тип",
+        "Формула",
+        "Пример"
+      ],
+      "rows": [
+        [
+          "Утверждение",
+          "Subject + V2/V-ed + ...",
+          "I played football yesterday."
+        ],
+        [
+          "Вопрос",
+          "Did + subject + V1 + ...?",
+          "Did you call your mother yesterday?"
+        ],
+        [
+          "Отрицание",
+          "Subject + did not (didn't) + V1 + ...",
+          "They didn't watch TV last night."
+        ]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Важно: глагол to be",
+      "lines": [
+        "Утверждение: I/he/she/it was - you/we/they were",
+        "Вопрос: Was/Were + subject?",
+        "Отрицание: wasn't / weren't"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Правильные и неправильные глаголы (V2)"
+    },
+    {
+      "type": "table",
+      "caption": "V2",
+      "columns": [
+        "Тип",
+        "Примеры"
+      ],
+      "rows": [
+        [
+          "Правильные: +ed",
+          "work -> worked; play -> played; wash -> washed"
+        ],
+        [
+          "Неправильные: особые формы",
+          "go -> went; see -> saw; take -> took"
+        ]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Памятка",
+      "lines": [
+        "Past Simple = как поставить штамп 'ВЫПОЛНЕНО' на действие."
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Временные указатели Past Simple"
+    },
+    {
+      "type": "highlight",
+      "title": "Точное время",
+      "lines": [
+        "yesterday",
+        "last week/month/year",
+        "in 2010"
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Период времени (контекст прошлого)",
+      "lines": [
+        "when I was a child",
+        "during the war",
+        "for two hours (если воспринимаем как завершенную длительность)"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Типичные ошибки"
+    },
+    {
+      "type": "highlight",
+      "title": "Мини-блок",
+      "lines": [
+        "Did you went? -> Did you go?",
+        "I didn't went -> I didn't go",
+        "Did + V1 (обычные глаголы) - Was/Were (только to be)"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Past Simple vs Past Continuous"
+    },
+    {
+      "type": "table",
+      "caption": "Супер-правило",
+      "columns": [
+        "Past Simple",
+        "Past Continuous"
+      ],
+      "rows": [
+        [
+          "событие/факт (точка)",
+          "процесс/фон (линия)"
+        ],
+        [
+          "цепочка событий: I got up, brushed my teeth and had breakfast.",
+          "процесс + событие: I was reading when the phone rang."
+        ]
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": [
+      {
+        "id": "meaning",
+        "title": "Когда используем (Meaning)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "ps_m_1",
+            "instruction": "Выбери объяснение",
+            "prompt": "I watched this movie yesterday.",
+            "options": [
+              "законченное действие",
+              "процесс",
+              "фон"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "ps_m_2",
+            "instruction": "Выбери объяснение",
+            "prompt": "I got up, brushed my teeth and had breakfast.",
+            "options": [
+              "законч. действие",
+              "последовательность действий",
+              "фон"
+            ],
+            "correctIndex": 1
+          },
+          {
+            "id": "ps_m_3",
+            "instruction": "Выбери объяснение",
+            "prompt": "I played football every Sunday.",
+            "options": [
+              "привычка в прошлом",
+              "процесс",
+              "прерванное действие"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "ps_m_4",
+            "instruction": "Выбери объяснение",
+            "prompt": "I didn't see him yesterday.",
+            "options": [
+              "законченное действие (отрицание)",
+              "процесс",
+              "фон"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "ps_m_5",
+            "instruction": "Выбери объяснение",
+            "prompt": "Did you call me last night?",
+            "options": [
+              "законч. действие (вопрос)",
+              "процесс",
+              "атмосфера/фон"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "ps_m_6",
+            "instruction": "Выбери объяснение",
+            "prompt": "She was tired after work.",
+            "options": [
+              "состояние в прошлом (to be)",
+              "процесс",
+              "прерванное действие"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "ps_m_7",
+            "instruction": "Выбери объяснение",
+            "prompt": "When I was a child, we lived in a small town.",
+            "options": [
+              "долгое состояние/факт в прошлом",
+              "процесс в моменте",
+              "раздражение (always)"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "ps_m_8",
+            "instruction": "Выбери объяснение",
+            "prompt": "He opened the door, came in and sat down.",
+            "options": [
+              "последовательность действий",
+              "процесс",
+              "фон"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "ps_m_9",
+            "instruction": "Выбери объяснение",
+            "prompt": "They often went to the cinema.",
+            "options": [
+              "привычка в прошлом",
+              "прерванное действие",
+              "процесс"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "ps_m_10",
+            "instruction": "Выбери объяснение",
+            "prompt": "The lesson started at 9 o’clock.",
+            "options": [
+              "точное событие/факт в прошлом",
+              "длительный процесс",
+              "фон"
+            ],
+            "correctIndex": 0
+          }
+        ]
+      },
+      {
+        "id": "formula",
+        "title": "Формула (Formula)",
+        "kind": "input",
+        "items": [
+          {
+            "id": "ps_f_1",
+            "instruction": "Вставь форму",
+            "prompt": "Yesterday I ________ (play) football.",
+            "accepted": [
+              "played"
+            ]
+          },
+          {
+            "id": "ps_f_2",
+            "instruction": "Вставь форму",
+            "prompt": "Did you ________ (call) your mother yesterday?",
+            "accepted": [
+              "call"
+            ]
+          },
+          {
+            "id": "ps_f_3",
+            "instruction": "Вставь форму",
+            "prompt": "They ________ (not/watch) TV last night.",
+            "accepted": [
+              "didn't watch",
+              "did not watch"
+            ]
+          },
+          {
+            "id": "ps_f_4",
+            "instruction": "Вставь форму",
+            "prompt": "She ________ (go) to Moscow last year.",
+            "accepted": [
+              "went"
+            ]
+          },
+          {
+            "id": "ps_f_5",
+            "instruction": "Вставь форму (to be)",
+            "prompt": "I ________ (be) at home yesterday.",
+            "accepted": [
+              "was"
+            ]
+          },
+          {
+            "id": "ps_f_6",
+            "instruction": "Вставь форму (to be)",
+            "prompt": "They ________ (be) happy last year.",
+            "accepted": [
+              "were"
+            ]
+          },
+          {
+            "id": "ps_f_7",
+            "instruction": "Сделай вопрос с to be",
+            "prompt": "________ you at school yesterday? (be)",
+            "accepted": [
+              "Were you at school yesterday?",
+              "Were you at school yesterday",
+              "Were you at school?",
+              "Were you at school"
+            ]
+          },
+          {
+            "id": "ps_f_8",
+            "instruction": "Сделай отрицание с to be",
+            "prompt": "She ________ (not/be) ready.",
+            "accepted": [
+              "wasn't ready",
+              "was not ready"
+            ]
+          },
+          {
+            "id": "ps_f_9",
+            "instruction": "Вставь форму",
+            "prompt": "We ________ (finish) the project in 2020.",
+            "accepted": [
+              "finished"
+            ]
+          },
+          {
+            "id": "ps_f_10",
+            "instruction": "Вставь форму",
+            "prompt": "He ________ (not/go) to work last Monday.",
+            "accepted": [
+              "didn't go",
+              "did not go"
+            ]
+          },
+          {
+            "id": "ps_f_11",
+            "instruction": "Вставь форму",
+            "prompt": "Did he ________ (write) an email?",
+            "accepted": [
+              "write"
+            ]
+          },
+          {
+            "id": "ps_f_12",
+            "instruction": "Вставь форму (irregular)",
+            "prompt": "They ________ (take) a taxi yesterday.",
+            "accepted": [
+              "took"
+            ]
+          },
+          {
+            "id": "ps_f_13",
+            "instruction": "Вставь форму",
+            "prompt": "Last weekend we ________ (visit) our grandparents.",
+            "accepted": [
+              "visited"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "markers",
+        "title": "Маркеры (Markers)",
+        "kind": "multi",
+        "items": [
+          {
+            "id": "ps_mark_1",
+            "instruction": "Выбери маркеры Past Simple",
+            "prompt": "Выбери маркеры Past Simple:",
+            "options": [
+              "yesterday",
+              "while",
+              "last year",
+              "in 2010",
+              "at 7 o’clock yesterday"
+            ],
+            "correctIndices": [
+              0,
+              2,
+              3
+            ]
+          },
+          {
+            "id": "ps_mark_2",
+            "instruction": "Выбери маркеры Past Simple",
+            "prompt": "Выбери маркеры Past Simple:",
+            "options": [
+              "last night",
+              "while",
+              "in 1999",
+              "when",
+              "two years ago"
+            ],
+            "correctIndices": [
+              0,
+              2,
+              4
+            ]
+          },
+          {
+            "id": "ps_mark_3",
+            "instruction": "Выбери маркеры Past Simple (контекст прошлого)",
+            "prompt": "Выбери маркеры Past Simple:",
+            "options": [
+              "when I was a child",
+              "at 5 pm yesterday",
+              "during the war",
+              "currently",
+              "now"
+            ],
+            "correctIndices": [
+              0,
+              2
+            ]
+          },
+          {
+            "id": "ps_mark_4",
+            "instruction": "Выбери маркеры Past Simple",
+            "prompt": "Выбери маркеры Past Simple:",
+            "options": [
+              "yesterday morning",
+              "all night",
+              "last month",
+              "at the moment",
+              "in 2012"
+            ],
+            "correctIndices": [
+              0,
+              2,
+              4
+            ]
+          }
+        ]
+      },
+      {
+        "id": "mistakes",
+        "title": "Ошибки (Fix mistakes)",
+        "kind": "correction",
+        "items": [
+          {
+            "id": "ps_err_1",
+            "instruction": "Исправь ошибку",
+            "prompt": "Did you went there?",
+            "accepted": [
+              "Did you go there?",
+              "Did you go there"
+            ]
+          },
+          {
+            "id": "ps_err_2",
+            "instruction": "Исправь ошибку",
+            "prompt": "I didn't went home.",
+            "accepted": [
+              "I didn't go home.",
+              "I did not go home.",
+              "I didn't go home",
+              "I did not go home"
+            ]
+          },
+          {
+            "id": "ps_err_3",
+            "instruction": "Исправь ошибку",
+            "prompt": "Did she went to Moscow?",
+            "accepted": [
+              "Did she go to Moscow?",
+              "Did she go to Moscow"
+            ],
+            "acceptedShort": [
+              "go"
+            ]
+          },
+          {
+            "id": "ps_err_4",
+            "instruction": "Исправь ошибку",
+            "prompt": "They didn't watched TV.",
+            "accepted": [
+              "They didn't watch TV.",
+              "They did not watch TV.",
+              "They didn't watch TV",
+              "They did not watch TV"
+            ],
+            "acceptedShort": [
+              "watch",
+              "didn't watch",
+              "did not watch"
+            ]
+          },
+          {
+            "id": "ps_err_5",
+            "instruction": "Исправь ошибку",
+            "prompt": "He didn't went to work.",
+            "accepted": [
+              "He didn't go to work.",
+              "He did not go to work.",
+              "He didn't go to work",
+              "He did not go to work"
+            ],
+            "acceptedShort": [
+              "go",
+              "didn't go",
+              "did not go"
+            ]
+          },
+          {
+            "id": "ps_err_6",
+            "instruction": "Исправь to be",
+            "prompt": "Was you at home yesterday?",
+            "accepted": [
+              "Were you at home yesterday?",
+              "Were you at home yesterday",
+              "Were you at home?",
+              "Were you at home"
+            ],
+            "acceptedShort": [
+              "were",
+              "were you"
+            ]
+          },
+          {
+            "id": "ps_err_7",
+            "instruction": "Исправь ошибку (irregular)",
+            "prompt": "Did you saw him?",
+            "accepted": [
+              "Did you see him?",
+              "Did you see him"
+            ],
+            "acceptedShort": [
+              "see"
+            ]
+          },
+          {
+            "id": "ps_err_8",
+            "instruction": "Исправь ошибку",
+            "prompt": "I didn't played football.",
+            "accepted": [
+              "I didn't play football.",
+              "I did not play football.",
+              "I didn't play football",
+              "I did not play football"
+            ],
+            "acceptedShort": [
+              "play",
+              "didn't play",
+              "did not play"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "compare",
+        "title": "Сравнение (Compare)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "ps_cmp_1",
+            "instruction": "Выбери правило",
+            "prompt": "I was reading when the phone rang.",
+            "options": [
+              "цепочка",
+              "процесс",
+              "фон",
+              "привычка",
+              "прерванное"
+            ],
+            "correctIndex": 4
+          },
+          {
+            "id": "ps_cmp_2",
+            "instruction": "Выбери правило",
+            "prompt": "I played football every Sunday.",
+            "options": [
+              "цепочка",
+              "процесс",
+              "фон",
+              "привычка",
+              "прерванное"
+            ],
+            "correctIndex": 3
+          },
+          {
+            "id": "ps_cmp_3",
+            "instruction": "Выбери правило",
+            "prompt": "At 7 o’clock yesterday I was watching TV.",
+            "options": [
+              "цепочка",
+              "процесс",
+              "фон",
+              "привычка",
+              "прерванное"
+            ],
+            "correctIndex": 1
+          },
+          {
+            "id": "ps_cmp_4",
+            "instruction": "Выбери правило",
+            "prompt": "People were chatting, music was playing.",
+            "options": [
+              "цепочка",
+              "процесс",
+              "фон",
+              "привычка",
+              "прерванное"
+            ],
+            "correctIndex": 2
+          },
+          {
+            "id": "ps_cmp_5",
+            "instruction": "Выбери правило",
+            "prompt": "I went home, took a shower and went to bed.",
+            "options": [
+              "цепочка",
+              "процесс",
+              "фон",
+              "привычка",
+              "прерванное"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "ps_cmp_6",
+            "instruction": "Выбери правило",
+            "prompt": "I played chess every weekend.",
+            "options": [
+              "цепочка",
+              "процесс",
+              "фон",
+              "привычка",
+              "прерванное"
+            ],
+            "correctIndex": 3
+          },
+          {
+            "id": "ps_cmp_7",
+            "instruction": "Выбери правило",
+            "prompt": "I was walking home when it started to rain.",
+            "options": [
+              "цепочка",
+              "процесс",
+              "фон",
+              "привычка",
+              "прерванное"
+            ],
+            "correctIndex": 4
+          }
+        ]
+      }
+    ]
+  }
+}

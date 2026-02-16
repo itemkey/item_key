@@ -1,0 +1,651 @@
+{
+  "id": "pastContinuous",
+  "title": "Past Continuous",
+  "subtitle": "прошлое как процесс - действие в моменте (линия)",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Когда используем Past Continuous"
+    },
+    {
+      "type": "text",
+      "text": "Past Continuous - действие в процессе в прошлом. Представь 'картинку' в моменте."
+    },
+    {
+      "type": "highlight",
+      "title": "4 основных случая",
+      "lines": [
+        "Действие в процессе в прошлом (часто его прерывает другое): I was reading when the phone rang.",
+        "Два действия одновременно (параллельно): While I was studying, he was playing games.",
+        "Описание атмосферы/фона: People were chatting, music was playing...",
+        "Раздражающие повторения (always/constantly): She was always coming late!"
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        {
+          "en": "I was reading when the phone rang.",
+          "ru": "Я читал, когда зазвонил телефон."
+        },
+        {
+          "en": "While I was studying, he was playing games.",
+          "ru": "Пока я учился, он играл."
+        },
+        {
+          "en": "People were chatting, music was playing, lights were flashing.",
+          "ru": "Люди болтали, играла музыка, сверкали огни."
+        },
+        {
+          "en": "She was always coming late to class!",
+          "ru": "Она постоянно опаздывала!"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Формула Past Continuous"
+    },
+    {
+      "type": "table",
+      "caption": "Past Continuous - базовые формулы",
+      "columns": [
+        "Тип",
+        "Формула",
+        "Пример"
+      ],
+      "rows": [
+        [
+          "Утверждение",
+          "Subject + was/were + verb-ing",
+          "We were walking in the street."
+        ],
+        [
+          "Вопрос",
+          "Was/Were + subject + verb-ing?",
+          "Were you watching TV?"
+        ],
+        [
+          "Отрицание",
+          "Subject + was/were + not + verb-ing",
+          "She wasn't sleeping."
+        ]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Памятка was/were",
+      "lines": [
+        "was: I/he/she/it",
+        "were: you/we/they"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Временные указатели Past Continuous"
+    },
+    {
+      "type": "highlight",
+      "title": "Подсказки",
+      "lines": [
+        "while",
+        "when (решает смысл: процесс или факт)",
+        "at 7 o’clock yesterday",
+        "all night",
+        "as"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Распространенные ошибки"
+    },
+    {
+      "type": "highlight",
+      "title": "Ошибки",
+      "lines": [
+        "I was read -> I was reading",
+        "You were watching TV? -> Were you watching TV?",
+        "We was playing -> We were playing",
+        "I didn't watching -> I wasn't watching / I was not watching",
+        "State verbs: I was knowing -> обычно I knew"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Past Simple vs Past Continuous"
+    },
+    {
+      "type": "table",
+      "caption": "Супер-правило",
+      "columns": [
+        "Past Simple",
+        "Past Continuous"
+      ],
+      "rows": [
+        [
+          "событие/факт (точка)",
+          "процесс/фон (линия)"
+        ],
+        [
+          "цепочка событий: I got up, brushed my teeth and had breakfast.",
+          "процесс + событие: I was reading when the phone rang."
+        ]
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": [
+      {
+        "id": "meaning",
+        "title": "Когда используем (Meaning)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "pc_m_1",
+            "instruction": "Выбери ситуацию",
+            "prompt": "I was reading when the phone rang.",
+            "options": [
+              "прерванное действие",
+              "цепочка",
+              "привычка"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "pc_m_2",
+            "instruction": "Выбери ситуацию",
+            "prompt": "While I was studying, he was playing games.",
+            "options": [
+              "параллельные действия",
+              "цепочка",
+              "фон как факт"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "pc_m_3",
+            "instruction": "Выбери ситуацию",
+            "prompt": "People were chatting, music was playing...",
+            "options": [
+              "атмосфера/фон",
+              "привычка",
+              "точка во времени"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "pc_m_4",
+            "instruction": "Выбери ситуацию",
+            "prompt": "She was always coming late...",
+            "options": [
+              "раздражение + always",
+              "фон",
+              "цепочка"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "pc_m_5",
+            "instruction": "Выбери ситуацию",
+            "prompt": "At 9 pm yesterday we were having dinner.",
+            "options": [
+              "действие в процессе (в момент времени)",
+              "цепочка",
+              "привычка"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "pc_m_6",
+            "instruction": "Выбери ситуацию",
+            "prompt": "I was walking to school when I met Tom.",
+            "options": [
+              "прерванное действие",
+              "привычка",
+              "точное событие"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "pc_m_7",
+            "instruction": "Выбери ситуацию",
+            "prompt": "They were laughing and talking loudly.",
+            "options": [
+              "атмосфера/фон",
+              "цепочка",
+              "точка"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "pc_m_8",
+            "instruction": "Выбери ситуацию",
+            "prompt": "He was constantly complaining about homework.",
+            "options": [
+              "раздражение + always/constantly",
+              "процесс как факт",
+              "цепочка"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "pc_m_9",
+            "instruction": "Выбери ситуацию",
+            "prompt": "While she was cooking, I was setting the table.",
+            "options": [
+              "параллельные действия",
+              "цепочка",
+              "привычка"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "pc_m_10",
+            "instruction": "Выбери ситуацию",
+            "prompt": "The sun was shining and birds were singing.",
+            "options": [
+              "атмосфера/фон",
+              "привычка",
+              "прерванное"
+            ],
+            "correctIndex": 0
+          }
+        ]
+      },
+      {
+        "id": "formula",
+        "title": "Формула (Formula)",
+        "kind": "input",
+        "items": [
+          {
+            "id": "pc_f_1",
+            "instruction": "Вставь форму",
+            "prompt": "At 7 o’clock yesterday I ________ (watch) TV.",
+            "accepted": [
+              "was watching"
+            ]
+          },
+          {
+            "id": "pc_f_2",
+            "instruction": "Вставь форму",
+            "prompt": "We ________ (walk) in the street.",
+            "accepted": [
+              "were walking"
+            ]
+          },
+          {
+            "id": "pc_f_3",
+            "instruction": "Вставь вопрос целиком",
+            "prompt": "________ you ________ (watch) TV?",
+            "accepted": [
+              "Were you watching?",
+              "Were you watching",
+              "Were you watching TV?",
+              "Were you watching TV"
+            ]
+          },
+          {
+            "id": "pc_f_4",
+            "instruction": "Вставь форму",
+            "prompt": "She ________ (not/sleep).",
+            "accepted": [
+              "wasn't sleeping",
+              "was not sleeping"
+            ]
+          },
+          {
+            "id": "pc_f_5",
+            "instruction": "Вставь форму",
+            "prompt": "They ________ (play) football at 5 pm yesterday.",
+            "accepted": [
+              "were playing"
+            ]
+          },
+          {
+            "id": "pc_f_6",
+            "instruction": "Вставь отрицание",
+            "prompt": "I ________ (not/listen) to music.",
+            "accepted": [
+              "wasn't listening",
+              "was not listening"
+            ]
+          },
+          {
+            "id": "pc_f_7",
+            "instruction": "Вставь вопрос",
+            "prompt": "________ she ________ (sleep) when you called?",
+            "accepted": [
+              "Was she sleeping?",
+              "Was she sleeping"
+            ]
+          },
+          {
+            "id": "pc_f_8",
+            "instruction": "Вставь форму",
+            "prompt": "It ________ (rain) all night.",
+            "accepted": [
+              "was raining"
+            ]
+          },
+          {
+            "id": "pc_f_9",
+            "instruction": "Вставь форму",
+            "prompt": "We ________ (study) while you were watching TV.",
+            "accepted": [
+              "were studying"
+            ]
+          },
+          {
+            "id": "pc_f_10",
+            "instruction": "Собери вопрос",
+            "prompt": "What ________ you ________ (do) at 8 pm yesterday?",
+            "accepted": [
+              "What were you doing at 8 pm yesterday?",
+              "What were you doing at 8 pm yesterday",
+              "What were you doing at 8 pm?",
+              "What were you doing at 8 pm"
+            ]
+          },
+          {
+            "id": "pc_f_11",
+            "instruction": "Вставь отрицание",
+            "prompt": "They ________ (not/work) at that moment.",
+            "accepted": [
+              "weren't working",
+              "were not working"
+            ]
+          },
+          {
+            "id": "pc_f_12",
+            "instruction": "Вставь форму",
+            "prompt": "I ________ (drive) when I saw the accident.",
+            "accepted": [
+              "was driving"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "markers",
+        "title": "Маркеры (Matching)",
+        "kind": "match",
+        "items": [
+          {
+            "id": "pc_mark_1",
+            "instruction": "Соедини маркер и подсказку",
+            "prompt": "Соедини маркер и подсказку:",
+            "pairs": [
+              {
+                "left": "while",
+                "right": "пока, в то время как"
+              },
+              {
+                "left": "when",
+                "right": "когда"
+              },
+              {
+                "left": "all night",
+                "right": "всю ночь"
+              },
+              {
+                "left": "as",
+                "right": "в то время как"
+              },
+              {
+                "left": "at 7 o’clock yesterday",
+                "right": "вчера в 7 часов"
+              }
+            ]
+          },
+          {
+            "id": "pc_mark_2",
+            "instruction": "Соедини маркер и подсказку",
+            "prompt": "Соедини маркер и подсказку:",
+            "pairs": [
+              {
+                "left": "at that moment",
+                "right": "в тот момент"
+              },
+              {
+                "left": "all evening",
+                "right": "весь вечер"
+              },
+              {
+                "left": "while",
+                "right": "пока"
+              },
+              {
+                "left": "when",
+                "right": "когда"
+              },
+              {
+                "left": "from 5 to 6",
+                "right": "с 5 до 6"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "mistakes",
+        "title": "Ошибки (Fix mistakes)",
+        "kind": "correction",
+        "items": [
+          {
+            "id": "pc_err_1",
+            "instruction": "Исправь ошибку",
+            "prompt": "I was read a book.",
+            "accepted": [
+              "I was reading a book.",
+              "I was reading a book"
+            ]
+          },
+          {
+            "id": "pc_err_2",
+            "instruction": "Исправь порядок слов",
+            "prompt": "You were watching TV?",
+            "accepted": [
+              "Were you watching TV?",
+              "Were you watching TV"
+            ]
+          },
+          {
+            "id": "pc_err_3",
+            "instruction": "Исправь was/were",
+            "prompt": "We was playing.",
+            "accepted": [
+              "We were playing.",
+              "We were playing"
+            ]
+          },
+          {
+            "id": "pc_err_4",
+            "instruction": "Исправь отрицание",
+            "prompt": "I didn't watching.",
+            "accepted": [
+              "I wasn't watching.",
+              "I was not watching.",
+              "I wasn't watching",
+              "I was not watching"
+            ]
+          },
+          {
+            "id": "pc_err_5",
+            "instruction": "Исправь was/were",
+            "prompt": "I were watching TV.",
+            "accepted": [
+              "I was watching TV.",
+              "I was watching TV"
+            ],
+            "acceptedShort": [
+              "was"
+            ]
+          },
+          {
+            "id": "pc_err_6",
+            "instruction": "Исправь форму глагола",
+            "prompt": "She was sleep.",
+            "accepted": [
+              "She was sleeping.",
+              "She was sleeping"
+            ],
+            "acceptedShort": [
+              "sleeping"
+            ]
+          },
+          {
+            "id": "pc_err_7",
+            "instruction": "Исправь was/were в вопросе",
+            "prompt": "Were he working?",
+            "accepted": [
+              "Was he working?",
+              "Was he working"
+            ],
+            "acceptedShort": [
+              "was",
+              "was he"
+            ]
+          },
+          {
+            "id": "pc_err_8",
+            "instruction": "Исправь state verb",
+            "prompt": "I was knowing the answer.",
+            "accepted": [
+              "I knew the answer.",
+              "I knew the answer"
+            ],
+            "acceptedShort": [
+              "knew"
+            ]
+          },
+          {
+            "id": "pc_err_9",
+            "instruction": "Исправь форму глагола",
+            "prompt": "They were play football.",
+            "accepted": [
+              "They were playing football.",
+              "They were playing football"
+            ],
+            "acceptedShort": [
+              "playing"
+            ]
+          },
+          {
+            "id": "pc_err_10",
+            "instruction": "Исправь отрицание",
+            "prompt": "He didn't listening.",
+            "accepted": [
+              "He wasn't listening.",
+              "He was not listening.",
+              "He wasn't listening",
+              "He was not listening"
+            ],
+            "acceptedShort": [
+              "wasn't",
+              "wasn't listening",
+              "was not listening"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "compare",
+        "title": "Сравнение (Compare)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "pc_cmp_1",
+            "instruction": "Выбери правило",
+            "prompt": "I got up, brushed my teeth and had breakfast.",
+            "options": [
+              "цепочка",
+              "процесс",
+              "фон",
+              "привычка",
+              "прерванное"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "pc_cmp_2",
+            "instruction": "Выбери правило",
+            "prompt": "I was reading when the phone rang.",
+            "options": [
+              "цепочка",
+              "процесс",
+              "фон",
+              "привычка",
+              "прерванное"
+            ],
+            "correctIndex": 4
+          },
+          {
+            "id": "pc_cmp_3",
+            "instruction": "Выбери правило",
+            "prompt": "At 7 o’clock yesterday I was watching TV.",
+            "options": [
+              "цепочка",
+              "процесс",
+              "фон",
+              "привычка",
+              "прерванное"
+            ],
+            "correctIndex": 1
+          },
+          {
+            "id": "pc_cmp_4",
+            "instruction": "Выбери правило",
+            "prompt": "I went home, took a shower and went to bed.",
+            "options": [
+              "цепочка",
+              "процесс",
+              "фон",
+              "привычка",
+              "прерванное"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "pc_cmp_5",
+            "instruction": "Выбери правило",
+            "prompt": "I was reading when the phone rang.",
+            "options": [
+              "цепочка",
+              "процесс",
+              "фон",
+              "привычка",
+              "прерванное"
+            ],
+            "correctIndex": 4
+          },
+          {
+            "id": "pc_cmp_6",
+            "instruction": "Выбери правило",
+            "prompt": "I played football every Sunday.",
+            "options": [
+              "цепочка",
+              "процесс",
+              "фон",
+              "привычка",
+              "прерванное"
+            ],
+            "correctIndex": 3
+          },
+          {
+            "id": "pc_cmp_7",
+            "instruction": "Выбери правило",
+            "prompt": "People were chatting, music was playing...",
+            "options": [
+              "цепочка",
+              "процесс",
+              "фон",
+              "привычка",
+              "прерванное"
+            ],
+            "correctIndex": 2
+          }
+        ]
+      }
+    ]
+  }
+}
