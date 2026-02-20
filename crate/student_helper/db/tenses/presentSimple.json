@@ -1,0 +1,912 @@
+{
+  "id": "presentSimple",
+  "title": "Present Simple",
+  "subtitle": "привычка • факт • расписание",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Когда используем Present Simple"
+    },
+    {
+      "type": "text",
+      "text": "Present Simple — время фактов и регулярности. Это «точка» на линии времени: привычка, расписание, истина, правило."
+    },
+    {
+      "type": "highlight",
+      "title": "Быстрые ассоциации",
+      "lines": [
+        "habit / routine → привычка (every day, usually)",
+        "facts / general truth → факт, истина",
+        "timetables / schedules → расписание (train leaves at 6)",
+        "states → состояния (know, like, want)"
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Формулы",
+      "columns": [
+        "",
+        "Утверждение",
+        "Отрицание",
+        "Вопрос"
+      ],
+      "rows": [
+        [
+          "I/You/We/They",
+          "V1 (work)",
+          "do not (don't) + V1",
+          "Do + S + V1?"
+        ],
+        [
+          "He/She/It",
+          "V1+s/es (works)",
+          "does not (doesn't) + V1",
+          "Does + S + V1?"
+        ]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Правило -s/-es (3-е лицо ед.ч.)",
+      "lines": [
+        "work → works, live → lives, play → plays",
+        "watch / go / do → watches / goes / does (-es)",
+        "study → studies (y → ies после согласной)",
+        "have → has (исключение)"
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Временные маркеры",
+      "columns": [
+        "Тип",
+        "Маркеры"
+      ],
+      "rows": [
+        [
+          "частота",
+          "always, usually, often, sometimes, never"
+        ],
+        [
+          "регулярность",
+          "every day/week/year, on Mondays, at weekends"
+        ],
+        [
+          "расписание",
+          "at 7:30, tomorrow (в расписании), next week (в расписании)"
+        ],
+        [
+          "общие факты",
+          "generally, in general, normally"
+        ]
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Типичные ошибки"
+    },
+    {
+      "type": "text",
+      "text": "1) забывают -s/-es в he/she/it. 2) ставят do/does в утверждении. 3) используют Present Continuous для фактов/привычек."
+    },
+    {
+      "type": "examples",
+      "items": [
+        {
+          "en": "She works in a bank.",
+          "ru": "Она работает в банке (факт)."
+        },
+        {
+          "en": "Do you play tennis every Friday?",
+          "ru": "Ты играешь в теннис каждую пятницу?"
+        },
+        {
+          "en": "The shop opens at 9 a.m.",
+          "ru": "Магазин открывается в 9 утра (расписание)."
+        },
+        {
+          "en": "He doesn't like coffee.",
+          "ru": "Ему не нравится кофе (состояние)."
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Сравнение: Present Simple vs Present Continuous"
+    },
+    {
+      "type": "highlight",
+      "title": "Супер-правило",
+      "lines": [
+        "Present Simple = привычка/факт (точка, повторяемость)",
+        "Present Continuous = процесс сейчас/временно (линия, движение)"
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        {
+          "en": "I work here.",
+          "ru": "Я здесь работаю (обычно)."
+        },
+        {
+          "en": "I'm working here this week.",
+          "ru": "Я работаю здесь на этой неделе (временно)."
+        },
+        {
+          "en": "She always forgets her keys.",
+          "ru": "Она всегда забывает ключи (привычка)."
+        },
+        {
+          "en": "She's always forgetting her keys!",
+          "ru": "Она постоянно забывает ключи! (раздражение, оттенок)"
+        }
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": [
+      {
+        "id": "meaning",
+        "title": "Когда используем (Meaning)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "prs_m_1",
+            "instruction": "Выбери объяснение",
+            "prompt": "I usually drink coffee in the morning.",
+            "options": [
+              "привычка/рутина",
+              "процесс сейчас",
+              "план на будущее"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "prs_m_2",
+            "instruction": "Выбери объяснение",
+            "prompt": "Water boils at 100°C.",
+            "options": [
+              "общеизвестный факт",
+              "процесс сейчас",
+              "временная ситуация"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "prs_m_3",
+            "instruction": "Выбери объяснение",
+            "prompt": "The train leaves at 6:15.",
+            "options": [
+              "расписание",
+              "процесс сейчас",
+              "разовое прошлое"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "prs_m_4",
+            "instruction": "Выбери объяснение",
+            "prompt": "He doesn't eat meat.",
+            "options": [
+              "постоянная привычка/факт (отрицание)",
+              "процесс сейчас",
+              "длительное действие в прошлом"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "prs_m_5",
+            "instruction": "Выбери объяснение",
+            "prompt": "Do you speak English?",
+            "options": [
+              "умение/факт (вопрос)",
+              "процесс сейчас",
+              "план на завтра"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "prs_m_6",
+            "instruction": "Выбери объяснение",
+            "prompt": "My sister lives in Kaunas.",
+            "options": [
+              "факт/постоянное состояние",
+              "временная ситуация",
+              "процесс в моменте"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "prs_m_7",
+            "instruction": "Выбери объяснение",
+            "prompt": "We go to the gym on Tuesdays.",
+            "options": [
+              "регулярность",
+              "процесс сейчас",
+              "разовое событие"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "prs_m_8",
+            "instruction": "Выбери объяснение",
+            "prompt": "I don't know his name.",
+            "options": [
+              "состояние (stative)",
+              "процесс сейчас",
+              "привычка в прошлом"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "prs_m_9",
+            "instruction": "Выбери объяснение",
+            "prompt": "She always arrives early.",
+            "options": [
+              "привычка + always",
+              "действие прямо сейчас",
+              "прерванный процесс"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "prs_m_10",
+            "instruction": "Выбери объяснение",
+            "prompt": "The lesson starts at 9.",
+            "options": [
+              "расписание/распорядок",
+              "процесс сейчас",
+              "past action"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "prs_m_11",
+            "instruction": "Выбери объяснение",
+            "prompt": "I work from home.",
+            "options": [
+              "постоянная ситуация",
+              "процесс сейчас",
+              "временно"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "prs_m_12",
+            "instruction": "Выбери объяснение",
+            "prompt": "Does your brother drive?",
+            "options": [
+              "умение/факт (вопрос)",
+              "процесс сейчас",
+              "прошлое"
+            ],
+            "correctIndex": 0
+          }
+        ]
+      },
+      {
+        "id": "formula",
+        "title": "Формулы (Formula)",
+        "kind": "input",
+        "items": [
+          {
+            "id": "prs_f_1",
+            "instruction": "Вставь правильную форму глагола",
+            "prompt": "She ____ (work) in a bank.",
+            "accepted": [
+              "works"
+            ]
+          },
+          {
+            "id": "prs_f_2",
+            "instruction": "Вставь правильную форму",
+            "prompt": "They ____ (play) football every weekend.",
+            "accepted": [
+              "play"
+            ]
+          },
+          {
+            "id": "prs_f_3",
+            "instruction": "Сделай отрицание",
+            "prompt": "He ____ (like) spicy food. → (negative)",
+            "accepted": [
+              "doesn't like",
+              "does not like"
+            ]
+          },
+          {
+            "id": "prs_f_4",
+            "instruction": "Сделай вопрос",
+            "prompt": "You ____ (watch) TV every day. → (question)",
+            "accepted": [
+              "Do you watch TV every day?",
+              "Do you watch TV every day"
+            ]
+          },
+          {
+            "id": "prs_f_5",
+            "instruction": "3-е лицо",
+            "prompt": "My dad ____ (go) to work by car.",
+            "accepted": [
+              "goes"
+            ]
+          },
+          {
+            "id": "prs_f_6",
+            "instruction": "Отрицание (I/you/we/they)",
+            "prompt": "I ____ (drink) milk. → (negative)",
+            "accepted": [
+              "don't drink",
+              "do not drink"
+            ]
+          },
+          {
+            "id": "prs_f_7",
+            "instruction": "Вопрос (he/she/it)",
+            "prompt": "She ____ (speak) French. → (question)",
+            "accepted": [
+              "Does she speak French?",
+              "Does she speak French"
+            ]
+          },
+          {
+            "id": "prs_f_8",
+            "instruction": "Правильная форма",
+            "prompt": "Our classes ____ (finish) at 3 p.m.",
+            "accepted": [
+              "finish"
+            ]
+          },
+          {
+            "id": "prs_f_9",
+            "instruction": "3-е лицо, -ies",
+            "prompt": "He ____ (study) at night.",
+            "accepted": [
+              "studies"
+            ]
+          },
+          {
+            "id": "prs_f_10",
+            "instruction": "Исключение have",
+            "prompt": "She ____ (have) a cat.",
+            "accepted": [
+              "has"
+            ]
+          },
+          {
+            "id": "prs_f_11",
+            "instruction": "Вопрос",
+            "prompt": "You ____ (know) the answer. → (question)",
+            "accepted": [
+              "Do you know the answer?",
+              "Do you know the answer"
+            ]
+          },
+          {
+            "id": "prs_f_12",
+            "instruction": "Отрицание",
+            "prompt": "He ____ (watch) horror movies. → (negative)",
+            "accepted": [
+              "doesn't watch",
+              "does not watch"
+            ]
+          },
+          {
+            "id": "prs_f_13",
+            "instruction": "3-е лицо, -es",
+            "prompt": "It ____ (do) this automatically.",
+            "accepted": [
+              "does"
+            ]
+          },
+          {
+            "id": "prs_f_14",
+            "instruction": "Вопрос",
+            "prompt": "Your sister ____ (work) on Fridays. → (question)",
+            "accepted": [
+              "Does your sister work on Fridays?",
+              "Does your sister work on Fridays"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "formula_2",
+        "goal": "formula",
+        "title": "Формулы (Multi-input)",
+        "kind": "multi_input",
+        "items": [
+          {
+            "id": "prs_mi_1",
+            "instruction": "Заполни пропуски (2–3)",
+            "prompt": "He ____ ____ coffee in the evening. (negative)",
+            "inputs": [
+              {
+                "placeholder": "doesn't / does not",
+                "accepted": [
+                  "doesn't",
+                  "does not"
+                ]
+              },
+              {
+                "placeholder": "drink",
+                "accepted": [
+                  "drink"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "prs_mi_2",
+            "instruction": "Заполни пропуски",
+            "prompt": "____ she ____ English? (question)",
+            "inputs": [
+              {
+                "placeholder": "Does",
+                "accepted": [
+                  "Does"
+                ]
+              },
+              {
+                "placeholder": "speak",
+                "accepted": [
+                  "speak"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "prs_mi_3",
+            "instruction": "Заполни пропуски",
+            "prompt": "My sister ____ ____ at 7. (get up)",
+            "inputs": [
+              {
+                "placeholder": "gets",
+                "accepted": [
+                  "gets"
+                ]
+              },
+              {
+                "placeholder": "up",
+                "accepted": [
+                  "up"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "prs_mi_4",
+            "instruction": "Заполни пропуски",
+            "prompt": "____ you ____ to music every day?",
+            "inputs": [
+              {
+                "placeholder": "Do",
+                "accepted": [
+                  "Do"
+                ]
+              },
+              {
+                "placeholder": "listen",
+                "accepted": [
+                  "listen"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "prs_mi_5",
+            "instruction": "Заполни пропуски",
+            "prompt": "The movie ____ ____ at 8. (start)",
+            "inputs": [
+              {
+                "placeholder": "starts",
+                "accepted": [
+                  "starts"
+                ]
+              },
+              {
+                "placeholder": "",
+                "accepted": [
+                  ""
+                ]
+              }
+            ]
+          },
+          {
+            "id": "prs_mi_6",
+            "instruction": "Заполни пропуски",
+            "prompt": "She ____ ____ meat. (negative)",
+            "inputs": [
+              {
+                "placeholder": "doesn't",
+                "accepted": [
+                  "doesn't",
+                  "does not"
+                ]
+              },
+              {
+                "placeholder": "eat",
+                "accepted": [
+                  "eat"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "markers",
+        "title": "Маркеры (Markers)",
+        "kind": "multi",
+        "items": [
+          {
+            "id": "prs_mark_1",
+            "instruction": "Выбери маркеры Present Simple",
+            "prompt": "Выбери подходящие маркеры",
+            "options": [
+              "usually",
+              "now",
+              "every day",
+              "at the moment"
+            ],
+            "correctIndices": [
+              0,
+              2
+            ]
+          },
+          {
+            "id": "prs_mark_2",
+            "instruction": "Выбери маркеры Present Simple",
+            "prompt": "Выбери подходящие маркеры",
+            "options": [
+              "often",
+              "currently",
+              "on Mondays",
+              "right now"
+            ],
+            "correctIndices": [
+              0,
+              2
+            ]
+          },
+          {
+            "id": "prs_mark_3",
+            "instruction": "Маркеры расписания/рутин",
+            "prompt": "Выбери",
+            "options": [
+              "always",
+              "tomorrow (по расписанию)",
+              "these days",
+              "never"
+            ],
+            "correctIndices": [
+              0,
+              1,
+              3
+            ]
+          },
+          {
+            "id": "prs_mark_4",
+            "instruction": "Частотные наречия",
+            "prompt": "Выбери",
+            "options": [
+              "sometimes",
+              "yesterday",
+              "normally",
+              "at the moment"
+            ],
+            "correctIndices": [
+              0,
+              2
+            ]
+          },
+          {
+            "id": "prs_mark_5",
+            "instruction": "Регулярность",
+            "prompt": "Выбери",
+            "options": [
+              "every week",
+              "next week (по расписанию)",
+              "right now",
+              "currently"
+            ],
+            "correctIndices": [
+              0,
+              1
+            ]
+          }
+        ]
+      },
+      {
+        "id": "markers_2",
+        "goal": "markers",
+        "title": "Match: маркер → перевод/смысл",
+        "kind": "match",
+        "items": [
+          {
+            "id": "prs_match_1",
+            "instruction": "Соедини",
+            "pairs": [
+              {
+                "left": "usually",
+                "right": "обычно"
+              },
+              {
+                "left": "every day",
+                "right": "каждый день"
+              },
+              {
+                "left": "on Mondays",
+                "right": "по понедельникам"
+              },
+              {
+                "left": "never",
+                "right": "никогда"
+              },
+              {
+                "left": "often",
+                "right": "часто"
+              }
+            ]
+          },
+          {
+            "id": "prs_match_2",
+            "instruction": "Соедини",
+            "pairs": [
+              {
+                "left": "generally",
+                "right": "в целом"
+              },
+              {
+                "left": "from time to time",
+                "right": "время от времени"
+              },
+              {
+                "left": "at weekends",
+                "right": "по выходным"
+              },
+              {
+                "left": "always",
+                "right": "всегда"
+              },
+              {
+                "left": "normally",
+                "right": "обычно / как правило"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "mistakes",
+        "title": "Исправь ошибки (Mistakes)",
+        "kind": "correction",
+        "items": [
+          {
+            "id": "prs_c_1",
+            "instruction": "Исправь предложение",
+            "prompt": "He work in an office.",
+            "accepted": [
+              "He works in an office."
+            ]
+          },
+          {
+            "id": "prs_c_2",
+            "instruction": "Исправь",
+            "prompt": "She don't like tea.",
+            "accepted": [
+              "She doesn't like tea.",
+              "She does not like tea."
+            ]
+          },
+          {
+            "id": "prs_c_3",
+            "instruction": "Исправь",
+            "prompt": "Does she speaks English?",
+            "accepted": [
+              "Does she speak English?"
+            ]
+          },
+          {
+            "id": "prs_c_4",
+            "instruction": "Исправь",
+            "prompt": "I am go to school every day.",
+            "accepted": [
+              "I go to school every day."
+            ]
+          },
+          {
+            "id": "prs_c_5",
+            "instruction": "Исправь",
+            "prompt": "He hasn't a car.",
+            "accepted": [
+              "He doesn't have a car.",
+              "He does not have a car."
+            ]
+          },
+          {
+            "id": "prs_c_6",
+            "instruction": "Исправь",
+            "prompt": "Do he play football?",
+            "accepted": [
+              "Does he play football?"
+            ]
+          },
+          {
+            "id": "prs_c_7",
+            "instruction": "Исправь",
+            "prompt": "My brother watchs TV.",
+            "accepted": [
+              "My brother watches TV."
+            ]
+          },
+          {
+            "id": "prs_c_8",
+            "instruction": "Исправь",
+            "prompt": "We doesn't work on Sundays.",
+            "accepted": [
+              "We don't work on Sundays.",
+              "We do not work on Sundays."
+            ]
+          },
+          {
+            "id": "prs_c_9",
+            "instruction": "Исправь",
+            "prompt": "She study English.",
+            "accepted": [
+              "She studies English."
+            ]
+          },
+          {
+            "id": "prs_c_10",
+            "instruction": "Исправь",
+            "prompt": "I do goes to bed early.",
+            "accepted": [
+              "I go to bed early."
+            ]
+          }
+        ]
+      },
+      {
+        "id": "compare",
+        "title": "Present Simple vs Present Continuous (Contrast)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "prs_cmp_1",
+            "instruction": "Выбери время",
+            "prompt": "She ____ (work) in a bank. (job)",
+            "options": [
+              "Present Simple",
+              "Present Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentSimple"
+          },
+          {
+            "id": "prs_cmp_2",
+            "instruction": "Выбери время",
+            "prompt": "She ____ (work) from home this week.",
+            "options": [
+              "Present Simple",
+              "Present Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "presentContinuous"
+          },
+          {
+            "id": "prs_cmp_3",
+            "instruction": "Выбери время",
+            "prompt": "I usually ____ (take) the bus.",
+            "options": [
+              "Present Simple",
+              "Present Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentSimple"
+          },
+          {
+            "id": "prs_cmp_4",
+            "instruction": "Выбери время",
+            "prompt": "Look! The bus ____ (come).",
+            "options": [
+              "Present Simple",
+              "Present Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "presentContinuous"
+          },
+          {
+            "id": "prs_cmp_5",
+            "instruction": "Выбери время",
+            "prompt": "He ____ (always/lose) his keys! (annoyed)",
+            "options": [
+              "Present Simple",
+              "Present Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "presentContinuous"
+          },
+          {
+            "id": "prs_cmp_6",
+            "instruction": "Выбери время",
+            "prompt": "He always ____ (lose) his keys. (habit)",
+            "options": [
+              "Present Simple",
+              "Present Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentSimple"
+          },
+          {
+            "id": "prs_cmp_7",
+            "instruction": "Выбери время",
+            "prompt": "I ____ (think) it's a good idea. (opinion)",
+            "options": [
+              "Present Simple",
+              "Present Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentSimple"
+          },
+          {
+            "id": "prs_cmp_8",
+            "instruction": "Выбери время",
+            "prompt": "I'm sorry, I ____ (think) about something else. (process)",
+            "options": [
+              "Present Simple",
+              "Present Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "presentContinuous"
+          },
+          {
+            "id": "prs_cmp_9",
+            "instruction": "Выбери время",
+            "prompt": "The shop ____ (open) at 9.",
+            "options": [
+              "Present Simple",
+              "Present Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentSimple"
+          },
+          {
+            "id": "prs_cmp_10",
+            "instruction": "Выбери время",
+            "prompt": "We ____ (have) dinner now.",
+            "options": [
+              "Present Simple",
+              "Present Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "presentContinuous"
+          },
+          {
+            "id": "prs_cmp_11",
+            "instruction": "Выбери время",
+            "prompt": "She ____ (not/understand) this rule.",
+            "options": [
+              "Present Simple",
+              "Present Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentSimple"
+          },
+          {
+            "id": "prs_cmp_12",
+            "instruction": "Выбери время",
+            "prompt": "They ____ (study) for the exam these days.",
+            "options": [
+              "Present Simple",
+              "Present Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "presentContinuous"
+          }
+        ]
+      }
+    ]
+  }
+}

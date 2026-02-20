@@ -1,0 +1,529 @@
+{
+  "id": "mixedPresent",
+  "title": "Mixed Present",
+  "subtitle": "Present Simple + Present Continuous",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Mixed Present: Present Simple vs Present Continuous"
+    },
+    {
+      "type": "highlight",
+      "title": "Супер-правило",
+      "lines": [
+        "Simple = habit/fact/schedule (обычно, регулярно, по расписанию)",
+        "Continuous = process now/temporary (сейчас, в данный момент, временно)",
+        "always + V-ing = раздражение (а Simple always = нейтральная привычка)"
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        {
+          "en": "I usually work from home.",
+          "ru": "Обычно я работаю из дома (Simple)."
+        },
+        {
+          "en": "I'm working from home today.",
+          "ru": "Сегодня я работаю из дома (Continuous)."
+        },
+        {
+          "en": "He always forgets his keys.",
+          "ru": "Он всегда забывает ключи (habit)."
+        },
+        {
+          "en": "He's always forgetting his keys!",
+          "ru": "Он постоянно забывает ключи! (annoyed)."
+        }
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": [
+      {
+        "id": "meaning",
+        "title": "Выбери время (Meaning)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "mpr_m_1",
+            "instruction": "Present Simple или Present Continuous?",
+            "prompt": "She usually ____ (go) to work by bus.",
+            "options": [
+              "Present Simple",
+              "Present Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentSimple"
+          },
+          {
+            "id": "mpr_m_2",
+            "instruction": "Выбери",
+            "prompt": "Look! She ____ (go) to work now.",
+            "options": [
+              "Present Simple",
+              "Present Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "presentContinuous"
+          },
+          {
+            "id": "mpr_m_3",
+            "instruction": "Выбери",
+            "prompt": "We ____ (meet) on Fridays.",
+            "options": [
+              "Present Simple",
+              "Present Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentSimple"
+          },
+          {
+            "id": "mpr_m_4",
+            "instruction": "Выбери",
+            "prompt": "We ____ (meet) John at the moment.",
+            "options": [
+              "Present Simple",
+              "Present Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "presentContinuous"
+          },
+          {
+            "id": "mpr_m_5",
+            "instruction": "Выбери",
+            "prompt": "He ____ (not/like) coffee.",
+            "options": [
+              "Present Simple",
+              "Present Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentSimple"
+          },
+          {
+            "id": "mpr_m_6",
+            "instruction": "Выбери",
+            "prompt": "He ____ (not/work) today.",
+            "options": [
+              "Present Simple",
+              "Present Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "presentContinuous"
+          },
+          {
+            "id": "mpr_m_7",
+            "instruction": "Выбери",
+            "prompt": "The shop ____ (open) at 9.",
+            "options": [
+              "Present Simple",
+              "Present Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentSimple"
+          },
+          {
+            "id": "mpr_m_8",
+            "instruction": "Выбери",
+            "prompt": "They ____ (study) these days.",
+            "options": [
+              "Present Simple",
+              "Present Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "presentContinuous"
+          },
+          {
+            "id": "mpr_m_9",
+            "instruction": "Выбери",
+            "prompt": "I ____ (think) this is easy. (opinion)",
+            "options": [
+              "Present Simple",
+              "Present Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentSimple"
+          },
+          {
+            "id": "mpr_m_10",
+            "instruction": "Выбери",
+            "prompt": "I'm ____ (think) about my plan. (process)",
+            "options": [
+              "Present Simple",
+              "Present Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "presentContinuous"
+          },
+          {
+            "id": "mpr_m_11",
+            "instruction": "Выбери",
+            "prompt": "He always ____ (complain) about everything.",
+            "options": [
+              "Present Simple",
+              "Present Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentSimple"
+          },
+          {
+            "id": "mpr_m_12",
+            "instruction": "Выбери",
+            "prompt": "He ____ (always/complain) about everything!",
+            "options": [
+              "Present Simple",
+              "Present Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "presentContinuous"
+          },
+          {
+            "id": "mpr_m_13",
+            "instruction": "Выбери",
+            "prompt": "I ____ (know) the answer.",
+            "options": [
+              "Present Simple",
+              "Present Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentSimple"
+          },
+          {
+            "id": "mpr_m_14",
+            "instruction": "Выбери",
+            "prompt": "Listen! Someone ____ (sing).",
+            "options": [
+              "Present Simple",
+              "Present Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "presentContinuous"
+          },
+          {
+            "id": "mpr_m_15",
+            "instruction": "Выбери",
+            "prompt": "She ____ (work) in a bank.",
+            "options": [
+              "Present Simple",
+              "Present Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentSimple"
+          }
+        ]
+      },
+      {
+        "id": "formula",
+        "title": "Формы: вставь правильную форму",
+        "kind": "multi_input",
+        "items": [
+          {
+            "id": "mpr_f_1",
+            "instruction": "Заполни 2 пропуска",
+            "prompt": "She ____ ____ in a bank. (work)",
+            "inputs": [
+              {
+                "placeholder": "works / is",
+                "accepted": [
+                  "works",
+                  "is"
+                ]
+              },
+              {
+                "placeholder": "— / working",
+                "accepted": [
+                  "",
+                  "working"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "mpr_f_2",
+            "instruction": "Заполни",
+            "prompt": "They ____ ____ now. (play)",
+            "inputs": [
+              {
+                "placeholder": "are",
+                "accepted": [
+                  "are"
+                ]
+              },
+              {
+                "placeholder": "playing",
+                "accepted": [
+                  "playing"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "mpr_f_3",
+            "instruction": "Заполни",
+            "prompt": "He ____ ____ coffee. (negative, simple)",
+            "inputs": [
+              {
+                "placeholder": "doesn't",
+                "accepted": [
+                  "doesn't",
+                  "does not"
+                ]
+              },
+              {
+                "placeholder": "drink",
+                "accepted": [
+                  "drink"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "mpr_f_4",
+            "instruction": "Заполни",
+            "prompt": "____ you ____ TV right now?",
+            "inputs": [
+              {
+                "placeholder": "Are",
+                "accepted": [
+                  "Are"
+                ]
+              },
+              {
+                "placeholder": "watching",
+                "accepted": [
+                  "watching"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "mpr_f_5",
+            "instruction": "Заполни",
+            "prompt": "The train ____ at 6:15. (leave)",
+            "inputs": [
+              {
+                "placeholder": "leaves",
+                "accepted": [
+                  "leaves"
+                ]
+              },
+              {
+                "placeholder": "",
+                "accepted": [
+                  ""
+                ]
+              }
+            ]
+          },
+          {
+            "id": "mpr_f_6",
+            "instruction": "Заполни",
+            "prompt": "I ____ ____ this week. (study)",
+            "inputs": [
+              {
+                "placeholder": "am",
+                "accepted": [
+                  "am"
+                ]
+              },
+              {
+                "placeholder": "studying",
+                "accepted": [
+                  "studying"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "markers",
+        "title": "Маркеры: Simple или Continuous",
+        "kind": "match",
+        "items": [
+          {
+            "id": "mpr_match_1",
+            "instruction": "Соедини маркер → время",
+            "pairs": [
+              {
+                "left": "usually",
+                "right": "Present Simple"
+              },
+              {
+                "left": "every day",
+                "right": "Present Simple"
+              },
+              {
+                "left": "now",
+                "right": "Present Continuous"
+              },
+              {
+                "left": "at the moment",
+                "right": "Present Continuous"
+              },
+              {
+                "left": "these days",
+                "right": "Present Continuous"
+              }
+            ]
+          },
+          {
+            "id": "mpr_match_2",
+            "instruction": "Соедини",
+            "pairs": [
+              {
+                "left": "on Mondays",
+                "right": "Present Simple"
+              },
+              {
+                "left": "right now",
+                "right": "Present Continuous"
+              },
+              {
+                "left": "Look!",
+                "right": "Present Continuous"
+              },
+              {
+                "left": "always (habit)",
+                "right": "Present Simple"
+              },
+              {
+                "left": "always + V-ing (annoyed)",
+                "right": "Present Continuous"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "mistakes",
+        "title": "Исправь ошибки (Mixed mistakes)",
+        "kind": "correction",
+        "items": [
+          {
+            "id": "mpr_c_1",
+            "instruction": "Исправь",
+            "prompt": "She work now.",
+            "accepted": [
+              "She is working now."
+            ]
+          },
+          {
+            "id": "mpr_c_2",
+            "instruction": "Исправь",
+            "prompt": "I am go to school every day.",
+            "accepted": [
+              "I go to school every day."
+            ]
+          },
+          {
+            "id": "mpr_c_3",
+            "instruction": "Исправь",
+            "prompt": "Does he working today?",
+            "accepted": [
+              "Is he working today?"
+            ]
+          },
+          {
+            "id": "mpr_c_4",
+            "instruction": "Исправь",
+            "prompt": "He is always forget his keys!",
+            "accepted": [
+              "He is always forgetting his keys!"
+            ]
+          },
+          {
+            "id": "mpr_c_5",
+            "instruction": "Исправь",
+            "prompt": "I knowing the answer.",
+            "accepted": [
+              "I know the answer."
+            ]
+          },
+          {
+            "id": "mpr_c_6",
+            "instruction": "Исправь",
+            "prompt": "We are play football on Sundays.",
+            "accepted": [
+              "We play football on Sundays."
+            ]
+          },
+          {
+            "id": "mpr_c_7",
+            "instruction": "Исправь",
+            "prompt": "She doesn't studying now.",
+            "accepted": [
+              "She isn't studying now.",
+              "She is not studying now."
+            ]
+          },
+          {
+            "id": "mpr_c_8",
+            "instruction": "Исправь",
+            "prompt": "Are you watch TV every day?",
+            "accepted": [
+              "Do you watch TV every day?"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "compare",
+        "title": "Контраст: привычка vs процесс",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "mpr_cmp_1",
+            "instruction": "Выбери смысл",
+            "prompt": "I work here.",
+            "options": [
+              "привычка/факт",
+              "процесс сейчас"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "mpr_cmp_2",
+            "instruction": "Выбери смысл",
+            "prompt": "I'm working here this week.",
+            "options": [
+              "привычка/факт",
+              "временно/сейчас"
+            ],
+            "correctIndex": 1
+          },
+          {
+            "id": "mpr_cmp_3",
+            "instruction": "Выбери смысл",
+            "prompt": "She always forgets her keys.",
+            "options": [
+              "нейтральная привычка",
+              "раздражение"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "mpr_cmp_4",
+            "instruction": "Выбери смысл",
+            "prompt": "She's always forgetting her keys!",
+            "options": [
+              "нейтральная привычка",
+              "раздражение"
+            ],
+            "correctIndex": 1
+          },
+          {
+            "id": "mpr_cmp_5",
+            "instruction": "Выбери смысл",
+            "prompt": "The train leaves at 6.",
+            "options": [
+              "расписание (Simple)",
+              "процесс"
+            ],
+            "correctIndex": 0
+          }
+        ]
+      }
+    ]
+  }
+}

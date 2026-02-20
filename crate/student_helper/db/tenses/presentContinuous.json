@@ -1,0 +1,914 @@
+{
+  "id": "presentContinuous",
+  "title": "Present Continuous",
+  "subtitle": "процесс сейчас • временно • движение",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Когда используем Present Continuous"
+    },
+    {
+      "type": "text",
+      "text": "Present Continuous — время процесса. Это «линия» в моменте: что-то происходит сейчас, временно или развивается вокруг настоящего."
+    },
+    {
+      "type": "highlight",
+      "title": "Быстрые ассоциации",
+      "lines": [
+        "now / right now / at the moment → прямо сейчас",
+        "temporary situation → временно (this week, these days)",
+        "changing / developing → изменения (getting better)",
+        "always + V-ing → раздражение/жалоба"
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Формулы",
+      "columns": [
+        "",
+        "Утверждение",
+        "Отрицание",
+        "Вопрос"
+      ],
+      "rows": [
+        [
+          "I",
+          "am + V-ing",
+          "am not + V-ing",
+          "Am I + V-ing?"
+        ],
+        [
+          "He/She/It",
+          "is + V-ing",
+          "isn't / is not + V-ing",
+          "Is he/she/it + V-ing?"
+        ],
+        [
+          "You/We/They",
+          "are + V-ing",
+          "aren't / are not + V-ing",
+          "Are you/we/they + V-ing?"
+        ]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Правописание -ing",
+      "lines": [
+        "make → making (e убираем)",
+        "run → running (удваиваем согласную: CVC)",
+        "lie → lying (ie → y)",
+        "play → playing (без изменений)"
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Временные маркеры",
+      "columns": [
+        "Тип",
+        "Маркеры"
+      ],
+      "rows": [
+        [
+          "прямо сейчас",
+          "now, right now, at the moment"
+        ],
+        [
+          "временно",
+          "this week/month, these days, today"
+        ],
+        [
+          "развитие",
+          "more and more, getting..."
+        ],
+        [
+          "контекст",
+          "Look!, Listen!"
+        ]
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Stative verbs (обычно НЕ Continuous)"
+    },
+    {
+      "type": "text",
+      "text": "Глаголы состояния (know, like, love, hate, want, need, understand, believe, remember, seem, belong...) обычно идут в Present Simple: I know, I like. В Continuous используют редко и с изменением смысла (I'm thinking = процесс)."
+    },
+    {
+      "type": "heading",
+      "text": "Типичные ошибки"
+    },
+    {
+      "type": "text",
+      "text": "1) забывают am/is/are. 2) ставят -ing без be. 3) используют Continuous для фактов/привычек. 4) ставят stative verbs в -ing без нужды."
+    },
+    {
+      "type": "examples",
+      "items": [
+        {
+          "en": "I'm reading now.",
+          "ru": "Я читаю сейчас (процесс)."
+        },
+        {
+          "en": "She's working from home this week.",
+          "ru": "Она работает из дома на этой неделе (временно)."
+        },
+        {
+          "en": "Look! It’s raining.",
+          "ru": "Смотри! Идёт дождь."
+        },
+        {
+          "en": "I know the answer.",
+          "ru": "Я знаю ответ (stative → обычно Simple)."
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Сравнение: Present Simple vs Present Continuous"
+    },
+    {
+      "type": "highlight",
+      "title": "Супер-правило",
+      "lines": [
+        "Simple = привычка/факт/расписание",
+        "Continuous = процесс сейчас/временно/изменения"
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        {
+          "en": "He works at a café.",
+          "ru": "Он работает в кафе (в целом)."
+        },
+        {
+          "en": "He is working at a café this summer.",
+          "ru": "Он работает в кафе этим летом (временно)."
+        }
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": [
+      {
+        "id": "meaning",
+        "title": "Когда используем (Meaning)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "prc_m_1",
+            "instruction": "Выбери объяснение",
+            "prompt": "I'm cooking dinner now.",
+            "options": [
+              "процесс сейчас",
+              "привычка",
+              "факт"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "prc_m_2",
+            "instruction": "Выбери объяснение",
+            "prompt": "She is studying a lot these days.",
+            "options": [
+              "временно/в текущий период",
+              "расписание",
+              "общеизвестный факт"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "prc_m_3",
+            "instruction": "Выбери объяснение",
+            "prompt": "Look! It’s snowing!",
+            "options": [
+              "процесс сейчас (контекст Look!)",
+              "привычка",
+              "прошлое действие"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "prc_m_4",
+            "instruction": "Выбери объяснение",
+            "prompt": "We are staying with friends this weekend.",
+            "options": [
+              "временный план/договоренность",
+              "расписание",
+              "прошлое"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "prc_m_5",
+            "instruction": "Выбери объяснение",
+            "prompt": "He is always complaining about work.",
+            "options": [
+              "раздражение (always + V-ing)",
+              "факт",
+              "привычка (нейтрально)"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "prc_m_6",
+            "instruction": "Выбери объяснение",
+            "prompt": "The weather is getting warmer.",
+            "options": [
+              "изменение/процесс",
+              "факт навсегда",
+              "расписание"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "prc_m_7",
+            "instruction": "Выбери объяснение",
+            "prompt": "I'm not working today.",
+            "options": [
+              "временно (отрицание)",
+              "привычка",
+              "прошлое"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "prc_m_8",
+            "instruction": "Выбери объяснение",
+            "prompt": "Are you listening to me?",
+            "options": [
+              "процесс сейчас (вопрос)",
+              "умение/факт",
+              "привычка"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "prc_m_9",
+            "instruction": "Выбери объяснение",
+            "prompt": "She’s living with her parents for now.",
+            "options": [
+              "временная ситуация",
+              "постоянный факт",
+              "расписание"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "prc_m_10",
+            "instruction": "Выбери объяснение",
+            "prompt": "I'm thinking about the answer.",
+            "options": [
+              "процесс (think = думать сейчас)",
+              "статичное мнение",
+              "привычка"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "prc_m_11",
+            "instruction": "Выбери объяснение",
+            "prompt": "They are building a new bridge.",
+            "options": [
+              "процесс/проект",
+              "расписание",
+              "привычка"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "prc_m_12",
+            "instruction": "Выбери объяснение",
+            "prompt": "Is he working right now?",
+            "options": [
+              "процесс сейчас",
+              "факт",
+              "привычка"
+            ],
+            "correctIndex": 0
+          }
+        ]
+      },
+      {
+        "id": "formula",
+        "title": "Формулы (Formula)",
+        "kind": "input",
+        "items": [
+          {
+            "id": "prc_f_1",
+            "instruction": "Вставь форму",
+            "prompt": "I ____ (read) a book now.",
+            "accepted": [
+              "am reading"
+            ]
+          },
+          {
+            "id": "prc_f_2",
+            "instruction": "Вставь форму",
+            "prompt": "She ____ (work) at the moment.",
+            "accepted": [
+              "is working"
+            ]
+          },
+          {
+            "id": "prc_f_3",
+            "instruction": "Сделай отрицание",
+            "prompt": "They ____ (play) football now. → (negative)",
+            "accepted": [
+              "They aren't playing football now.",
+              "They are not playing football now."
+            ]
+          },
+          {
+            "id": "prc_f_4",
+            "instruction": "Сделай вопрос",
+            "prompt": "He ____ (watch) TV now. → (question)",
+            "accepted": [
+              "Is he watching TV now?",
+              "Is he watching TV now"
+            ]
+          },
+          {
+            "id": "prc_f_5",
+            "instruction": "Вставь форму",
+            "prompt": "We ____ (study) these days.",
+            "accepted": [
+              "are studying"
+            ]
+          },
+          {
+            "id": "prc_f_6",
+            "instruction": "Отрицание I",
+            "prompt": "I ____ (sleep) right now. → (negative)",
+            "accepted": [
+              "I'm not sleeping right now.",
+              "I am not sleeping right now."
+            ]
+          },
+          {
+            "id": "prc_f_7",
+            "instruction": "Вопрос you",
+            "prompt": "You ____ (listen). → (question)",
+            "accepted": [
+              "Are you listening?",
+              "Are you listening"
+            ]
+          },
+          {
+            "id": "prc_f_8",
+            "instruction": "Вставь форму",
+            "prompt": "It ____ (rain).",
+            "accepted": [
+              "is raining"
+            ]
+          },
+          {
+            "id": "prc_f_9",
+            "instruction": "Правописание -ing",
+            "prompt": "He ____ (make) dinner.",
+            "accepted": [
+              "is making"
+            ]
+          },
+          {
+            "id": "prc_f_10",
+            "instruction": "Правописание -ing",
+            "prompt": "She ____ (run) fast.",
+            "accepted": [
+              "is running"
+            ]
+          },
+          {
+            "id": "prc_f_11",
+            "instruction": "Временная ситуация",
+            "prompt": "I ____ (live) here for now.",
+            "accepted": [
+              "am living"
+            ]
+          },
+          {
+            "id": "prc_f_12",
+            "instruction": "Контекст Look!",
+            "prompt": "Look! The bus ____ (come).",
+            "accepted": [
+              "is coming"
+            ]
+          },
+          {
+            "id": "prc_f_13",
+            "instruction": "Вставь форму",
+            "prompt": "They ____ (not/work) today.",
+            "accepted": [
+              "aren't working",
+              "are not working"
+            ]
+          },
+          {
+            "id": "prc_f_14",
+            "instruction": "Раздражение always",
+            "prompt": "He ____ (always/forget) his phone.",
+            "accepted": [
+              "is always forgetting"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "formula_2",
+        "goal": "formula",
+        "title": "Формулы (Multi-input)",
+        "kind": "multi_input",
+        "items": [
+          {
+            "id": "prc_mi_1",
+            "instruction": "Заполни пропуски",
+            "prompt": "She ____ ____ now. (work)",
+            "inputs": [
+              {
+                "placeholder": "is",
+                "accepted": [
+                  "is"
+                ]
+              },
+              {
+                "placeholder": "working",
+                "accepted": [
+                  "working"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "prc_mi_2",
+            "instruction": "Заполни пропуски",
+            "prompt": "____ you ____ to me?",
+            "inputs": [
+              {
+                "placeholder": "Are",
+                "accepted": [
+                  "Are"
+                ]
+              },
+              {
+                "placeholder": "listening",
+                "accepted": [
+                  "listening"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "prc_mi_3",
+            "instruction": "Заполни пропуски",
+            "prompt": "I ____ ____ today. (not/work)",
+            "inputs": [
+              {
+                "placeholder": "am not",
+                "accepted": [
+                  "am not",
+                  "'m not"
+                ]
+              },
+              {
+                "placeholder": "working",
+                "accepted": [
+                  "working"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "prc_mi_4",
+            "instruction": "Заполни пропуски",
+            "prompt": "It ____ ____. (rain)",
+            "inputs": [
+              {
+                "placeholder": "is",
+                "accepted": [
+                  "is"
+                ]
+              },
+              {
+                "placeholder": "raining",
+                "accepted": [
+                  "raining"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "prc_mi_5",
+            "instruction": "Заполни пропуски",
+            "prompt": "They ____ ____ this week. (study)",
+            "inputs": [
+              {
+                "placeholder": "are",
+                "accepted": [
+                  "are"
+                ]
+              },
+              {
+                "placeholder": "studying",
+                "accepted": [
+                  "studying"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "prc_mi_6",
+            "instruction": "Заполни пропуски",
+            "prompt": "He ____ ____ TV now. (watch)",
+            "inputs": [
+              {
+                "placeholder": "is",
+                "accepted": [
+                  "is"
+                ]
+              },
+              {
+                "placeholder": "watching",
+                "accepted": [
+                  "watching"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "markers",
+        "title": "Маркеры (Markers)",
+        "kind": "multi",
+        "items": [
+          {
+            "id": "prc_mark_1",
+            "instruction": "Выбери маркеры Present Continuous",
+            "prompt": "Выбери подходящие маркеры",
+            "options": [
+              "now",
+              "usually",
+              "at the moment",
+              "every day"
+            ],
+            "correctIndices": [
+              0,
+              2
+            ]
+          },
+          {
+            "id": "prc_mark_2",
+            "instruction": "Выбери маркеры Present Continuous",
+            "prompt": "Выбери подходящие маркеры",
+            "options": [
+              "currently",
+              "on Sundays",
+              "these days",
+              "often"
+            ],
+            "correctIndices": [
+              0,
+              2
+            ]
+          },
+          {
+            "id": "prc_mark_3",
+            "instruction": "Выбери",
+            "prompt": "Выбери",
+            "options": [
+              "right now",
+              "Look!",
+              "never",
+              "in general"
+            ],
+            "correctIndices": [
+              0,
+              1
+            ]
+          },
+          {
+            "id": "prc_mark_4",
+            "instruction": "Временно",
+            "prompt": "Выбери",
+            "options": [
+              "this week",
+              "every week",
+              "today",
+              "always (neutral)"
+            ],
+            "correctIndices": [
+              0,
+              2
+            ]
+          },
+          {
+            "id": "prc_mark_5",
+            "instruction": "Развитие",
+            "prompt": "Выбери",
+            "options": [
+              "getting better",
+              "more and more",
+              "yesterday",
+              "at weekends"
+            ],
+            "correctIndices": [
+              0,
+              1
+            ]
+          }
+        ]
+      },
+      {
+        "id": "markers_2",
+        "goal": "markers",
+        "title": "Match: маркер → перевод/смысл",
+        "kind": "match",
+        "items": [
+          {
+            "id": "prc_match_1",
+            "instruction": "Соедини",
+            "pairs": [
+              {
+                "left": "now",
+                "right": "сейчас"
+              },
+              {
+                "left": "at the moment",
+                "right": "в данный момент"
+              },
+              {
+                "left": "these days",
+                "right": "в эти дни"
+              },
+              {
+                "left": "right now",
+                "right": "прямо сейчас"
+              },
+              {
+                "left": "currently",
+                "right": "в настоящее время"
+              }
+            ]
+          },
+          {
+            "id": "prc_match_2",
+            "instruction": "Соедини",
+            "pairs": [
+              {
+                "left": "Look!",
+                "right": "смотри! (контекст)"
+              },
+              {
+                "left": "today",
+                "right": "сегодня"
+              },
+              {
+                "left": "this week",
+                "right": "на этой неделе"
+              },
+              {
+                "left": "getting...",
+                "right": "становится..."
+              },
+              {
+                "left": "always + V-ing",
+                "right": "раздражение/жалоба"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "mistakes",
+        "title": "Исправь ошибки (Mistakes)",
+        "kind": "correction",
+        "items": [
+          {
+            "id": "prc_c_1",
+            "instruction": "Исправь",
+            "prompt": "I reading now.",
+            "accepted": [
+              "I'm reading now.",
+              "I am reading now."
+            ]
+          },
+          {
+            "id": "prc_c_2",
+            "instruction": "Исправь",
+            "prompt": "She is work now.",
+            "accepted": [
+              "She is working now."
+            ]
+          },
+          {
+            "id": "prc_c_3",
+            "instruction": "Исправь",
+            "prompt": "Are you listen to me?",
+            "accepted": [
+              "Are you listening to me?"
+            ]
+          },
+          {
+            "id": "prc_c_4",
+            "instruction": "Исправь",
+            "prompt": "He watching TV.",
+            "accepted": [
+              "He is watching TV."
+            ]
+          },
+          {
+            "id": "prc_c_5",
+            "instruction": "Исправь",
+            "prompt": "They aren't play football.",
+            "accepted": [
+              "They aren't playing football.",
+              "They are not playing football."
+            ]
+          },
+          {
+            "id": "prc_c_6",
+            "instruction": "Исправь",
+            "prompt": "It raining.",
+            "accepted": [
+              "It's raining.",
+              "It is raining."
+            ]
+          },
+          {
+            "id": "prc_c_7",
+            "instruction": "Исправь",
+            "prompt": "I'm know the answer.",
+            "accepted": [
+              "I know the answer."
+            ]
+          },
+          {
+            "id": "prc_c_8",
+            "instruction": "Исправь",
+            "prompt": "She is always forget her keys.",
+            "accepted": [
+              "She is always forgetting her keys."
+            ]
+          },
+          {
+            "id": "prc_c_9",
+            "instruction": "Исправь",
+            "prompt": "We are go to the park now.",
+            "accepted": [
+              "We are going to the park now."
+            ]
+          },
+          {
+            "id": "prc_c_10",
+            "instruction": "Исправь",
+            "prompt": "Is he working every day?",
+            "accepted": [
+              "Does he work every day?"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "compare",
+        "title": "Present Simple vs Present Continuous (Contrast)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "prc_cmp_1",
+            "instruction": "Выбери время",
+            "prompt": "I ____ (watch) TV every evening.",
+            "options": [
+              "Present Simple",
+              "Present Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentSimple"
+          },
+          {
+            "id": "prc_cmp_2",
+            "instruction": "Выбери время",
+            "prompt": "I ____ (watch) TV right now.",
+            "options": [
+              "Present Simple",
+              "Present Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "presentContinuous"
+          },
+          {
+            "id": "prc_cmp_3",
+            "instruction": "Выбери время",
+            "prompt": "She ____ (live) in Vilnius.",
+            "options": [
+              "Present Simple",
+              "Present Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentSimple"
+          },
+          {
+            "id": "prc_cmp_4",
+            "instruction": "Выбери время",
+            "prompt": "She ____ (live) with friends for now.",
+            "options": [
+              "Present Simple",
+              "Present Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "presentContinuous"
+          },
+          {
+            "id": "prc_cmp_5",
+            "instruction": "Выбери время",
+            "prompt": "He ____ (always/complain) about everything!",
+            "options": [
+              "Present Simple",
+              "Present Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "presentContinuous"
+          },
+          {
+            "id": "prc_cmp_6",
+            "instruction": "Выбери время",
+            "prompt": "He always ____ (complain) about the weather.",
+            "options": [
+              "Present Simple",
+              "Present Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentSimple"
+          },
+          {
+            "id": "prc_cmp_7",
+            "instruction": "Выбери время",
+            "prompt": "The train ____ (leave) at 6:15.",
+            "options": [
+              "Present Simple",
+              "Present Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentSimple"
+          },
+          {
+            "id": "prc_cmp_8",
+            "instruction": "Выбери время",
+            "prompt": "Listen! Someone ____ (play) the piano.",
+            "options": [
+              "Present Simple",
+              "Present Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "presentContinuous"
+          },
+          {
+            "id": "prc_cmp_9",
+            "instruction": "Выбери время",
+            "prompt": "I ____ (think) you are right. (opinion)",
+            "options": [
+              "Present Simple",
+              "Present Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentSimple"
+          },
+          {
+            "id": "prc_cmp_10",
+            "instruction": "Выбери время",
+            "prompt": "I'm ____ (think) about it. (process)",
+            "options": [
+              "Present Simple",
+              "Present Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "presentContinuous"
+          },
+          {
+            "id": "prc_cmp_11",
+            "instruction": "Выбери время",
+            "prompt": "We ____ (have) dinner now.",
+            "options": [
+              "Present Simple",
+              "Present Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "presentContinuous"
+          },
+          {
+            "id": "prc_cmp_12",
+            "instruction": "Выбери время",
+            "prompt": "We ____ (have) dinner at 7 every day.",
+            "options": [
+              "Present Simple",
+              "Present Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentSimple"
+          }
+        ]
+      }
+    ]
+  }
+}

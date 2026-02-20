@@ -536,11 +536,86 @@
                   <div class="sh-tile__head">упражнения</div>
                   <div class="sh-tile__body">закрепление по целям и смешанные тренировки</div>
                   <div class="sh-tile__foot">открыть</div>
-                </button>
+                </button><button class="sh-tile" id="tensesGoCompare" type="button" role="listitem" aria-label="Сравнить два времени">
+  <div class="sh-tile__head">сравнение</div>
+  <div class="sh-tile__body">выбери любые 2 времени и потренируй различие</div>
+  <div class="sh-tile__foot">compare</div>
+</button>
+
+<button class="sh-tile" id="tensesGoDaily" type="button" role="listitem" aria-label="Ежедневная мини-сессия">
+  <div class="sh-tile__head">daily</div>
+  <div class="sh-tile__body">10 случайных заданий на сегодня</div>
+  <div class="sh-tile__foot">open</div>
+</button>
+
+<button class="sh-tile" id="tensesGoMixedPresent" type="button" role="listitem" aria-label="Смешанная тренировка Present Simple + Present Continuous">
+  <div class="sh-tile__head">mixed present</div>
+  <div class="sh-tile__body">Present Simple + Present Continuous — старт сразу</div>
+  <div class="sh-tile__foot">start</div>
+</button>
               </div>
 
               <p class="ik-footnote">подсказка: вернуться сюда можно кнопкой "меню" сверху</p>
-            </section>
+            </section><!-- COMPARE -->
+<section class="ik-ex" id="tensesCompareView" aria-label="Tenses compare" hidden>
+  <div class="ik-row">
+    <button class="ik-btn" id="tensesBackToHomeFromCompare" type="button">назад</button>
+    <span class="ik-spacer" aria-hidden="true"></span>
+  </div>
+
+  <div class="ik-divider"></div>
+
+  <p class="ik-title">сравнение времён</p>
+  <p class="ik-sub">выбери любые 2 времени</p>
+
+  <div class="ik-row" style="margin-top:8px; flex-wrap: wrap; gap: 8px;">
+    <label class="ik-label" for="tensesCompareA">A</label>
+    <select class="ik-select" id="tensesCompareA" style="min-width: 220px;"></select>
+
+    <label class="ik-label" for="tensesCompareB">B</label>
+    <select class="ik-select" id="tensesCompareB" style="min-width: 220px;"></select>
+
+    <button class="ik-btn ik-btn--black" id="tensesCompareBtn" type="button">compare</button>
+  </div>
+
+  <div class="ik-divider"></div>
+
+  <div class="sh-compare">
+    <div class="sh-compare__rule" id="tensesCompareRule"></div>
+    <div class="sh-compare__table" id="tensesCompareTable"></div>
+  </div>
+
+  <div class="ik-divider"></div>
+
+  <div class="ik-row">
+    <button class="ik-btn ik-btn--black" id="tensesCompareStartMiniBtn" type="button">mini training (10)</button>
+    <button class="ik-btn" id="tensesCompareStartMini5Btn" type="button">mini (5)</button>
+    <span class="ik-spacer" aria-hidden="true"></span>
+  </div>
+
+  <div id="tensesCompareRunBody" style="margin-top:12px;"></div>
+</section>
+
+<!-- DAILY -->
+<section class="ik-ex" id="tensesDailyView" aria-label="Tenses daily" hidden>
+  <div class="ik-row">
+    <button class="ik-btn" id="tensesBackToHomeFromDaily" type="button">назад</button>
+    <span class="ik-spacer" aria-hidden="true"></span>
+  </div>
+
+  <div class="ik-divider"></div>
+
+  <p class="ik-title">daily mini-session</p>
+  <p class="ik-sub">10 случайных заданий на сегодня</p>
+
+  <div class="ik-row" style="margin-top:8px;">
+    <button class="ik-btn ik-btn--black" id="tensesDailyStartBtn" type="button">start daily (10)</button>
+    <button class="ik-btn" id="tensesDailyNewBtn" type="button">new set</button>
+    <span class="ik-spacer" aria-hidden="true"></span>
+  </div>
+
+  <div id="tensesDailyRunBody" style="margin-top:12px;"></div>
+</section>
 
             <!-- LIST -->
             <section class="ik-ex" id="tensesListView" aria-label="Tenses list" hidden>
@@ -610,6 +685,9 @@
 
                 <button class="ik-btn ik-btn--black" id="tensesStartBtn" type="button">start</button>
                 <button class="ik-btn" id="tensesRetryMistakesBtn" type="button">retry mistakes</button>
+<button class="ik-btn" id="tensesClearMistakesBtn" type="button">clear mistakes</button>
+<button class="ik-btn" id="tensesResetProgressBtn" type="button">reset progress</button>
+
 
                 <span class="ik-spacer" aria-hidden="true"></span>
 

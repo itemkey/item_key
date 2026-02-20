@@ -907,10 +907,9 @@ function dictFilenameForSection(sectionName){
     }
     if(cfg.source === 'weak'){
       out.sort((a,b)=> practiceWeight(b) - practiceWeight(a));
-    }else{
-      shuffle(out);
+      return out;
     }
-    return out;
+    return shuffle(out);
   }
 
   function learnBuildQueue(picked, cfg){
@@ -997,7 +996,7 @@ function dictFilenameForSection(sectionName){
     if(!learnSession) return null;
     const k = practiceKey(item);
     if(!learnSession.wordState[k]){
-      learnSession.wordState[k] = { streak:0, firstOkAt:-1, lastOkAt:-1, learned:false };
+      learnSession.wordState[k] = { streak:0, firstOkAt:-1, lastOkAt:-1, learned:false, reqSpacing:10 };
     }
     return learnSession.wordState[k];
   }
@@ -1260,12 +1259,20 @@ if(btnLearnCheckNext){ btnLearnCheckNext.textContent = 'далее'; btnLearnChe
         if(ws.streak === 1) ws.firstOkAt = learnTaskCounter;
         ws.lastOkAt = learnTaskCounter;
 
-        // schedule second check after 10-20 tasks
+        // schedule second check with feasible spacing
+        const maxPossible = Math.max(0, (learnSession.portion || 0) - 1);
+        const wantMin = Math.min(10, maxPossible);
+        const remain = Math.max(0, learnSession.queue.length);
+        const minGap = Math.min(wantMin, remain);
+        const maxGap = Math.min(minGap + 10, remain);
+
         if(ws.streak === 1){
-          learnInsertTask({ type:'test', item:task.item, round:(task.round||1)+1 }, 10, 20);
+          ws.reqSpacing = minGap;
+          learnInsertTask({ type:'test', item:task.item, round:(task.round||1)+1 }, minGap, maxGap);
         }else if(ws.streak >= 2){
-          // require at least 10 tasks since first ok
-          if(ws.firstOkAt >= 0 && (learnTaskCounter - ws.firstOkAt) >= 10){
+          // require at least ws.reqSpacing tasks since first ok (auto-relaxed for small/late sessions)
+          const need = Number.isFinite(ws.reqSpacing) ? ws.reqSpacing : wantMin;
+          if(ws.firstOkAt >= 0 && (learnTaskCounter - ws.firstOkAt) >= need){
             ws.learned = true;
             learnSession.learnedCount += 1;
 
@@ -1281,7 +1288,8 @@ if(btnLearnCheckNext){ btnLearnCheckNext.textContent = 'далее'; btnLearnChe
             // not enough spacing yet - ask again later
             ws.streak = 1;
             ws.firstOkAt = learnTaskCounter;
-            learnInsertTask({ type:'test', item:task.item, round:(task.round||1)+1 }, 10, 20);
+            ws.reqSpacing = minGap;
+            learnInsertTask({ type:'test', item:task.item, round:(task.round||1)+1 }, minGap, maxGap);
           }
         }
       }

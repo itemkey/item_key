@@ -36,6 +36,12 @@
       if(mixed && mixed.id) byId[mixed.id] = mixed;
     } catch(_){}
 
+    // load mixed present (practice only)
+    try{
+      const mixedP = await fetchJson(TENSES_DIR + 'mixedPresent.json');
+      if(mixedP && mixedP.id) byId[mixedP.id] = mixedP;
+    } catch(_){}
+
     return { INDEX: index, byId };
   }
 
@@ -61,6 +67,32 @@
   const listView = document.getElementById('tensesListView');
   const detailView = document.getElementById('tensesDetailView');
   const practiceView = document.getElementById('tensesPracticeView');
+
+  const compareView = document.getElementById('tensesCompareView');
+  const dailyView = document.getElementById('tensesDailyView');
+
+  const btnGoCompare = document.getElementById('tensesGoCompare');
+  const btnGoDaily = document.getElementById('tensesGoDaily');
+  const btnGoMixedPresent = document.getElementById('tensesGoMixedPresent');
+
+  const btnBackHomeFromCompare = document.getElementById('tensesBackToHomeFromCompare');
+  const btnBackHomeFromDaily = document.getElementById('tensesBackToHomeFromDaily');
+
+  const cmpASelect = document.getElementById('tensesCompareA');
+  const cmpBSelect = document.getElementById('tensesCompareB');
+  const btnCompare = document.getElementById('tensesCompareBtn');
+  const cmpRule = document.getElementById('tensesCompareRule');
+  const cmpTable = document.getElementById('tensesCompareTable');
+  const btnCmpMini10 = document.getElementById('tensesCompareStartMiniBtn');
+  const btnCmpMini5 = document.getElementById('tensesCompareStartMini5Btn');
+  const cmpRunBody = document.getElementById('tensesCompareRunBody');
+
+  const btnDailyStart = document.getElementById('tensesDailyStartBtn');
+  const btnDailyNew = document.getElementById('tensesDailyNewBtn');
+  const dailyRunBody = document.getElementById('tensesDailyRunBody');
+
+  const btnClearMistakes = document.getElementById('tensesClearMistakesBtn');
+  const btnResetProgress = document.getElementById('tensesResetProgressBtn');
 
   const btnGoTheory = document.getElementById('tensesGoTheory');
   const btnGoPractice = document.getElementById('tensesGoPractice');
@@ -147,6 +179,8 @@
     setVisible(listView, viewName === 'list');
     setVisible(detailView, viewName === 'detail');
     setVisible(practiceView, viewName === 'practice');
+    setVisible(compareView, viewName === 'compare');
+    setVisible(dailyView, viewName === 'daily');
     window.scrollTo(0, 0);
   }
 
@@ -346,6 +380,11 @@
     optMixed.value = 'mixed';
     optMixed.textContent = 'Mixed (Past Simple + Past Continuous)';
     tenseSelect.appendChild(optMixed);
+
+    const optMixedP = document.createElement('option');
+    optMixedP.value = 'mixedPresent';
+    optMixedP.textContent = 'Mixed Present (Present Simple + Present Continuous)';
+    tenseSelect.appendChild(optMixedP);
   }
 
   function getTenseForPractice(id){
@@ -363,7 +402,7 @@
   function gatherExerciseIds(tenseObj, goalId){
     const list = (tenseObj.practice && tenseObj.practice.exercises) || [];
     if (goalId === 'all') return list.map(x=>x.id);
-    return list.filter(x=>x.id === goalId).map(x=>x.id);
+    return list.filter(x=>x.id === goalId || x.goal === goalId).map(x=>x.id);
   }
 
   function exerciseById(tenseObj, exId){
@@ -437,13 +476,22 @@
   // -------------------------
   // Practice run (choice/input/multi/match/multi_input)
   // -------------------------
-  function startRun(tenseObj, exerciseIds, opts){
+  function startRun(tenseObj, exerciseIds, opts, mountEl){
+    const practiceBody = mountEl || document.getElementById('tensesPracticeBody');
     const options = Object.assign({ showAfterEach: true, onlyMistakes: false }, opts || {});
     const exercises = (tenseObj.practice && tenseObj.practice.exercises) || [];
     const chosen = exercises.filter(ex => exerciseIds.includes(ex.id));
 
     const prog = loadProgress(tenseObj.id);
     const mistakesSet = new Set(prog.mistakes || []);
+
+    function saveMistakesSnapshot(){
+      try{
+        const p = loadProgress(tenseObj.id);
+        p.mistakes = Array.from(mistakesSet);
+        saveProgress(tenseObj.id, p);
+      } catch(_){}
+    }
 
     // -------------------------
     // Randomization helpers
@@ -535,6 +583,8 @@
       <div class="ik-divider"></div>
 
       <p class="ik-prompt" id="shTRunInstr">...</p>
+      <div id="shTRunHint" class="sh-hint" hidden></div>
+      <div class="sh-progress" id="shTRunProgress"><div></div></div>
       <div class="sh-run-card" id="shTRunCard"></div>
 
       <div class="ik-divider"></div>
@@ -760,8 +810,35 @@
       resetPerQuestionState();
       setFeedback('idle', 'ready', 'выбери ответ или введи ответ и нажми check');
 
-      const q = queue[idx];
-      elEx.textContent = `exercise: ${q.exTitle}`;
+
+const q = queue[idx];
+
+// progress
+try{
+  const bar = runWrap.querySelector('#shTRunProgress > div');
+  if (bar){
+    const pct = Math.round(((idx) / Math.max(1, queue.length)) * 100);
+    bar.style.width = pct + '%';
+  }
+} catch(_){}
+
+// hint detector (very lightweight)
+try{
+  const hintEl = runWrap.querySelector('#shTRunHint');
+  if (hintEl){
+    const txt = String(q.item?.prompt || '').toLowerCase();
+    const hints = [];
+    if (/(\bnow\b|at the moment|right now|currently|look!|listen!)/.test(txt)) hints.push('hint: Continuous (now / at the moment)');
+    if (/(\balways\b|\busually\b|\boften\b|\bsometimes\b|\bnever\b|every day|every week|on mondays|at weekends|in general)/.test(txt)) hints.push('hint: Simple (always / usually / every...)');
+    if (hints.length){
+      hintEl.hidden = false;
+      hintEl.textContent = hints.join(' • ');
+    } else {
+      hintEl.hidden = true;
+      hintEl.textContent = '';
+    }
+  }
+} catch(_){}      elEx.textContent = `exercise: ${q.exTitle}`;
       elQ.textContent  = `question: ${idx+1}/${queue.length}`;
 
       elInstr.textContent = q.item.instruction || '';
@@ -817,6 +894,7 @@
           setFeedback('wrong', 'no', `Correct answer: ${String.fromCharCode(97 + q.item.correctIndex)}`);
         }
         markChoice(q.item.correctIndex, selectedIndex);
+        saveMistakesSnapshot();
         return ok;
       }
 
@@ -881,6 +959,7 @@
           setFeedback('wrong', 'no', cbShowAfterLocal.checked ? `Correct: ${correctLabels.join(', ')}` : 'wrong');
         }
 
+        saveMistakesSnapshot();
         return ok;
       }
 
@@ -919,6 +998,7 @@
           setFeedback('wrong', 'no', cbShowAfterLocal.checked ? `Correct: ${rightStr}` : 'wrong');
         }
 
+        saveMistakesSnapshot();
         return ok;
       }
 
@@ -1176,6 +1256,53 @@
   btnGoPractice.addEventListener('click', ()=>{
     showPractice();
   });
+// Compare / Daily / Mixed Present quick start
+btnGoCompare && btnGoCompare.addEventListener('click', ()=>{
+  showCompare();
+});
+
+btnGoDaily && btnGoDaily.addEventListener('click', ()=>{
+  showDaily();
+});
+
+btnGoMixedPresent && btnGoMixedPresent.addEventListener('click', ()=>{
+  // open practice and start immediately
+  showPractice();
+  try{
+    goalSelect.value = 'meaning';
+    tenseSelect.value = 'mixedPresent';
+  }catch(_){}
+  setTimeout(()=>{ btnStart && btnStart.click(); }, 0);
+});
+
+btnBackHomeFromCompare && btnBackHomeFromCompare.addEventListener('click', ()=>{
+  showOnly('home');
+  setStatus('home');
+});
+
+btnBackHomeFromDaily && btnBackHomeFromDaily.addEventListener('click', ()=>{
+  showOnly('home');
+  setStatus('home');
+});
+
+btnClearMistakes && btnClearMistakes.addEventListener('click', ()=>{
+  const id = (tenseSelect && tenseSelect.value) || '';
+  if (!id) return;
+  const p = loadProgress(id);
+  p.mistakes = [];
+  saveProgress(id, p);
+  setStatus('mistakes cleared');
+  showPracticeMeta();
+});
+
+btnResetProgress && btnResetProgress.addEventListener('click', ()=>{
+  const id = (tenseSelect && tenseSelect.value) || '';
+  if (!id) return;
+  saveProgress(id, { mastery: 0, best: {}, mistakes: [] });
+  setStatus('progress reset');
+  showPracticeMeta();
+});
+
 
   btnBackHomeFromList && btnBackHomeFromList.addEventListener('click', ()=>{
     showOnly('home');
@@ -1242,6 +1369,237 @@
     const showAfter = !!cbShowAfter?.checked;
     startRun(tenseObj, exIds, { showAfterEach: showAfter, onlyMistakes: true });
   });
+
+// -------------------------
+// Compare view
+// -------------------------
+const QUICK = {
+  pastSimple: {
+    when: "факт/завершённое • цепочка • привычка в прошлом",
+    markers: "yesterday • last ... • ago • in 2010 • then",
+    formula: "V2 / did (neg+q)"
+  },
+  pastContinuous: {
+    when: "процесс в моменте • фон • параллельно • раздражение (always)",
+    markers: "while • when • at 5 p.m. • all day",
+    formula: "was/were + V-ing"
+  },
+  presentSimple: {
+    when: "привычка/рутина • факт • расписание • состояния",
+    markers: "always • usually • often • every day • on Mondays",
+    formula: "V1 / do-does (neg+q), -s/-es"
+  },
+  presentContinuous: {
+    when: "процесс сейчас • временно • развитие • раздражение always",
+    markers: "now • at the moment • right now • these days • Look!",
+    formula: "am/is/are + V-ing"
+  }
+};
+
+function fillCompareSelects(){
+  if (!cmpASelect || !cmpBSelect) return;
+  cmpASelect.innerHTML = '';
+  cmpBSelect.innerHTML = '';
+  for (const meta of REG.INDEX){
+    const o1=document.createElement('option');
+    o1.value=meta.id; o1.textContent=meta.title;
+    const o2=o1.cloneNode(true);
+    cmpASelect.appendChild(o1);
+    cmpBSelect.appendChild(o2);
+  }
+  // default: first two
+  if (REG.INDEX.length>=2){
+    cmpASelect.value = REG.INDEX[0].id;
+    cmpBSelect.value = REG.INDEX[1].id;
+  }
+}
+
+function superRule(aId,bId){
+  const pair=[aId,bId].sort().join('|');
+  if (pair==='presentContinuous|presentSimple') return 'Simple = привычка/факт/расписание (точка) • Continuous = процесс/временно (линия)';
+  if (pair==='pastContinuous|pastSimple') return 'Past Simple = факт/событие (точка) • Past Continuous = процесс/фон (линия)';
+  return 'Сравни: одно время — “более факт/обычно”, другое — “более процесс/контекст”.';
+}
+
+function renderCompare(){
+  if (!cmpASelect || !cmpBSelect || !cmpRule || !cmpTable) return;
+  const aId = cmpASelect.value;
+  const bId = cmpBSelect.value;
+  if (aId === bId){
+    cmpRule.textContent = 'Выбери два разных времени.';
+    cmpTable.innerHTML = '';
+    return;
+  }
+  const A = REG.INDEX.find(x=>x.id===aId);
+  const B = REG.INDEX.find(x=>x.id===bId);
+  cmpRule.textContent = superRule(aId,bId);
+
+  const qa = QUICK[aId] || {};
+  const qb = QUICK[bId] || {};
+  const table = document.createElement('table');
+  table.innerHTML = `
+    <thead>
+      <tr><th></th><th>${escapeHtml(A?.title||aId)}</th><th>${escapeHtml(B?.title||bId)}</th></tr>
+    </thead>
+    <tbody>
+      <tr><th>когда</th><td>${escapeHtml(qa.when||'—')}</td><td>${escapeHtml(qb.when||'—')}</td></tr>
+      <tr><th>маркеры</th><td>${escapeHtml(qa.markers||'—')}</td><td>${escapeHtml(qb.markers||'—')}</td></tr>
+      <tr><th>формула</th><td>${escapeHtml(qa.formula||'—')}</td><td>${escapeHtml(qb.formula||'—')}</td></tr>
+    </tbody>`;
+  cmpTable.innerHTML='';
+  cmpTable.appendChild(table);
+}
+
+function buildCompareItems(aId,bId,count){
+  const aObj = REG.byId[aId];
+  const bObj = REG.byId[bId];
+  const A = REG.INDEX.find(x=>x.id===aId);
+  const B = REG.INDEX.find(x=>x.id===bId);
+
+  const items=[];
+  function takeMeaning(tenseObj, correctIndex){
+    const ex = (tenseObj?.practice?.exercises||[]).find(x=>x.id==='meaning');
+    if (!ex || !Array.isArray(ex.items)) return;
+    for (const it of ex.items.slice(0, 8)){
+      items.push({
+        id: `cmp_${aId}_${bId}_${it.id}`,
+        instruction: 'Какое время подходит?',
+        prompt: it.prompt,
+        options: [A?.title||aId, B?.title||bId],
+        correctIndex
+      });
+    }
+  }
+  takeMeaning(aObj,0);
+  takeMeaning(bObj,1);
+
+  // Add extra PS vs PC contrast from mixedPresent if relevant
+  const pair=[aId,bId].sort().join('|');
+  if (pair==='presentContinuous|presentSimple' && REG.byId.mixedPresent){
+    const ex = (REG.byId.mixedPresent.practice?.exercises||[]).find(x=>x.id==='meaning');
+    for (const it of (ex?.items||[]).slice(0,10)){
+      items.push({
+        id: `cmp_mpr_${it.id}`,
+        instruction: it.instruction || 'Какое время?',
+        prompt: it.prompt,
+        options: [A?.title||aId, B?.title||bId],
+        correctIndex: (it.correctTenseId===aId)?0:1
+      });
+    }
+  }
+
+  // shuffle
+  for (let i=items.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [items[i],items[j]]=[items[j],items[i]];
+  }
+  return items.slice(0, Math.max(5, Math.min(10, count||10)));
+}
+
+function startCompareMini(n){
+  const aId = cmpASelect.value;
+  const bId = cmpBSelect.value;
+  if (aId === bId) return;
+  const items = buildCompareItems(aId,bId,n||10);
+  const synth = {
+    id: `compare_${aId}_vs_${bId}`,
+    title: 'Compare',
+    practice: { exercises: [{ id:'compare', title:'Compare', kind:'choice', items }] }
+  };
+  cmpRunBody.innerHTML='';
+  startRun(synth, ['compare'], { showAfterEach: true, onlyMistakes: false }, cmpRunBody);
+}
+
+function showCompare(){
+  fillCompareSelects();
+  renderCompare();
+  showOnly('compare');
+  setStatus('compare');
+}
+
+btnCompare && btnCompare.addEventListener('click', ()=>{
+  renderCompare();
+});
+btnCmpMini10 && btnCmpMini10.addEventListener('click', ()=> startCompareMini(10));
+btnCmpMini5 && btnCmpMini5.addEventListener('click', ()=> startCompareMini(5));
+
+cmpASelect && cmpASelect.addEventListener('change', renderCompare);
+cmpBSelect && cmpBSelect.addEventListener('change', renderCompare);
+
+// -------------------------
+// Daily mini-session (10)
+// -------------------------
+const KEY_DAILY = 'sh_tenses_daily_v1';
+
+function ymd(){
+  const d=new Date();
+  const yy=d.getFullYear();
+  const mm=String(d.getMonth()+1).padStart(2,'0');
+  const dd=String(d.getDate()).padStart(2,'0');
+  return `${yy}-${mm}-${dd}`;
+}
+
+function pickDailySet(forceNew){
+  const today = ymd();
+  let state=null;
+  try{ state = JSON.parse(localStorage.getItem(KEY_DAILY)||'null'); }catch(_){}
+  if (!forceNew && state && state.date===today && Array.isArray(state.items) && state.items.length){
+    return state.items;
+  }
+
+  // build pool from all tenses (including mixed + mixedPresent if present)
+  const pool=[];
+  const allIds = [...REG.INDEX.map(x=>x.id), 'mixed', 'mixedPresent'].filter(id=>REG.byId[id]);
+  for (const tid of allIds){
+    const t = REG.byId[tid];
+    for (const ex of (t.practice?.exercises||[])){
+      for (const it of (ex.items||[])){
+        pool.push({ tid, exId: ex.id, kind: ex.kind, item: it });
+      }
+    }
+  }
+  // shuffle and take 10
+  for (let i=pool.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [pool[i],pool[j]]=[pool[j],pool[i]];
+  }
+  const picked = pool.slice(0,10);
+  try{ localStorage.setItem(KEY_DAILY, JSON.stringify({ date: today, items: picked })); }catch(_){}
+  return picked;
+}
+
+function startDaily(forceNew){
+  const picked = pickDailySet(!!forceNew);
+
+  // group by kind into exercises
+  const byKind = {};
+  for (const q of picked){
+    const k = q.kind || 'choice';
+    byKind[k] = byKind[k] || [];
+    // clone item and keep unique id
+    byKind[k].push(Object.assign({}, q.item, { id: `dy_${q.tid}_${q.item.id}` }));
+  }
+
+  const exs = [];
+  const ids = [];
+  for (const k of Object.keys(byKind)){
+    const exId = `daily_${k}`;
+    exs.push({ id: exId, title: `Daily (${k})`, kind: k, items: byKind[k] });
+    ids.push(exId);
+  }
+
+  const synth = { id: 'daily', title:'Daily', practice: { exercises: exs } };
+  dailyRunBody.innerHTML='';
+  startRun(synth, ids, { showAfterEach: true, onlyMistakes: false }, dailyRunBody);
+}
+
+function showDaily(){
+  showOnly('daily');
+  setStatus('daily');
+}
+
+btnDailyStart && btnDailyStart.addEventListener('click', ()=> startDaily(false));
+btnDailyNew && btnDailyNew.addEventListener('click', ()=> startDaily(true));
 
   // Init
   if (countBadge) countBadge.textContent = `tenses: ${REG.INDEX.length}`;

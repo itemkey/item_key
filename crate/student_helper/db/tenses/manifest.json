@@ -3,6 +3,9 @@
     "index.json",
     "pastSimple.json",
     "pastContinuous.json",
-    "mixed.json"
+    "mixed.json",
+    "presentSimple.json",
+    "presentContinuous.json",
+    "mixedPresent.json"
   ]
 }

@@ -12,5 +12,19 @@
     "subtitle": "процесс - действие в моменте",
     "hint": "процесс • параллельно • фон • always/constantly",
     "file": "pastContinuous.json"
+  },
+  {
+    "id": "presentSimple",
+    "title": "Present Simple",
+    "subtitle": "привычка - факт - расписание",
+    "hint": "habit • facts • schedule • frequency",
+    "file": "presentSimple.json"
+  },
+  {
+    "id": "presentContinuous",
+    "title": "Present Continuous",
+    "subtitle": "процесс - сейчас/временно",
+    "hint": "now • temporary • changes • always/annoyed",
+    "file": "presentContinuous.json"
   }
 ]

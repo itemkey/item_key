@@ -603,3 +603,60 @@ html, body { background:#fff !important; background-image:none !important; filte
 @media (max-width: 720px){
   .sh-table{ min-width: 640px; }
 }
+
+
+/* -------------------------------------------- */
+/* Tenses: grid (make global, not only lobby)    */
+/* -------------------------------------------- */
+.sh-grid{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+/* Compare view */
+.sh-compare__rule{
+  border: 2px solid #000;
+  background: #fff;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+.sh-compare__table table{
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border: 2px solid #000;
+}
+.sh-compare__table th,
+.sh-compare__table td{
+  border: 1px solid #000;
+  padding: 8px;
+  vertical-align: top;
+}
+.sh-compare__table th{
+  font-weight: 700;
+}
+
+/* Run UI extras */
+.sh-hint{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border: 2px solid #000;
+  background: #fff;
+  font-size: 12px;
+  margin-top: 8px;
+}
+.sh-progress{
+  height: 10px;
+  border: 2px solid #000;
+  background: #fff;
+  margin-top: 10px;
+}
+.sh-progress > div{
+  height: 100%;
+  background: #000;
+  width: 0%;
+}
