@@ -1,0 +1,364 @@
+{
+  "id": "mixedPerfectPast",
+  "title": "Mixed Perfect",
+  "subtitle": "Present Perfect + Past Simple",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Present Perfect vs Past Simple"
+    },
+    {
+      "type": "highlight",
+      "title": "Ключевое отличие",
+      "lines": [
+        "Present Perfect = связь с настоящим (результат сейчас / опыт / период не закончен)",
+        "Past Simple = конкретное прошлое (есть yesterday/ago/last.../in 2010 и т.п.)",
+        "Маркеры PP: already, just, yet, ever/never, for/since, this week/year, so far",
+        "Вопрос «когда?» почти всегда тянет Past Simple"
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": [
+      {
+        "id": "pp_complete",
+        "title": "Complete (Present Perfect) — заполни 2 формы",
+        "kind": "multi_input",
+        "items": [
+          {
+            "id": "mpp_a_1",
+            "instruction": "Заполни 2 формы",
+            "prompt": "I ____ already ____ this film. (see)",
+            "inputs": [
+              {
+                "placeholder": "",
+                "accepted": [
+                  "have",
+                  "'ve"
+                ]
+              },
+              {
+                "placeholder": "",
+                "accepted": [
+                  "seen"
+                ]
+              }
+            ],
+            "explain": "already ⇒ Present Perfect; see → seen, I → have."
+          },
+          {
+            "id": "mpp_a_2",
+            "instruction": "Заполни 2 формы",
+            "prompt": "John and Julie ____ ____ their car for about a year. (have)",
+            "inputs": [
+              {
+                "placeholder": "",
+                "accepted": [
+                  "have",
+                  "'ve"
+                ]
+              },
+              {
+                "placeholder": "",
+                "accepted": [
+                  "had"
+                ]
+              }
+            ],
+            "explain": "for + период ⇒ длится до сих пор; have/has + had."
+          },
+          {
+            "id": "mpp_a_3",
+            "instruction": "Заполни 2 формы",
+            "prompt": "She ____ ____ her driving test yet. (not/take)",
+            "inputs": [
+              {
+                "placeholder": "",
+                "accepted": [
+                  "hasn't",
+                  "has not"
+                ]
+              },
+              {
+                "placeholder": "",
+                "accepted": [
+                  "taken"
+                ]
+              }
+            ],
+            "explain": "yet (в отрицании) ⇒ Present Perfect; take → taken, she → has."
+          },
+          {
+            "id": "mpp_a_4",
+            "instruction": "Заполни 2 формы",
+            "prompt": "Sue ____ ____ a tour guide since she left university. (be)",
+            "inputs": [
+              {
+                "placeholder": "",
+                "accepted": [
+                  "has"
+                ]
+              },
+              {
+                "placeholder": "",
+                "accepted": [
+                  "been"
+                ]
+              }
+            ],
+            "explain": "since + точка отсчёта ⇒ до настоящего; be → been."
+          },
+          {
+            "id": "mpp_a_5",
+            "instruction": "Заполни 2 формы",
+            "prompt": "____ you ____ into town on your new bike yet? (ride)",
+            "inputs": [
+              {
+                "placeholder": "",
+                "accepted": [
+                  "Have"
+                ]
+              },
+              {
+                "placeholder": "",
+                "accepted": [
+                  "ridden"
+                ]
+              }
+            ],
+            "explain": "вопрос + yet ⇒ Present Perfect; ride → ridden, you → have (Have you…?)."
+          },
+          {
+            "id": "mpp_a_6",
+            "instruction": "Заполни 2 формы",
+            "prompt": "This new computer ____ ____ my life a lot easier. (make)",
+            "inputs": [
+              {
+                "placeholder": "",
+                "accepted": [
+                  "has"
+                ]
+              },
+              {
+                "placeholder": "",
+                "accepted": [
+                  "made"
+                ]
+              }
+            ],
+            "explain": "результат «сейчас» (жизнь стала легче) ⇒ Present Perfect; make → made, computer → has."
+          },
+          {
+            "id": "mpp_a_7",
+            "instruction": "Заполни 2 формы",
+            "prompt": "We ____ ____ what to get Mark for his birthday yet. (not/decide)",
+            "inputs": [
+              {
+                "placeholder": "",
+                "accepted": [
+                  "haven't",
+                  "have not"
+                ]
+              },
+              {
+                "placeholder": "",
+                "accepted": [
+                  "decided"
+                ]
+              }
+            ],
+            "explain": "yet ⇒ «ещё не» до настоящего; decide → decided, we → have."
+          },
+          {
+            "id": "mpp_a_8",
+            "instruction": "Заполни 2 формы",
+            "prompt": "____ Paul ever ____ a famous person? (meet)",
+            "inputs": [
+              {
+                "placeholder": "",
+                "accepted": [
+                  "Has"
+                ]
+              },
+              {
+                "placeholder": "",
+                "accepted": [
+                  "met"
+                ]
+              }
+            ],
+            "explain": "ever ⇒ опыт «когда-либо» ⇒ Present Perfect; meet → met, Paul → has (Has Paul…?)."
+          }
+        ]
+      },
+      {
+        "id": "choose_correct",
+        "title": "Choose the correct answer (A/B)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "mpp_b_1",
+            "instruction": "Выбери правильный вариант",
+            "prompt": "Выбери: Present Perfect или Past Simple?",
+            "options": [
+              "I've never played this game before.",
+              "I never played this game before."
+            ],
+            "correctIndex": 0,
+            "explain": "never, before ⇒ опыт до настоящего ⇒ Present Perfect."
+          },
+          {
+            "id": "mpp_b_2",
+            "instruction": "Выбери правильный вариант",
+            "prompt": "Выбери",
+            "options": [
+              "Adam has tidied his room last night.",
+              "Adam tidied his room last night."
+            ],
+            "correctIndex": 1,
+            "explain": "last night = конкретное прошлое ⇒ Past Simple."
+          },
+          {
+            "id": "mpp_b_3",
+            "instruction": "Выбери",
+            "prompt": "Выбери",
+            "options": [
+              "Have you lived here since 2005?",
+              "Did you live here since 2005?"
+            ],
+            "correctIndex": 0,
+            "explain": "since 2005 ⇒ до настоящего ⇒ Present Perfect."
+          },
+          {
+            "id": "mpp_b_4",
+            "instruction": "Выбери",
+            "prompt": "Выбери",
+            "options": [
+              "Carol and I have gone to the cinema three nights ago.",
+              "Carol and I went to the cinema three nights ago."
+            ],
+            "correctIndex": 1,
+            "explain": "… ago ⇒ конкретное прошлое ⇒ Past Simple."
+          },
+          {
+            "id": "mpp_b_5",
+            "instruction": "Выбери",
+            "prompt": "Выбери",
+            "options": [
+              "It's the first time you've visited our flat, isn't it?",
+              "It's the first time you visit our flat, isn't it?"
+            ],
+            "correctIndex": 0,
+            "explain": "It’s the first time + Present Perfect (первый раз в жизни до сейчас)."
+          },
+          {
+            "id": "mpp_b_6",
+            "instruction": "Выбери",
+            "prompt": "Выбери",
+            "options": [
+              "They haven't given the baby a name yet.",
+              "They didn't give the baby a name yet."
+            ],
+            "correctIndex": 0,
+            "explain": "yet ⇒ «ещё не» ⇒ Present Perfect."
+          },
+          {
+            "id": "mpp_b_7",
+            "instruction": "Выбери",
+            "prompt": "Выбери",
+            "options": [
+              "Have you gone to New York when you went to the States last summer?",
+              "Did you go to New York when you went to the States last summer?"
+            ],
+            "correctIndex": 1,
+            "explain": "last summer + конкретная поездка в прошлом ⇒ Past Simple."
+          },
+          {
+            "id": "mpp_b_8",
+            "instruction": "Выбери",
+            "prompt": "Выбери",
+            "options": [
+              "Have you ever sent an e-mail before?",
+              "Did you ever send an e-mail before?"
+            ],
+            "correctIndex": 0,
+            "explain": "ever, before ⇒ жизненный опыт ⇒ Present Perfect."
+          }
+        ]
+      },
+      {
+        "id": "write_pp",
+        "title": "Write sentences (Present Perfect Simple)",
+        "kind": "input",
+        "items": [
+          {
+            "id": "mpp_c_1",
+            "instruction": "Напиши предложение",
+            "prompt": "The lesson / not start / yet.",
+            "accepted": [
+              "The lesson hasn't started yet.",
+              "The lesson has not started yet."
+            ],
+            "explain": "yet ⇒ Present Perfect (отрицание)."
+          },
+          {
+            "id": "mpp_c_2",
+            "instruction": "Напиши предложение",
+            "prompt": "The teacher / already / write / on the board.",
+            "accepted": [
+              "The teacher has already written on the board."
+            ],
+            "explain": "already ⇒ Present Perfect."
+          },
+          {
+            "id": "mpp_c_3",
+            "instruction": "Напиши предложение",
+            "prompt": "Joe and Tim / just / come / into the classroom.",
+            "accepted": [
+              "Joe and Tim have just come into the classroom."
+            ],
+            "explain": "just ⇒ «только что» ⇒ Present Perfect."
+          },
+          {
+            "id": "mpp_c_4",
+            "instruction": "Напиши предложение",
+            "prompt": "Tony / not finish / getting his books ready.",
+            "accepted": [
+              "Tony hasn't finished getting his books ready.",
+              "Tony has not finished getting his books ready."
+            ],
+            "explain": "действие ещё не завершено (результат важен сейчас) ⇒ Present Perfect."
+          },
+          {
+            "id": "mpp_c_5",
+            "instruction": "Напиши предложение",
+            "prompt": "Christine / already / open / her book.",
+            "accepted": [
+              "Christine has already opened her book."
+            ],
+            "explain": "already ⇒ Present Perfect."
+          },
+          {
+            "id": "mpp_c_6",
+            "instruction": "Напиши предложение",
+            "prompt": "Dave / drop / a pen on the floor.",
+            "accepted": [
+              "Dave has dropped a pen on the floor."
+            ],
+            "explain": "результат сейчас (ручка на полу) ⇒ Present Perfect."
+          },
+          {
+            "id": "mpp_c_7",
+            "instruction": "Напиши предложение",
+            "prompt": "He / not pick it up / yet.",
+            "accepted": [
+              "He hasn't picked it up yet.",
+              "He has not picked it up yet."
+            ],
+            "explain": "yet ⇒ Present Perfect (отрицание)."
+          }
+        ]
+      }
+    ]
+  }
+}

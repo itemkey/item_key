@@ -427,13 +427,13 @@
             "prompt": "She ____ ____ now. (work)",
             "inputs": [
               {
-                "placeholder": "is",
+                "placeholder": "",
                 "accepted": [
                   "is"
                 ]
               },
               {
-                "placeholder": "working",
+                "placeholder": "",
                 "accepted": [
                   "working"
                 ]
@@ -446,13 +446,13 @@
             "prompt": "____ you ____ to me?",
             "inputs": [
               {
-                "placeholder": "Are",
+                "placeholder": "",
                 "accepted": [
                   "Are"
                 ]
               },
               {
-                "placeholder": "listening",
+                "placeholder": "",
                 "accepted": [
                   "listening"
                 ]
@@ -465,14 +465,14 @@
             "prompt": "I ____ ____ today. (not/work)",
             "inputs": [
               {
-                "placeholder": "am not",
+                "placeholder": "",
                 "accepted": [
                   "am not",
                   "'m not"
                 ]
               },
               {
-                "placeholder": "working",
+                "placeholder": "",
                 "accepted": [
                   "working"
                 ]
@@ -485,13 +485,13 @@
             "prompt": "It ____ ____. (rain)",
             "inputs": [
               {
-                "placeholder": "is",
+                "placeholder": "",
                 "accepted": [
                   "is"
                 ]
               },
               {
-                "placeholder": "raining",
+                "placeholder": "",
                 "accepted": [
                   "raining"
                 ]
@@ -504,13 +504,13 @@
             "prompt": "They ____ ____ this week. (study)",
             "inputs": [
               {
-                "placeholder": "are",
+                "placeholder": "",
                 "accepted": [
                   "are"
                 ]
               },
               {
-                "placeholder": "studying",
+                "placeholder": "",
                 "accepted": [
                   "studying"
                 ]
@@ -523,13 +523,13 @@
             "prompt": "He ____ ____ TV now. (watch)",
             "inputs": [
               {
-                "placeholder": "is",
+                "placeholder": "",
                 "accepted": [
                   "is"
                 ]
               },
               {
-                "placeholder": "watching",
+                "placeholder": "",
                 "accepted": [
                   "watching"
                 ]

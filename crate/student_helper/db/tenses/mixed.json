@@ -46,7 +46,8 @@
               "Past Simple",
               "Past Continuous"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "Факт/событие в прошлом + точный маркер времени (yesterday/last/… ago/in 2010) ⇒ Past Simple."
           },
           {
             "id": "mx_m_2",
@@ -56,7 +57,8 @@
               "Past Simple",
               "Past Continuous"
             ],
-            "correctIndex": 1
+            "correctIndex": 1,
+            "explain": "Процесс/фон в прошлом (was/were + V‑ing, while/at 7 o’clock) ⇒ Past Continuous."
           },
           {
             "id": "mx_m_3",
@@ -66,7 +68,8 @@
               "Past Simple",
               "Past Continuous"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "Правильный ответ: Past Simple. Past Simple = факт; Past Continuous = процесс."
           },
           {
             "id": "mx_m_4",
@@ -76,7 +79,8 @@
               "Past Simple",
               "Past Continuous"
             ],
-            "correctIndex": 1
+            "correctIndex": 1,
+            "explain": "Процесс/фон в прошлом (was/were + V‑ing, while/at 7 o’clock) ⇒ Past Continuous."
           },
           {
             "id": "mx_m_5",
@@ -86,7 +90,8 @@
               "Past Simple",
               "Past Continuous"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "Факт/событие в прошлом + точный маркер времени (yesterday/last/… ago/in 2010) ⇒ Past Simple."
           },
           {
             "id": "mx_m_6",
@@ -96,7 +101,8 @@
               "Past Simple",
               "Past Continuous"
             ],
-            "correctIndex": 1
+            "correctIndex": 1,
+            "explain": "Процесс/фон в прошлом (was/were + V‑ing, while/at 7 o’clock) ⇒ Past Continuous."
           },
           {
             "id": "mx_m_7",
@@ -106,7 +112,8 @@
               "Past Simple",
               "Past Continuous"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "Факт/событие в прошлом + точный маркер времени (yesterday/last/… ago/in 2010) ⇒ Past Simple."
           },
           {
             "id": "mx_m_8",
@@ -116,7 +123,8 @@
               "Past Simple",
               "Past Continuous"
             ],
-            "correctIndex": 1
+            "correctIndex": 1,
+            "explain": "Процесс/фон в прошлом (was/were + V‑ing, while/at 7 o’clock) ⇒ Past Continuous."
           },
           {
             "id": "mx_m_9",
@@ -126,7 +134,8 @@
               "Past Simple",
               "Past Continuous"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "Факт/событие в прошлом + точный маркер времени (yesterday/last/… ago/in 2010) ⇒ Past Simple."
           },
           {
             "id": "mx_m_10",
@@ -136,7 +145,8 @@
               "Past Simple",
               "Past Continuous"
             ],
-            "correctIndex": 1
+            "correctIndex": 1,
+            "explain": "Процесс/фон в прошлом (was/were + V‑ing, while/at 7 o’clock) ⇒ Past Continuous."
           },
           {
             "id": "mx_m_11",
@@ -146,7 +156,8 @@
               "Past Simple",
               "Past Continuous"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "Факт/событие в прошлом + точный маркер времени (yesterday/last/… ago/in 2010) ⇒ Past Simple."
           },
           {
             "id": "mx_m_12",
@@ -156,7 +167,8 @@
               "Past Simple",
               "Past Continuous"
             ],
-            "correctIndex": 1
+            "correctIndex": 1,
+            "explain": "Процесс/фон в прошлом (was/were + V‑ing, while/at 7 o’clock) ⇒ Past Continuous."
           }
         ]
       },
@@ -171,18 +183,19 @@
             "prompt": "I ________ (read) when the phone ________ (ring).",
             "inputs": [
               {
-                "placeholder": "(read)",
+                "placeholder": "",
                 "accepted": [
                   "was reading"
                 ]
               },
               {
-                "placeholder": "(ring)",
+                "placeholder": "",
                 "accepted": [
                   "rang"
                 ]
               }
-            ]
+            ],
+            "explain": "Пример ответа: was reading / rang. Смотри правило."
           },
           {
             "id": "mx_f_2",
@@ -190,18 +203,19 @@
             "prompt": "While I ________ (study), he ________ (play) games.",
             "inputs": [
               {
-                "placeholder": "(study)",
+                "placeholder": "",
                 "accepted": [
                   "was studying"
                 ]
               },
               {
-                "placeholder": "(play)",
+                "placeholder": "",
                 "accepted": [
                   "was playing"
                 ]
               }
-            ]
+            ],
+            "explain": "Пример ответа: was studying / was playing. Смотри правило."
           },
           {
             "id": "mx_f_3",
@@ -209,18 +223,19 @@
             "prompt": "She ________ (cook) when he ________ (arrive).",
             "inputs": [
               {
-                "placeholder": "(cook)",
+                "placeholder": "",
                 "accepted": [
                   "was cooking"
                 ]
               },
               {
-                "placeholder": "(arrive)",
+                "placeholder": "",
                 "accepted": [
                   "arrived"
                 ]
               }
-            ]
+            ],
+            "explain": "Пример ответа: was cooking / arrived. Смотри правило."
           },
           {
             "id": "mx_f_4",
@@ -228,18 +243,19 @@
             "prompt": "They ________ (walk) in the park when it ________ (start) to rain.",
             "inputs": [
               {
-                "placeholder": "(walk)",
+                "placeholder": "",
                 "accepted": [
                   "were walking"
                 ]
               },
               {
-                "placeholder": "(start)",
+                "placeholder": "",
                 "accepted": [
                   "started"
                 ]
               }
-            ]
+            ],
+            "explain": "Пример ответа: were walking / started. Смотри правило."
           },
           {
             "id": "mx_f_5",
@@ -247,18 +263,19 @@
             "prompt": "While we ________ (study), our friends ________ (play) basketball.",
             "inputs": [
               {
-                "placeholder": "(study)",
+                "placeholder": "",
                 "accepted": [
                   "were studying"
                 ]
               },
               {
-                "placeholder": "(play)",
+                "placeholder": "",
                 "accepted": [
                   "were playing"
                 ]
               }
-            ]
+            ],
+            "explain": "Пример ответа: were studying / were playing. Смотри правило."
           },
           {
             "id": "mx_f_6",
@@ -266,18 +283,19 @@
             "prompt": "I ________ (read) when you ________ (call).",
             "inputs": [
               {
-                "placeholder": "(read)",
+                "placeholder": "",
                 "accepted": [
                   "was reading"
                 ]
               },
               {
-                "placeholder": "(call)",
+                "placeholder": "",
                 "accepted": [
                   "called"
                 ]
               }
-            ]
+            ],
+            "explain": "Пример ответа: was reading / called. Смотри правило."
           },
           {
             "id": "mx_f_7",
@@ -285,18 +303,19 @@
             "prompt": "We ________ (watch) TV while it ________ (rain).",
             "inputs": [
               {
-                "placeholder": "(watch)",
+                "placeholder": "",
                 "accepted": [
                   "watched"
                 ]
               },
               {
-                "placeholder": "(rain)",
+                "placeholder": "",
                 "accepted": [
                   "was raining"
                 ]
               }
-            ]
+            ],
+            "explain": "Пример ответа: watched / was raining. Смотри правило."
           }
         ]
       },
@@ -316,7 +335,8 @@
             "correctIndices": [
               0,
               1
-            ]
+            ],
+            "explain": "Нужно выбрать: Past Simple, Past Continuous."
           },
           {
             "id": "mx_mark_2",
@@ -328,7 +348,8 @@
             ],
             "correctIndices": [
               1
-            ]
+            ],
+            "explain": "Нужно выбрать: Past Continuous."
           },
           {
             "id": "mx_mark_3",
@@ -340,7 +361,8 @@
             ],
             "correctIndices": [
               0
-            ]
+            ],
+            "explain": "Нужно выбрать: Past Simple."
           },
           {
             "id": "mx_mark_4",
@@ -352,7 +374,8 @@
             ],
             "correctIndices": [
               1
-            ]
+            ],
+            "explain": "Нужно выбрать: Past Continuous."
           },
           {
             "id": "mx_mark_5",
@@ -364,7 +387,8 @@
             ],
             "correctIndices": [
               1
-            ]
+            ],
+            "explain": "Нужно выбрать: Past Continuous."
           },
           {
             "id": "mx_mark_6",
@@ -376,7 +400,8 @@
             ],
             "correctIndices": [
               0
-            ]
+            ],
+            "explain": "Нужно выбрать: Past Simple."
           },
           {
             "id": "mx_mark_7",
@@ -388,7 +413,8 @@
             ],
             "correctIndices": [
               1
-            ]
+            ],
+            "explain": "Нужно выбрать: Past Continuous."
           },
           {
             "id": "mx_mark_8",
@@ -400,7 +426,8 @@
             ],
             "correctIndices": [
               0
-            ]
+            ],
+            "explain": "Нужно выбрать: Past Simple."
           },
           {
             "id": "mx_mark_9",
@@ -412,7 +439,8 @@
             ],
             "correctIndices": [
               0
-            ]
+            ],
+            "explain": "Нужно выбрать: Past Simple."
           },
           {
             "id": "mx_mark_10",
@@ -424,7 +452,8 @@
             ],
             "correctIndices": [
               1
-            ]
+            ],
+            "explain": "Нужно выбрать: Past Continuous."
           },
           {
             "id": "mx_mark_11",
@@ -436,7 +465,8 @@
             ],
             "correctIndices": [
               1
-            ]
+            ],
+            "explain": "Нужно выбрать: Past Continuous."
           },
           {
             "id": "mx_mark_12",
@@ -449,7 +479,8 @@
             "correctIndices": [
               0,
               1
-            ]
+            ],
+            "explain": "Нужно выбрать: Past Simple, Past Continuous."
           }
         ]
       },
@@ -465,7 +496,8 @@
             "accepted": [
               "Did you go there?",
               "Did you go there"
-            ]
+            ],
+            "explain": "Правильный ответ: Did you go there?. Смотри правило времени."
           },
           {
             "id": "mx_err_2",
@@ -474,7 +506,8 @@
             "accepted": [
               "I was reading a book.",
               "I was reading a book"
-            ]
+            ],
+            "explain": "Правильный ответ: I was reading a book.. Смотри правило времени."
           },
           {
             "id": "mx_err_3",
@@ -483,7 +516,8 @@
             "accepted": [
               "We were playing.",
               "We were playing"
-            ]
+            ],
+            "explain": "Правильный ответ: We were playing.. Смотри правило времени."
           },
           {
             "id": "mx_err_4",
@@ -497,7 +531,8 @@
             ],
             "acceptedShort": [
               "go"
-            ]
+            ],
+            "explain": "Правильный ответ: I didn't go home.. Смотри правило времени."
           },
           {
             "id": "mx_err_5",
@@ -509,7 +544,8 @@
             ],
             "acceptedShort": [
               "was"
-            ]
+            ],
+            "explain": "Правильный ответ: She was sleeping at 10 pm.. Смотри правило времени."
           },
           {
             "id": "mx_err_6",
@@ -521,7 +557,8 @@
             ],
             "acceptedShort": [
               "were"
-            ]
+            ],
+            "explain": "Правильный ответ: They were playing outside.. Смотри правило времени."
           },
           {
             "id": "mx_err_7",
@@ -533,7 +570,8 @@
             ],
             "acceptedShort": [
               "see"
-            ]
+            ],
+            "explain": "Правильный ответ: Did you see it?. Смотри правило времени."
           },
           {
             "id": "mx_err_8",
@@ -545,7 +583,8 @@
             ],
             "acceptedShort": [
               "reading"
-            ]
+            ],
+            "explain": "Правильный ответ: I was reading when you called.. Смотри правило времени."
           },
           {
             "id": "mx_err_9",
@@ -559,7 +598,8 @@
             ],
             "acceptedShort": [
               "watch"
-            ]
+            ],
+            "explain": "Правильный ответ: We didn't watch a movie.. Смотри правило времени."
           },
           {
             "id": "mx_err_10",
@@ -574,7 +614,8 @@
             "acceptedShort": [
               "wasn't listening",
               "was not listening"
-            ]
+            ],
+            "explain": "Правильный ответ: He wasn't listening to me.. Смотри правило времени."
           }
         ]
       },
@@ -594,7 +635,8 @@
               "привычка",
               "прерванное"
             ],
-            "correctIndex": 4
+            "correctIndex": 4,
+            "explain": "Правильный вариант: прерванное."
           },
           {
             "id": "mx_cmp_2",
@@ -607,7 +649,8 @@
               "привычка",
               "прерванное"
             ],
-            "correctIndex": 3
+            "correctIndex": 3,
+            "explain": "Правильный вариант: привычка."
           },
           {
             "id": "mx_cmp_3",
@@ -620,7 +663,8 @@
               "привычка",
               "прерванное"
             ],
-            "correctIndex": 2
+            "correctIndex": 2,
+            "explain": "Правильный вариант: фон."
           },
           {
             "id": "mx_cmp_4",
@@ -633,7 +677,8 @@
               "привычка",
               "прерванное"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "Правильный вариант: цепочка."
           },
           {
             "id": "mx_cmp_5",
@@ -646,7 +691,8 @@
               "привычка",
               "прерванное"
             ],
-            "correctIndex": 1
+            "correctIndex": 1,
+            "explain": "Правильный вариант: процесс."
           },
           {
             "id": "mx_cmp_6",
@@ -659,7 +705,8 @@
               "привычка",
               "прерванное"
             ],
-            "correctIndex": 3
+            "correctIndex": 3,
+            "explain": "Правильный вариант: привычка."
           },
           {
             "id": "mx_cmp_7",
@@ -672,7 +719,8 @@
               "привычка",
               "прерванное"
             ],
-            "correctIndex": 4
+            "correctIndex": 4,
+            "explain": "Правильный вариант: прерванное."
           },
           {
             "id": "mx_cmp_8",
@@ -685,7 +733,8 @@
               "привычка",
               "прерванное"
             ],
-            "correctIndex": 2
+            "correctIndex": 2,
+            "explain": "Правильный вариант: фон."
           },
           {
             "id": "mx_cmp_9",
@@ -698,7 +747,8 @@
               "привычка",
               "прерванное"
             ],
-            "correctIndex": 1
+            "correctIndex": 1,
+            "explain": "Правильный вариант: процесс."
           },
           {
             "id": "mx_cmp_10",
@@ -711,7 +761,8 @@
               "привычка",
               "прерванное"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "Правильный вариант: цепочка."
           }
         ]
       }

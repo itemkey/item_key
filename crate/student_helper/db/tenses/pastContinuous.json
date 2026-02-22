@@ -149,7 +149,8 @@
               "цепочка",
               "привычка"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "Правильный вариант: прерванное действие."
           },
           {
             "id": "pc_m_2",
@@ -160,7 +161,8 @@
               "цепочка",
               "фон как факт"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "Правильный вариант: параллельные действия."
           },
           {
             "id": "pc_m_3",
@@ -171,7 +173,8 @@
               "привычка",
               "точка во времени"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "Правильный вариант: атмосфера/фон."
           },
           {
             "id": "pc_m_4",
@@ -182,7 +185,8 @@
               "фон",
               "цепочка"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "Правильный вариант: раздражение + always."
           },
           {
             "id": "pc_m_5",
@@ -193,7 +197,8 @@
               "цепочка",
               "привычка"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "Правильный вариант: действие в процессе (в момент времени)."
           },
           {
             "id": "pc_m_6",
@@ -204,7 +209,8 @@
               "привычка",
               "точное событие"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "Правильный вариант: прерванное действие."
           },
           {
             "id": "pc_m_7",
@@ -215,7 +221,8 @@
               "цепочка",
               "точка"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "Правильный вариант: атмосфера/фон."
           },
           {
             "id": "pc_m_8",
@@ -226,7 +233,8 @@
               "процесс как факт",
               "цепочка"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "Правильный вариант: раздражение + always/constantly."
           },
           {
             "id": "pc_m_9",
@@ -237,7 +245,8 @@
               "цепочка",
               "привычка"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "Правильный вариант: параллельные действия."
           },
           {
             "id": "pc_m_10",
@@ -248,7 +257,8 @@
               "привычка",
               "прерванное"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "Правильный вариант: атмосфера/фон."
           }
         ]
       },
@@ -263,7 +273,8 @@
             "prompt": "At 7 o’clock yesterday I ________ (watch) TV.",
             "accepted": [
               "was watching"
-            ]
+            ],
+            "explain": "Правильный ответ: was watching. Past Continuous = was/were + V‑ing (процесс в прошлом). Подсказка: 'yesterday'."
           },
           {
             "id": "pc_f_2",
@@ -271,7 +282,8 @@
             "prompt": "We ________ (walk) in the street.",
             "accepted": [
               "were walking"
-            ]
+            ],
+            "explain": "Правильный ответ: were walking. Past Continuous = was/were + V‑ing (процесс в прошлом)."
           },
           {
             "id": "pc_f_3",
@@ -282,7 +294,8 @@
               "Were you watching",
               "Were you watching TV?",
               "Were you watching TV"
-            ]
+            ],
+            "explain": "Правильный ответ: Were you watching?. Past Continuous = was/were + V‑ing (процесс в прошлом)."
           },
           {
             "id": "pc_f_4",
@@ -291,7 +304,8 @@
             "accepted": [
               "wasn't sleeping",
               "was not sleeping"
-            ]
+            ],
+            "explain": "Правильный ответ: wasn't sleeping. Past Continuous = was/were + V‑ing (процесс в прошлом)."
           },
           {
             "id": "pc_f_5",
@@ -299,7 +313,8 @@
             "prompt": "They ________ (play) football at 5 pm yesterday.",
             "accepted": [
               "were playing"
-            ]
+            ],
+            "explain": "Правильный ответ: were playing. Past Continuous = was/were + V‑ing (процесс в прошлом). Подсказка: 'yesterday'."
           },
           {
             "id": "pc_f_6",
@@ -308,7 +323,8 @@
             "accepted": [
               "wasn't listening",
               "was not listening"
-            ]
+            ],
+            "explain": "Правильный ответ: wasn't listening. Past Continuous = was/were + V‑ing (процесс в прошлом)."
           },
           {
             "id": "pc_f_7",
@@ -317,7 +333,8 @@
             "accepted": [
               "Was she sleeping?",
               "Was she sleeping"
-            ]
+            ],
+            "explain": "Правильный ответ: Was she sleeping?. Past Continuous = was/were + V‑ing (процесс в прошлом)."
           },
           {
             "id": "pc_f_8",
@@ -325,7 +342,8 @@
             "prompt": "It ________ (rain) all night.",
             "accepted": [
               "was raining"
-            ]
+            ],
+            "explain": "Правильный ответ: was raining. Past Continuous = was/were + V‑ing (процесс в прошлом)."
           },
           {
             "id": "pc_f_9",
@@ -333,7 +351,8 @@
             "prompt": "We ________ (study) while you were watching TV.",
             "accepted": [
               "were studying"
-            ]
+            ],
+            "explain": "Правильный ответ: were studying. Past Continuous = was/were + V‑ing (процесс в прошлом)."
           },
           {
             "id": "pc_f_10",
@@ -344,7 +363,8 @@
               "What were you doing at 8 pm yesterday",
               "What were you doing at 8 pm?",
               "What were you doing at 8 pm"
-            ]
+            ],
+            "explain": "Правильный ответ: What were you doing at 8 pm yesterday?. Past Continuous = was/were + V‑ing (процесс в прошлом). Подсказка: 'yesterday'."
           },
           {
             "id": "pc_f_11",
@@ -353,7 +373,8 @@
             "accepted": [
               "weren't working",
               "were not working"
-            ]
+            ],
+            "explain": "Правильный ответ: weren't working. Past Continuous = was/were + V‑ing (процесс в прошлом)."
           },
           {
             "id": "pc_f_12",
@@ -361,7 +382,8 @@
             "prompt": "I ________ (drive) when I saw the accident.",
             "accepted": [
               "was driving"
-            ]
+            ],
+            "explain": "Правильный ответ: was driving. Past Continuous = was/were + V‑ing (процесс в прошлом)."
           }
         ]
       },
@@ -395,7 +417,8 @@
                 "left": "at 7 o’clock yesterday",
                 "right": "вчера в 7 часов"
               }
-            ]
+            ],
+            "explain": "Правильные пары: while → пока, в то время как | when → когда | all night → всю ночь | as → в то время как | at 7 o’clock yesterday → вчера в 7 часов"
           },
           {
             "id": "pc_mark_2",
@@ -422,7 +445,8 @@
                 "left": "from 5 to 6",
                 "right": "с 5 до 6"
               }
-            ]
+            ],
+            "explain": "Правильные пары: at that moment → в тот момент | all evening → весь вечер | while → пока | when → когда | from 5 to 6 → с 5 до 6"
           }
         ]
       },
@@ -438,7 +462,8 @@
             "accepted": [
               "I was reading a book.",
               "I was reading a book"
-            ]
+            ],
+            "explain": "Правильный ответ: I was reading a book.. Past Continuous = was/were + V‑ing (процесс в прошлом)."
           },
           {
             "id": "pc_err_2",
@@ -447,7 +472,8 @@
             "accepted": [
               "Were you watching TV?",
               "Were you watching TV"
-            ]
+            ],
+            "explain": "Правильный ответ: Were you watching TV?. Past Continuous = was/were + V‑ing (процесс в прошлом)."
           },
           {
             "id": "pc_err_3",
@@ -456,7 +482,8 @@
             "accepted": [
               "We were playing.",
               "We were playing"
-            ]
+            ],
+            "explain": "Правильный ответ: We were playing.. Past Continuous = was/were + V‑ing (процесс в прошлом)."
           },
           {
             "id": "pc_err_4",
@@ -467,7 +494,8 @@
               "I was not watching.",
               "I wasn't watching",
               "I was not watching"
-            ]
+            ],
+            "explain": "Правильный ответ: I wasn't watching.. Past Continuous = was/were + V‑ing (процесс в прошлом)."
           },
           {
             "id": "pc_err_5",
@@ -479,7 +507,8 @@
             ],
             "acceptedShort": [
               "was"
-            ]
+            ],
+            "explain": "Правильный ответ: I was watching TV.. Past Continuous = was/were + V‑ing (процесс в прошлом)."
           },
           {
             "id": "pc_err_6",
@@ -491,7 +520,8 @@
             ],
             "acceptedShort": [
               "sleeping"
-            ]
+            ],
+            "explain": "Правильный ответ: She was sleeping.. Past Continuous = was/were + V‑ing (процесс в прошлом)."
           },
           {
             "id": "pc_err_7",
@@ -504,7 +534,8 @@
             "acceptedShort": [
               "was",
               "was he"
-            ]
+            ],
+            "explain": "Правильный ответ: Was he working?. Past Continuous = was/were + V‑ing (процесс в прошлом)."
           },
           {
             "id": "pc_err_8",
@@ -516,7 +547,8 @@
             ],
             "acceptedShort": [
               "knew"
-            ]
+            ],
+            "explain": "Правильный ответ: I knew the answer.. Past Continuous = was/were + V‑ing (процесс в прошлом). Подсказка: 'now'."
           },
           {
             "id": "pc_err_9",
@@ -528,7 +560,8 @@
             ],
             "acceptedShort": [
               "playing"
-            ]
+            ],
+            "explain": "Правильный ответ: They were playing football.. Past Continuous = was/were + V‑ing (процесс в прошлом)."
           },
           {
             "id": "pc_err_10",
@@ -544,7 +577,8 @@
               "wasn't",
               "wasn't listening",
               "was not listening"
-            ]
+            ],
+            "explain": "Правильный ответ: He wasn't listening.. Past Continuous = was/were + V‑ing (процесс в прошлом)."
           }
         ]
       },
@@ -564,7 +598,8 @@
               "привычка",
               "прерванное"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "Правильный вариант: цепочка."
           },
           {
             "id": "pc_cmp_2",
@@ -577,7 +612,8 @@
               "привычка",
               "прерванное"
             ],
-            "correctIndex": 4
+            "correctIndex": 4,
+            "explain": "Правильный вариант: прерванное."
           },
           {
             "id": "pc_cmp_3",
@@ -590,7 +626,8 @@
               "привычка",
               "прерванное"
             ],
-            "correctIndex": 1
+            "correctIndex": 1,
+            "explain": "Правильный вариант: процесс."
           },
           {
             "id": "pc_cmp_4",
@@ -603,7 +640,8 @@
               "привычка",
               "прерванное"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "Правильный вариант: цепочка."
           },
           {
             "id": "pc_cmp_5",
@@ -616,7 +654,8 @@
               "привычка",
               "прерванное"
             ],
-            "correctIndex": 4
+            "correctIndex": 4,
+            "explain": "Правильный вариант: прерванное."
           },
           {
             "id": "pc_cmp_6",
@@ -629,7 +668,8 @@
               "привычка",
               "прерванное"
             ],
-            "correctIndex": 3
+            "correctIndex": 3,
+            "explain": "Правильный вариант: привычка."
           },
           {
             "id": "pc_cmp_7",
@@ -642,7 +682,8 @@
               "привычка",
               "прерванное"
             ],
-            "correctIndex": 2
+            "correctIndex": 2,
+            "explain": "Правильный вариант: фон."
           }
         ]
       }

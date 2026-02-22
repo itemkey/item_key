@@ -42,6 +42,12 @@
       if(mixedP && mixedP.id) byId[mixedP.id] = mixedP;
     } catch(_){}
 
+    // load mixed perfect (practice only)
+    try{
+      const mixedPP = await fetchJson(TENSES_DIR + 'mixedPerfectPast.json');
+      if(mixedPP && mixedPP.id) byId[mixedPP.id] = mixedPP;
+    } catch(_){}
+
     return { INDEX: index, byId };
   }
 
@@ -385,7 +391,12 @@
     optMixedP.value = 'mixedPresent';
     optMixedP.textContent = 'Mixed Present (Present Simple + Present Continuous)';
     tenseSelect.appendChild(optMixedP);
-  }
+  
+    const optMixedPP = document.createElement('option');
+    optMixedPP.value = 'mixedPerfectPast';
+    optMixedPP.textContent = 'Mixed Perfect (Present Perfect + Past Simple)';
+    tenseSelect.appendChild(optMixedPP);
+}
 
   function getTenseForPractice(id){
     const t = REG.byId[id];
@@ -559,7 +570,7 @@
 
     // Clear any old key handler
     if (runKeyHandler){
-      document.removeEventListener('keydown', runKeyHandler, true);
+      document.removeEventListener('keydown', runKeyHandler);
       runKeyHandler = null;
     }
 
@@ -594,9 +605,9 @@
         <p class="ik-feedback__line" id="shTRunLine">выбери ответ или введи ответ и нажми check</p>
       </div>
 
-      <div class="ik-row" style="margin-top:12px; gap:10px;">
+      <div class="ik-row" style="margin-top:12px; gap:10px; flex-wrap:wrap;">
         <button class="ik-btn ik-btn--black" id="shTRunCheckNext" type="button">check</button>
-        <button class="ik-btn" id="shTRunExplainBtn" type="button" hidden>объяснение</button>
+        <button class="ik-btn" id="shTRunExplainBtn" type="button" disabled>объяснение</button>
       </div>
 
       <div id="shTRunExplainBox" class="sh-hint" hidden></div>
@@ -614,11 +625,28 @@
     const elLine = runWrap.querySelector('#shTRunLine');
     const btnExit = runWrap.querySelector('#shTRunExit');
     const btnCheckNext = runWrap.querySelector('#shTRunCheckNext');
-    const btnExplain = runWrap.querySelector('#shTRunExplainBtn');
-    const elExplain = runWrap.querySelector('#shTRunExplainBox');
     const cbShowAfterLocal = runWrap.querySelector('#shTRunShowAfter');
 
-    let idx = 0;
+    const btnExplain = runWrap.querySelector('#shTRunExplainBtn');
+    const elExplainBox = runWrap.querySelector('#shTRunExplainBox');
+
+    function getExplainText(q){
+      const e = q && q.item ? q.item.explain : null;
+      if (Array.isArray(e)) return e.join('\n');
+      if (typeof e === 'string') return e;
+      return '';
+    }
+
+    function setExplain(text){
+      if (!btnExplain || !elExplainBox) return;
+      const has = !!(text && String(text).trim());
+      btnExplain.disabled = !has || !checked;
+      btnExplain.setAttribute('aria-disabled', btnExplain.disabled ? 'true' : 'false');
+      btnExplain.dataset.explain = has ? String(text) : '';
+      elExplainBox.hidden = true;
+      elExplainBox.innerHTML = '';
+    }
+let idx = 0;
     let checked = false;
 
     // state per question
@@ -812,10 +840,9 @@
     function renderCurrent(){
       checked = false;
       btnCheckNext.textContent = 'check';
-      if (btnExplain){ btnExplain.hidden = true; btnExplain.textContent = 'объяснение'; }
-      if (elExplain){ elExplain.hidden = true; elExplain.textContent = ''; }
       resetPerQuestionState();
       setFeedback('idle', 'ready', 'выбери ответ или введи ответ и нажми check');
+      setExplain('');
 
 
 const q = queue[idx];
@@ -882,27 +909,23 @@ try{
       return true;
     }
 
-    function countAttempt(q){
-      exTotals[q.exId] = (exTotals[q.exId] || 0) + 1;
-    }
-
     function checkCurrent(){
       const q = queue[idx];
+      exTotals[q.exId] = (exTotals[q.exId] || 0) + 1;
+
       if (q.kind === 'choice'){
         if (selectedIndex === null){
           setFeedback('idle', 'pick', 'сначала выбери вариант');
-          return null;
+          return false;
         }
-        countAttempt(q);
         const ok = selectedIndex === q.item.correctIndex;
         if (ok){
           exCorrect[q.exId] = (exCorrect[q.exId] || 0) + 1;
           mistakesSet.delete(q.item.id);
-          setFeedback('correct', 'ok', 'верно');
+          setFeedback('correct', 'ok', `Correct answer: ${String.fromCharCode(97 + q.item.correctIndex)}`);
         } else {
           mistakesSet.add(q.item.id);
-          const corr = String.fromCharCode(97 + q.item.correctIndex);
-          setFeedback('wrong', 'no', cbShowAfterLocal.checked ? `неверно (правильно: ${corr})` : 'неверно');
+          setFeedback('wrong', 'no', `Correct answer: ${String.fromCharCode(97 + q.item.correctIndex)}`);
         }
         markChoice(q.item.correctIndex, selectedIndex);
         saveMistakesSnapshot();
@@ -912,7 +935,6 @@ try{
       if (q.kind === 'input' || q.kind === 'correction'){
         const input = elCard.querySelector('#shTRunInput');
         const raw = (input?.value || '').trim();
-        if (!raw){ setFeedback('idle','input','введи ответ'); return null; }
         const accepted = q.item.accepted || [];
         let acceptedList = accepted;
 
@@ -924,36 +946,33 @@ try{
           acceptedList = [...accepted, ...extra].filter(Boolean);
         }
 
-        countAttempt(q);
         const res = checkInput(raw, acceptedList);
         if (res.state === 'correct'){
           exCorrect[q.exId] = (exCorrect[q.exId] || 0) + 1;
           mistakesSet.delete(q.item.id);
           input.classList.remove('is-bad');
           input.classList.add('is-ok');
-          setFeedback('correct', 'ok', 'верно');
+          setFeedback('correct', 'ok', 'correct');
         } else if (res.state === 'almost'){
           exCorrect[q.exId] = (exCorrect[q.exId] || 0) + 1;
           mistakesSet.delete(q.item.id);
           input.classList.remove('is-bad');
           input.classList.add('is-ok');
-          setFeedback('correct', 'ok', 'верно (опечатка)');
+          setFeedback('correct', 'ok', 'almost correct (typo)');
         } else {
           mistakesSet.add(q.item.id);
           input.classList.remove('is-ok');
           input.classList.add('is-bad');
           if (cbShowAfterLocal.checked){
-            setFeedback('wrong', 'no', `неверно (правильно: ${accepted[0] || ''})`);
+            setFeedback('wrong', 'no', `Correct: ${accepted[0] || ''}`);
           } else {
-            setFeedback('wrong', 'no', 'неверно');
+            setFeedback('wrong', 'no', 'wrong');
           }
         }
         return res.state !== 'wrong';
       }
 
       if (q.kind === 'multi'){
-        if (selectedSet.size === 0){ setFeedback('idle','pick','сначала выбери варианты'); return null; }
-        countAttempt(q);
         const correctSet = new Set((q.item.correctIndices || []).map(x=>Number(x)));
         const ok = sameSet(selectedSet, correctSet);
 
@@ -967,11 +986,11 @@ try{
         if (ok){
           exCorrect[q.exId] = (exCorrect[q.exId] || 0) + 1;
           mistakesSet.delete(q.item.id);
-          setFeedback('correct', 'ok', 'верно');
+          setFeedback('correct', 'ok', 'correct');
         } else {
           mistakesSet.add(q.item.id);
           const correctLabels = (q.item.correctIndices || []).map(i => q.item.options?.[i]).filter(Boolean);
-          setFeedback('wrong', 'no', cbShowAfterLocal.checked ? `неверно (правильно: ${correctLabels.join(', ')})` : 'неверно');
+          setFeedback('wrong', 'no', cbShowAfterLocal.checked ? `Correct: ${correctLabels.join(', ')}` : 'wrong');
         }
 
         saveMistakesSnapshot();
@@ -982,7 +1001,7 @@ try{
         const st = matchState;
         if (!st){
           setFeedback('idle', 'pick', 'сначала выбери варианты');
-          return null;
+          return false;
         }
 
         let allPicked = true;
@@ -999,19 +1018,18 @@ try{
 
         if (!allPicked){
           setFeedback('idle', 'pick', 'заполни все строки');
-          return null;
+          return false;
         }
 
-        countAttempt(q);
         const ok = okCount === st.pairs.length;
         if (ok){
           exCorrect[q.exId] = (exCorrect[q.exId] || 0) + 1;
           mistakesSet.delete(q.item.id);
-          setFeedback('correct', 'ok', 'верно');
+          setFeedback('correct', 'ok', 'correct');
         } else {
           mistakesSet.add(q.item.id);
           const rightStr = st.pairs.map(p=>`${p.left} -> ${p.right}`).join(' | ');
-          setFeedback('wrong', 'no', cbShowAfterLocal.checked ? `неверно (правильно: ${rightStr})` : 'неверно');
+          setFeedback('wrong', 'no', cbShowAfterLocal.checked ? `Correct: ${rightStr}` : 'wrong');
         }
 
         saveMistakesSnapshot();
@@ -1022,7 +1040,7 @@ try{
         const specs = q.item.inputs || [];
         if (!multiInputs || multiInputs.length !== specs.length){
           setFeedback('idle', 'input', 'не удалось создать поля');
-          return null;
+          return false;
         }
 
         let allOk = true;
@@ -1031,7 +1049,6 @@ try{
         for (let i=0;i<specs.length;i++){
           const inputEl = multiInputs[i];
           const raw = (inputEl.value || '').trim();
-          if (!raw){ setFeedback('idle','input','заполни все формы'); return null; }
           const accepted = specs[i].accepted || [];
           const res = checkInput(raw, accepted);
 
@@ -1045,15 +1062,14 @@ try{
           }
         }
 
-        countAttempt(q);
         if (allOk){
           exCorrect[q.exId] = (exCorrect[q.exId] || 0) + 1;
           mistakesSet.delete(q.item.id);
-          setFeedback('correct', 'ok', anyAlmost ? 'верно (опечатка)' : 'верно');
+          setFeedback('correct', 'ok', anyAlmost ? 'almost correct (typo)' : 'correct');
         } else {
           mistakesSet.add(q.item.id);
           const firstAccepted = (specs[0] && specs[0].accepted && specs[0].accepted[0]) ? specs[0].accepted[0] : '';
-          setFeedback('wrong', 'no', cbShowAfterLocal.checked ? `неверно (пример: ${firstAccepted} ...)` : 'неверно');
+          setFeedback('wrong', 'no', cbShowAfterLocal.checked ? `Correct (пример): ${firstAccepted} ...` : 'wrong');
         }
 
         return allOk;
@@ -1067,7 +1083,7 @@ try{
     function finish(){
       // remove key handler
       if (runKeyHandler){
-        document.removeEventListener('keydown', runKeyHandler, true);
+        document.removeEventListener('keydown', runKeyHandler);
         runKeyHandler = null;
       }
 
@@ -1108,10 +1124,6 @@ try{
       if (!practiceBody.querySelector('#shTRunCard')) return;
 
       if (e.key === 'Enter'){
-        if (e.isComposing || e.repeat) return;
-        if (e.shiftKey || e.altKey || e.ctrlKey || e.metaKey) return;
-        e.preventDefault();
-        e.stopPropagation();
         btnCheckNext.click();
         return;
       }
@@ -1125,33 +1137,30 @@ try{
         }
       }
     };
-    document.addEventListener('keydown', runKeyHandler, true);
+    document.addEventListener('keydown', runKeyHandler);
 
     btnExit.addEventListener('click', finish);
 
-    if (btnExplain){
-      btnExplain.addEventListener('click', ()=>{
-        const q = queue[idx];
-        const t = (q && q.item && q.item.explain) ? String(q.item.explain) : 'объяснения пока нет';
-        if (!elExplain) return;
-        if (elExplain.hidden){
-          elExplain.textContent = t;
-          elExplain.hidden = false;
-          btnExplain.textContent = 'скрыть';
-        } else {
-          elExplain.hidden = true;
-          elExplain.textContent = '';
-          btnExplain.textContent = 'объяснение';
+    btnExplain && btnExplain.addEventListener('click', ()=>{
+      if (btnExplain.disabled) return;
+      const raw = btnExplain.dataset.explain || '';
+      if (!raw) return;
+      if (elExplainBox){
+        if (!elExplainBox.hidden){
+          elExplainBox.hidden = true;
+          elExplainBox.innerHTML = '';
+          return;
         }
-      });
-    }
+        elExplainBox.hidden = false;
+        elExplainBox.innerHTML = escapeHtml(raw).replace(/\n/g, '<br>');
+      }
+    });
 
     btnCheckNext.addEventListener('click', ()=>{
       if (!checked){
-        const res = checkCurrent(); // null = ещё не готово
-        if (res === null) return;
+        checkCurrent();
         checked = true;
-        if (btnExplain) btnExplain.hidden = false;
+        setExplain(getExplainText(queue[idx]));
         btnCheckNext.textContent = (idx === queue.length - 1) ? 'finish' : 'next';
         return;
       }

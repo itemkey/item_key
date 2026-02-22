@@ -506,20 +506,20 @@
             "prompt": "He ____ ____ ____ all day. (work)",
             "inputs": [
               {
-                "placeholder": "has / 's",
+                "placeholder": "",
                 "accepted": [
                   "has",
                   "'s"
                 ]
               },
               {
-                "placeholder": "been",
+                "placeholder": "",
                 "accepted": [
                   "been"
                 ]
               },
               {
-                "placeholder": "working",
+                "placeholder": "",
                 "accepted": [
                   "working"
                 ]
@@ -532,20 +532,20 @@
             "prompt": "We ____ ____ ____ for an hour. (wait)",
             "inputs": [
               {
-                "placeholder": "have / 've",
+                "placeholder": "",
                 "accepted": [
                   "have",
                   "'ve"
                 ]
               },
               {
-                "placeholder": "been",
+                "placeholder": "",
                 "accepted": [
                   "been"
                 ]
               },
               {
-                "placeholder": "waiting",
+                "placeholder": "",
                 "accepted": [
                   "waiting"
                 ]
@@ -558,20 +558,20 @@
             "prompt": "I ____ ____ ____ well recently. (not/sleep)",
             "inputs": [
               {
-                "placeholder": "haven't / have not",
+                "placeholder": "",
                 "accepted": [
                   "haven't",
                   "have not"
                 ]
               },
               {
-                "placeholder": "been",
+                "placeholder": "",
                 "accepted": [
                   "been"
                 ]
               },
               {
-                "placeholder": "sleeping",
+                "placeholder": "",
                 "accepted": [
                   "sleeping"
                 ]
@@ -584,19 +584,19 @@
             "prompt": "____ you ____ ____ a lot lately? (work)",
             "inputs": [
               {
-                "placeholder": "Have",
+                "placeholder": "",
                 "accepted": [
                   "Have"
                 ]
               },
               {
-                "placeholder": "been",
+                "placeholder": "",
                 "accepted": [
                   "been"
                 ]
               },
               {
-                "placeholder": "working",
+                "placeholder": "",
                 "accepted": [
                   "working"
                 ]
@@ -609,19 +609,19 @@
             "prompt": "It ____ ____ ____ since morning. (rain)",
             "inputs": [
               {
-                "placeholder": "has",
+                "placeholder": "",
                 "accepted": [
                   "has"
                 ]
               },
               {
-                "placeholder": "been",
+                "placeholder": "",
                 "accepted": [
                   "been"
                 ]
               },
               {
-                "placeholder": "raining",
+                "placeholder": "",
                 "accepted": [
                   "raining"
                 ]

@@ -223,14 +223,14 @@
             "prompt": "She ____ ____ in a bank. (work)",
             "inputs": [
               {
-                "placeholder": "works / is",
+                "placeholder": "",
                 "accepted": [
                   "works",
                   "is"
                 ]
               },
               {
-                "placeholder": "— / working",
+                "placeholder": "",
                 "accepted": [
                   "",
                   "working"
@@ -244,13 +244,13 @@
             "prompt": "They ____ ____ now. (play)",
             "inputs": [
               {
-                "placeholder": "are",
+                "placeholder": "",
                 "accepted": [
                   "are"
                 ]
               },
               {
-                "placeholder": "playing",
+                "placeholder": "",
                 "accepted": [
                   "playing"
                 ]
@@ -263,14 +263,14 @@
             "prompt": "He ____ ____ coffee. (negative, simple)",
             "inputs": [
               {
-                "placeholder": "doesn't",
+                "placeholder": "",
                 "accepted": [
                   "doesn't",
                   "does not"
                 ]
               },
               {
-                "placeholder": "drink",
+                "placeholder": "",
                 "accepted": [
                   "drink"
                 ]
@@ -283,13 +283,13 @@
             "prompt": "____ you ____ TV right now?",
             "inputs": [
               {
-                "placeholder": "Are",
+                "placeholder": "",
                 "accepted": [
                   "Are"
                 ]
               },
               {
-                "placeholder": "watching",
+                "placeholder": "",
                 "accepted": [
                   "watching"
                 ]
@@ -302,7 +302,7 @@
             "prompt": "The train ____ at 6:15. (leave)",
             "inputs": [
               {
-                "placeholder": "leaves",
+                "placeholder": "",
                 "accepted": [
                   "leaves"
                 ]
@@ -321,13 +321,13 @@
             "prompt": "I ____ ____ this week. (study)",
             "inputs": [
               {
-                "placeholder": "am",
+                "placeholder": "",
                 "accepted": [
                   "am"
                 ]
               },
               {
-                "placeholder": "studying",
+                "placeholder": "",
                 "accepted": [
                   "studying"
                 ]

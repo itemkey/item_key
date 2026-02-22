@@ -281,7 +281,8 @@
               "точное прошлое время",
               "привычка"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "Правильный вариант: результат сейчас."
           },
           {
             "id": "prp_m_2",
@@ -292,7 +293,8 @@
               "точное прошлое время",
               "расписание"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "Правильный вариант: жизненный опыт."
           },
           {
             "id": "prp_m_3",
@@ -303,7 +305,8 @@
               "вчера (точное время)",
               "привычка"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "Правильный вариант: недавно/только что."
           },
           {
             "id": "prp_m_4",
@@ -314,7 +317,8 @@
               "точное время в прошлом",
               "процесс сейчас"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "Правильный вариант: ещё нет (yet)."
           },
           {
             "id": "prp_m_5",
@@ -325,7 +329,8 @@
               "точное прошлое время",
               "будущее по расписанию"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "Правильный вариант: незаконченный период."
           },
           {
             "id": "prp_m_6",
@@ -336,7 +341,8 @@
               "разовое событие вчера",
               "привычка"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "Правильный вариант: действие/состояние началось в прошлом и продолжается."
           },
           {
             "id": "prp_m_7",
@@ -347,7 +353,8 @@
               "всегда (habit)",
               "вчера (past)"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "Правильный вариант: уже (already)."
           },
           {
             "id": "prp_m_8",
@@ -358,7 +365,8 @@
               "точное прошлое время",
               "план"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "Правильный вариант: никогда (опыт)."
           },
           {
             "id": "prp_m_9",
@@ -369,7 +377,8 @@
               "когда именно (past)",
               "процесс сейчас"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "Правильный вариант: как долго (for/since)."
           },
           {
             "id": "prp_m_10",
@@ -380,7 +389,8 @@
               "точное прошлое время",
               "процесс сейчас"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "Правильный вариант: сколько раз/опыт."
           },
           {
             "id": "prp_m_11",
@@ -391,7 +401,8 @@
               "точное прошлое время",
               "расписание"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "Правильный вариант: результат сейчас."
           },
           {
             "id": "prp_m_12",
@@ -402,7 +413,8 @@
               "вчера",
               "привычка"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "Правильный вариант: пока/до сих пор (период не закончен)."
           }
         ]
       },
@@ -418,7 +430,8 @@
             "accepted": [
               "have finished",
               "'ve finished"
-            ]
+            ],
+            "explain": "have + V3."
           },
           {
             "id": "prp_f_2",
@@ -426,7 +439,8 @@
             "prompt": "She ____ (see) this film.",
             "accepted": [
               "has seen"
-            ]
+            ],
+            "explain": "has + V3."
           },
           {
             "id": "prp_f_3",
@@ -435,7 +449,8 @@
             "accepted": [
               "haven't arrived",
               "have not arrived"
-            ]
+            ],
+            "explain": "yet ⇒ Present Perfect; have + V3."
           },
           {
             "id": "prp_f_4",
@@ -444,7 +459,8 @@
             "accepted": [
               "hasn't called",
               "has not called"
-            ]
+            ],
+            "explain": "since ⇒ Present Perfect; has + V3."
           },
           {
             "id": "prp_f_5",
@@ -453,7 +469,8 @@
             "accepted": [
               "have gone",
               "'ve gone"
-            ]
+            ],
+            "explain": "have + V3."
           },
           {
             "id": "prp_f_6",
@@ -461,7 +478,8 @@
             "prompt": "She ____ (do) it already.",
             "accepted": [
               "has done"
-            ]
+            ],
+            "explain": "already ⇒ Present Perfect; has + V3."
           },
           {
             "id": "prp_f_7",
@@ -470,7 +488,8 @@
             "accepted": [
               "have known",
               "'ve known"
-            ]
+            ],
+            "explain": "for ⇒ Present Perfect; have + V3."
           },
           {
             "id": "prp_f_8",
@@ -478,7 +497,8 @@
             "prompt": "It ____ (rain) a lot this week.",
             "accepted": [
               "has rained"
-            ]
+            ],
+            "explain": "this week ⇒ Present Perfect; has + V3."
           },
           {
             "id": "prp_f_9",
@@ -487,7 +507,8 @@
             "accepted": [
               "Have you ever been abroad?",
               "Have you ever been abroad"
-            ]
+            ],
+            "explain": "ever ⇒ Present Perfect; have + V3."
           },
           {
             "id": "prp_f_10",
@@ -496,7 +517,8 @@
             "accepted": [
               "Has she finished yet?",
               "Has she finished yet"
-            ]
+            ],
+            "explain": "yet ⇒ Present Perfect; has + V3."
           },
           {
             "id": "prp_f_11",
@@ -505,7 +527,8 @@
             "accepted": [
               "Have you seen my keys?",
               "Have you seen my keys"
-            ]
+            ],
+            "explain": "have + V3; форма: question → V3."
           },
           {
             "id": "prp_f_12",
@@ -514,7 +537,8 @@
             "accepted": [
               "haven't tried",
               "have not tried"
-            ]
+            ],
+            "explain": "have + V3."
           }
         ]
       },
@@ -542,7 +566,8 @@
                   "finished"
                 ]
               }
-            ]
+            ],
+            "explain": "has + V3; finish → V3."
           },
           {
             "id": "prp_mi_2",
@@ -562,7 +587,8 @@
                   "been"
                 ]
               }
-            ]
+            ],
+            "explain": "before, for ⇒ Present Perfect; have + V3; be → V3."
           },
           {
             "id": "prp_mi_3",
@@ -582,7 +608,8 @@
                   "done"
                 ]
               }
-            ]
+            ],
+            "explain": "yet ⇒ Present Perfect; have + V3; do → V3."
           },
           {
             "id": "prp_mi_4",
@@ -601,7 +628,8 @@
                   "tried"
                 ]
               }
-            ]
+            ],
+            "explain": "ever ⇒ Present Perfect; have + V3; try → V3."
           },
           {
             "id": "prp_mi_5",
@@ -620,7 +648,8 @@
                   "known"
                 ]
               }
-            ]
+            ],
+            "explain": "since ⇒ Present Perfect; has + V3; know → V3."
           },
           {
             "id": "prp_mi_6",
@@ -640,7 +669,8 @@
                   "arrived"
                 ]
               }
-            ]
+            ],
+            "explain": "yet ⇒ Present Perfect; have + V3; arrive → V3."
           }
         ]
       },
@@ -664,7 +694,8 @@
               1,
               3,
               4
-            ]
+            ],
+            "explain": "Правильные варианты: ever, already, yet."
           },
           {
             "id": "prp_mark_2",
@@ -681,7 +712,8 @@
               0,
               2,
               4
-            ]
+            ],
+            "explain": "Правильные варианты: this week, so far, today."
           },
           {
             "id": "prp_mark_3",
@@ -697,7 +729,8 @@
             "correctIndices": [
               0,
               1
-            ]
+            ],
+            "explain": "Правильные варианты: for, since."
           },
           {
             "id": "prp_mark_4",
@@ -714,7 +747,8 @@
               0,
               1,
               4
-            ]
+            ],
+            "explain": "Правильные варианты: ever, never, before."
           }
         ]
       },
@@ -748,7 +782,8 @@
                 "left": "just",
                 "right": "только что"
               }
-            ]
+            ],
+            "explain": "Соедини маркеры Present Perfect с переводом/смыслом."
           },
           {
             "id": "prp_match_2",
@@ -774,7 +809,8 @@
                 "left": "three times",
                 "right": "три раза (сколько раз)"
               }
-            ]
+            ],
+            "explain": "Соедини маркеры Present Perfect с переводом/смыслом."
           }
         ]
       },
@@ -790,7 +826,8 @@
             "accepted": [
               "I have gone to London.",
               "I've gone to London."
-            ]
+            ],
+            "explain": "Present Perfect: have/has + V3 (результат/опыт до сейчас)."
           },
           {
             "id": "prp_c_2",
@@ -799,7 +836,8 @@
             "accepted": [
               "Have you ever been abroad?",
               "Have you ever been abroad"
-            ]
+            ],
+            "explain": "ever ⇒ Present Perfect; have + V3."
           },
           {
             "id": "prp_c_3",
@@ -807,7 +845,8 @@
             "prompt": "She have finished her homework.",
             "accepted": [
               "She has finished her homework."
-            ]
+            ],
+            "explain": "Present Perfect: have/has + V3 (результат/опыт до сейчас)."
           },
           {
             "id": "prp_c_4",
@@ -815,7 +854,8 @@
             "prompt": "I have seen him yesterday.",
             "accepted": [
               "I saw him yesterday."
-            ]
+            ],
+            "explain": "Present Perfect: have/has + V3 (результат/опыт до сейчас)."
           },
           {
             "id": "prp_c_5",
@@ -824,7 +864,8 @@
             "accepted": [
               "Has he finished yet?",
               "Has he finished yet"
-            ]
+            ],
+            "explain": "yet ⇒ Present Perfect; has + V3."
           },
           {
             "id": "prp_c_6",
@@ -833,7 +874,8 @@
             "accepted": [
               "They haven't gone home.",
               "They have not gone home."
-            ]
+            ],
+            "explain": "Present Perfect: have/has + V3 (результат/опыт до сейчас)."
           },
           {
             "id": "prp_c_7",
@@ -842,7 +884,8 @@
             "accepted": [
               "I've known him since 2018.",
               "I have known him since 2018."
-            ]
+            ],
+            "explain": "since ⇒ Present Perfect."
           },
           {
             "id": "prp_c_8",
@@ -851,7 +894,8 @@
             "accepted": [
               "We have lived here for 10 years.",
               "We've lived here for 10 years."
-            ]
+            ],
+            "explain": "since ⇒ Present Perfect."
           },
           {
             "id": "prp_c_9",
@@ -860,7 +904,8 @@
             "accepted": [
               "She hasn't called yet.",
               "She has not called yet."
-            ]
+            ],
+            "explain": "already ⇒ Present Perfect."
           },
           {
             "id": "prp_c_10",
@@ -869,7 +914,8 @@
             "accepted": [
               "Has he finished?",
               "Has he finished"
-            ]
+            ],
+            "explain": "has + V3."
           }
         ]
       },
@@ -887,7 +933,8 @@
               "Past Simple"
             ],
             "correctIndex": 1,
-            "correctTenseId": "pastSimple"
+            "correctTenseId": "pastSimple",
+            "explain": "Правильный вариант: Past Simple."
           },
           {
             "id": "prp_cmp_2",
@@ -898,7 +945,8 @@
               "Past Simple"
             ],
             "correctIndex": 0,
-            "correctTenseId": "presentPerfect"
+            "correctTenseId": "presentPerfect",
+            "explain": "Правильный вариант: Present Perfect."
           },
           {
             "id": "prp_cmp_3",
@@ -909,7 +957,8 @@
               "Past Simple"
             ],
             "correctIndex": 0,
-            "correctTenseId": "presentPerfect"
+            "correctTenseId": "presentPerfect",
+            "explain": "Правильный вариант: Present Perfect."
           },
           {
             "id": "prp_cmp_4",
@@ -920,7 +969,8 @@
               "Past Simple"
             ],
             "correctIndex": 1,
-            "correctTenseId": "pastSimple"
+            "correctTenseId": "pastSimple",
+            "explain": "Правильный вариант: Past Simple."
           },
           {
             "id": "prp_cmp_5",
@@ -931,7 +981,8 @@
               "Past Simple"
             ],
             "correctIndex": 0,
-            "correctTenseId": "presentPerfect"
+            "correctTenseId": "presentPerfect",
+            "explain": "Правильный вариант: Present Perfect."
           },
           {
             "id": "prp_cmp_6",
@@ -942,7 +993,8 @@
               "Past Simple"
             ],
             "correctIndex": 1,
-            "correctTenseId": "pastSimple"
+            "correctTenseId": "pastSimple",
+            "explain": "Правильный вариант: Past Simple."
           },
           {
             "id": "prp_cmp_7",
@@ -953,7 +1005,8 @@
               "Past Simple"
             ],
             "correctIndex": 0,
-            "correctTenseId": "presentPerfect"
+            "correctTenseId": "presentPerfect",
+            "explain": "Правильный вариант: Present Perfect."
           },
           {
             "id": "prp_cmp_8",
@@ -964,7 +1017,8 @@
               "Past Simple"
             ],
             "correctIndex": 1,
-            "correctTenseId": "pastSimple"
+            "correctTenseId": "pastSimple",
+            "explain": "Правильный вариант: Past Simple."
           },
           {
             "id": "prp_cmp_9",
@@ -975,7 +1029,8 @@
               "Past Simple"
             ],
             "correctIndex": 0,
-            "correctTenseId": "presentPerfect"
+            "correctTenseId": "presentPerfect",
+            "explain": "Правильный вариант: Present Perfect."
           },
           {
             "id": "prp_cmp_10",
@@ -986,7 +1041,8 @@
               "Past Simple"
             ],
             "correctIndex": 1,
-            "correctTenseId": "pastSimple"
+            "correctTenseId": "pastSimple",
+            "explain": "Правильный вариант: Past Simple."
           },
           {
             "id": "prp_cmp_11",
@@ -997,7 +1053,8 @@
               "Past Simple"
             ],
             "correctIndex": 0,
-            "correctTenseId": "presentPerfect"
+            "correctTenseId": "presentPerfect",
+            "explain": "Правильный вариант: Present Perfect."
           },
           {
             "id": "prp_cmp_12",
@@ -1008,7 +1065,8 @@
               "Past Simple"
             ],
             "correctIndex": 1,
-            "correctTenseId": "pastSimple"
+            "correctTenseId": "pastSimple",
+            "explain": "Правильный вариант: Past Simple."
           }
         ]
       },
@@ -1026,7 +1084,8 @@
               "Present Perfect Continuous"
             ],
             "correctIndex": 0,
-            "correctTenseId": "presentPerfect"
+            "correctTenseId": "presentPerfect",
+            "explain": "Правильный вариант: Present Perfect."
           },
           {
             "id": "prp_cmp2_2",
@@ -1037,7 +1096,8 @@
               "Present Perfect Continuous"
             ],
             "correctIndex": 1,
-            "correctTenseId": "presentPerfectContinuous"
+            "correctTenseId": "presentPerfectContinuous",
+            "explain": "Правильный вариант: Present Perfect Continuous."
           },
           {
             "id": "prp_cmp2_3",
@@ -1048,7 +1108,8 @@
               "Present Perfect Continuous"
             ],
             "correctIndex": 0,
-            "correctTenseId": "presentPerfect"
+            "correctTenseId": "presentPerfect",
+            "explain": "Правильный вариант: Present Perfect."
           },
           {
             "id": "prp_cmp2_4",
@@ -1059,7 +1120,8 @@
               "Present Perfect Continuous"
             ],
             "correctIndex": 1,
-            "correctTenseId": "presentPerfectContinuous"
+            "correctTenseId": "presentPerfectContinuous",
+            "explain": "Правильный вариант: Present Perfect Continuous."
           },
           {
             "id": "prp_cmp2_5",
@@ -1070,7 +1132,8 @@
               "Present Perfect Continuous"
             ],
             "correctIndex": 0,
-            "correctTenseId": "presentPerfect"
+            "correctTenseId": "presentPerfect",
+            "explain": "Правильный вариант: Present Perfect."
           },
           {
             "id": "prp_cmp2_6",
@@ -1081,7 +1144,8 @@
               "Present Perfect Continuous"
             ],
             "correctIndex": 1,
-            "correctTenseId": "presentPerfectContinuous"
+            "correctTenseId": "presentPerfectContinuous",
+            "explain": "Правильный вариант: Present Perfect Continuous."
           },
           {
             "id": "prp_cmp2_7",
@@ -1092,7 +1156,8 @@
               "Present Perfect Continuous"
             ],
             "correctIndex": 0,
-            "correctTenseId": "presentPerfect"
+            "correctTenseId": "presentPerfect",
+            "explain": "Правильный вариант: Present Perfect."
           },
           {
             "id": "prp_cmp2_8",
@@ -1103,7 +1168,8 @@
               "Present Perfect Continuous"
             ],
             "correctIndex": 1,
-            "correctTenseId": "presentPerfectContinuous"
+            "correctTenseId": "presentPerfectContinuous",
+            "explain": "Правильный вариант: Present Perfect Continuous."
           },
           {
             "id": "prp_cmp2_9",
@@ -1114,7 +1180,8 @@
               "Present Perfect Continuous"
             ],
             "correctIndex": 0,
-            "correctTenseId": "presentPerfect"
+            "correctTenseId": "presentPerfect",
+            "explain": "Правильный вариант: Present Perfect."
           },
           {
             "id": "prp_cmp2_10",
@@ -1125,7 +1192,8 @@
               "Present Perfect Continuous"
             ],
             "correctIndex": 1,
-            "correctTenseId": "presentPerfectContinuous"
+            "correctTenseId": "presentPerfectContinuous",
+            "explain": "Правильный вариант: Present Perfect Continuous."
           }
         ]
       }

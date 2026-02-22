@@ -1169,11 +1169,29 @@ function dictFilenameForSection(sectionName){
     }
   }
 
+  // Prevent "answer peek" while the card flips back to the next question:
+  // - keep back side empty during question stage
+  // - fill back side only after check
+  function learnClearBack(){
+    if(elLearnBack) elLearnBack.textContent = '';
+    if(elLearnBackLang) elLearnBackLang.textContent = '';
+  }
+
+  function learnFillBackAnswer(item, askLang, cfg){
+    if(!item) return;
+    const exp = practiceExpected(item, askLang, cfg);
+    if(elLearnBack) elLearnBack.textContent = exp.expectedRaw || '';
+    if(elLearnBackLang) elLearnBackLang.textContent = (exp.lang === 'en') ? 'EN' : (exp.lang === 'ru' ? 'RU' : String(exp.lang||''));
+  }
+
+
+
 
   function learnShow(task){
     learnCurrent = task;
     learnHintLevel = 0;
     learnHintUsed = false;
+    learnClearBack();
     learnSetFlipped(false);
     learnSetIntroUi(false);
 
@@ -1268,9 +1286,9 @@ if(task.type === 'intro'){
 
     const frontIsEn = (askLang === 'en');
     if(elLearnFront) elLearnFront.textContent = frontIsEn ? task.item.en : task.item.ru;
-    if(elLearnBack) elLearnBack.textContent = frontIsEn ? task.item.ru : task.item.en;
+    // Keep back side empty until after check (prevents answer peek during flip)
+    learnClearBack();
     if(elLearnFrontLang) elLearnFrontLang.textContent = frontIsEn ? 'EN' : 'RU';
-    if(elLearnBackLang) elLearnBackLang.textContent = frontIsEn ? 'RU' : 'EN';
 
     const hintText = frontIsEn ? 'переведи на русский' : 'переведи на английский';
     if(elLearnPromptLabel) elLearnPromptLabel.textContent = (task.type === 'retype') ? 'введи правильный ответ' : hintText;
@@ -1291,8 +1309,27 @@ if(task.type === 'intro'){
 
   function learnInsertTask(task, gapMin, gapMax){
     if(!learnSession) return;
-    const gap = gapMin + Math.floor(Math.random() * Math.max(1, (gapMax-gapMin+1)));
-    const idx = Math.min(learnSession.queue.length, gap);
+
+    const minGap = Math.max(0, Math.floor(Number(gapMin) || 0));
+    const maxGap = Math.max(minGap, Math.floor(Number(gapMax) || minGap));
+    const key = (task && task.item) ? practiceKey(task.item) : '';
+
+    const gap = minGap + Math.floor(Math.random() * Math.max(1, (maxGap-minGap+1)));
+    let idx = Math.min(learnSession.queue.length, gap);
+
+    // Anti-loop: если это слово уже есть в ближайших заданиях, не ставим его ещё ближе.
+    if(key && learnSession.queue && learnSession.queue.length){
+      const scanTo = Math.min(learnSession.queue.length, idx + 1);
+      for(let i=0;i<scanTo;i++){
+        const t = learnSession.queue[i];
+        if(!t || !t.item) continue;
+        if(t.type === 'test' && practiceKey(t.item) === key){
+          idx = Math.min(learnSession.queue.length, i + minGap);
+          break;
+        }
+      }
+    }
+
     learnSession.queue.splice(idx, 0, task);
   }
 
@@ -1355,6 +1392,15 @@ if(elLearnInput){
   }
   elLearnInput.disabled = true;
 }
+  // Fill back side with the correct answer only after check
+  try{
+    const t = learnCurrent;
+    if(t && t.item && (t.type === 'test' || t.type === 'retype')){
+      const cfg = learnSession ? learnSession.cfg : loadLearnCfg();
+      const askLang = learnAskLang || learnChooseAskLang(t.item, cfg);
+      learnFillBackAnswer(t.item, askLang, cfg);
+    }
+  }catch(_e){}
 learnSetFlipped(true);
 learnCheckMode = 'next';
 if(btnLearnCheckNext){ btnLearnCheckNext.textContent = 'далее'; btnLearnCheckNext.title = 'Далее (Enter)'; }
@@ -1384,7 +1430,12 @@ if(btnLearnCheckNext){ btnLearnCheckNext.textContent = 'далее'; btnLearnChe
       btnLearnCheckNext.textContent = 'check';
       btnLearnCheckNext.title = 'Check (Enter)';
     }
-    learnSetFeedback('wrong', 'fix', 'введи правильно чтобы продолжить');
+    if(btnLearnGiveUp){
+      btnLearnGiveUp.style.display = '';
+      btnLearnGiveUp.textContent = 'пропустить';
+      btnLearnGiveUp.title = 'Пропустить и продолжить (слово вернётся позже)';
+    }
+    learnSetFeedback('wrong', 'fix', 'введи правильно (или нажми "пропустить")');
   }
 
 
@@ -1525,6 +1576,7 @@ if(btnLearnCheckNext){ btnLearnCheckNext.textContent = 'далее'; btnLearnChe
         // retype correct - move on
         learnSetFeedback('correct', 'ok', 'принято - жми далее');
         learnLockAfterCheck(true);
+        if(btnLearnGiveUp){ btnLearnGiveUp.textContent = 'сдаюсь'; btnLearnGiveUp.title = 'Показать ответ (считается ошибкой)'; }
         return;
       }
       learnHandleCorrect(task, cfg);
@@ -1611,11 +1663,12 @@ if(btnLearnCheckNext){ btnLearnCheckNext.textContent = 'далее'; btnLearnChe
     const cfg = learnSession ? learnSession.cfg : loadLearnCfg();
     learnHintUsed = true;
     if(learnCurrent.type === 'retype'){
-      learnSetFeedback('wrong', 'no', 'введи правильно, чтобы продолжить');
-      if(elLearnInput){
-        elLearnInput.classList.remove('is-ok');
-        elLearnInput.classList.add('is-bad');
-        pulse(elLearnInput, 'ik-shake');
+      // Fail-safe: не блокируем сессию на одном слове навсегда
+      learnSetFeedback('wrong', 'skip', 'пропущено — слово вернётся позже');
+      learnLockAfterCheck(false);
+      if(btnLearnGiveUp){
+        btnLearnGiveUp.textContent = 'сдаюсь';
+        btnLearnGiveUp.title = 'Показать ответ (считается ошибкой)';
       }
       return;
     }
@@ -2244,6 +2297,7 @@ function quizMcqLock(){
     const btns = Array.from(elQuizMcqButtons.querySelectorAll('button'));
     for(const b of btns) b.disabled = true;
   }
+  quizFillBackAnswer(quizCurrent, quizAskLang, cfgFromUI());
   quizSetFlipped(true);
   quizCheckMode = 'next';
   btnQuizCheckNext.textContent = 'далее';
@@ -2910,6 +2964,22 @@ li.appendChild(left);
     }
   }
 
+
+  // Prevent answer peek on NEXT: keep back empty until check
+  function quizClearBack(){
+    if(elQuizBack) elQuizBack.textContent = '';
+    if(elQuizBackLang) elQuizBackLang.textContent = '';
+  }
+
+  function quizFillBackAnswer(item, askLang, cfg){
+    if(!item) return;
+    const exp = practiceExpected(item, askLang, cfg);
+    if(elQuizBack) elQuizBack.textContent = exp.expectedRaw || '';
+    if(elQuizBackLang){
+      elQuizBackLang.textContent = (exp.lang === 'en') ? 'EN' : (exp.lang === 'ru' ? 'RU' : String(exp.lang || ''));
+    }
+  }
+
   function quizPickAskLang(item){
     const pref = String(elQuizMode.value || 'en');
     if(pref === 'mix') return Math.random() < 0.5 ? 'en' : 'ru';
@@ -2968,6 +3038,7 @@ li.appendChild(left);
     quizRenderPromptLabel(quizAskLang);
 
     quizSetFlipped(false);
+    quizClearBack();
 
     elQuizInput.classList.remove('is-ok', 'is-bad');
     elQuizInput.disabled = false;
@@ -2996,9 +3067,8 @@ li.appendChild(left);
 
     const frontIsEn = quizAskLang === 'en';
     elQuizFront.textContent = frontIsEn ? quizCurrent.en : quizCurrent.ru;
-    elQuizBack.textContent = frontIsEn ? quizCurrent.ru : quizCurrent.en;
+    // back (answer) is filled only after check
     elQuizFrontLang.textContent = frontIsEn ? 'EN' : 'RU';
-    elQuizBackLang.textContent = frontIsEn ? 'RU' : 'EN';
 
     const cfg = cfgFromUI();
     const kind = quizDecideTaskKind(quizCurrent, cfg);
@@ -3110,6 +3180,7 @@ li.appendChild(left);
       pulse(elQuizInput, 'ik-shake');
     }
     elQuizInput.disabled = true;
+    quizFillBackAnswer(quizCurrent, quizAskLang, cfgFromUI());
     quizSetFlipped(true); // show answer
     setQuizMode('next');
   }

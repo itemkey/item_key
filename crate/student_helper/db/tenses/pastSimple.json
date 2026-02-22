@@ -186,7 +186,8 @@
               "процесс",
               "фон"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "Правильный вариант: законченное действие."
           },
           {
             "id": "ps_m_2",
@@ -197,7 +198,8 @@
               "последовательность действий",
               "фон"
             ],
-            "correctIndex": 1
+            "correctIndex": 1,
+            "explain": "Правильный вариант: последовательность действий."
           },
           {
             "id": "ps_m_3",
@@ -208,7 +210,8 @@
               "процесс",
               "прерванное действие"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "Правильный вариант: привычка в прошлом."
           },
           {
             "id": "ps_m_4",
@@ -219,7 +222,8 @@
               "процесс",
               "фон"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "Правильный вариант: законченное действие (отрицание)."
           },
           {
             "id": "ps_m_5",
@@ -230,7 +234,8 @@
               "процесс",
               "атмосфера/фон"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "Правильный вариант: законч. действие (вопрос)."
           },
           {
             "id": "ps_m_6",
@@ -241,7 +246,8 @@
               "процесс",
               "прерванное действие"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "Правильный вариант: состояние в прошлом (to be)."
           },
           {
             "id": "ps_m_7",
@@ -252,7 +258,8 @@
               "процесс в моменте",
               "раздражение (always)"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "Правильный вариант: долгое состояние/факт в прошлом."
           },
           {
             "id": "ps_m_8",
@@ -263,7 +270,8 @@
               "процесс",
               "фон"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "Правильный вариант: последовательность действий."
           },
           {
             "id": "ps_m_9",
@@ -274,7 +282,8 @@
               "прерванное действие",
               "процесс"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "Правильный вариант: привычка в прошлом."
           },
           {
             "id": "ps_m_10",
@@ -285,7 +294,8 @@
               "длительный процесс",
               "фон"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "Правильный вариант: точное событие/факт в прошлом."
           }
         ]
       },
@@ -300,7 +310,8 @@
             "prompt": "Yesterday I ________ (play) football.",
             "accepted": [
               "played"
-            ]
+            ],
+            "explain": "Правильный ответ: played. Past Simple = V2 / did + V1 (и есть точное прошлое время). Подсказка: 'yesterday'."
           },
           {
             "id": "ps_f_2",
@@ -308,7 +319,8 @@
             "prompt": "Did you ________ (call) your mother yesterday?",
             "accepted": [
               "call"
-            ]
+            ],
+            "explain": "Правильный ответ: call. Past Simple = V2 / did + V1 (и есть точное прошлое время). Подсказка: 'yesterday'."
           },
           {
             "id": "ps_f_3",
@@ -317,7 +329,8 @@
             "accepted": [
               "didn't watch",
               "did not watch"
-            ]
+            ],
+            "explain": "Правильный ответ: didn't watch. Past Simple = V2 / did + V1 (и есть точное прошлое время). Подсказка: 'last night'."
           },
           {
             "id": "ps_f_4",
@@ -325,7 +338,8 @@
             "prompt": "She ________ (go) to Moscow last year.",
             "accepted": [
               "went"
-            ]
+            ],
+            "explain": "Правильный ответ: went. Past Simple = V2 / did + V1 (и есть точное прошлое время). Подсказка: 'last year'."
           },
           {
             "id": "ps_f_5",
@@ -333,7 +347,8 @@
             "prompt": "I ________ (be) at home yesterday.",
             "accepted": [
               "was"
-            ]
+            ],
+            "explain": "Правильный ответ: was. Past Simple = V2 / did + V1 (и есть точное прошлое время). Подсказка: 'yesterday'."
           },
           {
             "id": "ps_f_6",
@@ -341,7 +356,8 @@
             "prompt": "They ________ (be) happy last year.",
             "accepted": [
               "were"
-            ]
+            ],
+            "explain": "Правильный ответ: were. Past Simple = V2 / did + V1 (и есть точное прошлое время). Подсказка: 'last year'."
           },
           {
             "id": "ps_f_7",
@@ -352,7 +368,8 @@
               "Were you at school yesterday",
               "Were you at school?",
               "Were you at school"
-            ]
+            ],
+            "explain": "Правильный ответ: Were you at school yesterday?. Past Simple = V2 / did + V1 (и есть точное прошлое время). Подсказка: 'yesterday'."
           },
           {
             "id": "ps_f_8",
@@ -361,7 +378,8 @@
             "accepted": [
               "wasn't ready",
               "was not ready"
-            ]
+            ],
+            "explain": "Правильный ответ: wasn't ready. Past Simple = V2 / did + V1 (и есть точное прошлое время)."
           },
           {
             "id": "ps_f_9",
@@ -369,7 +387,8 @@
             "prompt": "We ________ (finish) the project in 2020.",
             "accepted": [
               "finished"
-            ]
+            ],
+            "explain": "Правильный ответ: finished. Past Simple = V2 / did + V1 (и есть точное прошлое время). Подсказка: 'in 20'."
           },
           {
             "id": "ps_f_10",
@@ -378,7 +397,8 @@
             "accepted": [
               "didn't go",
               "did not go"
-            ]
+            ],
+            "explain": "Правильный ответ: didn't go. Past Simple = V2 / did + V1 (и есть точное прошлое время)."
           },
           {
             "id": "ps_f_11",
@@ -386,7 +406,8 @@
             "prompt": "Did he ________ (write) an email?",
             "accepted": [
               "write"
-            ]
+            ],
+            "explain": "Правильный ответ: write. Past Simple = V2 / did + V1 (и есть точное прошлое время)."
           },
           {
             "id": "ps_f_12",
@@ -394,7 +415,8 @@
             "prompt": "They ________ (take) a taxi yesterday.",
             "accepted": [
               "took"
-            ]
+            ],
+            "explain": "Правильный ответ: took. Past Simple = V2 / did + V1 (и есть точное прошлое время). Подсказка: 'yesterday'."
           },
           {
             "id": "ps_f_13",
@@ -402,7 +424,8 @@
             "prompt": "Last weekend we ________ (visit) our grandparents.",
             "accepted": [
               "visited"
-            ]
+            ],
+            "explain": "Правильный ответ: visited. Past Simple = V2 / did + V1 (и есть точное прошлое время). Подсказка: 'last week'."
           }
         ]
       },
@@ -426,7 +449,8 @@
               0,
               2,
               3
-            ]
+            ],
+            "explain": "Нужно выбрать: yesterday, last year, in 2010."
           },
           {
             "id": "ps_mark_2",
@@ -443,7 +467,8 @@
               0,
               2,
               4
-            ]
+            ],
+            "explain": "Нужно выбрать: last night, in 1999, two years ago."
           },
           {
             "id": "ps_mark_3",
@@ -459,7 +484,8 @@
             "correctIndices": [
               0,
               2
-            ]
+            ],
+            "explain": "Нужно выбрать: when I was a child, during the war."
           },
           {
             "id": "ps_mark_4",
@@ -476,7 +502,8 @@
               0,
               2,
               4
-            ]
+            ],
+            "explain": "Нужно выбрать: yesterday morning, last month, in 2012."
           }
         ]
       },
@@ -492,7 +519,8 @@
             "accepted": [
               "Did you go there?",
               "Did you go there"
-            ]
+            ],
+            "explain": "Правильный ответ: Did you go there?. Past Simple = V2 / did + V1 (и есть точное прошлое время)."
           },
           {
             "id": "ps_err_2",
@@ -503,7 +531,8 @@
               "I did not go home.",
               "I didn't go home",
               "I did not go home"
-            ]
+            ],
+            "explain": "Правильный ответ: I didn't go home.. Past Simple = V2 / did + V1 (и есть точное прошлое время)."
           },
           {
             "id": "ps_err_3",
@@ -515,7 +544,8 @@
             ],
             "acceptedShort": [
               "go"
-            ]
+            ],
+            "explain": "Правильный ответ: Did she go to Moscow?. Past Simple = V2 / did + V1 (и есть точное прошлое время)."
           },
           {
             "id": "ps_err_4",
@@ -531,7 +561,8 @@
               "watch",
               "didn't watch",
               "did not watch"
-            ]
+            ],
+            "explain": "Правильный ответ: They didn't watch TV.. Past Simple = V2 / did + V1 (и есть точное прошлое время)."
           },
           {
             "id": "ps_err_5",
@@ -547,7 +578,8 @@
               "go",
               "didn't go",
               "did not go"
-            ]
+            ],
+            "explain": "Правильный ответ: He didn't go to work.. Past Simple = V2 / did + V1 (и есть точное прошлое время)."
           },
           {
             "id": "ps_err_6",
@@ -562,7 +594,8 @@
             "acceptedShort": [
               "were",
               "were you"
-            ]
+            ],
+            "explain": "Правильный ответ: Were you at home yesterday?. Past Simple = V2 / did + V1 (и есть точное прошлое время). Подсказка: 'yesterday'."
           },
           {
             "id": "ps_err_7",
@@ -574,7 +607,8 @@
             ],
             "acceptedShort": [
               "see"
-            ]
+            ],
+            "explain": "Правильный ответ: Did you see him?. Past Simple = V2 / did + V1 (и есть точное прошлое время)."
           },
           {
             "id": "ps_err_8",
@@ -590,7 +624,8 @@
               "play",
               "didn't play",
               "did not play"
-            ]
+            ],
+            "explain": "Правильный ответ: I didn't play football.. Past Simple = V2 / did + V1 (и есть точное прошлое время)."
           }
         ]
       },
@@ -610,7 +645,8 @@
               "привычка",
               "прерванное"
             ],
-            "correctIndex": 4
+            "correctIndex": 4,
+            "explain": "Правильный вариант: прерванное."
           },
           {
             "id": "ps_cmp_2",
@@ -623,7 +659,8 @@
               "привычка",
               "прерванное"
             ],
-            "correctIndex": 3
+            "correctIndex": 3,
+            "explain": "Правильный вариант: привычка."
           },
           {
             "id": "ps_cmp_3",
@@ -636,7 +673,8 @@
               "привычка",
               "прерванное"
             ],
-            "correctIndex": 1
+            "correctIndex": 1,
+            "explain": "Правильный вариант: процесс."
           },
           {
             "id": "ps_cmp_4",
@@ -649,7 +687,8 @@
               "привычка",
               "прерванное"
             ],
-            "correctIndex": 2
+            "correctIndex": 2,
+            "explain": "Правильный вариант: фон."
           },
           {
             "id": "ps_cmp_5",
@@ -662,7 +701,8 @@
               "привычка",
               "прерванное"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "Правильный вариант: цепочка."
           },
           {
             "id": "ps_cmp_6",
@@ -675,7 +715,8 @@
               "привычка",
               "прерванное"
             ],
-            "correctIndex": 3
+            "correctIndex": 3,
+            "explain": "Правильный вариант: привычка."
           },
           {
             "id": "ps_cmp_7",
@@ -688,7 +729,8 @@
               "привычка",
               "прерванное"
             ],
-            "correctIndex": 4
+            "correctIndex": 4,
+            "explain": "Правильный вариант: прерванное."
           }
         ]
       }

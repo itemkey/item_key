@@ -423,14 +423,14 @@
             "prompt": "He ____ ____ coffee in the evening. (negative)",
             "inputs": [
               {
-                "placeholder": "doesn't / does not",
+                "placeholder": "",
                 "accepted": [
                   "doesn't",
                   "does not"
                 ]
               },
               {
-                "placeholder": "drink",
+                "placeholder": "",
                 "accepted": [
                   "drink"
                 ]
@@ -443,13 +443,13 @@
             "prompt": "____ she ____ English? (question)",
             "inputs": [
               {
-                "placeholder": "Does",
+                "placeholder": "",
                 "accepted": [
                   "Does"
                 ]
               },
               {
-                "placeholder": "speak",
+                "placeholder": "",
                 "accepted": [
                   "speak"
                 ]
@@ -462,13 +462,13 @@
             "prompt": "My sister ____ ____ at 7. (get up)",
             "inputs": [
               {
-                "placeholder": "gets",
+                "placeholder": "",
                 "accepted": [
                   "gets"
                 ]
               },
               {
-                "placeholder": "up",
+                "placeholder": "",
                 "accepted": [
                   "up"
                 ]
@@ -481,13 +481,13 @@
             "prompt": "____ you ____ to music every day?",
             "inputs": [
               {
-                "placeholder": "Do",
+                "placeholder": "",
                 "accepted": [
                   "Do"
                 ]
               },
               {
-                "placeholder": "listen",
+                "placeholder": "",
                 "accepted": [
                   "listen"
                 ]
@@ -500,7 +500,7 @@
             "prompt": "The movie ____ ____ at 8. (start)",
             "inputs": [
               {
-                "placeholder": "starts",
+                "placeholder": "",
                 "accepted": [
                   "starts"
                 ]
@@ -519,14 +519,14 @@
             "prompt": "She ____ ____ meat. (negative)",
             "inputs": [
               {
-                "placeholder": "doesn't",
+                "placeholder": "",
                 "accepted": [
                   "doesn't",
                   "does not"
                 ]
               },
               {
-                "placeholder": "eat",
+                "placeholder": "",
                 "accepted": [
                   "eat"
                 ]

@@ -15,7 +15,9 @@
       "btnNext",
       "dictCardsNext",
       "btnQuizCheckNext",
+      "dictQuizCheckNext",
       "btnLearnCheckNext",
+      "dictLearnCheckNext",
       "next", "nextBtn", "btn-next", "btn-next-task",
       "tensesNext", "wtNext", "structureNext"
     ];
