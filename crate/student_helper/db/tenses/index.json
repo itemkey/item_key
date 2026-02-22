@@ -26,5 +26,19 @@
     "subtitle": "процесс - сейчас/временно",
     "hint": "now • temporary • changes • always/annoyed",
     "file": "presentContinuous.json"
+  },
+  {
+    "id": "presentPerfect",
+    "title": "Present Perfect",
+    "subtitle": "опыт - результат - период не закончен",
+    "hint": "result • experience • unfinished time • already/yet",
+    "file": "presentPerfect.json"
+  },
+  {
+    "id": "presentPerfectContinuous",
+    "title": "Present Perfect Continuous",
+    "subtitle": "длительность - процесс - видимый результат",
+    "hint": "for/since • how long • lately • tired/dirty",
+    "file": "presentPerfectContinuous.json"
   }
 ]

@@ -699,6 +699,7 @@ function dictFilenameForSection(sectionName){
   // Learn (spaced + recall)
   // -----------------------------
   const LEARN_CFG_KEY = 'student_helper_dict_learn_cfg_v1';
+  const LEARN_BATCHES_KEY = 'student_helper_dict_learn_batches_v1';
 
   let learnCfg = null;
 
@@ -716,6 +717,143 @@ function dictFilenameForSection(sectionName){
 
   const LEARN_SRS_FAST = [1,2,4,7];
   const LEARN_SRS_LONG = [1,3,7,14,30];
+
+  function ruNoun(n, one, few, many){
+    const x = Math.abs(Number(n) || 0);
+    const mod10 = x % 10;
+    const mod100 = x % 100;
+    if(mod10 === 1 && mod100 !== 11) return one;
+    if(mod10 >= 2 && mod10 <= 4 && !(mod100 >= 12 && mod100 <= 14)) return few;
+    return many;
+  }
+
+  function learnLoadBatches(){
+    const raw = localStorage.getItem(LEARN_BATCHES_KEY);
+    return safeJsonParse(raw, {}) || {};
+  }
+  function learnSaveBatches(b){
+    try{ localStorage.setItem(LEARN_BATCHES_KEY, JSON.stringify(b || {})); }catch(_){ }
+  }
+  function learnBatchKey(sectionId, source){
+    return `${String(sectionId||'').trim()}|${String(source||'').trim()}`;
+  }
+  function learnSyncBatch(batch, keysNow){
+    const nowSet = new Set(keysNow);
+    let order = Array.isArray(batch && batch.order)
+      ? batch.order.filter(k => nowSet.has(k))
+      : [];
+
+    const has = new Set(order);
+    for(const k of keysNow){
+      if(!has.has(k)) order.push(k);
+    }
+    if(!order.length) order = shuffle(keysNow);
+
+    let idx = Number(batch && batch.idx);
+    if(!Number.isFinite(idx)) idx = 0;
+    idx = Math.max(0, Math.min(idx, order.length));
+
+    return { order, idx };
+  }
+  function learnBatchPeek(sectionId, source, items){
+    const keysNow = items.map(practiceKey);
+    const store = learnLoadBatches();
+    const key = learnBatchKey(sectionId, source);
+    const synced = learnSyncBatch(store[key] || {}, keysNow);
+    store[key] = synced;
+    learnSaveBatches(store);
+    return {
+      remaining: Math.max(0, synced.order.length - synced.idx),
+      total: synced.order.length,
+      idx: synced.idx
+    };
+  }
+  function learnBatchTake(sectionId, source, items, want){
+    const keysNow = items.map(practiceKey);
+    const store = learnLoadBatches();
+    const key = learnBatchKey(sectionId, source);
+    let batch = learnSyncBatch(store[key] || {}, keysNow);
+
+    // start a new cycle when finished
+    if(batch.idx >= batch.order.length){
+      batch.order = shuffle(batch.order.slice());
+      batch.idx = 0;
+    }
+
+    const sliceKeys = batch.order.slice(batch.idx, batch.idx + want);
+    batch.idx += sliceKeys.length;
+    store[key] = batch;
+    learnSaveBatches(store);
+
+    const byKey = new Map(items.map(it => [practiceKey(it), it]));
+    const picked = sliceKeys.map(k => byKey.get(k)).filter(Boolean);
+
+    return {
+      picked,
+      remaining: Math.max(0, batch.order.length - batch.idx),
+      total: batch.order.length
+    };
+  }
+
+  function learnCountCandidates(items, cfg, sectionId){
+    const now = Date.now();
+    if(cfg.source === 'all'){
+      const peek = learnBatchPeek(sectionId, 'all', items);
+      return peek.remaining;
+    }
+    let cnt = 0;
+    for(const it of items){
+      const st = practiceGetStat(it) || {};
+      const srs = st.srs || null;
+      if(cfg.source === 'new'){
+        if(!srs || srs.step === undefined) cnt += 1;
+      }else if(cfg.source === 'due'){
+        if(srs && Number(srs.due || 0) > 0 && Number(srs.due) <= now) cnt += 1;
+      }else{
+        cnt += 1;
+      }
+    }
+    return cnt;
+  }
+
+  function learnRenderIdleNext(sectionId, cfg){
+    // show a helpful message on the big card when we're idle (e.g. after finishing a portion)
+    if(!elLearnFront || !elLearnBack) return;
+
+    const portionSetting = Math.max(1, Number(cfg.portion || 8) || 8);
+    const sid = String(sectionId || '').trim();
+    if(!sid){
+      elLearnFront.textContent = 'выбери section';
+      elLearnBack.textContent = 'нажми start';
+      return;
+    }
+
+    const all = wordsForSelection(sid);
+    if(!all.length){
+      elLearnFront.textContent = 'нет слов';
+      elLearnBack.textContent = 'добавь в constructor';
+      return;
+    }
+
+    const remain = learnCountCandidates(all, cfg, sid);
+    const nextN = Math.min(portionSetting, remain);
+    if(remain <= 0){
+      if(cfg.source === 'new'){
+        elLearnFront.textContent = 'новых слов нет';
+        elLearnBack.textContent = 'выбери другой источник';
+      }else if(cfg.source === 'all'){
+        elLearnFront.textContent = 'раздел пройден';
+        elLearnBack.textContent = `нажми start (повтор ${portionSetting})`;
+      }else{
+        elLearnFront.textContent = 'нет слов для этого источника';
+        elLearnBack.textContent = 'измени настройки';
+      }
+    }else{
+      const w = ruNoun(nextN, 'термин', 'термина', 'терминов');
+      elLearnFront.textContent = `выучить ещё ${nextN} ${w}`;
+      elLearnBack.textContent = 'нажми start';
+    }
+  }
 
   function loadLearnCfg(){
     const def = {
@@ -964,9 +1102,16 @@ function dictFilenameForSection(sectionName){
       return;
     }
 
-    const candidates = learnCandidateFilter(all, cfg);
-    const want = Math.min(Number(cfg.portion || 8) || 8, candidates.length || 0);
-    const picked = candidates.slice(0, want);
+    let picked = [];
+    if(cfg.source === 'all'){
+      const want = Math.min(Number(cfg.portion || 8) || 8, all.length || 0);
+      const res = learnBatchTake(sel, 'all', all, want);
+      picked = res.picked;
+    }else{
+      const candidates = learnCandidateFilter(all, cfg);
+      const want = Math.min(Number(cfg.portion || 8) || 8, candidates.length || 0);
+      picked = candidates.slice(0, want);
+    }
 
     if(!picked.length){
       learnShow(null);
@@ -1153,9 +1298,12 @@ if(task.type === 'intro'){
 
   function learnNext(){
     if(!learnSession || !learnSession.queue.length){
+      const prev = learnSession;
       learnShow(null);
-      if(learnSession){
-        learnSetFeedback('correct', 'done', `сессия завершена: выучено ${learnSession.learnedCount}/${learnSession.portion}`);
+      if(prev){
+        learnSetFeedback('correct', 'done', `сессия завершена: выучено ${prev.learnedCount}/${prev.portion}`);
+        const sid = String(elSectionLearn && elSectionLearn.value || '').trim();
+        learnRenderIdleNext(sid, prev.cfg || loadLearnCfg());
       }
       return;
     }

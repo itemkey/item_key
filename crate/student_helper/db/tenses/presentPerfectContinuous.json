@@ -1,0 +1,1062 @@
+{
+  "id": "presentPerfectContinuous",
+  "title": "Present Perfect Continuous",
+  "subtitle": "длительность • процесс • видимый результат",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Когда используем Present Perfect Continuous"
+    },
+    {
+      "type": "text",
+      "text": "Present Perfect Continuous подчёркивает длительность или процесс, который начался в прошлом и продолжается до сих пор (или только что закончился), и важен сейчас (часто есть видимый результат)."
+    },
+    {
+      "type": "highlight",
+      "title": "Быстрые ассоциации",
+      "lines": [
+        "how long? → как долго (for/since/how long)",
+        "process → чем занимался (акцент на процессе)",
+        "visible result → есть «следы» сейчас (tired, dirty, wet)",
+        "recent activity → действие было недавно/в последнее время (lately/recently)",
+        "annoyed/criticize → раздражение: Someone has been lying to me."
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Формулы",
+      "columns": [
+        "",
+        "Утверждение",
+        "Отрицание",
+        "Вопрос"
+      ],
+      "rows": [
+        [
+          "I/You/We/They",
+          "have been + V-ing",
+          "haven't / have not been + V-ing",
+          "Have + S + been + V-ing?"
+        ],
+        [
+          "He/She/It",
+          "has been + V-ing",
+          "hasn't / has not been + V-ing",
+          "Has + S + been + V-ing?"
+        ]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Важно: been",
+      "lines": [
+        "Present Perfect Continuous = have/has + been + V-ing",
+        "Нельзя: I have working → I have been working",
+        "Stative verbs (know, love, belong) обычно НЕ Continuous → I've known him for years."
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Временные маркеры",
+      "columns": [
+        "Тип",
+        "Маркеры"
+      ],
+      "rows": [
+        [
+          "длительность",
+          "for, since, how long, all day/week, for ages"
+        ],
+        [
+          "в последнее время",
+          "lately, recently, these days"
+        ],
+        [
+          "контекст/результат",
+          "look at you!, your hands are dirty, I'm tired"
+        ],
+        [
+          "период не закончен",
+          "today, this week (когда акцент на процессе)"
+        ]
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Ключевые случаи"
+    },
+    {
+      "type": "highlight",
+      "title": "3 основных случая",
+      "lines": [
+        "Действие началось в прошлом и длится до сих пор: I've been studying since 8 o’clock.",
+        "Длительное действие привело к видимому результату: He’s tired. He’s been working all day.",
+        "Чтобы выразить раздражение/критику (часто «в последнее время»): Someone has been using my cup!"
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        {
+          "en": "I've been waiting for an hour.",
+          "ru": "Я жду уже час."
+        },
+        {
+          "en": "She has been studying since 8 o’clock.",
+          "ru": "Она учится с 8 часов."
+        },
+        {
+          "en": "They have been living here for two years.",
+          "ru": "Они живут здесь уже два года."
+        },
+        {
+          "en": "He has been working all day. That's why he's tired.",
+          "ru": "Он работал весь день, поэтому он устал."
+        },
+        {
+          "en": "Someone has been lying to me!",
+          "ru": "Кто-то мне врёт! (раздражение)"
+        },
+        {
+          "en": "Why are your hands dirty? I've been fixing my bike.",
+          "ru": "Почему руки грязные? Я чинил велосипед."
+        },
+        {
+          "en": "It has been raining since morning.",
+          "ru": "Дождь идёт с утра."
+        },
+        {
+          "en": "Have you been exercising lately?",
+          "ru": "Ты занимался спортом в последнее время?"
+        },
+        {
+          "en": "I haven't been sleeping well recently.",
+          "ru": "Я плохо сплю в последнее время."
+        },
+        {
+          "en": "How long have you been learning English?",
+          "ru": "Как давно ты учишь английский?"
+        },
+        {
+          "en": "She's been talking on the phone for ages!",
+          "ru": "Она болтает по телефону целую вечность!"
+        },
+        {
+          "en": "We have been looking for a new flat.",
+          "ru": "Мы ищем новую квартиру (процесс)."
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Short answers, сокращения и нюансы"
+    },
+    {
+      "type": "highlight",
+      "title": "Быстро",
+      "lines": [
+        "Yes, I have. / No, I haven't.",
+        "Yes, he has. / No, he hasn't.",
+        "I've been / he's been / haven't been / hasn't been",
+        "С for/since обычно спрашиваем: How long have you been ...?",
+        "Можно сказать: I've been waiting (процесс), I've waited (факт/результат)."
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Типичные ошибки"
+    },
+    {
+      "type": "highlight",
+      "title": "Ошибки → исправление",
+      "lines": [
+        "I have working → I have been working",
+        "He has been work → He has been working",
+        "Since 2 hours → for 2 hours",
+        "I am working here since 2020 → I've been working here since 2020",
+        "I have been knowing → I've known (stative)"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Сравнение: Present Perfect vs Present Perfect Continuous"
+    },
+    {
+      "type": "highlight",
+      "title": "Супер-правило",
+      "lines": [
+        "Perfect = результат/факт/количество (что сделано, сколько раз)",
+        "Perfect Continuous = длительность/процесс/«следы» (как долго, чем занимался)"
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        {
+          "en": "I've written five emails.",
+          "ru": "Я написал 5 писем (сколько, результат)."
+        },
+        {
+          "en": "I've been writing emails all morning.",
+          "ru": "Я пишу письма всё утро (процесс)."
+        },
+        {
+          "en": "I've read 3 chapters.",
+          "ru": "Я прочитал 3 главы (результат)."
+        },
+        {
+          "en": "I've been reading for an hour.",
+          "ru": "Я читаю уже час (длительность)."
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Сравнение: Present Perfect Continuous vs Past Simple"
+    },
+    {
+      "type": "table",
+      "caption": "Чтобы не путаться",
+      "columns": [
+        "Present Perfect Continuous",
+        "Past Simple"
+      ],
+      "rows": [
+        [
+          "длится до сейчас / недавно, важно сейчас",
+          "закончилось в прошлом, важно когда"
+        ],
+        [
+          "I've been working all day. (сейчас устал)",
+          "I worked all day yesterday. (вчера)"
+        ],
+        [
+          "часто for/since/how long, lately/recently",
+          "часто yesterday/last week/in 2010/two days ago"
+        ]
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": [
+      {
+        "id": "meaning",
+        "title": "Когда используем (Meaning)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "ppc_m_1",
+            "instruction": "Выбери ситуацию",
+            "prompt": "I've been waiting for 20 minutes.",
+            "options": [
+              "длительность/процесс",
+              "точное прошлое время",
+              "привычка"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "ppc_m_2",
+            "instruction": "Выбери ситуацию",
+            "prompt": "He's tired. He's been working all day.",
+            "options": [
+              "видимый результат",
+              "расписание",
+              "точное прошлое"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "ppc_m_3",
+            "instruction": "Выбери ситуацию",
+            "prompt": "Someone has been using my laptop!",
+            "options": [
+              "раздражение/критика",
+              "факт навсегда",
+              "процесс сейчас (Present Continuous)"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "ppc_m_4",
+            "instruction": "Выбери ситуацию",
+            "prompt": "How long have you been learning English?",
+            "options": [
+              "как долго (how long)",
+              "когда именно (past)",
+              "будущее"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "ppc_m_5",
+            "instruction": "Выбери ситуацию",
+            "prompt": "I've been studying since 8 o’clock.",
+            "options": [
+              "since + точка отсчёта",
+              "точное событие вчера",
+              "привычка"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "ppc_m_6",
+            "instruction": "Выбери ситуацию",
+            "prompt": "It's been raining all morning.",
+            "options": [
+              "процесс/длительность",
+              "разовое прошлое",
+              "расписание"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "ppc_m_7",
+            "instruction": "Выбери ситуацию",
+            "prompt": "I haven't been sleeping well recently.",
+            "options": [
+              "в последнее время",
+              "вчера",
+              "всегда"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "ppc_m_8",
+            "instruction": "Выбери ситуацию",
+            "prompt": "Look at you! You've been running.",
+            "options": [
+              "видимый результат (потеешь/устал)",
+              "точное прошлое время",
+              "привычка"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "ppc_m_9",
+            "instruction": "Выбери ситуацию",
+            "prompt": "We've been looking for a new flat.",
+            "options": [
+              "процесс сейчас (долго)",
+              "точное прошлое",
+              "расписание"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "ppc_m_10",
+            "instruction": "Выбери ситуацию",
+            "prompt": "Have you been working a lot lately?",
+            "options": [
+              "в последнее время",
+              "когда именно",
+              "привычка всегда"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "ppc_m_11",
+            "instruction": "Выбери ситуацию",
+            "prompt": "She's been talking on the phone for ages!",
+            "options": [
+              "длительность + раздражение",
+              "расписание",
+              "точное прошлое"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "ppc_m_12",
+            "instruction": "Выбери ситуацию",
+            "prompt": "They've been traveling since Monday.",
+            "options": [
+              "since + точка отсчёта",
+              "вчера",
+              "привычка"
+            ],
+            "correctIndex": 0
+          }
+        ]
+      },
+      {
+        "id": "formula",
+        "title": "Формулы (Formula)",
+        "kind": "input",
+        "items": [
+          {
+            "id": "ppc_f_1",
+            "instruction": "Вставь форму",
+            "prompt": "I ____ ____ (work) all day.",
+            "accepted": [
+              "have been working",
+              "'ve been working"
+            ]
+          },
+          {
+            "id": "ppc_f_2",
+            "instruction": "Вставь форму",
+            "prompt": "She ____ ____ (study) since 8.",
+            "accepted": [
+              "has been studying",
+              "'s been studying"
+            ]
+          },
+          {
+            "id": "ppc_f_3",
+            "instruction": "Отрицание",
+            "prompt": "We ____ ____ (not/sleep) well recently.",
+            "accepted": [
+              "haven't been sleeping",
+              "have not been sleeping"
+            ]
+          },
+          {
+            "id": "ppc_f_4",
+            "instruction": "Отрицание",
+            "prompt": "He ____ ____ (not/work) today.",
+            "accepted": [
+              "hasn't been working",
+              "has not been working"
+            ]
+          },
+          {
+            "id": "ppc_f_5",
+            "instruction": "Вопрос",
+            "prompt": "____ you ____ ____ (wait) long?",
+            "accepted": [
+              "Have you been waiting long?",
+              "Have you been waiting long"
+            ]
+          },
+          {
+            "id": "ppc_f_6",
+            "instruction": "Вопрос",
+            "prompt": "____ she ____ ____ (learn) English for a year?",
+            "accepted": [
+              "Has she been learning English for a year?",
+              "Has she been learning English for a year"
+            ]
+          },
+          {
+            "id": "ppc_f_7",
+            "instruction": "Вставь форму",
+            "prompt": "It ____ ____ (rain) since morning.",
+            "accepted": [
+              "has been raining",
+              "'s been raining"
+            ]
+          },
+          {
+            "id": "ppc_f_8",
+            "instruction": "Вставь форму",
+            "prompt": "They ____ ____ (travel) for weeks.",
+            "accepted": [
+              "have been traveling",
+              "have been travelling",
+              "'ve been traveling",
+              "'ve been travelling"
+            ]
+          },
+          {
+            "id": "ppc_f_9",
+            "instruction": "Как долго",
+            "prompt": "How long ____ you ____ ____ (live) here?",
+            "accepted": [
+              "have you been living here?",
+              "have you been living here"
+            ]
+          },
+          {
+            "id": "ppc_f_10",
+            "instruction": "Вопрос",
+            "prompt": "What ____ you ____ ____ (do)?",
+            "accepted": [
+              "have you been doing?",
+              "have you been doing"
+            ]
+          },
+          {
+            "id": "ppc_f_11",
+            "instruction": "Отрицание",
+            "prompt": "I ____ ____ (not/feel) well lately.",
+            "accepted": [
+              "haven't been feeling",
+              "have not been feeling"
+            ]
+          },
+          {
+            "id": "ppc_f_12",
+            "instruction": "Вставь форму",
+            "prompt": "Someone ____ ____ (use) my phone!",
+            "accepted": [
+              "has been using"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "formula_2",
+        "goal": "formula",
+        "title": "Формулы (Multi-input)",
+        "kind": "multi_input",
+        "items": [
+          {
+            "id": "ppc_mi_1",
+            "instruction": "Заполни пропуски",
+            "prompt": "He ____ ____ ____ all day. (work)",
+            "inputs": [
+              {
+                "placeholder": "has / 's",
+                "accepted": [
+                  "has",
+                  "'s"
+                ]
+              },
+              {
+                "placeholder": "been",
+                "accepted": [
+                  "been"
+                ]
+              },
+              {
+                "placeholder": "working",
+                "accepted": [
+                  "working"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "ppc_mi_2",
+            "instruction": "Заполни пропуски",
+            "prompt": "We ____ ____ ____ for an hour. (wait)",
+            "inputs": [
+              {
+                "placeholder": "have / 've",
+                "accepted": [
+                  "have",
+                  "'ve"
+                ]
+              },
+              {
+                "placeholder": "been",
+                "accepted": [
+                  "been"
+                ]
+              },
+              {
+                "placeholder": "waiting",
+                "accepted": [
+                  "waiting"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "ppc_mi_3",
+            "instruction": "Заполни пропуски",
+            "prompt": "I ____ ____ ____ well recently. (not/sleep)",
+            "inputs": [
+              {
+                "placeholder": "haven't / have not",
+                "accepted": [
+                  "haven't",
+                  "have not"
+                ]
+              },
+              {
+                "placeholder": "been",
+                "accepted": [
+                  "been"
+                ]
+              },
+              {
+                "placeholder": "sleeping",
+                "accepted": [
+                  "sleeping"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "ppc_mi_4",
+            "instruction": "Заполни пропуски",
+            "prompt": "____ you ____ ____ a lot lately? (work)",
+            "inputs": [
+              {
+                "placeholder": "Have",
+                "accepted": [
+                  "Have"
+                ]
+              },
+              {
+                "placeholder": "been",
+                "accepted": [
+                  "been"
+                ]
+              },
+              {
+                "placeholder": "working",
+                "accepted": [
+                  "working"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "ppc_mi_5",
+            "instruction": "Заполни пропуски",
+            "prompt": "It ____ ____ ____ since morning. (rain)",
+            "inputs": [
+              {
+                "placeholder": "has",
+                "accepted": [
+                  "has"
+                ]
+              },
+              {
+                "placeholder": "been",
+                "accepted": [
+                  "been"
+                ]
+              },
+              {
+                "placeholder": "raining",
+                "accepted": [
+                  "raining"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "markers",
+        "title": "Маркеры (Markers)",
+        "kind": "multi",
+        "items": [
+          {
+            "id": "ppc_mark_1",
+            "instruction": "Выбери маркеры PPC",
+            "prompt": "Выбери маркеры Present Perfect Continuous:",
+            "options": [
+              "for",
+              "since",
+              "yesterday",
+              "how long",
+              "last year"
+            ],
+            "correctIndices": [
+              0,
+              1,
+              3
+            ]
+          },
+          {
+            "id": "ppc_mark_2",
+            "instruction": "Выбери маркеры «в последнее время»",
+            "prompt": "Что похоже на lately/recently?",
+            "options": [
+              "lately",
+              "recently",
+              "in 2010",
+              "two days ago",
+              "these days"
+            ],
+            "correctIndices": [
+              0,
+              1,
+              4
+            ]
+          },
+          {
+            "id": "ppc_mark_3",
+            "instruction": "Выбери маркеры длительности",
+            "prompt": "Что подходит к длительности?",
+            "options": [
+              "all day",
+              "for ages",
+              "at 7 pm",
+              "when",
+              "since Monday"
+            ],
+            "correctIndices": [
+              0,
+              1,
+              4
+            ]
+          }
+        ]
+      },
+      {
+        "id": "markers_2",
+        "goal": "markers",
+        "title": "Match: маркер → перевод/смысл",
+        "kind": "match",
+        "items": [
+          {
+            "id": "ppc_match_1",
+            "instruction": "Соедини",
+            "pairs": [
+              {
+                "left": "for",
+                "right": "в течение (период)"
+              },
+              {
+                "left": "since",
+                "right": "с (точка отсчёта)"
+              },
+              {
+                "left": "how long",
+                "right": "как долго"
+              },
+              {
+                "left": "lately",
+                "right": "в последнее время"
+              },
+              {
+                "left": "all day",
+                "right": "весь день"
+              }
+            ]
+          },
+          {
+            "id": "ppc_match_2",
+            "instruction": "Соедини",
+            "pairs": [
+              {
+                "left": "recently",
+                "right": "недавно"
+              },
+              {
+                "left": "for ages",
+                "right": "целую вечность"
+              },
+              {
+                "left": "these days",
+                "right": "в эти дни"
+              },
+              {
+                "left": "since morning",
+                "right": "с утра"
+              },
+              {
+                "left": "tired/dirty/wet",
+                "right": "видимый результат"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "mistakes",
+        "title": "Исправь ошибки (Mistakes)",
+        "kind": "correction",
+        "items": [
+          {
+            "id": "ppc_c_1",
+            "instruction": "Исправь",
+            "prompt": "I have working all day.",
+            "accepted": [
+              "I have been working all day.",
+              "I've been working all day."
+            ]
+          },
+          {
+            "id": "ppc_c_2",
+            "instruction": "Исправь",
+            "prompt": "He has been work since 9.",
+            "accepted": [
+              "He has been working since 9."
+            ]
+          },
+          {
+            "id": "ppc_c_3",
+            "instruction": "Исправь",
+            "prompt": "Since two hours I've been waiting.",
+            "accepted": [
+              "I've been waiting for two hours.",
+              "I have been waiting for two hours."
+            ]
+          },
+          {
+            "id": "ppc_c_4",
+            "instruction": "Исправь",
+            "prompt": "I am working here since 2020.",
+            "accepted": [
+              "I've been working here since 2020.",
+              "I have been working here since 2020."
+            ]
+          },
+          {
+            "id": "ppc_c_5",
+            "instruction": "Исправь",
+            "prompt": "Have you working lately?",
+            "accepted": [
+              "Have you been working lately?",
+              "Have you been working lately"
+            ]
+          },
+          {
+            "id": "ppc_c_6",
+            "instruction": "Исправь",
+            "prompt": "She have been studying.",
+            "accepted": [
+              "She has been studying."
+            ]
+          },
+          {
+            "id": "ppc_c_7",
+            "instruction": "Исправь",
+            "prompt": "I have been knowing him for years.",
+            "accepted": [
+              "I've known him for years.",
+              "I have known him for years."
+            ]
+          },
+          {
+            "id": "ppc_c_8",
+            "instruction": "Исправь",
+            "prompt": "They hasn't been traveling.",
+            "accepted": [
+              "They haven't been traveling.",
+              "They have not been traveling.",
+              "They haven't been travelling.",
+              "They have not been travelling."
+            ]
+          },
+          {
+            "id": "ppc_c_9",
+            "instruction": "Исправь",
+            "prompt": "It has been rain since morning.",
+            "accepted": [
+              "It has been raining since morning.",
+              "It's been raining since morning."
+            ]
+          },
+          {
+            "id": "ppc_c_10",
+            "instruction": "Исправь",
+            "prompt": "How long you have been waiting?",
+            "accepted": [
+              "How long have you been waiting?",
+              "How long have you been waiting"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "compare",
+        "title": "Present Perfect vs Present Perfect Continuous (Contrast)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "ppc_cmp_1",
+            "instruction": "Выбери время",
+            "prompt": "I ____ (write) 5 emails.",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentPerfect"
+          },
+          {
+            "id": "ppc_cmp_2",
+            "instruction": "Выбери время",
+            "prompt": "I ____ ____ (write) emails all morning.",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "presentPerfectContinuous"
+          },
+          {
+            "id": "ppc_cmp_3",
+            "instruction": "Выбери время",
+            "prompt": "How many pages ____ you ____ (read) today?",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentPerfect"
+          },
+          {
+            "id": "ppc_cmp_4",
+            "instruction": "Выбери время",
+            "prompt": "How long ____ you ____ ____ (read)?",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "presentPerfectContinuous"
+          },
+          {
+            "id": "ppc_cmp_5",
+            "instruction": "Выбери время",
+            "prompt": "I've ____ (lose) my keys.",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentPerfect"
+          },
+          {
+            "id": "ppc_cmp_6",
+            "instruction": "Выбери время",
+            "prompt": "My hands are dirty because I've ____ ____ (fix) my bike.",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "presentPerfectContinuous"
+          },
+          {
+            "id": "ppc_cmp_7",
+            "instruction": "Выбери время",
+            "prompt": "She ____ (visit) Paris twice.",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentPerfect"
+          },
+          {
+            "id": "ppc_cmp_8",
+            "instruction": "Выбери время",
+            "prompt": "She ____ ____ (travel) since Monday.",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "presentPerfectContinuous"
+          },
+          {
+            "id": "ppc_cmp_9",
+            "instruction": "Выбери время",
+            "prompt": "I ____ (know) him for years.",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentPerfect"
+          },
+          {
+            "id": "ppc_cmp_10",
+            "instruction": "Выбери время",
+            "prompt": "Why are you tired? I've ____ ____ (work) all day.",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "presentPerfectContinuous"
+          }
+        ]
+      },
+      {
+        "id": "compare_2",
+        "title": "Present Perfect Continuous vs Past Simple (Contrast)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "ppc_cmp2_1",
+            "instruction": "Выбери время",
+            "prompt": "I ____ (work) all day yesterday.",
+            "options": [
+              "Present Perfect Continuous",
+              "Past Simple"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "pastSimple"
+          },
+          {
+            "id": "ppc_cmp2_2",
+            "instruction": "Выбери время",
+            "prompt": "I ____ ____ (work) all day. (I'm tired now)",
+            "options": [
+              "Present Perfect Continuous",
+              "Past Simple"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentPerfectContinuous"
+          },
+          {
+            "id": "ppc_cmp2_3",
+            "instruction": "Выбери время",
+            "prompt": "She ____ (study) for 3 hours yesterday.",
+            "options": [
+              "Present Perfect Continuous",
+              "Past Simple"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "pastSimple"
+          },
+          {
+            "id": "ppc_cmp2_4",
+            "instruction": "Выбери время",
+            "prompt": "She ____ ____ (study) for 3 hours. (still now)",
+            "options": [
+              "Present Perfect Continuous",
+              "Past Simple"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentPerfectContinuous"
+          },
+          {
+            "id": "ppc_cmp2_5",
+            "instruction": "Выбери время",
+            "prompt": "They ____ (travel) to Spain last year.",
+            "options": [
+              "Present Perfect Continuous",
+              "Past Simple"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "pastSimple"
+          },
+          {
+            "id": "ppc_cmp2_6",
+            "instruction": "Выбери время",
+            "prompt": "They ____ ____ (travel) since Monday.",
+            "options": [
+              "Present Perfect Continuous",
+              "Past Simple"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentPerfectContinuous"
+          },
+          {
+            "id": "ppc_cmp2_7",
+            "instruction": "Выбери время",
+            "prompt": "It ____ (rain) all morning yesterday.",
+            "options": [
+              "Present Perfect Continuous",
+              "Past Simple"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "pastSimple"
+          },
+          {
+            "id": "ppc_cmp2_8",
+            "instruction": "Выбери время",
+            "prompt": "It ____ ____ (rain) since morning.",
+            "options": [
+              "Present Perfect Continuous",
+              "Past Simple"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentPerfectContinuous"
+          }
+        ]
+      }
+    ]
+  }
+}

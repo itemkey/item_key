@@ -1,0 +1,1134 @@
+{
+  "id": "presentPerfect",
+  "title": "Present Perfect",
+  "subtitle": "опыт • результат • период не закончен",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Когда используем Present Perfect"
+    },
+    {
+      "type": "text",
+      "text": "Present Perfect связывает прошлое с настоящим: действие произошло раньше, но важно сейчас (есть результат/опыт, или период времени ещё не закончился)."
+    },
+    {
+      "type": "highlight",
+      "title": "Быстрые ассоциации",
+      "lines": [
+        "result now → есть результат сейчас",
+        "life experience → опыт (ever/never)",
+        "unfinished time → сегодня/на этой неделе/в этом году",
+        "recent news → только что/уже/ещё нет (just/already/yet)",
+        "for/since → как долго (период + точка)"
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Формулы",
+      "columns": [
+        "",
+        "Утверждение",
+        "Отрицание",
+        "Вопрос"
+      ],
+      "rows": [
+        [
+          "I/You/We/They",
+          "have + V3",
+          "haven't / have not + V3",
+          "Have + S + V3?"
+        ],
+        [
+          "He/She/It",
+          "has + V3",
+          "hasn't / has not + V3",
+          "Has + S + V3?"
+        ]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "V3 (Past Participle) — третья форма",
+      "lines": [
+        "regular: work → worked, play → played",
+        "irregular: go → gone, do → done, see → seen, write → written",
+        "Важно: Past Simple = V2 (went), Present Perfect = V3 (gone)"
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Временные маркеры",
+      "columns": [
+        "Тип",
+        "Маркеры"
+      ],
+      "rows": [
+        [
+          "опыт",
+          "ever, never, before, once/twice, the first time"
+        ],
+        [
+          "результат/новость",
+          "already, just, yet, recently, lately"
+        ],
+        [
+          "период не закончен",
+          "today, this week/month/year, so far, up to now"
+        ],
+        [
+          "длительность",
+          "for, since, since when, how long, all day/week"
+        ],
+        [
+          "сколько раз",
+          "three times, several times, a few times"
+        ]
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Ключевые случаи"
+    },
+    {
+      "type": "highlight",
+      "title": "5 основных случаев",
+      "lines": [
+        "Результат в настоящем: I’ve lost my keys. (сейчас не могу найти)",
+        "Жизненный опыт: Have you ever been abroad? (когда именно — не важно)",
+        "Недавнее действие/новость: They’ve just arrived. / I’ve already done it.",
+        "Действие началось в прошлом и продолжается (часто state verbs): I’ve lived here for 10 years.",
+        "Незаконченный период времени: I’ve read three books this month. (месяц ещё идёт)"
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        {
+          "en": "I've lost my keys.",
+          "ru": "Я потерял ключи (результат сейчас)."
+        },
+        {
+          "en": "She has finished her homework.",
+          "ru": "Она закончила домашку (готово сейчас)."
+        },
+        {
+          "en": "We have already booked the tickets.",
+          "ru": "Мы уже забронировали билеты."
+        },
+        {
+          "en": "Have you ever been to London?",
+          "ru": "Ты когда-нибудь был в Лондоне?"
+        },
+        {
+          "en": "I have never tried sushi.",
+          "ru": "Я никогда не пробовал суши."
+        },
+        {
+          "en": "They have just arrived.",
+          "ru": "Они только что приехали."
+        },
+        {
+          "en": "I haven't seen him yet.",
+          "ru": "Я ещё не видел его."
+        },
+        {
+          "en": "I've lived here for ten years.",
+          "ru": "Я живу здесь уже десять лет."
+        },
+        {
+          "en": "She has known him since 2015.",
+          "ru": "Она знает его с 2015 года."
+        },
+        {
+          "en": "This month I've read three books.",
+          "ru": "В этом месяце я прочитал три книги (месяц ещё не закончился)."
+        },
+        {
+          "en": "It's the first time I've driven a car.",
+          "ru": "Это первый раз, когда я водил машину."
+        },
+        {
+          "en": "How long have you had this phone?",
+          "ru": "Как давно у тебя этот телефон?"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Short answers, сокращения и нюансы"
+    },
+    {
+      "type": "highlight",
+      "title": "Быстро",
+      "lines": [
+        "Yes, I have. / No, I haven't.",
+        "Yes, he has. / No, he hasn't.",
+        "I've / you've / we've / they've + V3; he's / she's / it's + V3 (He’s finished.)",
+        "yet → обычно в вопросах/отрицаниях; already → чаще в утверждениях",
+        "been/gone: He has been to Paris (был и вернулся). He has gone to Paris (уехал и ещё там)."
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Типичные ошибки"
+    },
+    {
+      "type": "highlight",
+      "title": "Ошибки → исправление",
+      "lines": [
+        "Did you ever been...? → Have you ever been...?",
+        "I have went → I have gone (V3!)",
+        "I have seen him yesterday → I saw him yesterday (есть точное прошлое время)",
+        "He has finished? → Has he finished?",
+        "since/for: since 2015 (точка), for 10 years (период)"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Сравнение: Present Perfect vs Past Simple"
+    },
+    {
+      "type": "table",
+      "caption": "Супер-правило",
+      "columns": [
+        "Present Perfect",
+        "Past Simple"
+      ],
+      "rows": [
+        [
+          "связь с настоящим / важно сейчас",
+          "законченное прошлое / важно когда"
+        ],
+        [
+          "не называем точное время (ever, already, yet, so far)",
+          "часто есть точное время (yesterday, last week, in 2010)"
+        ],
+        [
+          "Have you ever...? / Have you seen...? (до сейчас)",
+          "When did you...? / Did you see...? (в конкретный момент)"
+        ]
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        {
+          "en": "I've lost my wallet. I can't find it.",
+          "ru": "Я потерял кошелёк (важно сейчас)."
+        },
+        {
+          "en": "I lost my wallet yesterday.",
+          "ru": "Я потерял кошелёк вчера (время известно)."
+        },
+        {
+          "en": "Have you seen Anna?",
+          "ru": "Ты видел Анну? (до сейчас)"
+        },
+        {
+          "en": "Did you see Anna yesterday?",
+          "ru": "Ты видел Анну вчера? (конкретное время)"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Сравнение: Present Perfect vs Present Perfect Continuous"
+    },
+    {
+      "type": "highlight",
+      "title": "Когда какое?",
+      "lines": [
+        "Present Perfect = факт/результат/количество (что сделано, сколько раз)",
+        "Present Perfect Continuous = процесс/длительность (как долго, чем занимался, следы)",
+        "state verbs (know, love, belong) → обычно только Present Perfect: I've known him for years."
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        {
+          "en": "I've read three chapters.",
+          "ru": "Я прочитал 3 главы (результат/количество)."
+        },
+        {
+          "en": "I've been reading for an hour.",
+          "ru": "Я читаю уже час (длительность/процесс)."
+        },
+        {
+          "en": "She has written five emails.",
+          "ru": "Она написала 5 писем (сколько)."
+        },
+        {
+          "en": "She has been writing emails all morning.",
+          "ru": "Она пишет письма всё утро (процесс/период)."
+        }
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": [
+      {
+        "id": "meaning",
+        "title": "Когда используем (Meaning)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "prp_m_1",
+            "instruction": "Выбери ситуацию",
+            "prompt": "I've broken my leg.",
+            "options": [
+              "результат сейчас",
+              "точное прошлое время",
+              "привычка"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "prp_m_2",
+            "instruction": "Выбери ситуацию",
+            "prompt": "Have you ever flown in a plane?",
+            "options": [
+              "жизненный опыт",
+              "точное прошлое время",
+              "расписание"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "prp_m_3",
+            "instruction": "Выбери ситуацию",
+            "prompt": "They have just arrived.",
+            "options": [
+              "недавно/только что",
+              "вчера (точное время)",
+              "привычка"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "prp_m_4",
+            "instruction": "Выбери ситуацию",
+            "prompt": "I haven't finished yet.",
+            "options": [
+              "ещё нет (yet)",
+              "точное время в прошлом",
+              "процесс сейчас"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "prp_m_5",
+            "instruction": "Выбери ситуацию",
+            "prompt": "This week I've had three meetings.",
+            "options": [
+              "незаконченный период",
+              "точное прошлое время",
+              "будущее по расписанию"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "prp_m_6",
+            "instruction": "Выбери ситуацию",
+            "prompt": "I've known Kate since 2018.",
+            "options": [
+              "действие/состояние началось в прошлом и продолжается",
+              "разовое событие вчера",
+              "привычка"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "prp_m_7",
+            "instruction": "Выбери ситуацию",
+            "prompt": "I've already done my homework.",
+            "options": [
+              "уже (already)",
+              "всегда (habit)",
+              "вчера (past)"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "prp_m_8",
+            "instruction": "Выбери ситуацию",
+            "prompt": "I've never tried oysters.",
+            "options": [
+              "никогда (опыт)",
+              "точное прошлое время",
+              "план"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "prp_m_9",
+            "instruction": "Выбери ситуацию",
+            "prompt": "How long have you lived here?",
+            "options": [
+              "как долго (for/since)",
+              "когда именно (past)",
+              "процесс сейчас"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "prp_m_10",
+            "instruction": "Выбери ситуацию",
+            "prompt": "She's been to Spain twice.",
+            "options": [
+              "сколько раз/опыт",
+              "точное прошлое время",
+              "процесс сейчас"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "prp_m_11",
+            "instruction": "Выбери ситуацию",
+            "prompt": "I've lost my phone again.",
+            "options": [
+              "результат сейчас",
+              "точное прошлое время",
+              "расписание"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "prp_m_12",
+            "instruction": "Выбери ситуацию",
+            "prompt": "So far we've studied 5 units.",
+            "options": [
+              "пока/до сих пор (период не закончен)",
+              "вчера",
+              "привычка"
+            ],
+            "correctIndex": 0
+          }
+        ]
+      },
+      {
+        "id": "formula",
+        "title": "Формулы (Formula)",
+        "kind": "input",
+        "items": [
+          {
+            "id": "prp_f_1",
+            "instruction": "Вставь форму",
+            "prompt": "I ____ (finish) my homework.",
+            "accepted": [
+              "have finished",
+              "'ve finished"
+            ]
+          },
+          {
+            "id": "prp_f_2",
+            "instruction": "Вставь форму",
+            "prompt": "She ____ (see) this film.",
+            "accepted": [
+              "has seen"
+            ]
+          },
+          {
+            "id": "prp_f_3",
+            "instruction": "Сделай отрицание",
+            "prompt": "They ____ (not/arrive) yet.",
+            "accepted": [
+              "haven't arrived",
+              "have not arrived"
+            ]
+          },
+          {
+            "id": "prp_f_4",
+            "instruction": "Сделай отрицание",
+            "prompt": "He ____ (not/call) me since Monday.",
+            "accepted": [
+              "hasn't called",
+              "has not called"
+            ]
+          },
+          {
+            "id": "prp_f_5",
+            "instruction": "Irregular",
+            "prompt": "I ____ (go) to Paris twice.",
+            "accepted": [
+              "have gone",
+              "'ve gone"
+            ]
+          },
+          {
+            "id": "prp_f_6",
+            "instruction": "Irregular",
+            "prompt": "She ____ (do) it already.",
+            "accepted": [
+              "has done"
+            ]
+          },
+          {
+            "id": "prp_f_7",
+            "instruction": "Вставь форму",
+            "prompt": "We ____ (know) each other for years.",
+            "accepted": [
+              "have known",
+              "'ve known"
+            ]
+          },
+          {
+            "id": "prp_f_8",
+            "instruction": "Вставь форму",
+            "prompt": "It ____ (rain) a lot this week.",
+            "accepted": [
+              "has rained"
+            ]
+          },
+          {
+            "id": "prp_f_9",
+            "instruction": "Вопрос",
+            "prompt": "____ you ever ____ (be) abroad?",
+            "accepted": [
+              "Have you ever been abroad?",
+              "Have you ever been abroad"
+            ]
+          },
+          {
+            "id": "prp_f_10",
+            "instruction": "Вопрос",
+            "prompt": "____ she ____ (finish) yet?",
+            "accepted": [
+              "Has she finished yet?",
+              "Has she finished yet"
+            ]
+          },
+          {
+            "id": "prp_f_11",
+            "instruction": "Сделай вопрос",
+            "prompt": "You ____ (see) my keys. → (question)",
+            "accepted": [
+              "Have you seen my keys?",
+              "Have you seen my keys"
+            ]
+          },
+          {
+            "id": "prp_f_12",
+            "instruction": "Сделай отрицание",
+            "prompt": "I ____ (not/try) sushi.",
+            "accepted": [
+              "haven't tried",
+              "have not tried"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "formula_2",
+        "goal": "formula",
+        "title": "Формулы (Multi-input)",
+        "kind": "multi_input",
+        "items": [
+          {
+            "id": "prp_mi_1",
+            "instruction": "Заполни пропуски",
+            "prompt": "He ____ ____ his homework. (finish)",
+            "inputs": [
+              {
+                "placeholder": "has / 's",
+                "accepted": [
+                  "has",
+                  "'s"
+                ]
+              },
+              {
+                "placeholder": "finished",
+                "accepted": [
+                  "finished"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "prp_mi_2",
+            "instruction": "Заполни пропуски",
+            "prompt": "We ____ ____ to London before. (be)",
+            "inputs": [
+              {
+                "placeholder": "have / 've",
+                "accepted": [
+                  "have",
+                  "'ve"
+                ]
+              },
+              {
+                "placeholder": "been",
+                "accepted": [
+                  "been"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "prp_mi_3",
+            "instruction": "Заполни пропуски",
+            "prompt": "I ____ ____ it yet. (not/do)",
+            "inputs": [
+              {
+                "placeholder": "haven't / have not",
+                "accepted": [
+                  "haven't",
+                  "have not"
+                ]
+              },
+              {
+                "placeholder": "done",
+                "accepted": [
+                  "done"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "prp_mi_4",
+            "instruction": "Заполни пропуски",
+            "prompt": "____ you ever ____ sushi? (try)",
+            "inputs": [
+              {
+                "placeholder": "Have",
+                "accepted": [
+                  "Have"
+                ]
+              },
+              {
+                "placeholder": "tried",
+                "accepted": [
+                  "tried"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "prp_mi_5",
+            "instruction": "Заполни пропуски",
+            "prompt": "She ____ ____ him since 2015. (know)",
+            "inputs": [
+              {
+                "placeholder": "has",
+                "accepted": [
+                  "has"
+                ]
+              },
+              {
+                "placeholder": "known",
+                "accepted": [
+                  "known"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "prp_mi_6",
+            "instruction": "Заполни пропуски",
+            "prompt": "They ____ ____ yet. (not/arrive)",
+            "inputs": [
+              {
+                "placeholder": "haven't / have not",
+                "accepted": [
+                  "haven't",
+                  "have not"
+                ]
+              },
+              {
+                "placeholder": "arrived",
+                "accepted": [
+                  "arrived"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "markers",
+        "title": "Маркеры (Markers)",
+        "kind": "multi",
+        "items": [
+          {
+            "id": "prp_mark_1",
+            "instruction": "Выбери маркеры Present Perfect",
+            "prompt": "Выбери маркеры Present Perfect:",
+            "options": [
+              "yesterday",
+              "ever",
+              "last week",
+              "already",
+              "yet"
+            ],
+            "correctIndices": [
+              1,
+              3,
+              4
+            ]
+          },
+          {
+            "id": "prp_mark_2",
+            "instruction": "Выбери маркеры незаконченного периода",
+            "prompt": "Что подходит к Present Perfect (unfinished time)?",
+            "options": [
+              "this week",
+              "in 2010",
+              "so far",
+              "two years ago",
+              "today"
+            ],
+            "correctIndices": [
+              0,
+              2,
+              4
+            ]
+          },
+          {
+            "id": "prp_mark_3",
+            "instruction": "Выбери for/since",
+            "prompt": "Что чаще встречается с Present Perfect для длительности?",
+            "options": [
+              "for",
+              "since",
+              "when",
+              "at 7 pm",
+              "last night"
+            ],
+            "correctIndices": [
+              0,
+              1
+            ]
+          },
+          {
+            "id": "prp_mark_4",
+            "instruction": "Выбери маркеры опыта",
+            "prompt": "Маркеры «опыта» (experience):",
+            "options": [
+              "ever",
+              "never",
+              "just",
+              "in 1999",
+              "before"
+            ],
+            "correctIndices": [
+              0,
+              1,
+              4
+            ]
+          }
+        ]
+      },
+      {
+        "id": "markers_2",
+        "goal": "markers",
+        "title": "Match: маркер → смысл",
+        "kind": "match",
+        "items": [
+          {
+            "id": "prp_match_1",
+            "instruction": "Соедини",
+            "pairs": [
+              {
+                "left": "ever",
+                "right": "когда-нибудь (опыт)"
+              },
+              {
+                "left": "never",
+                "right": "никогда (опыт)"
+              },
+              {
+                "left": "already",
+                "right": "уже (обычно в утверждении)"
+              },
+              {
+                "left": "yet",
+                "right": "ещё / уже? (в вопросах/отрицаниях)"
+              },
+              {
+                "left": "just",
+                "right": "только что"
+              }
+            ]
+          },
+          {
+            "id": "prp_match_2",
+            "instruction": "Соедини",
+            "pairs": [
+              {
+                "left": "so far",
+                "right": "пока / до сих пор"
+              },
+              {
+                "left": "this week",
+                "right": "на этой неделе (период не закончен)"
+              },
+              {
+                "left": "for",
+                "right": "в течение (период)"
+              },
+              {
+                "left": "since",
+                "right": "с (точка отсчёта)"
+              },
+              {
+                "left": "three times",
+                "right": "три раза (сколько раз)"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "mistakes",
+        "title": "Исправь ошибки (Mistakes)",
+        "kind": "correction",
+        "items": [
+          {
+            "id": "prp_c_1",
+            "instruction": "Исправь",
+            "prompt": "I have went to London.",
+            "accepted": [
+              "I have gone to London.",
+              "I've gone to London."
+            ]
+          },
+          {
+            "id": "prp_c_2",
+            "instruction": "Исправь",
+            "prompt": "Did you ever been abroad?",
+            "accepted": [
+              "Have you ever been abroad?",
+              "Have you ever been abroad"
+            ]
+          },
+          {
+            "id": "prp_c_3",
+            "instruction": "Исправь",
+            "prompt": "She have finished her homework.",
+            "accepted": [
+              "She has finished her homework."
+            ]
+          },
+          {
+            "id": "prp_c_4",
+            "instruction": "Исправь",
+            "prompt": "I have seen him yesterday.",
+            "accepted": [
+              "I saw him yesterday."
+            ]
+          },
+          {
+            "id": "prp_c_5",
+            "instruction": "Исправь",
+            "prompt": "He has finish yet?",
+            "accepted": [
+              "Has he finished yet?",
+              "Has he finished yet"
+            ]
+          },
+          {
+            "id": "prp_c_6",
+            "instruction": "Исправь",
+            "prompt": "They haven't went home.",
+            "accepted": [
+              "They haven't gone home.",
+              "They have not gone home."
+            ]
+          },
+          {
+            "id": "prp_c_7",
+            "instruction": "Исправь",
+            "prompt": "I know him since 2018.",
+            "accepted": [
+              "I've known him since 2018.",
+              "I have known him since 2018."
+            ]
+          },
+          {
+            "id": "prp_c_8",
+            "instruction": "Исправь",
+            "prompt": "We have lived here since 10 years.",
+            "accepted": [
+              "We have lived here for 10 years.",
+              "We've lived here for 10 years."
+            ]
+          },
+          {
+            "id": "prp_c_9",
+            "instruction": "Исправь",
+            "prompt": "She hasn't called already.",
+            "accepted": [
+              "She hasn't called yet.",
+              "She has not called yet."
+            ]
+          },
+          {
+            "id": "prp_c_10",
+            "instruction": "Исправь",
+            "prompt": "He has finished?",
+            "accepted": [
+              "Has he finished?",
+              "Has he finished"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "compare",
+        "title": "Present Perfect vs Past Simple (Contrast)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "prp_cmp_1",
+            "instruction": "Выбери время",
+            "prompt": "I ____ (see) him yesterday.",
+            "options": [
+              "Present Perfect",
+              "Past Simple"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "pastSimple"
+          },
+          {
+            "id": "prp_cmp_2",
+            "instruction": "Выбери время",
+            "prompt": "I ____ (see) him already.",
+            "options": [
+              "Present Perfect",
+              "Past Simple"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentPerfect"
+          },
+          {
+            "id": "prp_cmp_3",
+            "instruction": "Выбери время",
+            "prompt": "____ you ____ (finish) yet?",
+            "options": [
+              "Present Perfect",
+              "Past Simple"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentPerfect"
+          },
+          {
+            "id": "prp_cmp_4",
+            "instruction": "Выбери время",
+            "prompt": "We ____ (go) to Italy in 2019.",
+            "options": [
+              "Present Perfect",
+              "Past Simple"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "pastSimple"
+          },
+          {
+            "id": "prp_cmp_5",
+            "instruction": "Выбери время",
+            "prompt": "This week I ____ (have) three meetings.",
+            "options": [
+              "Present Perfect",
+              "Past Simple"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentPerfect"
+          },
+          {
+            "id": "prp_cmp_6",
+            "instruction": "Выбери время",
+            "prompt": "Last week I ____ (have) three meetings.",
+            "options": [
+              "Present Perfect",
+              "Past Simple"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "pastSimple"
+          },
+          {
+            "id": "prp_cmp_7",
+            "instruction": "Выбери время",
+            "prompt": "Have you ever ____ (try) oysters?",
+            "options": [
+              "Present Perfect",
+              "Past Simple"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentPerfect"
+          },
+          {
+            "id": "prp_cmp_8",
+            "instruction": "Выбери время",
+            "prompt": "When I was a child, I ____ (live) in a small town.",
+            "options": [
+              "Present Perfect",
+              "Past Simple"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "pastSimple"
+          },
+          {
+            "id": "prp_cmp_9",
+            "instruction": "Выбери время",
+            "prompt": "I ____ (lose) my keys. I can't get in.",
+            "options": [
+              "Present Perfect",
+              "Past Simple"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentPerfect"
+          },
+          {
+            "id": "prp_cmp_10",
+            "instruction": "Выбери время",
+            "prompt": "I ____ (lose) my keys this morning. (it’s evening now)",
+            "options": [
+              "Present Perfect",
+              "Past Simple"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "pastSimple"
+          },
+          {
+            "id": "prp_cmp_11",
+            "instruction": "Выбери время",
+            "prompt": "So far we ____ (complete) 5 lessons.",
+            "options": [
+              "Present Perfect",
+              "Past Simple"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentPerfect"
+          },
+          {
+            "id": "prp_cmp_12",
+            "instruction": "Выбери время",
+            "prompt": "We ____ (complete) 5 lessons yesterday.",
+            "options": [
+              "Present Perfect",
+              "Past Simple"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "pastSimple"
+          }
+        ]
+      },
+      {
+        "id": "compare_2",
+        "title": "Present Perfect vs Present Perfect Continuous (Contrast)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "prp_cmp2_1",
+            "instruction": "Выбери время",
+            "prompt": "I ____ (read) 3 articles today.",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentPerfect"
+          },
+          {
+            "id": "prp_cmp2_2",
+            "instruction": "Выбери время",
+            "prompt": "I ____ ____ (read) for 2 hours.",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "presentPerfectContinuous"
+          },
+          {
+            "id": "prp_cmp2_3",
+            "instruction": "Выбери время",
+            "prompt": "She ____ (write) five emails.",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentPerfect"
+          },
+          {
+            "id": "prp_cmp2_4",
+            "instruction": "Выбери время",
+            "prompt": "She ____ ____ (write) emails all morning.",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "presentPerfectContinuous"
+          },
+          {
+            "id": "prp_cmp2_5",
+            "instruction": "Выбери время",
+            "prompt": "How long ____ you ____ (know) him?",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentPerfect"
+          },
+          {
+            "id": "prp_cmp2_6",
+            "instruction": "Выбери время",
+            "prompt": "Why are you tired? I ____ ____ (work) all day.",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "presentPerfectContinuous"
+          },
+          {
+            "id": "prp_cmp2_7",
+            "instruction": "Выбери время",
+            "prompt": "We ____ (visit) Paris twice.",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentPerfect"
+          },
+          {
+            "id": "prp_cmp2_8",
+            "instruction": "Выбери время",
+            "prompt": "We ____ ____ (travel) since Monday.",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "presentPerfectContinuous"
+          },
+          {
+            "id": "prp_cmp2_9",
+            "instruction": "Выбери время",
+            "prompt": "I ____ (lose) my keys again.",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentPerfect"
+          },
+          {
+            "id": "prp_cmp2_10",
+            "instruction": "Выбери время",
+            "prompt": "My hands are dirty because I ____ ____ (fix) my bike.",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "presentPerfectContinuous"
+          }
+        ]
+      }
+    ]
+  }
+}
