@@ -102,57 +102,6 @@
       text-wrap: pretty;
     }
 
-    /* Мобильная док-навигация (вместо rail'ов) */
-    .mobile-dock{
-      display: none;
-      position: fixed;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      z-index: 50;
-      padding: 10px calc(10px + env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) calc(10px + env(safe-area-inset-left));
-      pointer-events: none; /* контейнер не ловит клики, только внутреннее */
-    }
-    .mobile-dock__inner{
-      pointer-events: auto;
-      display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-      gap: 8px;
-      border: 1px solid rgba(0,0,0,.14);
-      background: rgba(255,255,255,.92);
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
-      border-radius: 0px;
-      padding: 8px;
-      box-shadow: 0 8px 26px rgba(0,0,0,.10);
-    }
-    .mobile-dock__link{
-      display: grid;
-      gap: 2px;
-      align-content: center;
-      justify-items: center;
-      text-decoration: none;
-      color: inherit;
-      min-height: var(--tap);
-      border-radius: 0px;
-      padding: 6px 6px;
-      border: 1px solid transparent;
-      transition: border-color .18s ease, background .18s ease;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .mobile-dock__link:active{
-      background: rgba(0,0,0,.04);
-      border-color: rgba(0,0,0,.10);
-    }
-    .mobile-dock__label{
-      font-size: 9px;
-      letter-spacing: 2.2px;
-      text-transform: uppercase;
-      line-height: 1.1;
-      text-align: center;
-      opacity: .85;
-    }
-
     /* Адаптив: на узких экранах делаем 1-2 колонки */
     @media (max-width: 920px){
       .crate-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -167,12 +116,7 @@
       .crate-card:hover{ transform: none; }
     }
 
-    /* Телефон: убираем боковые rail, добавляем нижний dock, увеличиваем полезную область */
-    @media (max-width: 720px){
-      .rail{ display: none !important; }
-      .mobile-dock{ display: block; }
-
-      /* если в глобальном CSS center-stage/frames имеют фиксированные отступы — слегка страхуемся */
+          /* если в глобальном CSS center-stage/frames имеют фиксированные отступы — слегка страхуемся */
       .center-stage{
         padding-left: 12px !important;
         padding-right: 12px !important;
@@ -189,15 +133,9 @@
       }
     }
 
-    /* Очень узкие экраны: 4 пункта + скрываем item-soft */
-    @media (max-width: 360px){
-      .mobile-dock__inner{ grid-template-columns: repeat(4, minmax(0, 1fr)); }
-      .mobile-dock__link--soft{ display: none; }
     }
     /* Принудительно острые углы для всех интерактивных элементов этой страницы */
     .crate-card,
-    .mobile-dock__inner,
-    .mobile-dock__link{
       border-radius: 0 !important;
     }
 
@@ -217,30 +155,6 @@
       <span class="tag">item-user</span>
     </a>
   </header>
-
-  <!-- левый rail -->
-  <aside class="rail rail--left" aria-label="Левое меню">
-    <a class="rail-link" href="index.html">
-      <span class="rail-link__title">item-key</span>
-      <span class="rail-link__meta">главное меню</span>
-    </a>
-    <a class="rail-link" href="item-manufacture.html">
-      <span class="rail-link__title">item-manufacture</span>
-      <span class="rail-link__meta">создание / производство</span>
-    </a>
-  </aside>
-
-  <!-- правый rail -->
-  <aside class="rail rail--right" aria-label="Правое меню">
-    <a class="rail-link" href="item-security.html">
-      <span class="rail-link__title">item-security</span>
-      <span class="rail-link__meta">доступ / защита</span>
-    </a>
-    <a class="rail-link" href="item-soft.html">
-      <span class="rail-link__title">item-soft</span>
-      <span class="rail-link__meta">инструменты / редакторы</span>
-    </a>
-  </aside>
 
   <!-- центр -->
   <main class="center-stage" aria-label="item-crate center">
@@ -280,30 +194,13 @@
 
   <footer class="bottombar bottombar--edge">
     <span class="hint">crate · hub</span>
-    <span class="sep">•</span>
+
+    <a class="toplink" href="index.html" aria-label="Item Key">
+      <span class="tag">item-key</span>
+    </a>
+
     <span class="hint">pre-alpha</span>
   </footer>
-
-  <!-- Мобильная навигация (появляется только на телефоне) -->
-  <nav class="mobile-dock" aria-label="Быстрая навигация">
-    <div class="mobile-dock__inner" role="navigation" aria-label="Разделы Item Key">
-      <a class="mobile-dock__link" href="index.html" aria-label="item-key">
-        <span class="mobile-dock__label">item-key</span>
-      </a>
-      <a class="mobile-dock__link" href="item-manufacture.html" aria-label="item-manufacture">
-        <span class="mobile-dock__label">manufacture</span>
-      </a>
-      <a class="mobile-dock__link" href="item-security.html" aria-label="item-security">
-        <span class="mobile-dock__label">security</span>
-      </a>
-      <a class="mobile-dock__link mobile-dock__link--soft" href="item-soft.html" aria-label="item-soft">
-        <span class="mobile-dock__label">item-soft</span>
-      </a>
-      <a class="mobile-dock__link" href="item-user.html?returnTo=item-crate.html" aria-label="item-user">
-        <span class="mobile-dock__label">item-user</span>
-      </a>
-    </div>
-  </nav>
 
   <!-- если общий main.js нужен для эффектов/движения -->
   <script src="assets/js/main.js"></script>

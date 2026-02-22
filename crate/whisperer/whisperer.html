@@ -419,6 +419,8 @@
         Ваш браузер не поддерживает Web Speech API (SpeechSynthesis). Попробуйте Chrome / Edge или обновите браузер.
       </div>
 
+      <div class="w-warning" id="noticeBox" hidden aria-live="polite"></div>
+
       <div class="w-grid">
         <div class="w-card" aria-label="Ввод текста">
           <div class="w-label">text</div>
@@ -667,7 +669,9 @@
       const textInput = document.getElementById('textInput');
       const display = document.getElementById('display');
 
-      const fontSizeNum = document.getElementById('fontSizeNum');
+      
+      const noticeBox = document.getElementById('noticeBox');
+const fontSizeNum = document.getElementById('fontSizeNum');
       const rateNum = document.getElementById('rateNum');
       const pitchNum = document.getElementById('pitchNum');
       const volNum = document.getElementById('volNum');
@@ -1309,7 +1313,69 @@ menuStopBtn.addEventListener('click', stopAll);
       function htmlToText(html){
         const d = document.createElement('div');
         d.innerHTML = html || '';
-        return (d.textContent || '').replace(/\s+/g,' ').trim();
+
+        d.querySelectorAll('br').forEach(br => br.replaceWith('\n'));
+        d.querySelectorAll('p,div,li,blockquote,pre,h1,h2,h3,h4,h5,h6').forEach(el => {
+          el.appendChild(document.createTextNode('\n'));
+        });
+
+        let t = d.textContent || '';
+        t = t.replace(/\u00a0/g, ' ').replace(/\r/g, '');
+        t = t.replace(/[\t\f\v ]+/g, ' ');
+        t = t.replace(/ *\n */g, '\n');
+        t = t.replace(/\n{3,}/g, '\n\n');
+        return t.trim();
+      }
+
+
+      // ========= inbound from onoi_notes =========
+      const INBOUND_KEY = 'onoi_whisper_payload_v1';
+      let noticeTimer = null;
+
+      function showNotice(msg, ttl=3200){
+        if(!noticeBox) return;
+        const text = String(msg || '').trim();
+        noticeBox.textContent = text;
+        noticeBox.hidden = !text;
+        if(noticeTimer) clearTimeout(noticeTimer);
+        if(text && ttl > 0){
+          noticeTimer = setTimeout(() => { noticeBox.hidden = true; }, ttl);
+        }
+      }
+
+      function ingestInboundText(){
+        const sp = new URLSearchParams(window.location.search);
+
+        // 1) URL param `text` (secondary transport)
+        const urlText = sp.get('text') || '';
+        if(urlText && urlText.trim()){
+          textInput.value = urlText;
+          buildDisplay();
+        } else {
+          // 2) localStorage payload (primary transport)
+          try{
+            const raw = localStorage.getItem(INBOUND_KEY);
+            if(raw){
+              const payload = JSON.parse(raw);
+              const pText = (payload && typeof payload.text === 'string') ? payload.text : '';
+              if(pText && pText.trim()){
+                textInput.value = pText;
+                buildDisplay();
+              }
+            }
+          }catch(e){}
+        }
+
+        // Optional: autoSpeak=1 (default OFF)
+        const auto = sp.get('autoSpeak') === '1';
+        if(auto && (textInput.value || '').trim() && !uiLocked){
+          speakFromWord(0);
+        }
+
+        // UX: show message if we came from notes but got empty text
+        if(sp.get('from') === 'onoi_notes' && !(textInput.value || '').trim()){
+          showNotice('Нет текста для whisperer.', 3400);
+        }
       }
 
       function fmtTime(ts){
@@ -1479,7 +1545,9 @@ menuStopBtn.addEventListener('click', stopAll);
 
       // initial control state
       updateControlAvailability();
-    })();
+    
+      ingestInboundText();
+})();
   </script>
 </body>
 </html>

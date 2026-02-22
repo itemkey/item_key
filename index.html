@@ -62,7 +62,7 @@ html::after {
 
 
 <style>
-  /* --- UNDER DEVELOPMENT OVERLAY (item-security / item-soft) --- */
+  /* --- UNDER DEVELOPMENT OVERLAY --- */
   .dev-overlay{
     position: fixed;
     inset: 0;
@@ -181,31 +181,7 @@ html::after {
     </a>
   </header>
 
-  <!-- ЛЕВЫЙ РЕЙЛ — прилегает к краю -->
-  <aside class="rail rail--left" aria-label="Левое меню">
-    <a class="rail-link" href="item-manufacture.html">
-      <span class="rail-link__title">item-manufacture</span>
-      <span class="rail-link__meta">создание / производство</span>
-    </a>
-    <a class="rail-link" href="item-crate.html">
-      <span class="rail-link__title">item-crate</span>
-      <span class="rail-link__meta">архив / контейнеры</span>
-    </a>
-  </aside>
-
-  <!-- ПРАВЫЙ РЕЙЛ — прилегает к краю -->
-  <aside class="rail rail--right" aria-label="Правое меню">
-    <a class="rail-link" href="item-security.html">
-      <span class="rail-link__title">item-security</span>
-      <span class="rail-link__meta">доступ / защита</span>
-    </a>
-    <a class="rail-link" href="item-soft.html">
-      <span class="rail-link__title">item-soft</span>
-      <span class="rail-link__meta">инструменты / редакторы</span>
-    </a>
-  </aside>
-
-  <main class="center-stage" aria-label="Центр">
+<main class="center-stage" aria-label="Центр">
   <div class="intro-stage" aria-hidden="true">
     <canvas id="introCanvas"></canvas>
   </div>
@@ -213,11 +189,10 @@ html::after {
 
 
 
-  <footer class="bottombar bottombar--edge">
-    <span class="hint">ты уже здесь был.
-ты просто не помнил.</span>
-    <span class="sep">•</span>
-    <span class="hint">pre-alpha</span>
+  <footer class="bottombar bottombar--edge" style="justify-content:center">
+    <a class="toplink" href="item-crate.html" aria-label="Item Crate">
+      <span class="tag">item-crate</span>
+    </a>
   </footer>
 
   <script src="assets/js/main.js"></script>
@@ -757,86 +732,6 @@ html::after {
 })();
 </script>
 
-
-<script>
-(function(){
-  const overlay = document.getElementById('devOverlay');
-  const btnBack = document.getElementById('devOverlayBack');
-  const textEl = document.getElementById('devOverlayText');
-  if(!overlay || !btnBack) return;
-
-  let lastFocus = null;
-
-  function openOverlay(forKey){
-    lastFocus = document.activeElement;
-
-    // Message can be slightly different per section (optional)
-    const map = {
-      'item-security': 'item-security сейчас в разработке. Доступ закован. Возвращайся позже.',
-      'item-soft': 'item-soft сейчас в разработке. Инструменты ещё не заточены. Возвращайся позже.'
-    };
-    if(textEl) textEl.textContent = map[forKey] || 'Этот отсек ещё не ожил. Возвращайся позже.';
-
-    overlay.classList.add('is-open');
-    overlay.setAttribute('aria-hidden', 'false');
-
-    // prevent background scroll while overlay is open
-    document.documentElement.style.overflow = 'hidden';
-    document.body.style.overflow = 'hidden';
-
-    // focus back button
-    btnBack.focus({ preventScroll:true });
-  }
-
-  function closeOverlay(){
-    overlay.classList.remove('is-open');
-    overlay.setAttribute('aria-hidden', 'true');
-
-    document.documentElement.style.overflow = '';
-    document.body.style.overflow = '';
-
-    if(lastFocus && typeof lastFocus.focus === 'function'){
-      lastFocus.focus({ preventScroll:true });
-    }
-  }
-
-  // Close when clicking outside window
-  overlay.addEventListener('pointerdown', (e)=>{
-    const doc = e.target && e.target.closest ? e.target.closest('.dev-window') : null;
-    if(!doc) closeOverlay();
-  });
-
-  btnBack.addEventListener('click', closeOverlay);
-
-  window.addEventListener('keydown', (e)=>{
-    if(!overlay.classList.contains('is-open')) return;
-    if(e.key === 'Escape'){
-      e.preventDefault();
-      closeOverlay();
-    }
-  });
-
-  // Intercept those menu links
-  function hookLink(hrefKey){
-    const link = document.querySelector(`a.rail-link[href="${hrefKey}.html"], a.rail-link[href="${hrefKey}.html#"], a.rail-link[href="${hrefKey}.html?"]`);
-    // More robust: find by title text if href changes
-    const link2 = link || Array.from(document.querySelectorAll('a.rail-link')).find(a=>{
-      const t = a.querySelector('.rail-link__title');
-      return (t && t.textContent.trim() === hrefKey) || (a.getAttribute('href') || '').includes(hrefKey);
-    });
-    if(!link2) return;
-
-    link2.addEventListener('click', (e)=>{
-      e.preventDefault();
-      e.stopPropagation();
-      openOverlay(hrefKey);
-    });
-  }
-
-  hookLink('item-security');
-  hookLink('item-soft');
-})();
-</script>
 
 </body>
 </html>

@@ -1253,8 +1253,20 @@
     function htmlToText(html){
       const d = document.createElement('div');
       d.innerHTML = html || '';
-      const t = (d.textContent || '').replace(/\s+/g,' ').trim();
-      return t;
+
+      // Preserve line breaks for whisperer/search/export
+      d.querySelectorAll('br').forEach(br => br.replaceWith('\n'));
+      d.querySelectorAll('p,div,li,blockquote,pre,h1,h2,h3,h4,h5,h6').forEach(el => {
+        el.appendChild(document.createTextNode('\n'));
+      });
+
+      let t = d.textContent || '';
+      t = t.replace(/\u00a0/g, ' ').replace(/\r/g, '');
+      // collapse spaces but keep newlines
+      t = t.replace(/[\t\f\v ]+/g, ' ');
+      t = t.replace(/ *\n */g, '\n');
+      t = t.replace(/\n{3,}/g, '\n\n');
+      return t.trim();
     }
     function firstLine(html){
       const t = htmlToText(html);
@@ -2013,16 +2025,71 @@ tgl.addEventListener('click', (e) => {
     }
 
     // ========= editor commands =========
+    let lastSelRange = null;
+
+    function focusEditor(){
+      try{ editor.focus({preventScroll:true}); }
+      catch(e){ try{ editor.focus(); }catch(e2){} }
+    }
+
+    function saveSelection(){
+      try{
+        const sel = window.getSelection ? window.getSelection() : null;
+        if(!sel || sel.rangeCount === 0) return;
+        const r = sel.getRangeAt(0);
+        const common = r.commonAncestorContainer;
+        const node = (common.nodeType === 1) ? common : common.parentNode;
+        if(!node || !editor.contains(node)) return;
+        lastSelRange = r.cloneRange();
+      }catch(e){}
+    }
+
+    function restoreSelection(){
+      if(!lastSelRange) return false;
+      try{
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(lastSelRange);
+        return true;
+      }catch(e){
+        return false;
+      }
+    }
+
+    // Keep selection stable when clicking toolbar or opening modals
+    document.addEventListener('selectionchange', saveSelection);
+    ['keyup','mouseup','touchend'].forEach(ev => editor.addEventListener(ev, saveSelection));
+
+    const toolbarEl = document.querySelector('.toolbar');
+    if(toolbarEl){
+      // Avoid losing selection when clicking toolbar buttons
+      toolbarEl.addEventListener('mousedown', (e) => {
+        const btn = e.target.closest('button.tool');
+        if(btn){
+          saveSelection();
+          e.preventDefault();
+          return;
+        }
+        const ctrl = e.target.closest('.toolsel, input[type="color"]');
+        if(ctrl) saveSelection();
+      }, true);
+
+      toolbarEl.addEventListener('touchstart', (e) => {
+        const ctrl = e.target.closest('button.tool, .toolsel, input[type="color"]');
+        if(ctrl) saveSelection();
+      }, {passive:true});
+    }
+
     function exec(cmd, arg=null){
-      editor.focus();
+      focusEditor();
+      restoreSelection();
       try{
         document.execCommand(cmd, false, arg);
       }catch(e){}
+      saveSelection();
       schedulePersist();
     }
-
-    
-    // ========= editor selection-based formatting (2026-01) =========
+// ========= editor selection-based formatting (2026-01) =========
     function getSelRange(){
       const sel = window.getSelection ? window.getSelection() : null;
       if(!sel || sel.rangeCount === 0) return null;
@@ -2080,7 +2147,8 @@ tgl.addEventListener('click', (e) => {
     }
 
     function applyStyleToSelection(styles, opts={}){
-      editor.focus();
+      focusEditor();
+      restoreSelection();
       const r = getSelRange();
       if(!r){
         // selection outside editor: just set defaults if requested
@@ -2172,29 +2240,29 @@ function setFontFamily(ff){
     async function insertImageFromFile(file){
       if(!file) return;
       const dataUrl = await fileToDataURL(file);
-      editor.focus();
+
+      focusEditor();
+      restoreSelection();
+
       // insert at cursor
-      const img = document.createElement('img');
-      img.src = dataUrl;
-      img.alt = file.name || 'image';
-      // Try to insert as HTML
-      const html = '<img src="' + dataUrl.replace(/"/g,'&quot;') + '" alt="' + (img.alt||'image').replace(/"/g,'&quot;') + '" />';
-      document.execCommand('insertHTML', false, html);
+      const alt = (file && file.name) ? file.name : 'image';
+      const html = '<img src="' + String(dataUrl).replace(/"/g,'&quot;') + '" alt="' + String(alt).replace(/"/g,'&quot;') + '" />';
+
+      try{
+        document.execCommand('insertHTML', false, html);
+      }catch(e){
+        // fallback: append
+        const img = document.createElement('img');
+        img.src = dataUrl;
+        img.alt = alt;
+        editor.appendChild(img);
+      }
+
+      sanitizeEditorHTML();
+      saveSelection();
       schedulePersist();
     }
-
-    editor.addEventListener('paste', async (e) => {
-      // If image in clipboard, insert as data URL
-      const items = e.clipboardData && e.clipboardData.items ? [...e.clipboardData.items] : [];
-      const imgItem = items.find(it => it.type && it.type.startsWith('image/'));
-      if(imgItem){
-        e.preventDefault();
-        const file = imgItem.getAsFile();
-        await insertImageFromFile(file);
-      }
-    });
-
-    // ========= note operations =========
+// ========= note operations =========
     
 
 function ensureCategoryForNewNote(){
@@ -2376,10 +2444,41 @@ const draftTitle = (noteTitle.value || '').trim();
     }
 
     // ========= whisperer transport =========
-    function whisperSelectedOrActive(){
-      const note = state.activeNoteId ? noteById(state.activeNoteId) : null;
-      if(!note) return;
+    async function whisperSelectedOrActive(){
+      let note = null;
+
+      if(state.activeNoteId){
+        note = noteById(state.activeNoteId);
+      } else {
+        // No active note: only create one if there's real draft text
+        const draftText = htmlToText(editor.innerHTML || '');
+        if(!draftText || !draftText.trim()){
+          toast('whisper', 'Нет текста для whisperer.', {ttl: 2600});
+          return;
+        }
+        note = ensureActiveNoteFromDraft();
+      }
+
+      if(!note){
+        toast('whisper', 'Нет активной заметки.', {ttl: 2600});
+        return;
+      }
+
+      // Capture latest editor state before leaving
+      try{
+        note.title = (noteTitle.value || '').trim();
+        note.html = editor.innerHTML || '';
+        note.updatedAt = now();
+      }catch(e){}
+
       const text = htmlToText(note.html);
+      if(!text || !text.trim()){
+        toast('whisper', 'Нет текста для whisperer.', {ttl: 2600});
+        return;
+      }
+
+      // Best-effort persist to avoid any loss on navigation
+      try{ await persistAll(); }catch(e){ /* ignore */ }
 
       // Store payload for whisperer (primary transport)
       const payload = { mode:'single', noteIds:[note.id], text:text, createdAt: now() };
@@ -2389,7 +2488,7 @@ const draftTitle = (noteTitle.value || '').trim();
       try{
         const u = new URL('../whisperer/whisperer.html', window.location.href);
         u.searchParams.set('from','onoi_notes');
-        if((text || '').length <= 2000){
+        if(text.length <= 2000){
           u.searchParams.set('text', text);
         }
         window.location.href = u.toString();
@@ -2654,7 +2753,8 @@ const draftTitle = (noteTitle.value || '').trim();
     // Extra editor tools
     if(clearFmtBtn){
       clearFmtBtn.addEventListener('click', () => {
-        editor.focus();
+        focusEditor();
+        restoreSelection();
         try{ document.execCommand('removeFormat', false, null); }catch(e){}
         try{ document.execCommand('unlink', false, null); }catch(e){}
         sanitizeEditorHTML();
@@ -2675,6 +2775,7 @@ const draftTitle = (noteTitle.value || '').trim();
 
     if(customSizeBtn){
       customSizeBtn.addEventListener('click', async () => {
+        saveSelection();
         const v = await uiPrompt('Размер шрифта в px (например: 15, 17, 22)', { title: 'Размер текста', label: 'px', value: String(sizeSelect.value || 16) });
         if(!v) return;
         const n = Number(String(v).replace(',', '.'));
@@ -2684,41 +2785,55 @@ const draftTitle = (noteTitle.value || '').trim();
       });
     }
 
-    // Smarter paste: default to plain text (Shift+Paste keeps formatting)
-    editor.addEventListener('paste', (e) => {
+    // Smarter paste: default to plain text (Shift+Paste keeps formatting). Also supports image paste.
+    editor.addEventListener('paste', async (e) => {
+      const cd = e.clipboardData;
+      const items = (cd && cd.items) ? [...cd.items] : [];
+      const imgItem = items.find(it => it.type && it.type.startsWith('image/'));
+
+      if(imgItem){
+        e.preventDefault();
+        try{
+          const file = imgItem.getAsFile();
+          await insertImageFromFile(file);
+        }catch(err){}
+        sanitizeEditorHTML();
+        saveSelection();
+        schedulePersist();
+        return;
+      }
+
       if(e.shiftKey) return; // keep rich paste
       e.preventDefault();
-      const text = (e.clipboardData || window.clipboardData).getData('text/plain') || '';
-      const lines = text.replace(/\r/g,'').split('\n');
-      const html = lines.map(line => line
-        .replace(/&/g,'&amp;')
-        .replace(/</g,'&lt;')
-        .replace(/>/g,'&gt;')
-        .replace(/"/g,'&quot;')
-        .replace(/'/g,'&#039;') || '<br>').join('<br>');
-      const r = getSelRange();
-      if(r){
-        r.deleteContents();
-        const tmp = document.createElement('div');
-        tmp.innerHTML = html;
-        const frag = document.createDocumentFragment();
-        while(tmp.firstChild) frag.appendChild(tmp.firstChild);
-        r.insertNode(frag);
-        // move caret to end
-        const sel = window.getSelection();
-        sel.removeAllRanges();
-        const nr = document.createRange();
-        nr.selectNodeContents(editor);
-        nr.collapse(false);
-        sel.addRange(nr);
-      }else{
-        try{ document.execCommand('insertHTML', false, html); }catch(err){}
+
+      const text = (cd ? cd.getData('text/plain') : '') || '';
+      if(!text) return;
+
+      focusEditor();
+      restoreSelection();
+
+      let ok = false;
+      try{ ok = document.execCommand('insertText', false, text); }catch(err){ ok = false; }
+
+      if(!ok){
+        const safe = text
+          .replace(/&/g,'&amp;')
+          .replace(/</g,'&lt;')
+          .replace(/>/g,'&gt;')
+          .replace(/"/g,'&quot;')
+          .replace(/'/g,'&#039;')
+          .replace(/\r/g,'');
+        try{
+          document.execCommand('insertHTML', false, safe.replace(/\n/g,'<br>'));
+        }catch(err){}
       }
+
       sanitizeEditorHTML();
+      saveSelection();
       schedulePersist();
     });
 
-    // Keep HTML tidy
+// Keep HTML tidy
     editor.addEventListener('input', () => {
       sanitizeEditorHTML();
     });
@@ -2745,12 +2860,45 @@ function applyColorSwatches(){
       applyStyleToSelection({ 'background-color': hlPick.value });
     });
     linkBtn.addEventListener('click', async () => {
+      // uiPrompt steals focus -> keep selection stable
+      saveSelection();
+
       const url = await uiPrompt('Ссылка (URL):', {title:'link', label:'URL', placeholder:'https://...'});
       if(!url) return;
-      exec('createLink', url.trim());
+
+      const href = String(url).trim();
+      if(!href) return;
+
+      focusEditor();
+      restoreSelection();
+
+      const r = getSelRange();
+      const esc = (s) => String(s)
+        .replace(/&/g,'&amp;')
+        .replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;')
+        .replace(/'/g,'&#039;');
+      const escAttr = (s) => esc(s).replace(/\n/g,'');
+
+      if(r && r.collapsed){
+        // No selection -> insert link as its own text
+        const a = `<a href="${escAttr(href)}" target="_blank" rel="noopener">${esc(href)}</a>`;
+        try{
+          document.execCommand('insertHTML', false, a);
+        }catch(e){
+          exec('createLink', href);
+        }
+        sanitizeEditorHTML();
+        saveSelection();
+        schedulePersist();
+      }else{
+        exec('createLink', href);
+        sanitizeEditorHTML();
+      }
     });
 
-    imgBtn.addEventListener('click', () => imgFile.click());
+imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
     imgFile.addEventListener('change', async () => {
       const f = imgFile.files && imgFile.files[0];
       imgFile.value = '';
