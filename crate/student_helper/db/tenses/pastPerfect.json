@@ -1,0 +1,780 @@
+{
+  "id": "pastPerfect",
+  "title": "Past Perfect",
+  "subtitle": "действие ДО другого в прошлом",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Когда используем Past Perfect"
+    },
+    {
+      "type": "text",
+      "text": "Past Perfect - это «прошлое до прошлого»: действие произошло раньше другого действия или момента в прошлом (важен порядок)."
+    },
+    {
+      "type": "highlight",
+      "title": "Слова-маркеры",
+      "lines": [
+        "before - до",
+        "after - после (часто: Past Simple + after + Past Perfect)",
+        "by 5 o'clock - к 5 часам",
+        "by the time ... - ко времени ...",
+        "already - уже"
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Формула (S + had + V3)",
+      "columns": [
+        "",
+        "Утверждение",
+        "Отрицание",
+        "Вопрос"
+      ],
+      "rows": [
+        [
+          "I/You/He/She/It/We/They",
+          "had + V3",
+          "hadn't / had not + V3",
+          "Had + S + V3?"
+        ]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "V3 (Past Participle)",
+      "lines": [
+        "regular: work - worked, play - played",
+        "irregular: go - gone, do - done, see - seen, write - written",
+        "частая ошибка: had went - had gone"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Случаи употребления"
+    },
+    {
+      "type": "highlight",
+      "title": "1) До другого действия/момента в прошлом",
+      "lines": [
+        "действие случилось раньше - другое действие позже (Past Simple)",
+        "часто есть «точка» в прошлом: by + time, by the end of..."
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        {
+          "en": "He had spent all his money by the end of the month.",
+          "ru": "Он потратил все деньги к концу месяца."
+        },
+        {
+          "en": "I could see from his face that he had received bad news.",
+          "ru": "По его лицу было видно, что он получил плохие новости (до этого момента)."
+        },
+        {
+          "en": "By the time we arrived, the film had started.",
+          "ru": "К тому времени как мы приехали, фильм уже начался."
+        }
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "2) Конструкции с before/after/by",
+      "lines": [
+        "Past Perfect + before/by + Past Simple",
+        "Past Simple + after + Past Perfect",
+        "Если не нужно подчёркивать предшествование, после after можно Past Simple."
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        {
+          "en": "Jim and Christina had known each other for two years before they got married.",
+          "ru": "Джим и Кристина знали друг друга 2 года до свадьбы."
+        },
+        {
+          "en": "I came to the station after the train had left.",
+          "ru": "Я пришёл на станцию после того, как поезд ушёл."
+        },
+        {
+          "en": "After she heard the news, she phoned me at once.",
+          "ru": "После того как она услышала новость, она сразу мне позвонила (без акцента на порядок - Past Simple)."
+        }
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "3) hardly/scarcely/no sooner (инверсия)",
+      "lines": [
+        "Hardly/Scarcely had + S + V3 + when ...",
+        "No sooner had + S + V3 + than ..."
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        {
+          "en": "Hardly had I entered the room when the phone rang.",
+          "ru": "Едва я вошёл в комнату, как зазвонил телефон."
+        },
+        {
+          "en": "We had no sooner started than it began raining.",
+          "ru": "Мы едва тронулись, как начался дождь."
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Типичные ошибки"
+    },
+    {
+      "type": "text",
+      "text": "1) путают V2 и V3 (had went). 2) забывают had в вопросе/отрицании. 3) ставят Past Perfect без второго действия/момента в прошлом (когда порядок не нужен)."
+    }
+  ],
+  "practice": {
+    "exercises": [
+      {
+        "id": "meaning",
+        "title": "Когда используем (Meaning)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "pp_m_1",
+            "instruction": "Выбери ситуацию",
+            "prompt": "She had left before I arrived.",
+            "options": [
+              "действие до другого в прошлом",
+              "процесс в моменте",
+              "привычка"
+            ],
+            "correctIndex": 0,
+            "explain": "Past Perfect показывает действие раньше (до arrived)."
+          },
+          {
+            "id": "pp_m_2",
+            "instruction": "Выбери ситуацию",
+            "prompt": "By 5 o'clock, they had finished the report.",
+            "options": [
+              "к определённому моменту в прошлом",
+              "процесс сейчас",
+              "расписание"
+            ],
+            "correctIndex": 0,
+            "explain": "by + past time - действие завершилось к моменту в прошлом."
+          },
+          {
+            "id": "pp_m_3",
+            "instruction": "Выбери ситуацию",
+            "prompt": "I realized I had forgotten my phone.",
+            "options": [
+              "сначала forgot, потом realized",
+              "два параллельных процесса",
+              "привычка"
+            ],
+            "correctIndex": 0,
+            "explain": "forgot произошло раньше realized."
+          },
+          {
+            "id": "pp_m_4",
+            "instruction": "Выбери ситуацию",
+            "prompt": "He said he had never seen snow before.",
+            "options": [
+              "опыт до момента в прошлом",
+              "действие вчера (точное время)",
+              "процесс в моменте"
+            ],
+            "correctIndex": 0,
+            "explain": "had never seen - опыт раньше said."
+          },
+          {
+            "id": "pp_m_5",
+            "instruction": "Выбери ситуацию",
+            "prompt": "Hardly had we started when it began raining.",
+            "options": [
+              "едва...как (инверсия)",
+              "будущее по расписанию",
+              "процесс в настоящем"
+            ],
+            "correctIndex": 0,
+            "explain": "Hardly had ... when - Past Perfect с инверсией."
+          },
+          {
+            "id": "pp_m_6",
+            "instruction": "Выбери ситуацию",
+            "prompt": "I came home after my parents had gone to bed.",
+            "options": [
+              "после: Past Simple + after + Past Perfect",
+              "процесс в прошлом",
+              "привычка"
+            ],
+            "correctIndex": 0,
+            "explain": "after - одно действие уже произошло (had gone)."
+          },
+          {
+            "id": "pp_m_7",
+            "instruction": "Выбери ситуацию",
+            "prompt": "By the time the lesson began, I had done my homework.",
+            "options": [
+              "к моменту в прошлом (by the time)",
+              "процесс сейчас",
+              "план"
+            ],
+            "correctIndex": 0,
+            "explain": "by the time - к моменту в прошлом."
+          },
+          {
+            "id": "pp_m_8",
+            "instruction": "Выбери ситуацию",
+            "prompt": "They were happy because they had won.",
+            "options": [
+              "причина раньше эмоции в прошлом",
+              "процесс в моменте",
+              "привычка"
+            ],
+            "correctIndex": 0,
+            "explain": "had won раньше were happy."
+          },
+          {
+            "id": "pp_m_9",
+            "instruction": "Выбери ситуацию",
+            "prompt": "We had no sooner arrived than it started to snow.",
+            "options": [
+              "no sooner...than (инверсия)",
+              "незаконченный период",
+              "расписание"
+            ],
+            "correctIndex": 0,
+            "explain": "No sooner had ... than - Past Perfect с инверсией."
+          },
+          {
+            "id": "pp_m_10",
+            "instruction": "Выбери ситуацию",
+            "prompt": "The train left at 6.",
+            "options": [
+              "обычный факт в прошлом (Past Simple)",
+              "Past Perfect",
+              "процесс в моменте"
+            ],
+            "correctIndex": 0,
+            "explain": "Здесь просто факт - Past Simple (без «до другого»)."
+          }
+        ]
+      },
+      {
+        "id": "formula_1",
+        "goal": "formula",
+        "title": "Вставь форму (Formula - Input)",
+        "kind": "input",
+        "items": [
+          {
+            "id": "pp_f_1",
+            "instruction": "Вставь форму",
+            "prompt": "I ____ (finish) my work before he came.",
+            "accepted": [
+              "had finished",
+              "'d finished"
+            ],
+            "explain": "Past Perfect: had + V3."
+          },
+          {
+            "id": "pp_f_2",
+            "instruction": "Отрицание",
+            "prompt": "She ____ (not/see) him before.",
+            "accepted": [
+              "hadn't seen",
+              "had not seen"
+            ],
+            "explain": "had not + V3."
+          },
+          {
+            "id": "pp_f_3",
+            "instruction": "Вопрос",
+            "prompt": "____ you ever ____ (try) sushi before?",
+            "accepted": [
+              "Had you ever tried sushi before?",
+              "Had you ever tried sushi before"
+            ],
+            "explain": "Had + S + V3?"
+          },
+          {
+            "id": "pp_f_4",
+            "instruction": "Вставь форму",
+            "prompt": "By the time we arrived, the film ____ (start).",
+            "accepted": [
+              "had started",
+              "'d started"
+            ],
+            "explain": "by the time - Past Perfect."
+          },
+          {
+            "id": "pp_f_5",
+            "instruction": "Вставь форму",
+            "prompt": "They ____ already ____ (leave) when I called.",
+            "accepted": [
+              "had already left",
+              "'d already left"
+            ],
+            "explain": "already + had + V3."
+          },
+          {
+            "id": "pp_f_6",
+            "instruction": "Вставь форму",
+            "prompt": "He ____ (lose) his keys, so he couldn't open the door.",
+            "accepted": [
+              "had lost",
+              "'d lost"
+            ],
+            "explain": "сначала потерял - потом не смог открыть."
+          }
+        ]
+      },
+      {
+        "id": "formula_2",
+        "goal": "formula",
+        "title": "Формула (Multi-input)",
+        "kind": "multi_input",
+        "items": [
+          {
+            "id": "pp_mi_1",
+            "instruction": "Заполни пропуски",
+            "prompt": "He ____ ____ his homework before dinner. (do)",
+            "inputs": [
+              {
+                "placeholder": "had / 'd",
+                "accepted": [
+                  "had",
+                  "'d"
+                ]
+              },
+              {
+                "placeholder": "done",
+                "accepted": [
+                  "done"
+                ]
+              }
+            ],
+            "explain": "had + done (V3)."
+          },
+          {
+            "id": "pp_mi_2",
+            "instruction": "Заполни пропуски",
+            "prompt": "We ____ ____ each other for two years before we got married. (know)",
+            "inputs": [
+              {
+                "placeholder": "had / 'd",
+                "accepted": [
+                  "had",
+                  "'d"
+                ]
+              },
+              {
+                "placeholder": "known",
+                "accepted": [
+                  "known"
+                ]
+              }
+            ],
+            "explain": "had known - знали до свадьбы."
+          },
+          {
+            "id": "pp_mi_3",
+            "instruction": "Заполни пропуски",
+            "prompt": "I ____ ____ the email by 5 o'clock. (send)",
+            "inputs": [
+              {
+                "placeholder": "had / 'd",
+                "accepted": [
+                  "had",
+                  "'d"
+                ]
+              },
+              {
+                "placeholder": "sent",
+                "accepted": [
+                  "sent"
+                ]
+              }
+            ],
+            "explain": "by 5 o'clock - had sent."
+          },
+          {
+            "id": "pp_mi_4",
+            "instruction": "Заполни пропуски",
+            "prompt": "I came to the station after the train ____ ____. (leave)",
+            "inputs": [
+              {
+                "placeholder": "had / 'd",
+                "accepted": [
+                  "had",
+                  "'d"
+                ]
+              },
+              {
+                "placeholder": "left",
+                "accepted": [
+                  "left"
+                ]
+              }
+            ],
+            "explain": "after - train had left."
+          },
+          {
+            "id": "pp_mi_5",
+            "instruction": "Заполни пропуски",
+            "prompt": "Hardly ____ I ____ the room when the phone rang. (enter)",
+            "inputs": [
+              {
+                "placeholder": "had",
+                "accepted": [
+                  "had"
+                ]
+              },
+              {
+                "placeholder": "entered",
+                "accepted": [
+                  "entered"
+                ]
+              }
+            ],
+            "explain": "Hardly had I entered... (инверсия)."
+          }
+        ]
+      },
+      {
+        "id": "markers",
+        "title": "Маркеры (Markers)",
+        "kind": "multi",
+        "items": [
+          {
+            "id": "pp_mark_1",
+            "instruction": "Выбери маркеры Past Perfect",
+            "prompt": "Выбери маркеры Past Perfect:",
+            "options": [
+              "before",
+              "by the time",
+              "yesterday",
+              "already",
+              "last week"
+            ],
+            "correctIndices": [
+              0,
+              1,
+              3
+            ],
+            "explain": "before, by the time, already - частые маркеры Past Perfect."
+          },
+          {
+            "id": "pp_mark_2",
+            "instruction": "Выбери «к моменту»",
+            "prompt": "Что означает «к определённому моменту в прошлом»?",
+            "options": [
+              "by 5 o'clock",
+              "at 5 o'clock",
+              "now",
+              "tomorrow",
+              "since"
+            ],
+            "correctIndices": [
+              0
+            ],
+            "explain": "by 5 o'clock = к 5 часам."
+          },
+          {
+            "id": "pp_mark_3",
+            "instruction": "Выбери связки",
+            "prompt": "Какие связки часто встречаются с Past Perfect?",
+            "options": [
+              "before",
+              "after",
+              "because",
+              "while",
+              "since"
+            ],
+            "correctIndices": [
+              0,
+              1
+            ],
+            "explain": "before/after часто задают порядок действий."
+          },
+          {
+            "id": "pp_mark_4",
+            "instruction": "Выбери конструкции",
+            "prompt": "Инверсия с Past Perfect:",
+            "options": [
+              "Hardly had ... when ...",
+              "No sooner had ... than ...",
+              "Did ...?",
+              "Have ...?",
+              "Used to ..."
+            ],
+            "correctIndices": [
+              0,
+              1
+            ],
+            "explain": "Hardly/No sooner - устойчивые конструкции."
+          }
+        ]
+      },
+      {
+        "id": "markers_2",
+        "goal": "markers",
+        "title": "Match: маркер - смысл",
+        "kind": "match",
+        "items": [
+          {
+            "id": "pp_match_1",
+            "instruction": "Соедини",
+            "pairs": [
+              {
+                "left": "before",
+                "right": "до"
+              },
+              {
+                "left": "after",
+                "right": "после"
+              },
+              {
+                "left": "by 5 o'clock",
+                "right": "к 5 часам"
+              },
+              {
+                "left": "by the time",
+                "right": "ко времени"
+              },
+              {
+                "left": "already",
+                "right": "уже"
+              }
+            ],
+            "explain": "Соедини маркеры Past Perfect с переводом."
+          },
+          {
+            "id": "pp_match_2",
+            "instruction": "Соедини",
+            "pairs": [
+              {
+                "left": "Hardly had ... when ...",
+                "right": "едва...как"
+              },
+              {
+                "left": "Scarcely had ... when ...",
+                "right": "едва...как"
+              },
+              {
+                "left": "No sooner had ... than ...",
+                "right": "едва...как (чем...)"
+              },
+              {
+                "left": "had + V3",
+                "right": "формула Past Perfect"
+              },
+              {
+                "left": "V3",
+                "right": "3-я форма (past participle)"
+              }
+            ],
+            "explain": "Устойчивые конструкции Past Perfect."
+          }
+        ]
+      },
+      {
+        "id": "mistakes",
+        "title": "Исправь ошибки (Mistakes)",
+        "kind": "correction",
+        "items": [
+          {
+            "id": "pp_c_1",
+            "instruction": "Исправь",
+            "prompt": "I had went home when you called.",
+            "accepted": [
+              "I had gone home when you called."
+            ],
+            "explain": "Past Perfect: had + V3 (go - gone)."
+          },
+          {
+            "id": "pp_c_2",
+            "instruction": "Исправь",
+            "prompt": "Did you had finished the test?",
+            "accepted": [
+              "Had you finished the test?",
+              "Had you finished the test"
+            ],
+            "explain": "Вопрос: Had + S + V3?"
+          },
+          {
+            "id": "pp_c_3",
+            "instruction": "Исправь",
+            "prompt": "She hadn't saw him before.",
+            "accepted": [
+              "She hadn't seen him before.",
+              "She had not seen him before."
+            ],
+            "explain": "see - seen (V3)."
+          },
+          {
+            "id": "pp_c_4",
+            "instruction": "Исправь",
+            "prompt": "By 5 o'clock we finished the report.",
+            "accepted": [
+              "By 5 o'clock we had finished the report."
+            ],
+            "explain": "by + time - Past Perfect."
+          },
+          {
+            "id": "pp_c_5",
+            "instruction": "Исправь",
+            "prompt": "After the train had left, I came to the station.",
+            "accepted": [
+              "I came to the station after the train had left."
+            ],
+            "explain": "Порядок слов - сначала Past Simple, потом after + Past Perfect."
+          },
+          {
+            "id": "pp_c_6",
+            "instruction": "Исправь",
+            "prompt": "Hardly I had entered the room when the phone rang.",
+            "accepted": [
+              "Hardly had I entered the room when the phone rang."
+            ],
+            "explain": "Hardly - инверсия: Hardly had I ..."
+          },
+          {
+            "id": "pp_c_7",
+            "instruction": "Исправь",
+            "prompt": "They had not knew the answer.",
+            "accepted": [
+              "They had not known the answer.",
+              "They hadn't known the answer."
+            ],
+            "explain": "know - known (V3)."
+          },
+          {
+            "id": "pp_c_8",
+            "instruction": "Исправь",
+            "prompt": "He had received bad news?",
+            "accepted": [
+              "Had he received bad news?",
+              "Had he received bad news"
+            ],
+            "explain": "Вопрос - Had + S + V3?"
+          },
+          {
+            "id": "pp_c_9",
+            "instruction": "Исправь",
+            "prompt": "No sooner we had started than it began raining.",
+            "accepted": [
+              "No sooner had we started than it began raining."
+            ],
+            "explain": "No sooner - инверсия: No sooner had S + V3 ..."
+          }
+        ]
+      },
+      {
+        "id": "compare",
+        "title": "Past Perfect vs Past Simple (Contrast)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "pp_cmp_1",
+            "instruction": "Выбери время",
+            "prompt": "By the time I arrived, he ____ (leave).",
+            "options": [
+              "Past Perfect",
+              "Past Simple"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "pastPerfect",
+            "explain": "by the time - действие раньше: had left."
+          },
+          {
+            "id": "pp_cmp_2",
+            "instruction": "Выбери время",
+            "prompt": "I ____ (meet) her in 2020.",
+            "options": [
+              "Past Perfect",
+              "Past Simple"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "pastSimple",
+            "explain": "конкретное время - Past Simple."
+          },
+          {
+            "id": "pp_cmp_3",
+            "instruction": "Выбери время",
+            "prompt": "She ____ (finish) the report before the meeting started.",
+            "options": [
+              "Past Perfect",
+              "Past Simple"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "pastPerfect",
+            "explain": "before - действие раньше."
+          },
+          {
+            "id": "pp_cmp_4",
+            "instruction": "Выбери время",
+            "prompt": "We ____ (watch) a film last night.",
+            "options": [
+              "Past Perfect",
+              "Past Simple"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "pastSimple",
+            "explain": "last night - Past Simple."
+          },
+          {
+            "id": "pp_cmp_5",
+            "instruction": "Выбери время",
+            "prompt": "I didn't recognize him because I ____ (not/see) him for years.",
+            "options": [
+              "Past Perfect",
+              "Past Simple"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "pastPerfect",
+            "explain": "причина раньше: hadn't seen."
+          },
+          {
+            "id": "pp_cmp_6",
+            "instruction": "Выбери время",
+            "prompt": "When I was 10, I ____ (live) in a small town.",
+            "options": [
+              "Past Perfect",
+              "Past Simple"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "pastSimple",
+            "explain": "история/период в прошлом - Past Simple."
+          },
+          {
+            "id": "pp_cmp_7",
+            "instruction": "Выбери время",
+            "prompt": "After she ____ (hear) the news, she phoned me.",
+            "options": [
+              "Past Perfect",
+              "Past Simple"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "pastPerfect",
+            "explain": "Если подчёркиваем порядок: after + Past Perfect."
+          },
+          {
+            "id": "pp_cmp_8",
+            "instruction": "Выбери время",
+            "prompt": "After she heard the news, she phoned me.",
+            "options": [
+              "Past Perfect",
+              "Past Simple"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "pastSimple",
+            "explain": "Без акцента на порядок - Past Simple возможен."
+          }
+        ]
+      }
+    ]
+  }
+}

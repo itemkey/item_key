@@ -385,6 +385,11 @@
     optMixedP.value = 'mixedPresent';
     optMixedP.textContent = 'Mixed Present (Present Simple + Present Continuous)';
     tenseSelect.appendChild(optMixedP);
+
+    const optMixedPP = document.createElement('option');
+    optMixedPP.value = 'mixedPerfectPast';
+    optMixedPP.textContent = 'Mixed Perfect - Past (Present Perfect + Past Simple)';
+    tenseSelect.appendChild(optMixedPP);
   }
 
   function getTenseForPractice(id){
@@ -1425,6 +1430,11 @@ const QUICK = {
     markers: "while • when • at 5 p.m. • all day",
     formula: "was/were + V-ing"
   },
+  pastPerfect: {
+    when: "действие до другого/момента в прошлом",
+    markers: "before • by (time) • by the time • already",
+    formula: "had + V3"
+  },
   presentSimple: {
     when: "привычка/рутина • факт • расписание • состояния",
     markers: "always • usually • often • every day • on Mondays",
@@ -1434,6 +1444,16 @@ const QUICK = {
     when: "процесс сейчас • временно • развитие • раздражение always",
     markers: "now • at the moment • right now • these days • Look!",
     formula: "am/is/are + V-ing"
+  },
+  presentPerfect: {
+    when: "результат/опыт до сейчас • незаконченный период",
+    markers: "already • yet • just • ever/never • for/since",
+    formula: "have/has + V3"
+  },
+  presentPerfectContinuous: {
+    when: "длительность/процесс до сейчас • видимый результат",
+    markers: "for/since • how long • lately/recently",
+    formula: "have/has been + V-ing"
   }
 };
 
@@ -1459,6 +1479,7 @@ function superRule(aId,bId){
   const pair=[aId,bId].sort().join('|');
   if (pair==='presentContinuous|presentSimple') return 'Simple = привычка/факт/расписание (точка) • Continuous = процесс/временно (линия)';
   if (pair==='pastContinuous|pastSimple') return 'Past Simple = факт/событие (точка) • Past Continuous = процесс/фон (линия)';
+  if (pair==='pastPerfect|pastSimple') return 'Past Perfect = действие до другого/момента в прошлом • Past Simple = факт/событие в прошлом';
   return 'Сравни: одно время — “более факт/обычно”, другое — “более процесс/контекст”.';
 }
 
@@ -1590,7 +1611,7 @@ function pickDailySet(forceNew){
 
   // build pool from all tenses (including mixed + mixedPresent if present)
   const pool=[];
-  const allIds = [...REG.INDEX.map(x=>x.id), 'mixed', 'mixedPresent'].filter(id=>REG.byId[id]);
+  const allIds = [...REG.INDEX.map(x=>x.id), 'mixed', 'mixedPresent', 'mixedPerfectPast'].filter(id=>REG.byId[id]);
   for (const tid of allIds){
     const t = REG.byId[tid];
     for (const ex of (t.practice?.exercises||[])){

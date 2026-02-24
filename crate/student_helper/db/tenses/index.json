@@ -14,6 +14,13 @@
     "file": "pastContinuous.json"
   },
   {
+    "id": "pastPerfect",
+    "title": "Past Perfect",
+    "subtitle": "действие до другого в прошлом",
+    "hint": "past before past • by/before • order",
+    "file": "pastPerfect.json"
+  },
+  {
     "id": "presentSimple",
     "title": "Present Simple",
     "subtitle": "привычка - факт - расписание",
