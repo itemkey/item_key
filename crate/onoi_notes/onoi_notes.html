@@ -2378,6 +2378,18 @@ tgl.addEventListener('click', (e) => {
       state.saving = true;
       setSaveStatus('saving');
       try{
+        // embed pasted/dragged images (blob:...) so export/import keeps them
+        try{
+          await embedBlobImagesInEditor();
+          const n = state.activeNoteId ? noteById(state.activeNoteId) : null;
+          if(n){
+            n.title = (noteTitle.value || '').trim();
+            n.html = editor.innerHTML;
+            n.updatedAt = now();
+            updatedText.textContent = 'updated: ' + fmtTime(n.updatedAt);
+          }
+        }catch(e){}
+
         // write cats and notes
         await idbTx('readwrite',[STORE.cats, STORE.notes], st => {
           state.cats.forEach(c => st[STORE.cats].put(c));
@@ -2622,6 +2634,41 @@ function setFontFamily(ff){
         fr.onerror = () => reject(fr.error);
         fr.readAsDataURL(file);
       });
+    }
+
+    async function blobToDataURL(blob){
+      return new Promise((resolve, reject) => {
+        const fr = new FileReader();
+        fr.onload = () => resolve(fr.result);
+        fr.onerror = () => reject(fr.error);
+        fr.readAsDataURL(blob);
+      });
+    }
+
+    // If browser inserted <img src="blob:..."> (paste/drag), embed it as data URL so export/import keeps it
+    let __embeddingImgs = false;
+    async function embedBlobImagesInEditor(){
+      if(__embeddingImgs) return;
+      __embeddingImgs = true;
+      try{
+        const imgs = Array.from(editor.querySelectorAll('img'));
+        for(const im of imgs){
+          const src = (im.getAttribute('src') || '').trim();
+          if(!src) continue;
+          if(src.startsWith('data:')) continue;
+
+          if(src.startsWith('blob:')){
+            try{
+              const resp = await fetch(src);
+              const blob = await resp.blob();
+              const dataUrl = await blobToDataURL(blob);
+              im.setAttribute('src', dataUrl);
+            }catch(e){}
+          }
+        }
+      }finally{
+        __embeddingImgs = false;
+      }
     }
 
     
