@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Item Key — item-crate</title>
+  <title>Item Crate - item-crate</title>
 
   <!-- глобальный стиль сайта -->
   <link rel="stylesheet" href="assets/css/styles.css" />
@@ -17,7 +17,53 @@
       --tap: 44px;
     }
 
-    /* Центр-хаб item-crate */
+    
+
+/* ================================
+   Site nav: "Главное меню" (scrolls with page)
+   ================================ */
+.ik-site-nav, .ik-site-nav *{ box-sizing: border-box; }
+
+.ik-site-nav{
+  position: relative; /* not fixed/sticky; scrolls with page */
+  z-index: 50;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px 14px;
+  margin: 0 0 18px;
+  background: #fff;
+  border-bottom: 1px solid rgba(0,0,0,.14);
+}
+
+.ik-site-nav__link{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  padding: 10px 16px;
+  border: 1px solid rgba(0,0,0,.14);
+  background: #fff;
+  color: rgba(0,0,0,.86);
+  text-decoration: none;
+  font-size: 11px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  border-radius: 0;
+}
+
+.ik-site-nav__link:hover{ border-color: rgba(0,0,0,.25); }
+
+@media (max-width: 520px){
+  .ik-site-nav{ padding: 14px 12px; margin-bottom: 14px; }
+  .ik-site-nav__link{ padding: 10px 12px; letter-spacing: 3px; }
+}
+
+/* Центр-хаб item-crate */
     .crate-hub{
       width: min(var(--crate-max), 92vw);
       margin: 0 auto;
@@ -116,30 +162,28 @@
       .crate-card:hover{ transform: none; }
     }
 
-          /* если в глобальном CSS center-stage/frames имеют фиксированные отступы — слегка страхуемся */
-      .center-stage{
-        padding-left: 12px !important;
-        padding-right: 12px !important;
-        padding-bottom: calc(92px + env(safe-area-inset-bottom)) !important; /* место под dock */
-      }
-
-      .crate-hub{
-        width: min(var(--crate-max), 96vw);
-        gap: 14px;
-      }
-
-      .crate-title{
-        padding: 10px 4px;
-      }
+    /* если в глобальном CSS center-stage/frames имеют фиксированные отступы - слегка страхуемся */
+    .center-stage{
+      padding-left: 12px !important;
+      padding-right: 12px !important;
+      padding-bottom: calc(92px + env(safe-area-inset-bottom)) !important; /* место под dock */
+      padding-top: 0 !important;
     }
 
+    .crate-hub{
+      width: min(var(--crate-max), 96vw);
+      gap: 14px;
     }
+
+    .crate-title{
+      padding: 10px 4px;
+    }
+
     /* Принудительно острые углы для всех интерактивных элементов этой страницы */
-    .crate-card,
+    .crate-card{
       border-radius: 0 !important;
     }
-
-  </style>
+</style>
 </head>
 
 <body class="page page-crate">
@@ -148,15 +192,11 @@
   <div class="rays" aria-hidden="true"></div>
   <div class="veil" aria-hidden="true"></div>
 
-  <!-- верхний “герб” -->
-  <header class="topbar topbar--edge">
-    <!-- returnTo важен: чтобы item-user мог вернуться обратно -->
-    <a class="toplink" href="item-user.html?returnTo=item-crate.html" aria-label="Item User">
-      <span class="tag">item-user</span>
-    </a>
-  </header>
-
-  <!-- центр -->
+  <!-- site nav -->
+<header class="ik-site-nav" id="ikSiteNav">
+  <a class="ik-site-nav__link" href="index.html">Главное меню</a>
+</header>
+<!-- центр -->
   <main class="center-stage" aria-label="item-crate center">
     <section class="crate-hub" aria-label="item-crate menu">
       <div class="crate-title">
@@ -179,13 +219,13 @@
 
         <a class="crate-card" href="crate/student_helper/student_helper.html">
           <div class="crate-card__kicker">module</div>
-          <h2 class="crate-card__name">помощь студентам</h2>
+          <h2 class="crate-card__name">Учебный центр  </h2>
           <p class="crate-card__meta">модуль активен. тренажёр / база / поиск.</p>
         </a>
 
         <a class="crate-card" href="crate/whisperer/whisperer.html">
           <div class="crate-card__kicker">module</div>
-          <h2 class="crate-card__name">whisperer</h2>
+          <h2 class="crate-card__name">прошептать </h2>
           <p class="crate-card__meta">диктор для докладов: озвучка текста с подсветкой и гибкими настройками.</p>
         </a>
       </div>
@@ -193,14 +233,10 @@
   </main>
 
   <footer class="bottombar bottombar--edge">
-    <span class="hint">crate · hub</span>
+  <span class="hint">crate · hub</span>
+  <span class="hint">pre-alpha</span>
+</footer>
 
-    <a class="toplink" href="index.html" aria-label="Item Key">
-      <span class="tag">item-key</span>
-    </a>
-
-    <span class="hint">pre-alpha</span>
-  </footer>
 
   <!-- если общий main.js нужен для эффектов/движения -->
   <script src="assets/js/main.js"></script>

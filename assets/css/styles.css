@@ -678,6 +678,117 @@ body::after{
 
 
 
+
+/* =========================
+   NAV (more obvious)
+   ========================= */
+
+.veil{
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(circle at 50% 52%, rgba(0,0,0,.02), transparent 52%);
+  opacity: .9;
+}
+
+/* give fixed bars a subtle plaque background */
+.topbar--edge, .bottombar--edge{
+  background: rgba(255,255,255,.92);
+  backdrop-filter: blur(3px);
+}
+
+/* visible nav buttons - used as "tabs" */
+.nav-actions{
+  display:flex;
+  gap: 10px;
+  align-items:center;
+  justify-content:center;
+  flex-wrap: wrap;
+}
+
+.nav-btn{
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+
+  /* bigger + clearer */
+  padding: 16px 22px;
+  border: 2px solid #000;
+  background: #fff;
+  color: #000;
+  text-decoration: none;
+
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  border-radius: 0;
+
+  font-size: 14px;
+
+  box-shadow: 0 8px 0 rgba(0,0,0,.92);
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+
+  transition: transform .12s ease, background-color .12s ease, color .12s ease, box-shadow .12s ease;
+}
+
+.nav-btn:hover{
+  transform: translateY(-1px);
+  background: #000;
+  color: #fff;
+}
+
+.nav-btn:active{
+  transform: translateY(2px);
+  box-shadow: 0 4px 0 rgba(0,0,0,.92);
+}
+
+.nav-btn:focus-visible{
+  outline: 3px dashed #000;
+  outline-offset: 6px;
+}
+
+.nav-btn.is-active,
+.nav-btn[aria-current="page"]{
+  background:#000;
+  color:#fff;
+}
+
+.nav-btn__hint{
+  font-size: 12px;
+  letter-spacing: .04em;
+  opacity: .9;
+  text-transform: none;
+}
+
+.nav-btn__arrow{
+  font-size: 18px;
+  line-height: 1;
+}
+
+/* make side rails more readable too */
+.rail-link{
+  border-color: rgba(0,0,0,.28);
+  background: rgba(255,255,255,.90);
+}
+.rail-link:hover{
+  border-color: rgba(0,0,0,.55);
+}
+.rail-link.is-active{
+  border-color: #000;
+  background: #000;
+  color:#fff;
+}
+
+/* mobile - keep buttons inside the plaque width */
+@media (max-width: 640px){
+  .nav-actions{ gap: 8px; }
+  .nav-btn{ padding: 14px 18px; box-shadow: 0 6px 0 rgba(0,0,0,.92); }
+}
+
+
 /* =========================
    PAGE RULES
    ========================= */
@@ -758,3 +869,25 @@ body.page-home{ overflow: hidden; }
 
 
 
+
+
+/* fixed center buttons (top + bottom) */
+.nav-btn--user{
+  position: fixed;
+  z-index: 60;
+  top: calc(18px + env(safe-area-inset-top, 0px));
+  left: 0;
+  right: 0;
+  width: max-content;
+  margin-inline: auto;
+}
+
+.nav-btn--crate{
+  position: fixed;
+  z-index: 60;
+  bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+  left: 0;
+  right: 0;
+  width: max-content;
+  margin-inline: auto;
+}

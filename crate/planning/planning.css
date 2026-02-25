@@ -1,6 +1,43 @@
 /* Декор — только фон, НЕ перехватывает клики */
 .outer-frame, .rays, .veil { pointer-events: none; }
 
+/* Shared top navigation (same layout as student_helper) */
+.ik-top-actions{
+  display:grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items:center;
+  gap:12px;
+  width:100%;
+  margin: 16px 0;
+}
+.ik-top-actions .ik-left{ justify-self:start; }
+.ik-top-actions .ik-center{ justify-self:center; }
+.ik-top-actions .ik-right{ justify-self:end; }
+.ik-top-actions > a.ik-btn,
+.ik-top-actions > button.ik-btn{
+  display:inline-flex;
+  align-items:center;
+  width:auto;
+  flex:0 0 auto;
+  white-space:nowrap;
+}
+.ik-btn{
+  border: 1px solid rgba(0,0,0,.14);
+  background: rgba(255,255,255,.86);
+  padding: 10px 12px;
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  cursor: pointer;
+  text-decoration: none;
+  border-radius: 0;
+  line-height: 1.2;
+  user-select: none;
+}
+.ik-btn:hover{ border-color: rgba(0,0,0,.25); transform: translateY(-1px); }
+.ik-btn:active{ transform: translateY(0); }
+
+
 /* Planning layout */
 .planning-shell{
   width: min(1180px, 94vw);
@@ -582,3 +619,45 @@
   place-items: center !important;
 }
 
+/* ================================
+   Site nav: "Главное меню" (scrolls with page)
+   ================================ */
+.ik-site-nav, .ik-site-nav *{ box-sizing: border-box; }
+
+.ik-site-nav{
+  position: relative; /* keep above decorative layers */
+  z-index: 50;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px 14px;
+  margin: 0 0 18px;
+  background: #fff;
+  border-bottom: 1px solid rgba(0,0,0,.14);
+}
+
+.ik-site-nav__link{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  padding: 10px 16px;
+  border: 1px solid rgba(0,0,0,.14);
+  background: #fff;
+  color: rgba(0,0,0,.86);
+  text-decoration: none;
+  font-size: 11px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.ik-site-nav__link:hover{ border-color: rgba(0,0,0,.25); }
+
+@media (max-width: 520px){
+  .ik-site-nav{ padding: 14px 12px; margin-bottom: 14px; }
+  .ik-site-nav__link{ padding: 10px 12px; letter-spacing: 3px; }
+}

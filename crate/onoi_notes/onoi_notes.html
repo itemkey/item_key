@@ -15,7 +15,7 @@
     .notes-wrap, .notes-wrap *{ box-sizing: border-box; }
     :root{
       --footerH: 56px;
-      --topbarOffset: 74px;
+      --topbarOffset: 0px;
 
       --bgCard: rgba(255,255,255,.86);
       --bd: rgba(0,0,0,.14);
@@ -449,8 +449,21 @@
     .toolbar-row{
       display: flex;
       gap: 8px;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      padding-bottom: 4px;
       align-items: center;
+    }
+    .toolbar-row::-webkit-scrollbar{ height: 8px; }
+    .toolsep{
+      width: 1px;
+      height: 24px;
+      background: rgba(0,0,0,.18);
+      margin: 0 2px;
+      flex: 0 0 auto;
+      align-self: center;
     }
     .tool, .toolsel{
       border: 1px solid var(--bd);
@@ -471,7 +484,7 @@
     .toolsel{ cursor: default; }
     .tool.is-primary{ font-weight: 700; letter-spacing: 3px; text-transform: uppercase; }
     .swatch{
-      width: 14px; height: 14px; border: 1px solid rgba(0,0,0,.22);
+      width: 16px; height: 16px; border: 1px solid rgba(0,0,0,.22);
       background: #000;
       display: inline-block;
     }
@@ -923,6 +936,127 @@
   border-color: rgba(0,0,0,.45);
 }
 
+/* =========================================================
+   Word-like UX additions (sharp / gothic, no rounding)
+   ========================================================= */
+.view-tools{ display:flex; gap:8px; align-items:center; }
+.view-tools .n-btn{ padding: 8px 10px; }
+
+.mini-pop{
+  position: fixed;
+  z-index: 9999;
+  min-width: 300px;
+  max-width: min(420px, calc(100vw - 24px));
+  background: var(--bgCard);
+  border: 1px solid var(--bd2);
+  box-shadow: 0 10px 24px rgba(0,0,0,.18);
+  border-radius: 0;
+  padding: 10px;
+}
+.mini-pop[hidden]{ display:none !important; }
+.mini-pop-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; }
+.mini-pop-title{ font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: rgba(0,0,0,.66); }
+.mini-pop-x{ padding: 6px 10px; line-height: 1; }
+.mini-pop-row{ display:grid; gap:8px; margin-bottom:10px; }
+.mini-pop-row.is-hex{ grid-template-columns: auto 1fr auto auto; align-items:center; }
+.mini-pop-label{ font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: rgba(0,0,0,.55); }
+
+.color-grid{
+  display:grid;
+  grid-template-columns: repeat(12, 22px);
+  gap: 6px;
+  align-items:center;
+}
+.color-grid.is-recent{ grid-template-columns: repeat(6, 22px); }
+.color-swatch{
+  width: 22px;
+  height: 22px;
+  border: 1px solid rgba(0,0,0,.28);
+  background: #000;
+  cursor: pointer;
+}
+.color-swatch.is-none{
+  background: repeating-linear-gradient(45deg,#0000 0 4px, rgba(0,0,0,.18) 4px 8px), #fff;
+}
+.color-swatch[aria-pressed="true"]{ outline: 2px solid rgba(0,0,0,.7); outline-offset: 1px; }
+
+.mini-hex{
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--bd2);
+  background: rgba(255,255,255,.72);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  border-radius: 0;
+}
+
+.code-copy-float{
+  position: fixed;
+  z-index: 9998;
+  padding: 6px 10px;
+  border-radius: 0;
+  opacity: .92;
+}
+.code-copy-float[hidden]{ display:none !important; }
+
+body.focus-mode .n-col-left,
+body.focus-mode .rail,
+body.focus-mode .toolbar,
+body.focus-mode .n-title,
+body.focus-mode .n-footer{
+  display:none !important;
+}
+body.focus-mode .n-col-right{
+  width: 100% !important;
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+
+
+/* ================================
+   Site nav: "Главное меню" (scrolls with page)
+   ================================ */
+.ik-site-nav, .ik-site-nav *{ box-sizing: border-box; }
+.ik-site-nav{
+  position: relative !important; /* must NOT be sticky/fixed */
+  top: auto !important;
+  z-index: 50;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px 14px;
+  margin: 0 0 18px;
+  background: #fff;
+  border-bottom: 1px solid rgba(0,0,0,.14);
+}
+.ik-site-nav__link{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  padding: 10px 16px;
+  border: 1px solid rgba(0,0,0,.14);
+  background: #fff;
+  color: rgba(0,0,0,.86);
+  text-decoration: none;
+  font-size: 11px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  border-radius: 0;
+}
+.ik-site-nav__link:hover{ border-color: rgba(0,0,0,.25); }
+
+@media (max-width: 520px){
+  .ik-site-nav{ padding: 14px 12px; margin-bottom: 14px; }
+  .ik-site-nav__link{ padding: 10px 12px; letter-spacing: 3px; }
+}
+
+.center-stage{ padding-top: 0 !important; }
+
 </style>
 </head>
 
@@ -932,36 +1066,9 @@
   <div class="rays" aria-hidden="true"></div>
   <div class="veil" aria-hidden="true"></div>
 
-  <!-- верхний “герб” -->
-  <header class="topbar topbar--edge">
-    <a class="toplink" href="../../item-user.html?returnTo=crate/onoi_notes/onoi_notes.html" aria-label="Item User">
-      <span class="tag">item-user</span>
-    </a>
+  <header class="ik-site-nav" id="ikSiteNav">
+    <a class="ik-site-nav__link" href="../../index.html">Главное меню</a>
   </header>
-
-  <!-- левый rail -->
-  <aside class="rail rail--left" aria-label="Левое меню">
-    <a class="rail-link" href="../../index.html">
-      <span class="rail-link__title">item-key</span>
-      <span class="rail-link__meta">главное меню</span>
-    </a>
-    <a class="rail-link" href="../../item-crate.html">
-      <span class="rail-link__title">item-crate</span>
-      <span class="rail-link__meta">назад в хаб</span>
-    </a>
-  </aside>
-
-  <!-- правый rail -->
-  <aside class="rail rail--right" aria-label="Правое меню">
-    <a class="rail-link" href="../../item-soft.html">
-      <span class="rail-link__title">item-soft</span>
-      <span class="rail-link__meta">инструменты / редакторы</span>
-    </a>
-    <a class="rail-link" href="../../item-security.html">
-      <span class="rail-link__title">item-security</span>
-      <span class="rail-link__meta">доступ / защита</span>
-    </a>
-  </aside>
 
   <main class="center-stage" aria-label="onoi_notes center">
     <section class="notes-wrap" aria-label="onoi_notes app">
@@ -1048,26 +1155,32 @@
 
           <div class="toolbar" aria-label="Панель форматирования">
             <div class="toolbar-row">
-              <button class="tool" type="button" data-cmd="bold"><b>B</b></button>
-              <button class="tool" type="button" data-cmd="italic"><i>I</i></button>
-              <button class="tool" type="button" data-cmd="underline"><u>U</u></button>
+              <button class="tool" type="button" id="undoBtn" title="Ctrl+Z">undo</button>
+              <button class="tool" type="button" id="redoBtn" title="Ctrl+Y">redo</button>
+              <span class="toolsep" aria-hidden="true"></span>
+
+              <button class="tool" type="button" data-cmd="bold" title="Ctrl+B"><b>B</b></button>
+              <button class="tool" type="button" data-cmd="italic" title="Ctrl+I"><i>I</i></button>
+              <button class="tool" type="button" data-cmd="underline" title="Ctrl+U"><u>U</u></button>
               <button class="tool" type="button" data-cmd="strikeThrough"><s>S</s></button>
 
+              <span class="toolsep" aria-hidden="true"></span>
               <button class="tool" type="button" data-cmd="insertUnorderedList">• list</button>
               <button class="tool" type="button" data-cmd="insertOrderedList">1. list</button>
-              <button class="tool" type="button" data-cmd="formatBlock" data-arg="blockquote">quote</button>
-              <button class="tool" type="button" data-cmd="formatBlock" data-arg="pre">code</button>
+              <button class="tool" type="button" id="quoteBtn" title="Ctrl+Shift+Q">quote</button>
+              <button class="tool" type="button" id="codeBtn" title="Ctrl+`">code</button>
 
-              <button class="tool" type="button" id="linkBtn">link</button>
-              <button class="tool" type="button" id="imgBtn">image</button>
-              <input id="imgFile" type="file" accept="image/*" hidden />
+              <span class="toolsep" aria-hidden="true"></span>
+              <button class="tool" type="button" id="textColorBtn" aria-haspopup="dialog" aria-controls="textColorPop" title="Цвет текста">
+                <span class="swatch" id="colorSwatch"></span>text
+              </button>
+              <button class="tool" type="button" id="hlBtn" aria-haspopup="dialog" aria-controls="hlPop" title="Маркер">
+                <span class="swatch" id="hlSwatch" style="background:#fff59d"></span>marker
+              </button>
+              <button class="tool" type="button" id="clearFmtBtn">clear</button>
             </div>
 
             <div class="toolbar-row">
-              <button class="tool" type="button" data-cmd="undo">undo</button>
-              <button class="tool" type="button" data-cmd="redo">redo</button>
-              <button class="tool" type="button" id="clearFmtBtn">clear</button>
-
               <select class="toolsel" id="blockSelect" aria-label="Стиль блока">
                 <option value="p" selected>P</option>
                 <option value="h1">H1</option>
@@ -1087,7 +1200,6 @@
                 <option value="\"Trebuchet MS\", Trebuchet, sans-serif">Trebuchet</option>
                 <option value="\"Comic Sans MS\", \"Comic Sans\", cursive">Comic</option>
               </select>
-
               <select class="toolsel" id="sizeSelect">
                 <option value="14">14px</option>
                 <option value="16" selected>16px</option>
@@ -1098,22 +1210,19 @@
                 <option value="32">32px</option>
               </select>
 
-              <label class="toolsel" style="gap:10px">
-                <span class="swatch" id="colorSwatch"></span>
-                <input id="colorPick" type="color" value="#000000" aria-label="Цвет текста" />
-              </label>
-
-              <label class="toolsel" style="gap:10px">
-                <span class="swatch" id="hlSwatch" style="background:#fff59d"></span>
-                <input id="hlPick" type="color" value="#fff59d" aria-label="Подсветка" />
-              </label>
-
+              <span class="toolsep" aria-hidden="true"></span>
               <button class="tool" type="button" data-cmd="justifyLeft">left</button>
               <button class="tool" type="button" data-cmd="justifyCenter">center</button>
               <button class="tool" type="button" data-cmd="justifyRight">right</button>
 
-              <button class="tool" type="button" id="toggleSidebarBtn">sidebar</button>
-              <button class="tool is-primary" type="button" id="focusBtn">focus</button>
+              <span class="toolsep" aria-hidden="true"></span>
+              <button class="tool" type="button" id="linkBtn">link</button>
+              <button class="tool" type="button" id="imgBtn">image</button>
+              <input id="imgFile" type="file" accept="image/*" hidden />
+
+              <span class="toolsep" aria-hidden="true"></span>
+              <button class="tool" id="toggleSidebarBtn" type="button" title="Sidebar">sidebar</button>
+              <button class="tool" id="focusBtn" type="button" title="Focus - Esc выход">focus</button>
             </div>
           </div>
 
@@ -1164,6 +1273,58 @@
 
 <!-- Toasts -->
 <div class="toast-wrap" id="toastWrap" aria-live="polite" aria-atomic="true"></div>
+
+<!-- Text color popover + code copy (ephemeral UI, not saved) -->
+<div class="mini-pop" id="textColorPop" role="dialog" aria-label="Цвет текста" hidden>
+  <div class="mini-pop-head">
+    <div class="mini-pop-title">Цвет текста</div>
+    <button class="n-btn mini-pop-x" type="button" id="textColorCloseBtn" aria-label="Закрыть">×</button>
+  </div>
+
+  <div class="mini-pop-row">
+    <div class="mini-pop-label">Presets</div>
+    <div class="color-grid" id="textColorPresets"></div>
+  </div>
+
+  <div class="mini-pop-row">
+    <div class="mini-pop-label">Recent</div>
+    <div class="color-grid is-recent" id="textColorRecent"></div>
+  </div>
+
+  <div class="mini-pop-row is-hex">
+    <div class="mini-pop-label">HEX</div>
+    <input class="mini-hex" id="textColorHex" type="text" inputmode="text" spellcheck="false" placeholder="#000000" />
+    <button class="n-btn" type="button" id="textColorApplyBtn">Применить</button>
+    <button class="n-btn" type="button" id="textColorResetBtn" title="Сбросить к теме">Сброс</button>
+  </div>
+</div>
+
+<!-- Marker popover (no system picker) -->
+<div class="mini-pop" id="hlPop" role="dialog" aria-label="Маркер" hidden>
+  <div class="mini-pop-head">
+    <div class="mini-pop-title">Маркер</div>
+    <button class="n-btn mini-pop-x" type="button" id="hlCloseBtn" aria-label="Закрыть">×</button>
+  </div>
+
+  <div class="mini-pop-row">
+    <div class="mini-pop-label">Presets</div>
+    <div class="color-grid" id="hlPresets"></div>
+  </div>
+
+  <div class="mini-pop-row">
+    <div class="mini-pop-label">Recent</div>
+    <div class="color-grid is-recent" id="hlRecent"></div>
+  </div>
+
+  <div class="mini-pop-row is-hex">
+    <div class="mini-pop-label">HEX</div>
+    <input class="mini-hex" id="hlHex" type="text" inputmode="text" spellcheck="false" placeholder="#fff59d" />
+    <button class="n-btn" type="button" id="hlApplyBtn">Применить</button>
+    <button class="n-btn" type="button" id="hlResetBtn" title="Сбросить">Сброс</button>
+  </div>
+</div>
+
+<button class="n-btn code-copy-float" id="codeCopyBtn" type="button" hidden>Copy</button>
 
   <!-- Settings modal -->
   <div class="modal" id="settingsModal" role="dialog" aria-modal="true" aria-label="Настройки">
@@ -2846,19 +3007,7 @@ fontSelect.addEventListener('change', () => {
       applyFontSizeToSelection(px, { alsoSetDefault: true });
     });
 
-function applyColorSwatches(){
-      colorSwatch.style.background = colorPick.value;
-      hlSwatch.style.background = hlPick.value;
-    }
-    applyColorSwatches();
-    colorPick.addEventListener('input', () => {
-      applyColorSwatches();
-      applyStyleToSelection({ color: colorPick.value });
-    });
-    hlPick.addEventListener('input', () => {
-      applyColorSwatches();
-      applyStyleToSelection({ 'background-color': hlPick.value });
-    });
+// Marker color handled by custom popover (no system picker)
     linkBtn.addEventListener('click', async () => {
       // uiPrompt steals focus -> keep selection stable
       saveSelection();
@@ -3129,11 +3278,1273 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
     boot();
   })();
   </script>
+<script>
+/* =========================================================
+   Word-level stability layer (no schema changes, keeps note.html as HTML)
+   - Custom text color popover (no system picker)
+   - Toggle quote / code block
+   - Code-block paste + Tab/Shift+Tab + Copy
+   - Snapshot history (undo/redo) with selection restore
+   - Sidebar (desktop collapse) vs Drawer (mobile) + Focus mode + ESC
+   ========================================================= */
+(function(){
+  'use strict';
 
-  <style>
-    /* focus mode: hide rails + reduce distractions */
-    body.focus-mode .rail{ display:none !important; }
-    body.focus-mode .notes-wrap{ max-width: 940px; }
-  </style>
+  const editor = document.getElementById('editor');
+  if(!editor) return;
+
+  const textColorBtn = document.getElementById('textColorBtn');
+  const colorSwatch = document.getElementById('colorSwatch');
+  const textColorPop = document.getElementById('textColorPop');
+  const textColorPresets = document.getElementById('textColorPresets');
+  const textColorRecent = document.getElementById('textColorRecent');
+  const textColorHex = document.getElementById('textColorHex');
+  const textColorApplyBtn = document.getElementById('textColorApplyBtn');
+  const textColorResetBtn = document.getElementById('textColorResetBtn');
+  const textColorCloseBtn = document.getElementById('textColorCloseBtn');
+
+  const hlBtn = document.getElementById('hlBtn');
+  const hlSwatch = document.getElementById('hlSwatch');
+  const hlPop = document.getElementById('hlPop');
+  const hlPresets = document.getElementById('hlPresets');
+  const hlRecent = document.getElementById('hlRecent');
+  const hlHex = document.getElementById('hlHex');
+  const hlApplyBtn = document.getElementById('hlApplyBtn');
+  const hlResetBtn = document.getElementById('hlResetBtn');
+  const hlCloseBtn = document.getElementById('hlCloseBtn');
+
+  const quoteBtn = document.getElementById('quoteBtn');
+  const codeBtn = document.getElementById('codeBtn');
+  const undoBtn = document.getElementById('undoBtn');
+  const redoBtn = document.getElementById('redoBtn');
+
+  const toggleSidebarBtn = document.getElementById('toggleSidebarBtn');
+  const focusBtn = document.getElementById('focusBtn');
+
+  const openDrawerBtn = document.getElementById('openDrawerBtn');
+  const closeDrawerBtn = document.getElementById('closeDrawerBtn');
+  const drawerOverlay = document.getElementById('drawerOverlay');
+
+  const codeCopyBtn = document.getElementById('codeCopyBtn');
+
+  const RECENT_KEY = 'onoi_notes_recent_text_colors_v1';
+  const HL_RECENT_KEY = 'onoi_notes_recent_marker_colors_v1';
+  const SIDEBAR_KEY = 'onoi_notes_sidebar_collapsed_v1';
+  const FOCUS_KEY = 'onoi_notes_focus_v1';
+
+  const PRESETS = [
+    '#000000','#111827','#374151','#6b7280','#9ca3af','#d1d5db','#ffffff','#7f1d1d','#dc2626','#f97316','#f59e0b','#fde047','#14532d','#16a34a','#22c55e','#0f766e','#06b6d4','#1e3a8a','#2563eb','#3b82f6','#4c1d95','#7c3aed','#c026d3','#be185d'
+  ];
+
+  const HL_PRESETS = [
+    '#fff59d','#ffe082','#ffecb3','#ffd54f','#ffccbc','#ffab91','#f8bbd0','#f48fb1','#e1bee7','#d1c4e9','#b39ddb','#9fa8da','#bbdefb','#90caf9','#b2ebf2','#80deea','#b2dfdb','#80cbc4','#c8e6c9','#a5d6a7','#dcedc8','#f0f4c3','#eeeeee','#cfd8dc'
+  ];
+
+  // -------------------------
+  // Utilities: selection markers (comments) to keep selection stable
+  // -------------------------
+  function inEditorSelection(){
+    const sel = window.getSelection();
+    if(!sel || sel.rangeCount === 0) return null;
+    const r = sel.getRangeAt(0);
+    if(!editor.contains(r.commonAncestorContainer)) return null;
+    return r;
+  }
+  function focusEditorSafe(){
+    try{ editor.focus({preventScroll:true}); }catch(e){ try{ editor.focus(); }catch(_e){} }
+  }
+
+  function insertMarkersFromRange(range){
+    const doc = range.startContainer.ownerDocument;
+    const start = doc.createComment('onoi_sel_start');
+    const end = doc.createComment('onoi_sel_end');
+    // insert end first (so start offsets remain valid)
+    const endRange = range.cloneRange();
+    endRange.collapse(false);
+    endRange.insertNode(end);
+    const startRange = range.cloneRange();
+    startRange.collapse(true);
+    startRange.insertNode(start);
+    return {start, end};
+  }
+
+  function restoreRangeFromMarkers(markers){
+    const {start, end} = markers || {};
+    if(!start || !end || !start.parentNode || !end.parentNode) return null;
+    const r = document.createRange();
+    r.setStartAfter(start);
+    r.setEndBefore(end);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(r);
+    // clean markers
+    start.remove();
+    end.remove();
+    return r;
+  }
+
+  // -------------------------
+  // Merge adjacent spans with same inline style (for color/back-color)
+  // -------------------------
+  function normalizeSpans(){
+    // merge adjacent spans that only differ by being separate nodes
+    const walker = document.createTreeWalker(editor, NodeFilter.SHOW_ELEMENT, {
+      acceptNode(node){
+        if(node.nodeName === 'SPAN' && node.hasAttribute('style')) return NodeFilter.FILTER_ACCEPT;
+        return NodeFilter.FILTER_SKIP;
+      }
+    });
+    const spans = [];
+    while(walker.nextNode()) spans.push(walker.currentNode);
+
+    for(const sp of spans){
+      if(!sp.parentNode) continue;
+      // remove empty / zwsp-only
+      if(sp.textContent === '\u200B') { sp.remove(); continue; }
+      // unwrap style-less
+      if(!sp.getAttribute('style')) { unwrap(sp); continue; }
+    }
+
+    // helper: stable style compare (order-insensitive)
+    function normStyleText(el){
+      const css = (el.getAttribute('style')||'').trim();
+      if(!css) return '';
+      return css.split(';').map(x => x.trim().toLowerCase()).filter(Boolean).sort().join(';');
+    }
+
+    // merge pass (adjacent siblings)
+    const mergeCandidates = editor.querySelectorAll('span[style]');
+    for(const sp of mergeCandidates){
+      if(!sp.parentNode) continue;
+      const next = sp.nextSibling;
+      if(next && next.nodeType === 1 && next.nodeName === 'SPAN'){
+        const a = normStyleText(sp);
+        const b = normStyleText(next);
+        if(a && a === b){
+          while(next.firstChild) sp.appendChild(next.firstChild);
+          next.remove();
+        }
+      }
+    }
+
+  }
+  function unwrap(el){
+    const p = el.parentNode;
+    if(!p) return;
+    while(el.firstChild) p.insertBefore(el.firstChild, el);
+    el.remove();
+  }
+
+  // Extend existing sanitizeEditorHTML safely (don't delete user's functions)
+  if(typeof window.sanitizeEditorHTML === 'function' && !window.__onoi_sanitize_wrapped){
+    window.__onoi_sanitize_wrapped = true;
+    const _sanitize = window.sanitizeEditorHTML;
+    window.sanitizeEditorHTML = function(){
+      try{ _sanitize(); }catch(e){}
+      try{
+        // remove leftover selection/caret artifacts
+        editor.querySelectorAll('span[data-onoi-caret="1"]').forEach(sp => {
+          if(sp.textContent === '\u200B' || sp.textContent === '') sp.remove();
+          else sp.removeAttribute('data-onoi-caret');
+        });
+        // normalize pre>code to plain text (no spans inside)
+        editor.querySelectorAll('pre').forEach(pre => {
+          let code = pre.querySelector('code');
+          if(!code){
+            code = document.createElement('code');
+            // keep pre text
+            code.textContent = pre.textContent;
+            pre.textContent = '';
+            pre.appendChild(code);
+          }
+          // collapse any markup inside code
+          code.textContent = code.textContent;
+        });
+
+        normalizeSpans();
+      }catch(e){}
+    };
+  }
+
+  // -------------------------
+  // Snapshot history (HTML + selection paths)
+  // -------------------------
+  const hist = {
+    noteId: null,
+    stack: [],
+    idx: -1,
+    pending: null
+  };
+
+  function nodeToPath(node){
+    const path = [];
+    let cur = node;
+    while(cur && cur !== editor){
+      const parent = cur.parentNode;
+      if(!parent) break;
+      const children = Array.from(parent.childNodes);
+      path.push(children.indexOf(cur));
+      cur = parent;
+    }
+    return path.reverse();
+  }
+  function pathToNode(path){
+    let cur = editor;
+    for(const idx of path){
+      if(!cur || !cur.childNodes || idx < 0 || idx >= cur.childNodes.length) return null;
+      cur = cur.childNodes[idx];
+    }
+    return cur;
+  }
+
+  function serializeSelection(){
+    const r = inEditorSelection();
+    if(!r) return null;
+    return {
+      sc: nodeToPath(r.startContainer),
+      so: r.startOffset,
+      ec: nodeToPath(r.endContainer),
+      eo: r.endOffset
+    };
+  }
+  function restoreSelectionFromSerialized(selObj){
+    if(!selObj) return;
+    const sc = pathToNode(selObj.sc);
+    const ec = pathToNode(selObj.ec);
+    if(!sc || !ec) return;
+    const r = document.createRange();
+    try{
+      r.setStart(sc, Math.min(selObj.so, sc.nodeType===3 ? sc.nodeValue.length : sc.childNodes.length));
+      r.setEnd(ec, Math.min(selObj.eo, ec.nodeType===3 ? ec.nodeValue.length : ec.childNodes.length));
+    }catch(e){ return; }
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(r);
+  }
+
+  function histReset(noteId){
+    hist.noteId = noteId || (editor.dataset.noteId || null);
+    hist.stack = [{ html: editor.innerHTML, sel: serializeSelection() }];
+    hist.idx = 0;
+  }
+  function histCommitNow(reason){
+    const noteId = editor.dataset.noteId || null;
+    if(hist.noteId !== noteId) histReset(noteId);
+    const snap = { html: editor.innerHTML, sel: serializeSelection(), t: Date.now(), reason: reason || '' };
+    const prev = hist.stack[hist.idx];
+    if(prev && prev.html === snap.html) return;
+    hist.stack = hist.stack.slice(0, hist.idx+1);
+    hist.stack.push(snap);
+    hist.idx = hist.stack.length-1;
+  }
+  function histCommitSoon(reason){
+    clearTimeout(hist.pending);
+    hist.pending = setTimeout(() => histCommitNow(reason || 'input'), 420);
+  }
+  function histUndo(){
+    if(hist.idx <= 0) return;
+    hist.idx -= 1;
+    const snap = hist.stack[hist.idx];
+    editor.innerHTML = snap.html;
+    try{ window.sanitizeEditorHTML(); }catch(e){}
+    restoreSelectionFromSerialized(snap.sel);
+    try{ window.schedulePersist && window.schedulePersist(); }catch(e){}
+  }
+  function histRedo(){
+    if(hist.idx >= hist.stack.length-1) return;
+    hist.idx += 1;
+    const snap = hist.stack[hist.idx];
+    editor.innerHTML = snap.html;
+    try{ window.sanitizeEditorHTML(); }catch(e){}
+    restoreSelectionFromSerialized(snap.sel);
+    try{ window.schedulePersist && window.schedulePersist(); }catch(e){}
+  }
+
+  // Patch renderEditor to reset history per note
+  if(typeof window.renderEditor === 'function' && !window.__onoi_render_wrapped){
+    window.__onoi_render_wrapped = true;
+    const _render = window.renderEditor;
+    window.renderEditor = function(note){
+      const r = _render(note);
+      try{ histReset(note && note.id ? note.id : (editor.dataset.noteId||null)); }catch(e){}
+      return r;
+    };
+  }
+
+  // init history on load
+  setTimeout(() => {
+    try{ histReset(editor.dataset.noteId||null); }catch(e){}
+  }, 0);
+
+  editor.addEventListener('input', () => histCommitSoon('input'), {passive:true});
+
+  // -------------------------
+  // Custom text color popover
+  // -------------------------
+  let activeTextColor = null; // null means default theme
+  let lastAppliedTextColor = null;
+  let popWasOpenWithCollapsed = true;
+
+  function loadRecent(){
+    try{
+      const v = JSON.parse(localStorage.getItem(RECENT_KEY) || '[]');
+      return Array.isArray(v) ? v.filter(x => typeof x === 'string') : [];
+    }catch(e){ return []; }
+  }
+  function saveRecent(list){
+    try{ localStorage.setItem(RECENT_KEY, JSON.stringify(list.slice(0,6))); }catch(e){}
+  }
+  function pushRecent(color){
+    if(!color) return;
+    const list = loadRecent().filter(c => c.toLowerCase() !== color.toLowerCase());
+    list.unshift(color);
+    saveRecent(list);
+    renderRecent();
+  }
+  function setSwatch(color){
+    if(!colorSwatch) return;
+    colorSwatch.style.background = color || 'rgba(0,0,0,.86)';
+  }
+  setSwatch(activeTextColor);
+
+  function renderPresets(){
+    if(!textColorPresets) return;
+    textColorPresets.innerHTML = '';
+    // first: "none"
+    const none = document.createElement('button');
+    none.type = 'button';
+    none.className = 'color-swatch is-none';
+    none.title = 'Сброс к теме';
+    none.setAttribute('aria-pressed', activeTextColor ? 'false':'true');
+    none.addEventListener('click', () => applyTextColor(null, {fromUI:true}));
+    textColorPresets.appendChild(none);
+
+    for(const c of PRESETS){
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'color-swatch';
+      b.style.background = c;
+      b.title = c;
+      b.setAttribute('aria-pressed', (activeTextColor && activeTextColor.toLowerCase() === c.toLowerCase()) ? 'true':'false');
+      b.addEventListener('click', () => applyTextColor(c, {fromUI:true}));
+      textColorPresets.appendChild(b);
+    }
+  }
+  function renderRecent(){
+    if(!textColorRecent) return;
+    textColorRecent.innerHTML = '';
+    const list = loadRecent();
+    if(list.length === 0){
+      const d = document.createElement('div');
+      d.style.fontSize = '11px';
+      d.style.color = 'rgba(0,0,0,.55)';
+      d.textContent = 'пусто';
+      textColorRecent.appendChild(d);
+      return;
+    }
+    for(const c of list){
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'color-swatch';
+      b.style.background = c;
+      b.title = c;
+      b.addEventListener('click', () => applyTextColor(c, {fromUI:true}));
+      textColorRecent.appendChild(b);
+    }
+  }
+
+  function openColorPop(){
+    if(!textColorPop || !textColorBtn) return;
+    // save selection in existing mechanism if present
+    try{ window.saveSelection && window.saveSelection(); }catch(e){}
+    popWasOpenWithCollapsed = !inEditorSelection() || inEditorSelection().collapsed;
+
+    renderPresets();
+    renderRecent();
+
+    textColorHex.value = activeTextColor || '';
+    textColorPop.hidden = false;
+
+    // position near button
+    const r = textColorBtn.getBoundingClientRect();
+    const pop = textColorPop;
+    const pad = 8;
+    const w = pop.offsetWidth || 320;
+    const h = pop.offsetHeight || 220;
+    let left = Math.min(window.innerWidth - w - pad, Math.max(pad, r.left));
+    let top = r.bottom + 8;
+    if(top + h > window.innerHeight - pad) top = Math.max(pad, r.top - h - 8);
+    pop.style.left = left + 'px';
+    pop.style.top = top + 'px';
+
+    // prevent focus steal from closing selection permanently
+    pop.addEventListener('mousedown', ev => ev.preventDefault(), {once:true});
+  }
+  function closeColorPop(){
+    if(!textColorPop) return;
+    textColorPop.hidden = true;
+    // restore selection back if we had one
+    try{ window.restoreSelection && window.restoreSelection(); }catch(e){}
+    focusEditorSafe();
+  }
+
+  function normalizeHex(v){
+    const t = (v||'').trim();
+    if(!t) return null;
+    const m = t.match(/^#?([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/);
+    if(!m) return null;
+    let hex = m[1].toLowerCase();
+    if(hex.length === 3) hex = hex.split('').map(ch => ch+ch).join('');
+    return '#'+hex;
+  }
+
+  // Core: apply color to selection OR set active for next typed text
+  function applyTextColor(color, opts){
+    const normalized = color ? normalizeHex(color) : null;
+    activeTextColor = normalized;
+    setSwatch(activeTextColor);
+    if(opts && opts.fromUI){
+      // keep recent
+      if(activeTextColor) pushRecent(activeTextColor);
+    }
+
+    focusEditorSafe();
+    try{ window.restoreSelection && window.restoreSelection(); }catch(e){}
+
+    const range = inEditorSelection();
+    if(!range) { closeColorPop(); return; }
+
+    // don't paint inside code blocks
+    const startEl = (range.startContainer.nodeType === 3) ? range.startContainer.parentNode : range.startContainer;
+    if(startEl && startEl.closest && startEl.closest('pre')) { closeColorPop(); return; }
+
+    if(range.collapsed){
+      // Word-like: make it active for next typing
+      lastAppliedTextColor = activeTextColor;
+      closeColorPop();
+      return;
+    }
+
+    const markers = insertMarkersFromRange(range);
+    // range between markers
+    const workRange = document.createRange();
+    workRange.setStartAfter(markers.start);
+    workRange.setEndBefore(markers.end);
+
+    // collect text nodes intersecting
+    const tw = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT, {
+      acceptNode(node){
+        if(!node.nodeValue) return NodeFilter.FILTER_REJECT;
+        if(!workRange.intersectsNode(node)) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    const nodes = [];
+    while(tw.nextNode()) nodes.push(tw.currentNode);
+
+    // split boundaries precisely
+    function splitAt(container, offset){
+      if(container.nodeType !== 3) return;
+      const len = container.nodeValue.length;
+      if(offset <= 0 || offset >= len) return;
+      container.splitText(offset);
+    }
+    // start boundary
+    if(workRange.startContainer.nodeType === 3) splitAt(workRange.startContainer, workRange.startOffset);
+    // end boundary: if endContainer is text node, split at endOffset (but beware after split changed)
+    if(workRange.endContainer.nodeType === 3) splitAt(workRange.endContainer, workRange.endOffset);
+
+    // apply styles
+    for(const tn of nodes){
+      if(!tn.parentNode) continue;
+      // ignore markers
+      if(tn.nodeValue === '') continue;
+
+      if(activeTextColor){
+        // if already inside span with same color, skip
+        const sp = tn.parentNode.nodeName === 'SPAN' ? tn.parentNode : null;
+        const cur = sp ? (sp.style && sp.style.color ? sp.style.color : '') : '';
+        if(cur && cur.toLowerCase() === activeTextColor.toLowerCase()) continue;
+
+        const wrap = document.createElement('span');
+        wrap.style.color = activeTextColor;
+        tn.parentNode.insertBefore(wrap, tn);
+        wrap.appendChild(tn);
+      } else {
+        // reset: remove color from parent span if present
+        let p = tn.parentNode;
+        while(p && p !== editor){
+          if(p.nodeType === 1 && p.nodeName === 'SPAN' && p.style && p.style.color){
+            p.style.color = '';
+            if(!p.getAttribute('style')) unwrap(p);
+            break;
+          }
+          p = p.parentNode;
+        }
+      }
+    }
+
+    try{ window.sanitizeEditorHTML(); }catch(e){}
+    const newRange = restoreRangeFromMarkers(markers);
+    // keep selection
+    if(newRange){
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(newRange);
+    }
+    closeColorPop();
+    try{ histCommitNow('color'); }catch(e){}
+    try{ window.schedulePersist && window.schedulePersist(); }catch(e){}
+  }
+
+  if(textColorBtn){
+    textColorBtn.addEventListener('click', () => {
+      if(!textColorPop) return;
+      if(!textColorPop.hidden) closeColorPop();
+      else openColorPop();
+    });
+  }
+  if(textColorCloseBtn) textColorCloseBtn.addEventListener('click', closeColorPop);
+  document.addEventListener('mousedown', (ev) => {
+    if(!textColorPop || textColorPop.hidden) return;
+    if(textColorPop.contains(ev.target) || textColorBtn.contains(ev.target)) return;
+    closeColorPop();
+  });
+
+  if(textColorApplyBtn){
+    textColorApplyBtn.addEventListener('click', () => {
+      const hex = normalizeHex(textColorHex.value);
+      if(!hex){
+        // keep pop open, but don't apply invalid
+        textColorHex.focus();
+        return;
+      }
+      applyTextColor(hex, {fromUI:true});
+    });
+  }
+  if(textColorResetBtn){
+    textColorResetBtn.addEventListener('click', () => applyTextColor(null, {fromUI:true}));
+  }
+  if(textColorHex){
+    textColorHex.addEventListener('keydown', (ev) => {
+      if(ev.key === 'Enter'){ ev.preventDefault(); textColorApplyBtn && textColorApplyBtn.click(); }
+      if(ev.key === 'Escape'){ ev.preventDefault(); closeColorPop(); }
+    });
+  }
+
+  
+  // -------------------------
+  // Custom marker (highlight) popover (no system picker)
+  // -------------------------
+  let activeHlColor = null; // null means no marker
+  const DEFAULT_HL = '#fff59d';
+
+  function loadHlRecent(){
+    try{
+      const v = JSON.parse(localStorage.getItem(HL_RECENT_KEY) || '[]');
+      return Array.isArray(v) ? v.filter(x => typeof x === 'string') : [];
+    }catch(e){ return []; }
+  }
+  function saveHlRecent(list){
+    try{ localStorage.setItem(HL_RECENT_KEY, JSON.stringify(list.slice(0,6))); }catch(e){}
+  }
+  function pushHlRecent(color){
+    if(!color) return;
+    const list = loadHlRecent().filter(c => c.toLowerCase() !== color.toLowerCase());
+    list.unshift(color);
+    saveHlRecent(list);
+    renderHlRecent();
+  }
+  function setHlSwatch(color){
+    if(!hlSwatch) return;
+    hlSwatch.style.background = color || DEFAULT_HL;
+  }
+
+  function renderHlPresets(){
+    if(!hlPresets) return;
+    hlPresets.innerHTML = '';
+    const none = document.createElement('button');
+    none.type = 'button';
+    none.className = 'color-swatch is-none';
+    none.title = 'Сбросить маркер';
+    none.setAttribute('aria-pressed', activeHlColor ? 'false':'true');
+    none.addEventListener('click', () => applyHlColor(null, {fromUI:true}));
+    hlPresets.appendChild(none);
+
+    for(const c of HL_PRESETS){
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'color-swatch';
+      b.style.background = c;
+      b.title = c;
+      b.setAttribute('aria-pressed', (activeHlColor && activeHlColor.toLowerCase() === c.toLowerCase()) ? 'true':'false');
+      b.addEventListener('click', () => applyHlColor(c, {fromUI:true}));
+      hlPresets.appendChild(b);
+    }
+  }
+  function renderHlRecent(){
+    if(!hlRecent) return;
+    hlRecent.innerHTML = '';
+    const list = loadHlRecent();
+    if(list.length === 0){
+      const d = document.createElement('div');
+      d.style.fontSize = '11px';
+      d.style.color = 'rgba(0,0,0,.55)';
+      d.textContent = 'пусто';
+      hlRecent.appendChild(d);
+      return;
+    }
+    for(const c of list){
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'color-swatch';
+      b.style.background = c;
+      b.title = c;
+      b.addEventListener('click', () => applyHlColor(c, {fromUI:true}));
+      hlRecent.appendChild(b);
+    }
+  }
+
+  function openHlPop(){
+    if(!hlPop || !hlBtn) return;
+    try{ window.saveSelection && window.saveSelection(); }catch(e){}
+
+    renderHlPresets();
+    renderHlRecent();
+
+    hlHex.value = activeHlColor || '';
+    hlPop.hidden = false;
+
+    const r = hlBtn.getBoundingClientRect();
+    const pop = hlPop;
+    const pad = 8;
+    const w = pop.offsetWidth || 320;
+    const h = pop.offsetHeight || 220;
+    let left = Math.min(window.innerWidth - w - pad, Math.max(pad, r.left));
+    let top = r.bottom + 8;
+    if(top + h > window.innerHeight - pad) top = Math.max(pad, r.top - h - 8);
+    pop.style.left = left + 'px';
+    pop.style.top = top + 'px';
+
+    pop.addEventListener('mousedown', ev => ev.preventDefault(), {once:true});
+  }
+  function closeHlPop(){
+    if(!hlPop) return;
+    hlPop.hidden = true;
+    try{ window.restoreSelection && window.restoreSelection(); }catch(e){}
+    focusEditorSafe();
+  }
+
+  function applyHlColor(color, opts){
+    const normalized = color ? normalizeHex(color) : null;
+    activeHlColor = normalized;
+    setHlSwatch(activeHlColor);
+
+    if(opts && opts.fromUI){
+      if(activeHlColor) pushHlRecent(activeHlColor);
+    }
+
+    focusEditorSafe();
+    try{ window.restoreSelection && window.restoreSelection(); }catch(e){}
+
+    const range = inEditorSelection();
+    if(!range) { closeHlPop(); return; }
+
+    // don't paint inside code blocks
+    const startEl = (range.startContainer.nodeType === 3) ? range.startContainer.parentNode : range.startContainer;
+    if(startEl && startEl.closest && startEl.closest('pre')) { closeHlPop(); return; }
+
+    if(range.collapsed){
+      closeHlPop();
+      return;
+    }
+
+    const markers = insertMarkersFromRange(range);
+    const workRange = document.createRange();
+    workRange.setStartAfter(markers.start);
+    workRange.setEndBefore(markers.end);
+
+    const tw = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT, {
+      acceptNode(node){
+        if(!node.nodeValue) return NodeFilter.FILTER_REJECT;
+        if(!workRange.intersectsNode(node)) return NodeFilter.FILTER_REJECT;
+        const p = node.parentNode;
+        if(p && p.closest && p.closest('pre')) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    const nodes = [];
+    while(tw.nextNode()) nodes.push(tw.currentNode);
+
+    function splitAt(container, offset){
+      if(container.nodeType !== 3) return;
+      const len = container.nodeValue.length;
+      if(offset <= 0 || offset >= len) return;
+      container.splitText(offset);
+    }
+    if(workRange.startContainer.nodeType === 3) splitAt(workRange.startContainer, workRange.startOffset);
+    if(workRange.endContainer.nodeType === 3) splitAt(workRange.endContainer, workRange.endOffset);
+
+    for(const tn of nodes){
+      if(!tn.parentNode) continue;
+      if(tn.nodeValue === '') continue;
+
+      if(activeHlColor){
+        const sp = tn.parentNode.nodeName === 'SPAN' ? tn.parentNode : null;
+        const cur = sp ? (sp.style && sp.style.backgroundColor ? sp.style.backgroundColor : '') : '';
+        if(cur && cur.toLowerCase() === activeHlColor.toLowerCase()) continue;
+
+        const wrap = document.createElement('span');
+        wrap.style.backgroundColor = activeHlColor;
+        tn.parentNode.insertBefore(wrap, tn);
+        wrap.appendChild(tn);
+      } else {
+        let p = tn.parentNode;
+        while(p && p !== editor){
+          if(p.nodeType === 1 && p.nodeName === 'SPAN' && p.style && p.style.backgroundColor){
+            p.style.backgroundColor = '';
+            if(!p.getAttribute('style')) unwrap(p);
+            break;
+          }
+          p = p.parentNode;
+        }
+      }
+    }
+
+    try{ window.sanitizeEditorHTML(); }catch(e){}
+    const newRange = restoreRangeFromMarkers(markers);
+    if(newRange){
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(newRange);
+    }
+    closeHlPop();
+    try{ histCommitNow('marker'); }catch(e){}
+    try{ window.schedulePersist && window.schedulePersist(); }catch(e){}
+  }
+
+  if(hlBtn){
+    hlBtn.addEventListener('click', () => {
+      if(!hlPop) return;
+      if(!hlPop.hidden) closeHlPop();
+      else openHlPop();
+    });
+  }
+  if(hlCloseBtn) hlCloseBtn.addEventListener('click', closeHlPop);
+
+  document.addEventListener('mousedown', (ev) => {
+    if(!hlPop || hlPop.hidden) return;
+    if(hlPop.contains(ev.target) || (hlBtn && hlBtn.contains(ev.target))) return;
+    closeHlPop();
+  });
+
+  if(hlApplyBtn){
+    hlApplyBtn.addEventListener('click', () => {
+      const hex = normalizeHex(hlHex.value);
+      if(!hex){ hlHex.focus(); return; }
+      applyHlColor(hex, {fromUI:true});
+    });
+  }
+  if(hlResetBtn){
+    hlResetBtn.addEventListener('click', () => applyHlColor(null, {fromUI:true}));
+  }
+  if(hlHex){
+    hlHex.addEventListener('keydown', (ev) => {
+      if(ev.key === 'Enter'){ ev.preventDefault(); hlApplyBtn && hlApplyBtn.click(); }
+      if(ev.key === 'Escape'){ ev.preventDefault(); closeHlPop(); }
+    });
+  }
+
+  // init swatch
+  setHlSwatch(activeHlColor);
+
+// Word-like typing: if selection collapsed and active text/marker is set, keep typing inside a styled span
+  editor.addEventListener('beforeinput', (ev) => {
+    if(!activeTextColor && !activeHlColor) return;
+    if(ev.inputType !== 'insertText' && ev.inputType !== 'insertCompositionText' && ev.inputType !== 'insertFromPaste') return;
+
+    const r = inEditorSelection();
+    if(!r || !r.collapsed) return;
+
+    const startEl = (r.startContainer.nodeType === 3) ? r.startContainer.parentNode : r.startContainer;
+    if(startEl && startEl.closest && startEl.closest('pre')) return; // don't style code blocks
+
+    // if already inside a span that matches both styles, do nothing
+    let p = startEl;
+    while(p && p !== editor){
+      if(p.nodeType === 1 && p.nodeName === 'SPAN'){
+        const okColor = (!activeTextColor) || (p.style && p.style.color && p.style.color.toLowerCase() === activeTextColor.toLowerCase());
+        const okBg = (!activeHlColor) || (p.style && p.style.backgroundColor && p.style.backgroundColor.toLowerCase() === activeHlColor.toLowerCase());
+        if(okColor && okBg) return;
+        break;
+      }
+      p = p.parentNode;
+    }
+
+    const sp = document.createElement('span');
+    if(activeTextColor) sp.style.color = activeTextColor;
+    if(activeHlColor) sp.style.backgroundColor = activeHlColor;
+    sp.setAttribute('data-onoi-caret','1');
+    sp.textContent = '\u200B';
+    r.insertNode(sp);
+
+    const tn = sp.firstChild;
+    const nr = document.createRange();
+    nr.setStart(tn, 1);
+    nr.collapse(true);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(nr);
+  });
+
+
+  // Update swatch based on current selection
+  function currentTextColorAtCaret(){
+    const r = inEditorSelection();
+    if(!r) return null;
+    let n = r.startContainer.nodeType === 3 ? r.startContainer.parentNode : r.startContainer;
+    while(n && n !== editor){
+      if(n.nodeType === 1 && n.nodeName === 'SPAN' && n.style && n.style.color){
+        return n.style.color;
+      }
+      n = n.parentNode;
+    }
+    return null;
+  }
+  document.addEventListener('selectionchange', () => {
+    const r = inEditorSelection();
+    if(!r) return;
+    const c = currentTextColorAtCaret();
+    if(c){ setSwatch(c); } else { setSwatch(activeTextColor); }
+    updateCodeCopyButton();
+  });
+
+  // -------------------------
+  // Toggle quote / code block
+  // -------------------------
+  function closestBlock(node){
+    let n = node;
+    if(n.nodeType === 3) n = n.parentNode;
+    while(n && n !== editor){
+      if(n.nodeType === 1){
+        const tag = n.nodeName;
+        if(['P','DIV','H1','H2','H3','H4','LI','BLOCKQUOTE','PRE'].includes(tag)) return n;
+      }
+      n = n.parentNode;
+    }
+    return null;
+  }
+  function getBlocksInRange(range){
+    if(!range) return [];
+    if(range.collapsed){
+      const b = closestBlock(range.startContainer);
+      return b ? [b] : [];
+    }
+    const markers = insertMarkersFromRange(range);
+    const workRange = document.createRange();
+    workRange.setStartAfter(markers.start);
+    workRange.setEndBefore(markers.end);
+
+    const blocks = [];
+    const walker = document.createTreeWalker(editor, NodeFilter.SHOW_ELEMENT, {
+      acceptNode(node){
+        if(!workRange.intersectsNode(node)) return NodeFilter.FILTER_SKIP;
+        const tag = node.nodeName;
+        if(['P','DIV','H1','H2','H3','H4','LI','PRE','BLOCKQUOTE'].includes(tag)){
+          // only top-level-ish blocks (avoid nested inside other blocks except li)
+          return NodeFilter.FILTER_ACCEPT;
+        }
+        return NodeFilter.FILTER_SKIP;
+      }
+    });
+    while(walker.nextNode()){
+      const el = walker.currentNode;
+      // keep only those whose closest block is itself
+      const cb = closestBlock(el);
+      if(cb === el) blocks.push(el);
+    }
+    restoreRangeFromMarkers(markers);
+    // de-dup while preserving order
+    const seen = new Set();
+    const out = [];
+    for(const b of blocks){
+      if(seen.has(b)) continue;
+      seen.add(b);
+      out.push(b);
+    }
+    return out.length ? out : (closestBlock(range.startContainer) ? [closestBlock(range.startContainer)] : []);
+  }
+
+  function wrapBlocksWith(wrapperTag, blocks){
+    if(!blocks.length) return null;
+    const w = document.createElement(wrapperTag);
+    const first = blocks[0];
+    first.parentNode.insertBefore(w, first);
+    for(const b of blocks) w.appendChild(b);
+    return w;
+  }
+  function unwrapBlockquote(bq){
+    const parent = bq.parentNode;
+    if(!parent) return;
+    const children = Array.from(bq.childNodes);
+    for(const ch of children){
+      if(ch.nodeType === 1 && ['P','DIV','H1','H2','H3','H4','PRE','UL','OL'].includes(ch.nodeName)){
+        parent.insertBefore(ch, bq);
+      } else if(ch.nodeType === 3 && ch.nodeValue.trim()){
+        const p = document.createElement('p');
+        p.textContent = ch.nodeValue;
+        parent.insertBefore(p, bq);
+      } else if(ch.nodeType === 1){
+        const p = document.createElement('p');
+        p.appendChild(ch);
+        parent.insertBefore(p, bq);
+      }
+    }
+    bq.remove();
+  }
+
+  function toggleQuote(){
+    focusEditorSafe();
+    try{ window.restoreSelection && window.restoreSelection(); }catch(e){}
+    const r = inEditorSelection();
+    if(!r) return;
+    const blocks = getBlocksInRange(r);
+    if(!blocks.length) return;
+
+    // if all blocks are inside the same blockquote -> unwrap that blockquote
+    const bq = blocks[0].closest('blockquote');
+    if(bq && blocks.every(b => b.closest('blockquote') === bq)){
+      unwrapBlockquote(bq);
+      try{ window.sanitizeEditorHTML(); }catch(e){}
+      histCommitNow('quote');
+      try{ window.schedulePersist && window.schedulePersist(); }catch(e){}
+      return;
+    }
+
+    // otherwise wrap
+    wrapBlocksWith('blockquote', blocks);
+    try{ window.sanitizeEditorHTML(); }catch(e){}
+    histCommitNow('quote');
+    try{ window.schedulePersist && window.schedulePersist(); }catch(e){}
+  }
+
+  function unwrapPre(pre){
+    const parent = pre.parentNode;
+    if(!parent) return;
+    const code = pre.querySelector('code');
+    const text = (code ? code.textContent : pre.textContent) || '';
+    const lines = text.split('\n');
+    // replace with paragraphs
+    const frag = document.createDocumentFragment();
+    for(const line of lines){
+      const p = document.createElement('p');
+      p.textContent = line || '';
+      frag.appendChild(p);
+    }
+    parent.insertBefore(frag, pre);
+    pre.remove();
+  }
+
+  function toggleCodeBlock(){
+    focusEditorSafe();
+    try{ window.restoreSelection && window.restoreSelection(); }catch(e){}
+    const r = inEditorSelection();
+    if(!r) return;
+
+    const inPre = (closestBlock(r.startContainer) && closestBlock(r.startContainer).nodeName === 'PRE') ? closestBlock(r.startContainer) : (r.startContainer.nodeType===1 ? r.startContainer.closest('pre') : null);
+    if(inPre){
+      unwrapPre(inPre);
+      try{ window.sanitizeEditorHTML(); }catch(e){}
+      histCommitNow('code');
+      try{ window.schedulePersist && window.schedulePersist(); }catch(e){}
+      return;
+    }
+
+    const blocks = getBlocksInRange(r);
+    if(!blocks.length) return;
+
+    // collect text from blocks
+    const parts = blocks.map(b => {
+      if(b.nodeName === 'PRE'){
+        const c = b.querySelector('code');
+        return (c ? c.textContent : b.textContent) || '';
+      }
+      return (b.innerText != null ? b.innerText : b.textContent) || '';
+    });
+    const text = parts.join('\n');
+
+    const pre = document.createElement('pre');
+    const code = document.createElement('code');
+    code.textContent = text.replace(/\r\n/g, '\n');
+    pre.appendChild(code);
+
+    // replace blocks with pre
+    const first = blocks[0];
+    first.parentNode.insertBefore(pre, first);
+    for(const b of blocks) b.remove();
+
+    // place caret inside code end
+    const tn = code.firstChild || code.appendChild(document.createTextNode(''));
+    const nr = document.createRange();
+    nr.setStart(tn, tn.nodeValue.length);
+    nr.collapse(true);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(nr);
+
+    try{ window.sanitizeEditorHTML(); }catch(e){}
+    histCommitNow('code');
+    try{ window.schedulePersist && window.schedulePersist(); }catch(e){}
+  }
+
+  if(quoteBtn) quoteBtn.addEventListener('click', toggleQuote);
+  if(codeBtn) codeBtn.addEventListener('click', toggleCodeBlock);
+
+  // -------------------------
+  // Code-block editing: paste + tab/outdent + enter
+  // -------------------------
+  function getCodeAtSelection(){
+    const r = inEditorSelection();
+    if(!r) return null;
+    let n = r.startContainer.nodeType === 3 ? r.startContainer.parentNode : r.startContainer;
+    const pre = n && n.closest ? n.closest('pre') : null;
+    if(!pre) return null;
+    const code = pre.querySelector('code') || pre;
+    // ensure plain text
+    if(code.nodeName === 'CODE') code.textContent = code.textContent;
+    return {pre, code, range: r};
+  }
+
+  function insertTextAtRange(range, text){
+    if(!range) return;
+    range.deleteContents();
+    const tn = document.createTextNode(text);
+    range.insertNode(tn);
+    // move caret to end
+    const nr = document.createRange();
+    nr.setStart(tn, tn.nodeValue.length);
+    nr.collapse(true);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(nr);
+  }
+
+  editor.addEventListener('paste', (ev) => {
+    const info = getCodeAtSelection();
+    if(!info) return; // normal paste handler in existing code handles plain text
+    ev.preventDefault();
+    const text = (ev.clipboardData && ev.clipboardData.getData('text/plain')) || '';
+    insertTextAtRange(info.range, text.replace(/\r\n/g, '\n'));
+    try{ window.sanitizeEditorHTML(); }catch(e){}
+    histCommitSoon('paste-code');
+    try{ window.schedulePersist && window.schedulePersist(); }catch(e){}
+  });
+
+  editor.addEventListener('keydown', (ev) => {
+    const info = getCodeAtSelection();
+    if(!info) {
+      // shortcuts outside code
+      if((ev.ctrlKey || ev.metaKey) && !ev.altKey){
+        const k = ev.key.toLowerCase();
+        if(k === 'z'){
+          ev.preventDefault();
+          if(ev.shiftKey) histRedo(); else histUndo();
+          return;
+        }
+        if(k === 'y'){
+          ev.preventDefault(); histRedo(); return;
+        }
+        if(k === 'b' || k === 'i' || k === 'u'){
+          // let execCommand handle (existing listeners)
+          return;
+        }
+        if(ev.shiftKey && k === 'q'){
+          ev.preventDefault(); toggleQuote(); return;
+        }
+        if(k === '`'){
+          ev.preventDefault(); toggleCodeBlock(); return;
+        }
+      }
+      if(ev.key === 'Escape'){
+        if(hlPop && !hlPop.hidden){ ev.preventDefault(); closeHlPop(); return; }
+        if(!textColorPop.hidden){ ev.preventDefault(); closeColorPop(); return; }
+        if(document.body.classList.contains('drawer-open')){ ev.preventDefault(); closeDrawer(); return; }
+        if(document.body.classList.contains('focus-mode')){ ev.preventDefault(); setFocus(false); return; }
+      }
+      return;
+    }
+
+    // inside code
+    if(ev.key === 'Tab'){
+      ev.preventDefault();
+      const tabStr = '  ';
+      if(ev.shiftKey){
+        // outdent at caret: remove preceding 2 spaces if present
+        const r = info.range;
+        const sc = r.startContainer;
+        if(sc.nodeType === 3){
+          const off = r.startOffset;
+          const val = sc.nodeValue;
+          if(off >= 2 && val.slice(off-2, off) === tabStr){
+            sc.nodeValue = val.slice(0, off-2) + val.slice(off);
+            const nr = document.createRange();
+            nr.setStart(sc, off-2);
+            nr.collapse(true);
+            const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(nr);
+          }
+        }
+      } else {
+        insertTextAtRange(info.range, tabStr);
+      }
+      histCommitSoon('tab-code');
+      return;
+    }
+
+    if(ev.key === 'Enter'){
+      ev.preventDefault();
+      insertTextAtRange(info.range, '\n');
+      histCommitSoon('enter-code');
+      return;
+    }
+
+    if((ev.ctrlKey || ev.metaKey) && !ev.altKey){
+      const k = ev.key.toLowerCase();
+      if(k === 'z'){ ev.preventDefault(); if(ev.shiftKey) histRedo(); else histUndo(); return; }
+      if(k === 'y'){ ev.preventDefault(); histRedo(); return; }
+    }
+  });
+
+  // -------------------------
+  // Floating Copy button for code blocks
+  // -------------------------
+  let lastPreForCopy = null;
+  function updateCodeCopyButton(){
+    if(!codeCopyBtn) return;
+    const info = getCodeAtSelection();
+    if(!info){ codeCopyBtn.hidden = true; lastPreForCopy = null; return; }
+    lastPreForCopy = info.pre;
+    const r = info.pre.getBoundingClientRect();
+    codeCopyBtn.hidden = false;
+    codeCopyBtn.style.left = (Math.min(window.innerWidth - 80, r.right - 70)) + 'px';
+    codeCopyBtn.style.top = (Math.max(8, r.top + 8)) + 'px';
+  }
+  if(codeCopyBtn){
+    codeCopyBtn.addEventListener('click', async () => {
+      if(!lastPreForCopy) return;
+      const code = lastPreForCopy.querySelector('code') || lastPreForCopy;
+      const text = (code.textContent || '');
+      try{
+        await navigator.clipboard.writeText(text);
+      }catch(e){
+        // fallback
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        try{ document.execCommand('copy'); }catch(_e){}
+        ta.remove();
+      }
+      codeCopyBtn.textContent = 'Copied';
+      setTimeout(() => { codeCopyBtn.textContent = 'Copy'; }, 700);
+    });
+    window.addEventListener('scroll', updateCodeCopyButton, {passive:true});
+    window.addEventListener('resize', updateCodeCopyButton, {passive:true});
+  }
+
+  // -------------------------
+  // Undo / Redo buttons
+  // -------------------------
+  if(undoBtn) undoBtn.addEventListener('click', () => { focusEditorSafe(); histUndo(); });
+  if(redoBtn) redoBtn.addEventListener('click', () => { focusEditorSafe(); histRedo(); });
+
+  // -------------------------
+  // Sidebar (desktop collapse) vs Drawer (mobile)
+  // -------------------------
+  function isMobile(){
+    return window.matchMedia('(max-width: 900px)').matches;
+  }
+  function setSidebarCollapsedDesktop(collapsed){
+    document.body.classList.toggle('is-sidebar-collapsed', !!collapsed);
+    try{ localStorage.setItem(SIDEBAR_KEY, collapsed ? '1':'0'); }catch(e){}
+  }
+  function openDrawer(){
+    document.body.classList.add('drawer-open');
+  }
+  function closeDrawer(){
+    document.body.classList.remove('drawer-open');
+  }
+
+  // init desktop sidebar state
+  try{
+    const v = localStorage.getItem(SIDEBAR_KEY);
+    if(v === '1' && !isMobile()) setSidebarCollapsedDesktop(true);
+  }catch(e){}
+
+  if(toggleSidebarBtn){
+    toggleSidebarBtn.addEventListener('click', () => {
+      if(isMobile()){
+        openDrawer();
+      } else {
+        const next = !document.body.classList.contains('is-sidebar-collapsed');
+        setSidebarCollapsedDesktop(next);
+      }
+    });
+  }
+  if(openDrawerBtn) openDrawerBtn.addEventListener('click', openDrawer);
+  if(closeDrawerBtn) closeDrawerBtn.addEventListener('click', closeDrawer);
+  if(drawerOverlay) drawerOverlay.addEventListener('click', closeDrawer);
+
+  // if switching between mobile/desktop, clear conflicting states
+  window.addEventListener('resize', () => {
+    if(isMobile()){
+      // don't hide sidebar permanently on mobile
+      document.body.classList.remove('is-sidebar-collapsed');
+    } else {
+      closeDrawer();
+      // restore desktop preference
+      try{
+        const v = localStorage.getItem(SIDEBAR_KEY);
+        if(v === '1') document.body.classList.add('is-sidebar-collapsed');
+      }catch(e){}
+    }
+  }, {passive:true});
+
+  // -------------------------
+  // Focus mode
+  // -------------------------
+  function setFocus(on){
+    document.body.classList.toggle('focus-mode', !!on);
+    try{ localStorage.setItem(FOCUS_KEY, on ? '1':'0'); }catch(e){}
+    if(focusBtn){
+      focusBtn.textContent = on ? 'exit focus' : 'focus';
+      focusBtn.classList.toggle('is-primary', !!on);
+    }
+    if(on) closeDrawer();
+  }
+  if(focusBtn){
+    focusBtn.addEventListener('click', () => setFocus(!document.body.classList.contains('focus-mode')));
+  }
+  try{
+    const v = localStorage.getItem(FOCUS_KEY);
+    if(v === '1') setFocus(true);
+  }catch(e){}
+
+  // Global ESC handling
+  document.addEventListener('keydown', (ev) => {
+    if(ev.key !== 'Escape') return;
+    if(hlPop && !hlPop.hidden){ ev.preventDefault(); closeHlPop(); return; }
+    if(!textColorPop.hidden){ ev.preventDefault(); closeColorPop(); return; }
+    if(document.body.classList.contains('drawer-open')){ ev.preventDefault(); closeDrawer(); return; }
+    if(document.body.classList.contains('focus-mode')){ ev.preventDefault(); setFocus(false); return; }
+  });
+
+})();
+</script>
+
+
+
+  
 </body>
 </html>

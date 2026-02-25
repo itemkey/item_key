@@ -3,43 +3,36 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Student Helper</title>
+  <title>Учебный Центр</title>
 
   <!-- Match main site look -->
   <link rel="stylesheet" href="../../assets/css/styles.css" />
 
   <link rel="stylesheet" href="./student_helper.css" />
+
+  <style>
+/* hide any db labels in UI */
+    #dictDbNameLine,
+    #dictDbPill,
+    #dbNameLine{
+      display:none !important;
+    }
+  </style>
+
 </head>
 
 <body class="page page-learning">
   <div class="veil" aria-hidden="true"></div>
 
-  <header class="topbar topbar--edge">
-    <a class="toplink" href="../../index.html" aria-label="Back to index">
-      <span class="tag">student-helper</span>
-    </a>
+  <header class="ik-site-nav" id="ikSiteNav">
+    <a class="ik-site-nav__link" href="../../index.html">Главное меню</a>
   </header>
 
   <main class="learn-stage" aria-label="Student Helper">
     <div class="learn-wrap">
-
-      <div class="ik-top-actions">
-        <a class="ik-back ik-btn" href="../../index.html">
-          <span aria-hidden="true">←</span>
-          <span>назад в index</span>
-        </a>
-
-        <button class="ik-btn" id="shHomeBtn" type="button" title="Главное меню">меню</button>
-
-        <span class="ik-pill" title="Локальная база IndexedDB (в браузере)">
-          <span>db</span>
-          <span id="dbStatus" class="ik-muted">...</span>
-        </span>
-      </div>
-
-      <section id="shLobby" class="ik-card sh-lobby" aria-label="Главное меню">
+<section id="shLobby" class="ik-card sh-lobby" aria-label="Главное меню">
         <div class="ik-inner">
-          <p class="ik-title">student helper</p>
+          <p class="ik-title">Учебный центр</p>
           <p class="ik-sub">выбери раздел, чтобы начать</p>
 
           <div class="sh-grid" role="list">
@@ -74,8 +67,7 @@
           <div class="ik-row sh-lobby-row">
             <button class="ik-btn" id="shContinue" type="button" hidden>продолжить</button>
             <span class="ik-spacer" aria-hidden="true"></span>
-            <p class="ik-footnote sh-lobby-note">можно вернуться сюда кнопкой "меню" сверху</p>
-          </div>
+</div>
         </div>
       </section>
 
@@ -96,7 +88,7 @@
               <span class="ik-badge" id="dictSeedBadge" title="Автозагрузка json при пустой базе">json: ...</span>
               <span class="ik-badge" id="dictDbNameLine">db: ...</span>
               <span class="ik-spacer" aria-hidden="true"></span>
-              <span class="ik-pill" title="Локальная база IndexedDB (в браузере)">
+              <span class="ik-pill" id="dictDbPill" title="Локальная база IndexedDB (в браузере)">
                 <span>dict db</span>
                 <span id="dictDbStatus" class="ik-muted">...</span>
               </span>
@@ -410,8 +402,8 @@
 
                   <span class="ik-spacer" aria-hidden="true"></span>
 
-                  <button class="ik-btn ik-btn--black" id="dictExportDb" type="button" title="Скачать json со всеми разделами">save db</button>
-                  <button class="ik-btn" id="dictImportDb" type="button" title="Загрузить json">load db</button>
+                  <button class="ik-btn ik-btn--black" id="dictExportDb" type="button" title="Скачать json со всеми разделами">save json</button>
+                  <button class="ik-btn" id="dictImportDb" type="button" title="Загрузить json">load json</button>
 
                   <label class="ik-label" style="display:flex; align-items:center; gap:8px;">
                     <input type="checkbox" id="dictImportReplace" />
@@ -821,8 +813,8 @@
                 <div class="ik-divider"></div>
 
                 <div class="ik-row">
-                  <button class="ik-btn ik-btn--black" id="btnExportDb" type="button" title="Скачать json (view category)">save db</button>
-                  <button class="ik-btn" id="btnImportDb" type="button" title="Загрузить json">load db</button>
+                  <button class="ik-btn ik-btn--black" id="btnExportDb" type="button" title="Скачать json (view category)">save json</button>
+                  <button class="ik-btn" id="btnImportDb" type="button" title="Загрузить json">load json</button>
 
                   <label class="ik-label" style="display:flex; align-items:center; gap:8px;">
                     <input type="checkbox" id="importReplace" />
@@ -847,7 +839,7 @@
   </main>
 
   <footer class="bottombar bottombar--edge">
-    <span class="hint">student helper</span>
+    <span class="hint">Учебный центр</span>
     <span class="sep">•</span>
     <span class="hint">pre-alpha</span>
   </footer>
@@ -860,5 +852,74 @@
   <script src="./js/word_transformation.js"></script>
   <script src="./js/dictionary.js"></script>
   <script src="./js/enter_next.js"></script>
+
+  <script>
+  // FIX: lobby tiles (dictionary/structure/tenses/word transformation) navigation
+  (function () {
+    function $(id){ return document.getElementById(id); }
+
+    const lobby = $("shLobby");
+    const app = $("shApp");
+    if (!lobby || !app) return;
+
+    const tabMap = {
+      "panel-dict": "tab-dict",
+      "panel-struct": "tab-struct",
+      "panel-tenses": "tab-tenses",
+      "panel-wt": "tab-wt"
+    };
+
+    function openPanel(panelId){
+      try { localStorage.setItem("sh:lastPanel", panelId); } catch(e) {}
+
+      lobby.hidden = true;
+      app.hidden = false;
+
+      // Prefer existing tab handler (tabs.js) if present
+      const tabId = tabMap[panelId];
+      const tabEl = tabId ? $(tabId) : null;
+      if (tabEl && typeof tabEl.click === "function") {
+        tabEl.click();
+      } else {
+        // Fallback: manual show/hide
+        Object.keys(tabMap).forEach(function(pid){
+          const p = $(pid);
+          if (p) p.hidden = (pid !== panelId);
+        });
+        Object.values(tabMap).forEach(function(tid){
+          const t = $(tid);
+          if (t) t.setAttribute("aria-selected", (tid === tabId) ? "true" : "false");
+        });
+      }
+
+      // Scroll to top (safe)
+      try { window.scrollTo({ top: 0, left: 0, behavior: "instant" }); }
+      catch(e){ window.scrollTo(0, 0); }
+    }
+
+    const bind = function(btnId, panelId){
+      const btn = $(btnId);
+      if (!btn) return;
+      btn.addEventListener("click", function(){ openPanel(panelId); });
+    };
+
+    bind("shGoDict", "panel-dict");
+    bind("shGoStruct", "panel-struct");
+    bind("shGoTenses", "panel-tenses");
+    bind("shGoWT", "panel-wt");
+
+    // Continue button
+    const cont = $("shContinue");
+    if (cont) {
+      let saved = null;
+      try { saved = localStorage.getItem("sh:lastPanel"); } catch(e) {}
+      if (saved && tabMap[saved]) {
+        cont.hidden = false;
+        cont.addEventListener("click", function(){ openPanel(saved); });
+      }
+    }
+  })();
+  </script>
+
 </body>
 </html>

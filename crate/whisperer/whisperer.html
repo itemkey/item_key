@@ -20,13 +20,7 @@
       --w-line-height: 1.75;
     }
 
-    .center-stage{
-      padding-top: calc(var(--topbarOffset) + var(--floatH) + 18px);
-      padding-bottom: calc(var(--footerH) + 28px + env(safe-area-inset-bottom));
-      overflow-x: hidden;
-    }
-
-    .whisperer-wrap{
+        .whisperer-wrap{
       width: 100%;
       max-width: 1040px;
       margin: 0 auto;
@@ -369,7 +363,87 @@
       background: transparent;
       padding: 14px 16px;
     }
-  </style>
+  
+    /* Shared top navigation (same layout as student_helper) */
+    .ik-top-actions{
+      display:grid !important;
+      grid-template-columns: 1fr auto 1fr !important;
+      align-items:center !important;
+      gap:12px !important;
+      width:100% !important;
+      margin: 16px 0 !important;
+    }
+    .ik-top-actions .ik-left{ justify-self:start !important; }
+    .ik-top-actions .ik-center{ justify-self:center !important; }
+    .ik-top-actions .ik-right{ justify-self:end !important; }
+    .ik-top-actions > a.ik-btn,
+    .ik-top-actions > button.ik-btn{
+      display:inline-flex !important;
+      align-items:center !important;
+      width:auto !important;
+      flex:0 0 auto !important;
+      white-space:nowrap !important;
+    }
+    .ik-btn{
+      border: 1px solid rgba(0,0,0,.14);
+      background: rgba(255,255,255,.86);
+      padding: 10px 12px;
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      cursor: pointer;
+      text-decoration: none;
+      border-radius: 0;
+      line-height: 1.2;
+      user-select: none;
+    }
+    .ik-btn:hover{ border-color: rgba(0,0,0,.25); transform: translateY(-1px); }
+    .ik-btn:active{ transform: translateY(0); }
+
+
+/* ================================
+   Site nav: "Главное меню" (scrolls with page)
+   ================================ */
+.ik-site-nav, .ik-site-nav *{ box-sizing: border-box; }
+
+.ik-site-nav{
+  position: relative; /* keep above decorative layers */
+  z-index: 50;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px 14px;
+  margin: 0 0 18px;
+  background: #fff;
+  border-bottom: 1px solid rgba(0,0,0,.14);
+}
+
+.ik-site-nav__link{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  padding: 10px 16px;
+  border: 1px solid rgba(0,0,0,.14);
+  background: #fff;
+  color: rgba(0,0,0,.86);
+  text-decoration: none;
+  font-size: 11px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.ik-site-nav__link:hover{ border-color: rgba(0,0,0,.25); }
+
+@media (max-width: 520px){
+  .ik-site-nav{ padding: 14px 12px; margin-bottom: 14px; }
+  .ik-site-nav__link{ padding: 10px 12px; letter-spacing: 3px; }
+}
+</style>
 </head>
 
 <body class="page page-crate">
@@ -377,39 +451,16 @@
   <div class="rays" aria-hidden="true"></div>
   <div class="veil" aria-hidden="true"></div>
 
-  <header class="topbar topbar--edge"></header>
+  <header class="ik-site-nav" id="ikSiteNav">
+    <a class="ik-site-nav__link" href="../../index.html">Главное меню</a>
+  </header>
 
-  <aside class="rail rail--left" aria-label="Левое меню">
-    <a class="rail-link" href="../../item-user.html?returnTo=crate/whisperer/whisperer.html">
-      <span class="rail-link__title">item-user</span>
-      <span class="rail-link__meta">профиль</span>
-    </a>
 
-    <a class="rail-link" href="../../index.html">
-      <span class="rail-link__title">item-key</span>
-      <span class="rail-link__meta">главное меню</span>
-    </a>
-    <a class="rail-link" href="../../item-crate.html">
-      <span class="rail-link__title">item-crate</span>
-      <span class="rail-link__meta">назад в хаб</span>
-    </a>
-
-    <div class="rail-sep" aria-hidden="true" style="height:1px;background:rgba(0,0,0,.12);margin:12px 0;"></div>
-  </aside>
-
-  <aside class="rail rail--right" aria-label="Правое меню">
-    <a class="rail-link" href="../../item-soft.html">
-      <span class="rail-link__title">item-soft</span>
-      <span class="rail-link__meta">инструменты / редакторы</span>
-    </a>
-    <a class="rail-link" href="../../item-security.html">
-      <span class="rail-link__title">item-security</span>
-      <span class="rail-link__meta">доступ / защита</span>
-    </a>
-  </aside>
+  
 
   <main class="center-stage" aria-label="whisperer center">
     <section class="whisperer-wrap" aria-label="whisperer app">
+
       <div class="w-title">
         <h1>whisperer</h1>
         <div class="sub">прошепчи моё имя, пожалуйста</div>
