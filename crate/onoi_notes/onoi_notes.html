@@ -514,6 +514,8 @@
       line-height: var(--lh-note);
       font-family: var(--font-note);
       word-break: break-word;
+      display: flow-root;
+      overflow-x: hidden;
     }
     .editor:focus{ border-color: rgba(0,0,0,.34); }
 
@@ -1057,6 +1059,119 @@ body.focus-mode .n-col-right{
 
 .center-stage{ padding-top: 0 !important; }
 
+
+/* =========================================================
+   Image objects (Word/Notion-like) - 2026-02
+   - Figure is the object (contenteditable=false)
+   - Modes: left/right (wrap), center (block), inline
+   ========================================================= */
+.editor figure.onoi-img{
+  position: relative;
+  display: block;
+  max-width: 100%;
+  margin: 10px 0;
+  border: 1px solid rgba(0,0,0,.12);
+  background: rgba(255,255,255,.70);
+  padding: 0;
+  box-sizing: border-box;
+}
+.editor figure.onoi-img[contenteditable="false"]{ user-select: none; }
+.editor figure.onoi-img img{
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  margin: 0 !important;
+  border: 0 !important;
+  background: transparent;
+  pointer-events: none;
+  -webkit-user-drag: none;
+  user-drag: none;
+}
+.editor figure.onoi-img.is-selected{
+  outline: 2px solid rgba(0,0,0,.55);
+  outline-offset: 2px;
+}
+
+/* Wrap modes */
+.editor figure.onoi-img[data-mode="left"]{ float: left; margin: 10px 14px 10px 0; max-width: calc(100% - 14px); }
+.editor figure.onoi-img[data-mode="right"]{ float: right; margin: 10px 0 10px 14px; max-width: calc(100% - 14px); }
+.editor figure.onoi-img[data-mode="center"]{ float: none; clear: both; margin: 10px auto; }
+.editor figure.onoi-img[data-mode="inline"]{ float: none; clear: none; display: inline-block; margin: 0 6px; vertical-align: baseline; max-width: calc(100% - 12px); }
+
+.editor figure.onoi-img.is-dragging{
+  float: none !important;
+  clear: both !important;
+  margin: 10px auto !important;
+  opacity: .65;
+}
+
+/* Drop marker for drag-and-drop */
+.editor .onoi-img-drop-marker{
+  clear: both;
+  height: 2px;
+  background: rgba(0,0,0,.70);
+  margin: 6px 0;
+}
+
+/* Overlay (resize handles + mini toolbar) */
+.onoi-img-overlay{
+  position: fixed;
+  z-index: 100001;
+  pointer-events: none;
+}
+.onoi-img-overlay .box{
+  position: absolute;
+  inset: 0;
+  border: 2px solid rgba(0,0,0,.55);
+  box-sizing: border-box;
+}
+.onoi-img-overlay .h{
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: rgba(255,255,255,.98);
+  border: 1px solid rgba(0,0,0,.70);
+  box-sizing: border-box;
+  pointer-events: auto;
+}
+.onoi-img-overlay .h[data-pos="nw"]{ left: -6px; top: -6px; cursor: nwse-resize; }
+.onoi-img-overlay .h[data-pos="ne"]{ right: -6px; top: -6px; cursor: nesw-resize; }
+.onoi-img-overlay .h[data-pos="sw"]{ left: -6px; bottom: -6px; cursor: nesw-resize; }
+.onoi-img-overlay .h[data-pos="se"]{ right: -6px; bottom: -6px; cursor: nwse-resize; }
+.onoi-img-overlay .h[data-pos="n"]{ left: 50%; top: -6px; transform: translateX(-50%); cursor: ns-resize; }
+.onoi-img-overlay .h[data-pos="s"]{ left: 50%; bottom: -6px; transform: translateX(-50%); cursor: ns-resize; }
+.onoi-img-overlay .h[data-pos="w"]{ left: -6px; top: 50%; transform: translateY(-50%); cursor: ew-resize; }
+.onoi-img-overlay .h[data-pos="e"]{ right: -6px; top: 50%; transform: translateY(-50%); cursor: ew-resize; }
+
+.onoi-img-bubble{
+  position: fixed;
+  z-index: 100002;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  padding: 6px 8px;
+  background: rgba(255,255,255,.94);
+  border: 1px solid rgba(0,0,0,.34);
+  box-shadow: 0 6px 18px rgba(0,0,0,.12);
+  pointer-events: auto;
+}
+.onoi-img-bubble button{
+  appearance: none;
+  border: 1px solid rgba(0,0,0,.22);
+  background: rgba(255,255,255,.96);
+  padding: 4px 7px;
+  font: inherit;
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+}
+.onoi-img-bubble button:hover{ border-color: rgba(0,0,0,.40); }
+.onoi-img-bubble button.is-on{
+  border-color: rgba(0,0,0,.55);
+  background: rgba(0,0,0,.03);
+}
+
 </style>
 </head>
 
@@ -1377,7 +1492,7 @@ body.focus-mode .n-col-right{
           </div>
           <div class="field" style="grid-column: 1 / -1;">
             <label>path (json file)</label>
-            <input id="ghPath" class="mono" placeholder="crate/onoi_notes/db.json" value="crate/onoi_notes/db.json" />
+            <input id="ghPath" class="mono" placeholder="crate/onoi_notes/db/db.json" value="crate/onoi_notes/db/db.json" />
           </div>
         </div>
 
@@ -1532,7 +1647,7 @@ body.focus-mode .n-col-right{
         owner: '',
         repo: '',
         branch: 'main',
-        path: 'crate/onoi_notes/db.json',
+        path: 'crate/onoi_notes/db/db.json',
         gistId: '',
         gistFile: 'onoi_notes_db.json',
         pollEvery: 30,
@@ -1807,6 +1922,113 @@ async function uiPrompt(msg, opts={}){
         return main.id;
       };
 
+      // Fresh install seed (no cats + no notes): create "english" with starter notes.
+      // Uses stable ids so it won't duplicate across devices when you sync.
+      if(state.cats.length === 0 && state.notes.length === 0){
+        const t0 = 0;
+
+        const main = { id: 'cat-main', parentId: null, name: 'main', createdAt: t0, updatedAt: t0 };
+        const english = { id: 'cat-english', parentId: null, name: 'english', createdAt: t0+1, updatedAt: t0+1 };
+
+        state.cats = [main, english];
+        state.activeCatId = english.id;
+
+        const mk = (id, title, html, i) => ({
+          id: String(id || uid()),
+          catId: english.id,
+          title: String(title || ''),
+          html: String(html || ''),
+          createdAt: t0 + 10 + (i||0),
+          updatedAt: t0 + 10 + (i||0)
+        });
+
+        state.notes = [
+        mk('en-01', 'Population', `<p>If I pull the card “Population”, I speak about the people who live in Belarus. Belarus is not a huge country, so the population is not very big. It is about nine million people (approximately). Many people live in towns and cities, because cities give more jobs, universities, and services. The biggest city is Minsk. It is the capital, and it has the largest number of residents. Other large cities are Gomel, Mogilev, Vitebsk, Grodno, and Brest.</p>
+<p>People in Belarus mostly speak two languages in daily life - Belarusian and Russian. In many families both languages are used. At school you can study Belarusian, Russian, and also foreign languages like English. The main ethnic group is Belarusians, but there are also Russians, Ukrainians, Poles, and people from other groups.</p>
+<p>The population is important because it affects the economy. When there are more working people, it is easier to produce goods and services. When there are fewer young people, the country must think about jobs, education, and support for older people. Many people work in manufacturing, services, and agriculture. Some work in big factories, some work in offices, and some work on farms.</p>
+<p>When we talk about population, we can also mention living standards. People need decent wages, good schools, medical care, and social protection. So, population is not only a number - it is real lives, families, work, and the future of the country.</p>`, 0),
+        mk('en-02', 'Map of Belarus (regions and neighbours)', `<p>If I pull the map card, I explain where Belarus is and what it looks like on the map. Belarus is in Eastern Europe. It has no sea, so it is a landlocked country. Belarus is located between several neighbours: Poland is to the west, Lithuania and Latvia are to the north-west and north, Russia is to the east, and Ukraine is to the south. Because of this position, Belarus is often a crossroads for roads and railways. People and goods can travel through Belarus from one part of Europe to another part.</p>
+<p>The map also shows the main regions. Belarus has regions like Brest, Grodno, Minsk, Vitebsk, Mogilev, and Gomel. Each region has its own big city. Minsk is special, because it is the capital and it is also a separate city with its own status. Minsk is near the centre of the country, and many roads go to Minsk.</p>
+<p>When you look at Belarus on the map, you can also speak about nature. Belarus is known for forests, fields, rivers, and lakes. The land is mostly flat, so it is comfortable for farming and for building roads. The climate has cold winters and warm summers, so the seasons are clear. This influences agriculture, transport, and everyday life.</p>
+<p>So this map card is not only about geography. It is also about culture and connections. Neighbours influence trade, travel, and history. The regions show that Belarus is not only Minsk - it is many areas, many towns, and many local communities.</p>`, 1),
+        mk('en-03', 'Legislative power - Executive power - Judicial power', `<p>If I pull this card, I talk about how power is organised in Belarus. The key idea is that state power is divided into three main parts: legislative, executive, and judicial power. Each part has its own job, so the system can work in an organised way.</p>
+<p>Legislative power means making laws. In Belarus, the Parliament is called the National Assembly. It has two chambers. One chamber is the House of Representatives, and its deputies are elected by the people. The other chamber is the Council of the Republic, which is a regional representative body with members from the regions and Minsk. Legislative power discusses new laws, approves laws, and changes laws when it is necessary.</p>
+<p>Executive power means running the country day by day. It includes the President and the Government. The Government is called the Council of Ministers. It includes the Prime Minister, deputy prime ministers, and ministers. The Prime Minister is appointed by the President and approved by Parliament. The Government works with the economy, education, healthcare, security, transport, and many other areas. It makes sure the country works every day, not only on paper.</p>
+<p>Judicial power means courts. Courts decide different cases - civil cases, criminal cases, administrative cases, and economic cases. There is also the Constitutional Court. It checks if laws follow the Constitution. Judges have an important role because they must follow the law and protect legal rules.</p>
+<p>So, this card is like a simple explanation: Parliament makes laws, the Government carries out these laws, and courts check and protect the law in real situations.</p>`, 2),
+        mk('en-04', 'All-Belarus National Congress', `<p>If I pull the card “All-Belarus National Congress”, I explain it as a big national meeting. It is a large forum where many representatives can come together and speak about important topics for the whole country. The main idea is to talk about the present and the future of Belarus. People can discuss social issues, the economy, development plans, and national priorities.</p>
+<p>When a country has a big meeting like this, it usually wants to hear many voices. Representatives can come from different regions and different сферы жизни - for example, education, industry, culture, youth organisations, and public institutions. The Congress can be a place where people speak about what has been done well and what needs improvement. It can also be a place where long-term goals are explained in simple words, so people understand what direction the country wants to follow.</p>
+<p>In such discussions, you often hear about well-being of people. That includes decent wages, stable jobs, medical care, education, and social protection. Another common topic is development - how to modernise enterprises, how to support new technologies, and how to improve infrastructure like roads and public buildings.</p>
+<p>This card can also connect to the idea of unity. A national congress often shows that the country wants to work together, not separately. Even if people have different opinions, the goal is to speak, listen, and choose priorities.</p>
+<p>So, in easy English, I would say: the All-Belarus National Congress is a big meeting for big questions. It is about plans, priorities, and the future of the country.</p>`, 3),
+        mk('en-05', 'Local power', `<p>If I pull the card “Local power”, I talk about power close to people’s everyday life. Local power is very important because it solves local problems - the problems you see in your street, school, hospital, or transport system. In Belarus, local power is represented by locally elected Councils of Deputies and by executive committees of different levels.</p>
+<p>Deputies are elected for a term (in the text you gave, it says a 4-year term). Their job is to deal with local issues and to represent local people. That means they should know what citizens need in their town, district, or village. For example, local authorities can work with issues in health, education, and social welfare. They can support schools and kindergartens, help organise medical services, and take care of social protection for people who need help.</p>
+<p>Local power also deals with trade and transport inside the area. For example, local decisions can influence bus routes, road repairs, street lighting, public parks, and local markets. Of course, local power must work within the framework of existing laws. That means local leaders cannot just do anything they want - they must follow national rules.</p>
+<p>Executive committees usually do practical work. They organise services, control how things are done, and help implement decisions. If something is broken - a road, a building, a local service - people often expect local power to react.</p>
+<p>So, this card is about real life. It is not only about big politics in the capital. It is about how a city or village is managed every day, and how local people can be represented through elections.</p>`, 4),
+        mk('en-06', 'The fundamental law of the country (Constitution)', `<p>If I pull this card, I explain the Constitution in very simple words. The Constitution is the fundamental law of the country. It is the main legal document, and it is the base for the political system and all other laws. It tells how the state works, how власти are formed, and what rights citizens have.</p>
+<p>According to the text you gave me, the current Constitution of Belarus was adopted on 15 March 1994. It was adopted by the Supreme Council, and later it was amended in national referendums (1996, 2004, and 2022). The Constitution is also called the Fundamental Law of the State. This name is logical, because everything else is built on it - like a building on a foundation.</p>
+<p>The Constitution describes the structure of power: the President, Parliament, the Government, and the courts. It explains basic principles, like the rule of law. The rule of law means that the law is above people and institutions, and everyone should follow it. The Constitution also talks about human and civil rights. These rights are important because they protect citizens in their daily life and help them feel safe.</p>
+<p>Another important part is democratic procedures - voting and elections. The Constitution explains that public authorities are formed through elections and votes. That means citizens can take part in choosing representatives.</p>
+<p>So, when I speak about this card, I say: the Constitution is the main rule book of the country. It gives the structure, the rights, and the basic rules. Without it, laws would be chaotic and people would not know what rules are the most important.</p>`, 5),
+        mk('en-07', 'Tractor (agriculture and engineering)', `<p>If I pull the tractor card, I speak about Belarusian agriculture and industry together. A tractor is a strong machine that helps farmers do heavy work. With a tractor, people can plough the soil, plant seeds, carry tools, and help with harvesting. Without tractors and other machines, farming would be much slower and harder.</p>
+<p>Belarus is known for engineering and for producing agricultural machinery. In the text you gave, there is an example - Minsk Tractor Works (MTZ). This is a famous enterprise connected with tractors. Tractors are not only for fields. They can also be used in forestry, in коммунальные services, and in construction. The reason is simple: a tractor can use many different attachments. You can add different tools, and the same tractor can do many tasks.</p>
+<p>This card also connects to agriculture in Belarus. Belarus produces grain, potatoes, sugar beet, vegetables, and flax. It also produces dairy products, meat, and eggs. Agriculture needs machines, and machines are produced by industry. So, the tractor is like a bridge between two spheres: farming and manufacturing.</p>
+<p>A tractor also shows economic ideas like export. If a country produces good tractors, it can sell them abroad. This brings money into the country and supports jobs in factories and service centres.</p>
+<p>When I speak about this card, I try to show respect for work. Farming is not easy, and engineering is not easy either. A tractor is a symbol of people who work with their hands and minds. It is also a symbol of стабильность - food security depends on good work in agriculture, and good machines help make this possible.</p>`, 6),
+        mk('en-08', 'BelAZ dump truck (heavy industry)', `<p>If I pull the BelAZ card, I speak about heavy industry and huge machines. BelAZ is a Belarusian company known for very big mining dump trucks. These trucks are used in open-pit mines, where they carry rock and heavy materials. They work in very hard conditions, so they must be strong, safe, and reliable.</p>
+<p>In the text you gave me, there is a very impressive example: the mine dump truck BelAZ 75710. It can carry up to 450 tonnes of cargo. That is an enormous amount. The truck was shown (unveiled) at a testing field in September 2022, according to your text. It uses an electromechanical transmission powered by alternating current, and it has two diesel engines. It is designed to work in different climates, from minus 50°C to plus 50°C. That means it can work in very cold and very hot places.</p>
+<p>The truck has special systems for steering, braking, and dumping. It also has a cabin for two people and safety solutions like ROPS to protect operators if something dangerous happens. Even the tires matter - the text mentions Michelin radial tubeless pneumatic tires on eight wheels. The top speed is about 64 km/h, which is fast for such a massive machine.</p>
+<p>This card is a great example of Belarusian engineering. Building a truck like this needs many специалистов: designers, mechanics, electricians, and test engineers. It also shows export potential. Countries with mining industries need such trucks, so this product can be sold around the world.</p>
+<p>So, when I speak about this card, I say: this truck is not just transport. It is a symbol of heavy industry, technology, and big-scale production.</p>`, 7),
+        mk('en-09', 'High-Tech Park - ICT (the building photo)', `<p>If I pull this card, I talk about modern Belarus - the IT and technology sector. The photo looks like a place connected with high technologies, like offices where people work with computers, software, and digital projects. In Belarus, the ICT sphere is an important modern branch of the economy, because it is based on knowledge and skills, not on heavy machines.</p>
+<p>In IT, people create software, mobile apps, websites, and digital services. A big advantage is that these services can be exported easily. You do not need to ship a product in a truck - you can send the result online. That is why IT can connect Belarus with many countries at the same time. It also gives jobs to young people who study mathematics, programming, and foreign languages.</p>
+<p>This card also shows the idea of “technological advancement” from your text. Developed economies usually have a skilled workforce and use advanced technologies. IT needs education, training, and постоянное learning. People must update skills, learn new tools, and work in teams. IT also needs good infrastructure - fast internet, good universities, and a business environment that supports new ideas.</p>
+<p>Technology influences other industries too. For example, factories use automation, agriculture uses smart equipment, and transport uses digital systems. So, IT is not only its own sphere - it helps the whole country modernise.</p>
+<p>When I speak about this card, I keep it simple: it is about brains and ideas. It is about people who create digital products. It is about the future, because many new jobs in the world are connected with technology. And it is also about export, because software can be sold to the world.</p>`, 8),
+        mk('en-10', 'Export - Import', `<p>If I pull the “Export - Import” card, I explain these two words in the easiest way. Export means selling goods or services to other countries. Import means buying goods or services from other countries. Every country uses both, because no country can produce everything that people need.</p>
+<p>In your text, export is described as an important characteristic of any economy. The text also says the share of export should be higher than the share of import. Countries try to export more because export brings money into the economy and supports local jobs. When a factory produces machines or food and sells it abroad, workers have wages, and the country earns income.</p>
+<p>Belarus exports different products. From the information you shared, Belarus is strong in engineering - vehicles, tractors, machinery. Belarus also has food industries, petrochemical products, woodworking, and textiles. Many of these goods can be exported. Belarus also exports some services, and IT services are a good example because they can be sold online.</p>
+<p>Import is also normal and needed. A country may import raw materials, parts, technology, or products that are not produced enough inside the country. Import helps factories work, because factories sometimes need foreign parts or materials. Import also helps people get different goods from abroad.</p>
+<p>When I speak about this card, I also connect it with the idea of trade. Trade creates connections between countries. It can improve quality, because producers must compete and develop. It can also help the economy grow if the country exports successful products.</p>
+<p>So, in simple words: export is “we sell”, import is “we buy”. A good balance helps the economy stay stable and gives people more opportunities.</p>`, 9),
+        mk('en-11', 'Industries', `<p>If I pull the “Industries” card, I speak about what Belarus produces and what сферы are important in the economy. Your text says Belarus has a wide structure: manufacturing industries, services sector, and agriculture. This is important because a wide structure means the economy is diversified - it does not depend on only one product.</p>
+<p>One of the strongest parts is engineering. Belarus produces vehicles, agricultural machinery, machine tools, electrical equipment, optics, and household appliances. Engineering is important because it creates many jobs and produces goods for export. Another important sphere is electronics. Electronics are used in agriculture, construction, energy, and transport.</p>
+<p>Light industry is also developed. It produces fibres and yarn, linen, many kinds of fabric, clothes, bed linen, stockings, tights, and socks. Belarusian textiles and linen are well known, and they can also be exported.</p>
+<p>Food industry is very important for food security and for export. The text mentions chocolate, confectionary, baby food, preserves, meat, sugar, juices, vegetable oil, poultry, eggs, and dairy products like milk, cheese, and butter. These goods are part of everyday life, so this industry is always needed.</p>
+<p>Woodworking produces furniture, pulp, and paper. Petrochemical industry produces chemical products, coke, petroleum derivatives, plastic, and rubber. Pharmaceutical industry produces medications. Agriculture produces grain, potatoes, sugar beet, vegetables, flax, dairy products, meat, and eggs. Construction builds housing, roads, factories, and social infrastructure like hospitals and schools. The energy industry generates electricity and provides fuel and gas supplies.</p>
+<p>So, when I speak about industries, I say: Belarus works in many directions. It produces machines, food, fabrics, chemicals, wood products, and more. This creates jobs, supports export, and helps the country develop.</p>`, 10),
+        mk('en-12', '2014 Ice Hockey World Championship in Minsk', `<p>If I pull this card, I speak about a big sports event - the 2014 IIHF World Ice Hockey Championship in Minsk. Hosting a championship is not only about matches. It is also about preparation, infrastructure, гостей, and international attention. Your text says the championship was held from 9 to 25 May, and before it opened, a lot of work had been done.</p>
+<p>First, Belarus expected many visitors. For the period from 25 April to 31 May 2014, entry to Belarus was made visa-free for people who had tickets. That made travel easier for fans and guests. Second, security measures were organised. The text says security was a joint effort of different ministries and services. Even if crime rate is low, organisers still create extra security for a big event.</p>
+<p>Third, accommodation was prepared. Many hotels and other places were used for teams, officials, journalists, and fans. The text mentions a large number of hotels of different levels, plus halls of residence and even the Fan village. Fourth, venues were prepared. Two main venues were Minsk Arena and Chizhovka Arena. Minsk Arena has 15,000 seats, and Chizhovka Arena has around 10,000 seats.</p>
+<p>Fifth, transport infrastructure was improved. Roads, interchanges, metro stations, and even city commuter train service were developed. Volunteers with foreign language skills were recruited and deployed in public places to help guests.</p>
+<p>The championship also had symbols. The bison mascot became an important image, because the bison is a Belarusian symbol. Souvenirs, logos, and ads helped create a праздничная atmosphere.</p>
+<p>So, when I speak about this card, I say: this event was sport plus organisation. It showed Belarus as a host country and gave Minsk a big international experience.</p>`, 11),
+        mk('en-13', 'Michal Kleofas Oginski', `<p>If I pull the Oginski card, I speak about a person who connects politics and art. Michal Kleofas Oginski was a statesman and a military leader, but many people remember him mostly for music. He shows that one person can work for the country and also create culture.</p>
+<p>According to the text you gave, he became Ambassador to the Sejm of Poland at a young age, and later he became Head of the Treasury of the Grand Duchy of Lithuania. He was also an Extraordinary Ambassador to the Netherlands. These are serious positions, so he was a very educated and active person. But it is surprising that his most famous “language” today is music, not politics.</p>
+<p>He is best remembered for his polonaises, especially the A-minor polonaise “Farewell to the Fatherland.” This music is very emotional. When people listen to it, they often feel sadness, love for home, and respect for the past. The text says the piece was written in his family estate in Zalessie (Grodno region) before he had to leave the country after taking part in the uprising against tsarist Russia. This detail makes the music even more meaningful, because it is connected with real life and real исторические events.</p>
+<p>Oginski’s story is also about Belarusian culture inside European culture. Polonaise is a European dance form, but his inspiration came from traditional Belarusian folk songs and the beauty of local culture. That means he combined European style with Belarusian spirit.</p>
+<p>So, when I speak about this card, I say: Oginski is a symbol of Belarusian культурный talent. He reminds us that music can keep history and feelings alive. It is amazing how one melody can travel through centuries and still touch people today.</p>`, 12),
+        mk('en-14', 'Vladimir Karvat', `<p>If I pull the Vladimir Karvat card, I speak about courage and responsibility. Karvat is remembered because he saved others at the cost of his own life. According to the text you gave, he was flying a training military aircraft on 23 May 1996 when the plane caught fire. In such a situation, the normal order is to eject and save yourself. Karvat was ordered to eject to safety.</p>
+<p>But he realised something страшное: if he ejected immediately, the plane could crash on villages. That would put many civilians in danger. So he made a decision that showed great humanity. He steered the plane away from the settlements until the moment of crash. The text says the plane crashed one kilometre from the settlements of Arabovshchyna and Bolshoye Gatishche in Brest region. Karvat died, but people in the villages lived.</p>
+<p>Later, on 21 November 1996, he was posthumously awarded the title Hero of Belarus. “Posthumously” means after death. This award is not only about bravery in the air. It is about moral strength. It shows that he thought first about other people, not only about himself.</p>
+<p>This story is powerful because it is very human. It is not about politics or money. It is about a person who had only seconds to choose, and he chose to protect others. For many people, this is the highest form of duty. It is also a lesson: real heroism can happen quietly, without any plan, in one difficult moment.</p>
+<p>So, when I speak about this card, I say: Vladimir Karvat is worthy of admiration. It is unbelievable how much courage and care for people he had. His name is part of modern Belarusian history, and it reminds us what responsibility can mean.</p>`, 13),
+        mk('en-15', 'Darya Domracheva', `<p>If I pull the Darya Domracheva card, I speak about modern Belarusian sport and strong character. Domracheva is a famous Belarusian biathlete. Biathlon is not an easy sport, because it combines two very different skills. First you must ski very fast for many kilometres. Then you must stop and shoot at targets with спокойные hands. If you are tired and stressed, shooting becomes very difficult. So biathlon needs both physical power and mental control.</p>
+<p>According to your text, Domracheva has competed in the Biathlon World Cup since 2006. That means many years of hard training and competition. Athletes like her train almost every day. They work in cold weather, they travel to different countries, and they must keep discipline for a long time. Success in biathlon is not luck - it is постоянный work.</p>
+<p>Her biggest moment for many fans was the 2014 Winter Olympics in Sochi. The text says she won three gold medals: in the women’s 10 km pursuit, the women’s 15 km individual race, and the 12.5 km mass start. Three gold medals at one Olympics is a huge result. It is amazing, because Olympic pressure is enormous. The world watches you, and one mistake can change everything.</p>
+<p>Her victories gave Belarus a strong image in winter sport. Many people felt proud, because they saw Belarusian flag and heard Belarusian name at the top level. Her success also inspired young athletes. When children see a champion from their country, they believe they can do it too.</p>
+<p>So, when I speak about this card, I say: Domracheva is a symbol of focus and strength. She shows what discipline can bring. It is impressive how she could be fast, calm, and brave at the same time.</p>`, 14),
+        mk('en-16', 'Pavel Sukhoi', `<p>If I pull the Pavel Sukhoi card, I speak about science, engineering, and big ideas. Pavel Sukhoi was an aerospace engineer and an aircraft designer. He worked in aviation and helped create many aircraft solutions. In the text you gave, he is described as an inventor and the founder of the Sukhoi Design Bureau. His name is connected with Sukhoi military aircraft, which are famous in the world of авиация.</p>
+<p>Aircraft design is a very complex area. To build a plane, you need mathematics, physics, materials science, and a lot of testing. A designer must think about speed, safety, fuel, control systems, and the comfort and protection of pilots. Even small details can matter. Sukhoi worked on supersonic jets - planes that can fly faster than the speed of sound. This is a high level of technology, and it needs deep knowledge and years of experiments.</p>
+<p>The text says he designed more than 50 original aircraft solutions, and more than 30 of them were constructed and tested. That means his ideas were not only theory. They were real machines that flew and were checked in practice. This is impressive, because not every idea becomes a real working aircraft. Many ideas fail, and engineers must start again. Sukhoi’s work shows persistence and strong scientific thinking.</p>
+<p>His story also shows that Belarus has people who influenced world technology. When we talk about famous Belarusians, we can talk not only about culture and sport, but also about science and engineering.</p>
+<p>So, when I speak about this card, I say: Pavel Sukhoi represents the power of knowledge. He helped build advanced aircraft and pushed technology forward. It is really impressive how one person’s work can influence an entire field for decades.</p>`, 15),
+        ];
+        state.activeNoteId = state.notes[0]?.id || null;
+        return;
+      }
+
       // If db is empty - create "main"
       if(state.cats.length === 0){
         state.activeCatId = ensureMain();
@@ -1830,7 +2052,6 @@ async function uiPrompt(msg, opts={}){
         state.notes.push(n);
         state.activeNoteId = n.id;
       }
-
 
       if(!state.activeNoteId){
         const nn = state.notes.find(x => x.catId === state.activeCatId) || state.notes[0];
@@ -2341,7 +2562,8 @@ tgl.addEventListener('click', (e) => {
     }
 
     // Normalize: remove leftover <font> tags (from execCommand), and cleanup ZWSP spans if possible
-    function sanitizeEditorHTML(){
+    
+function sanitizeEditorHTML(){
       try{
         // Replace <font> tags with spans while preserving color/face/size attributes
         editor.querySelectorAll('font').forEach(f => {
@@ -2368,8 +2590,12 @@ tgl.addEventListener('click', (e) => {
             sp.remove();
           }
         });
+
+        // Normalize images into figure "objects" (drag/resize/wrap)
+        try{ normalizeImageBlocks(); }catch(e){}
       }catch(e){}
     }
+
 function setFontFamily(ff){
       document.documentElement.style.setProperty('--font-note', ff);
       try{ localStorage.setItem('onoi_font_note', ff); }catch(e){}
@@ -2398,31 +2624,637 @@ function setFontFamily(ff){
       });
     }
 
+    
     async function insertImageFromFile(file){
       if(!file) return;
+
       const dataUrl = await fileToDataURL(file);
+
+      // compute reasonable default size (keeps aspect ratio)
+      let natW = 0, natH = 0, ratio = 0;
+      try{
+        const tmp = new Image();
+        tmp.src = dataUrl;
+        // decode() is best-effort (not supported everywhere)
+        if(tmp.decode) await tmp.decode();
+        natW = Number(tmp.naturalWidth || 0);
+        natH = Number(tmp.naturalHeight || 0);
+        if(natW > 0 && natH > 0) ratio = natH / natW;
+      }catch(e){}
+
+      const editorW = Math.max(240, editor.clientWidth || editor.getBoundingClientRect().width || 640);
+      const maxW = Math.max(200, Math.floor(editorW - 32));
+      let w = Math.floor(editorW * 0.62);
+      w = clamp(w, 220, Math.min(720, maxW));
+      let h = ratio ? Math.floor(w * ratio) : Math.floor(w * 0.66);
+      h = clamp(h, 120, 2000);
 
       focusEditor();
       restoreSelection();
 
-      // insert at cursor
       const alt = (file && file.name) ? file.name : 'image';
-      const html = '<img src="' + String(dataUrl).replace(/"/g,'&quot;') + '" alt="' + String(alt).replace(/"/g,'&quot;') + '" />';
+      const escAttr = (s) => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+
+      const figHtml =
+        `<figure class="onoi-img" data-mode="center" contenteditable="false" style="width:${w}px;height:${h}px" data-onoi-img="1">` +
+          `<img src="${escAttr(dataUrl)}" alt="${escAttr(alt)}" draggable="false">` +
+        `</figure>` +
+        `<p><br></p>`;
 
       try{
-        document.execCommand('insertHTML', false, html);
+        document.execCommand('insertHTML', false, figHtml);
       }catch(e){
-        // fallback: append
+        // fallback: append at end
+        const fig = document.createElement('figure');
+        fig.className = 'onoi-img';
+        fig.setAttribute('data-mode','center');
+        fig.setAttribute('contenteditable','false');
+        fig.setAttribute('data-onoi-img','1');
+        fig.style.width = w + 'px';
+        fig.style.height = h + 'px';
+        clampFigToEditor(fig);
         const img = document.createElement('img');
         img.src = dataUrl;
         img.alt = alt;
-        editor.appendChild(img);
+        img.draggable = false;
+        fig.appendChild(img);
+        editor.appendChild(fig);
+        const p = document.createElement('p');
+        p.appendChild(document.createElement('br'));
+        editor.appendChild(p);
       }
 
       sanitizeEditorHTML();
       saveSelection();
       schedulePersist();
     }
+
+    // =========================
+    // Image objects: normalize + select + drag + resize + wrap
+    // =========================
+
+
+    function getModeMaxWidth(mode){
+      const rect = editor.getBoundingClientRect();
+      const editorW = Math.max(240, editor.clientWidth || rect.width || 640);
+      const m = (mode === 'left' || mode === 'right') ? 14 : (mode === 'inline' ? 12 : 0);
+      return Math.max(140, Math.floor(editorW - m - 6));
+    }
+    function clampFigToEditor(fig){
+      if(!fig) return;
+      const mode = fig.dataset.mode || 'center';
+      const maxW = getModeMaxWidth(mode);
+
+      let w = parseFloat(fig.style.width || '') || 0;
+      let h = parseFloat(fig.style.height || '') || 0;
+      if(!(w > 0 && h > 0)){
+        try{
+          const r = fig.getBoundingClientRect();
+          w = r.width || w;
+          h = r.height || h;
+        }catch(e){}
+      }
+      if(!(w > 0 && h > 0)) return;
+
+      if(w > maxW){
+        const ratio = w / h;
+        const newW = maxW;
+        const newH = newW / ratio;
+        fig.style.width = Math.round(newW) + 'px';
+        fig.style.height = Math.round(newH) + 'px';
+      }
+    }
+    function ensureTrailingParagraph(){
+      const last = editor.lastChild;
+      if(!last) {
+        const p = document.createElement('p');
+        p.appendChild(document.createElement('br'));
+        editor.appendChild(p);
+        return;
+      }
+      // If the last node is an image object - add an empty paragraph so caret/drop can land after it
+      if(last.nodeType === 1 && last.matches && last.matches('figure.onoi-img')){
+        const p = document.createElement('p');
+        p.appendChild(document.createElement('br'));
+        editor.appendChild(p);
+      }
+    }
+
+    function normalizeImageBlocks(){
+      // 1) Wrap bare <img> into <figure class="onoi-img"...> objects
+      const bareImgs = Array.from(editor.querySelectorAll('img')).filter(im => !im.closest('figure.onoi-img'));
+      for(const im of bareImgs){
+        const src = im.getAttribute('src') || '';
+        if(!src) continue;
+
+        // Use current rendered size if possible
+        let rect = null;
+        try{ rect = im.getBoundingClientRect(); }catch(e){}
+        const editorW = Math.max(240, editor.clientWidth || editor.getBoundingClientRect().width || 640);
+        const maxW = Math.max(200, Math.floor(editorW - 32));
+        let w = rect && rect.width ? Math.round(rect.width) : Math.round(clamp(editorW * 0.62, 220, Math.min(720, maxW)));
+        let h = rect && rect.height ? Math.round(rect.height) : Math.round(w * 0.66);
+        w = clamp(w, 120, maxW);
+        h = clamp(h, 80, 4000);
+
+        const fig = document.createElement('figure');
+        fig.className = 'onoi-img';
+        fig.setAttribute('data-mode', 'center');
+        fig.setAttribute('contenteditable', 'false');
+        fig.setAttribute('data-onoi-img', '1');
+        fig.style.width = w + 'px';
+        fig.style.height = h + 'px';
+        clampFigToEditor(fig);
+
+        im.draggable = false;
+        // reset inline sizing so figure controls size
+        im.style.width = '100%';
+        im.style.height = '100%';
+        im.style.maxWidth = '100%';
+        im.style.display = 'block';
+        im.style.margin = '0';
+
+        // If inside <p>, split paragraph around image to avoid invalid p>figure nesting
+        const p = im.parentElement && im.parentElement.tagName === 'P' ? im.parentElement : null;
+        if(p){
+          const before = document.createElement('p');
+          const after = document.createElement('p');
+          let hit = false;
+          Array.from(p.childNodes).forEach(ch => {
+            if(ch === im){ hit = true; return; }
+            (hit ? after : before).appendChild(ch);
+          });
+          fig.appendChild(im);
+
+          const frag = document.createDocumentFragment();
+          if(before.textContent.trim() || before.querySelector('br') || before.childNodes.length) frag.appendChild(before);
+          frag.appendChild(fig);
+          if(after.textContent.trim() || after.querySelector('br') || after.childNodes.length) frag.appendChild(after);
+          else{
+            const tail = document.createElement('p');
+            tail.appendChild(document.createElement('br'));
+            frag.appendChild(tail);
+          }
+          p.replaceWith(frag);
+        } else {
+          fig.appendChild(im);
+          im.replaceWith(fig);
+        }
+      }
+
+      // 2) Normalize existing figures
+      editor.querySelectorAll('figure.onoi-img').forEach(fig => {
+        fig.setAttribute('contenteditable','false');
+        fig.setAttribute('data-onoi-img','1');
+        if(!fig.dataset.mode) fig.dataset.mode = 'center';
+
+        const img = fig.querySelector('img');
+        if(img){
+          img.draggable = false;
+          img.style.width = '100%';
+          img.style.height = '100%';
+          img.style.maxWidth = '100%';
+          img.style.display = 'block';
+          img.style.margin = '0';
+        }
+
+        // Ensure width/height exist
+        const w = parseFloat(fig.style.width || '') || 0;
+        const h = parseFloat(fig.style.height || '') || 0;
+        if(!(w > 0 && h > 0)){
+          let rect = null;
+          try{ rect = fig.getBoundingClientRect(); }catch(e){}
+          const ww = rect && rect.width ? Math.round(rect.width) : 360;
+          const hh = rect && rect.height ? Math.round(rect.height) : 240;
+          fig.style.width = clamp(ww, 120, 2000) + 'px';
+          fig.style.height = clamp(hh, 80, 3000) + 'px';
+        }
+        clampFigToEditor(fig);
+      });
+      ensureTrailingParagraph();
+    }
+
+    // selection + overlay UI
+    let selectedImgFig = null;
+    let imgDrag = null;
+    let dropMarker = null;
+
+    const imgOverlay = document.createElement('div');
+    imgOverlay.className = 'onoi-img-overlay';
+    imgOverlay.style.display = 'none';
+    imgOverlay.innerHTML =
+      '<div class="box"></div>' +
+      '<div class="h" data-pos="nw"></div><div class="h" data-pos="n"></div><div class="h" data-pos="ne"></div>' +
+      '<div class="h" data-pos="w"></div><div class="h" data-pos="e"></div>' +
+      '<div class="h" data-pos="sw"></div><div class="h" data-pos="s"></div><div class="h" data-pos="se"></div>';
+    document.body.appendChild(imgOverlay);
+
+    const imgBubble = document.createElement('div');
+    imgBubble.className = 'onoi-img-bubble';
+    imgBubble.style.display = 'none';
+    imgBubble.innerHTML =
+      '<button type="button" data-mode="left">left</button>' +
+      '<button type="button" data-mode="center">center</button>' +
+      '<button type="button" data-mode="right">right</button>' +
+      '<button type="button" data-mode="inline">inline</button>' +
+      '<button type="button" data-act="del">del</button>';
+    document.body.appendChild(imgBubble);
+
+    function hideImgUI(){
+      if(selectedImgFig) selectedImgFig.classList.remove('is-selected');
+      selectedImgFig = null;
+      imgOverlay.style.display = 'none';
+      imgBubble.style.display = 'none';
+    }
+
+    function placeCaretAfter(node){
+      try{
+        const r = document.createRange();
+        r.setStartAfter(node);
+        r.collapse(true);
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(r);
+      }catch(e){}
+      saveSelection();
+    }
+
+    function updateImgUI(){
+      if(!selectedImgFig) return;
+      const rect = selectedImgFig.getBoundingClientRect();
+      imgOverlay.style.display = 'block';
+      imgOverlay.style.left = rect.left + 'px';
+      imgOverlay.style.top = rect.top + 'px';
+      imgOverlay.style.width = rect.width + 'px';
+      imgOverlay.style.height = rect.height + 'px';
+
+      imgBubble.style.display = 'flex';
+      const bW = imgBubble.getBoundingClientRect().width || 220;
+      const left = Math.min(window.innerWidth - bW - 10, Math.max(10, rect.left));
+      const top = Math.max(10, rect.top - 44);
+      imgBubble.style.left = left + 'px';
+      imgBubble.style.top = top + 'px';
+
+      // pressed state
+      const mode = selectedImgFig.dataset.mode || 'center';
+      imgBubble.querySelectorAll('button[data-mode]').forEach(b => {
+        b.classList.toggle('is-on', b.dataset.mode === mode);
+      });
+    }
+
+    function selectImg(fig){
+      if(!fig || !editor.contains(fig)) return;
+      if(selectedImgFig && selectedImgFig !== fig) selectedImgFig.classList.remove('is-selected');
+      selectedImgFig = fig;
+      selectedImgFig.classList.add('is-selected');
+      updateImgUI();
+      placeCaretAfter(fig);
+    }
+    function caretRangeFromPoint(x,y){
+      const rect = editor.getBoundingClientRect();
+      const cx = clamp(x, rect.left + 2, rect.right - 2);
+      const cy = clamp(y, rect.top + 2, rect.bottom - 2);
+
+      let r = null;
+
+      // Firefox - caretPositionFromPoint
+      if(document.caretPositionFromPoint){
+        const pos = document.caretPositionFromPoint(cx, cy);
+        if(pos){
+          r = document.createRange();
+          try{
+            r.setStart(pos.offsetNode, pos.offset);
+            r.collapse(true);
+          }catch(e){ r = null; }
+        }
+      } else if(document.caretRangeFromPoint){
+        try{ r = document.caretRangeFromPoint(cx, cy); }catch(e){ r = null; }
+      }
+
+      if(r && r.startContainer && editor.contains(r.startContainer)) return r;
+
+      // If the point is inside editor (incl. empty bottom area) - fall back to end
+      if(cx >= rect.left && cx <= rect.right && cy >= rect.top && cy <= rect.bottom){
+        try{
+          const end = document.createRange();
+          end.selectNodeContents(editor);
+          end.collapse(false);
+          return end;
+        }catch(e){}
+      }
+      return null;
+    }
+
+    // Click to select
+    editor.addEventListener('mousedown', (ev) => {
+      const fig = ev.target && ev.target.closest ? ev.target.closest('figure.onoi-img') : null;
+      if(fig && editor.contains(fig)){
+        ev.preventDefault();
+        selectImg(fig);
+      } else {
+        hideImgUI();
+      }
+    });
+
+    // Global outside click closes UI
+    document.addEventListener('mousedown', (ev) => {
+      if(!selectedImgFig) return;
+      if(ev.target.closest('figure.onoi-img')) return;
+      if(ev.target.closest('.onoi-img-overlay')) return;
+      if(ev.target.closest('.onoi-img-bubble')) return;
+      hideImgUI();
+    });
+
+    // Keep overlay positioned
+    window.addEventListener('scroll', () => { if(selectedImgFig) updateImgUI(); }, {passive:true});
+    window.addEventListener('resize', () => { if(selectedImgFig) updateImgUI(); }, {passive:true});
+
+    // Bubble actions
+    imgBubble.addEventListener('mousedown', (ev) => { ev.preventDefault(); }, true);
+    imgBubble.addEventListener('click', (ev) => {
+      if(!selectedImgFig) return;
+      const btn = ev.target.closest('button');
+      if(!btn) return;
+
+      const mode = btn.dataset.mode;
+      const act = btn.dataset.act;
+
+      if(mode){
+        selectedImgFig.dataset.mode = mode;
+        normalizeImageBlocks();
+        updateImgUI();
+        schedulePersist();
+        return;
+      }
+      if(act === 'del'){
+        const toRemove = selectedImgFig;
+        hideImgUI();
+        toRemove.remove();
+        sanitizeEditorHTML();
+        schedulePersist();
+      }
+    });
+
+    // Delete/backspace removes selected image
+    editor.addEventListener('keydown', (ev) => {
+      if(!selectedImgFig) return;
+      if(ev.key === 'Backspace' || ev.key === 'Delete'){
+        ev.preventDefault();
+        const toRemove = selectedImgFig;
+        hideImgUI();
+        toRemove.remove();
+        sanitizeEditorHTML();
+        schedulePersist();
+      }
+    });
+
+    // -------------------------
+    // Drag-and-drop within editor (pointer-based)
+    // -------------------------
+    function ensureDropMarker(){
+      if(dropMarker && dropMarker.parentNode) return dropMarker;
+      dropMarker = document.createElement('div');
+      dropMarker.className = 'onoi-img-drop-marker';
+      return dropMarker;
+    }
+    function removeDropMarker(){
+      if(dropMarker && dropMarker.parentNode) dropMarker.remove();
+    }
+    function topLevelChild(node){
+      let cur = node;
+      while(cur && cur !== editor && cur.parentNode !== editor){
+        cur = cur.parentNode;
+      }
+      return (cur && cur.parentNode === editor) ? cur : null;
+    }
+    function moveMarkerToPoint(x,y){
+      const edRect = editor.getBoundingClientRect();
+      const marker = ensureDropMarker();
+
+      // Allow drop into empty bottom area - always treat as end of document
+      if(y >= edRect.bottom - 24){
+        editor.appendChild(marker);
+        return;
+      }
+
+      const r = caretRangeFromPoint(x,y);
+      if(!r){
+        editor.appendChild(marker);
+        return;
+      }
+
+      let node = r.startContainer.nodeType === 1 ? r.startContainer : r.startContainer.parentNode;
+      if(!node){
+        editor.appendChild(marker);
+        return;
+      }
+
+      const fig = node.closest && node.closest('figure.onoi-img') ? node.closest('figure.onoi-img') : null;
+      if(fig) node = fig;
+
+      let top = topLevelChild(node);
+      if(!top){
+        editor.appendChild(marker);
+        return;
+      }
+
+      if(imgDrag && top === imgDrag.fig) return;
+
+      const rect = top.getBoundingClientRect();
+      const before = y < (rect.top + rect.height / 2);
+      editor.insertBefore(marker, before ? top : top.nextSibling);
+    }
+
+    editor.addEventListener('pointerdown', (ev) => {
+      if(ev.button !== 0) return;
+      const fig = ev.target && ev.target.closest ? ev.target.closest('figure.onoi-img') : null;
+      if(!fig || !editor.contains(fig)) return;
+
+      // Don't start drag when user is resizing (overlay handles)
+      if(ev.target.closest('.onoi-img-overlay') || ev.target.closest('.onoi-img-bubble')) return;
+
+      imgDrag = { fig, x: ev.clientX, y: ev.clientY, moved: false, pid: ev.pointerId };
+      try{ fig.setPointerCapture(ev.pointerId); }catch(e){}
+    });
+
+    editor.addEventListener('pointermove', (ev) => {
+      if(!imgDrag) return;
+      const dx = ev.clientX - imgDrag.x;
+      const dy = ev.clientY - imgDrag.y;
+      if(!imgDrag.moved){
+        if(Math.hypot(dx,dy) < 4) return;
+        imgDrag.moved = true;
+        try{ imgDrag.fig.classList.add('is-dragging'); }catch(e){}
+        ensureDropMarker();
+      }
+      ev.preventDefault();
+      moveMarkerToPoint(ev.clientX, ev.clientY);
+    });
+
+    editor.addEventListener('pointerup', (ev) => {
+      if(!imgDrag) return;
+      const fig = imgDrag.fig;
+      const moved = imgDrag.moved;
+      imgDrag = null;
+
+      try{ fig.classList.remove('is-dragging'); }catch(e){}
+
+      if(!moved){
+        return;
+      }
+      ev.preventDefault();
+      if(dropMarker && dropMarker.parentNode){
+        dropMarker.parentNode.insertBefore(fig, dropMarker);
+        removeDropMarker();
+        sanitizeEditorHTML();
+        schedulePersist();
+        selectImg(fig);
+      } else {
+        removeDropMarker();
+      }
+    });
+
+    editor.addEventListener('pointercancel', () => {
+      try{ if(imgDrag && imgDrag.fig) imgDrag.fig.classList.remove('is-dragging'); }catch(e){}
+      imgDrag = null;
+      removeDropMarker();
+    });
+
+    // -------------------------
+    // Resize handles (overlay)
+    // -------------------------
+    let resizeState = null;
+
+    imgOverlay.addEventListener('pointerdown', (ev) => {
+      const h = ev.target && ev.target.closest ? ev.target.closest('.h') : null;
+      if(!h || !selectedImgFig) return;
+
+      ev.preventDefault();
+      ev.stopPropagation();
+
+      const pos = h.dataset.pos || 'se';
+      const rect = selectedImgFig.getBoundingClientRect();
+      const ratio = rect.width > 0 && rect.height > 0 ? (rect.width / rect.height) : 1.4;
+
+      resizeState = {
+        pos,
+        startX: ev.clientX,
+        startY: ev.clientY,
+        startW: rect.width,
+        startH: rect.height,
+        ratio,
+        pid: ev.pointerId
+      };
+      try{ imgOverlay.setPointerCapture(ev.pointerId); }catch(e){}
+    });
+
+    imgOverlay.addEventListener('pointermove', (ev) => {
+      if(!resizeState || !selectedImgFig) return;
+      ev.preventDefault();
+
+      const dx = ev.clientX - resizeState.startX;
+      const dy = ev.clientY - resizeState.startY;
+      const pos = resizeState.pos;
+      const ratio = resizeState.ratio || 1.4;
+
+      let newW = resizeState.startW;
+      let newH = resizeState.startH;
+
+      const hasE = pos.includes('e');
+      const hasW = pos.includes('w');
+      const hasN = pos.includes('n');
+      const hasS = pos.includes('s');
+
+      if(hasE) newW = resizeState.startW + dx;
+      if(hasW) newW = resizeState.startW - dx;
+      if(hasS) newH = resizeState.startH + dy;
+      if(hasN) newH = resizeState.startH - dy;
+
+      // lock aspect ratio, but allow both directions
+      if(pos.length === 2){
+        const wFromH = newH * ratio;
+        const hFromW = newW / ratio;
+        if(Math.abs(newW - resizeState.startW) > Math.abs(newH - resizeState.startH)){
+          newH = hFromW;
+        } else {
+          newW = wFromH;
+        }
+      } else if(pos === 'e' || pos === 'w'){
+        newH = newW / ratio;
+      } else if(pos === 'n' || pos === 's'){
+        newW = newH * ratio;
+      }
+
+      const maxW = getModeMaxWidth(selectedImgFig.dataset.mode || 'center');
+      newW = clamp(newW, 120, maxW);
+      newH = clamp(newH, 80, 6000);
+
+      // keep ratio exact after clamping
+      newH = newW / ratio;
+
+      selectedImgFig.style.width = Math.round(newW) + 'px';
+      selectedImgFig.style.height = Math.round(newH) + 'px';
+
+      updateImgUI();
+    });
+
+    imgOverlay.addEventListener('pointerup', () => {
+      if(!resizeState) return;
+      resizeState = null;
+      sanitizeEditorHTML();
+      schedulePersist();
+    });
+    imgOverlay.addEventListener('pointercancel', () => {
+      if(!resizeState) return;
+      resizeState = null;
+      sanitizeEditorHTML();
+      schedulePersist();
+    });
+
+    // -------------------------
+    // Drop image files from OS into editor
+    // -------------------------
+    editor.addEventListener('dragover', (ev) => {
+      if(ev.dataTransfer && ev.dataTransfer.files && ev.dataTransfer.files.length){
+        ev.preventDefault();
+      }
+    });
+    editor.addEventListener('drop', async (ev) => {
+      const dt = ev.dataTransfer;
+      const files = (dt && dt.files) ? Array.from(dt.files) : [];
+      const imgFile = files.find(f => f && f.type && f.type.startsWith('image/'));
+      if(!imgFile) return;
+      ev.preventDefault();
+
+      // place caret at drop point
+      const r = caretRangeFromPoint(ev.clientX, ev.clientY);
+      if(r){
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(r);
+        saveSelection();
+      }
+      await insertImageFromFile(imgFile);
+    });
+
+
+    // Normalize when switching notes (renderEditor changes editor.dataset.noteId)
+    try{
+      const mo = new MutationObserver((muts) => {
+        for(const m of muts){
+          if(m.type === 'attributes' && (m.attributeName === 'data-note-id' || m.attributeName === 'data-noteid')){
+            try{ normalizeImageBlocks(); }catch(e){}
+            try{ hideImgUI(); }catch(e){}
+            break;
+          }
+        }
+      });
+      mo.observe(editor, { attributes:true, attributeFilter:['data-note-id','data-noteid'] });
+    }catch(e){}
+
+    // Run once on load and on each renderEditor (history layer might re-render)
+    setTimeout(() => { try{ normalizeImageBlocks(); }catch(e){} }, 0);
+
 // ========= note operations =========
     
 
@@ -2567,9 +3399,12 @@ const draftTitle = (noteTitle.value || '').trim();
       URL.revokeObjectURL(url);
     }
 
-    async function importJSON(obj){
+    async function importJSON(obj, opts){
       if(!obj || typeof obj !== 'object') throw new Error('Bad JSON');
       if(!Array.isArray(obj.cats) || !Array.isArray(obj.notes)) throw new Error('No cats/notes arrays');
+      opts = opts || {};
+      const doRender = (opts.render !== false);
+
 
       // very light validation
       const cats = obj.cats.map(c => ({
@@ -2600,8 +3435,10 @@ const draftTitle = (noteTitle.value || '').trim();
         state.notes.forEach(n => st[STORE.notes].put(n));
       });
 
-      renderAll();
-      schedulePersist(50);
+      if(doRender){
+        renderAll();
+        schedulePersist(50);
+      }
     }
 
     // ========= whisperer transport =========
@@ -2672,7 +3509,7 @@ const draftTitle = (noteTitle.value || '').trim();
       ghOwner.value = state.cloud.owner || '';
       ghRepo.value = state.cloud.repo || '';
       ghBranch.value = state.cloud.branch || 'main';
-      ghPath.value = state.cloud.path || 'crate/onoi_notes/db.json';
+      ghPath.value = state.cloud.path || 'crate/onoi_notes/db/db.json';
       ghGistId.value = state.cloud.gistId || '';
       ghGistFile.value = state.cloud.gistFile || 'onoi_notes_db.json';
 
@@ -3146,7 +3983,7 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
       state.cloud.owner = ghOwner.value.trim();
       state.cloud.repo = ghRepo.value.trim();
       state.cloud.branch = (ghBranch.value.trim() || 'main');
-      state.cloud.path = (ghPath.value.trim() || 'crate/onoi_notes/db.json');
+      state.cloud.path = (ghPath.value.trim() || 'crate/onoi_notes/db/db.json');
       state.cloud.gistId = ghGistId.value.trim();
       state.cloud.gistFile = (ghGistFile.value.trim() || 'onoi_notes_db.json');
       saveCloudSettings();
@@ -3248,6 +4085,21 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
       // load all from idb
       state.cats = await idb.all(STORE.cats);
       state.notes = await idb.all(STORE.notes);
+
+      // If DB is empty, try to load from a static file (GitHub Pages friendly):
+      // ./db/db.json (so you can commit notes into the repo and open them on any device)
+      if(state.cats.length === 0 && state.notes.length === 0){
+        try{
+          const r = await fetch('./db/db.json', { cache:'no-store' });
+          if(r.ok){
+            const obj = await r.json();
+            await importJSON(obj, { render:false });
+            // reload (importJSON wrote into idb)
+            state.cats = await idb.all(STORE.cats);
+            state.notes = await idb.all(STORE.notes);
+          }
+        }catch(e){ /* ignore */ }
+      }
 
       ensureDefaults();
 
