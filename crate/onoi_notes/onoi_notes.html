@@ -2095,10 +2095,7 @@ async function uiPrompt(msg, opts={}){
       }
 
       if(!state.activeNoteId){
-        const inCat = state.notes
-          .filter(x => x.catId === state.activeCatId)
-          .sort((a,b) => (b.updatedAt||0) - (a.updatedAt||0));
-        const nn = inCat[0] || state.notes.slice().sort((a,b) => (b.updatedAt||0) - (a.updatedAt||0))[0] || null;
+        const nn = state.notes.find(x => x.catId === state.activeCatId) || state.notes[0];
         state.activeNoteId = nn ? nn.id : null;
       }
     }
@@ -2118,31 +2115,16 @@ async function uiPrompt(msg, opts={}){
 
     function syncEditorIntoCurrentNote(){
       const editorNoteId = (editor && editor.dataset && editor.dataset.noteId) ? String(editor.dataset.noteId) : null;
-      const isHydrated = !!(editor && editor.dataset && editor.dataset.hydrated === '1');
-      // Sync only when the editor is already bound to a real rendered note.
-      // This prevents a blank/uninitialized editor from overwriting an existing note.
-      if(!editorNoteId || !isHydrated) return null;
+      // Sync only when the editor is already bound to a real note.
+      // This prevents a blank editor on first load from overwriting an existing note.
+      if(!editorNoteId) return null;
 
       const note = noteById(editorNoteId);
       if(!note) return null;
 
-      // Extra safety: ignore stale editor instances that are no longer the active note.
-      if(state.activeNoteId && String(state.activeNoteId) !== editorNoteId) return note;
-
       try{
-        const nextTitle = (noteTitle.value || '').trim();
-        const rawHtml = (editor && typeof editor.innerHTML === 'string') ? editor.innerHTML : '';
-        const hasVisibleText = !!htmlToText(rawHtml || '').trim();
-        const noteHadVisibleText = !!htmlToText(note.html || '').trim();
-
-        note.title = nextTitle;
-
-        // Never let an unexpectedly empty editor wipe a populated note during navigation/init.
-        // Real user deletions are already captured by the editor input listener below.
-        if(hasVisibleText || !noteHadVisibleText){
-          note.html = rawHtml.trim() ? rawHtml : '<p></p>';
-        }
-
+        note.title = (noteTitle.value || '').trim();
+        note.html = (editor && typeof editor.innerHTML === 'string' && editor.innerHTML.trim()) ? editor.innerHTML : '<p></p>';
         note.updatedAt = now();
         updatedText.textContent = 'updated: ' + fmtTime(note.updatedAt);
       }catch(e){}
@@ -2424,11 +2406,10 @@ tgl.addEventListener('click', (e) => {
 
       if(!note){
         noteTitle.value = '';
-        noteTitle.disabled = true;
+        noteTitle.disabled = false;
         editor.innerHTML = '<p></p>';
         delete editor.dataset.noteId;
-        editor.dataset.hydrated = '0';
-        editor.setAttribute('contenteditable', 'false');
+        editor.setAttribute('contenteditable', 'true');
         updatedText.textContent = '-';
         return;
       }
@@ -2437,19 +2418,12 @@ tgl.addEventListener('click', (e) => {
       noteTitle.disabled = false;
       editor.setAttribute('contenteditable','true');
 
-      const safeHtml = (note && typeof note.html === 'string' && note.html.trim()) ? note.html : '<p></p>';
-      const mustHydrate = (
-        editor.dataset.noteId !== note.id ||
-        editor.dataset.hydrated !== '1' ||
-        (!htmlToText(editor.innerHTML || '').trim() && !!htmlToText(safeHtml).trim())
-      );
-
+      // avoid resetting cursor if already on same note and active element is editor
       if(noteTitle.value !== (note.title || '')) noteTitle.value = note.title || '';
-      if(mustHydrate){
-        editor.innerHTML = safeHtml;
+      if(editor.dataset.noteId !== note.id){
+        editor.innerHTML = note.html || '';
+        editor.dataset.noteId = note.id;
       }
-      editor.dataset.noteId = note.id;
-      editor.dataset.hydrated = '1';
 
       updatedText.textContent = 'updated: ' + fmtTime(note.updatedAt);
     }
@@ -3402,6 +3376,7 @@ function ensureCategoryForNewNote(){
   return state.activeCatId;
 }
 async function createNote(){
+      syncEditorIntoCurrentNote();
       ensureCategoryForNewNote();
 
       const n = { id: uid(), catId: state.activeCatId, title: '', html: '<p></p>', createdAt: now(), updatedAt: now() };
@@ -3843,10 +3818,8 @@ const draftTitle = (noteTitle.value || '').trim();
     deleteCatBtn.addEventListener('click', deleteActiveCategory);
 
     noteTitle.addEventListener('input', () => {
-      const noteId = (editor && editor.dataset && editor.dataset.noteId) ? String(editor.dataset.noteId) : (state.activeNoteId ? String(state.activeNoteId) : null);
-      const note = noteId ? noteById(noteId) : null;
+      const note = ensureActiveNoteFromDraft();
       if(!note) return;
-      editor.dataset.hydrated = '1';
       note.title = (noteTitle.value || '').trim();
       note.updatedAt = now();
       updatedText.textContent = 'updated: ' + fmtTime(note.updatedAt);
@@ -3855,11 +3828,9 @@ const draftTitle = (noteTitle.value || '').trim();
     });
 
     editor.addEventListener('input', () => {
-      const noteId = (editor && editor.dataset && editor.dataset.noteId) ? String(editor.dataset.noteId) : (state.activeNoteId ? String(state.activeNoteId) : null);
-      const note = noteId ? noteById(noteId) : null;
+      const note = ensureActiveNoteFromDraft();
       if(!note) return;
-      editor.dataset.hydrated = '1';
-      note.html = (editor.innerHTML && editor.innerHTML.trim()) ? editor.innerHTML : '<p></p>';
+      note.html = editor.innerHTML;
       note.updatedAt = now();
       updatedText.textContent = 'updated: ' + fmtTime(note.updatedAt);
       renderNotesList();
