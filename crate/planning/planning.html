@@ -3,13 +3,134 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Item Key — Planning</title>
+  <title>Item Key - Планирование</title>
 
   <link rel="stylesheet" href="../../assets/css/styles.css" />
   <link rel="stylesheet" href="./planning.css" />
+
+
+<style id="ik-site-settings-css">
+.ik-site-nav{ position: relative; }
+.ik-site-nav__actions{
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ik-floating-settings{
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 100100;
+}
+.ik-gear-btn{
+  appearance: none;
+  border: 1px solid rgba(0,0,0,.14);
+  background: #fff;
+  color: rgba(0,0,0,.86);
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  display: inline-grid;
+  place-items: center;
+  cursor: pointer;
+  border-radius: 0;
+  transition: transform .18s ease, border-color .18s ease, opacity .18s ease;
+  box-shadow: none;
+}
+.ik-gear-btn:hover{
+  transform: translateY(-1px);
+  border-color: rgba(0,0,0,.28);
+  opacity: .98;
+}
+.ik-gear-btn:focus-visible{
+  outline: 2px solid rgba(0,0,0,.55);
+  outline-offset: 2px;
+}
+.ik-gear-btn svg{
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+.ik-settings-panel{
+  position: fixed;
+  top: 68px;
+  right: 16px;
+  z-index: 100101;
+  width: min(320px, calc(100vw - 24px));
+  border: 1px solid rgba(0,0,0,.18);
+  background: rgba(255,255,255,.98);
+  box-shadow: 0 10px 32px rgba(0,0,0,.10);
+  padding: 14px;
+  border-radius: 0;
+}
+.ik-settings-panel[hidden]{ display: none !important; }
+.ik-settings-panel__head{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.ik-settings-panel__title{
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+}
+.ik-settings-panel__close{
+  appearance: none;
+  border: 1px solid rgba(0,0,0,.14);
+  background: #fff;
+  color: rgba(0,0,0,.86);
+  padding: 8px 10px;
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 0;
+}
+.ik-settings-group{ display: grid; gap: 10px; }
+.ik-settings-label{
+  font-size: 10px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: rgba(0,0,0,.58);
+}
+.ik-lang-switch{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.ik-lang-option{
+  border: 1px solid rgba(0,0,0,.14);
+  background: rgba(255,255,255,.92);
+  min-height: 42px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+.ik-lang-option input{ margin: 0; }
+.ik-lang-option.is-active{
+  border-color: rgba(0,0,0,.34);
+  background: rgba(0,0,0,.03);
+}
+@media (max-width: 640px){
+  .ik-site-nav__actions{ right: 12px; }
+  .ik-floating-settings{ top: 12px; right: 12px; }
+  .ik-settings-panel{ top: 62px; right: 12px; width: min(320px, calc(100vw - 24px)); }
+}
+</style>
+
 </head>
 
-<body class="page page-planning">
+<body class="page page-planning" data-i18n-page="planning">
   <!-- декоративные слои -->
   <div class="outer-frame" aria-hidden="true"></div>
   <div class="rays" aria-hidden="true"></div>
@@ -22,57 +143,57 @@
 
   
 
-  <main class="center-stage" aria-label="planning center">
+  <main class="center-stage" aria-label="центр планирования">
     <section class="planning-shell">
 
       <header class="planning-head">
         <div class="planning-title">
-          <div class="kicker">module</div>
+          <div class="kicker">модуль</div>
           <h1>планирование</h1>
         </div>
 
         <div class="planning-actions">
-          <button class="btn" id="btnNewProject" type="button">+ project</button>
-          <button class="btn" id="btnNewTask" type="button">+ task</button>
-          <button class="btn" id="btnNewEvent" type="button">+ schedule</button>
+          <button class="btn" id="btnNewProject" type="button">+ проект</button>
+          <button class="btn" id="btnNewTask" type="button">+ задача</button>
+          <button class="btn" id="btnNewEvent" type="button">+ расписание</button>
         </div>
       </header>
 
       <div class="planning-toolbar">
-        <select id="projectSelect" class="ctl" aria-label="Project"></select>
-        <input id="searchInput" class="ctl" type="search" placeholder="поиск задач…" aria-label="Search" />
+        <select id="projectSelect" class="ctl" aria-label="Проект"></select>
+        <input id="searchInput" class="ctl" type="search" placeholder="поиск задач…" aria-label="Поиск" />
 
-        <input id="tagsFilter" class="ctl" type="text" placeholder="tags: study, work" aria-label="Filter by tags" />
+        <input id="tagsFilter" class="ctl" type="text" placeholder="теги: учёба, работа" aria-label="Фильтр по тегам" />
 
-        <select id="priorityFilter" class="ctl" aria-label="Filter by priority">
-          <option value="all">priority: all</option>
-          <option value="high">priority: high</option>
-          <option value="mid">priority: mid</option>
-          <option value="low">priority: low</option>
+        <select id="priorityFilter" class="ctl" aria-label="Фильтр по приоритету">
+          <option value="all">приоритет: все</option>
+          <option value="high">приоритет: высокий</option>
+          <option value="mid">приоритет: средний</option>
+          <option value="low">приоритет: низкий</option>
         </select>
 
-        <select id="deadlineFilter" class="ctl" aria-label="Filter by deadline">
-          <option value="all">deadline: all</option>
-          <option value="today">deadline: today</option>
-          <option value="overdue">deadline: overdue</option>
-          <option value="week">deadline: week</option>
+        <select id="deadlineFilter" class="ctl" aria-label="Фильтр по сроку">
+          <option value="all">срок: все</option>
+          <option value="today">срок: сегодня</option>
+          <option value="overdue">срок: просрочено</option>
+          <option value="week">срок: неделя</option>
         </select>
 
-        <select id="sortSelect" class="ctl" aria-label="Sort tasks">
-          <option value="default">sort: default</option>
-          <option value="deadline">sort: deadline</option>
-          <option value="priority">sort: priority</option>
-          <option value="newest">sort: newest</option>
+        <select id="sortSelect" class="ctl" aria-label="Сортировка задач">
+          <option value="default">сортировка: по умолчанию</option>
+          <option value="deadline">сортировка: по сроку</option>
+          <option value="priority">сортировка: по приоритету</option>
+          <option value="newest">сортировка: сначала новые</option>
         </select>
 
-        <button class="btn btn--thin" id="clearFilters" type="button">clear</button>
-        <select id="viewSelect" class="ctl" aria-label="View">
-          <option value="board">board</option>
-          <option value="schedule">schedule</option>
+        <button class="btn btn--thin" id="clearFilters" type="button">очистить</button>
+        <select id="viewSelect" class="ctl" aria-label="Вид">
+          <option value="board">доска</option>
+          <option value="schedule">расписание</option>
         </select>
       </div>
 
-      <div id="projectBar" class="projectbar" aria-label="Projects"></div>
+      <div id="projectBar" class="projectbar" aria-label="Проекты"></div>
 
       <section class="planning-content">
         <div id="boardView" class="board" hidden></div>
@@ -82,9 +203,9 @@
   </main>
 
   <footer class="bottombar bottombar--edge">
-    <span class="hint">planning · projects · tasks</span>
+    <span class="hint">планирование · проекты · задачи</span>
     <span class="sep">•</span>
-    <span class="hint">pre-alpha</span>
+    <span class="hint">пре-альфа</span>
   </footer>
 
   <!-- ВАЖНО: модалка и тосты вынесены из main и стоят ПЕРЕД script -->
@@ -93,7 +214,7 @@
     <div class="modal__panel" role="dialog" aria-modal="true">
       <div class="modal__head">
         <div class="modal__title" id="modalTitle"></div>
-        <button class="icon-btn" data-close aria-label="Close">×</button>
+        <button class="icon-btn" data-close aria-label="Закрыть">×</button>
       </div>
       <div class="modal__body" id="modalBody"></div>
     </div>
@@ -102,6 +223,575 @@
   <div class="toast-stack" id="toasts" aria-live="polite"></div>
 
   <script type="module" src="./planning.js"></script>
+
+
+<script id="ik-site-settings-js">
+(() => {
+  const STORAGE_KEY = 'ik_site_lang_v1';
+  const DEFAULT_LANG = 'ru';
+  const PAGE = document.body?.dataset?.i18nPage || '';
+
+  const TITLES = {
+    planning: { ru: 'Item Key - Планирование', en: 'Item Key - Planning' }
+  };
+
+  const TEXT_PAIRS = [
+    ['Главное меню', 'Main menu'],
+    ['Настройки', 'Settings'],
+    ['Настройки сайта', 'Site settings'],
+    ['Язык сайта', 'Site language'],
+    ['Русский', 'Russian'],
+    ['Английский', 'English'],
+    ['модуль', 'module'],
+    ['планирование', 'planning'],
+    ['Планирование', 'Planning'],
+    ['+ проект', '+ project'],
+    ['+ задача', '+ task'],
+    ['+ расписание', '+ schedule'],
+    ['проект', 'project'],
+    ['проекты', 'projects'],
+    ['задача', 'task'],
+    ['задачи', 'tasks'],
+    ['расписание', 'schedule'],
+    ['доска', 'board'],
+    ['очистить', 'clear'],
+    ['пре-альфа', 'pre-alpha'],
+    ['планирование · проекты · задачи', 'planning · projects · tasks'],
+    ['Проект', 'Project'],
+    ['Поиск', 'Search'],
+    ['Фильтр по тегам', 'Filter by tags'],
+    ['Фильтр по приоритету', 'Filter by priority'],
+    ['Фильтр по сроку', 'Filter by deadline'],
+    ['Сортировка задач', 'Sort tasks'],
+    ['Вид', 'View'],
+    ['Проекты', 'Projects'],
+    ['центр планирования', 'planning center'],
+    ['Закрыть', 'Close'],
+    ['диалог', 'dialog'],
+    ['теги: учёба, работа', 'tags: study, work'],
+    ['приоритет: все', 'priority: all'],
+    ['приоритет: высокий', 'priority: high'],
+    ['приоритет: средний', 'priority: mid'],
+    ['приоритет: низкий', 'priority: low'],
+    ['срок: все', 'deadline: all'],
+    ['срок: сегодня', 'deadline: today'],
+    ['срок: просрочено', 'deadline: overdue'],
+    ['срок: неделя', 'deadline: week'],
+    ['сортировка: по умолчанию', 'sort: default'],
+    ['сортировка: по сроку', 'sort: deadline'],
+    ['сортировка: по приоритету', 'sort: priority'],
+    ['сортировка: сначала новые', 'sort: newest'],
+    ['проектов пока нет', 'No projects yet'],
+    ['задач пока нет', 'No tasks yet'],
+    ['событий пока нет', 'No events yet'],
+    ['создать проект', 'Create project'],
+    ['создать задачу', 'Create task'],
+    ['создать событие', 'Create event'],
+    ['новый проект', 'New project'],
+    ['новая задача', 'New task'],
+    ['новое событие', 'New event'],
+    ['редактировать проект', 'Edit project'],
+    ['редактировать задачу', 'Edit task'],
+    ['редактировать событие', 'Edit event'],
+    ['удалить проект', 'Delete project'],
+    ['удалить задачу', 'Delete task'],
+    ['удалить событие', 'Delete event'],
+    ['сохранить', 'Save'],
+    ['отмена', 'Cancel'],
+    ['название', 'Title'],
+    ['имя проекта', 'Project name'],
+    ['название задачи', 'Task title'],
+    ['описание', 'Description'],
+    ['приоритет', 'Priority'],
+    ['срок', 'Deadline'],
+    ['теги', 'Tags'],
+    ['статус', 'Status'],
+    ['дата', 'Date'],
+    ['время', 'Time'],
+    ['сегодня', 'Today'],
+    ['завтра', 'Tomorrow'],
+    ['неделя', 'Week'],
+    ['месяц', 'Month'],
+    ['все', 'All'],
+    ['готово', 'Done'],
+    ['в процессе', 'In progress'],
+    ['запланировано', 'Planned'],
+    ['ожидает', 'Backlog'],
+    ['высокий', 'High'],
+    ['средний', 'Medium'],
+    ['низкий', 'Low'],
+    ['без срока', 'No deadline'],
+    ['сегодняшние', 'Today'],
+    ['просроченные', 'Overdue'],
+    ['по умолчанию', 'Default'],
+    ['сначала новые', 'Newest first'],
+    ['выполнено', 'Completed'],
+    ['календарь', 'Calendar'],
+    ['добавить задачу', 'Add task'],
+    ['добавить проект', 'Add project'],
+    ['добавить событие', 'Add event']
+  ];
+
+  const PLACEHOLDER_PAIRS = [
+    ['поиск задач…', 'search tasks…'],
+    ['теги: учёба, работа', 'tags: study, work'],
+    ['имя проекта', 'Project name'],
+    ['название задачи', 'Task title'],
+    ['описание', 'Description'],
+    ['поиск...', 'search...']
+  ];
+
+  function normalize(text) {
+    return String(text || '').replace(/\s+/g, ' ').trim();
+  }
+
+  function buildMaps(pairs) {
+    const ruToEn = Object.create(null);
+    const enToRu = Object.create(null);
+    pairs.forEach(([ru, en]) => {
+      ruToEn[normalize(ru)] = en;
+      enToRu[normalize(en)] = ru;
+    });
+    return { ruToEn, enToRu };
+  }
+
+  const textMaps = buildMaps(TEXT_PAIRS);
+  const placeholderMaps = buildMaps(PLACEHOLDER_PAIRS);
+  const TEXTS_RU_TO_EN = textMaps.ruToEn;
+  const TEXTS_EN_TO_RU = textMaps.enToRu;
+  const PLACEHOLDERS_RU_TO_EN = placeholderMaps.ruToEn;
+  const PLACEHOLDERS_EN_TO_RU = placeholderMaps.enToRu;
+
+  const ALIASES_RU_TO_EN = {
+    'module': 'module',
+    'planning': 'planning',
+    'clear': 'clear',
+    'board': 'board',
+    'schedule': 'schedule',
+    'pre-alpha': 'pre-alpha',
+    'Main menu': 'Main menu',
+    'Close': 'Close'
+  };
+
+  const ALIASES_EN_TO_RU = {
+    'module': 'модуль',
+    'planning': 'планирование',
+    'clear': 'очистить',
+    'board': 'доска',
+    'schedule': 'расписание',
+    'pre-alpha': 'пре-альфа',
+    'Main menu': 'Главное меню',
+    'Close': 'Закрыть',
+    'search tasks…': 'поиск задач…',
+    'tags: study, work': 'теги: учёба, работа',
+    'priority: all': 'приоритет: все',
+    'priority: high': 'приоритет: высокий',
+    'priority: mid': 'приоритет: средний',
+    'priority: low': 'приоритет: низкий',
+    'deadline: all': 'срок: все',
+    'deadline: today': 'срок: сегодня',
+    'deadline: overdue': 'срок: просрочено',
+    'deadline: week': 'срок: неделя',
+    'sort: default': 'сортировка: по умолчанию',
+    'sort: deadline': 'сортировка: по сроку',
+    'sort: priority': 'сортировка: по приоритету',
+    'sort: newest': 'сортировка: сначала новые',
+    'planning · projects · tasks': 'планирование · проекты · задачи',
+    'Project': 'Проект',
+    'Projects': 'Проекты',
+    'Search': 'Поиск',
+    'Filter by tags': 'Фильтр по тегам',
+    'Filter by priority': 'Фильтр по приоритету',
+    'Filter by deadline': 'Фильтр по сроку',
+    'Sort tasks': 'Сортировка задач',
+    'View': 'Вид',
+    'planning center': 'центр планирования',
+    'No projects yet': 'проектов пока нет',
+    'No tasks yet': 'задач пока нет',
+    'No events yet': 'событий пока нет',
+    'Create project': 'создать проект',
+    'Create task': 'создать задачу',
+    'Create event': 'создать событие',
+    'New project': 'новый проект',
+    'New task': 'новая задача',
+    'New event': 'новое событие',
+    'Edit project': 'редактировать проект',
+    'Edit task': 'редактировать задачу',
+    'Edit event': 'редактировать событие',
+    'Delete project': 'удалить проект',
+    'Delete task': 'удалить задачу',
+    'Delete event': 'удалить событие',
+    'Save': 'сохранить',
+    'Cancel': 'отмена',
+    'Title': 'название',
+    'Project name': 'имя проекта',
+    'Task title': 'название задачи',
+    'Description': 'описание',
+    'Priority': 'приоритет',
+    'Deadline': 'срок',
+    'Tags': 'теги',
+    'Status': 'статус',
+    'Date': 'дата',
+    'Time': 'время',
+    'Today': 'сегодня',
+    'Tomorrow': 'завтра',
+    'Week': 'неделя',
+    'Month': 'месяц',
+    'All': 'все',
+    'Done': 'готово',
+    'In progress': 'в процессе',
+    'Planned': 'запланировано',
+    'Backlog': 'ожидает',
+    'High': 'высокий',
+    'Medium': 'средний',
+    'Low': 'низкий',
+    'No deadline': 'без срока',
+    'Overdue': 'просроченные',
+    'Default': 'по умолчанию',
+    'Newest first': 'сначала новые',
+    'Completed': 'выполнено',
+    'Calendar': 'календарь',
+    'Add task': 'добавить задачу',
+    'Add project': 'добавить проект',
+    'Add event': 'добавить событие'
+  };
+
+  const SELECTOR_RULES = {
+    planning: [
+      { selector: '.planning-title .kicker', text: { ru: 'модуль', en: 'module' } },
+      { selector: '.planning-title h1', text: { ru: 'планирование', en: 'planning' } },
+      { selector: '#btnNewProject', text: { ru: '+ проект', en: '+ project' } },
+      { selector: '#btnNewTask', text: { ru: '+ задача', en: '+ task' } },
+      { selector: '#btnNewEvent', text: { ru: '+ расписание', en: '+ schedule' } },
+      { selector: '#clearFilters', text: { ru: 'очистить', en: 'clear' } },
+      { selector: '#searchInput', placeholder: { ru: 'поиск задач…', en: 'search tasks…' } },
+      { selector: '#tagsFilter', placeholder: { ru: 'теги: учёба, работа', en: 'tags: study, work' } },
+      { selector: 'main.center-stage', attr: { 'aria-label': { ru: 'центр планирования', en: 'planning center' } } },
+      { selector: '#projectSelect', attr: { 'aria-label': { ru: 'Проект', en: 'Project' } } },
+      { selector: '#searchInput', attr: { 'aria-label': { ru: 'Поиск', en: 'Search' } } },
+      { selector: '#tagsFilter', attr: { 'aria-label': { ru: 'Фильтр по тегам', en: 'Filter by tags' } } },
+      { selector: '#priorityFilter', attr: { 'aria-label': { ru: 'Фильтр по приоритету', en: 'Filter by priority' } } },
+      { selector: '#deadlineFilter', attr: { 'aria-label': { ru: 'Фильтр по сроку', en: 'Filter by deadline' } } },
+      { selector: '#sortSelect', attr: { 'aria-label': { ru: 'Сортировка задач', en: 'Sort tasks' } } },
+      { selector: '#viewSelect', attr: { 'aria-label': { ru: 'Вид', en: 'View' } } },
+      { selector: '#projectBar', attr: { 'aria-label': { ru: 'Проекты', en: 'Projects' } } },
+      { selector: '.bottombar .hint:first-child', text: { ru: 'планирование · проекты · задачи', en: 'planning · projects · tasks' } },
+      { selector: '.bottombar .hint:last-child', text: { ru: 'пре-альфа', en: 'pre-alpha' } },
+      { selector: '.modal__head .icon-btn', attr: { 'aria-label': { ru: 'Закрыть', en: 'Close' } } }
+    ]
+  };
+
+  const SKIP_SELECTOR = [
+    '#ikSiteSettingsPanel',
+    '[contenteditable="true"]',
+    'script',
+    'style',
+    'textarea'
+  ].join(',');
+
+  function translateDynamic(text, lang) {
+    const key = normalize(text);
+    const rules = [
+      {
+        ru: /^проектов:\s*(\d+)$/i,
+        en: /^projects:\s*(\d+)$/i,
+        toRu: (m) => `проектов: ${m[1]}`,
+        toEn: (m) => `projects: ${m[1]}`
+      },
+      {
+        ru: /^задач:\s*(\d+)$/i,
+        en: /^tasks:\s*(\d+)$/i,
+        toRu: (m) => `задач: ${m[1]}`,
+        toEn: (m) => `tasks: ${m[1]}`
+      },
+      {
+        ru: /^событий:\s*(\d+)$/i,
+        en: /^events:\s*(\d+)$/i,
+        toRu: (m) => `событий: ${m[1]}`,
+        toEn: (m) => `events: ${m[1]}`
+      },
+      {
+        ru: /^дедлайн:\s*(.+)$/i,
+        en: /^deadline:\s*(.+)$/i,
+        toRu: (m) => `дедлайн: ${translateText(m[1], 'ru')}`,
+        toEn: (m) => `deadline: ${translateText(m[1], 'en')}`
+      },
+      {
+        ru: /^приоритет:\s*(.+)$/i,
+        en: /^priority:\s*(.+)$/i,
+        toRu: (m) => `приоритет: ${translateText(m[1], 'ru')}`,
+        toEn: (m) => `priority: ${translateText(m[1], 'en')}`
+      },
+      {
+        ru: /^статус:\s*(.+)$/i,
+        en: /^status:\s*(.+)$/i,
+        toRu: (m) => `статус: ${translateText(m[1], 'ru')}`,
+        toEn: (m) => `status: ${translateText(m[1], 'en')}`
+      }
+    ];
+
+    for (const rule of rules) {
+      if (lang === 'en') {
+        const match = key.match(rule.ru);
+        if (match) return rule.toEn(match);
+      } else {
+        const match = key.match(rule.en);
+        if (match) return rule.toRu(match);
+      }
+    }
+    return text;
+  }
+
+  function translateViaMaps(text, lang, ruToEn, enToRu, aliasRuToEn, aliasEnToRu) {
+    const key = normalize(text);
+    if (!key) return text;
+    if (lang === 'en') return ruToEn[key] || aliasRuToEn[key] || translateDynamic(key, 'en') || text;
+    return enToRu[key] || aliasEnToRu[key] || translateDynamic(key, 'ru') || text;
+  }
+
+  function translateText(text, lang) {
+    return translateViaMaps(text, lang, TEXTS_RU_TO_EN, TEXTS_EN_TO_RU, ALIASES_RU_TO_EN, ALIASES_EN_TO_RU);
+  }
+
+  function translatePlaceholder(text, lang) {
+    return translateViaMaps(text, lang, PLACEHOLDERS_RU_TO_EN, PLACEHOLDERS_EN_TO_RU, ALIASES_RU_TO_EN, ALIASES_EN_TO_RU);
+  }
+
+  function getLang() {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      return saved === 'en' ? 'en' : DEFAULT_LANG;
+    } catch (e) {
+      return DEFAULT_LANG;
+    }
+  }
+
+  function saveLang(lang) {
+    try {
+      localStorage.setItem(STORAGE_KEY, lang === 'en' ? 'en' : 'ru');
+    } catch (e) {}
+  }
+
+  function setPanelState(lang) {
+    const ru = document.getElementById('ikLangRu');
+    const en = document.getElementById('ikLangEn');
+    if (ru) ru.checked = lang === 'ru';
+    if (en) en.checked = lang === 'en';
+    document.querySelectorAll('.ik-lang-option').forEach((label) => {
+      const input = label.querySelector('input');
+      label.classList.toggle('is-active', !!input?.checked);
+    });
+    const gear = document.getElementById('ikGlobalSettingsBtn');
+    if (gear) {
+      const label = lang === 'en' ? 'Site settings' : 'Настройки сайта';
+      gear.setAttribute('aria-label', label);
+      gear.setAttribute('title', label);
+    }
+  }
+
+  function applySelectorRules(lang) {
+    const rules = SELECTOR_RULES[PAGE] || [];
+    rules.forEach((rule) => {
+      document.querySelectorAll(rule.selector).forEach((el) => {
+        if (rule.text) el.textContent = rule.text[lang];
+        if (rule.placeholder && 'placeholder' in el) el.placeholder = rule.placeholder[lang];
+        if (rule.attr) {
+          Object.entries(rule.attr).forEach(([attr, values]) => {
+            el.setAttribute(attr, values[lang]);
+          });
+        }
+      });
+    });
+  }
+
+  function shouldSkipElement(el) {
+    if (!el || !(el instanceof Element)) return true;
+    if (el.closest(SKIP_SELECTOR)) return true;
+    return false;
+  }
+
+  function applyTextNodeTranslations(lang) {
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+      acceptNode(node) {
+        const parent = node.parentElement;
+        if (!parent || shouldSkipElement(parent)) return NodeFilter.FILTER_REJECT;
+        if (!normalize(node.nodeValue)) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+
+    const nodes = [];
+    let current;
+    while ((current = walker.nextNode())) nodes.push(current);
+
+    nodes.forEach((node) => {
+      const match = String(node.nodeValue || '').match(/^(\s*)([\s\S]*?)(\s*)$/);
+      if (!match) return;
+      const translated = translateText(match[2], lang);
+      if (translated !== normalize(match[2])) node.nodeValue = `${match[1]}${translated}${match[3]}`;
+    });
+  }
+
+  function applyAttributeTranslations(lang) {
+    ['placeholder', 'title', 'aria-label'].forEach((attr) => {
+      document.querySelectorAll(`[${attr}]`).forEach((el) => {
+        const current = el.getAttribute(attr);
+        if (!current) return;
+        const translated = attr === 'placeholder' ? translatePlaceholder(current, lang) : translateText(current, lang);
+        if (translated !== current) el.setAttribute(attr, translated);
+      });
+    });
+
+    document.querySelectorAll('input[type="button"][value], input[type="submit"][value], input[type="reset"][value]').forEach((el) => {
+      const current = el.value;
+      const translated = translateText(current, lang);
+      if (translated !== current) el.value = translated;
+    });
+  }
+
+  let isApplying = false;
+
+  function applyLanguage(lang) {
+    if (isApplying) return;
+    isApplying = true;
+    const next = lang === 'en' ? 'en' : 'ru';
+    document.documentElement.lang = next;
+    if (TITLES[PAGE]) document.title = TITLES[PAGE][next];
+
+    const titleEl = document.getElementById('ikSiteSettingsTitle');
+    const closeEl = document.getElementById('ikSiteSettingsClose');
+    const labelEl = document.getElementById('ikSiteLangLabel');
+    const ruEl = document.getElementById('ikLangRuText');
+    const enEl = document.getElementById('ikLangEnText');
+
+    if (titleEl) titleEl.textContent = next === 'en' ? 'Settings' : 'Настройки';
+    if (closeEl) closeEl.textContent = next === 'en' ? 'Close' : 'Закрыть';
+    if (labelEl) labelEl.textContent = next === 'en' ? 'Site language' : 'Язык сайта';
+    if (ruEl) ruEl.textContent = next === 'en' ? 'Russian' : 'Русский';
+    if (enEl) enEl.textContent = next === 'en' ? 'English' : 'Английский';
+
+    applySelectorRules(next);
+    applyTextNodeTranslations(next);
+    applyAttributeTranslations(next);
+    setPanelState(next);
+    isApplying = false;
+  }
+
+  function setLang(lang) {
+    const next = lang === 'en' ? 'en' : 'ru';
+    saveLang(next);
+    applyLanguage(next);
+    document.dispatchEvent(new CustomEvent('ik:languagechange', { detail: { lang: next } }));
+  }
+
+  function buildGearButton() {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.id = 'ikGlobalSettingsBtn';
+    btn.className = 'ik-gear-btn';
+    btn.setAttribute('aria-label', 'Настройки сайта');
+    btn.setAttribute('title', 'Настройки сайта');
+    btn.innerHTML = `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+        <path d="M12 8.4A3.6 3.6 0 1 0 12 15.6A3.6 3.6 0 1 0 12 8.4Z"/>
+        <path d="M19.4 15a1 1 0 0 0 .2 1.1l.1.1a1.2 1.2 0 0 1 0 1.7l-1.6 1.6a1.2 1.2 0 0 1-1.7 0l-.1-.1a1 1 0 0 0-1.1-.2 1 1 0 0 0-.6.9V20a1.2 1.2 0 0 1-1.2 1.2h-2.3A1.2 1.2 0 0 1 9.9 20v-.2a1 1 0 0 0-.6-.9 1 1 0 0 0-1.1.2l-.1.1a1.2 1.2 0 0 1-1.7 0l-1.6-1.6a1.2 1.2 0 0 1 0-1.7l.1-.1a1 1 0 0 0 .2-1.1 1 1 0 0 0-.9-.6H4A1.2 1.2 0 0 1 2.8 13v-2.3A1.2 1.2 0 0 1 4 9.5h.2a1 1 0 0 0 .9-.6 1 1 0 0 0-.2-1.1l-.1-.1a1.2 1.2 0 0 1 0-1.7l1.6-1.6a1.2 1.2 0 0 1 1.7 0l.1.1a1 1 0 0 0 1.1.2 1 1 0 0 0 .6-.9V4A1.2 1.2 0 0 1 11.1 2.8h2.3A1.2 1.2 0 0 1 14.6 4v.2a1 1 0 0 0 .6.9 1 1 0 0 0 1.1-.2l.1-.1a1.2 1.2 0 0 1 1.7 0l1.6 1.6a1.2 1.2 0 0 1 0 1.7l-.1.1a1 1 0 0 0-.2 1.1 1 1 0 0 0 .9.6h.2A1.2 1.2 0 0 1 21.2 10.7V13A1.2 1.2 0 0 1 20 14.2h-.2a1 1 0 0 0-.4.8Z"/>
+      </svg>
+    `;
+    return btn;
+  }
+
+  function buildPanel() {
+    const panel = document.createElement('div');
+    panel.id = 'ikSiteSettingsPanel';
+    panel.className = 'ik-settings-panel';
+    panel.hidden = true;
+    panel.innerHTML = `
+      <div class="ik-settings-panel__head">
+        <p class="ik-settings-panel__title" id="ikSiteSettingsTitle">Настройки</p>
+        <button type="button" class="ik-settings-panel__close" id="ikSiteSettingsClose">Закрыть</button>
+      </div>
+      <div class="ik-settings-group">
+        <div class="ik-settings-label" id="ikSiteLangLabel">Язык сайта</div>
+        <div class="ik-lang-switch">
+          <label class="ik-lang-option" for="ikLangRu">
+            <input type="radio" name="ikSiteLang" id="ikLangRu" value="ru" />
+            <span id="ikLangRuText">Русский</span>
+          </label>
+          <label class="ik-lang-option" for="ikLangEn">
+            <input type="radio" name="ikSiteLang" id="ikLangEn" value="en" />
+            <span id="ikLangEnText">Английский</span>
+          </label>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(panel);
+    return panel;
+  }
+
+  function initSettingsUI() {
+    if (document.getElementById('ikGlobalSettingsBtn')) return;
+
+    const gearBtn = buildGearButton();
+    const panel = buildPanel();
+    const closeBtn = panel.querySelector('#ikSiteSettingsClose');
+    const header = document.querySelector('.ik-site-nav');
+
+    if (header) {
+      let actions = header.querySelector('.ik-site-nav__actions');
+      if (!actions) {
+        actions = document.createElement('div');
+        actions.className = 'ik-site-nav__actions';
+        header.appendChild(actions);
+      }
+      actions.appendChild(gearBtn);
+    } else {
+      const floating = document.createElement('div');
+      floating.className = 'ik-floating-settings';
+      floating.appendChild(gearBtn);
+      document.body.appendChild(floating);
+    }
+
+    const openPanel = () => { panel.hidden = false; };
+    const closePanel = () => { panel.hidden = true; };
+
+    gearBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      panel.hidden ? openPanel() : closePanel();
+    });
+    closeBtn.addEventListener('click', closePanel);
+    panel.addEventListener('click', (e) => e.stopPropagation());
+    document.addEventListener('click', () => { if (!panel.hidden) closePanel(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !panel.hidden) closePanel(); });
+    panel.querySelectorAll('input[name="ikSiteLang"]').forEach((input) => {
+      input.addEventListener('change', () => setLang(input.value));
+    });
+  }
+
+  function initObserver() {
+    let queued = false;
+    const observer = new MutationObserver(() => {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(() => {
+        queued = false;
+        applyLanguage(getLang());
+      });
+    });
+    observer.observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['placeholder', 'title', 'aria-label', 'value'] });
+  }
+
+  window.IKSiteLang = {
+    get: getLang,
+    set: setLang,
+    apply: () => applyLanguage(getLang())
+  };
+
+  document.addEventListener('DOMContentLoaded', () => {
+    initSettingsUI();
+    applyLanguage(getLang());
+    initObserver();
+  });
+})();
+</script>
 </body>
 </html>
-

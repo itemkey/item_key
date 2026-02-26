@@ -123,7 +123,7 @@
     /* Top utility bar */
     .n-topbar{
       display: grid;
-      grid-template-columns: 1fr auto auto;
+      grid-template-columns: 1fr auto auto auto;
       gap: 10px;
       align-items: center;
     }
@@ -296,8 +296,9 @@
       font-size: 13px;
       letter-spacing: 1.2px;
     }
-    .tree-item[data-depth="0"] .tree-name::after{
+    html[lang="ru"] .tree-item[data-depth="0"] .tree-name::after{
       content: "категория";
+
       margin-left: 8px;
       font-size: 10px;
       letter-spacing: 2px;
@@ -306,6 +307,9 @@
     }
 .tree-item[data-depth="0"] .tree-name{
   font-weight: 750;
+}
+html[lang="en"] .tree-item[data-depth="0"] .tree-name::after{
+  content: "category";
 }
 .tree-item[data-depth="0"] .tree-name::after{
   padding: 2px 6px;
@@ -1172,31 +1176,131 @@ body.focus-mode .n-col-right{
   background: rgba(0,0,0,.03);
 }
 
-
-
-/* =========================================================
-   Mobile UX fixes - 2026-02-26
-   - Hide redundant "Меню" on desktop
-   - Prevent background scroll when drawer is open
-   - Use dvh/svh to avoid iOS address bar jumps
-   ========================================================= */
-#openDrawerBtn{ display: none; }
-@media (max-width: 900px){
-  #openDrawerBtn{ display: inline-flex; }
-  body.drawer-open{ overflow: hidden; }
-  @supports (height: 1dvh){
-    .editor{ min-height: 55dvh; }
-    .modal-card{ max-height: calc(100dvh - 20px); }
-  }
-  @supports (height: 1svh){
-    .editor{ min-height: 55svh; }
-  }
-}
-
 </style>
+
+
+<style id="ik-site-settings-css">
+.ik-site-nav{ position: relative; }
+.ik-site-nav__actions{
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ik-floating-settings{
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 100100;
+}
+.ik-gear-btn{
+  appearance: none;
+  border: 1px solid rgba(0,0,0,.14);
+  background: #fff;
+  color: rgba(0,0,0,.86);
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  display: inline-grid;
+  place-items: center;
+  cursor: pointer;
+  border-radius: 0;
+  transition: transform .18s ease, border-color .18s ease, opacity .18s ease;
+  box-shadow: none;
+}
+.ik-gear-btn:hover{
+  transform: translateY(-1px);
+  border-color: rgba(0,0,0,.28);
+  opacity: .98;
+}
+.ik-gear-btn:focus-visible{
+  outline: 2px solid rgba(0,0,0,.55);
+  outline-offset: 2px;
+}
+.ik-gear-btn svg{
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+.ik-settings-panel{
+  position: fixed;
+  top: 68px;
+  right: 16px;
+  z-index: 100101;
+  width: min(320px, calc(100vw - 24px));
+  border: 1px solid rgba(0,0,0,.18);
+  background: rgba(255,255,255,.98);
+  box-shadow: 0 10px 32px rgba(0,0,0,.10);
+  padding: 14px;
+  border-radius: 0;
+}
+.ik-settings-panel[hidden]{ display: none !important; }
+.ik-settings-panel__head{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.ik-settings-panel__title{
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+}
+.ik-settings-panel__close{
+  appearance: none;
+  border: 1px solid rgba(0,0,0,.14);
+  background: #fff;
+  color: rgba(0,0,0,.86);
+  padding: 8px 10px;
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 0;
+}
+.ik-settings-group{ display: grid; gap: 10px; }
+.ik-settings-label{
+  font-size: 10px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: rgba(0,0,0,.58);
+}
+.ik-lang-switch{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.ik-lang-option{
+  border: 1px solid rgba(0,0,0,.14);
+  background: rgba(255,255,255,.92);
+  min-height: 42px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+.ik-lang-option input{ margin: 0; }
+.ik-lang-option.is-active{
+  border-color: rgba(0,0,0,.34);
+  background: rgba(0,0,0,.03);
+}
+@media (max-width: 640px){
+  .ik-site-nav__actions{ right: 12px; }
+  .ik-floating-settings{ top: 12px; right: 12px; }
+  .ik-settings-panel{ top: 62px; right: 12px; width: min(320px, calc(100vw - 24px)); }
+}
+</style>
+
 </head>
 
-<body class="page page-crate">
+<body class="page page-crate" data-i18n-page="onoi_notes">
   <!-- фон/рамки - как в item-key -->
   <div class="outer-frame" aria-hidden="true"></div>
   <div class="rays" aria-hidden="true"></div>
@@ -1216,7 +1320,7 @@ body.focus-mode .n-col-right{
       <div class="n-card">
         <div class="n-topbar" aria-label="Панель поиска и действий">
           <input class="n-search" id="searchInput" placeholder="Поиск по заметкам…" />
-                    <button class="n-btn" id="openDrawerBtn" type="button" aria-controls="sidebarCol" aria-expanded="false">Меню</button>
+                    <button class="n-btn" id="openDrawerBtn" type="button">Меню</button>
 <div class="n-pill" aria-label="Статус синхронизации">
             <span class="dot" id="syncDot"></span>
             <span id="syncText">local</span>
@@ -1611,35 +1715,7 @@ body.focus-mode .n-col-right{
         document.documentElement.style.setProperty('--sidebarW', state.ui.sidebarW + 'px');
       }
     }
-    
-
-    // ========= topbar offset (drawer under fixed header) =========
-    function computeTopbarOffset(){
-      try{
-        const els = Array.from(document.querySelectorAll('header, nav, .topbar, .site-topbar, .app-topbar, .ik-site-nav'));
-        let maxH = 0;
-        for(const el of els){
-          if(!el) continue;
-          const cs = getComputedStyle(el);
-          const pos = cs.position;
-          if(pos !== 'fixed' && pos !== 'sticky') continue;
-          const top = parseFloat(cs.top || '0');
-          if(!Number.isFinite(top) || Math.abs(top) > 1) continue;
-          const r = el.getBoundingClientRect();
-          if(r.height <= 0) continue;
-          if(r.top > 1 || r.top < -1) continue;
-          maxH = Math.max(maxH, r.height);
-        }
-        return Math.round(maxH);
-      }catch(e){
-        return 0;
-      }
-    }
-    function applyTopbarOffset(){
-      const off = computeTopbarOffset();
-      document.documentElement.style.setProperty('--topbarOffset', off + 'px');
-    }
-// ========= IndexedDB =========
+    // ========= IndexedDB =========
     const DB_NAME = 'itemkey_onoi_notes_db_v1';
     const DB_VER = 1;
     const STORE = { meta:'meta', cats:'cats', notes:'notes' };
@@ -2088,10 +2164,18 @@ async function uiPrompt(msg, opts={}){
         }
       }
 
-      // If there are no notes yet - keep the category selected, but do not auto-create a blank note.
+      // If there are no notes yet - start with an empty sheet (no welcome text)
       if(state.notes.length === 0){
-        state.activeNoteId = null;
-        return;
+        const n = {
+          id: uid(),
+          catId: state.activeCatId || ensureMain(),
+          title: '',
+          html: '',
+          createdAt: now(),
+          updatedAt: now()
+        };
+        state.notes.push(n);
+        state.activeNoteId = n.id;
       }
 
       if(!state.activeNoteId){
@@ -2112,23 +2196,6 @@ async function uiPrompt(msg, opts={}){
 
     function catById(id){ return state.cats.find(c => c.id === id) || null; }
     function noteById(id){ return state.notes.find(n => n.id === id) || null; }
-
-    function syncEditorIntoCurrentNote(){
-      const editorNoteId = (editor && editor.dataset && editor.dataset.noteId) ? String(editor.dataset.noteId) : null;
-      const targetId = editorNoteId || (state.activeNoteId ? String(state.activeNoteId) : null);
-      if(!targetId) return null;
-      const note = noteById(targetId);
-      if(!note) return null;
-
-      try{
-        note.title = (noteTitle.value || '').trim();
-        note.html = (editor && typeof editor.innerHTML === 'string' && editor.innerHTML.trim()) ? editor.innerHTML : '<p></p>';
-        note.updatedAt = now();
-        updatedText.textContent = 'updated: ' + fmtTime(note.updatedAt);
-      }catch(e){}
-
-      return note;
-    }
 
     function catPath(catId){
       const path = [];
@@ -2249,7 +2316,6 @@ tgl.addEventListener('click', (e) => {
           row.appendChild(cnt);
 
           row.addEventListener('click', (e) => {
-            syncEditorIntoCurrentNote();
             state.activeCatId = cat.id;
             // pick first note in cat
             const list = getVisibleNotes();
@@ -2378,7 +2444,6 @@ tgl.addEventListener('click', (e) => {
         row.appendChild(sn);
 
         const openNote = () => {
-          syncEditorIntoCurrentNote();
           state.activeNoteId = n.id;
           renderEditor();
           renderNotesList();
@@ -2404,9 +2469,10 @@ tgl.addEventListener('click', (e) => {
 
       if(!note){
         noteTitle.value = '';
+        // Можно начинать печатать сразу - при первом вводе заметка и категория создадутся автоматически
         noteTitle.disabled = false;
-        editor.innerHTML = '<p></p>';
-        delete editor.dataset.noteId;
+        // Не блокируем редактор: пусть пользователь сразу пишет, даже если нет ни одной категории/заметки
+        if(!editor.innerHTML.trim()) editor.innerHTML = '<p></p>';
         editor.setAttribute('contenteditable', 'true');
         updatedText.textContent = '-';
         return;
@@ -2440,7 +2506,13 @@ tgl.addEventListener('click', (e) => {
         // embed pasted/dragged images (blob:...) so export/import keeps them
         try{
           await embedBlobImagesInEditor();
-          syncEditorIntoCurrentNote();
+          const n = state.activeNoteId ? noteById(state.activeNoteId) : null;
+          if(n){
+            n.title = (noteTitle.value || '').trim();
+            n.html = editor.innerHTML;
+            n.updatedAt = now();
+            updatedText.textContent = 'updated: ' + fmtTime(n.updatedAt);
+          }
         }catch(e){}
 
         // write cats and notes
@@ -3374,7 +3446,6 @@ function ensureCategoryForNewNote(){
   return state.activeCatId;
 }
 async function createNote(){
-      syncEditorIntoCurrentNote();
       ensureCategoryForNewNote();
 
       const n = { id: uid(), catId: state.activeCatId, title: '', html: '<p></p>', createdAt: now(), updatedAt: now() };
@@ -4179,9 +4250,6 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
       state.ui.sidebarCollapsed = (lsGet(LS_UI.sidebarCollapsed) === '1');
       state.ui.collapsedCats = loadCollapsedCats();
       applySidebarUI();
-      applyTopbarOffset();
-      window.addEventListener('resize', applyTopbarOffset, {passive:true});
-      window.addEventListener('orientationchange', applyTopbarOffset, {passive:true});
 
       loadCloudSettings();
       applySavedTypography();
@@ -5426,31 +5494,10 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
     try{ localStorage.setItem(SIDEBAR_KEY, collapsed ? '1':'0'); }catch(e){}
   }
   function openDrawer(){
-    if(document.body.classList.contains('drawer-open')) return;
-    try{ window.saveSelection && window.saveSelection(); }catch(e){}
-    // remember focus, so we can restore it on close
-    openDrawer._lastFocus = document.activeElement || null;
-
     document.body.classList.add('drawer-open');
-    try{ openDrawerBtn && openDrawerBtn.setAttribute('aria-expanded','true'); }catch(e){}
-    try{ drawerOverlay && drawerOverlay.setAttribute('aria-hidden','false'); }catch(e){}
-    // focus close for better a11y
-    window.setTimeout(() => { try{ closeDrawerBtn && closeDrawerBtn.focus(); }catch(e){} }, 0);
   }
   function closeDrawer(){
-    if(!document.body.classList.contains('drawer-open')) return;
     document.body.classList.remove('drawer-open');
-    try{ openDrawerBtn && openDrawerBtn.setAttribute('aria-expanded','false'); }catch(e){}
-    try{ drawerOverlay && drawerOverlay.setAttribute('aria-hidden','true'); }catch(e){}
-    // restore focus
-    window.setTimeout(() => {
-      try{
-        const el = openDrawer._lastFocus;
-        if(el && el.focus) el.focus();
-        else if(openDrawerBtn && openDrawerBtn.focus) openDrawerBtn.focus();
-      }catch(e){}
-      openDrawer._lastFocus = null;
-    }, 0);
   }
 
   // init desktop sidebar state
@@ -5523,5 +5570,929 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
 
 
   
+
+
+<script id="ik-site-settings-js">
+(() => {
+  const STORAGE_KEY = 'ik_site_lang_v1';
+  const DEFAULT_LANG = 'ru';
+  const PAGE = document.body?.dataset?.i18nPage || '';
+
+  function normalize(text) {
+    return String(text || '').replace(/\s+/g, ' ').trim();
+  }
+
+  const TITLES = {
+    index: { ru: 'Item Key - Главное меню', en: 'Item Key - Main menu' },
+    'item-crate': { ru: 'Item Key - Заметки', en: 'Item Key - Notes' },
+    onoi_notes: { ru: 'Item Key - Заметки', en: 'Item Key - Notes' },
+    planning: { ru: 'Item Key - Планирование', en: 'Item Key - Planning' },
+    student_helper: { ru: 'Учебный центр', en: 'Study Center' },
+    whisperer: { ru: 'Item Key - Озвучка', en: 'Item Key - Whisperer' }
+  };
+
+  const TEXT_PAIRS = [
+    ['Главное меню', 'Main menu'],
+    ['Учебный Центр', 'Study Center'],
+    ['Учебный центр', 'Study Center'],
+    ['учебный центр', 'study center'],
+    ['Настройки', 'Settings'],
+    ['настройки', 'settings'],
+    ['Настройки сайта', 'Site settings'],
+    ['Язык сайта', 'Site language'],
+    ['Русский', 'Russian'],
+    ['Английский', 'English'],
+    ['Белорусский', 'Belarusian'],
+    ['отсек в разработке', 'section in development'],
+    ['Этот отсек ещё не ожил. Возвращайся позже.', 'This section is not ready yet. Come back later.'],
+    ['вернуться назад', 'go back'],
+    ['перейти', 'open'],
+    ['планирование', 'planning'],
+    ['выбери раздел, чтобы начать', 'choose a section to start'],
+    ['выбери раздел чтобы начать', 'choose a section to start'],
+    ['продолжить', 'continue'],
+    ['обучение', 'learning'],
+    ['словарь', 'dictionary'],
+    ['структура', 'structure'],
+    ['времена', 'tenses'],
+    ['словообразование', 'word transformation'],
+    ['конструктор', 'constructor'],
+    ['карточки', 'cards'],
+    ['практика', 'practice'],
+    ['заучивание', 'learn'],
+    ['разделы', 'sections'],
+    ['назад', 'back'],
+    ['далее', 'next'],
+    ['англ', 'EN'],
+    ['рус', 'RU'],
+    ['сдаюсь', 'give up'],
+    ['засчитать', 'accept'],
+    ['не засчитывать', 'reject'],
+    ['настройки сохраняются в браузере', 'settings are saved in the browser'],
+    ['нажми на карточку чтобы перевернуть', 'tap the card to flip it'],
+    ['переведи', 'translate'],
+    ['введи перевод и нажми check', 'enter the translation and press check'],
+    ['введи ответ и нажми check', 'enter the answer and press check'],
+    ['источник', 'source'],
+    ['новые', 'new'],
+    ['пора повторить', 'due for review'],
+    ['слабые', 'weak'],
+    ['все', 'all'],
+    ['порция', 'batch'],
+    ['направление', 'direction'],
+    ['цель', 'goal'],
+    ['быстро запомнить', 'memorize fast'],
+    ['закрепить надолго', 'retain longer'],
+    ['строгость', 'strictness'],
+    ['мягко', 'soft'],
+    ['строго', 'strict'],
+    ['опечатки', 'typos'],
+    ['формы (EN)', 'forms (EN)'],
+    ['подсказки', 'hints'],
+    ['создать', 'create'],
+    ['удалить раздел', 'delete section'],
+    ['сохранить', 'save'],
+    ['список разделов', 'section list'],
+    ['слова в разделе', 'words in section'],
+    ['слова', 'words'],
+    ['выбери грамматическую тему', 'choose a grammar topic'],
+    ['Меню', 'Menu'],
+    ['Экспорт JSON', 'Export JSON'],
+    ['Импорт JSON', 'Import JSON'],
+    ['+ Категория', '+ Category'],
+    ['+ Подкатегория', '+ Subcategory'],
+    ['Переименовать', 'Rename'],
+    ['Удалить', 'Delete'],
+    ['Новая заметка', 'New note'],
+    ['Прошептать', 'Whisper'],
+    ['Закрыть', 'Close'],
+    ['Применить', 'Apply'],
+    ['Сброс', 'Reset'],
+    ['Отмена', 'Cancel'],
+    ['Ок', 'OK'],
+    ['Цвет текста', 'Text color'],
+    ['Маркер', 'Marker'],
+    ['Проверить', 'Test'],
+    ['Поиск по заметкам…', 'Search notes…'],
+    ['Название заметки…', 'Note title…'],
+    ['ЗАМЕТКИ', 'NOTES'],
+    ['Очистить', 'Clear'],
+    ['Из заметок', 'From notes'],
+    ['Озвучить', 'Speak'],
+    ['Стоп', 'Stop'],
+    ['Заблокировать', 'Lock'],
+    ['Пауза', 'Pause'],
+    ['Вставить', 'Insert'],
+    ['Вставить и озвучить', 'Insert and speak'],
+    ['Выбери заметки - я вставлю их в поле текста. Можно сразу озвучить.', 'Select notes - I will insert them into the text field. You can speak them right away.'],
+    ['Поиск заметок...', 'Search notes...'],
+    ['грамматика: правила + практика', 'grammar: rules + practice'],
+    ['времена: теория + упражнения', 'tenses: theory + exercises'],
+    ['практика и конструктор для форм слов', 'practice and constructor for word forms'],
+    ['правила, формулы, маркеры, ошибки', 'rules, formulas, markers, mistakes'],
+    ['открыть', 'open'],
+    ['сравнение времён', 'tenses comparison'],
+    ['выбери любые 2 времени и потренируй различие', 'pick any 2 tenses and train the difference'],
+    ['упражнения', 'practice'],
+    ['закрепление по целям и смешанные тренировки', 'goal-based drills and mixed training'],
+    ['прошепчи моё имя, пожалуйста', 'whisper my name, please'],
+    ['текст', 'text'],
+    ['размер текста (px)', 'text size (px)'],
+    ['скорость', 'rate'],
+    ['тон', 'pitch'],
+    ['громкость', 'volume'],
+    ['голоса (необязательно)', 'voices (optional)'],
+    ['английский голос', 'English voice'],
+    ['русский голос', 'Russian voice'],
+    ['белорусский голос', 'Belarusian voice'],
+    ['Авто', 'Auto'],
+    ['язык: авто', 'lang: auto'],
+    ['режим: ожидание', 'mode: idle'],
+    ['слово: -', 'word: -'],
+    ['сопровождение', 'follow'],
+    ['озвучка · сопровождение', 'speech · follow'],
+    ['заметки', 'notes'],
+    ['Ваш браузер не поддерживает Web Speech API (SpeechSynthesis). Попробуйте Chrome / Edge или обновите браузер.', 'Your browser does not support the Web Speech API (SpeechSynthesis). Try Chrome / Edge or update your browser.'],
+    ['Клик по слову в FOLLOW - начать чтение с него. Пауза/продолжить всегда сверху. Горячие клавиши: Ctrl+Enter - озвучить, Space - пауза/продолжить, Esc - стоп (если не заблокировано).', 'Click a word in FOLLOW to start reading from it. Pause/resume is always at the top. Hotkeys: Ctrl+Enter - speak, Space - pause/resume, Esc - stop (if not locked).'],
+    ['Заметки берутся из onoi_notes (IndexedDB). Если включен Cloud Sync в заметках - тут тоже будет доступна та же база (на этом же домене).', 'Notes are loaded from onoi_notes (IndexedDB). If Cloud Sync is enabled in notes, the same database will also be available here (on the same domain).'],
+    ['категории · подкатегории · редактор · озвучка', 'categories · subcategories · editor · whisperer'],
+    ['локально', 'local'],
+    ['категории', 'categories'],
+    ['редактор', 'editor'],
+    ['отменить', 'undo'],
+    ['повторить', 'redo'],
+    ['список', 'list'],
+    ['цитата', 'quote'],
+    ['код', 'code'],
+    ['маркер', 'marker'],
+    ['размер…', 'size…'],
+    ['по умолчанию', 'Default'],
+    ['с засечками', 'Serif'],
+    ['моно', 'Mono'],
+    ['слева', 'left'],
+    ['по центру', 'center'],
+    ['справа', 'right'],
+    ['ссылка', 'link'],
+    ['изображение', 'image'],
+    ['боковая панель', 'sidebar'],
+    ['фокус', 'focus'],
+    ['сохранено', 'saved'],
+    ['автосохранение · категории · озвучка', 'autosave · categories · whisperer'],
+    ['диалог', 'dialog'],
+    ['значение', 'value'],
+    ['наборы', 'Presets'],
+    ['недавние', 'Recent'],
+    ['копировать', 'Copy'],
+    ['режим облака', 'cloud mode'],
+    ['база словаря', 'dict db'],
+    ['подсказка: позже можно сменить раздел через кнопку "разделы" в карточках', 'tip: later you can change the section via the "sections" button in cards'],
+    ['по слабым', 'weak only'],
+    ['"to" не обяз.', '"to" optional'],
+    ['артикли не обяз.', 'articles optional'],
+    ['нажми start или выбери section', 'press start or choose a section'],
+    ['выбери цель и время (или mixed)', 'choose a goal and a tense (or mixed)'],
+    ['восстановить из json', 'restore from JSON'],
+    ['Не выбрано', 'Not selected'],
+    ['репозиторий', 'repo'],
+    ['маркеры списка', '• list'],
+    ['нумерованный список', '1. list'],
+    ['английский голос (EN)', 'EN voice'],
+    ['русский голос (RU)', 'RU voice'],
+    ['белорусский голос (BE)', 'BE voice'],
+    ['Авто сам выбирает язык (EN/RU/BE) по тексту. Эти списки - только если хочешь закрепить голос.', 'Auto chooses the language (EN/RU/BE) from the text. These lists are only needed if you want to lock a specific voice.'],
+    ['выкл. (только локально)', 'Off (local only)'],
+    ['файл репозитория GitHub (Contents API)', 'GitHub Repo file (Contents API)'],
+    ['GitHub Gist (один файл)', 'GitHub Gist (single file)'],
+    ['опрос', 'poll'],
+    ['без опроса', 'No polling'],
+    ['токен (PAT)', 'token (PAT)'],
+    ['владелец / пользователь', 'owner / user'],
+    ['ветка', 'branch'],
+    ['путь (json-файл)', 'path (json file)'],
+    ['id gist', 'gist id'],
+    ['имя файла', 'filename'],
+    ['получить', 'Pull'],
+    ['отправить', 'Push'],
+    ['случайно', 'random'],
+    ['лицевая сторона', 'front'],
+    ['смешанно', 'mix'],
+    ['раздел', 'section'],
+    ['русский -> английский', 'Russian -> English'],
+    ['английский -> русский', 'English -> Russian'],
+    ['только слабые', 'weak only'],
+    ['сессия', 'session'],
+    ['"to" не обязателен', '"to" optional'],
+    ['артикли не обязательны', 'articles optional'],
+    ['готово', 'ready'],
+    ['правило: после проверки переписать нельзя - только далее. неверные слова вернутся через пару заданий.', 'rule: after checking, you cannot edit the answer - only move on. wrong words will return after a couple of tasks.'],
+    ['умные повторы', 'smart review'],
+    ['нажми start или выбери раздел', 'press start or choose a section'],
+    ['слово считается выученным в сессии, если 2 раза подряд ответил верно без подсказок и между ответами было хотя бы 10 заданий.', 'a word is counted as learned in the session if you answer it correctly twice in a row without hints, with at least 10 tasks between the answers.'],
+    ['сохранить JSON', 'save JSON'],
+    ['загрузить JSON', 'load JSON'],
+    ['заменить', 'replace'],
+    ['структуры - это мини-курсы: правило + практика + прогресс', 'structures are mini-courses: rule + practice + progress'],
+    ['освоение', 'mastery'],
+    ['начать практику', 'start practice'],
+    ['правило', 'rule'],
+    ['выбери режим', 'choose mode'],
+    ['сравнение', 'comparison'],
+    ['смешанный презент', 'mixed present'],
+    ['10 случайных заданий на сегодня', '10 random tasks for today'],
+    ['простое настоящее + длительное настоящее - быстрый старт', 'Present Simple + Present Continuous - quick start'],
+    ['подсказка: вернуться сюда можно кнопкой "меню" сверху', 'tip: you can return here with the "menu" button above'],
+    ['выбери любые 2 времени', 'pick any 2 tenses'],
+    ['мини-тренировка (10)', 'mini training (10)'],
+    ['мини (5)', 'mini (5)'],
+    ['ежедневная мини-сессия', 'daily mini-session'],
+    ['начать ежедневную (10)', 'start daily (10)'],
+    ['новый набор', 'new set'],
+    ['выбери время', 'choose a tense'],
+    ['перейти к упражнениям', 'go to practice'],
+    ['упражнения по временам', 'tense practice'],
+    ['выбери цель и время (или смешанный режим)', 'choose a goal and a tense (or mixed)'],
+    ['время', 'tense'],
+    ['повторить ошибки', 'retry mistakes'],
+    ['очистить ошибки', 'clear mistakes'],
+    ['сбросить прогресс', 'reset progress'],
+    ['показывать ответы после каждого', 'show answers after each'],
+    ['Enter - проверить/далее • Esc - выйти в меню', 'Enter - check/next • Esc - go to menu'],
+    ['тип', 'type'],
+    ['прилагательное', 'Adjective'],
+    ['категория', 'category'],
+    ['все категории', 'All'],
+    ['суффиксы', 'Suffixes'],
+    ['приставки', 'Prefixes'],
+    ['вопрос', 'q'],
+    ['Сделай прилагательное из существительного', 'Make an adjective from the noun'],
+    ['перевод', 'translation'],
+    ['ответ', 'answer'],
+    ['просмотр', 'view'],
+    ['добавить', 'add'],
+    ['восстановить из JSON', 'restore from JSON'],
+    ['задания', 'tasks'],
+    ['пре-альфа', 'pre-alpha'],
+    ['Панель поиска и действий', 'Search and actions panel'],
+    ['Статус синхронизации', 'Sync status'],
+    ['Основной интерфейс', 'Main interface'],
+    ['Боковая панель', 'Sidebar'],
+    ['Мобильное меню', 'Mobile menu'],
+    ['Текущая категория', 'Current category'],
+    ['Дерево категорий', 'Category tree'],
+    ['Список заметок', 'Notes list'],
+    ['Действия с заметками', 'Note actions'],
+    ['Изменение ширины боковой панели', 'Resize sidebar'],
+    ['Редактор', 'Editor'],
+    ['Редактор заметки', 'Note editor'],
+    ['Панель форматирования', 'Formatting toolbar'],
+    ['Стиль блока', 'Block style'],
+    ['Текст заметки', 'Note text'],
+    ['Автосохранение', 'Autosave'],
+    ['Диалог', 'Dialog'],
+    ['Ввод текста', 'Text input'],
+    ['Инструменты', 'Tools'],
+    ['Управление озвучкой', 'Speech controls'],
+    ['Статус', 'Status'],
+    ['Текст с подсветкой', 'Highlighted text'],
+    ['Развернуть FOLLOW', 'Expand FOLLOW'],
+    ['Пауза/продолжить', 'Pause/resume'],
+    ['Выбор раздела', 'Section picker'],
+    ['Режимы словаря', 'Dictionary modes'],
+    ['Практика', 'Practice'],
+    ['Заучивание', 'Learn'],
+    ['Конструктор словаря', 'Dictionary constructor'],
+    ['Список слов', 'Word list'],
+    ['Список структур', 'Structure list'],
+    ['Список времён', 'Tenses list'],
+    ['Список времен', 'Tenses list'],
+    ['Structure list', 'Structure list'],
+    ['Structure detail', 'Structure detail'],
+    ['Structure tabs', 'Structure tabs'],
+    ['Rule content', 'Rule content'],
+    ['Practice content', 'Practice content'],
+    ['Tenses home', 'Tenses home'],
+    ['Открыть времена (теория)', 'Open tenses (theory)'],
+    ['Открыть упражнения по временам', 'Open tense practice'],
+    ['Сравнить два времени', 'Compare two tenses'],
+    ['Смешанная тренировка Present Simple + Present Continuous', 'Mixed training: Present Simple + Present Continuous'],
+    ['Tenses compare', 'Tenses compare'],
+    ['Tenses daily', 'Tenses daily'],
+    ['Tenses list', 'Tenses list'],
+    ['Tense detail', 'Tense detail'],
+    ['Theory content', 'Theory content'],
+    ['Tenses practice', 'Tenses practice'],
+    ['Режимы word transformation', 'Word transformation modes'],
+    ['Предыдущий вопрос', 'Previous question'],
+    ['Следующий вопрос', 'Next question'],
+    ['Правило (r)', 'Rule (r)'],
+    ['Перевод (t)', 'Translation (t)'],
+    ['Показать правильный ответ', 'Show the correct answer'],
+    ['Конструктор', 'Constructor'],
+    ['Предыдущая карточка', 'Previous card'],
+    ['Следующая карточка', 'Next card'],
+    ['Выбрать раздел', 'Choose section'],
+    ['Настройки practice', 'Practice settings'],
+    ['Настройки learn', 'Learn settings'],
+    ['Нажми чтобы посмотреть ответ (после проверки)', 'Tap to view the answer (after checking)'],
+    ['Нажми чтобы перевернуть (после проверки)', 'Tap to flip (after checking)'],
+    ['Подсказка', 'Hint'],
+    ['Показать ответ (считается ошибкой)', 'Show the answer (counts as a mistake)'],
+    ['Начать заново', 'Start over'],
+    ['Удалит раздел и все слова внутри', 'Delete the section and all words inside'],
+    ['Скачать json со всеми разделами', 'Download JSON with all sections'],
+    ['Загрузить json', 'Load JSON'],
+    ['Прогресс хранится в браузере (localStorage)', 'Progress is stored in the browser (localStorage)'],
+    ['Автозагрузка json при пустой базе', 'Autoload JSON when the database is empty'],
+    ['Автозагрузка из json при пустой базе', 'Autoload from JSON when the database is empty'],
+    ['Загрузит suffixes + prefixes из json рядом с этим html', 'Load suffixes + prefixes from the JSON next to this HTML'],
+    ['Скачать json (view category)', 'Download JSON (view category)'],
+    ['Student Helper', 'Student Helper'],
+    ['Учебный помощник', 'Student Helper'],
+    ['Flashcard', 'Flashcard'],
+    ['Quiz card', 'Quiz card'],
+    ['Learn card', 'Learn card'],
+    ['center', 'center'],
+    ['onoi_notes', 'onoi_notes'],
+    ['whisperer', 'whisperer']
+  ];
+
+  const PLACEHOLDER_PAIRS = [
+    ['Поиск по заметкам…', 'Search notes…'],
+    ['Название заметки…', 'Note title…'],
+    ['Поиск заметок...', 'Search notes...'],
+    ['Вставь сюда текст...', 'Paste text here...'],
+    ['Вставь сюда текст.', 'Paste text here.'],
+    ['поиск задач…', 'search tasks…'],
+    ['поиск...', 'search...'],
+    ['Ответ', 'Answer'],
+    ['Введите перевод...', 'Enter translation...'],
+    ['название раздела', 'section name'],
+    ['перевод (RU)', 'translation (RU)'],
+    ['слово/фраза (EN)', 'word/phrase (EN)'],
+    ['Ответ (EN)', 'Answer (EN)'],
+    ['слово (EN)', 'word (EN)'],
+    ['ответ (EN)', 'answer (EN)'],
+    ['слово (RU)', 'word (RU)'],
+    ['ответ (RU)', 'answer (RU)']
+  ];
+
+  function buildMaps(pairs) {
+    const ruToEn = Object.create(null);
+    const enToRu = Object.create(null);
+    pairs.forEach(([ru, en]) => {
+      ruToEn[normalize(ru)] = en;
+      enToRu[normalize(en)] = ru;
+    });
+    return { ruToEn, enToRu };
+  }
+
+  const textMaps = buildMaps(TEXT_PAIRS);
+  const placeholderMaps = buildMaps(PLACEHOLDER_PAIRS);
+  const TEXTS_RU_TO_EN = textMaps.ruToEn;
+  const TEXTS_EN_TO_RU = textMaps.enToRu;
+  const PLACEHOLDERS_RU_TO_EN = placeholderMaps.ruToEn;
+  const PLACEHOLDERS_EN_TO_RU = placeholderMaps.enToRu;
+
+  const ALIASES_RU_TO_EN = {
+    'dictionary': 'dictionary',
+    'structure': 'structure',
+    'tenses': 'tenses',
+    'word transformation': 'word transformation',
+    'practice и constructor для word forms': 'practice and constructor for word forms',
+    'практика и constructor для word forms': 'practice and constructor for word forms',
+    'карточки, practice, learn, constructor': 'flashcards, practice, learn, constructor',
+    'ready': 'ready',
+    'save json': 'save JSON',
+    'load json': 'load JSON',
+    'compare': 'compare',
+    'daily': 'daily',
+    'start': 'start',
+    'check': 'check',
+    'hint': 'hint',
+    'open': 'open',
+    'mixed present': 'mixed present',
+    'Present Simple + Present Continuous — старт сразу': 'Present Simple + Present Continuous - quick start',
+    'Present Simple + Present Continuous - старт сразу': 'Present Simple + Present Continuous - quick start',
+    'mini training (10)': 'mini training (10)',
+    'mini (5)': 'mini (5)',
+    'daily mini-session': 'daily mini-session',
+    'start daily (10)': 'start daily (10)',
+    'new set': 'new set',
+    'retry mistakes': 'retry mistakes',
+    'clear mistakes': 'clear mistakes',
+    'reset progress': 'reset progress',
+    'show answers after each': 'show answers after each',
+    'view': 'view',
+    'add': 'add',
+    'replace': 'replace',
+    'clear': 'clear',
+    'board': 'board',
+    'schedule': 'schedule',
+    'module': 'module',
+    'planning · projects · tasks': 'planning · projects · tasks',
+    'pre-alpha': 'pre-alpha',
+    'priority: all': 'priority: all',
+    'priority: high': 'priority: high',
+    'priority: mid': 'priority: mid',
+    'priority: low': 'priority: low',
+    'deadline: all': 'deadline: all',
+    'deadline: today': 'deadline: today',
+    'deadline: overdue': 'deadline: overdue',
+    'deadline: week': 'deadline: week',
+    'sort: default': 'sort: default',
+    'sort: deadline': 'sort: deadline',
+    'sort: priority': 'sort: priority',
+    'sort: newest': 'sort: newest',
+    'GitHub Repo file (Contents API)': 'GitHub Repo file (Contents API)',
+    'GitHub Gist (single file)': 'GitHub Gist (single file)',
+    'No polling': 'No polling',
+    'owner / user': 'owner / user',
+    'token (PAT)': 'token (PAT)',
+    'path (json file)': 'path (json file)',
+    'gist id': 'gist id',
+    'filename': 'filename',
+    'Pull': 'Pull',
+    'Push': 'Push',
+    'Student Helper': 'Student Helper',
+    'enter - check/next • esc - выйти в меню': 'Enter - check/next • Esc - go to menu',
+    'Flashcard': 'Flashcard',
+    'Quiz card': 'Quiz card',
+    'Learn card': 'Learn card',
+    'Structure list': 'Structure list',
+    'Structure detail': 'Structure detail',
+    'Structure tabs': 'Structure tabs',
+    'Rule content': 'Rule content',
+    'Practice content': 'Practice content',
+    'Tenses home': 'Tenses home',
+    'Tenses compare': 'Tenses compare',
+    'Tenses daily': 'Tenses daily',
+    'Tenses list': 'Tenses list',
+    'Tense detail': 'Tense detail',
+    'Theory content': 'Theory content',
+    'Tenses practice': 'Tenses practice'
+  };
+
+  const ALIASES_EN_TO_RU = {
+    'dictionary': 'словарь',
+    'structure': 'структура',
+    'tenses': 'времена',
+    'word transformation': 'словообразование',
+    'practice and constructor for word forms': 'практика и конструктор для форм слов',
+    'flashcards, practice, learn, constructor': 'карточки, практика, заучивание, конструктор',
+    'ready': 'готово',
+    'save json': 'сохранить JSON',
+    'save JSON': 'сохранить JSON',
+    'load json': 'загрузить JSON',
+    'load JSON': 'загрузить JSON',
+    'random': 'случайно',
+    'front': 'лицевая сторона',
+    'mix': 'смешанно',
+    'mixed': 'смешанно',
+    'section': 'раздел',
+    'check': 'проверить',
+    'hint': 'подсказка',
+    'open': 'открыть',
+    'start': 'старт',
+    'compare': 'сравнить',
+    'daily': 'на сегодня',
+    'mixed present': 'смешанный презент',
+    'Present Simple + Present Continuous - quick start': 'простое настоящее + длительное настоящее - быстрый старт',
+    'mini training (10)': 'мини-тренировка (10)',
+    'mini (5)': 'мини (5)',
+    'daily mini-session': 'ежедневная мини-сессия',
+    'start daily (10)': 'начать ежедневную (10)',
+    'new set': 'новый набор',
+    'retry mistakes': 'повторить ошибки',
+    'clear mistakes': 'очистить ошибки',
+    'reset progress': 'сбросить прогресс',
+    'show answers after each': 'показывать ответы после каждого',
+    'view': 'просмотр',
+    'add': 'добавить',
+    'replace': 'заменить',
+    'clear': 'очистить',
+    'board': 'доска',
+    'schedule': 'расписание',
+    'module': 'модуль',
+    'planning · projects · tasks': 'планирование · проекты · задачи',
+    'pre-alpha': 'пре-альфа',
+    'priority: all': 'приоритет: все',
+    'priority: high': 'приоритет: высокий',
+    'priority: mid': 'приоритет: средний',
+    'priority: low': 'приоритет: низкий',
+    'deadline: all': 'срок: все',
+    'deadline: today': 'срок: сегодня',
+    'deadline: overdue': 'срок: просрочено',
+    'deadline: week': 'срок: неделя',
+    'sort: default': 'сортировка: по умолчанию',
+    'sort: deadline': 'сортировка: по сроку',
+    'sort: priority': 'сортировка: по приоритету',
+    'sort: newest': 'сортировка: сначала новые',
+    'GitHub Repo file (Contents API)': 'файл репозитория GitHub (Contents API)',
+    'GitHub Gist (single file)': 'GitHub Gist (один файл)',
+    'No polling': 'без опроса',
+    'owner / user': 'владелец / пользователь',
+    'token (PAT)': 'токен (PAT)',
+    'path (json file)': 'путь (json-файл)',
+    'gist id': 'id gist',
+    'filename': 'имя файла',
+    'Pull': 'получить',
+    'Push': 'отправить',
+    'Student Helper': 'Учебный помощник',
+    'Enter - check/next • Esc - go to menu': 'Enter - проверить/далее • Esc - выйти в меню',
+    'Flashcard': 'карточка',
+    'dict db': 'база словаря',
+    'tip: later you can change the section via the "sections" button in cards': 'подсказка: позже можно сменить раздел через кнопку "разделы" в карточках',
+    'weak only': 'по слабым',
+    '"to" optional': '"to" не обяз.',
+    'articles optional': 'артикли не обяз.',
+    'press start or choose a section': 'нажми start или выбери section',
+    'choose a goal and a tense (or mixed)': 'выбери цель и время (или mixed)',
+    'restore from JSON': 'восстановить из json',
+    'Not selected': 'Не выбрано',
+    'repo': 'репозиторий',
+    '• list': 'маркеры списка',
+    '1. list': 'нумерованный список',
+    'EN voice': 'английский голос (EN)',
+    'RU voice': 'русский голос (RU)',
+    'BE voice': 'белорусский голос (BE)',
+    'Auto chooses the language (EN/RU/BE) from the text. These lists are only needed if you want to lock a specific voice.': 'Авто сам выбирает язык (EN/RU/BE) по тексту. Эти списки - только если хочешь закрепить голос.',
+    'categories · subcategories · editor · whisperer': 'категории · подкатегории · редактор · озвучка',
+    'Quiz card': 'карточка практики',
+    'Learn card': 'карточка заучивания',
+    'Structure list': 'список структур',
+    'Structure detail': 'структура',
+    'Structure tabs': 'вкладки структуры',
+    'Rule content': 'содержание правила',
+    'Practice content': 'содержание практики',
+    'Tenses home': 'главная времён',
+    'Tenses compare': 'сравнение времён',
+    'Tenses daily': 'ежедневные времена',
+    'Tenses list': 'список времён',
+    'Tense detail': 'время',
+    'Theory content': 'содержание теории',
+    'Tenses practice': 'практика по временам'
+  };
+
+  const SELECTOR_RULES = {
+    student_helper: [
+      { selector: '#shLobby .ik-title', text: { ru: 'Учебный центр', en: 'Study Center' } },
+      { selector: '#shLobby .ik-sub', text: { ru: 'выбери раздел, чтобы начать', en: 'choose a section to start' } },
+      { selector: '#shContinue', text: { ru: 'продолжить', en: 'continue' } }
+    ],
+    whisperer: [
+      { selector: '.w-title h1', text: { ru: 'озвучка', en: 'whisperer' } },
+      { selector: '.w-title .sub', text: { ru: 'прошепчи моё имя, пожалуйста', en: 'whisper my name, please' } },
+      { selector: '#textInput', placeholder: { ru: 'Вставь сюда текст...', en: 'Paste text here...' } },
+      { selector: '#notesSearch', placeholder: { ru: 'Поиск заметок...', en: 'Search notes...' } }
+    ],
+    onoi_notes: [
+      { selector: 'h1', text: { ru: 'ЗАМЕТКИ', en: 'NOTES' } },
+      { selector: '.n-title .sub', text: { ru: 'категории · подкатегории · редактор · озвучка', en: 'categories · subcategories · editor · whisperer' } },
+      { selector: '#searchInput', placeholder: { ru: 'Поиск по заметкам…', en: 'Search notes…' } },
+      { selector: '#noteTitle', placeholder: { ru: 'Название заметки…', en: 'Note title…' } }
+    ]
+  };
+
+  const SKIP_SELECTOR = [
+    '#ikSiteSettingsPanel',
+    '[contenteditable="true"]',
+    '.editor',
+    '.editor-title',
+    '.note-title',
+    '.note-snippet',
+    '.tree-name',
+    '.tree-breadcrumb',
+    '.crumbs',
+    '.w-display',
+    '.ik-word',
+    '#dictCardFront', '#dictCardBack', '#dictQuizFront', '#dictQuizBack', '#dictLearnFront', '#dictLearnBack',
+    '#promptEn', '#promptRu',
+    '#dictSectionCards', '#dictSectionQuiz', '#dictSectionLearn', '#dictBuilderSection',
+    '#dictSectionList', '#dictWordList', '#dictFirstPickList', '#structList', '#tensesList',
+    '#tensesCompareA', '#tensesCompareB', '#tensesTenseSelect', '#viewCategory', '#taskList'
+  ].join(',');
+
+  function translateDynamic(text, lang) {
+    const key = normalize(text);
+    const rules = [
+      {
+        ru: /^слов:\s*(\d+)$/i,
+        en: /^words:\s*(\d+)$/i,
+        toRu: (m) => `слов: ${m[1]}`,
+        toEn: (m) => `words: ${m[1]}`
+      },
+      {
+        ru: /^структур:\s*(\d+)$/i,
+        en: /^structures:\s*(\d+)$/i,
+        toRu: (m) => `структур: ${m[1]}`,
+        toEn: (m) => `structures: ${m[1]}`
+      },
+      {
+        ru: /^врем[её]н:\s*(\d+)$/i,
+        en: /^tenses:\s*(\d+)$/i,
+        toRu: (m) => `времён: ${m[1]}`,
+        toEn: (m) => `tenses: ${m[1]}`
+      },
+      {
+        ru: /^задани[йя]:\s*(\d+)$/i,
+        en: /^tasks:\s*(\d+)$/i,
+        toRu: (m) => `заданий: ${m[1]}`,
+        toEn: (m) => `tasks: ${m[1]}`
+      },
+      {
+        ru: /^вопр\.?[:]?\s*(\d+)$/i,
+        en: /^q:\s*(\d+)$/i,
+        toRu: (m) => `вопр.: ${m[1]}`,
+        toEn: (m) => `q: ${m[1]}`
+      },
+      {
+        ru: /^освоение\s+(\d+\/\d+)$/i,
+        en: /^mastery\s+(\d+\/\d+)$/i,
+        toRu: (m) => `освоение ${m[1]}`,
+        toEn: (m) => `mastery ${m[1]}`
+      },
+      {
+        ru: /^язык:\s*авто$/i,
+        en: /^lang:\s*auto$/i,
+        toRu: () => 'язык: авто',
+        toEn: () => 'lang: auto'
+      },
+      {
+        ru: /^режим:\s*ожидание$/i,
+        en: /^mode:\s*idle$/i,
+        toRu: () => 'режим: ожидание',
+        toEn: () => 'mode: idle'
+      },
+      {
+        ru: /^слово:\s*[-—]$/i,
+        en: /^word:\s*[-—]$/i,
+        toRu: () => 'слово: -',
+        toEn: () => 'word: -'
+      }
+    ];
+
+    for (const rule of rules) {
+      if (lang === 'en') {
+        const match = key.match(rule.ru);
+        if (match) return rule.toEn(match);
+      } else {
+        const match = key.match(rule.en);
+        if (match) return rule.toRu(match);
+      }
+    }
+    return text;
+  }
+
+  function translateViaMaps(text, lang, ruToEn, enToRu, aliasRuToEn, aliasEnToRu) {
+    const key = normalize(text);
+    if (!key) return text;
+    if (lang === 'en') {
+      return ruToEn[key] || aliasRuToEn[key] || translateDynamic(key, 'en') || text;
+    }
+    return enToRu[key] || aliasEnToRu[key] || translateDynamic(key, 'ru') || text;
+  }
+
+  function translateText(text, lang) {
+    return translateViaMaps(text, lang, TEXTS_RU_TO_EN, TEXTS_EN_TO_RU, ALIASES_RU_TO_EN, ALIASES_EN_TO_RU);
+  }
+
+  function translatePlaceholder(text, lang) {
+    return translateViaMaps(text, lang, PLACEHOLDERS_RU_TO_EN, PLACEHOLDERS_EN_TO_RU, ALIASES_RU_TO_EN, ALIASES_EN_TO_RU);
+  }
+
+  function getLang() {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      return saved === 'en' ? 'en' : DEFAULT_LANG;
+    } catch (e) {
+      return DEFAULT_LANG;
+    }
+  }
+
+  function saveLang(lang) {
+    try {
+      localStorage.setItem(STORAGE_KEY, lang === 'en' ? 'en' : 'ru');
+    } catch (e) {}
+  }
+
+  function setPanelState(lang) {
+    const ru = document.getElementById('ikLangRu');
+    const en = document.getElementById('ikLangEn');
+    if (ru) ru.checked = lang === 'ru';
+    if (en) en.checked = lang === 'en';
+    document.querySelectorAll('.ik-lang-option').forEach((label) => {
+      const input = label.querySelector('input');
+      label.classList.toggle('is-active', !!input?.checked);
+    });
+    const gear = document.getElementById('ikGlobalSettingsBtn');
+    if (gear) {
+      const label = lang === 'en' ? 'Site settings' : 'Настройки сайта';
+      gear.setAttribute('aria-label', label);
+      gear.setAttribute('title', label);
+    }
+  }
+
+  function applySelectorRules(lang) {
+    const rules = SELECTOR_RULES[PAGE] || [];
+    rules.forEach((rule) => {
+      document.querySelectorAll(rule.selector).forEach((el) => {
+        if (rule.text) el.textContent = rule.text[lang];
+        if (rule.placeholder && 'placeholder' in el) el.placeholder = rule.placeholder[lang];
+      });
+    });
+  }
+
+  function shouldSkipElement(el) {
+    if (!el || !(el instanceof Element)) return true;
+    if (el.closest(SKIP_SELECTOR)) return true;
+    const tag = el.tagName;
+    return tag === 'SCRIPT' || tag === 'STYLE' || tag === 'TEXTAREA';
+  }
+
+  function applyTextNodeTranslations(lang) {
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+      acceptNode(node) {
+        const parent = node.parentElement;
+        if (!parent || shouldSkipElement(parent)) return NodeFilter.FILTER_REJECT;
+        if (!normalize(node.nodeValue)) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+
+    const nodes = [];
+    let current;
+    while ((current = walker.nextNode())) nodes.push(current);
+
+    nodes.forEach((node) => {
+      const match = String(node.nodeValue || '').match(/^(\s*)([\s\S]*?)(\s*)$/);
+      if (!match) return;
+      const translated = translateText(match[2], lang);
+      if (translated !== normalize(match[2])) {
+        node.nodeValue = `${match[1]}${translated}${match[3]}`;
+      }
+    });
+  }
+
+  function applyAttributeTranslations(lang) {
+    ['placeholder', 'title', 'aria-label'].forEach((attr) => {
+      document.querySelectorAll(`[${attr}]`).forEach((el) => {
+        const current = el.getAttribute(attr);
+        if (!current) return;
+        const translated = attr === 'placeholder' ? translatePlaceholder(current, lang) : translateText(current, lang);
+        if (translated !== current) el.setAttribute(attr, translated);
+      });
+    });
+
+    document.querySelectorAll('input[type="button"][value], input[type="submit"][value], input[type="reset"][value]').forEach((el) => {
+      const current = el.value;
+      const translated = translateText(current, lang);
+      if (translated !== current) el.value = translated;
+    });
+  }
+
+  let isApplying = false;
+
+  function applyLanguage(lang) {
+    if (isApplying) return;
+    isApplying = true;
+    const next = lang === 'en' ? 'en' : 'ru';
+    document.documentElement.lang = next;
+    if (TITLES[PAGE]) document.title = TITLES[PAGE][next];
+
+    const titleEl = document.getElementById('ikSiteSettingsTitle');
+    const closeEl = document.getElementById('ikSiteSettingsClose');
+    const labelEl = document.getElementById('ikSiteLangLabel');
+    const ruEl = document.getElementById('ikLangRuText');
+    const enEl = document.getElementById('ikLangEnText');
+
+    if (titleEl) titleEl.textContent = next === 'en' ? 'Settings' : 'Настройки';
+    if (closeEl) closeEl.textContent = next === 'en' ? 'Close' : 'Закрыть';
+    if (labelEl) labelEl.textContent = next === 'en' ? 'Site language' : 'Язык сайта';
+    if (ruEl) ruEl.textContent = next === 'en' ? 'Russian' : 'Русский';
+    if (enEl) enEl.textContent = next === 'en' ? 'English' : 'Английский';
+
+    applySelectorRules(next);
+    applyTextNodeTranslations(next);
+    applyAttributeTranslations(next);
+    setPanelState(next);
+    isApplying = false;
+  }
+
+  function setLang(lang) {
+    const next = lang === 'en' ? 'en' : 'ru';
+    saveLang(next);
+    applyLanguage(next);
+    document.dispatchEvent(new CustomEvent('ik:languagechange', { detail: { lang: next } }));
+  }
+
+  function buildGearButton() {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.id = 'ikGlobalSettingsBtn';
+    btn.className = 'ik-gear-btn';
+    btn.setAttribute('aria-label', 'Настройки сайта');
+    btn.setAttribute('title', 'Настройки сайта');
+    btn.innerHTML = `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+        <path d="M12 8.4A3.6 3.6 0 1 0 12 15.6A3.6 3.6 0 1 0 12 8.4Z"/>
+        <path d="M19.4 15a1 1 0 0 0 .2 1.1l.1.1a1.2 1.2 0 0 1 0 1.7l-1.6 1.6a1.2 1.2 0 0 1-1.7 0l-.1-.1a1 1 0 0 0-1.1-.2 1 1 0 0 0-.6.9V20a1.2 1.2 0 0 1-1.2 1.2h-2.3A1.2 1.2 0 0 1 9.9 20v-.2a1 1 0 0 0-.6-.9 1 1 0 0 0-1.1.2l-.1.1a1.2 1.2 0 0 1-1.7 0l-1.6-1.6a1.2 1.2 0 0 1 0-1.7l.1-.1a1 1 0 0 0 .2-1.1 1 1 0 0 0-.9-.6H4A1.2 1.2 0 0 1 2.8 13v-2.3A1.2 1.2 0 0 1 4 9.5h.2a1 1 0 0 0 .9-.6 1 1 0 0 0-.2-1.1l-.1-.1a1.2 1.2 0 0 1 0-1.7l1.6-1.6a1.2 1.2 0 0 1 1.7 0l.1.1a1 1 0 0 0 1.1.2 1 1 0 0 0 .6-.9V4A1.2 1.2 0 0 1 11.1 2.8h2.3A1.2 1.2 0 0 1 14.6 4v.2a1 1 0 0 0 .6.9 1 1 0 0 0 1.1-.2l.1-.1a1.2 1.2 0 0 1 1.7 0l1.6 1.6a1.2 1.2 0 0 1 0 1.7l-.1.1a1 1 0 0 0-.2 1.1 1 1 0 0 0 .9.6h.2A1.2 1.2 0 0 1 21.2 10.7V13A1.2 1.2 0 0 1 20 14.2h-.2a1 1 0 0 0-.4.8Z"/>
+      </svg>
+    `;
+    return btn;
+  }
+
+  function buildPanel() {
+    const panel = document.createElement('div');
+    panel.id = 'ikSiteSettingsPanel';
+    panel.className = 'ik-settings-panel';
+    panel.hidden = true;
+    panel.innerHTML = `
+      <div class="ik-settings-panel__head">
+        <p class="ik-settings-panel__title" id="ikSiteSettingsTitle">Настройки</p>
+        <button type="button" class="ik-settings-panel__close" id="ikSiteSettingsClose">Закрыть</button>
+      </div>
+      <div class="ik-settings-group">
+        <div class="ik-settings-label" id="ikSiteLangLabel">Язык сайта</div>
+        <div class="ik-lang-switch">
+          <label class="ik-lang-option" for="ikLangRu">
+            <input type="radio" name="ikSiteLang" id="ikLangRu" value="ru" />
+            <span id="ikLangRuText">Русский</span>
+          </label>
+          <label class="ik-lang-option" for="ikLangEn">
+            <input type="radio" name="ikSiteLang" id="ikLangEn" value="en" />
+            <span id="ikLangEnText">Английский</span>
+          </label>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(panel);
+    return panel;
+  }
+
+  function initSettingsUI() {
+    if (document.getElementById('ikGlobalSettingsBtn')) return;
+
+    const gearBtn = buildGearButton();
+    const panel = buildPanel();
+    const closeBtn = panel.querySelector('#ikSiteSettingsClose');
+    const header = document.querySelector('.ik-site-nav');
+
+    if (header) {
+      let actions = header.querySelector('.ik-site-nav__actions');
+      if (!actions) {
+        actions = document.createElement('div');
+        actions.className = 'ik-site-nav__actions';
+        header.appendChild(actions);
+      }
+      actions.appendChild(gearBtn);
+    } else {
+      const floating = document.createElement('div');
+      floating.className = 'ik-floating-settings';
+      floating.appendChild(gearBtn);
+      document.body.appendChild(floating);
+    }
+
+    const openPanel = () => { panel.hidden = false; };
+    const closePanel = () => { panel.hidden = true; };
+
+    gearBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      panel.hidden ? openPanel() : closePanel();
+    });
+    closeBtn.addEventListener('click', closePanel);
+    panel.addEventListener('click', (e) => e.stopPropagation());
+    document.addEventListener('click', () => { if (!panel.hidden) closePanel(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !panel.hidden) closePanel(); });
+    panel.querySelectorAll('input[name="ikSiteLang"]').forEach((input) => {
+      input.addEventListener('change', () => setLang(input.value));
+    });
+  }
+
+  function initObserver() {
+    let queued = false;
+    const observer = new MutationObserver(() => {
+      if (queued || isApplying) return;
+      queued = true;
+      requestAnimationFrame(() => {
+        queued = false;
+        applyLanguage(getLang());
+      });
+    });
+    observer.observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['title', 'aria-label', 'placeholder', 'value'] });
+  }
+
+  window.IKSiteLang = {
+    get: getLang,
+    set: setLang,
+    apply: () => applyLanguage(getLang())
+  };
+
+  document.addEventListener('DOMContentLoaded', () => {
+    initSettingsUI();
+    applyLanguage(getLang());
+    initObserver();
+  });
+})();
+</script>
 </body>
 </html>
