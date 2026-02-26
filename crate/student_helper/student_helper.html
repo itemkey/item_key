@@ -2,40 +2,199 @@
 <html lang="ru">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Student Helper</title>
 
   <!-- Match main site look -->
   <link rel="stylesheet" href="../../assets/css/styles.css" />
 
   <link rel="stylesheet" href="./student_helper.css" />
+
+<style id="ik-site-nav-css">
+.ik-site-nav, .ik-site-nav *{ box-sizing: border-box; }
+
+.ik-site-nav{
+  position: relative;
+  z-index: 50;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px 14px;
+  margin: 0 0 18px;
+  background: #fff;
+  border-bottom: 1px solid rgba(0,0,0,.14);
+}
+
+.ik-site-nav__link{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  padding: 10px 16px;
+  border: 1px solid rgba(0,0,0,.14);
+  background: #fff;
+  color: rgba(0,0,0,.86);
+  text-decoration: none;
+  font-size: 11px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.ik-site-nav__link:hover{ border-color: rgba(0,0,0,.25); }
+
+.ik-site-nav{ position: relative; }
+.ik-site-nav__actions{
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ik-hidden-ui{
+  display: none !important;
+}
+
+@media (max-width: 520px){
+  .ik-site-nav{ padding: 14px 12px; margin-bottom: 14px; }
+  .ik-site-nav__link{ padding: 10px 12px; letter-spacing: 3px; }
+}
+</style>
+
+<style id="ik-site-settings-css">
+.ik-floating-settings{
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 100100;
+}
+.ik-gear-btn{
+  appearance: none;
+  border: 1px solid rgba(0,0,0,.14);
+  background: #fff;
+  color: rgba(0,0,0,.86);
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  display: inline-grid;
+  place-items: center;
+  cursor: pointer;
+  border-radius: 0;
+  transition: transform .18s ease, border-color .18s ease, opacity .18s ease;
+  box-shadow: none;
+}
+.ik-gear-btn:hover{
+  transform: translateY(-1px);
+  border-color: rgba(0,0,0,.28);
+  opacity: .98;
+}
+.ik-gear-btn:focus-visible{
+  outline: 2px solid rgba(0,0,0,.55);
+  outline-offset: 2px;
+}
+.ik-gear-btn svg{
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+.ik-settings-panel{
+  position: fixed;
+  top: 68px;
+  right: 16px;
+  z-index: 100101;
+  width: min(320px, calc(100vw - 28px));
+  border: 1px solid rgba(0,0,0,.18);
+  background: rgba(255,255,255,.98);
+  box-shadow: 0 10px 32px rgba(0,0,0,.10);
+  padding: 14px;
+  border-radius: 0;
+}
+.ik-settings-panel[hidden]{ display: none !important; }
+.ik-settings-panel__head{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.ik-settings-panel__title{
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+}
+.ik-settings-panel__close{
+  appearance: none;
+  border: 1px solid rgba(0,0,0,.14);
+  background: #fff;
+  color: rgba(0,0,0,.86);
+  padding: 8px 10px;
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 0;
+}
+.ik-settings-group{ display: grid; gap: 10px; }
+.ik-settings-label{
+  font-size: 10px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: rgba(0,0,0,.58);
+}
+.ik-lang-switch{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.ik-lang-option{
+  border: 1px solid rgba(0,0,0,.14);
+  background: rgba(255,255,255,.92);
+  min-height: 42px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+.ik-lang-option input{ margin: 0; }
+.ik-lang-option.is-active{
+  border-color: rgba(0,0,0,.34);
+  background: rgba(0,0,0,.03);
+}
+@media (max-width: 640px){
+  .ik-floating-settings{ top: 12px; right: 12px; }
+  .ik-site-nav__actions{ right: 12px; }
+  .ik-settings-panel{ top: 62px; right: 12px; width: min(320px, calc(100vw - 24px)); }
+}
+</style>
+
 </head>
 
-<body class="page page-learning">
+<body class="page page-learning" data-i18n-page="student_helper">
   <div class="veil" aria-hidden="true"></div>
 
-  <header class="topbar topbar--edge">
-    <a class="toplink" href="../../index.html" aria-label="Back to index">
-      <span class="tag">student-helper</span>
-    </a>
+  <header class="ik-site-nav" id="ikSiteNav">
+    <a class="ik-site-nav__link" href="../../index.html">Главное меню</a>
   </header>
+
+  <div class="ik-hidden-ui" aria-hidden="true">
+    <button class="ik-btn" id="shHomeBtn" type="button" title="Главное меню">меню</button>
+    <span class="ik-pill" title="Локальная база IndexedDB (в браузере)">
+      <span>db</span>
+      <span id="dbStatus" class="ik-muted">...</span>
+    </span>
+  </div>
 
   <main class="learn-stage" aria-label="Student Helper">
     <div class="learn-wrap">
-
-      <div class="ik-top-actions">
-        <a class="ik-back ik-btn" href="../../index.html">
-          <span aria-hidden="true">←</span>
-          <span>назад в index</span>
-        </a>
-
-        <button class="ik-btn" id="shHomeBtn" type="button" title="Главное меню">меню</button>
-
-        <span class="ik-pill" title="Локальная база IndexedDB (в браузере)">
-          <span>db</span>
-          <span id="dbStatus" class="ik-muted">...</span>
-        </span>
-      </div>
 
       <section id="shLobby" class="ik-card sh-lobby" aria-label="Главное меню">
         <div class="ik-inner">
@@ -860,5 +1019,562 @@
   <script src="./js/word_transformation.js"></script>
   <script src="./js/dictionary.js"></script>
   <script src="./js/enter_next.js"></script>
+
+<script id="ik-site-settings-js">
+(() => {
+  const STORAGE_KEY = 'ik_site_lang_v1';
+  const DEFAULT_LANG = 'ru';
+  const PAGE = document.body?.dataset?.i18nPage || '';
+
+  function normalize(text) {
+    return String(text || '').replace(/\s+/g, ' ').trim();
+  }
+
+  const TITLES = {
+    index: { ru: 'Item Key - Главное меню', en: 'Item Key - Main menu' },
+    'item-crate': { ru: 'Item Key - Заметки', en: 'Item Key - Notes' },
+    onoi_notes: { ru: 'Item Key - Заметки', en: 'Item Key - Notes' },
+    planning: { ru: 'Item Key - Планирование', en: 'Item Key - Planning' },
+    student_helper: { ru: 'Учебный центр', en: 'Study Center' },
+    whisperer: { ru: 'Item Key - Озвучка', en: 'Item Key - Whisperer' }
+  };
+
+  const TEXT_PAIRS = [
+    ['Главное меню', 'Main menu'],
+    ['Учебный Центр', 'Study Center'],
+    ['Учебный центр', 'Study Center'],
+    ['учебный центр', 'study center'],
+    ['Настройки', 'Settings'],
+    ['настройки', 'settings'],
+    ['Настройки сайта', 'Site settings'],
+    ['Язык сайта', 'Site language'],
+    ['Русский', 'Russian'],
+    ['Английский', 'English'],
+    ['Белорусский', 'Belarusian'],
+    ['выбери раздел, чтобы начать', 'choose a section to start'],
+    ['выбери раздел чтобы начать', 'choose a section to start'],
+    ['продолжить', 'continue'],
+    ['обучение', 'learning'],
+    ['словарь', 'dictionary'],
+    ['структура', 'structure'],
+    ['времена', 'tenses'],
+    ['словообразование', 'word transformation'],
+    ['конструктор', 'constructor'],
+    ['карточки', 'cards'],
+    ['практика', 'practice'],
+    ['заучивание', 'learn'],
+    ['разделы', 'sections'],
+    ['назад', 'back'],
+    ['далее', 'next'],
+    ['англ', 'EN'],
+    ['рус', 'RU'],
+    ['сдаюсь', 'give up'],
+    ['засчитать', 'accept'],
+    ['не засчитывать', 'reject'],
+    ['настройки сохраняются в браузере', 'settings are saved in the browser'],
+    ['нажми на карточку чтобы перевернуть', 'tap the card to flip it'],
+    ['переведи', 'translate'],
+    ['введи перевод и нажми check', 'enter the translation and press check'],
+    ['введи ответ и нажми check', 'enter the answer and press check'],
+    ['источник', 'source'],
+    ['новые', 'new'],
+    ['пора повторить', 'due for review'],
+    ['слабые', 'weak'],
+    ['все', 'all'],
+    ['порция', 'batch'],
+    ['направление', 'direction'],
+    ['цель', 'goal'],
+    ['быстро запомнить', 'memorize fast'],
+    ['закрепить надолго', 'retain longer'],
+    ['строгость', 'strictness'],
+    ['мягко', 'soft'],
+    ['строго', 'strict'],
+    ['опечатки', 'typos'],
+    ['формы (EN)', 'forms (EN)'],
+    ['подсказки', 'hints'],
+    ['создать', 'create'],
+    ['удалить раздел', 'delete section'],
+    ['сохранить', 'save'],
+    ['слова', 'words'],
+    ['выбери грамматическую тему', 'choose a grammar topic'],
+    ['подсказка: позже можно сменить раздел через кнопку "разделы" в карточках', 'tip: later you can change the section via the "sections" button in cards'],
+    ['по слабым', 'weak only'],
+    ['"to" не обяз.', '"to" optional'],
+    ['артикли не обяз.', 'articles optional'],
+    ['нажми start или выбери section', 'press start or choose a section'],
+    ['выбери цель и время (или mixed)', 'choose a goal and a tense (or mixed)'],
+    ['восстановить из json', 'restore from JSON'],
+    ['Не выбрано', 'Not selected'],
+    ['случайно', 'random'],
+    ['лицевая сторона', 'front'],
+    ['смешанно', 'mix'],
+    ['раздел', 'section'],
+    ['русский -> английский', 'Russian -> English'],
+    ['английский -> русский', 'English -> Russian'],
+    ['только слабые', 'weak only'],
+    ['сессия', 'session'],
+    ['"to" не обязателен', '"to" optional'],
+    ['артикли не обязательны', 'articles optional'],
+    ['готово', 'ready'],
+    ['правило: после проверки переписать нельзя - только далее. неверные слова вернутся через пару заданий.', 'rule: after checking, you cannot edit the answer - only move on. wrong words will return after a couple of tasks.'],
+    ['умные повторы', 'smart review'],
+    ['слово считается выученным в сессии, если 2 раза подряд ответил верно без подсказок и между ответами было хотя бы 10 заданий.', 'a word is counted as learned in the session if you answer it correctly twice in a row without hints, with at least 10 tasks between the answers.'],
+    ['сохранить JSON', 'save JSON'],
+    ['загрузить JSON', 'load JSON'],
+    ['заменить', 'replace'],
+    ['структуры - это мини-курсы: правило + практика + прогресс', 'structures are mini-courses: rule + practice + progress'],
+    ['освоение', 'mastery'],
+    ['начать практику', 'start practice'],
+    ['правило', 'rule'],
+    ['выбери режим', 'choose mode'],
+    ['сравнение', 'comparison'],
+    ['смешанный презент', 'mixed present'],
+    ['10 случайных заданий на сегодня', '10 random tasks for today'],
+    ['простое настоящее + длительное настоящее - быстрый старт', 'Present Simple + Present Continuous - quick start'],
+    ['выбери любые 2 времени', 'pick any 2 tenses'],
+    ['мини-тренировка (10)', 'mini training (10)'],
+    ['мини (5)', 'mini (5)'],
+    ['ежедневная мини-сессия', 'daily mini-session'],
+    ['начать ежедневную (10)', 'start daily (10)'],
+    ['новый набор', 'new set'],
+    ['выбери время', 'choose a tense'],
+    ['перейти к упражнениям', 'go to practice'],
+    ['упражнения по временам', 'tense practice'],
+    ['выбери цель и время (или смешанный режим)', 'choose a goal and a tense (or mixed)'],
+    ['время', 'tense'],
+    ['повторить ошибки', 'retry mistakes'],
+    ['очистить ошибки', 'clear mistakes'],
+    ['сбросить прогресс', 'reset progress'],
+    ['показывать ответы после каждого', 'show answers after each'],
+    ['Enter - проверить/далее • Esc - выйти в меню', 'Enter - check/next • Esc - go to menu'],
+    ['тип', 'type'],
+    ['прилагательное', 'Adjective'],
+    ['категория', 'category'],
+    ['все категории', 'All'],
+    ['суффиксы', 'Suffixes'],
+    ['приставки', 'Prefixes'],
+    ['вопрос', 'q'],
+    ['Сделай прилагательное из существительного', 'Make an adjective from the noun'],
+    ['перевод', 'translation'],
+    ['ответ', 'answer'],
+    ['просмотр', 'view'],
+    ['добавить', 'add'],
+    ['восстановить из JSON', 'restore from JSON'],
+    ['задания', 'tasks'],
+    ['пре-альфа', 'pre-alpha'],
+    ['Student Helper', 'Student Helper'],
+    ['Учебный помощник', 'Student Helper'],
+    ['Flashcard', 'Flashcard'],
+    ['Quiz card', 'Quiz card'],
+    ['Learn card', 'Learn card'],
+    ['Structure list', 'Structure list'],
+    ['Structure detail', 'Structure detail'],
+    ['Structure tabs', 'Structure tabs'],
+    ['Rule content', 'Rule content'],
+    ['Practice content', 'Practice content'],
+    ['Tenses home', 'Tenses home'],
+    ['Tenses compare', 'Tenses compare'],
+    ['Tenses daily', 'Tenses daily'],
+    ['Tenses list', 'Tenses list'],
+    ['Tense detail', 'Tense detail'],
+    ['Theory content', 'Theory content'],
+    ['Tenses practice', 'Tenses practice']
+  ];
+
+  const PLACEHOLDER_PAIRS = [
+    ['поиск...', 'search...'],
+    ['Ответ', 'Answer'],
+    ['Введите перевод...', 'Enter translation...'],
+    ['название раздела', 'section name'],
+    ['перевод (RU)', 'translation (RU)'],
+    ['слово/фраза (EN)', 'word/phrase (EN)'],
+    ['Ответ (EN)', 'Answer (EN)'],
+    ['слово (EN)', 'word (EN)'],
+    ['ответ (EN)', 'answer (EN)'],
+    ['слово (RU)', 'word (RU)'],
+    ['ответ (RU)', 'answer (RU)']
+  ];
+
+  function buildMaps(pairs) {
+    const ruToEn = Object.create(null);
+    const enToRu = Object.create(null);
+    pairs.forEach(([ru, en]) => {
+      ruToEn[normalize(ru)] = en;
+      enToRu[normalize(en)] = ru;
+    });
+    return { ruToEn, enToRu };
+  }
+
+  const textMaps = buildMaps(TEXT_PAIRS);
+  const placeholderMaps = buildMaps(PLACEHOLDER_PAIRS);
+  const TEXTS_RU_TO_EN = textMaps.ruToEn;
+  const TEXTS_EN_TO_RU = textMaps.enToRu;
+  const PLACEHOLDERS_RU_TO_EN = placeholderMaps.ruToEn;
+  const PLACEHOLDERS_EN_TO_RU = placeholderMaps.enToRu;
+
+  const ALIASES_RU_TO_EN = {
+    'dictionary': 'dictionary',
+    'structure': 'structure',
+    'tenses': 'tenses',
+    'word transformation': 'word transformation',
+    'practice и constructor для word forms': 'practice and constructor for word forms',
+    'практика и constructor для word forms': 'practice and constructor for word forms',
+    'карточки, practice, learn, constructor': 'flashcards, practice, learn, constructor',
+    'ready': 'ready',
+    'save json': 'save JSON',
+    'load json': 'load JSON',
+    'compare': 'compare',
+    'daily': 'daily',
+    'start': 'start',
+    'check': 'check',
+    'hint': 'hint',
+    'open': 'open',
+    'mixed present': 'mixed present',
+    'mini training (10)': 'mini training (10)',
+    'mini (5)': 'mini (5)',
+    'daily mini-session': 'daily mini-session',
+    'start daily (10)': 'start daily (10)',
+    'new set': 'new set',
+    'retry mistakes': 'retry mistakes',
+    'clear mistakes': 'clear mistakes',
+    'reset progress': 'reset progress',
+    'show answers after each': 'show answers after each',
+    'view': 'view',
+    'add': 'add',
+    'replace': 'replace'
+  };
+
+  const ALIASES_EN_TO_RU = {
+    'dictionary': 'словарь',
+    'structure': 'структура',
+    'tenses': 'времена',
+    'word transformation': 'словообразование',
+    'practice and constructor for word forms': 'практика и конструктор для форм слов',
+    'flashcards, practice, learn, constructor': 'карточки, практика, заучивание, конструктор',
+    'ready': 'готово',
+    'save json': 'сохранить JSON',
+    'save JSON': 'сохранить JSON',
+    'load json': 'загрузить JSON',
+    'load JSON': 'загрузить JSON',
+    'random': 'случайно',
+    'front': 'лицевая сторона',
+    'mix': 'смешанно',
+    'mixed': 'смешанно',
+    'section': 'раздел',
+    'check': 'проверить',
+    'hint': 'подсказка',
+    'open': 'открыть',
+    'start': 'старт',
+    'compare': 'сравнить',
+    'daily': 'на сегодня',
+    'mixed present': 'смешанный презент',
+    'mini training (10)': 'мини-тренировка (10)',
+    'mini (5)': 'мини (5)',
+    'daily mini-session': 'ежедневная мини-сессия',
+    'start daily (10)': 'начать ежедневную (10)',
+    'new set': 'новый набор',
+    'retry mistakes': 'повторить ошибки',
+    'clear mistakes': 'очистить ошибки',
+    'reset progress': 'сбросить прогресс',
+    'show answers after each': 'показывать ответы после каждого',
+    'view': 'просмотр',
+    'add': 'добавить',
+    'replace': 'заменить'
+  };
+
+  const SELECTOR_RULES = {
+    student_helper: [
+      { selector: '#shLobby .ik-title', text: { ru: 'Учебный центр', en: 'Study Center' } },
+      { selector: '#shLobby .ik-sub', text: { ru: 'выбери раздел, чтобы начать', en: 'choose a section to start' } },
+      { selector: '#shContinue', text: { ru: 'продолжить', en: 'continue' } }
+    ]
+  };
+
+  const SKIP_SELECTOR = [
+    '#ikSiteSettingsPanel',
+    '[contenteditable="true"]',
+    '.ik-word',
+    '#dictCardFront', '#dictCardBack', '#dictQuizFront', '#dictQuizBack', '#dictLearnFront', '#dictLearnBack',
+    '#promptEn', '#promptRu',
+    '#dictSectionCards', '#dictSectionQuiz', '#dictSectionLearn', '#dictBuilderSection',
+    '#dictSectionList', '#dictWordList', '#dictFirstPickList', '#structList', '#tensesList',
+    '#tensesCompareA', '#tensesCompareB', '#tensesTenseSelect', '#viewCategory', '#taskList'
+  ].join(',');
+
+  function translateDynamic(text, lang) {
+    const key = normalize(text);
+    const rules = [
+      { ru: /^слов:\s*(\d+)$/i, en: /^words:\s*(\d+)$/i, toRu: (m) => `слов: ${m[1]}`, toEn: (m) => `words: ${m[1]}` },
+      { ru: /^структур:\s*(\d+)$/i, en: /^structures:\s*(\d+)$/i, toRu: (m) => `структур: ${m[1]}`, toEn: (m) => `structures: ${m[1]}` },
+      { ru: /^врем[её]н:\s*(\d+)$/i, en: /^tenses:\s*(\d+)$/i, toRu: (m) => `времён: ${m[1]}`, toEn: (m) => `tenses: ${m[1]}` },
+      { ru: /^задани[йя]:\s*(\d+)$/i, en: /^tasks:\s*(\d+)$/i, toRu: (m) => `заданий: ${m[1]}`, toEn: (m) => `tasks: ${m[1]}` },
+      { ru: /^вопр\.?[:]?\s*(\d+)$/i, en: /^q:\s*(\d+)$/i, toRu: (m) => `вопр.: ${m[1]}`, toEn: (m) => `q: ${m[1]}` },
+      { ru: /^освоение\s+(\d+\/\d+)$/i, en: /^mastery\s+(\d+\/\d+)$/i, toRu: (m) => `освоение ${m[1]}`, toEn: (m) => `mastery ${m[1]}` }
+    ];
+
+    for (const rule of rules) {
+      if (lang === 'en') {
+        const match = key.match(rule.ru);
+        if (match) return rule.toEn(match);
+      } else {
+        const match = key.match(rule.en);
+        if (match) return rule.toRu(match);
+      }
+    }
+    return text;
+  }
+
+  function translateViaMaps(text, lang, ruToEn, enToRu, aliasRuToEn, aliasEnToRu) {
+    const key = normalize(text);
+    if (!key) return text;
+    if (lang === 'en') {
+      return ruToEn[key] || aliasRuToEn[key] || translateDynamic(key, 'en') || text;
+    }
+    return enToRu[key] || aliasEnToRu[key] || translateDynamic(key, 'ru') || text;
+  }
+
+  function translateText(text, lang) {
+    return translateViaMaps(text, lang, TEXTS_RU_TO_EN, TEXTS_EN_TO_RU, ALIASES_RU_TO_EN, ALIASES_EN_TO_RU);
+  }
+
+  function translatePlaceholder(text, lang) {
+    return translateViaMaps(text, lang, PLACEHOLDERS_RU_TO_EN, PLACEHOLDERS_EN_TO_RU, ALIASES_RU_TO_EN, ALIASES_EN_TO_RU);
+  }
+
+  function getLang() {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      return saved === 'en' ? 'en' : DEFAULT_LANG;
+    } catch (e) {
+      return DEFAULT_LANG;
+    }
+  }
+
+  function saveLang(lang) {
+    try {
+      localStorage.setItem(STORAGE_KEY, lang === 'en' ? 'en' : 'ru');
+    } catch (e) {}
+  }
+
+  function setPanelState(lang) {
+    const ru = document.getElementById('ikLangRu');
+    const en = document.getElementById('ikLangEn');
+    if (ru) ru.checked = lang === 'ru';
+    if (en) en.checked = lang === 'en';
+    document.querySelectorAll('.ik-lang-option').forEach((label) => {
+      const input = label.querySelector('input');
+      label.classList.toggle('is-active', !!input?.checked);
+    });
+    const gear = document.getElementById('ikGlobalSettingsBtn');
+    if (gear) {
+      const label = lang === 'en' ? 'Site settings' : 'Настройки сайта';
+      gear.setAttribute('aria-label', label);
+      gear.setAttribute('title', label);
+    }
+  }
+
+  function applySelectorRules(lang) {
+    const rules = SELECTOR_RULES[PAGE] || [];
+    rules.forEach((rule) => {
+      document.querySelectorAll(rule.selector).forEach((el) => {
+        if (rule.text) el.textContent = rule.text[lang];
+        if (rule.placeholder && 'placeholder' in el) el.placeholder = rule.placeholder[lang];
+      });
+    });
+  }
+
+  function shouldSkipElement(el) {
+    if (!el || !(el instanceof Element)) return true;
+    if (el.closest(SKIP_SELECTOR)) return true;
+    const tag = el.tagName;
+    return tag === 'SCRIPT' || tag === 'STYLE' || tag === 'TEXTAREA';
+  }
+
+  function applyTextNodeTranslations(lang) {
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+      acceptNode(node) {
+        const parent = node.parentElement;
+        if (!parent || shouldSkipElement(parent)) return NodeFilter.FILTER_REJECT;
+        if (!normalize(node.nodeValue)) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+
+    const nodes = [];
+    let current;
+    while ((current = walker.nextNode())) nodes.push(current);
+
+    nodes.forEach((node) => {
+      const match = String(node.nodeValue || '').match(/^(\s*)([\s\S]*?)(\s*)$/);
+      if (!match) return;
+      const translated = translateText(match[2], lang);
+      if (translated !== normalize(match[2])) {
+        node.nodeValue = `${match[1]}${translated}${match[3]}`;
+      }
+    });
+  }
+
+  function applyAttributeTranslations(lang) {
+    ['placeholder', 'title', 'aria-label'].forEach((attr) => {
+      document.querySelectorAll(`[${attr}]`).forEach((el) => {
+        const current = el.getAttribute(attr);
+        if (!current) return;
+        const translated = attr === 'placeholder' ? translatePlaceholder(current, lang) : translateText(current, lang);
+        if (translated !== current) el.setAttribute(attr, translated);
+      });
+    });
+
+    document.querySelectorAll('input[type="button"][value], input[type="submit"][value], input[type="reset"][value]').forEach((el) => {
+      const current = el.value;
+      const translated = translateText(current, lang);
+      if (translated !== current) el.value = translated;
+    });
+  }
+
+  let isApplying = false;
+
+  function applyLanguage(lang) {
+    if (isApplying) return;
+    isApplying = true;
+    const next = lang === 'en' ? 'en' : 'ru';
+    document.documentElement.lang = next;
+    if (TITLES[PAGE]) document.title = TITLES[PAGE][next];
+
+    const titleEl = document.getElementById('ikSiteSettingsTitle');
+    const closeEl = document.getElementById('ikSiteSettingsClose');
+    const labelEl = document.getElementById('ikSiteLangLabel');
+    const ruEl = document.getElementById('ikLangRuText');
+    const enEl = document.getElementById('ikLangEnText');
+
+    if (titleEl) titleEl.textContent = next === 'en' ? 'Settings' : 'Настройки';
+    if (closeEl) closeEl.textContent = next === 'en' ? 'Close' : 'Закрыть';
+    if (labelEl) labelEl.textContent = next === 'en' ? 'Site language' : 'Язык сайта';
+    if (ruEl) ruEl.textContent = next === 'en' ? 'Russian' : 'Русский';
+    if (enEl) enEl.textContent = next === 'en' ? 'English' : 'Английский';
+
+    applySelectorRules(next);
+    applyTextNodeTranslations(next);
+    applyAttributeTranslations(next);
+    setPanelState(next);
+    isApplying = false;
+  }
+
+  function setLang(lang) {
+    const next = lang === 'en' ? 'en' : 'ru';
+    saveLang(next);
+    applyLanguage(next);
+    document.dispatchEvent(new CustomEvent('ik:languagechange', { detail: { lang: next } }));
+  }
+
+  function buildGearButton() {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.id = 'ikGlobalSettingsBtn';
+    btn.className = 'ik-gear-btn';
+    btn.setAttribute('aria-label', 'Настройки сайта');
+    btn.setAttribute('title', 'Настройки сайта');
+    btn.innerHTML = `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+        <path d="M12 8.4A3.6 3.6 0 1 0 12 15.6A3.6 3.6 0 1 0 12 8.4Z"/>
+        <path d="M19.4 15a1 1 0 0 0 .2 1.1l.1.1a1.2 1.2 0 0 1 0 1.7l-1.6 1.6a1.2 1.2 0 0 1-1.7 0l-.1-.1a1 1 0 0 0-1.1-.2 1 1 0 0 0-.6.9V20a1.2 1.2 0 0 1-1.2 1.2h-2.3A1.2 1.2 0 0 1 9.9 20v-.2a1 1 0 0 0-.6-.9 1 1 0 0 0-1.1.2l-.1.1a1.2 1.2 0 0 1-1.7 0l-1.6-1.6a1.2 1.2 0 0 1 0-1.7l.1-.1a1 1 0 0 0 .2-1.1 1 1 0 0 0-.9-.6H4A1.2 1.2 0 0 1 2.8 13v-2.3A1.2 1.2 0 0 1 4 9.5h.2a1 1 0 0 0 .9-.6 1 1 0 0 0-.2-1.1l-.1-.1a1.2 1.2 0 0 1 0-1.7l1.6-1.6a1.2 1.2 0 0 1 1.7 0l.1.1a1 1 0 0 0 1.1.2 1 1 0 0 0 .6-.9V4A1.2 1.2 0 0 1 11.1 2.8h2.3A1.2 1.2 0 0 1 14.6 4v.2a1 1 0 0 0 .6.9 1 1 0 0 0 1.1-.2l.1-.1a1.2 1.2 0 0 1 1.7 0l1.6 1.6a1.2 1.2 0 0 1 0 1.7l-.1.1a1 1 0 0 0-.2 1.1 1 1 0 0 0 .9.6h.2A1.2 1.2 0 0 1 21.2 10.7V13A1.2 1.2 0 0 1 20 14.2h-.2a1 1 0 0 0-.4.8Z"/>
+      </svg>
+    `;
+    return btn;
+  }
+
+  function buildPanel() {
+    const panel = document.createElement('div');
+    panel.id = 'ikSiteSettingsPanel';
+    panel.className = 'ik-settings-panel';
+    panel.hidden = true;
+    panel.innerHTML = `
+      <div class="ik-settings-panel__head">
+        <p class="ik-settings-panel__title" id="ikSiteSettingsTitle">Настройки</p>
+        <button type="button" class="ik-settings-panel__close" id="ikSiteSettingsClose">Закрыть</button>
+      </div>
+      <div class="ik-settings-group">
+        <div class="ik-settings-label" id="ikSiteLangLabel">Язык сайта</div>
+        <div class="ik-lang-switch">
+          <label class="ik-lang-option" for="ikLangRu">
+            <input type="radio" name="ikSiteLang" id="ikLangRu" value="ru" />
+            <span id="ikLangRuText">Русский</span>
+          </label>
+          <label class="ik-lang-option" for="ikLangEn">
+            <input type="radio" name="ikSiteLang" id="ikLangEn" value="en" />
+            <span id="ikLangEnText">Английский</span>
+          </label>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(panel);
+    return panel;
+  }
+
+  function initSettingsUI() {
+    if (document.getElementById('ikGlobalSettingsBtn')) return;
+
+    const gearBtn = buildGearButton();
+    const panel = buildPanel();
+    const closeBtn = panel.querySelector('#ikSiteSettingsClose');
+    const header = document.querySelector('.ik-site-nav');
+
+    if (header) {
+      let actions = header.querySelector('.ik-site-nav__actions');
+      if (!actions) {
+        actions = document.createElement('div');
+        actions.className = 'ik-site-nav__actions';
+        header.appendChild(actions);
+      }
+      actions.appendChild(gearBtn);
+    } else {
+      const floating = document.createElement('div');
+      floating.className = 'ik-floating-settings';
+      floating.appendChild(gearBtn);
+      document.body.appendChild(floating);
+    }
+
+    const openPanel = () => { panel.hidden = false; };
+    const closePanel = () => { panel.hidden = true; };
+
+    gearBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      panel.hidden ? openPanel() : closePanel();
+    });
+    closeBtn.addEventListener('click', closePanel);
+    panel.addEventListener('click', (e) => e.stopPropagation());
+    document.addEventListener('click', () => { if (!panel.hidden) closePanel(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !panel.hidden) closePanel(); });
+    panel.querySelectorAll('input[name="ikSiteLang"]').forEach((input) => {
+      input.addEventListener('change', () => setLang(input.value));
+    });
+  }
+
+  function initObserver() {
+    let queued = false;
+    const observer = new MutationObserver(() => {
+      if (queued || isApplying) return;
+      queued = true;
+      requestAnimationFrame(() => {
+        queued = false;
+        applyLanguage(getLang());
+      });
+    });
+    observer.observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['title', 'aria-label', 'placeholder', 'value'] });
+  }
+
+  window.IKSiteLang = {
+    get: getLang,
+    set: setLang,
+    apply: () => applyLanguage(getLang())
+  };
+
+  document.addEventListener('DOMContentLoaded', () => {
+    initSettingsUI();
+    applyLanguage(getLang());
+    initObserver();
+  });
+})();
+</script>
+
 </body>
 </html>
