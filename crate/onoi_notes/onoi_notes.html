@@ -123,7 +123,7 @@
     /* Top utility bar */
     .n-topbar{
       display: grid;
-      grid-template-columns: 1fr auto auto auto;
+      grid-template-columns: 1fr auto auto;
       gap: 10px;
       align-items: center;
     }
@@ -1172,6 +1172,27 @@ body.focus-mode .n-col-right{
   background: rgba(0,0,0,.03);
 }
 
+
+
+/* =========================================================
+   Mobile UX fixes - 2026-02-26
+   - Hide redundant "Меню" on desktop
+   - Prevent background scroll when drawer is open
+   - Use dvh/svh to avoid iOS address bar jumps
+   ========================================================= */
+#openDrawerBtn{ display: none; }
+@media (max-width: 900px){
+  #openDrawerBtn{ display: inline-flex; }
+  body.drawer-open{ overflow: hidden; }
+  @supports (height: 1dvh){
+    .editor{ min-height: 55dvh; }
+    .modal-card{ max-height: calc(100dvh - 20px); }
+  }
+  @supports (height: 1svh){
+    .editor{ min-height: 55svh; }
+  }
+}
+
 </style>
 </head>
 
@@ -1195,7 +1216,7 @@ body.focus-mode .n-col-right{
       <div class="n-card">
         <div class="n-topbar" aria-label="Панель поиска и действий">
           <input class="n-search" id="searchInput" placeholder="Поиск по заметкам…" />
-                    <button class="n-btn" id="openDrawerBtn" type="button">Меню</button>
+                    <button class="n-btn" id="openDrawerBtn" type="button" aria-controls="sidebarCol" aria-expanded="false">Меню</button>
 <div class="n-pill" aria-label="Статус синхронизации">
             <span class="dot" id="syncDot"></span>
             <span id="syncText">local</span>
@@ -1590,7 +1611,35 @@ body.focus-mode .n-col-right{
         document.documentElement.style.setProperty('--sidebarW', state.ui.sidebarW + 'px');
       }
     }
-    // ========= IndexedDB =========
+    
+
+    // ========= topbar offset (drawer under fixed header) =========
+    function computeTopbarOffset(){
+      try{
+        const els = Array.from(document.querySelectorAll('header, nav, .topbar, .site-topbar, .app-topbar, .ik-site-nav'));
+        let maxH = 0;
+        for(const el of els){
+          if(!el) continue;
+          const cs = getComputedStyle(el);
+          const pos = cs.position;
+          if(pos !== 'fixed' && pos !== 'sticky') continue;
+          const top = parseFloat(cs.top || '0');
+          if(!Number.isFinite(top) || Math.abs(top) > 1) continue;
+          const r = el.getBoundingClientRect();
+          if(r.height <= 0) continue;
+          if(r.top > 1 || r.top < -1) continue;
+          maxH = Math.max(maxH, r.height);
+        }
+        return Math.round(maxH);
+      }catch(e){
+        return 0;
+      }
+    }
+    function applyTopbarOffset(){
+      const off = computeTopbarOffset();
+      document.documentElement.style.setProperty('--topbarOffset', off + 'px');
+    }
+// ========= IndexedDB =========
     const DB_NAME = 'itemkey_onoi_notes_db_v1';
     const DB_VER = 1;
     const STORE = { meta:'meta', cats:'cats', notes:'notes' };
@@ -2039,22 +2088,17 @@ async function uiPrompt(msg, opts={}){
         }
       }
 
-      // If there are no notes yet - start with an empty sheet (no welcome text)
+      // If there are no notes yet - keep the category selected, but do not auto-create a blank note.
       if(state.notes.length === 0){
-        const n = {
-          id: uid(),
-          catId: state.activeCatId || ensureMain(),
-          title: '',
-          html: '',
-          createdAt: now(),
-          updatedAt: now()
-        };
-        state.notes.push(n);
-        state.activeNoteId = n.id;
+        state.activeNoteId = null;
+        return;
       }
 
       if(!state.activeNoteId){
-        const nn = state.notes.find(x => x.catId === state.activeCatId) || state.notes[0];
+        const inCat = state.notes
+          .filter(x => x.catId === state.activeCatId)
+          .sort((a,b) => (b.updatedAt||0) - (a.updatedAt||0));
+        const nn = inCat[0] || state.notes.slice().sort((a,b) => (b.updatedAt||0) - (a.updatedAt||0))[0] || null;
         state.activeNoteId = nn ? nn.id : null;
       }
     }
@@ -2071,6 +2115,40 @@ async function uiPrompt(msg, opts={}){
 
     function catById(id){ return state.cats.find(c => c.id === id) || null; }
     function noteById(id){ return state.notes.find(n => n.id === id) || null; }
+
+    function syncEditorIntoCurrentNote(){
+      const editorNoteId = (editor && editor.dataset && editor.dataset.noteId) ? String(editor.dataset.noteId) : null;
+      const isHydrated = !!(editor && editor.dataset && editor.dataset.hydrated === '1');
+      // Sync only when the editor is already bound to a real rendered note.
+      // This prevents a blank/uninitialized editor from overwriting an existing note.
+      if(!editorNoteId || !isHydrated) return null;
+
+      const note = noteById(editorNoteId);
+      if(!note) return null;
+
+      // Extra safety: ignore stale editor instances that are no longer the active note.
+      if(state.activeNoteId && String(state.activeNoteId) !== editorNoteId) return note;
+
+      try{
+        const nextTitle = (noteTitle.value || '').trim();
+        const rawHtml = (editor && typeof editor.innerHTML === 'string') ? editor.innerHTML : '';
+        const hasVisibleText = !!htmlToText(rawHtml || '').trim();
+        const noteHadVisibleText = !!htmlToText(note.html || '').trim();
+
+        note.title = nextTitle;
+
+        // Never let an unexpectedly empty editor wipe a populated note during navigation/init.
+        // Real user deletions are already captured by the editor input listener below.
+        if(hasVisibleText || !noteHadVisibleText){
+          note.html = rawHtml.trim() ? rawHtml : '<p></p>';
+        }
+
+        note.updatedAt = now();
+        updatedText.textContent = 'updated: ' + fmtTime(note.updatedAt);
+      }catch(e){}
+
+      return note;
+    }
 
     function catPath(catId){
       const path = [];
@@ -2191,6 +2269,7 @@ tgl.addEventListener('click', (e) => {
           row.appendChild(cnt);
 
           row.addEventListener('click', (e) => {
+            syncEditorIntoCurrentNote();
             state.activeCatId = cat.id;
             // pick first note in cat
             const list = getVisibleNotes();
@@ -2319,6 +2398,7 @@ tgl.addEventListener('click', (e) => {
         row.appendChild(sn);
 
         const openNote = () => {
+          syncEditorIntoCurrentNote();
           state.activeNoteId = n.id;
           renderEditor();
           renderNotesList();
@@ -2344,11 +2424,11 @@ tgl.addEventListener('click', (e) => {
 
       if(!note){
         noteTitle.value = '';
-        // Можно начинать печатать сразу - при первом вводе заметка и категория создадутся автоматически
-        noteTitle.disabled = false;
-        // Не блокируем редактор: пусть пользователь сразу пишет, даже если нет ни одной категории/заметки
-        if(!editor.innerHTML.trim()) editor.innerHTML = '<p></p>';
-        editor.setAttribute('contenteditable', 'true');
+        noteTitle.disabled = true;
+        editor.innerHTML = '<p></p>';
+        delete editor.dataset.noteId;
+        editor.dataset.hydrated = '0';
+        editor.setAttribute('contenteditable', 'false');
         updatedText.textContent = '-';
         return;
       }
@@ -2357,12 +2437,19 @@ tgl.addEventListener('click', (e) => {
       noteTitle.disabled = false;
       editor.setAttribute('contenteditable','true');
 
-      // avoid resetting cursor if already on same note and active element is editor
+      const safeHtml = (note && typeof note.html === 'string' && note.html.trim()) ? note.html : '<p></p>';
+      const mustHydrate = (
+        editor.dataset.noteId !== note.id ||
+        editor.dataset.hydrated !== '1' ||
+        (!htmlToText(editor.innerHTML || '').trim() && !!htmlToText(safeHtml).trim())
+      );
+
       if(noteTitle.value !== (note.title || '')) noteTitle.value = note.title || '';
-      if(editor.dataset.noteId !== note.id){
-        editor.innerHTML = note.html || '';
-        editor.dataset.noteId = note.id;
+      if(mustHydrate){
+        editor.innerHTML = safeHtml;
       }
+      editor.dataset.noteId = note.id;
+      editor.dataset.hydrated = '1';
 
       updatedText.textContent = 'updated: ' + fmtTime(note.updatedAt);
     }
@@ -2381,13 +2468,7 @@ tgl.addEventListener('click', (e) => {
         // embed pasted/dragged images (blob:...) so export/import keeps them
         try{
           await embedBlobImagesInEditor();
-          const n = state.activeNoteId ? noteById(state.activeNoteId) : null;
-          if(n){
-            n.title = (noteTitle.value || '').trim();
-            n.html = editor.innerHTML;
-            n.updatedAt = now();
-            updatedText.textContent = 'updated: ' + fmtTime(n.updatedAt);
-          }
+          syncEditorIntoCurrentNote();
         }catch(e){}
 
         // write cats and notes
@@ -3762,8 +3843,10 @@ const draftTitle = (noteTitle.value || '').trim();
     deleteCatBtn.addEventListener('click', deleteActiveCategory);
 
     noteTitle.addEventListener('input', () => {
-      const note = ensureActiveNoteFromDraft();
+      const noteId = (editor && editor.dataset && editor.dataset.noteId) ? String(editor.dataset.noteId) : (state.activeNoteId ? String(state.activeNoteId) : null);
+      const note = noteId ? noteById(noteId) : null;
       if(!note) return;
+      editor.dataset.hydrated = '1';
       note.title = (noteTitle.value || '').trim();
       note.updatedAt = now();
       updatedText.textContent = 'updated: ' + fmtTime(note.updatedAt);
@@ -3772,9 +3855,11 @@ const draftTitle = (noteTitle.value || '').trim();
     });
 
     editor.addEventListener('input', () => {
-      const note = ensureActiveNoteFromDraft();
+      const noteId = (editor && editor.dataset && editor.dataset.noteId) ? String(editor.dataset.noteId) : (state.activeNoteId ? String(state.activeNoteId) : null);
+      const note = noteId ? noteById(noteId) : null;
       if(!note) return;
-      note.html = editor.innerHTML;
+      editor.dataset.hydrated = '1';
+      note.html = (editor.innerHTML && editor.innerHTML.trim()) ? editor.innerHTML : '<p></p>';
       note.updatedAt = now();
       updatedText.textContent = 'updated: ' + fmtTime(note.updatedAt);
       renderNotesList();
@@ -4125,6 +4210,9 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
       state.ui.sidebarCollapsed = (lsGet(LS_UI.sidebarCollapsed) === '1');
       state.ui.collapsedCats = loadCollapsedCats();
       applySidebarUI();
+      applyTopbarOffset();
+      window.addEventListener('resize', applyTopbarOffset, {passive:true});
+      window.addEventListener('orientationchange', applyTopbarOffset, {passive:true});
 
       loadCloudSettings();
       applySavedTypography();
@@ -4150,11 +4238,11 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
 
       ensureDefaults();
 
+      // render first so the editor is bound to the active note before any sync/persist happens
+      renderAll();
+
       // persist defaults if needed
       await persistAll();
-
-      // render
-      renderAll();
 
       // set sync indicator
       if(state.cloud.mode === 'off') setSync('ok', 'local');
@@ -5369,10 +5457,31 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
     try{ localStorage.setItem(SIDEBAR_KEY, collapsed ? '1':'0'); }catch(e){}
   }
   function openDrawer(){
+    if(document.body.classList.contains('drawer-open')) return;
+    try{ window.saveSelection && window.saveSelection(); }catch(e){}
+    // remember focus, so we can restore it on close
+    openDrawer._lastFocus = document.activeElement || null;
+
     document.body.classList.add('drawer-open');
+    try{ openDrawerBtn && openDrawerBtn.setAttribute('aria-expanded','true'); }catch(e){}
+    try{ drawerOverlay && drawerOverlay.setAttribute('aria-hidden','false'); }catch(e){}
+    // focus close for better a11y
+    window.setTimeout(() => { try{ closeDrawerBtn && closeDrawerBtn.focus(); }catch(e){} }, 0);
   }
   function closeDrawer(){
+    if(!document.body.classList.contains('drawer-open')) return;
     document.body.classList.remove('drawer-open');
+    try{ openDrawerBtn && openDrawerBtn.setAttribute('aria-expanded','false'); }catch(e){}
+    try{ drawerOverlay && drawerOverlay.setAttribute('aria-hidden','true'); }catch(e){}
+    // restore focus
+    window.setTimeout(() => {
+      try{
+        const el = openDrawer._lastFocus;
+        if(el && el.focus) el.focus();
+        else if(openDrawerBtn && openDrawerBtn.focus) openDrawerBtn.focus();
+      }catch(e){}
+      openDrawer._lastFocus = null;
+    }, 0);
   }
 
   // init desktop sidebar state
