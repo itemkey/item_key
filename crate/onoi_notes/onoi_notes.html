@@ -2115,11 +2115,9 @@ async function uiPrompt(msg, opts={}){
 
     function syncEditorIntoCurrentNote(){
       const editorNoteId = (editor && editor.dataset && editor.dataset.noteId) ? String(editor.dataset.noteId) : null;
-      // Sync only when the editor is already bound to a real note.
-      // This prevents a blank editor on first load from overwriting an existing note.
-      if(!editorNoteId) return null;
-
-      const note = noteById(editorNoteId);
+      const targetId = editorNoteId || (state.activeNoteId ? String(state.activeNoteId) : null);
+      if(!targetId) return null;
+      const note = noteById(targetId);
       if(!note) return null;
 
       try{
@@ -4209,11 +4207,11 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
 
       ensureDefaults();
 
-      // render first so the editor is bound to the active note before any sync/persist happens
-      renderAll();
-
       // persist defaults if needed
       await persistAll();
+
+      // render
+      renderAll();
 
       // set sync indicator
       if(state.cloud.mode === 'off') setSync('ok', 'local');
