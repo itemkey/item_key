@@ -137,6 +137,7 @@
   <div class="veil" aria-hidden="true"></div>
 
   <header class="ik-site-nav" id="ikSiteNav">
+    <button type="button" class="ik-site-nav__link" id="ikBackBtn" title="Вернуться назад">← Назад</button>
     <a class="ik-site-nav__link" href="../../index.html">Главное меню</a>
   </header>
 
@@ -224,6 +225,110 @@
 
   <script type="module" src="./planning.js"></script>
 
+  <script>
+    document.addEventListener('DOMContentLoaded', function(){
+      var backBtn = document.getElementById('ikBackBtn');
+      var viewSelect = document.getElementById('viewSelect');
+      var modal = document.getElementById('modal');
+
+      var ignoreNextHashChange = false;
+      var applyFromHashInProgress = false;
+
+      function safeBrowserBack(fallbackHref){
+        if(window.history.length <= 1){
+          window.location.href = fallbackHref;
+          return;
+        }
+
+        var currentHref = window.location.href;
+        var navigated = false;
+        var markNavigated = function(){ navigated = true; };
+
+        window.addEventListener('pagehide', markNavigated, { once: true });
+        window.addEventListener('popstate', markNavigated, { once: true });
+
+        window.history.back();
+
+        window.setTimeout(function(){
+          if(navigated) return;
+          if(window.location.href === currentHref){
+            window.location.href = fallbackHref;
+          }
+        }, 450);
+      }
+
+      function readViewFromHash(){
+        var raw = String(window.location.hash || '').replace('#', '').trim().toLowerCase();
+        if(raw === 'board' || raw === 'schedule') return raw;
+        return '';
+      }
+
+      function writeHashForView(view, replace){
+        var next = '#' + view;
+        if(window.location.hash === next) return;
+
+        if(replace){
+          var base = window.location.pathname + window.location.search + next;
+          window.history.replaceState(window.history.state, '', base);
+          return;
+        }
+
+        ignoreNextHashChange = true;
+        window.location.hash = view;
+      }
+
+      function closeOpenModal(){
+        if(!modal || modal.hidden) return false;
+        var closeBtn = modal.querySelector('.icon-btn[data-close], [data-close]');
+        if(closeBtn){
+          closeBtn.click();
+        } else {
+          modal.hidden = true;
+        }
+        return true;
+      }
+
+      if(viewSelect){
+        var hashView = readViewFromHash();
+        if(hashView && hashView !== viewSelect.value){
+          applyFromHashInProgress = true;
+          viewSelect.value = hashView;
+          viewSelect.dispatchEvent(new Event('change', { bubbles: true }));
+          applyFromHashInProgress = false;
+        } else {
+          writeHashForView(viewSelect.value || 'board', true);
+        }
+
+        viewSelect.addEventListener('change', function(){
+          if(applyFromHashInProgress) return;
+          writeHashForView(viewSelect.value || 'board', false);
+        });
+
+        window.addEventListener('hashchange', function(){
+          if(ignoreNextHashChange){
+            ignoreNextHashChange = false;
+            return;
+          }
+
+          var nextView = readViewFromHash();
+          if(!nextView || nextView === viewSelect.value) return;
+
+          applyFromHashInProgress = true;
+          viewSelect.value = nextView;
+          viewSelect.dispatchEvent(new Event('change', { bubbles: true }));
+          applyFromHashInProgress = false;
+        });
+      }
+
+      if(backBtn){
+        backBtn.addEventListener('click', function(event){
+          event.preventDefault();
+          if(closeOpenModal()) return;
+          safeBrowserBack('../../index.html');
+        });
+      }
+    });
+  </script>
 
 <script id="ik-site-settings-js">
 (() => {

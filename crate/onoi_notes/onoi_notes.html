@@ -1024,8 +1024,7 @@ body.focus-mode .n-col-right{
    ================================ */
 .ik-site-nav, .ik-site-nav *{ box-sizing: border-box; }
 .ik-site-nav{
-  position: relative !important; /* must NOT be sticky/fixed */
-  top: auto !important;
+  position: relative;
   z-index: 50;
   width: 100%;
   display: flex;
@@ -1055,6 +1054,9 @@ body.focus-mode .n-col-right{
   border-radius: 0;
 }
 .ik-site-nav__link:hover{ border-color: rgba(0,0,0,.25); }
+
+.ik-site-nav__link#ikBackBtn{ margin-right: auto; }
+.ik-site-nav__link[href]{ margin-left: auto; margin-right: auto; }
 
 @media (max-width: 520px){
   .ik-site-nav{ padding: 14px 12px; margin-bottom: 14px; }
@@ -1307,6 +1309,7 @@ body.focus-mode .n-col-right{
   <div class="veil" aria-hidden="true"></div>
 
   <header class="ik-site-nav" id="ikSiteNav">
+    <button type="button" class="ik-site-nav__link" id="ikBackBtn" title="Вернуться назад">← Назад</button>
     <a class="ik-site-nav__link" href="../../index.html">Главное меню</a>
   </header>
 
@@ -1642,6 +1645,98 @@ body.focus-mode .n-col-right{
   </div>
 
   <script src="../../assets/js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function(){
+      var backBtn = document.getElementById('ikBackBtn');
+
+      function safeBrowserBack(fallbackHref){
+        if(window.history.length <= 1){
+          window.location.href = fallbackHref;
+          return;
+        }
+
+        var currentHref = window.location.href;
+        var navigated = false;
+        var markNavigated = function(){ navigated = true; };
+
+        window.addEventListener('pagehide', markNavigated, { once: true });
+        window.addEventListener('popstate', markNavigated, { once: true });
+
+        window.history.back();
+
+        window.setTimeout(function(){
+          if(navigated) return;
+          if(window.location.href === currentHref){
+            window.location.href = fallbackHref;
+          }
+        }, 450);
+      }
+
+      function pressEscape(){
+        document.dispatchEvent(new KeyboardEvent('keydown', {
+          key: 'Escape',
+          bubbles: true,
+          cancelable: true
+        }));
+      }
+
+      function tryInternalBack(){
+        var uiModal = document.getElementById('uiModal');
+        if(uiModal && uiModal.classList.contains('is-open')){
+          var closeUiModal = document.getElementById('uiModalClose');
+          if(closeUiModal){
+            closeUiModal.click();
+          } else {
+            uiModal.classList.remove('is-open');
+          }
+          return true;
+        }
+
+        var settingsModal = document.getElementById('settingsModal');
+        if(settingsModal && settingsModal.classList.contains('is-open')){
+          var closeSettings = document.getElementById('closeSettings');
+          if(closeSettings){
+            closeSettings.click();
+          } else {
+            settingsModal.classList.remove('is-open');
+          }
+          return true;
+        }
+
+        var sitePanel = document.getElementById('ikSiteSettingsPanel');
+        if(sitePanel && !sitePanel.hidden){
+          var closeSitePanel = document.getElementById('ikSiteSettingsClose');
+          if(closeSitePanel){
+            closeSitePanel.click();
+          } else {
+            sitePanel.hidden = true;
+          }
+          return true;
+        }
+
+        var textColorPop = document.getElementById('textColorPop');
+        var hlPop = document.getElementById('hlPop');
+        var drawerOpen = document.body.classList.contains('drawer-open');
+        var focusMode = document.body.classList.contains('focus-mode');
+        var hasInlinePopups = (textColorPop && !textColorPop.hidden) || (hlPop && !hlPop.hidden);
+
+        if(hasInlinePopups || drawerOpen || focusMode){
+          pressEscape();
+          return true;
+        }
+
+        return false;
+      }
+
+      if(backBtn){
+        backBtn.addEventListener('click', function(event){
+          event.preventDefault();
+          if(tryInternalBack()) return;
+          safeBrowserBack('../../index.html');
+        });
+      }
+    });
+  </script>
 
   <script>
   (function(){

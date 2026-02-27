@@ -891,3 +891,11 @@ body.page-home{ overflow: hidden; }
   width: max-content;
   margin-inline: auto;
 }
+
+#ikSiteNav > #ikBackBtn + a.ik-site-nav__link[href$="index.html"]{
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-left: 0;
+  margin-right: 0;
+}
