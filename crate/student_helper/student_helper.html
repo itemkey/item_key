@@ -46,7 +46,9 @@
 
 .ik-site-nav__link:hover{ border-color: rgba(0,0,0,.25); }
 
-.ik-site-nav{ position: relative; }
+.ik-site-nav__link#ikBackBtn{ margin-right: auto; }
+.ik-site-nav__link[href]{ margin-left: auto; margin-right: auto; }
+
 .ik-site-nav__actions{
   position: absolute;
   right: 14px;
@@ -182,6 +184,7 @@
   <div class="veil" aria-hidden="true"></div>
 
   <header class="ik-site-nav" id="ikSiteNav">
+    <button type="button" class="ik-site-nav__link" id="ikBackBtn" title="Вернуться назад">← Назад</button>
     <a class="ik-site-nav__link" href="../../index.html">Главное меню</a>
   </header>
 
@@ -1012,6 +1015,41 @@
   </footer>
 
   <script src="./js/tabs.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function(){
+      var backBtn = document.getElementById('ikBackBtn');
+
+      function safeBrowserBack(fallbackHref){
+        if(window.history.length <= 1){
+          window.location.href = fallbackHref;
+          return;
+        }
+
+        var currentHref = window.location.href;
+        var navigated = false;
+        var markNavigated = function(){ navigated = true; };
+
+        window.addEventListener('pagehide', markNavigated, { once: true });
+        window.addEventListener('popstate', markNavigated, { once: true });
+
+        window.history.back();
+
+        window.setTimeout(function(){
+          if(navigated) return;
+          if(window.location.href === currentHref){
+            window.location.href = fallbackHref;
+          }
+        }, 450);
+      }
+
+      if(backBtn){
+        backBtn.addEventListener('click', function(event){
+          event.preventDefault();
+          safeBrowserBack('../../index.html');
+        });
+      }
+    });
+  </script>
   <script src="./js/lobby.js"></script>
   <script src="./js/structure_data.js"></script>
   <script src="./js/structure.js"></script>

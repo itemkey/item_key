@@ -9,6 +9,50 @@
   <link rel="stylesheet" href="../../assets/css/styles.css" />
 
   <style>
+    /* ik-site-nav styles */
+    .ik-site-nav, .ik-site-nav *{ box-sizing: border-box; }
+
+    .ik-site-nav{
+      position: relative;
+      z-index: 50;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px 14px;
+      margin: 0 0 18px;
+      background: #fff;
+      border-bottom: 1px solid rgba(0,0,0,.14);
+    }
+
+    .ik-site-nav__link{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      max-width: 100%;
+      padding: 10px 16px;
+      border: 1px solid rgba(0,0,0,.14);
+      background: #fff;
+      color: rgba(0,0,0,.86);
+      text-decoration: none;
+      font-size: 11px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      line-height: 1;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .ik-site-nav__link:hover{ border-color: rgba(0,0,0,.25); }
+
+    .ik-site-nav__link#ikBackBtn{ position: absolute; left: 14px; }
+    .ik-site-nav__center{ position: absolute; left: 50%; transform: translateX(-50%); }
+
+    @media (max-width: 520px){
+      .ik-site-nav{ padding: 14px 12px; margin-bottom: 14px; }
+      .ik-site-nav__link{ padding: 10px 12px; letter-spacing: 3px; }
+    }
+
     html, body { background:#fff !important; background-image:none !important; filter:none !important; }
     body::before, body::after, html::before, html::after { content:none !important; display:none !important; }
     [class*="circle"], [class*="ring"], [class*="orb"], [class*="halo"], [class*="glow"] { display:none !important; }
@@ -289,21 +333,15 @@
 <body class="page page-learning">
   <div class="veil" aria-hidden="true"></div>
 
-  <header class="topbar topbar--edge">
-    <a class="toplink" href="../../index.html" aria-label="Back to index">
-      <span class="tag">student-helper</span>
-    </a>
+  <header class="ik-site-nav" id="ikSiteNav">
+    <button type="button" class="ik-site-nav__link" id="ikBackBtn" title="Вернуться назад">← Назад</button>
+    <a class="ik-site-nav__link ik-site-nav__center" href="../../index.html">Главное меню</a>
   </header>
 
   <main class="learn-stage" aria-label="Student Helper">
     <div class="learn-wrap">
 
       <div class="ik-top-actions">
-        <a class="ik-back ik-btn" href="../../index.html">
-          <span aria-hidden="true">←</span>
-          <span>назад в index</span>
-        </a>
-
         <span class="ik-pill" title="Локальная база IndexedDB (в браузере)">
           <span>db</span>
           <span id="dbStatus" class="ik-muted">...</span>
@@ -824,13 +862,57 @@
 
   <script>
   // -----------------------------
-  // Tabs
+  // Back button handler
+  // -----------------------------
+  (function(){
+    const backBtn = document.getElementById('ikBackBtn');
+
+    function safeBrowserBack(fallbackHref){
+      if(window.history.length <= 1){
+        window.location.href = fallbackHref;
+        return;
+      }
+
+      const currentHref = window.location.href;
+      let navigated = false;
+      const markNavigated = () => { navigated = true; };
+
+      window.addEventListener('pagehide', markNavigated, { once: true });
+      window.addEventListener('popstate', markNavigated, { once: true });
+
+      window.history.back();
+
+      window.setTimeout(() => {
+        if(navigated) return;
+        if(window.location.href === currentHref){
+          window.location.href = fallbackHref;
+        }
+      }, 450);
+    }
+
+    if(backBtn){
+      backBtn.addEventListener('click', function(event){
+        event.preventDefault();
+        safeBrowserBack('../../index.html');
+      });
+    }
+  })();
+
+  // -----------------------------
+  // Tabs + internal route hash
   // -----------------------------
   (function(){
     const tabDict = document.getElementById('tab-dict');
     const tabWT   = document.getElementById('tab-wt');
     const panelDict = document.getElementById('panel-dict');
     const panelWT   = document.getElementById('panel-wt');
+
+    const subPractice = document.getElementById('subtab-practice');
+    const subBuilder = document.getElementById('subtab-builder');
+    const panelPractice = document.getElementById('panel-practice');
+    const panelBuilder = document.getElementById('panel-builder');
+
+    let ignoreNextHashChange = false;
 
     function setTab(which){
       const isDict = which === 'dict';
@@ -839,25 +921,87 @@
       panelDict.hidden = !isDict;
       panelWT.hidden   = isDict;
     }
-    tabDict.addEventListener('click', ()=> setTab('dict'));
-    tabWT.addEventListener('click', ()=> setTab('wt'));
-  })();
 
-  (function(){
-    const a = document.getElementById('subtab-practice');
-    const b = document.getElementById('subtab-builder');
-    const pa = document.getElementById('panel-practice');
-    const pb = document.getElementById('panel-builder');
-
-    function set(which){
+    function setSubTab(which){
       const isA = which === 'practice';
-      a.setAttribute('aria-selected', String(isA));
-      b.setAttribute('aria-selected', String(!isA));
-      pa.hidden = !isA;
-      pb.hidden = isA;
+      subPractice.setAttribute('aria-selected', String(isA));
+      subBuilder.setAttribute('aria-selected', String(!isA));
+      panelPractice.hidden = !isA;
+      panelBuilder.hidden = isA;
     }
-    a.addEventListener('click', ()=> set('practice'));
-    b.addEventListener('click', ()=> set('builder'));
+
+    function getMainTab(){
+      return panelWT.hidden ? 'dict' : 'wt';
+    }
+
+    function getWTSubTab(){
+      return panelPractice.hidden ? 'builder' : 'practice';
+    }
+
+    function getRouteHash(){
+      const main = getMainTab();
+      if(main === 'dict') return 'dict';
+      return getWTSubTab() === 'builder' ? 'wt-builder' : 'wt-practice';
+    }
+
+    function setHashRoute(route, replace){
+      const nextHash = '#' + route;
+      if(window.location.hash === nextHash) return;
+
+      if(replace){
+        const nextUrl = window.location.pathname + window.location.search + nextHash;
+        window.history.replaceState(window.history.state, '', nextUrl);
+        return;
+      }
+
+      ignoreNextHashChange = true;
+      window.location.hash = route;
+    }
+
+    function parseHashRoute(){
+      const hash = String(window.location.hash || '').replace('#', '').trim().toLowerCase();
+      if(hash === 'dict') return { main: 'dict', wtSubtab: 'practice' };
+      if(hash === 'wt' || hash === 'wt-practice') return { main: 'wt', wtSubtab: 'practice' };
+      if(hash === 'wt-builder') return { main: 'wt', wtSubtab: 'builder' };
+      return null;
+    }
+
+    function applyRoute(route, syncHash){
+      const next = route || { main: 'dict', wtSubtab: 'practice' };
+      if(next.main === 'dict'){
+        setTab('dict');
+      } else {
+        setTab('wt');
+        setSubTab(next.wtSubtab === 'builder' ? 'builder' : 'practice');
+      }
+
+      if(syncHash){
+        setHashRoute(getRouteHash(), false);
+      }
+    }
+
+    tabDict.addEventListener('click', ()=> applyRoute({ main: 'dict', wtSubtab: 'practice' }, true));
+    tabWT.addEventListener('click', ()=> applyRoute({ main: 'wt', wtSubtab: getWTSubTab() }, true));
+    subPractice.addEventListener('click', ()=> applyRoute({ main: 'wt', wtSubtab: 'practice' }, true));
+    subBuilder.addEventListener('click', ()=> applyRoute({ main: 'wt', wtSubtab: 'builder' }, true));
+
+    window.addEventListener('hashchange', () => {
+      if(ignoreNextHashChange){
+        ignoreNextHashChange = false;
+        return;
+      }
+
+      const parsed = parseHashRoute();
+      if(parsed) applyRoute(parsed, false);
+    });
+
+    const parsedInit = parseHashRoute();
+    if(parsedInit){
+      applyRoute(parsedInit, false);
+    } else {
+      applyRoute({ main: getMainTab(), wtSubtab: getWTSubTab() }, false);
+      setHashRoute(getRouteHash(), true);
+    }
   })();
 
   // -----------------------------

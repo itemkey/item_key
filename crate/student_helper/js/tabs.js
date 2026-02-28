@@ -41,10 +41,18 @@
   window.StudentHelperTabs.setMainTab = setMainTab;
   window.StudentHelperTabs.getMainTab = getMainTab;
 
-  if (tabDict) tabDict.addEventListener('click', ()=> setMainTab('dict'));
-  if (tabStruct) tabStruct.addEventListener('click', ()=> setMainTab('struct'));
-  if (tabTenses) tabTenses.addEventListener('click', ()=> setMainTab('tenses'));
-  if (tabWT) tabWT.addEventListener('click', ()=> setMainTab('wt'));
+  function goRouteOrFallback(route, fallback){
+    if(window.StudentHelperRoute && typeof window.StudentHelperRoute.go === 'function'){
+      window.StudentHelperRoute.go(route);
+      return;
+    }
+    fallback();
+  }
+
+  if (tabDict) tabDict.addEventListener('click', ()=> goRouteOrFallback('dict', ()=> setMainTab('dict')));
+  if (tabStruct) tabStruct.addEventListener('click', ()=> goRouteOrFallback('struct', ()=> setMainTab('struct')));
+  if (tabTenses) tabTenses.addEventListener('click', ()=> goRouteOrFallback('tenses', ()=> setMainTab('tenses')));
+  if (tabWT) tabWT.addEventListener('click', ()=> goRouteOrFallback('wt', ()=> setMainTab('wt')));
 
   // Init from markup
   let init = 'dict';
@@ -75,8 +83,16 @@
   window.StudentHelperTabs.setWTSubTab = set;
   window.StudentHelperTabs.getWTSubTab = ()=> (pa.hidden ? 'builder' : 'practice');
 
-  a.addEventListener('click', ()=> set('practice'));
-  b.addEventListener('click', ()=> set('builder'));
+  function goRouteOrFallback(route, fallback){
+    if(window.StudentHelperRoute && typeof window.StudentHelperRoute.go === 'function'){
+      window.StudentHelperRoute.go(route);
+      return;
+    }
+    fallback();
+  }
+
+  a.addEventListener('click', ()=> goRouteOrFallback('wt-practice', ()=> set('practice')));
+  b.addEventListener('click', ()=> goRouteOrFallback('wt-builder', ()=> set('builder')));
 
   const initIsPractice = a.getAttribute('aria-selected') === 'true';
   set(initIsPractice ? 'practice' : 'builder');
