@@ -1,13 +1,58 @@
 /* student_helper.css + student_helper_extra.css (merged) */
 /* -------------------------------------------- */
 
-html, body { background:#fff !important; background-image:none !important; filter:none !important; }
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--ik-bg, var(--bg, #fff)) !important;
+  background-image: none !important;
+  filter: none !important;
+}
+
+body {
+  min-height: 100vh;
+}
     body::before, body::after, html::before, html::after { content:none !important; display:none !important; }
     [class*="circle"], [class*="ring"], [class*="orb"], [class*="halo"], [class*="glow"] { display:none !important; }
 
-    body.page-learning{ min-height:100vh; display:flex; flex-direction:column; }
-    main.learn-stage{ flex:1 1 auto; padding:64px 16px 72px; }
+    body.page-learning{
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+    }
+    main.learn-stage{
+      flex: 1 1 auto;
+      width: 100%;
+      padding: 64px 16px 72px;
+    }
     .learn-wrap{ width:min(980px,100%); margin:0 auto; }
+
+    body.page-learning .sh-footer.bottombar--edge{
+      position: static;
+      left: auto;
+      right: auto;
+      bottom: auto;
+      transform: none;
+      z-index: auto;
+      width: min(860px, calc(100% - max(24px, 2*var(--safe-x))));
+      margin: auto auto max(var(--bottom), 14px);
+    }
+
+    @media (max-width: 900px){
+      body.page-learning .sh-footer.bottombar--edge{
+        width: calc(100% - 20px);
+        margin-bottom: 14px;
+      }
+    }
+
+    @media (max-width: 640px){
+      body.page-learning .sh-footer.bottombar--edge{
+        width: calc(100% - 16px);
+        margin-bottom: 10px;
+      }
+    }
 
     .ik-card{
       border:2px solid #000; background:#fff;
