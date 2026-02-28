@@ -1,0 +1,540 @@
+:root {
+  --ik-bg: #ffffff;
+  --ik-text: #0c0f14;
+  --ik-muted: rgba(12, 15, 20, 0.66);
+  --ik-border: rgba(0, 0, 0, 0.16);
+  --ik-border-strong: rgba(0, 0, 0, 0.34);
+  --ik-surface: rgba(255, 255, 255, 0.94);
+  --ik-surface-soft: rgba(255, 255, 255, 0.86);
+  --ik-surface-alt: rgba(247, 249, 253, 0.85);
+  --ik-overlay: rgba(0, 0, 0, 0.3);
+  --ik-shadow: 0 14px 32px rgba(0, 0, 0, 0.18);
+  --ik-focus: #2f5bff;
+  --ik-link: #1740c7;
+  --ik-success-bg: rgba(32, 165, 85, 0.17);
+  --ik-error-bg: rgba(220, 60, 90, 0.17);
+  --ik-warn-bg: rgba(255, 170, 0, 0.24);
+}
+
+html {
+  color-scheme: light;
+}
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --ik-bg: #0f1218;
+  --ik-text: #edf2fa;
+  --ik-muted: rgba(237, 242, 250, 0.74);
+  --ik-border: rgba(237, 242, 250, 0.24);
+  --ik-border-strong: rgba(237, 242, 250, 0.44);
+  --ik-surface: rgba(24, 29, 38, 0.96);
+  --ik-surface-soft: rgba(29, 35, 45, 0.92);
+  --ik-surface-alt: rgba(35, 42, 54, 0.88);
+  --ik-overlay: rgba(6, 9, 14, 0.72);
+  --ik-shadow: 0 18px 40px rgba(0, 0, 0, 0.56);
+  --ik-focus: #9fc0ff;
+  --ik-link: #9fc0ff;
+  --ik-success-bg: rgba(64, 196, 129, 0.25);
+  --ik-error-bg: rgba(255, 132, 158, 0.24);
+  --ik-warn-bg: rgba(248, 195, 108, 0.22);
+}
+
+html[data-theme="dark"] body {
+  background: var(--ik-bg) !important;
+  color: var(--ik-text) !important;
+}
+
+html[data-theme="dark"] body::before {
+  opacity: 0.35;
+  background:
+    radial-gradient(circle at 18% 22%, rgba(255, 255, 255, 0.03), transparent 42%),
+    radial-gradient(circle at 72% 64%, rgba(255, 255, 255, 0.03), transparent 44%),
+    radial-gradient(circle at 52% 14%, rgba(255, 255, 255, 0.02), transparent 38%),
+    radial-gradient(circle at 28% 78%, rgba(255, 255, 255, 0.03), transparent 46%);
+}
+
+html[data-theme="dark"] body::after {
+  opacity: 0.06;
+  filter: blur(0.3px);
+}
+
+html[data-theme="dark"] a {
+  color: inherit;
+}
+
+html[data-theme="dark"] ::placeholder {
+  color: var(--ik-muted);
+  opacity: 0.82;
+}
+
+html[data-theme="dark"] :where(button, a, input, textarea, select, [role="button"]):focus-visible {
+  outline-color: var(--ik-focus) !important;
+  border-color: var(--ik-focus) !important;
+}
+
+.ik-theme-switch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.ik-theme-option {
+  border: 1px solid var(--ik-border);
+  background: var(--ik-surface-soft);
+  min-height: 42px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.ik-theme-option input {
+  margin: 0;
+}
+
+.ik-theme-option.is-active {
+  border-color: var(--ik-border-strong);
+  background: var(--ik-surface-alt);
+}
+
+.ik-theme-fab {
+  position: fixed;
+  right: 14px;
+  bottom: 14px;
+  z-index: 100300;
+  min-width: 86px;
+  min-height: 44px;
+  border: 1px solid var(--ik-border-strong);
+  background: var(--ik-surface);
+  color: var(--ik-text);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-size: 11px;
+  cursor: pointer;
+  box-shadow: var(--ik-shadow);
+}
+
+@media (max-width: 640px) {
+  .ik-theme-fab {
+    bottom: calc(14px + env(safe-area-inset-bottom));
+  }
+}
+
+html[data-theme="dark"] .topbar--edge,
+html[data-theme="dark"] .bottombar--edge,
+html[data-theme="dark"] .ik-site-nav,
+html[data-theme="dark"] .ik-settings-panel,
+html[data-theme="dark"] .dev-window,
+html[data-theme="dark"] .auth-box,
+html[data-theme="dark"] .logo-circle,
+html[data-theme="dark"] .nav-btn,
+html[data-theme="dark"] .rail-link,
+html[data-theme="dark"] .tag,
+html[data-theme="dark"] .ik-site-nav__link,
+html[data-theme="dark"] .ik-gear-btn,
+html[data-theme="dark"] .ik-settings-panel__close,
+html[data-theme="dark"] .ik-lang-option,
+html[data-theme="dark"] .ik-lang-option.is-active {
+  background: var(--ik-surface);
+  color: var(--ik-text);
+  border-color: var(--ik-border);
+}
+
+html[data-theme="dark"] .nav-btn {
+  border-color: var(--ik-border-strong);
+  box-shadow: 0 8px 0 rgba(0, 0, 0, 0.52);
+}
+
+html[data-theme="dark"] .nav-btn:hover,
+html[data-theme="dark"] .nav-btn.is-active,
+html[data-theme="dark"] .nav-btn[aria-current="page"],
+html[data-theme="dark"] .rail-link.is-active {
+  background: #ecf2ff;
+  color: #0f1218;
+  border-color: #ecf2ff;
+}
+
+html[data-theme="dark"] .rail-link:hover {
+  border-color: var(--ik-border-strong);
+}
+
+html[data-theme="dark"] .hint,
+html[data-theme="dark"] .muted,
+html[data-theme="dark"] .hero-sub,
+html[data-theme="dark"] .hero-meta,
+html[data-theme="dark"] .logo-hint,
+html[data-theme="dark"] .core-sub,
+html[data-theme="dark"] .microtext,
+html[data-theme="dark"] .microtext--free,
+html[data-theme="dark"] .m-line,
+html[data-theme="dark"] .ik-settings-label,
+html[data-theme="dark"] .ik-label,
+html[data-theme="dark"] .ik-footnote,
+html[data-theme="dark"] .w-label,
+html[data-theme="dark"] .w-hint,
+html[data-theme="dark"] .w-status,
+html[data-theme="dark"] .m-meta,
+html[data-theme="dark"] .m-snippet,
+html[data-theme="dark"] .n-label,
+html[data-theme="dark"] .list-meta,
+html[data-theme="dark"] .crumbs,
+html[data-theme="dark"] .dialog-msg,
+html[data-theme="dark"] .field label,
+html[data-theme="dark"] .toast-body,
+html[data-theme="dark"] .note-snippet,
+html[data-theme="dark"] .w-title .sub,
+html[data-theme="dark"] .n-title .sub,
+html[data-theme="dark"] .drawer-title,
+html[data-theme="dark"] .crate-card__kicker,
+html[data-theme="dark"] .crate-card__meta,
+html[data-theme="dark"] .crate-title .sub,
+html[data-theme="dark"] .planning-title .kicker,
+html[data-theme="dark"] .page-planning .column__count,
+html[data-theme="dark"] .page-planning .card__meta {
+  color: var(--ik-muted);
+}
+
+html[data-theme="dark"] .window,
+html[data-theme="dark"] .tracery,
+html[data-theme="dark"] .arch,
+html[data-theme="dark"] .arch--free,
+html[data-theme="dark"] .core-caption,
+html[data-theme="dark"] .core-caption--free,
+html[data-theme="dark"] .outer-frame,
+html[data-theme="dark"] .outer-frame::before,
+html[data-theme="dark"] .outer-frame::after {
+  border-color: var(--ik-border);
+}
+
+html[data-theme="dark"] .window {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent 42%);
+}
+
+html[data-theme="dark"] .tracery {
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.07) 0 1px, transparent 1px 18px),
+    repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0 1px, transparent 1px 24px);
+}
+
+html[data-theme="dark"] .m-line::before,
+html[data-theme="dark"] .rail--left::before,
+html[data-theme="dark"] .rail--right::before,
+html[data-theme="dark"] .buttress {
+  background: rgba(237, 242, 250, 0.26);
+}
+
+html[data-theme="dark"] .intro-stage {
+  background: #0f1218 !important;
+  filter: invert(1) hue-rotate(180deg);
+}
+
+html[data-theme="dark"] #logoCanvas {
+  filter: invert(1) contrast(1.06);
+}
+
+html[data-theme="dark"] .dev-overlay,
+html[data-theme="dark"] .modal,
+html[data-theme="dark"] .modal__backdrop,
+html[data-theme="dark"] .follow-scrim,
+html[data-theme="dark"] .drawer-overlay {
+  background: var(--ik-overlay);
+}
+
+html[data-theme="dark"] .dev-window,
+html[data-theme="dark"] .modal-card,
+html[data-theme="dark"] .modal__panel,
+html[data-theme="dark"] .toast,
+html[data-theme="dark"] .w-floatbar,
+html[data-theme="dark"] .mini-pop,
+html[data-theme="dark"] .onoi-img-bubble,
+html[data-theme="dark"] .ik-settings-panel,
+html[data-theme="dark"] .mobile-dock,
+html[data-theme="dark"] .drawer-head {
+  background: var(--ik-surface);
+  border-color: var(--ik-border-strong);
+  box-shadow: var(--ik-shadow);
+}
+
+html[data-theme="dark"] .btn,
+html[data-theme="dark"] .ctl,
+html[data-theme="dark"] .icon-btn,
+html[data-theme="dark"] .ik-btn,
+html[data-theme="dark"] .ik-tab,
+html[data-theme="dark"] .ik-pill,
+html[data-theme="dark"] .ik-badge,
+html[data-theme="dark"] .w-btn,
+html[data-theme="dark"] .w-pill,
+html[data-theme="dark"] .w-winbtn,
+html[data-theme="dark"] .n-btn,
+html[data-theme="dark"] .tool,
+html[data-theme="dark"] .toolsel,
+html[data-theme="dark"] .proj-chip,
+html[data-theme="dark"] .proj-chip__ctl,
+html[data-theme="dark"] .proj-chip__del,
+html[data-theme="dark"] .tree-tgl,
+html[data-theme="dark"] .color-swatch,
+html[data-theme="dark"] .code-copy-float {
+  background: var(--ik-surface-soft);
+  color: var(--ik-text);
+  border-color: var(--ik-border);
+}
+
+html[data-theme="dark"] .btn--primary,
+html[data-theme="dark"] .ik-btn.ik-btn--black,
+html[data-theme="dark"] .ik-tab[aria-selected="true"],
+html[data-theme="dark"] .w-btn--primary,
+html[data-theme="dark"] .tool.is-primary {
+  background: #ecf2ff;
+  color: #0f1218;
+  border-color: #ecf2ff;
+}
+
+html[data-theme="dark"] :is(.btn, .ik-btn, .w-btn, .n-btn, .tool)[disabled] {
+  color: var(--ik-muted);
+  opacity: 0.46;
+}
+
+html[data-theme="dark"] .auth-form input,
+html[data-theme="dark"] .ik-input,
+html[data-theme="dark"] .ik-select,
+html[data-theme="dark"] .w-text,
+html[data-theme="dark"] .n-search,
+html[data-theme="dark"] .editor-title,
+html[data-theme="dark"] .dialog-input,
+html[data-theme="dark"] .mini-hex,
+html[data-theme="dark"] .modal-input,
+html[data-theme="dark"] input[type="number"],
+html[data-theme="dark"] select,
+html[data-theme="dark"] textarea {
+  background: var(--ik-surface-soft);
+  color: var(--ik-text);
+  border-color: var(--ik-border);
+}
+
+html[data-theme="dark"] .ik-input.is-ok,
+html[data-theme="dark"] .ik-select.is-ok,
+html[data-theme="dark"] .sh-choice.is-correct {
+  background: var(--ik-success-bg);
+}
+
+html[data-theme="dark"] .ik-input.is-bad,
+html[data-theme="dark"] .ik-select.is-bad,
+html[data-theme="dark"] .sh-choice.is-wrong {
+  background: var(--ik-error-bg);
+}
+
+html[data-theme="dark"] .dot,
+html[data-theme="dark"] .col-dot {
+  border-color: var(--ik-border);
+}
+
+html[data-theme="dark"] .dot.warn {
+  background: var(--ik-warn-bg);
+}
+
+html[data-theme="dark"] .dot.bad {
+  background: var(--ik-error-bg);
+}
+
+html[data-theme="dark"] .modal__head,
+html[data-theme="dark"] .modal-head,
+html[data-theme="dark"] .w-reader.is-full .w-reader-head {
+  border-color: var(--ik-border);
+}
+
+html[data-theme="dark"] .crate-card {
+  background: var(--ik-surface);
+  border-color: var(--ik-border);
+  color: var(--ik-text);
+}
+
+html[data-theme="dark"] .crate-card:hover {
+  border-color: var(--ik-border-strong);
+}
+
+html[data-theme="dark"] .page-planning .planning-shell,
+html[data-theme="dark"] .page-planning .column,
+html[data-theme="dark"] .page-planning .schedule,
+html[data-theme="dark"] .page-planning .card,
+html[data-theme="dark"] .page-planning .proj-chip,
+html[data-theme="dark"] .page-planning .modal__panel,
+html[data-theme="dark"] .page-planning .toast {
+  background: var(--ik-surface);
+  border-color: var(--ik-border);
+}
+
+html[data-theme="dark"] .page-planning .card {
+  background: color-mix(in srgb, var(--accent, #d7e4ff) 20%, #1b2230);
+  border-color: color-mix(in srgb, var(--accent, #d7e4ff) 42%, #0f1218);
+}
+
+html[data-theme="dark"] .page-planning .card::before {
+  background: color-mix(in srgb, var(--accent, #d7e4ff) 70%, #eef4ff);
+}
+
+html[data-theme="dark"] .page-planning .schedule-placeholder {
+  color: var(--ik-muted);
+}
+
+html[data-theme="dark"] .page-learning .ik-card,
+html[data-theme="dark"] .page-learning .ik-ex,
+html[data-theme="dark"] .page-learning .ik-list,
+html[data-theme="dark"] .page-learning .ik-feedback,
+html[data-theme="dark"] .page-learning .ik-rule,
+html[data-theme="dark"] .page-learning .ik-flip-face,
+html[data-theme="dark"] .page-learning .sh-table-wrap,
+html[data-theme="dark"] .page-learning .sh-examples,
+html[data-theme="dark"] .page-learning .sh-highlight,
+html[data-theme="dark"] .page-learning .sh-run-card,
+html[data-theme="dark"] .page-learning .sh-compare__rule,
+html[data-theme="dark"] .page-learning .sh-compare__table table,
+html[data-theme="dark"] .page-learning .sh-hint,
+html[data-theme="dark"] .page-learning .sh-progress,
+html[data-theme="dark"] .page-learning .sh-tile {
+  background: var(--ik-surface);
+  border-color: var(--ik-border-strong);
+  color: var(--ik-text);
+}
+
+html[data-theme="dark"] .page-learning .ik-card::before,
+html[data-theme="dark"] .page-learning .ik-flip-face::before {
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0)),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.07) 0 1px, rgba(255, 255, 255, 0) 1px 5px);
+  mix-blend-mode: screen;
+  opacity: 0.2;
+}
+
+html[data-theme="dark"] .page-learning .ik-feedback[data-state="correct"] .ik-feedback__stamp {
+  background: #ecf2ff;
+  color: #0f1218;
+  border-color: #ecf2ff;
+}
+
+html[data-theme="dark"] .page-learning .ik-feedback[data-state="idle"] .ik-feedback__stamp,
+html[data-theme="dark"] .page-learning .ik-feedback[data-state="wrong"] .ik-feedback__stamp {
+  background: var(--ik-surface-alt);
+  color: var(--ik-text);
+}
+
+html[data-theme="dark"] .page-learning .sh-choice.is-picked {
+  background: rgba(159, 192, 255, 0.18);
+  box-shadow: inset 0 0 0 2px rgba(159, 192, 255, 0.58);
+}
+
+html[data-theme="dark"] .page-learning .sh-table th,
+html[data-theme="dark"] .page-learning .sh-table td,
+html[data-theme="dark"] .page-learning .sh-compare__table th,
+html[data-theme="dark"] .page-learning .sh-compare__table td,
+html[data-theme="dark"] .page-learning .ik-list li {
+  border-color: var(--ik-border);
+}
+
+html[data-theme="dark"] .page-learning .sh-table thead th {
+  background: rgba(159, 192, 255, 0.16);
+}
+
+html[data-theme="dark"] .w-card,
+html[data-theme="dark"] .w-reader,
+html[data-theme="dark"] .w-warning,
+html[data-theme="dark"] details.w-adv,
+html[data-theme="dark"] .w-display,
+html[data-theme="dark"] .modal-list,
+html[data-theme="dark"] .m-row {
+  background: var(--ik-surface);
+  border-color: var(--ik-border);
+  color: var(--ik-text);
+}
+
+html[data-theme="dark"] .w-word:hover {
+  background: rgba(159, 192, 255, 0.14);
+}
+
+html[data-theme="dark"] .w-word.is-active {
+  background: rgba(159, 192, 255, 0.22);
+}
+
+html[data-theme="dark"] .w-reader.is-full {
+  background: var(--ik-surface);
+  border-color: var(--ik-border-strong);
+  box-shadow: var(--ik-shadow);
+}
+
+html[data-theme="dark"] .w-reader.is-full .w-reader-head {
+  background: var(--ik-surface);
+  border-bottom-color: var(--ik-border);
+}
+
+html[data-theme="dark"] .notes-wrap {
+  --bgCard: var(--ik-surface);
+  --bd: var(--ik-border);
+  --bd2: var(--ik-border-strong);
+  --muted: var(--ik-muted);
+  --accent: #d7e4ff;
+  --accentSoft: rgba(159, 192, 255, 0.17);
+  --accentSoft2: rgba(159, 192, 255, 0.24);
+}
+
+html[data-theme="dark"] .tree-item,
+html[data-theme="dark"] .note-row,
+html[data-theme="dark"] .editor,
+html[data-theme="dark"] .tree-breadcrumb,
+html[data-theme="dark"] .warnbox,
+html[data-theme="dark"] .empty,
+html[data-theme="dark"] .editor blockquote,
+html[data-theme="dark"] .editor img,
+html[data-theme="dark"] .editor figure.onoi-img,
+html[data-theme="dark"] .onoi-img-overlay .h,
+html[data-theme="dark"] .onoi-img-bubble button,
+html[data-theme="dark"] .editor .onoi-img-drop-marker {
+  background: var(--ik-surface-soft);
+  border-color: var(--ik-border);
+  color: var(--ik-text);
+}
+
+html[data-theme="dark"] .tree-item[data-depth="0"] {
+  background: rgba(43, 51, 66, 0.8);
+  border-left-color: rgba(219, 231, 255, 0.46);
+}
+
+html[data-theme="dark"] .tree-item[data-depth="0"] .tree-name::after {
+  border-color: var(--ik-border);
+  background: rgba(159, 192, 255, 0.17);
+}
+
+html[data-theme="dark"] .tree-item[data-depth]:not([data-depth="0"]),
+html[data-theme="dark"] .indent .tree-item {
+  background: rgba(31, 37, 48, 0.78);
+  border-color: var(--ik-border);
+}
+
+html[data-theme="dark"] .indent,
+html[data-theme="dark"] .indent > li > .tree-item::before {
+  border-color: var(--ik-border);
+}
+
+html[data-theme="dark"] .editor {
+  background: rgba(15, 21, 30, 0.93);
+}
+
+html[data-theme="dark"] .editor pre,
+html[data-theme="dark"] code.k {
+  background: rgba(10, 14, 22, 0.94);
+  border-color: var(--ik-border);
+  color: #dbe7ff;
+}
+
+html[data-theme="dark"] .color-swatch.is-none {
+  background: repeating-linear-gradient(45deg, transparent 0 4px, rgba(255, 255, 255, 0.24) 4px 8px), #202734;
+}
+
+html[data-theme="dark"] .onoi-img-overlay .box {
+  border-color: var(--ik-focus);
+}
+
+html[data-theme="dark"] .onoi-img-bubble button.is-on {
+  border-color: var(--ik-focus);
+  background: rgba(159, 192, 255, 0.16);
+}

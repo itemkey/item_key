@@ -4,12 +4,24 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Item Key — Главное меню</title>
+  <script>
+    (function() {
+      var key = "ik_site_theme_v1";
+      var stored = null;
+      try { stored = localStorage.getItem(key); } catch (e) {}
+      var theme = (stored === "dark" || stored === "light")
+        ? stored
+        : ((window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) ? "dark" : "light");
+      document.documentElement.setAttribute("data-theme", theme);
+      document.documentElement.style.colorScheme = theme;
+    })();
+  </script>
   <link rel="stylesheet" href="assets/css/styles.css" />
 
 <style>
 /* ABSOLUTE KILL OF ANY BACKGROUND CIRCLES / GRADIENTS */
 html, body {
-  background: #ffffff !important;
+  background: var(--bg) !important;
   background-image: none !important;
   filter: none !important;
 }
@@ -46,7 +58,7 @@ html::after {
     position: fixed;
     inset: 0;
     z-index: 5;
-    background: #fff;
+    background: var(--bg);
     pointer-events: none; /* do not block clicks */
   }
   #introCanvas{
@@ -56,7 +68,7 @@ html::after {
   }
 /* respect reduced motion */
   @media (prefers-reduced-motion: reduce){
-    .intro-stage{ filter:none !important; }
+    .intro-stage{ filter:none; }
   }
 </style>
 
@@ -271,6 +283,8 @@ html::after {
 }
 </style>
 
+<link rel="stylesheet" href="assets/css/theme.css" />
+
 </head>
 <body class="page page-home" data-i18n-page="index">
 
@@ -316,6 +330,7 @@ html::after {
   </div>
 </main>
 
+<script src="assets/js/theme.js"></script>
 <script src="assets/js/main.js"></script>
 
 <script>

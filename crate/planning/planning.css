@@ -190,6 +190,10 @@
   padding: 12px;
 }
 
+.schedule-placeholder{
+  color: var(--muted);
+}
+
 /* Modal — ВСЕГДА поверх всего сайта */
 .modal{
   position: fixed;

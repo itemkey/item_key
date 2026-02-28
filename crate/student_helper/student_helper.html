@@ -5,6 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Student Helper</title>
 
+  <script>
+    (function() {
+      var key = "ik_site_theme_v1";
+      var stored = null;
+      try { stored = localStorage.getItem(key); } catch (e) {}
+      var theme = (stored === "dark" || stored === "light")
+        ? stored
+        : ((window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) ? "dark" : "light");
+      document.documentElement.setAttribute("data-theme", theme);
+      document.documentElement.style.colorScheme = theme;
+    })();
+  </script>
+
   <!-- Match main site look -->
   <link rel="stylesheet" href="../../assets/css/styles.css" />
 
@@ -177,6 +190,8 @@
   .ik-settings-panel{ top: 62px; right: 12px; width: min(320px, calc(100vw - 24px)); }
 }
 </style>
+
+<link rel="stylesheet" href="../../assets/css/theme.css" />
 
 </head>
 
@@ -1014,6 +1029,7 @@
     <span class="hint">pre-alpha</span>
   </footer>
 
+  <script src="../../assets/js/theme.js"></script>
   <script src="./js/tabs.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function(){

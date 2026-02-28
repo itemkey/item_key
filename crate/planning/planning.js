@@ -34,7 +34,7 @@ function setView(view) {
 
   if (view === "schedule") {
     els.scheduleView.innerHTML = `
-      <div style="font-size:11px; letter-spacing:3px; text-transform:uppercase; color:rgba(0,0,0,.65);">
+      <div class="schedule-placeholder" style="font-size:11px; letter-spacing:3px; text-transform:uppercase;">
         schedule is next step
       </div>`;
   }

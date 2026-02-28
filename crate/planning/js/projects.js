@@ -110,7 +110,7 @@ export class Projects {
       title: "delete project",
       bodyHtml: `
         <form class="form">
-          <div style="font-size:11px; letter-spacing:2px; text-transform:uppercase; color:rgba(0,0,0,.75); line-height:1.5;">
+          <div style="font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); line-height:1.5;">
             confirm deletion. tasks inside will be deleted too.
           </div>
 

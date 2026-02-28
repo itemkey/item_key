@@ -5,6 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Item Key - onoi_notes</title>
 
+  <script>
+    (function() {
+      var key = "ik_site_theme_v1";
+      var stored = null;
+      try { stored = localStorage.getItem(key); } catch (e) {}
+      var theme = (stored === "dark" || stored === "light")
+        ? stored
+        : ((window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) ? "dark" : "light");
+      document.documentElement.setAttribute("data-theme", theme);
+      document.documentElement.style.colorScheme = theme;
+    })();
+  </script>
+
   <!-- глобальный стиль сайта -->
   <link rel="stylesheet" href="../../assets/css/styles.css" />
 
@@ -181,6 +194,17 @@
     .dot.ok{ background: rgba(0,0,0,.18); }
     .dot.warn{ background: rgba(255,170,0,.35); border-color: rgba(255,170,0,.6); }
     .dot.bad{ background: rgba(255,0,0,.25); border-color: rgba(255,0,0,.45); }
+
+    .n-top-actions,
+    .cat-actions,
+    .editor-status{
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .mobile-dock{ display: none; }
 
     /* Category tree */
     .tree{
@@ -1178,6 +1202,162 @@ body.focus-mode .n-col-right{
   background: rgba(0,0,0,.03);
 }
 
+/* =========================================================
+   Phone-only notes ergonomics
+   - larger input/editor
+   - thumb-friendly actions
+   - keyboard/safe-area aware dock
+   ========================================================= */
+:root{ --onoiKeyboardInset: 0px; }
+
+@media (max-width: 480px){
+  .center-stage{
+    padding-bottom: calc(var(--footerH) + 170px + env(safe-area-inset-bottom) + var(--onoiKeyboardInset));
+  }
+
+  .notes-wrap{
+    padding: 10px 10px 14px;
+    gap: 10px;
+  }
+
+  .n-card{ padding: 10px; }
+
+  .n-topbar{
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .list-head{
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .list-actions,
+  .tree-actions,
+  .cat-actions,
+  .n-top-actions{
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .list-actions .n-btn,
+  .tree-actions .n-btn,
+  .cat-actions .n-btn,
+  .n-top-actions .n-btn,
+  .n-topbar .n-btn,
+  #whisperBtn,
+  .mobile-dock .n-btn{
+    width: 100%;
+  }
+
+  .n-top-actions .n-btn:first-child{ grid-column: 1 / -1; }
+
+  .n-search,
+  .editor-title,
+  .dialog-input,
+  .field input,
+  .field select{
+    font-size: 16px;
+  }
+
+  .n-search{
+    height: 48px;
+    padding: 12px 14px;
+  }
+
+  .editor-head{
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .editor-head-right{
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    justify-content: stretch;
+  }
+
+  .editor-head-right .crumbs{ max-width: none; }
+
+  .editor-title{
+    min-height: 52px;
+    height: auto;
+    padding: 14px;
+    letter-spacing: 1px;
+  }
+
+  .editor{
+    min-height: clamp(280px, 48dvh, 560px);
+    padding: 16px 14px;
+    font-size: 17px;
+    line-height: 1.75;
+    scroll-padding-bottom: calc(190px + env(safe-area-inset-bottom) + var(--onoiKeyboardInset));
+  }
+
+  .n-btn,
+  .tool,
+  .toolsel{
+    min-height: 48px;
+  }
+
+  .n-btn{
+    padding: 12px 12px;
+    font-size: 12px;
+    letter-spacing: 2px;
+  }
+
+  .tool,
+  .toolsel{
+    height: 48px;
+    font-size: 14px;
+    padding: 0 12px;
+  }
+
+  .editor-status{
+    padding-bottom: calc(8px + env(safe-area-inset-bottom));
+  }
+
+  .mobile-dock{
+    position: fixed;
+    left: 10px;
+    right: 10px;
+    bottom: calc(var(--footerH) + 8px + env(safe-area-inset-bottom) + var(--onoiKeyboardInset));
+    z-index: 100050;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    padding: 8px;
+    border: 1px solid rgba(0,0,0,.18);
+    background: rgba(255,255,255,.96);
+  }
+
+  .mobile-dock .n-btn{
+    min-height: 48px;
+    padding: 8px;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+  }
+}
+
+@media (max-width: 380px){
+  .mobile-dock,
+  .n-top-actions,
+  .tree-actions,
+  .cat-actions,
+  .list-actions{
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) and (pointer: coarse){
+  .n-btn,
+  .tool,
+  .toolsel{
+    min-height: 50px;
+  }
+}
+
 </style>
 
 
@@ -1300,6 +1480,8 @@ body.focus-mode .n-col-right{
 }
 </style>
 
+<link rel="stylesheet" href="../../assets/css/theme.css" />
+
 </head>
 
 <body class="page page-crate" data-i18n-page="onoi_notes">
@@ -1329,7 +1511,7 @@ body.focus-mode .n-col-right{
             <span id="syncText">local</span>
           </div>
         </div>
-<div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px">
+<div class="n-top-actions">
 <button class="n-btn" id="settingsBtn" type="button">Настройки</button>
           <button class="n-btn" id="exportBtn" type="button">Экспорт JSON</button>
           <button class="n-btn" id="importBtn" type="button">Импорт JSON</button>
@@ -1358,7 +1540,7 @@ body.focus-mode .n-col-right{
 
           <div class="tree" id="catTree" aria-label="Дерево категорий"></div>
 
-          <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px">
+          <div class="cat-actions">
             <button class="n-btn" id="renameCatBtn" type="button">Переименовать</button>
             <button class="n-btn" id="deleteCatBtn" type="button">Удалить</button>
           </div>
@@ -1471,7 +1653,7 @@ body.focus-mode .n-col-right{
 
           <div class="editor" id="editor" contenteditable="true" spellcheck="true" aria-label="Текст заметки"></div>
 
-          <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px">
+          <div class="editor-status">
             <div class="n-pill" aria-label="Автосохранение">
               <span class="dot ok" id="saveDot"></span>
               <span id="saveText">saved</span>
@@ -1485,6 +1667,12 @@ body.focus-mode .n-col-right{
       </div>
     </section>
   </main>
+
+  <div class="mobile-dock" aria-label="Быстрые действия">
+    <button class="n-btn is-primary" id="mobileNewNoteBtn" type="button">Новая заметка</button>
+    <button class="n-btn" id="mobileDeleteNoteBtn" type="button">Удалить</button>
+    <button class="n-btn" id="mobileWhisperBtn" type="button">Прошептать</button>
+  </div>
 
   <footer class="bottombar bottombar--edge">
     <span class="hint">onoi_notes</span>
@@ -6587,6 +6775,58 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
     applyLanguage(getLang());
     initObserver();
   });
+})();
+</script>
+
+<script src="../../assets/js/theme.js"></script>
+
+<script>
+(() => {
+  const root = document.documentElement;
+  const mqPhone = window.matchMedia('(max-width: 480px)');
+
+  const mobileNew = document.getElementById('mobileNewNoteBtn');
+  const mobileDelete = document.getElementById('mobileDeleteNoteBtn');
+  const mobileWhisper = document.getElementById('mobileWhisperBtn');
+
+  const newNoteBtn = document.getElementById('newNoteBtn');
+  const deleteNoteBtn = document.getElementById('deleteNoteBtn');
+  const whisperBtn = document.getElementById('whisperBtn');
+
+  function forwardClick(from, to){
+    if(!from || !to) return;
+    from.addEventListener('click', () => to.click());
+  }
+
+  forwardClick(mobileNew, newNoteBtn);
+  forwardClick(mobileDelete, deleteNoteBtn);
+  forwardClick(mobileWhisper, whisperBtn);
+
+  function syncKeyboardInset(){
+    if(!mqPhone.matches){
+      root.style.setProperty('--onoiKeyboardInset', '0px');
+      return;
+    }
+
+    const vv = window.visualViewport;
+    if(!vv){
+      root.style.setProperty('--onoiKeyboardInset', '0px');
+      return;
+    }
+
+    const keyboardInset = Math.max(0, window.innerHeight - (vv.height + vv.offsetTop));
+    root.style.setProperty('--onoiKeyboardInset', keyboardInset + 'px');
+  }
+
+  syncKeyboardInset();
+
+  if(window.visualViewport){
+    window.visualViewport.addEventListener('resize', syncKeyboardInset);
+    window.visualViewport.addEventListener('scroll', syncKeyboardInset);
+  }
+
+  window.addEventListener('resize', syncKeyboardInset);
+  try{ mqPhone.addEventListener('change', syncKeyboardInset); }catch(e){}
 })();
 </script>
 </body>

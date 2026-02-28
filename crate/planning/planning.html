@@ -5,6 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Item Key - Планирование</title>
 
+  <script>
+    (function() {
+      var key = "ik_site_theme_v1";
+      var stored = null;
+      try { stored = localStorage.getItem(key); } catch (e) {}
+      var theme = (stored === "dark" || stored === "light")
+        ? stored
+        : ((window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) ? "dark" : "light");
+      document.documentElement.setAttribute("data-theme", theme);
+      document.documentElement.style.colorScheme = theme;
+    })();
+  </script>
+
   <link rel="stylesheet" href="../../assets/css/styles.css" />
   <link rel="stylesheet" href="./planning.css" />
 
@@ -128,6 +141,8 @@
 }
 </style>
 
+<link rel="stylesheet" href="../../assets/css/theme.css" />
+
 </head>
 
 <body class="page page-planning" data-i18n-page="planning">
@@ -223,6 +238,7 @@
 
   <div class="toast-stack" id="toasts" aria-live="polite"></div>
 
+  <script src="../../assets/js/theme.js"></script>
   <script type="module" src="./planning.js"></script>
 
   <script>

@@ -456,7 +456,7 @@ export class Tasks {
       title: "delete task",
       bodyHtml: `
         <form class="form">
-          <div style="font-size:11px; letter-spacing:2px; text-transform:uppercase; color:rgba(0,0,0,.75); line-height:1.5;">
+          <div style="font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); line-height:1.5;">
             confirm deletion. this action cannot be undone.
           </div>
           <div class="form__actions">
