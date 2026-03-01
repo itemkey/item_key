@@ -230,12 +230,28 @@
   const tag = userLink.querySelector(".tag");
   if (!tag) return;
 
-  if (current && current.name) {
-    tag.textContent = `item-user · @${current.name}`;
-    userLink.setAttribute("aria-label", `Item User ${current.name}`);
-  } else {
+  const setTag = (name) => {
+    if (name) {
+      tag.textContent = `item-user · @${name}`;
+      userLink.setAttribute("aria-label", `Item User ${name}`);
+      return;
+    }
     tag.textContent = "item-user";
     userLink.setAttribute("aria-label", "Item User");
-  }
+  };
+
+  setTag(current && current.name ? current.name : "");
+
+  if (!(window.IKSupabase && window.IKSupabase.getClient)) return;
+  const supa = window.IKSupabase.getClient();
+  if (!supa) return;
+
+  supa.auth.getUser().then(({ data, error }) => {
+    if (error || !data || !data.user) return;
+    const user = data.user;
+    const meta = user.user_metadata || {};
+    const name = String(meta.username || meta.login || "").trim() || String(user.email || "").split("@")[0] || "";
+    setTag(name);
+  }).catch(() => {});
 })();
 
