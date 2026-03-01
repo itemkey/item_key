@@ -43,6 +43,31 @@
     if(title) badge.title = title;
   }
 
+  function shortErr(err){
+    const raw = String(err && (err.message || err) || '').trim();
+    if(!raw) return 'unknown';
+    const one = raw.replace(/\s+/g, ' ');
+    if(/row-level security|permission denied|not allowed/i.test(one)) return 'RLS';
+    if(/jwt|token|auth/i.test(one)) return 'auth';
+    if(/fetch|network|failed to fetch|timeout/i.test(one)) return 'network';
+    if(/duplicate|unique/i.test(one)) return 'duplicate';
+    return one.slice(0, 48);
+  }
+
+  function explainErr(err){
+    if(!err) return 'unknown';
+    const msg = String(err.message || '').trim();
+    const details = String(err.details || '').trim();
+    const hint = String(err.hint || '').trim();
+    const code = String(err.code || '').trim();
+    const parts = [];
+    if(msg) parts.push(msg);
+    if(code) parts.push(`code=${code}`);
+    if(details) parts.push(`details=${details}`);
+    if(hint) parts.push(`hint=${hint}`);
+    return parts.join(' | ') || 'unknown';
+  }
+
   function reqAsPromise(req){
     return new Promise((resolve, reject) => {
       req.onsuccess = () => resolve(req.result);
@@ -356,7 +381,7 @@
     return remoteRawToSnapshot(raw.sectionsRaw, raw.wordsRaw);
   }
 
-  async function upsertRemoteFromSnapshot(snapshot){
+  async function insertRemoteFromSnapshot(snapshot){
     const sectionsPayload = (snapshot.sections || []).map((s) => ({
       owner_id: state.userId,
       name: normSpaces(s.name || ''),
@@ -365,9 +390,7 @@
     })).filter((s) => s.name && s.name_key);
 
     if(sectionsPayload.length){
-      const { error } = await state.client
-        .from(TABLE_SECTIONS)
-        .upsert(sectionsPayload, { onConflict: 'owner_id,name_key' });
+      const { error } = await state.client.from(TABLE_SECTIONS).insert(sectionsPayload);
       if(error) throw error;
     }
 
@@ -396,9 +419,7 @@
     }).filter(Boolean);
 
     if(wordsPayload.length){
-      const { error } = await state.client
-        .from(TABLE_WORDS)
-        .upsert(wordsPayload, { onConflict: 'owner_id,pair_key' });
+      const { error } = await state.client.from(TABLE_WORDS).insert(wordsPayload);
       if(error) throw error;
     }
   }
@@ -411,56 +432,35 @@
     return out;
   }
 
-  async function deleteRemoteMissing(localUserSnapshot, remoteRaw){
-    const localSectionKeys = new Set((localUserSnapshot.sections || []).map((s) => normalize(s.nameKey || s.name || '')).filter(Boolean));
-    const remoteSections = Array.isArray(remoteRaw.sectionsRaw) ? remoteRaw.sectionsRaw : [];
+  async function clearRemoteUserData(){
+    const remoteRaw = await fetchRemoteRaw();
     const remoteWords = Array.isArray(remoteRaw.wordsRaw) ? remoteRaw.wordsRaw : [];
+    const remoteSections = Array.isArray(remoteRaw.sectionsRaw) ? remoteRaw.sectionsRaw : [];
 
-    const sectionKeyById = new Map();
-    for(const s of remoteSections){
-      sectionKeyById.set(Number(s.id), normalize(s.name_key || s.name || ''));
-    }
-
-    const localWordKeys = new Set((localUserSnapshot.words || []).map((w) => {
-      const sk = normalize(w.sectionNameKey || '');
-      const ek = normEn(w.en || '');
-      const rk = normRu(w.ru || '');
-      return `${sk}|${ek}|${rk}`;
-    }).filter(Boolean));
-
-    const remoteWordPairKeys = remoteWords
-      .map((w) => String(w.pair_key || '').trim())
-      .filter(Boolean);
-    const wordsToDelete = remoteWordPairKeys.filter((k) => !localWordKeys.has(k));
-
-    for(const part of chunk(wordsToDelete, 500)){
+    const wordIds = remoteWords.map((w) => Number(w.id)).filter((v) => Number.isFinite(v));
+    for(const part of chunk(wordIds, 50)){
       const { error } = await state.client
         .from(TABLE_WORDS)
         .delete()
         .eq('owner_id', state.userId)
-        .in('pair_key', part);
+        .in('id', part);
       if(error) throw error;
     }
 
-    const remoteSectionKeys = remoteSections
-      .map((s) => normalize(s.name_key || s.name || ''))
-      .filter(Boolean);
-    const sectionsToDelete = remoteSectionKeys.filter((k) => !localSectionKeys.has(k));
-
-    for(const part of chunk(sectionsToDelete, 500)){
+    const sectionIds = remoteSections.map((s) => Number(s.id)).filter((v) => Number.isFinite(v));
+    for(const part of chunk(sectionIds, 50)){
       const { error } = await state.client
         .from(TABLE_SECTIONS)
         .delete()
         .eq('owner_id', state.userId)
-        .in('name_key', part);
+        .in('id', part);
       if(error) throw error;
     }
   }
 
   async function syncRemoteWithLocal(localUserSnapshot){
-    const remoteRaw = await fetchRemoteRaw();
-    await deleteRemoteMissing(localUserSnapshot, remoteRaw);
-    await upsertRemoteFromSnapshot(localUserSnapshot);
+    await clearRemoteUserData();
+    await insertRemoteFromSnapshot(localUserSnapshot);
   }
 
   function fp(snapshot){
@@ -550,7 +550,7 @@
       await applyToUi();
     }catch(err){
       console.error(err);
-      setBadge('failed', `Ошибка синхронизации: ${err && err.message ? err.message : err}`);
+      setBadge(`failed (${shortErr(err)})`, `Ошибка синхронизации: ${explainErr(err)}`);
       await logRun('failed', { error: String(err && (err.message || err) || 'unknown') });
     }finally{
       state.syncing = false;
@@ -632,6 +632,6 @@
 
   init().catch((err) => {
     console.error(err);
-    setBadge('failed', 'Cloud sync init failed');
+    setBadge(`failed (${shortErr(err)})`, `Cloud sync init failed: ${explainErr(err)}`);
   });
 })();
