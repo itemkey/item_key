@@ -1,6 +1,7 @@
 (() => {
   const CURRENT_KEY = 'itemkey.currentUser';
   const NAME_MAP_KEY = 'itemkey.supabaseNameMap';
+  const NOTICE_STYLE_ID = 'ikAuthNoticeStyles';
 
   const guestBox = document.getElementById('authGuest');
   const profileBox = document.getElementById('authProfile');
@@ -9,6 +10,62 @@
   const logoutBtn = document.getElementById('logoutBtn');
   const pLogin = document.getElementById('pLogin');
   const pEmail = document.getElementById('pEmail');
+
+  function ensureNoticeStyles(){
+    if(document.getElementById(NOTICE_STYLE_ID)) return;
+    const st = document.createElement('style');
+    st.id = NOTICE_STYLE_ID;
+    st.textContent = [
+      '.ik-auth-notice-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.42);display:flex;align-items:center;justify-content:center;z-index:100200;padding:16px;}',
+      '.ik-auth-notice{width:min(420px,96vw);background:#fff;border:1px solid rgba(0,0,0,.18);box-shadow:0 10px 32px rgba(0,0,0,.16);padding:16px;}',
+      '.ik-auth-notice__text{margin:0 0 12px;font-size:14px;line-height:1.45;color:#111;}',
+      '.ik-auth-notice__actions{display:flex;gap:8px;justify-content:flex-end;}',
+      '.ik-auth-notice__btn{appearance:none;border:1px solid rgba(0,0,0,.2);background:#fff;color:#111;padding:8px 12px;cursor:pointer;font-size:12px;letter-spacing:.04em;text-transform:uppercase;}',
+      '.ik-auth-notice__btn--main{background:#111;color:#fff;border-color:#111;}'
+    ].join('');
+    document.head.appendChild(st);
+  }
+
+  function showNotice(text, options){
+    ensureNoticeStyles();
+    const opts = options || {};
+    const backdrop = document.createElement('div');
+    backdrop.className = 'ik-auth-notice-backdrop';
+    const box = document.createElement('div');
+    box.className = 'ik-auth-notice';
+    const p = document.createElement('p');
+    p.className = 'ik-auth-notice__text';
+    p.textContent = String(text || '').trim() || 'Готово';
+
+    const actions = document.createElement('div');
+    actions.className = 'ik-auth-notice__actions';
+
+    const closeBtn = document.createElement('button');
+    closeBtn.type = 'button';
+    closeBtn.className = 'ik-auth-notice__btn';
+    closeBtn.textContent = opts.closeLabel || 'Закрыть';
+    closeBtn.addEventListener('click', () => backdrop.remove());
+    actions.appendChild(closeBtn);
+
+    if(opts.actionLabel && typeof opts.onAction === 'function'){
+      const goBtn = document.createElement('button');
+      goBtn.type = 'button';
+      goBtn.className = 'ik-auth-notice__btn ik-auth-notice__btn--main';
+      goBtn.textContent = opts.actionLabel;
+      goBtn.addEventListener('click', () => {
+        try{ opts.onAction(); }finally{ backdrop.remove(); }
+      });
+      actions.appendChild(goBtn);
+    }
+
+    box.appendChild(p);
+    box.appendChild(actions);
+    backdrop.appendChild(box);
+    backdrop.addEventListener('click', (e) => {
+      if(e.target === backdrop) backdrop.remove();
+    });
+    document.body.appendChild(backdrop);
+  }
 
   function readJson(key, fallback){
     try{
@@ -98,13 +155,13 @@
     setupTabs();
 
     if(!(window.IKSupabase && window.IKSupabase.getClient)){
-      alert('Supabase SDK не загружен. Обнови страницу.');
+      showNotice('Ошибка инициализации');
       return;
     }
 
     const supa = window.IKSupabase.getClient();
     if(!supa){
-      alert('Supabase клиент не инициализирован.');
+      showNotice('Ошибка инициализации');
       return;
     }
 
@@ -127,7 +184,7 @@
         const pass = String(passInput && passInput.value || '');
 
         if(!name || !email || !pass){
-          alert('Заполни логин, почту и пароль.');
+          showNotice('Заполни логин, почту и пароль');
           return;
         }
 
@@ -140,13 +197,19 @@
         });
 
         if(error){
-          alert(`Ошибка регистрации: ${error.message || error}`);
+          showNotice('Ошибка регистрации');
           return;
         }
 
         setNameForEmail(email, name);
         renderSession(data && data.user ? data.user : null);
-        alert('Аккаунт создан. Теперь можно работать со словарем в облаке.');
+        showNotice('Успешная регистрация', {
+          actionLabel: 'Перейти к сайту',
+          closeLabel: 'Остаться',
+          onAction: () => {
+            window.location.href = 'index.html';
+          }
+        });
       });
     }
 
@@ -160,7 +223,7 @@
         const pass = String(passInput && passInput.value || '');
 
         if(!email || !pass){
-          alert('Введи почту и пароль.');
+          showNotice('Введи почту и пароль');
           return;
         }
 
@@ -170,7 +233,7 @@
         });
 
         if(error){
-          alert(`Ошибка входа: ${error.message || error}`);
+          showNotice('Ошибка входа');
           return;
         }
 
@@ -182,7 +245,7 @@
       logoutBtn.addEventListener('click', async () => {
         const { error } = await supa.auth.signOut();
         if(error){
-          alert(`Ошибка выхода: ${error.message || error}`);
+          showNotice('Ошибка выхода');
           return;
         }
         renderSession(null);
@@ -192,6 +255,6 @@
 
   init().catch((err) => {
     console.error(err);
-    alert(`Auth init failed: ${err && err.message ? err.message : err}`);
+    showNotice('Ошибка инициализации');
   });
 })();

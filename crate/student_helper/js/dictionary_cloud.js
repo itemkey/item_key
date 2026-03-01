@@ -1,64 +1,46 @@
 (function(){
+  const STORE_SECTIONS = 'sections';
+  const STORE_WORDS = 'words';
   const DB_VERSION = 1;
-  const DB_SECTIONS = 'sections';
-  const DB_WORDS = 'words';
-  const REPORT_KEY = 'student_helper_dict_cloud_report_v1';
-  const SECTION_TABLE = 'sh_dictionary_sections';
-  const WORD_TABLE = 'sh_dictionary_words';
-  const RUNS_TABLE = 'sh_migration_runs';
+
+  const OWNER_KEY = 'student_helper_dict_owner_v1';
+  const RUN_REPORT_KEY = 'student_helper_dict_cloud_report_v1';
+
+  const TABLE_SECTIONS = 'sh_dictionary_sections';
+  const TABLE_WORDS = 'sh_dictionary_words';
+  const TABLE_RUNS = 'sh_migration_runs';
+
+  const MANIFEST_PATHS = ['db/manifest.json', 'db/dictionary/manifest.json'];
+  const DICT_DIR = 'db/dictionary/';
+  const DEFAULT_FILES = [
+    'student_helper_db__dictionary_Destination_B1_Unit_3.json',
+    'student_helper_db__dictionary_Destination_B1_Unit_6.json'
+  ];
 
   const state = {
-    syncing: false,
-    timer: null,
+    client: null,
     userId: null,
-    client: null
+    syncing: false,
+    stock: null,
+    interval: null
   };
 
-  function normSpaces(v){
-    return String(v || '').trim().replace(/\s+/g, ' ');
-  }
-
-  function normalize(v){
-    return String(v || '').trim().toLowerCase();
-  }
-
-  function normEnCmp(v){
-    return normSpaces(v).toLowerCase();
-  }
-
-  function normRuCmp(v){
-    return normSpaces(v).toLowerCase().replaceAll('ё', 'е');
-  }
-
-  function dictDbName(){
+  function dbName(){
     if(typeof window.dbNameFor === 'function') return window.dbNameFor('dictionary');
     return 'student_helper_db__dictionary';
   }
 
+  function normSpaces(v){ return String(v || '').trim().replace(/\s+/g, ' '); }
+  function normalize(v){ return String(v || '').trim().toLowerCase(); }
+  function normEn(v){ return normSpaces(v).toLowerCase(); }
+  function normRu(v){ return normSpaces(v).toLowerCase().replaceAll('ё', 'е'); }
+
   function setBadge(text, title){
     const badge = document.getElementById('dictSeedBadge');
     if(!badge) return;
-    badge.dataset.cloud = text;
-    const base = badge.textContent || '';
-    const clean = base.replace(/\s*\|\s*cloud:[^|]+$/i, '').trim();
-    badge.textContent = `${clean} | cloud: ${text}`;
+    const base = String(badge.textContent || '').replace(/\s*\|\s*cloud:[^|]+$/i, '').trim();
+    badge.textContent = `${base} | cloud: ${text}`;
     if(title) badge.title = title;
-  }
-
-  function openDb(){
-    return new Promise((resolve, reject) => {
-      const req = indexedDB.open(dictDbName(), DB_VERSION);
-      req.onerror = () => reject(req.error || new Error('open db failed'));
-      req.onsuccess = () => resolve(req.result);
-    });
-  }
-
-  function txDone(tx, db){
-    return new Promise((resolve, reject) => {
-      tx.oncomplete = () => { try{ db.close(); }catch(_){ } resolve(true); };
-      tx.onerror = () => { try{ db.close(); }catch(_){ } reject(tx.error || new Error('tx failed')); };
-      tx.onabort = () => { try{ db.close(); }catch(_){ } reject(tx.error || new Error('tx aborted')); };
-    });
   }
 
   function reqAsPromise(req){
@@ -68,394 +50,487 @@
     });
   }
 
-  async function readLocalSnapshot(){
+  function openDb(){
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open(dbName(), DB_VERSION);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error || new Error('open db failed'));
+    });
+  }
+
+  function txDone(db, tx){
+    return new Promise((resolve, reject) => {
+      tx.oncomplete = () => { try{ db.close(); }catch(_){ } resolve(true); };
+      tx.onerror = () => { try{ db.close(); }catch(_){ } reject(tx.error || new Error('tx failed')); };
+      tx.onabort = () => { try{ db.close(); }catch(_){ } reject(tx.error || new Error('tx aborted')); };
+    });
+  }
+
+  async function readLocal(){
     const db = await openDb();
-    const tx = db.transaction([DB_SECTIONS, DB_WORDS], 'readonly');
-    const sReq = tx.objectStore(DB_SECTIONS).getAll();
-    const wReq = tx.objectStore(DB_WORDS).getAll();
+    const tx = db.transaction([STORE_SECTIONS, STORE_WORDS], 'readonly');
+    const sReq = tx.objectStore(STORE_SECTIONS).getAll();
+    const wReq = tx.objectStore(STORE_WORDS).getAll();
     const [sections, words] = await Promise.all([reqAsPromise(sReq), reqAsPromise(wReq)]);
-    await txDone(tx, db);
-    return {
-      sections: Array.isArray(sections) ? sections : [],
-      words: Array.isArray(words) ? words : []
-    };
+    await txDone(db, tx);
+    return { sections: sections || [], words: words || [] };
   }
 
-  async function ensureLocalSections(remoteSections){
-    if(!Array.isArray(remoteSections) || !remoteSections.length) return;
-    const snap = await readLocalSnapshot();
-    const have = new Set(snap.sections.map((s) => normalize(s.nameKey || s.name || '')));
-    const toAdd = remoteSections
-      .map((s) => ({
-        name: normSpaces(s.name || ''),
-        nameKey: normalize(s.name_key || s.name || '')
-      }))
-      .filter((s) => s.name && s.nameKey && !have.has(s.nameKey));
-    if(!toAdd.length) return;
-
+  async function replaceLocal(snapshot){
     const db = await openDb();
-    const tx = db.transaction([DB_SECTIONS], 'readwrite');
-    const store = tx.objectStore(DB_SECTIONS);
-    for(const s of toAdd){
-      store.add({
-        name: s.name,
-        nameKey: s.nameKey,
-        createdAt: Date.now(),
-        updatedAt: Date.now()
-      });
+    const tx = db.transaction([STORE_SECTIONS, STORE_WORDS], 'readwrite');
+    const sStore = tx.objectStore(STORE_SECTIONS);
+    const wStore = tx.objectStore(STORE_WORDS);
+
+    sStore.clear();
+    wStore.clear();
+
+    const byNameKey = new Map();
+    const sectionRows = (snapshot.sections || []).map((s) => ({
+      name: normSpaces(s.name || ''),
+      nameKey: normalize(s.nameKey || s.name || ''),
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    })).filter((s) => s.name && s.nameKey);
+
+    for(const section of sectionRows){
+      const id = await reqAsPromise(sStore.add(section));
+      byNameKey.set(section.nameKey, Number(id));
     }
-    await txDone(tx, db);
-  }
 
-  async function ensureLocalWords(remoteWords, sectionIdByNameKey){
-    if(!Array.isArray(remoteWords) || !remoteWords.length) return;
-    const snap = await readLocalSnapshot();
-    const have = new Set(snap.words.map((w) => String(w.pairKey || '')));
-    const toAdd = [];
-
-    for(const w of remoteWords){
-      const nameKey = normalize(w.section_name_key || '');
-      const sectionId = sectionIdByNameKey.get(nameKey);
-      if(!sectionId) continue;
+    const words = snapshot.words || [];
+    for(const w of words){
+      const nameKey = normalize(w.sectionNameKey || '');
+      const sid = byNameKey.get(nameKey);
+      if(!sid) continue;
 
       const en = normSpaces(w.en || '');
       const ru = String(w.ru || '').trim();
       if(!en || !ru) continue;
+      const enKey = normEn(en);
+      const ruKey = normRu(ru);
 
-      const enKey = normEnCmp(en);
-      const ruKey = normRuCmp(ru);
-      const pairKey = `${sectionId}|${enKey}|${ruKey}`;
-      if(have.has(pairKey)) continue;
-      have.add(pairKey);
-
-      toAdd.push({
-        sectionId,
+      wStore.add({
+        sectionId: sid,
         en,
         ru,
         enKey,
         ruKey,
-        pairKey,
+        pairKey: `${sid}|${enKey}|${ruKey}`,
         createdAt: Date.now(),
         updatedAt: Date.now()
       });
     }
 
-    if(!toAdd.length) return;
-    const db = await openDb();
-    const tx = db.transaction([DB_WORDS], 'readwrite');
-    const store = tx.objectStore(DB_WORDS);
-    for(const row of toAdd) store.add(row);
-    await txDone(tx, db);
+    await txDone(db, tx);
   }
 
-  function chunk(list, size){
-    const out = [];
-    for(let i = 0; i < list.length; i += size) out.push(list.slice(i, i + size));
-    return out;
+  function parseSectionsJson(data, fallbackName){
+    if(!data) return [];
+    const fb = String(fallbackName || '').trim();
+    if(Array.isArray(data.sections)){
+      return data.sections
+        .map((s) => ({
+          name: String((s && (s.name || s.sectionName || s.section)) || fb).trim(),
+          words: Array.isArray(s && s.words) ? s.words : []
+        }))
+        .filter((s) => s.name);
+    }
+    const name = String((data.sectionName || data.name || data.section) || fb).trim();
+    if(name && Array.isArray(data.words)) return [{ name, words: data.words }];
+    return [];
   }
 
-  async function selectAllOwned(table, columns, userId){
+  async function fetchJson(path){
+    const res = await fetch(path, { cache: 'no-store' });
+    if(!res.ok) throw new Error(`fetch failed: ${path}`);
+    return res.json();
+  }
+
+  async function loadStockSnapshot(){
+    if(state.stock) return state.stock;
+
+    let files = [];
+    for(const mp of MANIFEST_PATHS){
+      try{
+        const man = await fetchJson(mp);
+        if(Array.isArray(man)) files = man;
+        else if(man && Array.isArray(man.dictionary)) files = man.dictionary;
+        else if(man && man.dictionary && Array.isArray(man.dictionary.files)) files = man.dictionary.files;
+        else if(man && man.dictionary && Array.isArray(man.dictionary.dbs)) files = man.dictionary.dbs;
+        else if(man && Array.isArray(man.files)) files = man.files;
+        else if(man && Array.isArray(man.dbs)) files = man.dbs;
+        if(files.length) break;
+      }catch(_){ }
+    }
+
+    if(!files.length) files = DEFAULT_FILES;
+    files = files.map((f) => String(f || '').trim()).filter(Boolean);
+
+    const sections = [];
+    for(const f of files){
+      const rel = f.includes('/') ? f : `${DICT_DIR}${f}`;
+      try{
+        const json = await fetchJson(rel);
+        const fallback = String(f).replace(/^student_helper_db__dictionary_/, '').replace(/\.json$/i, '').replaceAll('_', ' ');
+        const parsed = parseSectionsJson(json, fallback);
+        sections.push(...parsed);
+      }catch(_){ }
+    }
+
+    const bySection = new Map();
+    for(const sec of sections){
+      const name = normSpaces(sec.name || '');
+      const nameKey = normalize(name);
+      if(!name || !nameKey) continue;
+      if(!bySection.has(nameKey)) bySection.set(nameKey, { name, nameKey, words: new Map() });
+      const bucket = bySection.get(nameKey);
+      for(const w of (sec.words || [])){
+        const en = normSpaces(w && w.en || '');
+        const ru = String(w && w.ru || '').trim();
+        if(!en || !ru) continue;
+        const enKey = normEn(en);
+        const ruKey = normRu(ru);
+        bucket.words.set(`${enKey}|${ruKey}`, { en, ru, sectionNameKey: nameKey });
+      }
+    }
+
+    const result = {
+      sections: Array.from(bySection.values()).map((s) => ({ name: s.name, nameKey: s.nameKey })),
+      words: Array.from(bySection.values()).flatMap((s) => Array.from(s.words.values()))
+    };
+
+    state.stock = result;
+    return result;
+  }
+
+  function mergeSnapshots(stock, remote){
+    const sectionMap = new Map();
+    const wordMap = new Map();
+
+    for(const s of (stock.sections || [])){
+      const name = normSpaces(s.name || '');
+      const nameKey = normalize(s.nameKey || s.name || '');
+      if(!name || !nameKey) continue;
+      sectionMap.set(nameKey, { name, nameKey });
+    }
+
+    for(const s of (remote.sections || [])){
+      const name = normSpaces(s.name || '');
+      const nameKey = normalize(s.nameKey || s.name || '');
+      if(!name || !nameKey) continue;
+      sectionMap.set(nameKey, { name, nameKey });
+    }
+
+    const pushWord = (w) => {
+      const sectionNameKey = normalize(w.sectionNameKey || '');
+      const en = normSpaces(w.en || '');
+      const ru = String(w.ru || '').trim();
+      if(!sectionNameKey || !en || !ru) return;
+      const enKey = normEn(en);
+      const ruKey = normRu(ru);
+      wordMap.set(`${sectionNameKey}|${enKey}|${ruKey}`, { sectionNameKey, en, ru });
+    };
+
+    for(const w of (stock.words || [])) pushWord(w);
+    for(const w of (remote.words || [])) pushWord(w);
+
+    return {
+      sections: Array.from(sectionMap.values()).sort((a, b) => a.name.localeCompare(b.name, 'ru')),
+      words: Array.from(wordMap.values())
+    };
+  }
+
+  function localToScopedSnapshot(local){
+    const idToNameKey = new Map();
+    for(const s of local.sections || []){
+      idToNameKey.set(Number(s.id), normalize(s.nameKey || s.name || ''));
+    }
+
+    const sections = (local.sections || []).map((s) => ({
+      name: normSpaces(s.name || ''),
+      nameKey: normalize(s.nameKey || s.name || '')
+    })).filter((s) => s.name && s.nameKey);
+
+    const words = (local.words || []).map((w) => {
+      const sectionNameKey = idToNameKey.get(Number(w.sectionId || 0)) || '';
+      return {
+        sectionNameKey,
+        en: normSpaces(w.en || ''),
+        ru: String(w.ru || '').trim()
+      };
+    }).filter((w) => w.sectionNameKey && w.en && w.ru);
+
+    return { sections, words };
+  }
+
+  function getOwnerMarker(){
+    try{ return localStorage.getItem(OWNER_KEY) || 'guest'; }catch(_){ return 'guest'; }
+  }
+
+  function setOwnerMarker(owner){
+    try{ localStorage.setItem(OWNER_KEY, owner || 'guest'); }catch(_){ }
+  }
+
+  async function selectOwned(table, columns){
     const rows = [];
-    const page = 1000;
+    const size = 1000;
     let from = 0;
 
     while(true){
       const { data, error } = await state.client
         .from(table)
         .select(columns)
-        .eq('owner_id', userId)
+        .eq('owner_id', state.userId)
         .order('id', { ascending: true })
-        .range(from, from + page - 1);
-
+        .range(from, from + size - 1);
       if(error) throw error;
-      const chunkRows = Array.isArray(data) ? data : [];
-      rows.push(...chunkRows);
-      if(chunkRows.length < page) break;
-      from += page;
+      const part = Array.isArray(data) ? data : [];
+      rows.push(...part);
+      if(part.length < size) break;
+      from += size;
     }
 
     return rows;
   }
 
-  function fingerprint(snapshot){
-    const sectionKeys = snapshot.sections
-      .map((s) => normalize(s.nameKey || s.name || ''))
-      .filter(Boolean)
-      .sort();
+  async function fetchRemoteSnapshot(){
+    const sectionsRaw = await selectOwned(TABLE_SECTIONS, 'id,name,name_key');
+    const wordsRaw = await selectOwned(TABLE_WORDS, 'section_id,en,ru');
 
-    const sectionById = new Map();
-    snapshot.sections.forEach((s) => sectionById.set(Number(s.id), normalize(s.nameKey || s.name || '')));
+    const sectionNameById = new Map();
+    const sections = sectionsRaw.map((s) => {
+      const name = normSpaces(s.name || '');
+      const nameKey = normalize(s.name_key || s.name || '');
+      sectionNameById.set(Number(s.id), nameKey);
+      return { name, nameKey };
+    }).filter((s) => s.name && s.nameKey);
 
-    const wordKeys = snapshot.words
-      .map((w) => {
-        const sid = Number(w.sectionId || 0);
-        const sectionKey = sectionById.get(sid) || '';
-        const enKey = normEnCmp(w.en || w.enKey || '');
-        const ruKey = normRuCmp(w.ru || w.ruKey || '');
-        return `${sectionKey}|${enKey}|${ruKey}`;
-      })
-      .filter(Boolean)
-      .sort();
+    const words = wordsRaw.map((w) => ({
+      sectionNameKey: sectionNameById.get(Number(w.section_id || 0)) || '',
+      en: normSpaces(w.en || ''),
+      ru: String(w.ru || '').trim()
+    })).filter((w) => w.sectionNameKey && w.en && w.ru);
 
-    return `${sectionKeys.join('||')}##${wordKeys.join('||')}`;
+    return { sections, words };
   }
 
-  async function pushLocalToRemote(local){
-    const sectionsPayload = local.sections
-      .map((s) => ({
-        owner_id: state.userId,
-        name: normSpaces(s.name || ''),
-        name_key: normalize(s.nameKey || s.name || ''),
-        source: 'imported_local'
-      }))
-      .filter((s) => s.name && s.name_key);
+  async function upsertRemoteFromSnapshot(snapshot){
+    const sectionsPayload = (snapshot.sections || []).map((s) => ({
+      owner_id: state.userId,
+      name: normSpaces(s.name || ''),
+      name_key: normalize(s.nameKey || s.name || ''),
+      source: 'imported_local'
+    })).filter((s) => s.name && s.name_key);
 
-    for(const part of chunk(sectionsPayload, 500)){
+    if(sectionsPayload.length){
       const { error } = await state.client
-        .from(SECTION_TABLE)
-        .upsert(part, { onConflict: 'owner_id,name_key' });
+        .from(TABLE_SECTIONS)
+        .upsert(sectionsPayload, { onConflict: 'owner_id,name_key' });
       if(error) throw error;
     }
 
-    const remoteSections = await selectAllOwned(SECTION_TABLE, 'id,name_key', state.userId);
-    const sectionIdByNameKey = new Map();
-    for(const s of remoteSections){
-      sectionIdByNameKey.set(normalize(s.name_key), Number(s.id));
-    }
+    const mappedSections = await selectOwned(TABLE_SECTIONS, 'id,name_key');
+    const sectionIdByKey = new Map();
+    mappedSections.forEach((s) => sectionIdByKey.set(normalize(s.name_key), Number(s.id)));
 
-    const sectionByLocalId = new Map();
-    for(const s of local.sections){
-      sectionByLocalId.set(Number(s.id), normalize(s.nameKey || s.name || ''));
-    }
-
-    const wordsPayload = [];
-    for(const w of local.words){
-      const localSid = Number(w.sectionId || 0);
-      const sectionNameKey = sectionByLocalId.get(localSid);
-      const remoteSid = sectionNameKey ? sectionIdByNameKey.get(sectionNameKey) : null;
-      if(!remoteSid) continue;
-
+    const wordsPayload = (snapshot.words || []).map((w) => {
+      const sectionNameKey = normalize(w.sectionNameKey || '');
+      const sectionId = sectionIdByKey.get(sectionNameKey);
       const en = normSpaces(w.en || '');
       const ru = String(w.ru || '').trim();
-      if(!en || !ru) continue;
-
-      const enKey = normEnCmp(en);
-      const ruKey = normRuCmp(ru);
-      wordsPayload.push({
+      if(!sectionId || !sectionNameKey || !en || !ru) return null;
+      const enKey = normEn(en);
+      const ruKey = normRu(ru);
+      return {
         owner_id: state.userId,
-        section_id: remoteSid,
+        section_id: sectionId,
         en,
         ru,
         en_key: enKey,
         ru_key: ruKey,
         pair_key: `${sectionNameKey}|${enKey}|${ruKey}`,
         source: 'imported_local'
-      });
-    }
+      };
+    }).filter(Boolean);
 
-    for(const part of chunk(wordsPayload, 500)){
+    if(wordsPayload.length){
       const { error } = await state.client
-        .from(WORD_TABLE)
-        .upsert(part, { onConflict: 'owner_id,pair_key' });
+        .from(TABLE_WORDS)
+        .upsert(wordsPayload, { onConflict: 'owner_id,pair_key' });
       if(error) throw error;
     }
-
-    return {
-      sections: sectionsPayload.length,
-      words: wordsPayload.length
-    };
   }
 
-  async function pullRemoteToLocal(){
-    const remoteSections = await selectAllOwned(SECTION_TABLE, 'id,name,name_key', state.userId);
-    const remoteWordsRaw = await selectAllOwned(WORD_TABLE, 'id,section_id,en,ru,en_key,ru_key,pair_key', state.userId);
-
-    if(!remoteSections.length && !remoteWordsRaw.length){
-      return { remoteSections, remoteWords: [] };
-    }
-
-    await ensureLocalSections(remoteSections);
-    const snap = await readLocalSnapshot();
-    const localSectionIdByNameKey = new Map();
-    for(const s of snap.sections){
-      localSectionIdByNameKey.set(normalize(s.nameKey || s.name || ''), Number(s.id));
-    }
-
-    const remoteSectionNameById = new Map();
-    for(const s of remoteSections){
-      remoteSectionNameById.set(Number(s.id), normalize(s.name_key || s.name || ''));
-    }
-
-    const remoteWords = remoteWordsRaw.map((w) => ({
-      section_name_key: remoteSectionNameById.get(Number(w.section_id)) || '',
-      en: w.en,
-      ru: w.ru,
-      en_key: w.en_key,
-      ru_key: w.ru_key,
-      pair_key: w.pair_key
-    }));
-
-    await ensureLocalWords(remoteWords, localSectionIdByNameKey);
-    return { remoteSections, remoteWords };
+  function fp(snapshot){
+    const s = (snapshot.sections || []).map((x) => normalize(x.nameKey || x.name || '')).filter(Boolean).sort();
+    const w = (snapshot.words || [])
+      .map((x) => `${normalize(x.sectionNameKey || '')}|${normEn(x.en || '')}|${normRu(x.ru || '')}`)
+      .filter(Boolean)
+      .sort();
+    return `${s.join('||')}##${w.join('||')}`;
   }
 
-  async function writeRunLog(payload){
+  async function logRun(status, details){
+    if(!state.userId) return;
+    const d = details || {};
     try{
-      await state.client.from(RUNS_TABLE).insert({
+      await state.client.from(TABLE_RUNS).insert({
         owner_id: state.userId,
         run_type: 'dictionary',
-        status: payload.status,
-        local_sections_count: payload.local_sections_count,
-        local_words_count: payload.local_words_count,
-        remote_sections_count: payload.remote_sections_count,
-        remote_words_count: payload.remote_words_count,
-        local_fingerprint: payload.local_fingerprint,
-        remote_fingerprint: payload.remote_fingerprint,
-        details: payload.details || {}
+        status,
+        local_sections_count: Number(d.localSections || 0),
+        local_words_count: Number(d.localWords || 0),
+        remote_sections_count: Number(d.remoteSections || 0),
+        remote_words_count: Number(d.remoteWords || 0),
+        local_fingerprint: d.localFingerprint || null,
+        remote_fingerprint: d.remoteFingerprint || null,
+        details: d
       });
     }catch(_){ }
   }
 
-  async function syncOnce(reason){
-    if(state.syncing || !state.client || !state.userId) return;
+  async function applyToUi(){
+    if(typeof window.dictCloudRefresh === 'function'){
+      try{ await window.dictCloudRefresh(); return; }catch(_){ }
+    }
+    window.location.reload();
+  }
+
+  async function switchToGuest(stock){
+    const target = mergeSnapshots(stock, { sections: [], words: [] });
+    await replaceLocal(target);
+    setOwnerMarker('guest');
+    setBadge('guest', 'Показаны только стоковые категории');
+    await applyToUi();
+  }
+
+  async function switchToUser(stock){
+    const remote = await fetchRemoteSnapshot();
+    const target = mergeSnapshots(stock, remote);
+    await replaceLocal(target);
+    setOwnerMarker(state.userId);
+    setBadge('account', 'Показаны стоковые + данные текущего аккаунта');
+    await applyToUi();
+  }
+
+  async function regularSync(stock){
+    if(state.syncing) return;
     state.syncing = true;
-    setBadge('sync...', `sync reason: ${reason}`);
+    setBadge('sync...', 'Синхронизация словаря');
 
     try{
-      const localBefore = await readLocalSnapshot();
-      const pull = await pullRemoteToLocal();
-      const localAfterPull = await readLocalSnapshot();
-      await pushLocalToRemote(localAfterPull);
+      const local = localToScopedSnapshot(await readLocal());
+      await upsertRemoteFromSnapshot(local);
 
-      const remoteSectionsFinal = await selectAllOwned(SECTION_TABLE, 'id,name_key', state.userId);
-      const remoteWordsFinal = await selectAllOwned(WORD_TABLE, 'id,pair_key', state.userId);
+      const remote = await fetchRemoteSnapshot();
+      const target = mergeSnapshots(stock, remote);
+      await replaceLocal(target);
 
-      const localFingerprint = fingerprint(localAfterPull);
-      const remoteFingerprint = `${remoteSectionsFinal.map((s) => normalize(s.name_key)).sort().join('||')}##${remoteWordsFinal.map((w) => String(w.pair_key || '')).sort().join('||')}`;
-      const status = localFingerprint === remoteFingerprint ? 'ok' : 'partial';
+      const localAfter = localToScopedSnapshot(await readLocal());
+      const localFingerprint = fp(localAfter);
+      const remoteFingerprint = fp(target);
+      const ok = localFingerprint === remoteFingerprint;
 
       const report = {
         ts: Date.now(),
-        reason,
-        status,
-        localBefore: {
-          sections: localBefore.sections.length,
-          words: localBefore.words.length
-        },
-        localAfter: {
-          sections: localAfterPull.sections.length,
-          words: localAfterPull.words.length
-        },
-        remote: {
-          sections: remoteSectionsFinal.length,
-          words: remoteWordsFinal.length
-        }
+        status: ok ? 'ok' : 'partial',
+        localSections: localAfter.sections.length,
+        localWords: localAfter.words.length,
+        remoteSections: target.sections.length,
+        remoteWords: target.words.length,
+        localFingerprint,
+        remoteFingerprint
       };
-      localStorage.setItem(REPORT_KEY, JSON.stringify(report));
+      try{ localStorage.setItem(RUN_REPORT_KEY, JSON.stringify(report)); }catch(_){ }
 
-      await writeRunLog({
-        status: status === 'ok' ? 'ok' : 'failed',
-        local_sections_count: localAfterPull.sections.length,
-        local_words_count: localAfterPull.words.length,
-        remote_sections_count: remoteSectionsFinal.length,
-        remote_words_count: remoteWordsFinal.length,
-        local_fingerprint: localFingerprint,
-        remote_fingerprint: remoteFingerprint,
-        details: report
-      });
-
-      if(status === 'ok'){
-        setBadge('ok', `cloud sync ok\nlocal sections: ${report.localAfter.sections}\nlocal words: ${report.localAfter.words}\nremote sections: ${report.remote.sections}\nremote words: ${report.remote.words}`);
-      }else{
-        setBadge('partial', 'cloud sync finished with fingerprint mismatch');
-      }
+      await logRun(ok ? 'ok' : 'failed', report);
+      setBadge(ok ? 'ok' : 'partial', ok ? 'Синхронизация завершена' : 'Синхронизация завершена частично');
+      await applyToUi();
     }catch(err){
       console.error(err);
-      setBadge('failed', `cloud sync error: ${err && err.message ? err.message : err}`);
-      await writeRunLog({
-        status: 'failed',
-        local_sections_count: 0,
-        local_words_count: 0,
-        remote_sections_count: 0,
-        remote_words_count: 0,
-        local_fingerprint: null,
-        remote_fingerprint: null,
-        details: {
-          reason,
-          error: String(err && (err.message || err) || 'unknown error')
-        }
-      });
+      setBadge('failed', `Ошибка синхронизации: ${err && err.message ? err.message : err}`);
+      await logRun('failed', { error: String(err && (err.message || err) || 'unknown') });
     }finally{
       state.syncing = false;
     }
   }
 
-  function waitDictReady(timeoutMs){
-    const started = Date.now();
-    return new Promise((resolve) => {
-      function probe(){
-        const el = document.getElementById('dictDbStatus');
-        if(el && String(el.textContent || '').trim() === 'ok'){
-          resolve(true);
-          return;
-        }
-        if(Date.now() - started >= timeoutMs){
-          resolve(false);
-          return;
-        }
-        setTimeout(probe, 350);
+  async function waitBoot(){
+    const t0 = Date.now();
+    while(Date.now() - t0 < 15000){
+      const st = document.getElementById('dictDbStatus');
+      if(st && String(st.textContent || '').trim() === 'ok') return true;
+      await new Promise((r) => setTimeout(r, 250));
+    }
+    return false;
+  }
+
+  async function run(reason){
+    if(!state.client) return;
+    const stock = await loadStockSnapshot();
+    const marker = getOwnerMarker();
+
+    const { data, error } = await state.client.auth.getUser();
+    if(error){
+      setBadge('auth-error', 'Ошибка авторизации');
+      return;
+    }
+
+    const user = data && data.user ? data.user : null;
+    state.userId = user ? user.id : null;
+
+    if(!state.userId){
+      const localNow = localToScopedSnapshot(await readLocal());
+      const stockOnly = mergeSnapshots(stock, { sections: [], words: [] });
+      const guestNeedsReset = fp(localNow) !== fp(stockOnly);
+      if(marker !== 'guest' || reason === 'force-guest' || guestNeedsReset){
+        await switchToGuest(stock);
+      }else{
+        setBadge('guest', 'Показаны только стоковые категории');
       }
-      probe();
-    });
+      return;
+    }
+
+    if(marker !== state.userId){
+      await switchToUser(stock);
+      return;
+    }
+
+    await regularSync(stock);
   }
 
   async function init(){
     if(!(window.IKSupabase && typeof window.IKSupabase.getClient === 'function')){
-      setBadge('off', 'supabase client missing');
+      setBadge('off', 'Supabase не подключен');
       return;
     }
 
     state.client = window.IKSupabase.getClient();
     if(!state.client){
-      setBadge('off', 'supabase sdk missing');
+      setBadge('off', 'Supabase не подключен');
       return;
     }
 
-    const { data, error } = await state.client.auth.getUser();
-    if(error){
-      setBadge('auth-error', `auth error: ${error.message || error}`);
-      return;
-    }
+    await waitBoot();
+    await run('boot');
 
-    const user = data && data.user;
-    if(!user){
-      setBadge('login', 'Войди через item-user, чтобы синхронизировать словарь с Supabase.');
-      return;
-    }
-
-    state.userId = user.id;
-    await waitDictReady(20000);
-    await syncOnce('boot');
-
-    if(state.timer) clearInterval(state.timer);
-    state.timer = setInterval(() => {
-      syncOnce('interval');
-    }, 60000);
-
-    document.addEventListener('visibilitychange', () => {
-      if(document.visibilityState === 'visible') syncOnce('focus');
+    state.client.auth.onAuthStateChange(() => {
+      run('auth-change');
     });
 
-    state.client.auth.onAuthStateChange((_evt, session) => {
-      const uid = session && session.user ? session.user.id : null;
-      state.userId = uid;
-      if(uid) syncOnce('auth-change');
-      else setBadge('login', 'Войди через item-user, чтобы синхронизировать словарь с Supabase.');
+    if(state.interval) clearInterval(state.interval);
+    state.interval = setInterval(() => {
+      run('interval');
+    }, 90000);
+
+    document.addEventListener('visibilitychange', () => {
+      if(document.visibilityState === 'visible') run('focus');
     });
   }
 
   init().catch((err) => {
     console.error(err);
-    setBadge('failed', `cloud init failed: ${err && err.message ? err.message : err}`);
+    setBadge('failed', 'Cloud sync init failed');
   });
 })();

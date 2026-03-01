@@ -3894,6 +3894,12 @@ if(sync.okFiles.length){
   });
 
   window.dictBoot = dictBoot;
+  window.dictCloudRefresh = async function(){
+    await dictRefreshAll();
+    renderWordsUI();
+    dictResetCards();
+    dictResetQuiz();
+  };
 
 
   dictBoot();
