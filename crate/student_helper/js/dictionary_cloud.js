@@ -241,7 +241,18 @@
     };
   }
 
-  function localToScopedSnapshot(local){
+  function makeStockKeySet(stock){
+    const sectionKeys = new Set((stock.sections || []).map((s) => normalize(s.nameKey || s.name || '')).filter(Boolean));
+    const wordKeys = new Set((stock.words || []).map((w) => {
+      const sectionNameKey = normalize(w.sectionNameKey || '');
+      const enKey = normEn(w.en || '');
+      const ruKey = normRu(w.ru || '');
+      return `${sectionNameKey}|${enKey}|${ruKey}`;
+    }).filter(Boolean));
+    return { sectionKeys, wordKeys };
+  }
+
+  function localToNamedSnapshot(local){
     const idToNameKey = new Map();
     for(const s of local.sections || []){
       idToNameKey.set(Number(s.id), normalize(s.nameKey || s.name || ''));
@@ -260,6 +271,25 @@
         ru: String(w.ru || '').trim()
       };
     }).filter((w) => w.sectionNameKey && w.en && w.ru);
+
+    return { sections, words };
+  }
+
+  function localToScopedSnapshot(local, stock){
+    const named = localToNamedSnapshot(local);
+    const stockKeys = makeStockKeySet(stock);
+
+    const sections = named.sections.filter((s) => !stockKeys.sectionKeys.has(normalize(s.nameKey || s.name || '')));
+
+    const userSectionSet = new Set(sections.map((s) => normalize(s.nameKey || s.name || '')).filter(Boolean));
+    const words = named.words.filter((w) => {
+      const sectionNameKey = normalize(w.sectionNameKey || '');
+      const enKey = normEn(w.en || '');
+      const ruKey = normRu(w.ru || '');
+      const key = `${sectionNameKey}|${enKey}|${ruKey}`;
+      if(stockKeys.wordKeys.has(key)) return false;
+      return userSectionSet.has(sectionNameKey);
+    });
 
     return { sections, words };
   }
@@ -294,25 +324,36 @@
     return rows;
   }
 
-  async function fetchRemoteSnapshot(){
-    const sectionsRaw = await selectOwned(TABLE_SECTIONS, 'id,name,name_key');
-    const wordsRaw = await selectOwned(TABLE_WORDS, 'section_id,en,ru');
+  function remoteRawToSnapshot(sectionsRaw, wordsRaw){
+    const safeSections = Array.isArray(sectionsRaw) ? sectionsRaw : [];
+    const safeWords = Array.isArray(wordsRaw) ? wordsRaw : [];
 
     const sectionNameById = new Map();
-    const sections = sectionsRaw.map((s) => {
+    const sections = safeSections.map((s) => {
       const name = normSpaces(s.name || '');
       const nameKey = normalize(s.name_key || s.name || '');
       sectionNameById.set(Number(s.id), nameKey);
       return { name, nameKey };
     }).filter((s) => s.name && s.nameKey);
 
-    const words = wordsRaw.map((w) => ({
+    const words = safeWords.map((w) => ({
       sectionNameKey: sectionNameById.get(Number(w.section_id || 0)) || '',
       en: normSpaces(w.en || ''),
       ru: String(w.ru || '').trim()
     })).filter((w) => w.sectionNameKey && w.en && w.ru);
 
     return { sections, words };
+  }
+
+  async function fetchRemoteRaw(){
+    const sectionsRaw = await selectOwned(TABLE_SECTIONS, 'id,name,name_key');
+    const wordsRaw = await selectOwned(TABLE_WORDS, 'id,section_id,en,ru,pair_key');
+    return { sectionsRaw, wordsRaw };
+  }
+
+  async function fetchRemoteSnapshot(){
+    const raw = await fetchRemoteRaw();
+    return remoteRawToSnapshot(raw.sectionsRaw, raw.wordsRaw);
   }
 
   async function upsertRemoteFromSnapshot(snapshot){
@@ -360,6 +401,66 @@
         .upsert(wordsPayload, { onConflict: 'owner_id,pair_key' });
       if(error) throw error;
     }
+  }
+
+  function chunk(list, size){
+    const out = [];
+    for(let i = 0; i < list.length; i += size){
+      out.push(list.slice(i, i + size));
+    }
+    return out;
+  }
+
+  async function deleteRemoteMissing(localUserSnapshot, remoteRaw){
+    const localSectionKeys = new Set((localUserSnapshot.sections || []).map((s) => normalize(s.nameKey || s.name || '')).filter(Boolean));
+    const remoteSections = Array.isArray(remoteRaw.sectionsRaw) ? remoteRaw.sectionsRaw : [];
+    const remoteWords = Array.isArray(remoteRaw.wordsRaw) ? remoteRaw.wordsRaw : [];
+
+    const sectionKeyById = new Map();
+    for(const s of remoteSections){
+      sectionKeyById.set(Number(s.id), normalize(s.name_key || s.name || ''));
+    }
+
+    const localWordKeys = new Set((localUserSnapshot.words || []).map((w) => {
+      const sk = normalize(w.sectionNameKey || '');
+      const ek = normEn(w.en || '');
+      const rk = normRu(w.ru || '');
+      return `${sk}|${ek}|${rk}`;
+    }).filter(Boolean));
+
+    const remoteWordPairKeys = remoteWords
+      .map((w) => String(w.pair_key || '').trim())
+      .filter(Boolean);
+    const wordsToDelete = remoteWordPairKeys.filter((k) => !localWordKeys.has(k));
+
+    for(const part of chunk(wordsToDelete, 500)){
+      const { error } = await state.client
+        .from(TABLE_WORDS)
+        .delete()
+        .eq('owner_id', state.userId)
+        .in('pair_key', part);
+      if(error) throw error;
+    }
+
+    const remoteSectionKeys = remoteSections
+      .map((s) => normalize(s.name_key || s.name || ''))
+      .filter(Boolean);
+    const sectionsToDelete = remoteSectionKeys.filter((k) => !localSectionKeys.has(k));
+
+    for(const part of chunk(sectionsToDelete, 500)){
+      const { error } = await state.client
+        .from(TABLE_SECTIONS)
+        .delete()
+        .eq('owner_id', state.userId)
+        .in('name_key', part);
+      if(error) throw error;
+    }
+  }
+
+  async function syncRemoteWithLocal(localUserSnapshot){
+    const remoteRaw = await fetchRemoteRaw();
+    await deleteRemoteMissing(localUserSnapshot, remoteRaw);
+    await upsertRemoteFromSnapshot(localUserSnapshot);
   }
 
   function fp(snapshot){
@@ -420,16 +521,16 @@
     setBadge('sync...', 'Синхронизация словаря');
 
     try{
-      const local = localToScopedSnapshot(await readLocal());
-      await upsertRemoteFromSnapshot(local);
+      const local = localToScopedSnapshot(await readLocal(), stock);
+      await syncRemoteWithLocal(local);
 
       const remote = await fetchRemoteSnapshot();
       const target = mergeSnapshots(stock, remote);
       await replaceLocal(target);
 
-      const localAfter = localToScopedSnapshot(await readLocal());
+      const localAfter = localToScopedSnapshot(await readLocal(), stock);
       const localFingerprint = fp(localAfter);
-      const remoteFingerprint = fp(target);
+      const remoteFingerprint = fp(remote);
       const ok = localFingerprint === remoteFingerprint;
 
       const report = {
@@ -437,8 +538,8 @@
         status: ok ? 'ok' : 'partial',
         localSections: localAfter.sections.length,
         localWords: localAfter.words.length,
-        remoteSections: target.sections.length,
-        remoteWords: target.words.length,
+        remoteSections: remote.sections.length,
+        remoteWords: remote.words.length,
         localFingerprint,
         remoteFingerprint
       };
@@ -481,7 +582,7 @@
     state.userId = user ? user.id : null;
 
     if(!state.userId){
-      const localNow = localToScopedSnapshot(await readLocal());
+      const localNow = localToNamedSnapshot(await readLocal());
       const stockOnly = mergeSnapshots(stock, { sections: [], words: [] });
       const guestNeedsReset = fp(localNow) !== fp(stockOnly);
       if(marker !== 'guest' || reason === 'force-guest' || guestNeedsReset){

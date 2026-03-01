@@ -67,6 +67,15 @@
     document.body.appendChild(backdrop);
   }
 
+  function briefError(err){
+    const text = String(err && (err.message || err) || '').trim();
+    if(!text) return 'Неизвестная ошибка';
+    if(/invalid login credentials/i.test(text)) return 'Неверная почта или пароль';
+    if(/already registered|user already registered/i.test(text)) return 'Почта уже зарегистрирована';
+    if(/password/i.test(text) && /short|at least/i.test(text)) return 'Пароль слишком короткий';
+    return text;
+  }
+
   function readJson(key, fallback){
     try{
       const raw = localStorage.getItem(key);
@@ -197,7 +206,7 @@
         });
 
         if(error){
-          showNotice('Ошибка регистрации');
+          showNotice(`Ошибка регистрации: ${briefError(error)}`);
           return;
         }
 
@@ -233,7 +242,7 @@
         });
 
         if(error){
-          showNotice('Ошибка входа');
+          showNotice(`Ошибка входа: ${briefError(error)}`);
           return;
         }
 
@@ -245,7 +254,7 @@
       logoutBtn.addEventListener('click', async () => {
         const { error } = await supa.auth.signOut();
         if(error){
-          showNotice('Ошибка выхода');
+          showNotice(`Ошибка выхода: ${briefError(error)}`);
           return;
         }
         renderSession(null);
@@ -255,6 +264,6 @@
 
   init().catch((err) => {
     console.error(err);
-    showNotice('Ошибка инициализации');
+    showNotice(`Ошибка инициализации: ${briefError(err)}`);
   });
 })();
