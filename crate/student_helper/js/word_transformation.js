@@ -486,7 +486,67 @@ function _buildUrlCandidates(relPath){
   return _uniq(out);
 }
 
-function _basename(p){ return String(p || '').split('/').filter(Boolean).pop() || ''; }
+  function _basename(p){ return String(p || '').split('/').filter(Boolean).pop() || ''; }
+
+  async function readLegacyLocalTasks(type){
+    let localDb = null;
+    try{
+      localDb = await openIDBForType(type);
+      const rows = await getAllTasks(localDb);
+      return Array.isArray(rows) ? rows : [];
+    }catch(_){
+      return [];
+    }finally{
+      try{ if(localDb && typeof localDb.close === 'function') localDb.close(); }catch(_){ }
+    }
+  }
+
+  async function loadSeedTasksFromJson(type){
+    if(type !== 'noun_to_adj') return [];
+    const out = [];
+    const push = (list, fallbackCategory) => {
+      for(const t of list || []){
+        const enNoun = normalize(t.en_noun);
+        const enAdj = normalize(t.en_adj);
+        const ruNoun = String(t.ru_noun || '').trim();
+        const ruAdj = String(t.ru_adj || '').trim();
+        const category = normCategory(t.category || fallbackCategory || 'Suffixes');
+        if(!enNoun || !enAdj || !ruNoun || !ruAdj) continue;
+        const row = { type, category, en_noun: enNoun, en_adj: enAdj, ru_noun: ruNoun, ru_adj: ruAdj };
+        row.pairKey = makePairKey(row);
+        out.push(row);
+      }
+    };
+
+    try{
+      const s = await fetchJson(N2A_SUFFIX_FILE);
+      push(Array.isArray(s && s.tasks) ? s.tasks : [], 'Suffixes');
+    }catch(_){ }
+    try{
+      const p = await fetchJson(N2A_PREFIX_FILE);
+      push(Array.isArray(p && p.tasks) ? p.tasks : [], 'Prefixes');
+    }catch(_){ }
+
+    const dedup = new Map();
+    for(const row of out){
+      dedup.set(String(row.pairKey || ''), row);
+    }
+    return Array.from(dedup.values());
+  }
+
+  async function seedSupabaseIfAdminAndEmpty(db, type){
+    if(!(db && db.kind === 'supabase' && wtRuntime.isAdmin)) return { seeded:false, count:0 };
+    const n = await countAllTasks(db);
+    if(n > 0) return { seeded:false, count:n };
+
+    const seed = await loadSeedTasksFromJson(type);
+    let added = 0;
+    for(const row of seed){
+      const res = await addTask(db, row);
+      if(res && res.ok) added += 1;
+    }
+    return { seeded: added > 0, count: added };
+  }
 
 async function fetchJson(relPath){
   const urls = _buildUrlCandidates(relPath);
@@ -869,8 +929,25 @@ async function fetchJson(relPath){
   }
 
   async function refreshTasks(){
-    const all = await getAllTasks(db);
-    tasksAll = all
+    let all = await getAllTasks(db);
+
+    if(db && db.kind === 'supabase' && (!all || all.length === 0)){
+      const legacy = await readLegacyLocalTasks('noun_to_adj');
+      if(legacy.length){
+        all = legacy;
+        elSeedBadge.textContent = 'cloud: empty/local';
+        elSeedBadge.title = 'В Supabase пока нет задач. Показана локальная база этого браузера.';
+      }else{
+        const seed = await loadSeedTasksFromJson('noun_to_adj');
+        if(seed.length){
+          all = seed;
+          elSeedBadge.textContent = 'cloud: empty/seed';
+          elSeedBadge.title = 'В Supabase пока нет задач. Показаны стоковые задания из JSON.';
+        }
+      }
+    }
+
+    tasksAll = (all || [])
       .filter(t => t.type === 'noun_to_adj')
       .map(t => ({
         ...t,
@@ -961,6 +1038,16 @@ async function fetchJson(relPath){
 
       const canMutate = (db && db.kind === 'supabase') ? wtRuntime.isAdmin : true;
       if(canMutate){
+        if(db && db.kind === 'supabase' && wtRuntime.isAdmin){
+          try{
+            const seeded = await seedSupabaseIfAdminAndEmpty(db, 'noun_to_adj');
+            if(seeded.seeded){
+              elSeedBadge.textContent = 'cloud: seeded';
+              elSeedBadge.title = `В Supabase загружено ${seeded.count} задач из локальных JSON.`;
+            }
+          }catch(_){ }
+        }
+
         const report = await autoLoadIfEmpty('noun_to_adj');
 
         if(db && db.kind === 'supabase'){
@@ -983,6 +1070,16 @@ async function fetchJson(relPath){
       }
 
       await refreshTasks();
+      if(!tasksAll.length){
+        const seed = await loadSeedTasksFromJson('noun_to_adj');
+        if(seed.length){
+          tasksAll = seed;
+          updateCountBadge();
+          renderTaskList();
+          elSeedBadge.textContent = 'seed: memory';
+          elSeedBadge.title = 'Показаны задания из локальных JSON (без записи в базу).';
+        }
+      }
       updateActiveTasks();
       updateScore();
       updateQ();
