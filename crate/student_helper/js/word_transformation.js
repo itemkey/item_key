@@ -127,9 +127,13 @@ function buildAffixHintHTML(baseWord, kind){
 
   function tx(db, mode='readonly'){
     if(db && db.kind === 'supabase') return null;
+    if(db && db.kind === 'memory') return null;
     return db.transaction([STORE_TASKS], mode).objectStore(STORE_TASKS);
   }
   async function getAllTasks(db){
+    if(db && db.kind === 'memory'){
+      return Array.isArray(db.tasks) ? db.tasks.map((x) => ({ ...x })) : [];
+    }
     if(db && db.kind === 'supabase'){
       const rows = [];
       const page = 1000;
@@ -168,6 +172,9 @@ function buildAffixHintHTML(baseWord, kind){
     });
   }
   async function countAllTasks(db){
+    if(db && db.kind === 'memory'){
+      return Array.isArray(db.tasks) ? db.tasks.length : 0;
+    }
     if(db && db.kind === 'supabase'){
       const { count, error } = await db.client
         .from(WT_TABLE)
@@ -184,6 +191,10 @@ function buildAffixHintHTML(baseWord, kind){
     });
   }
   async function clearAll(db){
+    if(db && db.kind === 'memory'){
+      db.tasks = [];
+      return true;
+    }
     if(db && db.kind === 'supabase'){
       const { error } = await db.client.from(WT_TABLE).delete().eq('type', db.type);
       if(error) throw error;
@@ -209,6 +220,15 @@ function buildAffixHintHTML(baseWord, kind){
       updatedAt: now
     };
     payload.pairKey = makePairKey(payload);
+
+    if(db && db.kind === 'memory'){
+      const has = (db.tasks || []).some((x) => String(x.pairKey || '') === String(payload.pairKey || ''));
+      if(has) return { ok:false, skipped:true, reason:'duplicate' };
+      const nextId = Number(db.nextId || 1);
+      db.nextId = nextId + 1;
+      db.tasks.push({ ...payload, id: nextId });
+      return { ok:true, id: nextId };
+    }
 
     if(db && db.kind === 'supabase'){
       const exists = await db.client
@@ -255,6 +275,10 @@ function buildAffixHintHTML(baseWord, kind){
     });
   }
   async function deleteTask(db, id){
+    if(db && db.kind === 'memory'){
+      db.tasks = (db.tasks || []).filter((x) => Number(x.id) !== Number(id));
+      return true;
+    }
     if(db && db.kind === 'supabase'){
       const { error } = await db.client.from(WT_TABLE).delete().eq('id', id).eq('type', db.type);
       if(error) throw error;
@@ -316,6 +340,32 @@ function buildAffixHintHTML(baseWord, kind){
     }catch(_){
       return false;
     }
+  }
+
+  async function loadSeedTasksFromJson(type){
+    if(type !== 'noun_to_adj') return [];
+    const out = [];
+    const push = (data, fallbackCategory) => {
+      const list = Array.isArray(data && data.tasks) ? data.tasks : [];
+      for(const t of list){
+        const en_noun = normalize(t && t.en_noun);
+        const en_adj = normalize(t && t.en_adj);
+        const ru_noun = String(t && t.ru_noun || '').trim();
+        const ru_adj = String(t && t.ru_adj || '').trim();
+        const category = normCategory((t && t.category) || fallbackCategory || 'Suffixes');
+        if(!en_noun || !en_adj || !ru_noun || !ru_adj) continue;
+        const row = { type, category, en_noun, en_adj, ru_noun, ru_adj };
+        row.pairKey = makePairKey(row);
+        out.push(row);
+      }
+    };
+
+    try{ push(await fetchJson(N2A_SUFFIX_FILE), 'Suffixes'); }catch(_){ }
+    try{ push(await fetchJson(N2A_PREFIX_FILE), 'Prefixes'); }catch(_){ }
+
+    const uniq = new Map();
+    for(const row of out) uniq.set(String(row.pairKey || ''), row);
+    return Array.from(uniq.values());
   }
 
   // -----------------------------
@@ -880,6 +930,27 @@ async function fetchJson(relPath){
     return { kind:'supabase', type, client: wtRuntime.supa };
   }
 
+  function memoryDb(type, list){
+    const tasks = Array.isArray(list) ? list.map((t, idx) => ({
+      id: Number(t.id || (idx + 1)),
+      type: t.type || type,
+      category: normCategory(t.category || 'Suffixes'),
+      en_noun: normalize(t.en_noun),
+      en_adj: normalize(t.en_adj),
+      ru_noun: String(t.ru_noun || '').trim(),
+      ru_adj: String(t.ru_adj || '').trim(),
+      pairKey: t.pairKey || makePairKey(t),
+      createdAt: Number(t.createdAt || Date.now()),
+      updatedAt: Number(t.updatedAt || Date.now())
+    })) : [];
+    return {
+      kind: 'memory',
+      type,
+      tasks,
+      nextId: tasks.length + 1
+    };
+  }
+
   async function seedCloudFromList(type, list){
     if(!wtRuntime.supa || !wtRuntime.isAdmin) return 0;
     let added = 0;
@@ -957,53 +1028,77 @@ async function fetchJson(relPath){
       elDbStatus.textContent = 'opening...';
       elDbNameLine.textContent = `db: ${dbNameFor('noun_to_adj')}`;
 
-      const localDb = await openDBForType('noun_to_adj');
-      db = localDb;
-      wtRuntime.source = 'local';
-      elDbStatus.textContent = 'ok';
-
-      const report = await autoLoadIfEmpty('noun_to_adj');
-
-      if(report.loaded){
-        elSeedBadge.textContent = 'json: loaded';
-        elSeedBadge.title = report.okFiles.join(', ');
-      }else{
-        elSeedBadge.textContent = report.reason === 'not_empty' ? 'json: skip' : 'json: fail';
-        elSeedBadge.title = report.reason === 'not_empty'
-          ? 'Данные уже есть'
-          : 'Автозагрузка не сработала. Если это file://, нажми load db';
+      let localDb = null;
+      try{
+        localDb = await openDBForType('noun_to_adj');
+        db = localDb;
+        wtRuntime.source = 'local';
+        const report = await autoLoadIfEmpty('noun_to_adj');
+        if(report.loaded){
+          elSeedBadge.textContent = 'json: loaded';
+          elSeedBadge.title = report.okFiles.join(', ');
+        }else{
+          elSeedBadge.textContent = report.reason === 'not_empty' ? 'json: skip' : 'json: fail';
+          elSeedBadge.title = report.reason === 'not_empty'
+            ? 'Данные уже есть'
+            : 'Автозагрузка не сработала. Если это file://, нажми load db';
+        }
+      }catch(localError){
+        console.warn('WT local DB unavailable:', localError);
       }
 
-      if(wtRuntime.supa && await isSupabaseReady('noun_to_adj')){
-        const cloud = supabaseDb('noun_to_adj');
-        let cloudCount = 0;
+      if(wtRuntime.supa){
         try{
-          cloudCount = await countAllTasks(cloud);
-        }catch(_){
-          cloudCount = 0;
-        }
+          const cloudReady = await isSupabaseReady('noun_to_adj');
+          if(cloudReady){
+            const cloud = supabaseDb('noun_to_adj');
+            let cloudCount = 0;
+            try{ cloudCount = await countAllTasks(cloud); }catch(_){ cloudCount = 0; }
 
-        if(cloudCount <= 0 && wtRuntime.isAdmin){
-          const localList = await getAllTasks(localDb);
-          if(localList.length){
-            await seedCloudFromList('noun_to_adj', localList);
-            cloudCount = await countAllTasks(cloud);
+            if(cloudCount <= 0 && wtRuntime.isAdmin){
+              let sourceList = [];
+              if(localDb){
+                sourceList = await getAllTasks(localDb);
+              }
+              if(!sourceList.length){
+                sourceList = await loadSeedTasksFromJson('noun_to_adj');
+              }
+              if(sourceList.length){
+                await seedCloudFromList('noun_to_adj', sourceList);
+                cloudCount = await countAllTasks(cloud);
+              }
+            }
+
+            if(cloudCount > 0){
+              db = cloud;
+              wtRuntime.source = 'cloud';
+              elDbNameLine.textContent = `db: ${WT_TABLE}`;
+              elSeedBadge.textContent = wtRuntime.isAdmin ? 'cloud: admin' : 'cloud: read';
+              elSeedBadge.title = wtRuntime.isAdmin
+                ? 'Источник: Supabase (admin read/write)'
+                : 'Источник: Supabase (read-only)';
+            }
+          }else{
+            elSeedBadge.textContent = 'cloud: off';
+            elSeedBadge.title = `Таблица ${WT_TABLE} пока не создана. Используется локальная база.`;
           }
-        }
-
-        if(cloudCount > 0){
-          db = cloud;
-          wtRuntime.source = 'cloud';
-          elDbNameLine.textContent = `db: ${WT_TABLE}`;
-          elSeedBadge.textContent = wtRuntime.isAdmin ? 'cloud: admin' : 'cloud: read';
-          elSeedBadge.title = wtRuntime.isAdmin
-            ? 'Источник: Supabase (admin read/write)'
-            : 'Источник: Supabase (read-only)';
-        }else if(wtRuntime.isAdmin){
-          elSeedBadge.textContent = 'cloud: empty/local';
-          elSeedBadge.title = 'Supabase пустой. Показана локальная база; зайди в constructor и нажми "восстановить из json" при необходимости.';
+        }catch(cloudError){
+          console.warn('WT cloud init skipped:', cloudError);
+          elSeedBadge.textContent = 'cloud: off';
+          elSeedBadge.title = `Cloud fallback: ${cloudError && (cloudError.message || cloudError)}`;
         }
       }
+
+      if(!db){
+        const seed = await loadSeedTasksFromJson('noun_to_adj');
+        db = memoryDb('noun_to_adj', seed);
+        wtRuntime.source = 'memory';
+        elDbNameLine.textContent = 'db: memory-seed';
+        elSeedBadge.textContent = 'seed: memory';
+        elSeedBadge.title = 'IndexedDB/Supabase недоступны. Показаны задания из локальных JSON файлов.';
+      }
+
+      elDbStatus.textContent = 'ok';
 
       await refreshTasks();
       updateActiveTasks();
@@ -1019,7 +1114,7 @@ async function fetchJson(relPath){
       }
     }catch(e){
       elDbStatus.textContent = 'failed';
-      setFeedback('idle', 'fail', 'IndexedDB недоступен');
+      setFeedback('idle', 'fail', `Ошибка запуска: ${e && (e.message || e)}`);
       console.error(e);
     }
   }
