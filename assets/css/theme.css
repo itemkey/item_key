@@ -144,11 +144,17 @@ html[data-theme="dark"] .tag,
 html[data-theme="dark"] .ik-site-nav__link,
 html[data-theme="dark"] .ik-gear-btn,
 html[data-theme="dark"] .ik-settings-panel__close,
+html[data-theme="dark"] .ik-settings-link,
 html[data-theme="dark"] .ik-lang-option,
 html[data-theme="dark"] .ik-lang-option.is-active {
   background: var(--ik-surface);
   color: var(--ik-text);
   border-color: var(--ik-border);
+}
+
+html[data-theme="dark"] .ik-settings-link:hover {
+  background: var(--ik-surface-alt);
+  border-color: var(--ik-border-strong);
 }
 
 html[data-theme="dark"] .nav-btn {
@@ -201,7 +207,10 @@ html[data-theme="dark"] .crate-card__meta,
 html[data-theme="dark"] .crate-title .sub,
 html[data-theme="dark"] .planning-title .kicker,
 html[data-theme="dark"] .page-planning .column__count,
-html[data-theme="dark"] .page-planning .card__meta {
+html[data-theme="dark"] .page-planning .card__meta,
+html[data-theme="dark"] .friend-user-id,
+html[data-theme="dark"] .friend-meta,
+html[data-theme="dark"] .friends-empty {
   color: var(--ik-muted);
 }
 
@@ -260,10 +269,20 @@ html[data-theme="dark"] .mini-pop,
 html[data-theme="dark"] .onoi-img-bubble,
 html[data-theme="dark"] .ik-settings-panel,
 html[data-theme="dark"] .mobile-dock,
-html[data-theme="dark"] .drawer-head {
+html[data-theme="dark"] .drawer-head,
+html[data-theme="dark"] .constructor-panel,
+html[data-theme="dark"] .friend-card,
+html[data-theme="dark"] .friends-empty {
   background: var(--ik-surface);
   border-color: var(--ik-border-strong);
   box-shadow: var(--ik-shadow);
+}
+
+html[data-theme="dark"] .friend-avatar,
+html[data-theme="dark"] .profile-avatar {
+  border-color: var(--ik-border);
+  background: var(--ik-surface-soft);
+  color: var(--ik-text);
 }
 
 html[data-theme="dark"] .btn,

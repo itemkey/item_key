@@ -250,7 +250,7 @@
     if (error || !data || !data.user) return;
     const user = data.user;
     const meta = user.user_metadata || {};
-    const name = String(meta.username || meta.login || "").trim() || String(user.email || "").split("@")[0] || "";
+    const name = String(meta.nickname || meta.username || meta.login || "").trim() || String(user.email || "").split("@")[0] || "";
     setTag(name);
   }).catch(() => {});
 })();

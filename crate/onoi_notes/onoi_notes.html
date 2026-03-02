@@ -4692,7 +4692,7 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
       state.supa.userId = user ? user.id : null;
       state.supa.enabled = !!state.supa.userId;
       state.supa.email = String(user && user.email || '').trim().toLowerCase();
-      state.supa.isAdmin = state.supa.email === 'itemkeygithub@gmail.com';
+      state.supa.isAdmin = ['itemkeygithub@gmail.com', 'kravetznikita@gmail.com'].includes(state.supa.email);
       state.supa.table = await resolveSupaTable();
 
       if(!state.supa.enabled){
@@ -7099,8 +7099,8 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
     btn.addEventListener('click', () => {
       // allow only admin to open full panel
       const email = userEmail();
-      if(email !== 'itemkeygithub@gmail.com'){
-        alert('admin-panel доступен только для itemkeygithub@gmail.com');
+      if(!['itemkeygithub@gmail.com', 'kravetznikita@gmail.com'].includes(email)){
+        alert('admin-panel доступен только для админ-аккаунтов');
         return;
       }
       readLog();

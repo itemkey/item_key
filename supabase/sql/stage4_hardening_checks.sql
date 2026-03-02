@@ -15,7 +15,10 @@ where schemaname = 'public'
     'sh_wt_tasks',
     'sh_user_state',
     'sh_onoi_state',
-    'sh_plan_state'
+    'sh_plan_state',
+    'ik_user_profiles',
+    'ik_friend_requests',
+    'ik_friendships'
   )
 order by tablename, policyname;
 
@@ -27,7 +30,10 @@ select
   to_regclass('public.sh_wt_tasks') as sh_wt_tasks,
   to_regclass('public.sh_user_state') as sh_user_state,
   to_regclass('public.sh_onoi_state') as sh_onoi_state,
-  to_regclass('public.sh_plan_state') as sh_plan_state;
+  to_regclass('public.sh_plan_state') as sh_plan_state,
+  to_regclass('public.ik_user_profiles') as ik_user_profiles,
+  to_regclass('public.ik_friend_requests') as ik_friend_requests,
+  to_regclass('public.ik_friendships') as ik_friendships;
 
 -- Verify unique constraints
 select conrelid::regclass as table_name, conname as constraint_name
@@ -38,7 +44,8 @@ where conrelid::regclass::text in (
   'sh_wt_tasks',
   'sh_user_state',
   'sh_onoi_state',
-  'sh_plan_state'
+  'sh_plan_state',
+  'ik_friendships'
 )
   and contype = 'u'
 order by conrelid::regclass::text, conname;

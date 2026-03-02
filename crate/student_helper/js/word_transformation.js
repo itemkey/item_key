@@ -4,7 +4,7 @@
   const DB_VERSION = 4;
   const STORE_TASKS = 'tasks';
   const WT_TABLE = 'sh_wt_tasks';
-  const WT_ADMIN_EMAIL = 'itemkeygithub@gmail.com';
+  const WT_ADMIN_EMAILS = ['itemkeygithub@gmail.com', 'kravetznikita@gmail.com'];
 
   const N2A_SUFFIX_FILE = 'db/word_transformation/student_helper_db__noun_to_adj_Suffixes.json';
   const N2A_PREFIX_FILE = 'db/word_transformation/student_helper_db__noun_to_adj_Prefixes.json';
@@ -329,7 +329,7 @@ function buildAffixHintHTML(baseWord, kind){
     }catch(_){
       wtRuntime.supa = null;
     }
-    wtRuntime.isAdmin = email === WT_ADMIN_EMAIL;
+    wtRuntime.isAdmin = WT_ADMIN_EMAILS.includes(email);
   }
 
   async function isSupabaseReady(type){

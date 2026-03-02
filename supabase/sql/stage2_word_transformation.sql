@@ -1,5 +1,5 @@
 -- Stage 2: shared word_transformation storage
--- Read for everyone, write only for admin account itemkeygithub@gmail.com
+-- Read for everyone, write only for admin accounts
 
 create table if not exists public.sh_wt_tasks (
   id bigserial primary key,
@@ -41,15 +41,15 @@ using (true);
 drop policy if exists "wt_admin_insert" on public.sh_wt_tasks;
 create policy "wt_admin_insert"
 on public.sh_wt_tasks for insert
-with check (lower(coalesce(auth.jwt()->>'email','')) = 'itemkeygithub@gmail.com');
+with check (lower(coalesce(auth.jwt()->>'email','')) in ('itemkeygithub@gmail.com', 'kravetznikita@gmail.com'));
 
 drop policy if exists "wt_admin_update" on public.sh_wt_tasks;
 create policy "wt_admin_update"
 on public.sh_wt_tasks for update
-using (lower(coalesce(auth.jwt()->>'email','')) = 'itemkeygithub@gmail.com')
-with check (lower(coalesce(auth.jwt()->>'email','')) = 'itemkeygithub@gmail.com');
+using (lower(coalesce(auth.jwt()->>'email','')) in ('itemkeygithub@gmail.com', 'kravetznikita@gmail.com'))
+with check (lower(coalesce(auth.jwt()->>'email','')) in ('itemkeygithub@gmail.com', 'kravetznikita@gmail.com'));
 
 drop policy if exists "wt_admin_delete" on public.sh_wt_tasks;
 create policy "wt_admin_delete"
 on public.sh_wt_tasks for delete
-using (lower(coalesce(auth.jwt()->>'email','')) = 'itemkeygithub@gmail.com');
+using (lower(coalesce(auth.jwt()->>'email','')) in ('itemkeygithub@gmail.com', 'kravetznikita@gmail.com'));

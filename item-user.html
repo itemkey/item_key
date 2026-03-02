@@ -37,34 +37,100 @@
       <p class="muted">доступ к архиву</p>
 
       <div class="auth-tabs">
-        <button data-tab="login" class="auth-tab is-active">вход</button>
-        <button data-tab="register" class="auth-tab">регистрация</button>
+        <button data-tab="login" class="auth-tab is-active" type="button">вход</button>
+        <button data-tab="register" class="auth-tab" type="button">регистрация</button>
       </div>
 
       <!-- ВХОД -->
       <form id="loginForm" class="auth-form">
-        <input required type="text" placeholder="почта" id="loginName">
+        <input required type="email" placeholder="почта" id="loginName" autocomplete="email">
         <input required type="password" placeholder="пароль" id="loginPass">
         <button class="btn btn--primary" type="submit">войти</button>
       </form>
 
       <!-- РЕГИСТРАЦИЯ -->
       <form id="registerForm" class="auth-form hidden">
-        <input required type="text" placeholder="логин" id="regName">
+        <input required type="text" placeholder="user-id (уникальный)" id="regUserId" minlength="4" maxlength="32" autocomplete="off">
+        <input required type="text" placeholder="ник" id="regNick" maxlength="48" autocomplete="nickname">
         <input required type="email" placeholder="почта" id="regEmail">
         <input required type="password" placeholder="пароль" id="regPass">
+        <p class="muted auth-tip">user-id нужен для друзей. допустимо: латиница, цифры, <code>.</code> <code>_</code> <code>-</code></p>
         <button class="btn btn--primary" type="submit">создать аккаунт</button>
       </form>
     </section>
 
-    <!-- ПРОФИЛЬ -->
-    <section id="authProfile" class="auth-box hidden">
-      <h1>профиль</h1>
+    <!-- ЛК -->
+    <section id="authWorkspace" class="auth-box hidden">
+      <h1>account center</h1>
+      <p class="muted">управление профилем и друзьями</p>
 
-      <div class="profile-line"><b>логин:</b> <span id="pLogin"></span></div>
-      <div class="profile-line"><b>email:</b> <span id="pEmail"></span></div>
+      <div class="auth-tabs auth-tabs--workspace">
+        <button data-view="profile" class="auth-tab auth-view-tab is-active" type="button">my profile</button>
+        <button data-view="friends" class="auth-tab auth-view-tab" type="button">friends</button>
+      </div>
 
-      <button id="logoutBtn" class="btn">выйти</button>
+      <div id="profileView" class="user-view">
+        <div class="profile-avatar-row">
+          <div class="profile-avatar" id="profileAvatarPreview" aria-label="avatar">IK</div>
+          <label class="btn profile-avatar-upload" for="profileAvatarInput">
+            сменить аватар
+          </label>
+          <input class="visually-hidden" type="file" id="profileAvatarInput" accept="image/*">
+        </div>
+
+        <form id="profileForm" class="auth-form">
+          <input required type="text" placeholder="ник" id="profileNick" maxlength="48">
+          <input required type="text" placeholder="user-id" id="profileUserId" minlength="4" maxlength="32" autocomplete="off">
+          <textarea id="profileBio" placeholder="описание профиля" rows="4" maxlength="280"></textarea>
+          <button class="btn btn--primary" type="submit">сохранить профиль</button>
+        </form>
+
+        <button id="constructorToggle" class="btn" type="button">конструктор</button>
+
+        <section id="constructorPanel" class="constructor-panel hidden" aria-label="конструктор аккаунта">
+          <div class="constructor-line"><b>почта:</b> <span id="constructorEmail">-</span></div>
+          <div class="constructor-line"><b>пароль:</b> <span id="constructorMaskedPassword">********</span></div>
+
+          <form id="emailChangeForm" class="auth-form constructor-form">
+            <input required type="password" id="emailCurrentPass" placeholder="текущий пароль (проверка)">
+            <input required type="email" id="emailNewValue" placeholder="новая почта">
+            <button class="btn" type="submit">сменить почту</button>
+          </form>
+
+          <form id="passwordChangeForm" class="auth-form constructor-form">
+            <input required type="password" id="passwordCurrentPass" placeholder="текущий пароль (проверка)">
+            <input required type="password" id="passwordNewValue" placeholder="новый пароль">
+            <input required type="password" id="passwordRepeatValue" placeholder="повтори новый пароль">
+            <button class="btn" type="submit">сменить пароль</button>
+          </form>
+        </section>
+
+        <button id="logoutBtn" class="btn" type="button">выйти</button>
+      </div>
+
+      <div id="friendsView" class="user-view hidden">
+        <form id="addFriendForm" class="auth-form">
+          <input required type="text" id="addFriendUserId" placeholder="user-id друга" minlength="4" maxlength="32" autocomplete="off">
+          <button class="btn btn--primary" type="submit">add friend</button>
+        </form>
+
+        <button id="friendsRefreshBtn" class="btn" type="button">обновить</button>
+
+        <section class="friends-block">
+          <h2 class="friends-title">входящие приглашения</h2>
+          <div id="incomingRequestsList" class="friends-list"></div>
+        </section>
+
+        <section class="friends-block">
+          <h2 class="friends-title">исходящие приглашения</h2>
+          <div id="outgoingRequestsList" class="friends-list"></div>
+        </section>
+
+        <section class="friends-block">
+          <h2 class="friends-title">друзья</h2>
+          <div id="friendsList" class="friends-list"></div>
+        </section>
+      </div>
     </section>
 
   </main>
@@ -80,22 +146,24 @@
       const tag = link.querySelector(".tag");
 
       const params = new URLSearchParams(location.search);
+      const ownPath = String(location.pathname || "").replace(/^\/+/, "");
+      const appRoot = ownPath.includes("/") ? ownPath.split("/").slice(0, -1).join("/") : "";
 
-      const getRefFile = () => {
+      const getRefPath = () => {
         const ref = document.referrer || "";
         if (!ref) return null;
         try {
           const u = new URL(ref);
-          const file = (u.pathname || "").split("/").pop();
-          return file || null;
+          const path = String(u.pathname || "").replace(/^\/+/, "");
+          return path || null;
         } catch (e) {
           // fallback if referrer isn't a valid absolute URL
-          const file = String(ref).split("?")[0].split("#")[0].split("/").pop();
-          return file || null;
+          const path = String(ref).split("?")[0].split("#")[0].replace(/^\/+/, "");
+          return path || null;
         }
       };
 
-      const refFile = getRefFile();
+      const refPath = getRefPath();
 
       // Priority:
       // 1) explicit query (?returnTo / ?from)
@@ -104,7 +172,7 @@
       const candidate =
         params.get("returnTo") ||
         params.get("from") ||
-        (refFile && refFile.toLowerCase() !== "item-user.html" ? refFile : null) ||
+        (refPath && !/item-user\.html$/i.test(refPath) ? refPath : null) ||
         sessionStorage.getItem("itemkey.user.returnTo") ||
         localStorage.getItem("itemkey.user.returnTo") ||
         localStorage.getItem("itemkey.lastPage") ||
@@ -114,15 +182,24 @@
         localStorage.getItem("itemkey.user.from") ||
         "index.html";
 
-      const safeFile = (v) => {
+      const safePath = (v) => {
         if (!v) return null;
-        const clean = String(v).split("?")[0].split("#")[0].split("/").pop().trim();
-        if (!/^[a-z0-9\-]+\.html$/i.test(clean)) return null;
-        if (clean.toLowerCase() === "item-user.html") return null;
+        let clean = String(v)
+          .split("?")[0]
+          .split("#")[0]
+          .replace(/\\/g, "/")
+          .replace(/^\/+/, "")
+          .trim();
+        if (appRoot && clean.toLowerCase().startsWith((appRoot + "/").toLowerCase())) {
+          clean = clean.slice(appRoot.length + 1);
+        }
+        if (!clean || clean.includes("..")) return null;
+        if (!/^[a-z0-9_./\-]+\.html$/i.test(clean)) return null;
+        if (/item-user\.html$/i.test(clean)) return null;
         return clean;
       };
 
-      const dest = safeFile(candidate) || "index.html";
+      const dest = safePath(candidate) || "index.html";
       link.href = dest;
        // keep last origin in storage (helps when referrer is empty on file://)
        try { sessionStorage.setItem("itemkey.user.returnTo", dest); } catch(e) {}
@@ -132,7 +209,7 @@
       const label =
         dest.toLowerCase() === "index.html"
           ? "item-key"
-          : dest.replace(/\.html$/i, "");
+          : dest.split("/").pop().replace(/\.html$/i, "");
 
       if (tag) tag.textContent = label;
       link.setAttribute("aria-label", `back to ${label}`);

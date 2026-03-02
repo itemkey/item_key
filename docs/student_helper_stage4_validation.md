@@ -6,7 +6,7 @@ Goal: confirm zero-loss behavior after Supabase integration.
 
 - A (regular user)
 - B (regular user)
-- Admin (`itemkeygithub@gmail.com`)
+- Admin (`itemkeygithub@gmail.com` / `kravetznikita@gmail.com`)
 - Guest (logged out)
 
 ## Module Checks

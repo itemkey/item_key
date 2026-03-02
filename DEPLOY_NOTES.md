@@ -8,6 +8,7 @@ Order for fresh environment:
 4. Run `supabase/sql/stage4_hardening_checks.sql`
 5. Run `supabase/sql/stage6_onoi_notes_private.sql`
 6. Run `supabase/sql/stage7_planning_private.sql`
+7. Run `supabase/sql/stage8_accounts_social.sql`
 
 After SQL:
 

@@ -4,7 +4,33 @@
   const LIGHT = "light";
   const PANEL_SELECTOR = "#ikSiteSettingsPanel";
   const FAB_ID = "ikThemeFab";
-  const ADMIN_EMAIL = "itemkeygithub@gmail.com";
+  const ADMIN_EMAILS = ["itemkeygithub@gmail.com", "kravetznikita@gmail.com"];
+  const ACCOUNT_LINK_STYLE_ID = "ikAccountLinksStyle";
+
+  const scriptRef = (() => {
+    const direct = document.currentScript;
+    if (direct && direct.getAttribute) return direct;
+    const scripts = Array.from(document.querySelectorAll("script[src]"));
+    return scripts.find((el) => /assets\/js\/theme\.js(?:$|[?#])/i.test(String(el.getAttribute("src") || ""))) || null;
+  })();
+
+  const appPrefix = (() => {
+    const srcAttr = scriptRef ? String(scriptRef.getAttribute("src") || "") : "";
+    if (!srcAttr) return "";
+    const clean = srcAttr.replace(/\\/g, "/").split("?")[0].split("#")[0];
+    const marker = "assets/js/theme.js";
+    const idx = clean.toLowerCase().lastIndexOf(marker);
+    if (idx < 0) return "";
+    return clean.slice(0, idx);
+  })();
+
+  const appRootPath = (() => {
+    try {
+      return new URL(appPrefix || "./", window.location.href).pathname;
+    } catch {
+      return "/";
+    }
+  })();
 
   const adminState = {
     isAdmin: false,
@@ -136,6 +162,70 @@
     document.head.appendChild(style);
   }
 
+  function ensureAccountLinkStyle() {
+    if (document.getElementById(ACCOUNT_LINK_STYLE_ID)) return;
+    const style = document.createElement("style");
+    style.id = ACCOUNT_LINK_STYLE_ID;
+    style.textContent = [
+      ".ik-settings-links { display:grid; gap:8px; margin: 0 0 10px; }",
+      ".ik-settings-link { min-height:42px; border:1px solid rgba(0,0,0,.14); background: rgba(255,255,255,.92); color: rgba(0,0,0,.88); text-decoration:none; display:flex; align-items:center; justify-content:center; letter-spacing:.14em; text-transform:uppercase; font-size:11px; cursor:pointer; transition: border-color .16s ease, background .16s ease, transform .16s ease; }",
+      ".ik-settings-link:hover { border-color: rgba(0,0,0,.34); background: rgba(0,0,0,.04); transform: translateY(-1px); }",
+      ".ik-settings-link:active { transform: translateY(0); }",
+      ".ik-settings-link:focus-visible { outline: 2px solid rgba(0,0,0,.48); outline-offset: 2px; }"
+    ].join("\n");
+    document.head.appendChild(style);
+  }
+
+  function currentAppRelativePath() {
+    const pathname = String(window.location.pathname || "");
+    let relative = pathname.startsWith(appRootPath)
+      ? pathname.slice(appRootPath.length)
+      : pathname.replace(/^\/+/, "");
+    if (!relative) relative = "index.html";
+    if (relative.endsWith("/")) relative += "index.html";
+    return relative;
+  }
+
+  function buildAccountHref(view) {
+    const params = new URLSearchParams();
+    params.set("view", view === "friends" ? "friends" : "profile");
+    params.set("returnTo", currentAppRelativePath());
+    return `${appPrefix}item-user.html?${params.toString()}`;
+  }
+
+  function ensureAccountLinks(panel) {
+    if (!panel) return;
+    ensureAccountLinkStyle();
+
+    let wrap = panel.querySelector(".ik-settings-links");
+    if (!wrap) {
+      wrap = document.createElement("div");
+      wrap.className = "ik-settings-links";
+      panel.insertBefore(wrap, panel.firstElementChild || null);
+    }
+
+    let profileLink = wrap.querySelector("#ikMyProfileLink");
+    if (!profileLink) {
+      profileLink = document.createElement("a");
+      profileLink.id = "ikMyProfileLink";
+      profileLink.className = "ik-settings-link";
+      profileLink.textContent = "my profile";
+      wrap.appendChild(profileLink);
+    }
+
+    let friendsLink = wrap.querySelector("#ikFriendsLink");
+    if (!friendsLink) {
+      friendsLink = document.createElement("a");
+      friendsLink.id = "ikFriendsLink";
+      friendsLink.className = "ik-settings-link";
+      friendsLink.textContent = "friends";
+      wrap.appendChild(friendsLink);
+    }
+
+    profileLink.href = buildAccountHref("profile");
+    friendsLink.href = buildAccountHref("friends");
+  }
+
   function getLocalUserEmail() {
     try {
       const raw = localStorage.getItem("itemkey.currentUser");
@@ -158,7 +248,7 @@
         }
       }
     } catch {}
-    return email === ADMIN_EMAIL;
+    return ADMIN_EMAILS.includes(email);
   }
 
   function pushAdminLog(level, source, payload) {
@@ -356,7 +446,12 @@
   }
 
   function enhancePanel(panel) {
-    if (!panel || panel.querySelector(".ik-theme-group")) return;
+    if (!panel) return;
+    ensureAccountLinks(panel);
+    if (panel.querySelector(".ik-theme-group")) {
+      ensureAdminButton(panel);
+      return;
+    }
     const current = resolveTheme(document.documentElement.getAttribute("data-theme"));
     panel.appendChild(buildThemeGroup(current));
     ensureAdminButton(panel);
@@ -454,6 +549,8 @@
     window.addEventListener("storage", (e) => {
       if (e.key === "itemkey.currentUser") refreshAdminAccess();
     });
+
+    document.addEventListener("ik:authchange", refreshAdminAccess);
 
     initSystemListener();
   });
