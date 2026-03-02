@@ -22,7 +22,8 @@
     userId: null,
     syncing: false,
     stock: null,
-    interval: null
+    interval: null,
+    localChangeTimer: null
   };
 
   function dbName(){
@@ -624,6 +625,13 @@
     state.interval = setInterval(() => {
       run('interval');
     }, 90000);
+
+    window.addEventListener('dict:local-changed', () => {
+      if(state.localChangeTimer) clearTimeout(state.localChangeTimer);
+      state.localChangeTimer = setTimeout(() => {
+        run('local-change');
+      }, 350);
+    });
 
     document.addEventListener('visibilitychange', () => {
       if(document.visibilityState === 'visible') run('focus');

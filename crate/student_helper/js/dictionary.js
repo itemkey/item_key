@@ -3796,6 +3796,12 @@ if(sync.okFiles.length){
     }
   });
 
+  function notifyDictLocalChanged(){
+    try{
+      window.dispatchEvent(new CustomEvent('dict:local-changed'));
+    }catch(_){ }
+  }
+
   btnAddSection.addEventListener('click', async ()=>{
     const name = (elNewSectionName.value || '').trim();
     if(!name){
@@ -3815,6 +3821,7 @@ if(sync.okFiles.length){
       dictResetCards();
       dictResetQuiz();
       dictSetSubtab('builder');
+      notifyDictLocalChanged();
     }catch(e){
       alert(`Ошибка сохранения: ${e.message || e}`);
     }
@@ -3835,6 +3842,7 @@ if(sync.okFiles.length){
       renderWordsUI();
       dictResetCards();
       dictResetQuiz();
+      notifyDictLocalChanged();
     }catch(e){
       alert(`Ошибка удаления: ${e.message || e}`);
     }
@@ -3866,6 +3874,7 @@ if(sync.okFiles.length){
       renderWordsUI();
       dictResetCards();
       dictResetQuiz();
+      notifyDictLocalChanged();
     }catch(e){
       alert(`Ошибка сохранения: ${e.message || e}`);
     }
@@ -3888,6 +3897,7 @@ if(sync.okFiles.length){
       dictResetCards();
       dictResetQuiz();
       alert('Импорт: ok');
+      notifyDictLocalChanged();
     }catch(e){
       alert(`Ошибка импорта: ${e.message || e}`);
     }
