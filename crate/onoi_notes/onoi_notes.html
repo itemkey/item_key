@@ -1829,30 +1829,8 @@ body.focus-mode .n-col-right{
           <button class="n-btn" id="testCloud" type="button">Проверить</button>
           <button class="n-btn" id="pullCloud" type="button">Pull</button>
           <button class="n-btn" id="pushCloud" type="button">Push</button>
-          <button class="n-btn" id="adminPanelBtn" type="button">admin-panel</button>
         </div>
 </div>
-    </div>
-  </div>
-
-  <div class="modal" id="adminPanelModal" role="dialog" aria-modal="true" aria-label="Admin Panel">
-    <div class="modal-card">
-      <div class="modal-head">
-        <h2 class="modal-title">admin panel</h2>
-        <button class="n-btn" id="adminPanelClose" type="button">Закрыть</button>
-      </div>
-      <div class="modal-grid">
-        <p class="hint" id="adminPanelMeta">diagnostics</p>
-        <div class="field" style="grid-column:1/-1;">
-          <label>errors log</label>
-          <textarea id="adminPanelLog" class="mono" readonly style="min-height:260px;"></textarea>
-        </div>
-        <div class="modal-actions">
-          <button class="n-btn" id="adminPanelRefresh" type="button">Обновить</button>
-          <button class="n-btn" id="adminPanelCopy" type="button">Копировать</button>
-          <button class="n-btn" id="adminPanelClear" type="button">Очистить</button>
-        </div>
-      </div>
     </div>
   </div>
 
@@ -4695,8 +4673,7 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
       state.ui.collapsedCats = loadCollapsedCats();
       applySidebarUI();
 
-      // One-time hard reset of legacy local notes storage for clean private launch
-      await hardResetLocalOnce();
+      // Safety-first: never auto-wipe notes on boot.
 
       loadCloudSettings();
       applySavedTypography();

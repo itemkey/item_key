@@ -9,6 +9,7 @@
   const TABLE_SECTIONS = 'sh_dictionary_sections';
   const TABLE_WORDS = 'sh_dictionary_words';
   const TABLE_RUNS = 'sh_migration_runs';
+  const REMOTE_BACKUP_KEY = 'student_helper_dict_remote_backup_v1';
 
   const MANIFEST_PATHS = ['db/manifest.json', 'db/dictionary/manifest.json'];
   const DICT_DIR = 'db/dictionary/';
@@ -425,6 +426,31 @@
     }
   }
 
+  function saveRemoteBackup(snapshot){
+    try{
+      const payload = {
+        ts: Date.now(),
+        owner: state.userId,
+        snapshot: snapshot || { sections: [], words: [] }
+      };
+      localStorage.setItem(REMOTE_BACKUP_KEY, JSON.stringify(payload));
+    }catch(_){ }
+  }
+
+  function loadRemoteBackup(){
+    try{
+      const raw = localStorage.getItem(REMOTE_BACKUP_KEY);
+      if(!raw) return null;
+      const obj = JSON.parse(raw);
+      if(!obj || obj.owner !== state.userId) return null;
+      const snap = obj.snapshot;
+      if(!snap || !Array.isArray(snap.sections) || !Array.isArray(snap.words)) return null;
+      return snap;
+    }catch(_){
+      return null;
+    }
+  }
+
   function chunk(list, size){
     const out = [];
     for(let i = 0; i < list.length; i += size){
@@ -460,8 +486,22 @@
   }
 
   async function syncRemoteWithLocal(localUserSnapshot){
-    await clearRemoteUserData();
-    await insertRemoteFromSnapshot(localUserSnapshot);
+    const remoteBefore = await fetchRemoteSnapshot();
+    saveRemoteBackup(remoteBefore);
+    try{
+      await clearRemoteUserData();
+      await insertRemoteFromSnapshot(localUserSnapshot);
+    }catch(e){
+      // rollback best-effort to previous remote state
+      try{
+        const backup = loadRemoteBackup();
+        if(backup){
+          await clearRemoteUserData();
+          await insertRemoteFromSnapshot(backup);
+        }
+      }catch(_){ }
+      throw e;
+    }
   }
 
   function fp(snapshot){

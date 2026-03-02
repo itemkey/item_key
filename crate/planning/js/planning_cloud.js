@@ -1,6 +1,7 @@
 const LOCAL_KEY = 'itemkey_planning_v1';
 const OWNER_KEY = 'planning_owner_v1';
 const CACHE_PREFIX = 'planning_cache_v1__';
+const BACKUP_PREFIX = 'planning_backup_v1__';
 const PLAN_TABLE = 'sh_plan_state';
 const PLAN_FALLBACK_TABLE = 'sh_user_state';
 const STATE_KEY = 'planning_state_v1';
@@ -65,6 +66,14 @@ function saveOwnerCache(owner, raw){
   try{
     if(!raw) return;
     localStorage.setItem(cacheKey(owner), raw);
+  }catch(_){ }
+}
+
+function saveOwnerBackup(owner, raw){
+  try{
+    if(!raw) return;
+    const key = `${BACKUP_PREFIX}${String(owner || 'guest')}`;
+    localStorage.setItem(key, JSON.stringify({ ts: Date.now(), raw }));
   }catch(_){ }
 }
 
@@ -229,7 +238,10 @@ export async function initPlanningCloud(){
     if(!runtime.userId){
       const prevOwner = storageGet(OWNER_KEY) || '';
       const currentRaw = storageGet(LOCAL_KEY);
-      if(prevOwner) saveOwnerCache(prevOwner, currentRaw);
+      if(prevOwner){
+        saveOwnerCache(prevOwner, currentRaw);
+        saveOwnerBackup(prevOwner, currentRaw);
+      }
       storageDel(LOCAL_KEY);
       storageSet(OWNER_KEY, 'guest');
       setBadge('off', 'login required');
@@ -245,7 +257,10 @@ export async function initPlanningCloud(){
     // if owner marker is missing or belongs to another user, never keep current local state
     // as active state for the new user.
     if(prevOwner !== runtime.userId){
-      if(prevOwner) saveOwnerCache(prevOwner, currentRaw);
+      if(prevOwner){
+        saveOwnerCache(prevOwner, currentRaw);
+        saveOwnerBackup(prevOwner, currentRaw);
+      }
 
       const cached = loadOwnerCache(runtime.userId);
       if(cached){
