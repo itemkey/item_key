@@ -3,9 +3,17 @@
   const DB_PREFIX = 'student_helper_db__';
   const DB_VERSION = 4;
   const STORE_TASKS = 'tasks';
+  const WT_TABLE = 'sh_wt_tasks';
+  const WT_ADMIN_EMAIL = 'itemkeygithub@gmail.com';
 
   const N2A_SUFFIX_FILE = 'db/word_transformation/student_helper_db__noun_to_adj_Suffixes.json';
   const N2A_PREFIX_FILE = 'db/word_transformation/student_helper_db__noun_to_adj_Prefixes.json';
+
+  const wtRuntime = {
+    isAdmin: false,
+    supa: null,
+    source: 'local'
+  };
 
   function idbSupported(){ return typeof indexedDB !== 'undefined'; }
   function dbNameFor(type){ return `${DB_PREFIX}${type}`; }
@@ -118,9 +126,40 @@ function buildAffixHintHTML(baseWord, kind){
   }
 
   function tx(db, mode='readonly'){
+    if(db && db.kind === 'supabase') return null;
     return db.transaction([STORE_TASKS], mode).objectStore(STORE_TASKS);
   }
-  function getAllTasks(db){
+  async function getAllTasks(db){
+    if(db && db.kind === 'supabase'){
+      const rows = [];
+      const page = 1000;
+      let from = 0;
+      while(true){
+        const { data, error } = await db.client
+          .from(WT_TABLE)
+          .select('id,type,category,en_noun,en_adj,ru_noun,ru_adj,pair_key,created_at,updated_at')
+          .eq('type', db.type)
+          .order('id', { ascending:true })
+          .range(from, from + page - 1);
+        if(error) throw error;
+        const part = Array.isArray(data) ? data : [];
+        rows.push(...part.map((r) => ({
+          id: r.id,
+          type: r.type,
+          category: normCategory(r.category || 'Suffixes'),
+          en_noun: normalize(r.en_noun),
+          en_adj: normalize(r.en_adj),
+          ru_noun: String(r.ru_noun || '').trim(),
+          ru_adj: String(r.ru_adj || '').trim(),
+          pairKey: String(r.pair_key || ''),
+          createdAt: Date.parse(r.created_at || '') || Date.now(),
+          updatedAt: Date.parse(r.updated_at || '') || Date.now()
+        })));
+        if(part.length < page) break;
+        from += page;
+      }
+      return rows;
+    }
     return new Promise((resolve, reject)=>{
       const store = tx(db, 'readonly');
       const req = store.getAll();
@@ -128,7 +167,15 @@ function buildAffixHintHTML(baseWord, kind){
       req.onerror = ()=> reject(req.error || new Error('Failed to get tasks'));
     });
   }
-  function countAllTasks(db){
+  async function countAllTasks(db){
+    if(db && db.kind === 'supabase'){
+      const { count, error } = await db.client
+        .from(WT_TABLE)
+        .select('id', { head:true, count:'exact' })
+        .eq('type', db.type);
+      if(error) throw error;
+      return Number(count || 0);
+    }
     return new Promise((resolve, reject)=>{
       const store = tx(db, 'readonly');
       const req = store.count();
@@ -136,7 +183,12 @@ function buildAffixHintHTML(baseWord, kind){
       req.onerror = ()=> reject(req.error || new Error('Failed to count'));
     });
   }
-  function clearAll(db){
+  async function clearAll(db){
+    if(db && db.kind === 'supabase'){
+      const { error } = await db.client.from(WT_TABLE).delete().eq('type', db.type);
+      if(error) throw error;
+      return true;
+    }
     return new Promise((resolve, reject)=>{
       const store = tx(db, 'readwrite');
       const req = store.clear();
@@ -144,7 +196,7 @@ function buildAffixHintHTML(baseWord, kind){
       req.onerror = ()=> reject(req.error || new Error('Failed to clear'));
     });
   }
-  function addTask(db, task){
+  async function addTask(db, task){
     const now = Date.now();
     const payload = {
       type: task.type,
@@ -157,6 +209,36 @@ function buildAffixHintHTML(baseWord, kind){
       updatedAt: now
     };
     payload.pairKey = makePairKey(payload);
+
+    if(db && db.kind === 'supabase'){
+      const exists = await db.client
+        .from(WT_TABLE)
+        .select('id')
+        .eq('type', payload.type)
+        .eq('pair_key', payload.pairKey)
+        .limit(1);
+      if(exists.error) throw exists.error;
+      if(Array.isArray(exists.data) && exists.data.length){
+        return { ok:false, skipped:true, reason:'duplicate' };
+      }
+
+      const { data, error } = await db.client
+        .from(WT_TABLE)
+        .insert({
+          type: payload.type,
+          category: payload.category,
+          en_noun: payload.en_noun,
+          en_adj: payload.en_adj,
+          ru_noun: payload.ru_noun,
+          ru_adj: payload.ru_adj,
+          pair_key: payload.pairKey,
+          source: 'admin'
+        })
+        .select('id')
+        .single();
+      if(error) throw error;
+      return { ok:true, id: data && data.id };
+    }
 
     return new Promise((resolve, reject)=>{
       const store = tx(db, 'readwrite');
@@ -172,7 +254,12 @@ function buildAffixHintHTML(baseWord, kind){
       };
     });
   }
-  function deleteTask(db, id){
+  async function deleteTask(db, id){
+    if(db && db.kind === 'supabase'){
+      const { error } = await db.client.from(WT_TABLE).delete().eq('id', id).eq('type', db.type);
+      if(error) throw error;
+      return true;
+    }
     return new Promise((resolve, reject)=>{
       const store = tx(db, 'readwrite');
       const req = store.delete(id);
@@ -191,6 +278,44 @@ function buildAffixHintHTML(baseWord, kind){
   function safeParseJSON(text){
     try{ return { ok:true, data: JSON.parse(text) }; }
     catch(e){ return { ok:false, error:e }; }
+  }
+
+  function localCurrentEmail(){
+    try{
+      const raw = localStorage.getItem('itemkey.currentUser');
+      const obj = raw ? JSON.parse(raw) : null;
+      return String(obj && obj.email || '').trim().toLowerCase();
+    }catch(_){
+      return '';
+    }
+  }
+
+  async function initWtAccess(){
+    let email = localCurrentEmail();
+    try{
+      if(window.IKSupabase && typeof window.IKSupabase.getClient === 'function'){
+        const client = window.IKSupabase.getClient();
+        if(client){
+          wtRuntime.supa = client;
+          const out = await client.auth.getUser();
+          const cloudEmail = String(out && out.data && out.data.user && out.data.user.email || '').trim().toLowerCase();
+          if(cloudEmail) email = cloudEmail;
+        }
+      }
+    }catch(_){
+      wtRuntime.supa = null;
+    }
+    wtRuntime.isAdmin = email === WT_ADMIN_EMAIL;
+  }
+
+  async function isSupabaseReady(type){
+    if(!wtRuntime.supa) return false;
+    try{
+      const { error } = await wtRuntime.supa.from(WT_TABLE).select('id', { head:true, count:'exact' }).eq('type', type);
+      return !error;
+    }catch(_){
+      return false;
+    }
   }
 
   // -----------------------------
@@ -518,6 +643,10 @@ async function fetchJson(relPath){
   const elTaskCount = document.getElementById('taskCountBadge');
   const elSeedBadge = document.getElementById('seedBadge');
   const elDbNameLine = document.getElementById('dbNameLine');
+  const elSubtabPractice = document.getElementById('subtab-practice');
+  const elSubtabBuilder = document.getElementById('subtab-builder');
+  const elPanelPractice = document.getElementById('panel-practice');
+  const elPanelBuilder = document.getElementById('panel-builder');
 
   const elPromptEn = document.getElementById('promptEn');
   const elPromptRu = document.getElementById('promptRu');
@@ -547,6 +676,19 @@ async function fetchJson(relPath){
   const btnReveal = document.getElementById('btnReveal');
   const btnCheckNext = document.getElementById('btnCheckNext');
   const btnShowAnswer = document.getElementById('btnShowAnswer');
+
+  function enforceBuilderAccess(){
+    if(elSubtabBuilder){
+      elSubtabBuilder.hidden = !wtRuntime.isAdmin;
+      elSubtabBuilder.disabled = !wtRuntime.isAdmin;
+      elSubtabBuilder.setAttribute('aria-hidden', String(!wtRuntime.isAdmin));
+    }
+    if(!wtRuntime.isAdmin){
+      if(elPanelBuilder) elPanelBuilder.hidden = true;
+      if(elPanelPractice) elPanelPractice.hidden = false;
+      if(elSubtabPractice) elSubtabPractice.setAttribute('aria-selected', 'true');
+    }
+  }
 
   function pulse(el, cls){
     if(!el) return;
@@ -734,6 +876,29 @@ async function fetchJson(relPath){
     renderTaskList();
   }
 
+  function supabaseDb(type){
+    return { kind:'supabase', type, client: wtRuntime.supa };
+  }
+
+  async function seedCloudFromList(type, list){
+    if(!wtRuntime.supa || !wtRuntime.isAdmin) return 0;
+    let added = 0;
+    const cloud = supabaseDb(type);
+    for(const t of list){
+      // eslint-disable-next-line no-await-in-loop
+      const res = await addTask(cloud, {
+        type,
+        category: normCategory(t.category || 'Suffixes'),
+        en_noun: t.en_noun,
+        en_adj: t.en_adj,
+        ru_noun: t.ru_noun,
+        ru_adj: t.ru_adj
+      });
+      if(res && res.ok) added += 1;
+    }
+    return added;
+  }
+
   function renderTaskList(){
     const view = normCategory(elViewCategory.value || 'All');
     const list = (view === 'All') ? tasksAll : tasksAll.filter(t => normCategory(t.category) === view);
@@ -760,24 +925,24 @@ async function fetchJson(relPath){
 
       const right = document.createElement('div');
       right.className = 'ik-mini';
-
-      const btnDel = document.createElement('button');
-      btnDel.className = 'ik-btn';
-      btnDel.type = 'button';
-      btnDel.textContent = 'удалить';
-      btnDel.addEventListener('click', async ()=>{
-        try{
-          await deleteTask(db, t.id);
-          await refreshTasks();
-          updateActiveTasks();
-          resetPracticeSession();
-          goNext();
-        }catch(e){
-          alert(`Ошибка удаления: ${e.message || e}`);
-        }
-      });
-
-      right.appendChild(btnDel);
+      if(wtRuntime.isAdmin){
+        const btnDel = document.createElement('button');
+        btnDel.className = 'ik-btn';
+        btnDel.type = 'button';
+        btnDel.textContent = 'удалить';
+        btnDel.addEventListener('click', async ()=>{
+          try{
+            await deleteTask(db, t.id);
+            await refreshTasks();
+            updateActiveTasks();
+            resetPracticeSession();
+            goNext();
+          }catch(e){
+            alert(`Ошибка удаления: ${e.message || e}`);
+          }
+        });
+        right.appendChild(btnDel);
+      }
       li.appendChild(left);
       li.appendChild(right);
       elTaskList.appendChild(li);
@@ -786,10 +951,15 @@ async function fetchJson(relPath){
 
   async function boot(){
     try{
+      await initWtAccess();
+      enforceBuilderAccess();
+
       elDbStatus.textContent = 'opening...';
       elDbNameLine.textContent = `db: ${dbNameFor('noun_to_adj')}`;
 
-      db = await openDBForType('noun_to_adj');
+      const localDb = await openDBForType('noun_to_adj');
+      db = localDb;
+      wtRuntime.source = 'local';
       elDbStatus.textContent = 'ok';
 
       const report = await autoLoadIfEmpty('noun_to_adj');
@@ -804,11 +974,49 @@ async function fetchJson(relPath){
           : 'Автозагрузка не сработала. Если это file://, нажми load db';
       }
 
+      if(wtRuntime.supa && await isSupabaseReady('noun_to_adj')){
+        const cloud = supabaseDb('noun_to_adj');
+        let cloudCount = 0;
+        try{
+          cloudCount = await countAllTasks(cloud);
+        }catch(_){
+          cloudCount = 0;
+        }
+
+        if(cloudCount <= 0 && wtRuntime.isAdmin){
+          const localList = await getAllTasks(localDb);
+          if(localList.length){
+            await seedCloudFromList('noun_to_adj', localList);
+            cloudCount = await countAllTasks(cloud);
+          }
+        }
+
+        if(cloudCount > 0){
+          db = cloud;
+          wtRuntime.source = 'cloud';
+          elDbNameLine.textContent = `db: ${WT_TABLE}`;
+          elSeedBadge.textContent = wtRuntime.isAdmin ? 'cloud: admin' : 'cloud: read';
+          elSeedBadge.title = wtRuntime.isAdmin
+            ? 'Источник: Supabase (admin read/write)'
+            : 'Источник: Supabase (read-only)';
+        }else if(wtRuntime.isAdmin){
+          elSeedBadge.textContent = 'cloud: empty/local';
+          elSeedBadge.title = 'Supabase пустой. Показана локальная база; зайди в constructor и нажми "восстановить из json" при необходимости.';
+        }
+      }
+
       await refreshTasks();
       updateActiveTasks();
       updateScore();
       updateQ();
       goNext();
+
+      if(wtRuntime.supa && wtRuntime.supa.auth && typeof wtRuntime.supa.auth.onAuthStateChange === 'function'){
+        wtRuntime.supa.auth.onAuthStateChange(async () => {
+          await initWtAccess();
+          enforceBuilderAccess();
+        });
+      }
     }catch(e){
       elDbStatus.textContent = 'failed';
       setFeedback('idle', 'fail', 'IndexedDB недоступен');
@@ -849,6 +1057,10 @@ if(e.key.toLowerCase() === 't'){ if(inText) return; toggleTranslate(); return; }
   elViewCategory.addEventListener('change', renderTaskList);
 
   document.getElementById('btnAddTask').addEventListener('click', async ()=>{
+    if(!wtRuntime.isAdmin){
+      setFeedback('idle', 'read-only', 'конструктор доступен только администратору');
+      return;
+    }
     const cat = normCategory(elAddCategory.value || 'Suffixes');
 
     const enWord = normalize(document.getElementById('inEnWord').value);
@@ -885,6 +1097,10 @@ if(e.key.toLowerCase() === 't'){ if(inText) return; toggleTranslate(); return; }
   });
 
   document.getElementById('btnResetFromJson').addEventListener('click', async ()=>{
+    if(!wtRuntime.isAdmin){
+      setFeedback('idle', 'read-only', 'конструктор доступен только администратору');
+      return;
+    }
     try{
       await clearAll(db);
 
@@ -908,17 +1124,29 @@ if(e.key.toLowerCase() === 't'){ if(inText) return; toggleTranslate(); return; }
   });
 
   document.getElementById('btnExportDb').addEventListener('click', async ()=>{
+    if(!wtRuntime.isAdmin){
+      setFeedback('idle', 'read-only', 'конструктор доступен только администратору');
+      return;
+    }
     const view = normCategory(elViewCategory.value || 'All');
     const list = (view === 'All') ? tasksAll : tasksAll.filter(t => normCategory(t.category) === view);
     await exportDb('noun_to_adj', view, list);
   });
 
   document.getElementById('btnImportDb').addEventListener('click', ()=>{
+    if(!wtRuntime.isAdmin){
+      setFeedback('idle', 'read-only', 'конструктор доступен только администратору');
+      return;
+    }
     elFileImport.value = '';
     elFileImport.click();
   });
 
   elFileImport.addEventListener('change', async ()=>{
+    if(!wtRuntime.isAdmin){
+      setFeedback('idle', 'read-only', 'конструктор доступен только администратору');
+      return;
+    }
     const file = elFileImport.files && elFileImport.files[0];
     if(!file) return;
     try{
