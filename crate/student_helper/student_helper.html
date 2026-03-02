@@ -1385,9 +1385,11 @@
     const key = normalize(text);
     if (!key) return text;
     if (lang === 'en') {
-      return ruToEn[key] || aliasRuToEn[key] || translateDynamic(key, 'en') || text;
+      const alias = Object.prototype.hasOwnProperty.call(aliasRuToEn, key) ? aliasRuToEn[key] : undefined;
+      return ruToEn[key] || alias || translateDynamic(key, 'en') || text;
     }
-    return enToRu[key] || aliasEnToRu[key] || translateDynamic(key, 'ru') || text;
+    const alias = Object.prototype.hasOwnProperty.call(aliasEnToRu, key) ? aliasEnToRu[key] : undefined;
+    return enToRu[key] || alias || translateDynamic(key, 'ru') || text;
   }
 
   function translateText(text, lang) {

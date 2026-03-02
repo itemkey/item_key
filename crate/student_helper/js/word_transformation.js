@@ -1101,6 +1101,32 @@ async function fetchJson(relPath){
       elDbStatus.textContent = 'ok';
 
       await refreshTasks();
+      if(!tasksAll.length){
+        if(localDb && db && db.kind === 'supabase'){
+          const localList = await getAllTasks(localDb);
+          if(localList.length){
+            db = localDb;
+            wtRuntime.source = 'local';
+            elDbNameLine.textContent = `db: ${dbNameFor('noun_to_adj')}`;
+            elSeedBadge.textContent = 'cloud: empty/local';
+            elSeedBadge.title = 'В облаке пока нет корректных задач. Показана локальная база браузера.';
+            await refreshTasks();
+          }
+        }
+      }
+
+      if(!tasksAll.length){
+        const seed = await loadSeedTasksFromJson('noun_to_adj');
+        if(seed.length){
+          db = memoryDb('noun_to_adj', seed);
+          wtRuntime.source = 'memory';
+          elDbNameLine.textContent = 'db: memory-seed';
+          elSeedBadge.textContent = 'seed: memory';
+          elSeedBadge.title = 'Показаны задания из JSON, потому что локальная/облачная база пустая.';
+          await refreshTasks();
+        }
+      }
+
       updateActiveTasks();
       updateScore();
       updateQ();
