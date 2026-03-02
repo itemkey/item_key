@@ -221,6 +221,8 @@
   <footer class="bottombar bottombar--edge">
     <span class="hint">планирование · проекты · задачи</span>
     <span class="sep">•</span>
+    <span class="hint" id="planningCloudBadge" title="planning cloud sync">planning cloud: ...</span>
+    <span class="sep">•</span>
     <span class="hint">пре-альфа</span>
   </footer>
 
@@ -239,7 +241,13 @@
   <div class="toast-stack" id="toasts" aria-live="polite"></div>
 
   <script src="../../assets/js/theme.js"></script>
-  <script type="module" src="./planning.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../../assets/js/supabase-client.js"></script>
+  <script type="module">
+    import { initPlanningCloud } from './js/planning_cloud.js';
+    await initPlanningCloud();
+    await import('./planning.js');
+  </script>
 
   <script>
     document.addEventListener('DOMContentLoaded', function(){

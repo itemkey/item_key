@@ -7,6 +7,7 @@ Order for fresh environment:
 3. Run `supabase/sql/stage3_progress_state.sql`
 4. Run `supabase/sql/stage4_hardening_checks.sql`
 5. Run `supabase/sql/stage6_onoi_notes_private.sql`
+6. Run `supabase/sql/stage7_planning_private.sql`
 
 After SQL:
 
