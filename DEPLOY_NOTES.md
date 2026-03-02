@@ -6,6 +6,7 @@ Order for fresh environment:
 2. Run `supabase/sql/stage2_word_transformation.sql`
 3. Run `supabase/sql/stage3_progress_state.sql`
 4. Run `supabase/sql/stage4_hardening_checks.sql`
+5. Run `supabase/sql/stage6_onoi_notes_private.sql`
 
 After SQL:
 

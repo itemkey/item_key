@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Item Key - onoi_notes</title>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../../assets/js/supabase-client.js"></script>
   <script>
     (function() {
       var key = "ik_site_theme_v1";
@@ -1827,8 +1829,30 @@ body.focus-mode .n-col-right{
           <button class="n-btn" id="testCloud" type="button">Проверить</button>
           <button class="n-btn" id="pullCloud" type="button">Pull</button>
           <button class="n-btn" id="pushCloud" type="button">Push</button>
+          <button class="n-btn" id="adminPanelBtn" type="button">admin-panel</button>
         </div>
 </div>
+    </div>
+  </div>
+
+  <div class="modal" id="adminPanelModal" role="dialog" aria-modal="true" aria-label="Admin Panel">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2 class="modal-title">admin panel</h2>
+        <button class="n-btn" id="adminPanelClose" type="button">Закрыть</button>
+      </div>
+      <div class="modal-grid">
+        <p class="hint" id="adminPanelMeta">diagnostics</p>
+        <div class="field" style="grid-column:1/-1;">
+          <label>errors log</label>
+          <textarea id="adminPanelLog" class="mono" readonly style="min-height:260px;"></textarea>
+        </div>
+        <div class="modal-actions">
+          <button class="n-btn" id="adminPanelRefresh" type="button">Обновить</button>
+          <button class="n-btn" id="adminPanelCopy" type="button">Копировать</button>
+          <button class="n-btn" id="adminPanelClear" type="button">Очистить</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1972,6 +1996,13 @@ body.focus-mode .n-col-right{
       catCollapsed: 'onoi_notes_cat_collapsed_v1'
     };
 
+    const ONOI_RESET_MARK = 'onoi_notes_supabase_reset_v1';
+    const ONOI_OWNER_MARK = 'onoi_notes_owner_v1';
+    const ONOI_CLOUD_TABLE = 'sh_onoi_state';
+    const ONOI_CLOUD_FALLBACK_TABLE = 'sh_user_state';
+    const ONOI_CLOUD_KEY = 'snapshot';
+    const ONOI_LOCAL_SNAP_PREFIX = 'onoi_notes_local_snapshot_v2__';
+
     function lsGet(key){
       try{ return localStorage.getItem(key); }catch(e){ return null; }
     }
@@ -2036,6 +2067,60 @@ body.focus-mode .n-col-right{
       clear: (store) => idbTx('readwrite',[store], st => new Promise((res, rej)=>{ const r=st[store].clear(); r.onsuccess=()=>res(true); r.onerror=()=>rej(r.error); })),
     };
 
+    async function clearLocalNotesStorage(){
+      try{ await idb.clear(STORE.meta); }catch(_){ }
+      try{ await idb.clear(STORE.cats); }catch(_){ }
+      try{ await idb.clear(STORE.notes); }catch(_){ }
+      try{
+        const keys = [];
+        for(let i = 0; i < localStorage.length; i += 1){
+          const key = localStorage.key(i);
+          const k = String(key || '');
+          if(!k.startsWith('onoi_notes_')) continue;
+          if(k === ONOI_RESET_MARK) continue;
+          keys.push(key);
+        }
+        keys.forEach((k) => localStorage.removeItem(k));
+      }catch(_){ }
+    }
+
+    async function hardResetLocalOnce(){
+      try{
+        if(localStorage.getItem(ONOI_RESET_MARK) === '1') return;
+      }catch(_){ }
+      try{ localStorage.setItem(ONOI_RESET_MARK, '1'); }catch(_){ }
+      await clearLocalNotesStorage();
+      try{ localStorage.setItem(ONOI_RESET_MARK, '1'); }catch(_){ }
+    }
+
+    function getStoredOwner(){
+      try{ return localStorage.getItem(ONOI_OWNER_MARK) || ''; }catch(_){ return ''; }
+    }
+
+    function setStoredOwner(v){
+      try{ localStorage.setItem(ONOI_OWNER_MARK, String(v || '')); }catch(_){ }
+    }
+
+    function saveLocalSnapshot(ownerId, snap){
+      try{
+        const key = ONOI_LOCAL_SNAP_PREFIX + String(ownerId || 'guest');
+        localStorage.setItem(key, JSON.stringify(snap || {}));
+      }catch(_){ }
+    }
+
+    function loadLocalSnapshot(ownerId){
+      try{
+        const key = ONOI_LOCAL_SNAP_PREFIX + String(ownerId || 'guest');
+        const raw = localStorage.getItem(key);
+        if(!raw) return null;
+        const obj = JSON.parse(raw);
+        if(!obj || !Array.isArray(obj.cats) || !Array.isArray(obj.notes)) return null;
+        return obj;
+      }catch(_){
+        return null;
+      }
+    }
+
     // ========= state =========
     const state = {
       cats: [],
@@ -2045,6 +2130,7 @@ body.focus-mode .n-col-right{
       search: '',
       dirty: false,
       ui: { sidebarW: 320, sidebarCollapsed: false, collapsedCats: new Set() },
+      uiHydrated: false,
       saving: false,
       saveTimer: null,
       lastSavedAt: 0,
@@ -2064,6 +2150,19 @@ body.focus-mode .n-col-right{
         lastPushAt: 0,
         lastSha: null, // for repo
         lastGistETag: null
+      },
+
+      supa: {
+        client: null,
+        userId: null,
+        enabled: false,
+        isAdmin: false,
+        email: '',
+        table: ONOI_CLOUD_TABLE
+      },
+
+      diag: {
+        errors: []
       }
     };
 
@@ -2151,14 +2250,69 @@ body.focus-mode .n-col-right{
     const testCloud = $('testCloud');
     const pullCloud = $('pullCloud');
     const pushCloud = $('pushCloud');
+    const adminPanelBtn = $('adminPanelBtn');
+    const adminPanelModal = $('adminPanelModal');
+    const adminPanelClose = $('adminPanelClose');
+    const adminPanelRefresh = $('adminPanelRefresh');
+    const adminPanelCopy = $('adminPanelCopy');
+    const adminPanelClear = $('adminPanelClear');
+    const adminPanelLog = $('adminPanelLog');
+    const adminPanelMeta = $('adminPanelMeta');
 
-    function setSync(status, kind){
+    function setAuthLocked(locked){
+      const v = !!locked;
+      try{ newNoteBtn.disabled = v; }catch(_){ }
+      try{ deleteNoteBtn.disabled = v; }catch(_){ }
+      try{ addCatBtn.disabled = v; }catch(_){ }
+      try{ addSubCatBtn.disabled = v; }catch(_){ }
+      try{ renameCatBtn.disabled = v; }catch(_){ }
+      try{ deleteCatBtn.disabled = v; }catch(_){ }
+      try{ noteTitle.disabled = v; }catch(_){ }
+      try{ editor.setAttribute('contenteditable', v ? 'false' : 'true'); }catch(_){ }
+    }
+
+    function errText(e){
+      if(!e) return 'unknown';
+      const parts = [];
+      if(e.message) parts.push(String(e.message));
+      if(e.code) parts.push(`code=${e.code}`);
+      if(e.details) parts.push(`details=${e.details}`);
+      if(e.hint) parts.push(`hint=${e.hint}`);
+      if(!parts.length) parts.push(String(e));
+      return parts.join(' | ');
+    }
+
+    function pushDiag(level, source, error, extra){
+      const row = {
+        at: new Date().toISOString(),
+        level: String(level || 'info'),
+        source: String(source || 'runtime'),
+        error: typeof error === 'string' ? error : errText(error),
+        extra: extra || null
+      };
+      state.diag.errors.push(row);
+      if(state.diag.errors.length > 250) state.diag.errors.shift();
+    }
+
+    function renderAdminPanel(){
+      if(!adminPanelLog || !adminPanelMeta) return;
+      const rows = state.diag.errors || [];
+      const lines = rows.map((r, i) => `[${i+1}] ${r.at} | ${r.level} | ${r.source}\n${r.error}${r.extra ? `\nextra: ${JSON.stringify(r.extra)}` : ''}`);
+      adminPanelLog.value = lines.join('\n\n');
+      const uid = state.supa.userId || '-';
+      const mail = state.supa.email || '-';
+      const table = state.supa.table || '-';
+      adminPanelMeta.textContent = `errors: ${rows.length} | user: ${mail} | uid: ${uid} | table: ${table}`;
+    }
+
+    function setSync(status, kind, detail){
       // status: 'local'|'syncing'|'ok'|'warn'|'bad'
       syncText.textContent = kind || 'local';
       syncDot.className = 'dot';
       if(status === 'ok') syncDot.classList.add('ok');
       if(status === 'warn') syncDot.classList.add('warn');
       if(status === 'bad') syncDot.classList.add('bad');
+      if(detail) syncText.title = String(detail);
     }
     function setSaveStatus(mode){
       // 'saved'|'saving'|'dirty'
@@ -2330,113 +2484,6 @@ async function uiPrompt(msg, opts={}){
         return main.id;
       };
 
-      // Fresh install seed (no cats + no notes): create "english" with starter notes.
-      // Uses stable ids so it won't duplicate across devices when you sync.
-      if(state.cats.length === 0 && state.notes.length === 0){
-        const t0 = 0;
-
-        const main = { id: 'cat-main', parentId: null, name: 'main', createdAt: t0, updatedAt: t0 };
-        const english = { id: 'cat-english', parentId: null, name: 'english', createdAt: t0+1, updatedAt: t0+1 };
-
-        state.cats = [main, english];
-        state.activeCatId = english.id;
-
-        const mk = (id, title, html, i) => ({
-          id: String(id || uid()),
-          catId: english.id,
-          title: String(title || ''),
-          html: String(html || ''),
-          createdAt: t0 + 10 + (i||0),
-          updatedAt: t0 + 10 + (i||0)
-        });
-
-        state.notes = [
-        mk('en-01', 'Population', `<p>If I pull the card “Population”, I speak about the people who live in Belarus. Belarus is not a huge country, so the population is not very big. It is about nine million people (approximately). Many people live in towns and cities, because cities give more jobs, universities, and services. The biggest city is Minsk. It is the capital, and it has the largest number of residents. Other large cities are Gomel, Mogilev, Vitebsk, Grodno, and Brest.</p>
-<p>People in Belarus mostly speak two languages in daily life - Belarusian and Russian. In many families both languages are used. At school you can study Belarusian, Russian, and also foreign languages like English. The main ethnic group is Belarusians, but there are also Russians, Ukrainians, Poles, and people from other groups.</p>
-<p>The population is important because it affects the economy. When there are more working people, it is easier to produce goods and services. When there are fewer young people, the country must think about jobs, education, and support for older people. Many people work in manufacturing, services, and agriculture. Some work in big factories, some work in offices, and some work on farms.</p>
-<p>When we talk about population, we can also mention living standards. People need decent wages, good schools, medical care, and social protection. So, population is not only a number - it is real lives, families, work, and the future of the country.</p>`, 0),
-        mk('en-02', 'Map of Belarus (regions and neighbours)', `<p>If I pull the map card, I explain where Belarus is and what it looks like on the map. Belarus is in Eastern Europe. It has no sea, so it is a landlocked country. Belarus is located between several neighbours: Poland is to the west, Lithuania and Latvia are to the north-west and north, Russia is to the east, and Ukraine is to the south. Because of this position, Belarus is often a crossroads for roads and railways. People and goods can travel through Belarus from one part of Europe to another part.</p>
-<p>The map also shows the main regions. Belarus has regions like Brest, Grodno, Minsk, Vitebsk, Mogilev, and Gomel. Each region has its own big city. Minsk is special, because it is the capital and it is also a separate city with its own status. Minsk is near the centre of the country, and many roads go to Minsk.</p>
-<p>When you look at Belarus on the map, you can also speak about nature. Belarus is known for forests, fields, rivers, and lakes. The land is mostly flat, so it is comfortable for farming and for building roads. The climate has cold winters and warm summers, so the seasons are clear. This influences agriculture, transport, and everyday life.</p>
-<p>So this map card is not only about geography. It is also about culture and connections. Neighbours influence trade, travel, and history. The regions show that Belarus is not only Minsk - it is many areas, many towns, and many local communities.</p>`, 1),
-        mk('en-03', 'Legislative power - Executive power - Judicial power', `<p>If I pull this card, I talk about how power is organised in Belarus. The key idea is that state power is divided into three main parts: legislative, executive, and judicial power. Each part has its own job, so the system can work in an organised way.</p>
-<p>Legislative power means making laws. In Belarus, the Parliament is called the National Assembly. It has two chambers. One chamber is the House of Representatives, and its deputies are elected by the people. The other chamber is the Council of the Republic, which is a regional representative body with members from the regions and Minsk. Legislative power discusses new laws, approves laws, and changes laws when it is necessary.</p>
-<p>Executive power means running the country day by day. It includes the President and the Government. The Government is called the Council of Ministers. It includes the Prime Minister, deputy prime ministers, and ministers. The Prime Minister is appointed by the President and approved by Parliament. The Government works with the economy, education, healthcare, security, transport, and many other areas. It makes sure the country works every day, not only on paper.</p>
-<p>Judicial power means courts. Courts decide different cases - civil cases, criminal cases, administrative cases, and economic cases. There is also the Constitutional Court. It checks if laws follow the Constitution. Judges have an important role because they must follow the law and protect legal rules.</p>
-<p>So, this card is like a simple explanation: Parliament makes laws, the Government carries out these laws, and courts check and protect the law in real situations.</p>`, 2),
-        mk('en-04', 'All-Belarus National Congress', `<p>If I pull the card “All-Belarus National Congress”, I explain it as a big national meeting. It is a large forum where many representatives can come together and speak about important topics for the whole country. The main idea is to talk about the present and the future of Belarus. People can discuss social issues, the economy, development plans, and national priorities.</p>
-<p>When a country has a big meeting like this, it usually wants to hear many voices. Representatives can come from different regions and different сферы жизни - for example, education, industry, culture, youth organisations, and public institutions. The Congress can be a place where people speak about what has been done well and what needs improvement. It can also be a place where long-term goals are explained in simple words, so people understand what direction the country wants to follow.</p>
-<p>In such discussions, you often hear about well-being of people. That includes decent wages, stable jobs, medical care, education, and social protection. Another common topic is development - how to modernise enterprises, how to support new technologies, and how to improve infrastructure like roads and public buildings.</p>
-<p>This card can also connect to the idea of unity. A national congress often shows that the country wants to work together, not separately. Even if people have different opinions, the goal is to speak, listen, and choose priorities.</p>
-<p>So, in easy English, I would say: the All-Belarus National Congress is a big meeting for big questions. It is about plans, priorities, and the future of the country.</p>`, 3),
-        mk('en-05', 'Local power', `<p>If I pull the card “Local power”, I talk about power close to people’s everyday life. Local power is very important because it solves local problems - the problems you see in your street, school, hospital, or transport system. In Belarus, local power is represented by locally elected Councils of Deputies and by executive committees of different levels.</p>
-<p>Deputies are elected for a term (in the text you gave, it says a 4-year term). Their job is to deal with local issues and to represent local people. That means they should know what citizens need in their town, district, or village. For example, local authorities can work with issues in health, education, and social welfare. They can support schools and kindergartens, help organise medical services, and take care of social protection for people who need help.</p>
-<p>Local power also deals with trade and transport inside the area. For example, local decisions can influence bus routes, road repairs, street lighting, public parks, and local markets. Of course, local power must work within the framework of existing laws. That means local leaders cannot just do anything they want - they must follow national rules.</p>
-<p>Executive committees usually do practical work. They organise services, control how things are done, and help implement decisions. If something is broken - a road, a building, a local service - people often expect local power to react.</p>
-<p>So, this card is about real life. It is not only about big politics in the capital. It is about how a city or village is managed every day, and how local people can be represented through elections.</p>`, 4),
-        mk('en-06', 'The fundamental law of the country (Constitution)', `<p>If I pull this card, I explain the Constitution in very simple words. The Constitution is the fundamental law of the country. It is the main legal document, and it is the base for the political system and all other laws. It tells how the state works, how власти are formed, and what rights citizens have.</p>
-<p>According to the text you gave me, the current Constitution of Belarus was adopted on 15 March 1994. It was adopted by the Supreme Council, and later it was amended in national referendums (1996, 2004, and 2022). The Constitution is also called the Fundamental Law of the State. This name is logical, because everything else is built on it - like a building on a foundation.</p>
-<p>The Constitution describes the structure of power: the President, Parliament, the Government, and the courts. It explains basic principles, like the rule of law. The rule of law means that the law is above people and institutions, and everyone should follow it. The Constitution also talks about human and civil rights. These rights are important because they protect citizens in their daily life and help them feel safe.</p>
-<p>Another important part is democratic procedures - voting and elections. The Constitution explains that public authorities are formed through elections and votes. That means citizens can take part in choosing representatives.</p>
-<p>So, when I speak about this card, I say: the Constitution is the main rule book of the country. It gives the structure, the rights, and the basic rules. Without it, laws would be chaotic and people would not know what rules are the most important.</p>`, 5),
-        mk('en-07', 'Tractor (agriculture and engineering)', `<p>If I pull the tractor card, I speak about Belarusian agriculture and industry together. A tractor is a strong machine that helps farmers do heavy work. With a tractor, people can plough the soil, plant seeds, carry tools, and help with harvesting. Without tractors and other machines, farming would be much slower and harder.</p>
-<p>Belarus is known for engineering and for producing agricultural machinery. In the text you gave, there is an example - Minsk Tractor Works (MTZ). This is a famous enterprise connected with tractors. Tractors are not only for fields. They can also be used in forestry, in коммунальные services, and in construction. The reason is simple: a tractor can use many different attachments. You can add different tools, and the same tractor can do many tasks.</p>
-<p>This card also connects to agriculture in Belarus. Belarus produces grain, potatoes, sugar beet, vegetables, and flax. It also produces dairy products, meat, and eggs. Agriculture needs machines, and machines are produced by industry. So, the tractor is like a bridge between two spheres: farming and manufacturing.</p>
-<p>A tractor also shows economic ideas like export. If a country produces good tractors, it can sell them abroad. This brings money into the country and supports jobs in factories and service centres.</p>
-<p>When I speak about this card, I try to show respect for work. Farming is not easy, and engineering is not easy either. A tractor is a symbol of people who work with their hands and minds. It is also a symbol of стабильность - food security depends on good work in agriculture, and good machines help make this possible.</p>`, 6),
-        mk('en-08', 'BelAZ dump truck (heavy industry)', `<p>If I pull the BelAZ card, I speak about heavy industry and huge machines. BelAZ is a Belarusian company known for very big mining dump trucks. These trucks are used in open-pit mines, where they carry rock and heavy materials. They work in very hard conditions, so they must be strong, safe, and reliable.</p>
-<p>In the text you gave me, there is a very impressive example: the mine dump truck BelAZ 75710. It can carry up to 450 tonnes of cargo. That is an enormous amount. The truck was shown (unveiled) at a testing field in September 2022, according to your text. It uses an electromechanical transmission powered by alternating current, and it has two diesel engines. It is designed to work in different climates, from minus 50°C to plus 50°C. That means it can work in very cold and very hot places.</p>
-<p>The truck has special systems for steering, braking, and dumping. It also has a cabin for two people and safety solutions like ROPS to protect operators if something dangerous happens. Even the tires matter - the text mentions Michelin radial tubeless pneumatic tires on eight wheels. The top speed is about 64 km/h, which is fast for such a massive machine.</p>
-<p>This card is a great example of Belarusian engineering. Building a truck like this needs many специалистов: designers, mechanics, electricians, and test engineers. It also shows export potential. Countries with mining industries need such trucks, so this product can be sold around the world.</p>
-<p>So, when I speak about this card, I say: this truck is not just transport. It is a symbol of heavy industry, technology, and big-scale production.</p>`, 7),
-        mk('en-09', 'High-Tech Park - ICT (the building photo)', `<p>If I pull this card, I talk about modern Belarus - the IT and technology sector. The photo looks like a place connected with high technologies, like offices where people work with computers, software, and digital projects. In Belarus, the ICT sphere is an important modern branch of the economy, because it is based on knowledge and skills, not on heavy machines.</p>
-<p>In IT, people create software, mobile apps, websites, and digital services. A big advantage is that these services can be exported easily. You do not need to ship a product in a truck - you can send the result online. That is why IT can connect Belarus with many countries at the same time. It also gives jobs to young people who study mathematics, programming, and foreign languages.</p>
-<p>This card also shows the idea of “technological advancement” from your text. Developed economies usually have a skilled workforce and use advanced technologies. IT needs education, training, and постоянное learning. People must update skills, learn new tools, and work in teams. IT also needs good infrastructure - fast internet, good universities, and a business environment that supports new ideas.</p>
-<p>Technology influences other industries too. For example, factories use automation, agriculture uses smart equipment, and transport uses digital systems. So, IT is not only its own sphere - it helps the whole country modernise.</p>
-<p>When I speak about this card, I keep it simple: it is about brains and ideas. It is about people who create digital products. It is about the future, because many new jobs in the world are connected with technology. And it is also about export, because software can be sold to the world.</p>`, 8),
-        mk('en-10', 'Export - Import', `<p>If I pull the “Export - Import” card, I explain these two words in the easiest way. Export means selling goods or services to other countries. Import means buying goods or services from other countries. Every country uses both, because no country can produce everything that people need.</p>
-<p>In your text, export is described as an important characteristic of any economy. The text also says the share of export should be higher than the share of import. Countries try to export more because export brings money into the economy and supports local jobs. When a factory produces machines or food and sells it abroad, workers have wages, and the country earns income.</p>
-<p>Belarus exports different products. From the information you shared, Belarus is strong in engineering - vehicles, tractors, machinery. Belarus also has food industries, petrochemical products, woodworking, and textiles. Many of these goods can be exported. Belarus also exports some services, and IT services are a good example because they can be sold online.</p>
-<p>Import is also normal and needed. A country may import raw materials, parts, technology, or products that are not produced enough inside the country. Import helps factories work, because factories sometimes need foreign parts or materials. Import also helps people get different goods from abroad.</p>
-<p>When I speak about this card, I also connect it with the idea of trade. Trade creates connections between countries. It can improve quality, because producers must compete and develop. It can also help the economy grow if the country exports successful products.</p>
-<p>So, in simple words: export is “we sell”, import is “we buy”. A good balance helps the economy stay stable and gives people more opportunities.</p>`, 9),
-        mk('en-11', 'Industries', `<p>If I pull the “Industries” card, I speak about what Belarus produces and what сферы are important in the economy. Your text says Belarus has a wide structure: manufacturing industries, services sector, and agriculture. This is important because a wide structure means the economy is diversified - it does not depend on only one product.</p>
-<p>One of the strongest parts is engineering. Belarus produces vehicles, agricultural machinery, machine tools, electrical equipment, optics, and household appliances. Engineering is important because it creates many jobs and produces goods for export. Another important sphere is electronics. Electronics are used in agriculture, construction, energy, and transport.</p>
-<p>Light industry is also developed. It produces fibres and yarn, linen, many kinds of fabric, clothes, bed linen, stockings, tights, and socks. Belarusian textiles and linen are well known, and they can also be exported.</p>
-<p>Food industry is very important for food security and for export. The text mentions chocolate, confectionary, baby food, preserves, meat, sugar, juices, vegetable oil, poultry, eggs, and dairy products like milk, cheese, and butter. These goods are part of everyday life, so this industry is always needed.</p>
-<p>Woodworking produces furniture, pulp, and paper. Petrochemical industry produces chemical products, coke, petroleum derivatives, plastic, and rubber. Pharmaceutical industry produces medications. Agriculture produces grain, potatoes, sugar beet, vegetables, flax, dairy products, meat, and eggs. Construction builds housing, roads, factories, and social infrastructure like hospitals and schools. The energy industry generates electricity and provides fuel and gas supplies.</p>
-<p>So, when I speak about industries, I say: Belarus works in many directions. It produces machines, food, fabrics, chemicals, wood products, and more. This creates jobs, supports export, and helps the country develop.</p>`, 10),
-        mk('en-12', '2014 Ice Hockey World Championship in Minsk', `<p>If I pull this card, I speak about a big sports event - the 2014 IIHF World Ice Hockey Championship in Minsk. Hosting a championship is not only about matches. It is also about preparation, infrastructure, гостей, and international attention. Your text says the championship was held from 9 to 25 May, and before it opened, a lot of work had been done.</p>
-<p>First, Belarus expected many visitors. For the period from 25 April to 31 May 2014, entry to Belarus was made visa-free for people who had tickets. That made travel easier for fans and guests. Second, security measures were organised. The text says security was a joint effort of different ministries and services. Even if crime rate is low, organisers still create extra security for a big event.</p>
-<p>Third, accommodation was prepared. Many hotels and other places were used for teams, officials, journalists, and fans. The text mentions a large number of hotels of different levels, plus halls of residence and even the Fan village. Fourth, venues were prepared. Two main venues were Minsk Arena and Chizhovka Arena. Minsk Arena has 15,000 seats, and Chizhovka Arena has around 10,000 seats.</p>
-<p>Fifth, transport infrastructure was improved. Roads, interchanges, metro stations, and even city commuter train service were developed. Volunteers with foreign language skills were recruited and deployed in public places to help guests.</p>
-<p>The championship also had symbols. The bison mascot became an important image, because the bison is a Belarusian symbol. Souvenirs, logos, and ads helped create a праздничная atmosphere.</p>
-<p>So, when I speak about this card, I say: this event was sport plus organisation. It showed Belarus as a host country and gave Minsk a big international experience.</p>`, 11),
-        mk('en-13', 'Michal Kleofas Oginski', `<p>If I pull the Oginski card, I speak about a person who connects politics and art. Michal Kleofas Oginski was a statesman and a military leader, but many people remember him mostly for music. He shows that one person can work for the country and also create culture.</p>
-<p>According to the text you gave, he became Ambassador to the Sejm of Poland at a young age, and later he became Head of the Treasury of the Grand Duchy of Lithuania. He was also an Extraordinary Ambassador to the Netherlands. These are serious positions, so he was a very educated and active person. But it is surprising that his most famous “language” today is music, not politics.</p>
-<p>He is best remembered for his polonaises, especially the A-minor polonaise “Farewell to the Fatherland.” This music is very emotional. When people listen to it, they often feel sadness, love for home, and respect for the past. The text says the piece was written in his family estate in Zalessie (Grodno region) before he had to leave the country after taking part in the uprising against tsarist Russia. This detail makes the music even more meaningful, because it is connected with real life and real исторические events.</p>
-<p>Oginski’s story is also about Belarusian culture inside European culture. Polonaise is a European dance form, but his inspiration came from traditional Belarusian folk songs and the beauty of local culture. That means he combined European style with Belarusian spirit.</p>
-<p>So, when I speak about this card, I say: Oginski is a symbol of Belarusian культурный talent. He reminds us that music can keep history and feelings alive. It is amazing how one melody can travel through centuries and still touch people today.</p>`, 12),
-        mk('en-14', 'Vladimir Karvat', `<p>If I pull the Vladimir Karvat card, I speak about courage and responsibility. Karvat is remembered because he saved others at the cost of his own life. According to the text you gave, he was flying a training military aircraft on 23 May 1996 when the plane caught fire. In such a situation, the normal order is to eject and save yourself. Karvat was ordered to eject to safety.</p>
-<p>But he realised something страшное: if he ejected immediately, the plane could crash on villages. That would put many civilians in danger. So he made a decision that showed great humanity. He steered the plane away from the settlements until the moment of crash. The text says the plane crashed one kilometre from the settlements of Arabovshchyna and Bolshoye Gatishche in Brest region. Karvat died, but people in the villages lived.</p>
-<p>Later, on 21 November 1996, he was posthumously awarded the title Hero of Belarus. “Posthumously” means after death. This award is not only about bravery in the air. It is about moral strength. It shows that he thought first about other people, not only about himself.</p>
-<p>This story is powerful because it is very human. It is not about politics or money. It is about a person who had only seconds to choose, and he chose to protect others. For many people, this is the highest form of duty. It is also a lesson: real heroism can happen quietly, without any plan, in one difficult moment.</p>
-<p>So, when I speak about this card, I say: Vladimir Karvat is worthy of admiration. It is unbelievable how much courage and care for people he had. His name is part of modern Belarusian history, and it reminds us what responsibility can mean.</p>`, 13),
-        mk('en-15', 'Darya Domracheva', `<p>If I pull the Darya Domracheva card, I speak about modern Belarusian sport and strong character. Domracheva is a famous Belarusian biathlete. Biathlon is not an easy sport, because it combines two very different skills. First you must ski very fast for many kilometres. Then you must stop and shoot at targets with спокойные hands. If you are tired and stressed, shooting becomes very difficult. So biathlon needs both physical power and mental control.</p>
-<p>According to your text, Domracheva has competed in the Biathlon World Cup since 2006. That means many years of hard training and competition. Athletes like her train almost every day. They work in cold weather, they travel to different countries, and they must keep discipline for a long time. Success in biathlon is not luck - it is постоянный work.</p>
-<p>Her biggest moment for many fans was the 2014 Winter Olympics in Sochi. The text says she won three gold medals: in the women’s 10 km pursuit, the women’s 15 km individual race, and the 12.5 km mass start. Three gold medals at one Olympics is a huge result. It is amazing, because Olympic pressure is enormous. The world watches you, and one mistake can change everything.</p>
-<p>Her victories gave Belarus a strong image in winter sport. Many people felt proud, because they saw Belarusian flag and heard Belarusian name at the top level. Her success also inspired young athletes. When children see a champion from their country, they believe they can do it too.</p>
-<p>So, when I speak about this card, I say: Domracheva is a symbol of focus and strength. She shows what discipline can bring. It is impressive how she could be fast, calm, and brave at the same time.</p>`, 14),
-        mk('en-16', 'Pavel Sukhoi', `<p>If I pull the Pavel Sukhoi card, I speak about science, engineering, and big ideas. Pavel Sukhoi was an aerospace engineer and an aircraft designer. He worked in aviation and helped create many aircraft solutions. In the text you gave, he is described as an inventor and the founder of the Sukhoi Design Bureau. His name is connected with Sukhoi military aircraft, which are famous in the world of авиация.</p>
-<p>Aircraft design is a very complex area. To build a plane, you need mathematics, physics, materials science, and a lot of testing. A designer must think about speed, safety, fuel, control systems, and the comfort and protection of pilots. Even small details can matter. Sukhoi worked on supersonic jets - planes that can fly faster than the speed of sound. This is a high level of technology, and it needs deep knowledge and years of experiments.</p>
-<p>The text says he designed more than 50 original aircraft solutions, and more than 30 of them were constructed and tested. That means his ideas were not only theory. They were real machines that flew and were checked in practice. This is impressive, because not every idea becomes a real working aircraft. Many ideas fail, and engineers must start again. Sukhoi’s work shows persistence and strong scientific thinking.</p>
-<p>His story also shows that Belarus has people who influenced world technology. When we talk about famous Belarusians, we can talk not only about culture and sport, but also about science and engineering.</p>
-<p>So, when I speak about this card, I say: Pavel Sukhoi represents the power of knowledge. He helped build advanced aircraft and pushed technology forward. It is really impressive how one person’s work can influence an entire field for decades.</p>`, 15),
-        ];
-        state.activeNoteId = state.notes[0]?.id || null;
-        return;
-      }
-
       // If db is empty - create "main"
       if(state.cats.length === 0){
         state.activeCatId = ensureMain();
@@ -2447,18 +2494,9 @@ async function uiPrompt(msg, opts={}){
         }
       }
 
-      // If there are no notes yet - start with an empty sheet (no welcome text)
+      // No starter notes: users create their own private notes.
       if(state.notes.length === 0){
-        const n = {
-          id: uid(),
-          catId: state.activeCatId || ensureMain(),
-          title: '',
-          html: '',
-          createdAt: now(),
-          updatedAt: now()
-        };
-        state.notes.push(n);
-        state.activeNoteId = n.id;
+        state.activeNoteId = null;
       }
 
       if(!state.activeNoteId){
@@ -2757,6 +2795,7 @@ tgl.addEventListener('click', (e) => {
         // Не блокируем редактор: пусть пользователь сразу пишет, даже если нет ни одной категории/заметки
         if(!editor.innerHTML.trim()) editor.innerHTML = '<p></p>';
         editor.setAttribute('contenteditable', 'true');
+        editor.dataset.noteId = '';
         updatedText.textContent = '-';
         return;
       }
@@ -2790,7 +2829,7 @@ tgl.addEventListener('click', (e) => {
         try{
           await embedBlobImagesInEditor();
           const n = state.activeNoteId ? noteById(state.activeNoteId) : null;
-          if(n){
+          if(n && state.uiHydrated && String(editor.dataset.noteId || '') === String(n.id || '')){
             n.title = (noteTitle.value || '').trim();
             n.html = editor.innerHTML;
             n.updatedAt = now();
@@ -2803,6 +2842,7 @@ tgl.addEventListener('click', (e) => {
           state.cats.forEach(c => st[STORE.cats].put(c));
           state.notes.forEach(n => st[STORE.notes].put(n));
         });
+        saveLocalSnapshot(state.supa.userId || getStoredOwner() || 'guest', currentDBSnapshot());
         state.lastSavedAt = now();
         state.dirty = false;
         setSaveStatus('saved');
@@ -2819,9 +2859,16 @@ tgl.addEventListener('click', (e) => {
       if(state.saveTimer) clearTimeout(state.saveTimer);
       state.saveTimer = setTimeout(async () => {
         await persistAll();
-        // push cloud after local save
-        if(state.cloud.mode !== 'off'){
-          scheduleCloudPush();
+        // push private cloud after local save
+        if(state.supa.enabled){
+          try{
+            setSync('warn', 'syncing');
+            await supaPushSnapshot();
+            setSync('ok', 'private');
+          }catch(e){
+            pushDiag('error', 'supaPushSnapshot', e);
+            setSync('bad', 'private err', errText(e));
+          }
         }
       }, delay);
     }
@@ -3745,7 +3792,11 @@ async function createNote(){
 
       ensureCategoryForNewNote();
 
-const draftTitle = (noteTitle.value || '').trim();
+      const draftTitle = (noteTitle.value || '').trim();
+      const draftText = htmlToText(editor.innerHTML || '');
+      const hasRealDraft = !!(draftTitle || (draftText && draftText.trim()));
+      if(!hasRealDraft) return null;
+
       const draftHtml = (editor.innerHTML && editor.innerHTML.trim()) ? editor.innerHTML : '<p></p>';
       const n = { id: uid(), catId: state.activeCatId, title: draftTitle, html: draftHtml, createdAt: now(), updatedAt: now() };
       state.notes.unshift(n);
@@ -3948,6 +3999,71 @@ const draftTitle = (noteTitle.value || '').trim();
       }catch(e){
         window.location.href = '../whisperer/whisperer.html?from=onoi_notes';
       }
+    }
+
+    // ========= Supabase private sync =========
+    function getSupaClient(){
+      try{
+        if(!(window.IKSupabase && typeof window.IKSupabase.getClient === 'function')) return null;
+        return window.IKSupabase.getClient();
+      }catch(_){
+        return null;
+      }
+    }
+
+    async function resolveSupaUser(){
+      const client = getSupaClient();
+      if(!client) return null;
+      const out = await client.auth.getUser();
+      return out && out.data && out.data.user ? out.data.user : null;
+    }
+
+    async function resolveSupaTable(){
+      if(!state.supa.client) return ONOI_CLOUD_TABLE;
+      try{
+        const t1 = await state.supa.client.from(ONOI_CLOUD_TABLE).select('id', { head:true, count:'exact' }).limit(1);
+        if(!t1.error) return ONOI_CLOUD_TABLE;
+        pushDiag('warn', 'resolveSupaTable', t1.error, { try: ONOI_CLOUD_TABLE });
+      }catch(e){
+        pushDiag('warn', 'resolveSupaTable', e, { try: ONOI_CLOUD_TABLE });
+      }
+      try{
+        const t2 = await state.supa.client.from(ONOI_CLOUD_FALLBACK_TABLE).select('id', { head:true, count:'exact' }).limit(1);
+        if(!t2.error) return ONOI_CLOUD_FALLBACK_TABLE;
+        pushDiag('warn', 'resolveSupaTable', t2.error, { try: ONOI_CLOUD_FALLBACK_TABLE });
+      }catch(e){
+        pushDiag('warn', 'resolveSupaTable', e, { try: ONOI_CLOUD_FALLBACK_TABLE });
+      }
+      return ONOI_CLOUD_TABLE;
+    }
+
+    async function supaPullSnapshot(){
+      if(!state.supa.client || !state.supa.userId) return null;
+      const table = state.supa.table || ONOI_CLOUD_TABLE;
+      const { data, error } = await state.supa.client
+        .from(table)
+        .select('state_value')
+        .eq('owner_id', state.supa.userId)
+        .eq('state_key', ONOI_CLOUD_KEY)
+        .maybeSingle();
+      if(error) throw error;
+      return data && data.state_value ? data.state_value : null;
+    }
+
+    async function supaPushSnapshot(){
+      if(!state.supa.client || !state.supa.userId) return;
+      const table = state.supa.table || ONOI_CLOUD_TABLE;
+      const snap = currentDBSnapshot();
+      const payload = {
+        owner_id: state.supa.userId,
+        state_key: ONOI_CLOUD_KEY,
+        state_value: snap,
+        state_hash: String((snap.cats||[]).length) + ':' + String((snap.notes||[]).length)
+      };
+      const { error } = await state.supa.client
+        .from(table)
+        .upsert(payload, { onConflict: 'owner_id,state_key' });
+      if(error) throw error;
     }
 
     // ========= cloud sync =========
@@ -4420,6 +4536,51 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
       if(e.target === settingsModal) settingsModal.classList.remove('is-open');
     });
 
+    if(adminPanelBtn){
+      adminPanelBtn.addEventListener('click', () => {
+        if(!state.supa.isAdmin) return;
+        renderAdminPanel();
+        adminPanelModal.classList.add('is-open');
+      });
+    }
+    if(adminPanelClose){
+      adminPanelClose.addEventListener('click', () => {
+        adminPanelModal.classList.remove('is-open');
+      });
+    }
+    if(adminPanelModal){
+      adminPanelModal.addEventListener('click', (e) => {
+        if(e.target === adminPanelModal) adminPanelModal.classList.remove('is-open');
+      });
+    }
+    if(adminPanelRefresh){
+      adminPanelRefresh.addEventListener('click', renderAdminPanel);
+    }
+    if(adminPanelCopy){
+      adminPanelCopy.addEventListener('click', async () => {
+        try{
+          await navigator.clipboard.writeText(adminPanelLog.value || '');
+          toast('admin', 'Лог скопирован', { ttl: 1800 });
+        }catch(e){
+          pushDiag('warn', 'admin-copy', e);
+          toast('admin', 'Не удалось скопировать', { ttl: 2200 });
+        }
+      });
+    }
+    if(adminPanelClear){
+      adminPanelClear.addEventListener('click', () => {
+        state.diag.errors = [];
+        renderAdminPanel();
+      });
+    }
+
+    window.addEventListener('error', (e) => {
+      pushDiag('error', 'window.error', e && (e.error || e.message || e));
+    });
+    window.addEventListener('unhandledrejection', (e) => {
+      pushDiag('error', 'unhandledrejection', e && (e.reason || e));
+    });
+
     cloudMode.addEventListener('change', () => {
       state.cloud.mode = cloudMode.value;
       setCloudUI();
@@ -4534,51 +4695,108 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
       state.ui.collapsedCats = loadCollapsedCats();
       applySidebarUI();
 
+      // One-time hard reset of legacy local notes storage for clean private launch
+      await hardResetLocalOnce();
+
       loadCloudSettings();
       applySavedTypography();
+
+      // Disable legacy GitHub sync for private-by-account mode
+      state.cloud.mode = 'off';
+      saveCloudSettings();
 
       // load all from idb
       state.cats = await idb.all(STORE.cats);
       state.notes = await idb.all(STORE.notes);
 
-      // If DB is empty, try to load from a static file (GitHub Pages friendly):
-      // ./db/db.json (so you can commit notes into the repo and open them on any device)
+      // Resolve Supabase user and enforce per-account privacy
+      state.supa.client = getSupaClient();
+      const user = await resolveSupaUser();
+      state.supa.userId = user ? user.id : null;
+      state.supa.enabled = !!state.supa.userId;
+      state.supa.email = String(user && user.email || '').trim().toLowerCase();
+      state.supa.isAdmin = state.supa.email === 'itemkeygithub@gmail.com';
+      state.supa.table = await resolveSupaTable();
+
+      if(!state.supa.enabled){
+        // No login -> no notes data shown
+        state.cats = [];
+        state.notes = [];
+        state.activeCatId = null;
+        state.activeNoteId = null;
+        ensureDefaults();
+        renderAll();
+        setAuthLocked(true);
+        setSync('bad', 'login required', 'Войди в аккаунт item-user, чтобы хранить приватные заметки.');
+        return;
+      }
+
+      setAuthLocked(false);
+
+      // If user switched, clear local cache and rebuild from that user's cloud state
+      const prevOwner = getStoredOwner();
+      if(prevOwner && prevOwner !== 'guest' && prevOwner !== state.supa.userId){
+        await clearLocalNotesStorage();
+        state.cats = [];
+        state.notes = [];
+      }
+      setStoredOwner(state.supa.userId);
+
+      // local backup fallback for this owner
       if(state.cats.length === 0 && state.notes.length === 0){
-        try{
-          const r = await fetch('./db/db.json', { cache:'no-store' });
-          if(r.ok){
-            const obj = await r.json();
-            await importJSON(obj, { render:false });
-            // reload (importJSON wrote into idb)
+        const localSnap = loadLocalSnapshot(state.supa.userId);
+        if(localSnap){
+          try{
+            await importJSON(localSnap, { render:false });
             state.cats = await idb.all(STORE.cats);
             state.notes = await idb.all(STORE.notes);
-          }
-        }catch(e){ /* ignore */ }
+          }catch(_){ }
+        }
+      }
+
+      try{
+        const remoteSnap = await supaPullSnapshot();
+        if(remoteSnap && Array.isArray(remoteSnap.cats) && Array.isArray(remoteSnap.notes)){
+          await importJSON(remoteSnap, { render:false });
+          state.cats = await idb.all(STORE.cats);
+          state.notes = await idb.all(STORE.notes);
+        }
+      }catch(e){
+        pushDiag('error', 'supaPullSnapshot', e);
+        setSync('bad', 'private err', errText(e));
       }
 
       ensureDefaults();
 
+      // render first to hydrate editor/note binding before first persist
+      renderAll();
+      state.uiHydrated = true;
+
       // persist defaults if needed
       await persistAll();
 
-      // render
-      renderAll();
+      // ensure first snapshot exists in cloud
+      try{
+        await supaPushSnapshot();
+      }catch(e){
+        pushDiag('error', 'supaPushSnapshot@boot', e);
+        setSync('bad', 'private err', errText(e));
+      }
 
       // set sync indicator
-      if(state.cloud.mode === 'off') setSync('ok', 'local');
-      else setSync('warn', 'cloud');
+      setSync('ok', 'private');
 
-      // start polling and initial pull (optional)
+      // legacy cloud UI remains visible but disabled
       setCloudUI();
       startPolling();
 
-      // If cloud enabled, try pull once at start (best-effort)
-      if(state.cloud.mode !== 'off'){
-        try{
-          await cloudPull();
-        }catch(e){
-          setSync('bad','cloud err');
-        }
+      if(state.supa.client && state.supa.client.auth && typeof state.supa.client.auth.onAuthStateChange === 'function'){
+        state.supa.client.auth.onAuthStateChange((_evt, session) => {
+          const uid = session && session.user ? session.user.id : null;
+          if(String(uid || '') !== String(state.supa.userId || '')){
+            window.location.reload();
+          }
+        });
       }
     }
 
@@ -6827,6 +7045,111 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
 
   window.addEventListener('resize', syncKeyboardInset);
   try{ mqPhone.addEventListener('change', syncKeyboardInset); }catch(e){}
+})();
+</script>
+<script>
+// Fallback bindings: keeps settings/admin panel reachable even if main app script failed earlier.
+(function(){
+  function byId(id){ return document.getElementById(id); }
+
+  function userEmail(){
+    try{
+      const raw = localStorage.getItem('itemkey.currentUser');
+      const obj = raw ? JSON.parse(raw) : null;
+      return String(obj && obj.email || '').trim().toLowerCase();
+    }catch(_){
+      return '';
+    }
+  }
+
+  function ensureVisibleAdminBtn(){
+    const btn = byId('adminPanelBtn');
+    if(!btn) return;
+    btn.hidden = false;
+    btn.style.display = '';
+    btn.disabled = false;
+  }
+
+  function bindSettings(){
+    const settingsBtn = byId('settingsBtn');
+    const settingsModal = byId('settingsModal');
+    const closeSettings = byId('closeSettings');
+    if(settingsBtn && settingsModal){
+      settingsBtn.addEventListener('click', () => {
+        settingsModal.classList.add('is-open');
+        ensureVisibleAdminBtn();
+      });
+    }
+    if(closeSettings && settingsModal){
+      closeSettings.addEventListener('click', () => settingsModal.classList.remove('is-open'));
+      settingsModal.addEventListener('click', (e) => {
+        if(e.target === settingsModal) settingsModal.classList.remove('is-open');
+      });
+    }
+  }
+
+  function bindAdminPanel(){
+    const btn = byId('adminPanelBtn');
+    const modal = byId('adminPanelModal');
+    const closeBtn = byId('adminPanelClose');
+    const meta = byId('adminPanelMeta');
+    const log = byId('adminPanelLog');
+    const refresh = byId('adminPanelRefresh');
+    const clear = byId('adminPanelClear');
+    const copy = byId('adminPanelCopy');
+    if(!btn || !modal) return;
+
+    const readLog = () => {
+      const syncText = byId('syncText');
+      const dot = byId('syncDot');
+      const email = userEmail() || '-';
+      const status = syncText ? String(syncText.textContent || '-') : '-';
+      const detail = syncText && syncText.title ? syncText.title : '';
+      const cls = dot ? String(dot.className || '') : '';
+      const lines = [
+        `time: ${new Date().toISOString()}`,
+        `email: ${email}`,
+        `syncText: ${status}`,
+        `syncDotClass: ${cls}`,
+        `syncDetail: ${detail || '-'}`,
+        '',
+        'Tip: open browser console for full stack trace.'
+      ];
+      if(meta) meta.textContent = `user: ${email} | status: ${status}`;
+      if(log) log.value = lines.join('\n');
+    };
+
+    btn.addEventListener('click', () => {
+      // allow only admin to open full panel
+      const email = userEmail();
+      if(email !== 'itemkeygithub@gmail.com'){
+        alert('admin-panel доступен только для itemkeygithub@gmail.com');
+        return;
+      }
+      readLog();
+      modal.classList.add('is-open');
+    });
+
+    if(closeBtn) closeBtn.addEventListener('click', () => modal.classList.remove('is-open'));
+    modal.addEventListener('click', (e) => { if(e.target === modal) modal.classList.remove('is-open'); });
+    if(refresh) refresh.addEventListener('click', readLog);
+    if(clear) clear.addEventListener('click', () => { if(log) log.value = ''; });
+    if(copy) copy.addEventListener('click', async () => {
+      try{ await navigator.clipboard.writeText((log && log.value) || ''); }catch(_){ }
+    });
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', () => {
+      ensureVisibleAdminBtn();
+      bindSettings();
+      bindAdminPanel();
+    });
+  } else {
+    ensureVisibleAdminBtn();
+    bindSettings();
+    bindAdminPanel();
+  }
 })();
 </script>
 </body>
