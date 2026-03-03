@@ -916,9 +916,9 @@ body.page-home{ overflow: hidden; }
   z-index: 100050;
   background: transparent;
   display: flex;
-  justify-content: center;
   align-items: flex-start;
-  padding-top: 14vh;
+  justify-content: center;
+  padding-top: 0;
   opacity: 0;
   pointer-events: none;
   transition: opacity .24s ease;
@@ -926,15 +926,17 @@ body.page-home{ overflow: hidden; }
 
 body.ik-loading .ik-loading-overlay{ opacity: 1; }
 
-.ik-loading-card{
-  width: min(520px, 84vw);
-  border: 1px solid rgba(0,0,0,.18);
-  background: rgba(255,255,255,.94);
-  padding: 18px 20px;
-  display: grid;
-  gap: 12px;
-  box-shadow: 0 10px 24px rgba(0,0,0,.12);
+.ik-loading-bar{
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(0,0,0,.28) 50%, rgba(0,0,0,0) 100%);
+  background-size: 240% 100%;
+  animation: ik-shimmer 1.1s ease infinite;
 }
+
 
 .ik-loading-line{
   height: 12px;

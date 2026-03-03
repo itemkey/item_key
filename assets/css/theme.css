@@ -71,11 +71,8 @@ html[data-theme="dark"] .ik-loading-overlay{
   background: transparent;
 }
 
-html[data-theme="dark"] .ik-loading-card{
-  background: var(--ik-surface);
-  border-color: var(--ik-border-strong);
-  color: var(--ik-text);
-  box-shadow: var(--ik-shadow);
+html[data-theme="dark"] .ik-loading-bar{
+  background: linear-gradient(90deg, rgba(237,242,250,0) 0%, rgba(237,242,250,.35) 50%, rgba(237,242,250,0) 100%);
 }
 
 html[data-theme="dark"] .ik-loading-line{

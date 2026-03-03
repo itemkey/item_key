@@ -7,7 +7,7 @@
   const ADMIN_EMAILS = ["itemkeygithub@gmail.com", "kravetznikita@gmail.com"];
   const ACCOUNT_LINK_STYLE_ID = "ikAccountLinksStyle";
   const LOADING_ATTR = "data-ik-loading";
-  const LOADING_MIN_MS = 420;
+  const LOADING_MIN_MS = 320;
 
   const scriptRef = (() => {
     const direct = document.currentScript;
@@ -57,11 +57,7 @@
     overlay.className = "ik-loading-overlay";
     overlay.setAttribute("aria-hidden", "true");
     overlay.innerHTML = `
-      <div class="ik-loading-card">
-        <div class="ik-loading-line is-long"></div>
-        <div class="ik-loading-line is-mid"></div>
-        <div class="ik-loading-line is-short"></div>
-      </div>
+      <div class="ik-loading-bar"></div>
     `;
     document.body.appendChild(overlay);
   }
@@ -79,7 +75,7 @@
       loadingFallbackTimer = window.setTimeout(() => {
         doneLoading();
       }, 5000);
-    }, 280);
+    }, 420);
   }
 
   function doneLoading() {
