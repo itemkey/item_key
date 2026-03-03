@@ -18,7 +18,9 @@
     ownerId: null,
     syncing: false,
     muted: false,
-    timer: null
+    timer: null,
+    lastBadgeText: '',
+    lastBadgeTitle: ''
   };
 
   function setBadge(stateText, title){
@@ -26,6 +28,16 @@
     if(!el) return;
     el.textContent = `progress cloud: ${stateText}`;
     if(title) el.title = title;
+    const nextText = String(stateText || '');
+    const nextTitle = String(title || '');
+    if(nextText !== state.lastBadgeText || nextTitle !== state.lastBadgeTitle){
+      state.lastBadgeText = nextText;
+      state.lastBadgeTitle = nextTitle;
+      if(window.IKAdminLog){
+        const payload = nextTitle ? `progress cloud: ${nextText} | ${nextTitle}` : `progress cloud: ${nextText}`;
+        window.IKAdminLog('log', 'student_helper', payload);
+      }
+    }
   }
 
   function shortReason(err){

@@ -520,13 +520,75 @@ function mcqBuildOptions(targetItem, askLang, answerLang, count, itemsPool, cfg)
     });
   }
 
-  const DICT_DIR = 'db/dictionary/';
+const DICT_DIR = 'db/dictionary/';
 const DICT_MANIFESTS = ['db/manifest.json', `${DICT_DIR}manifest.json`];
 const DICT_FILE_PREFIX = 'student_helper_db__dictionary_';
-const DICT_DEFAULT_FILES = [
-  `${DICT_FILE_PREFIX}Destination_B1_Unit_3.json`,
-  `${DICT_FILE_PREFIX}Destination_B1_Unit_6.json`,
-];
+  const DICT_DEFAULT_FILES = [
+    `${DICT_FILE_PREFIX}Destination_B1_Unit_3.json`,
+    `${DICT_FILE_PREFIX}Destination_B1_Unit_6.json`,
+  ];
+
+function _uniq(list){
+  const out = [];
+  const set = new Set();
+  for(const x of list){
+    if(!x || set.has(x)) continue;
+    set.add(x);
+    out.push(x);
+  }
+  return out;
+}
+
+function _guessSiteRoots(){
+  const roots = [];
+  const origin = window.location && window.location.origin ? window.location.origin : '';
+  const path = window.location && window.location.pathname ? window.location.pathname : '/';
+  const baseDir = String(path || '/').replace(/[^/]*$/, '');
+
+  if(origin){
+    roots.push(origin + '/');
+    if(baseDir) roots.push(origin + baseDir);
+    const parts = String(path || '').split('/').filter(Boolean);
+    const repoIdx = parts.indexOf('item_key');
+    if(repoIdx >= 0){
+      const repoPath = '/' + parts.slice(0, repoIdx + 1).join('/') + '/';
+      roots.push(origin + repoPath);
+    }
+  }
+
+  return _uniq(roots);
+}
+
+function _buildUrlCandidates(relPath){
+  const cleaned = String(relPath || '').trim().replace(/^\.\//, '');
+  const out = [];
+  try{ out.push(new URL(cleaned, document.baseURI).href); }catch(_){ }
+  for(const root of _guessSiteRoots()){
+    try{ out.push(new URL(cleaned, root).href); }catch(_){ }
+  }
+  return _uniq(out);
+}
+
+async function fetchJson(relPath){
+  const urls = _buildUrlCandidates(relPath);
+  let lastErr = null;
+  for(const url of urls){
+    try{
+      const res = await fetch(url, { cache: 'no-store' });
+      if(!res.ok){
+        lastErr = new Error(`HTTP ${res.status}`);
+        continue;
+      }
+      return await res.json();
+    }catch(e){
+      lastErr = e;
+    }
+  }
+  const tried = urls.slice(0, 6).join(' | ');
+  throw new Error(`JSON fetch failed: ${relPath}. tried: ${tried}. ${lastErr && (lastErr.message || lastErr)}`);
+}
+
+if(window.IKAdminLog) window.IKAdminLog('log', 'student_helper', 'dict: script loaded');
 
 function dictSlug(name){
   return String(name || '')
@@ -1682,6 +1744,19 @@ if(btnLearnCheckNext){ btnLearnCheckNext.textContent = 'далее'; btnLearnChe
   const elDictDbNameLine = document.getElementById('dictDbNameLine');
   const elDictCountBadge = document.getElementById('dictCountBadge');
 
+  const adminStatus = {};
+  function setAdminText(el, text, label){
+    if(el) el.textContent = text;
+    const key = label || (el && el.id) || '';
+    if(key && window.IKAdminLog){
+      const next = String(text || '');
+      if(adminStatus[key] !== next){
+        adminStatus[key] = next;
+        window.IKAdminLog('log', 'student_helper', `${key}: ${next}`);
+      }
+    }
+  }
+
   const dictTabCards = document.getElementById('dict-tab-cards');
   const dictTabQuiz = document.getElementById('dict-tab-quiz');
   const dictTabLearn = document.getElementById('dict-tab-learn');
@@ -2573,7 +2648,7 @@ function handleMcqHotkeys(e){
   }
 
   function updateGlobalBadges(){
-    elDictDbNameLine.textContent = `db: ${dictDbName()}`;
+    setAdminText(elDictDbNameLine, `db: ${dictDbName()}`);
     elDictCountBadge.textContent = `words: ${dictWordsAll.length}`;
   }
 
@@ -3606,27 +3681,45 @@ async function dictSyncFromFolder(opts){
   }
 
   async function dictBoot(){
+    if(window.__dictBooted) return;
+    window.__dictBooted = true;
     try{
-      elDictDbStatus.textContent = 'opening...';
+      if(window.IKAdminLog) window.IKAdminLog('log', 'student_helper', 'dict: boot');
+      setAdminText(elDictDbStatus, 'opening...');
       dictDb = await dictOpenDB();
-      elDictDbStatus.textContent = 'ok';const sync = await dictSyncFromFolder({ replaceExisting:false, mergeExisting:false });
+      setAdminText(elDictDbStatus, 'ok');
+      const sync = await dictSyncFromFolder({ replaceExisting:false, mergeExisting:false });
+      if(window.IKAdminLog){
+        window.IKAdminLog('log', 'student_helper', `dict: okFiles=${sync.okFiles.length} failFiles=${sync.failFiles.length} manifest=${sync.manifestUsed || 'none'}`);
+      }
 
 if(sync.okFiles.length){
   const okPart = sync.failFiles.length ? 'partial' : 'ok';
-  elDictSeedBadge.textContent = `json: ${okPart} (${sync.okFiles.length}/${sync.filesCount || sync.okFiles.length})`;
+  setAdminText(elDictSeedBadge, `json: ${okPart} (${sync.okFiles.length}/${sync.filesCount || sync.okFiles.length})`);
   elDictSeedBadge.title =
     `manifest: ${sync.manifestUsed || 'none'}\n\nok:\n- ${sync.okFiles.join('\n- ')}\n\nfail:\n- ${sync.failFiles.length ? sync.failFiles.join('\n- ') : 'none'}\n\nhint: для GitHub Pages нужен db/manifest.json (или db/dictionary/manifest.json) со списком файлов`;
 }else if(sync.failFiles.length){
-  elDictSeedBadge.textContent = 'json: failed';
+  setAdminText(elDictSeedBadge, 'json: failed');
   elDictSeedBadge.title =
     `manifest tried:\n- ${(sync.manifestErrors && sync.manifestErrors.length) ? sync.manifestErrors.join('\n- ') : 'n/a'}\n\nfail:\n- ${sync.failFiles.join('\n- ')}\n\nhint: проверь пути (GitHub Pages добавляет /<repo>/ в URL) и регистр папок (db vs DB).`;
 }else{
-  elDictSeedBadge.textContent = 'json: none';
+  setAdminText(elDictSeedBadge, 'json: none');
   elDictSeedBadge.title = 'manifest не найден и DICT_DEFAULT_FILES пустой.';
 }
 
       await dictRefreshAll();
       renderWordsUI();
+
+      if(!dictSections.length && !dictWordsAll.length){
+        const retry = await dictSyncFromFolder({ replaceExisting:false, mergeExisting:false });
+        if(retry.okFiles.length){
+          setAdminText(elDictSeedBadge, `json: ok (${retry.okFiles.length}/${retry.filesCount || retry.okFiles.length})`);
+          elDictSeedBadge.title =
+            `manifest: ${retry.manifestUsed || 'none'}\n\nok:\n- ${retry.okFiles.join('\n- ')}\n\nfail:\n- ${retry.failFiles.length ? retry.failFiles.join('\n- ') : 'none'}`;
+          await dictRefreshAll();
+          renderWordsUI();
+        }
+      }
 
       dictShowFirstPick();
       cardsShow(null, 'en');
@@ -3634,8 +3727,11 @@ if(sync.okFiles.length){
       learnShow(null);
       quizSetFeedback('idle', 'pick', 'выбери section');
     }catch(e){
-      elDictDbStatus.textContent = 'failed';
+      setAdminText(elDictDbStatus, 'failed');
       console.error(e);
+      if(window.IKAdminLog) window.IKAdminLog('error', 'student_helper', `dict boot failed: ${e && (e.message || e)}`);
+    }finally{
+      if(window.IKLoading) window.IKLoading.done();
     }
   }
 

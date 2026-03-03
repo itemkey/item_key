@@ -330,7 +330,7 @@
 </style>
 </head>
 
-<body class="page page-learning">
+<body class="page page-learning" data-ik-loading>
   <div class="veil" aria-hidden="true"></div>
 
   <header class="ik-site-nav" id="ikSiteNav">
@@ -342,7 +342,7 @@
     <div class="learn-wrap">
 
       <div class="ik-top-actions">
-        <span class="ik-pill" title="Локальная база IndexedDB (в браузере)">
+        <span class="ik-pill ik-admin-indicator" title="Локальная база IndexedDB (в браузере)">
           <span>db</span>
           <span id="dbStatus" class="ik-muted">...</span>
         </span>
@@ -360,10 +360,10 @@
           <div id="panel-dict" role="tabpanel" aria-labelledby="tab-dict" hidden>
             <div class="ik-row">
               <span class="ik-badge" id="dictCountBadge">words: 0</span>
-              <span class="ik-badge" id="dictSeedBadge" title="Автозагрузка json при пустой базе">json: ...</span>
-              <span class="ik-badge" id="dictDbNameLine">db: ...</span>
+              <span class="ik-badge ik-admin-indicator" id="dictSeedBadge" title="Автозагрузка json при пустой базе">json: ...</span>
+              <span class="ik-badge ik-admin-indicator" id="dictDbNameLine">db: ...</span>
               <span class="ik-spacer" aria-hidden="true"></span>
-              <span class="ik-pill" title="Локальная база IndexedDB (в браузере)">
+              <span class="ik-pill ik-admin-indicator" title="Локальная база IndexedDB (в браузере)">
                 <span>dict db</span>
                 <span id="dictDbStatus" class="ik-muted">...</span>
               </span>
@@ -721,10 +721,10 @@
               </select>
 
               <span class="ik-badge" id="taskCountBadge">tasks: 0</span>
-              <span class="ik-badge" id="seedBadge" title="Автозагрузка из json при пустой базе">json: ...</span>
+              <span class="ik-badge ik-admin-indicator" id="seedBadge" title="Автозагрузка из json при пустой базе">json: ...</span>
             </div>
 
-            <p class="ik-footnote" id="dbNameLine">...</p>
+            <p class="ik-footnote ik-admin-indicator" id="dbNameLine">...</p>
 
             <div class="ik-divider"></div>
 

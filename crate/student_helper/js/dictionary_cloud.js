@@ -24,7 +24,9 @@
     syncing: false,
     stock: null,
     interval: null,
-    localChangeTimer: null
+    localChangeTimer: null,
+    lastBadgeText: '',
+    lastBadgeTitle: ''
   };
 
   function dbName(){
@@ -43,6 +45,16 @@
     const base = String(badge.textContent || '').replace(/\s*\|\s*cloud:[^|]+$/i, '').trim();
     badge.textContent = `${base} | cloud: ${text}`;
     if(title) badge.title = title;
+    const nextText = String(text || '');
+    const nextTitle = String(title || '');
+    if(nextText !== state.lastBadgeText || nextTitle !== state.lastBadgeTitle){
+      state.lastBadgeText = nextText;
+      state.lastBadgeTitle = nextTitle;
+      if(window.IKAdminLog){
+        const payload = nextTitle ? `dict cloud: ${nextText} | ${nextTitle}` : `dict cloud: ${nextText}`;
+        window.IKAdminLog('log', 'student_helper', payload);
+      }
+    }
   }
 
   function shortErr(err){
@@ -168,10 +180,64 @@
     return [];
   }
 
+  function uniq(list){
+    const out = [];
+    const set = new Set();
+    for(const x of list){
+      if(!x || set.has(x)) continue;
+      set.add(x);
+      out.push(x);
+    }
+    return out;
+  }
+
+  function guessRoots(){
+    const roots = [];
+    const origin = window.location && window.location.origin ? window.location.origin : '';
+    const path = window.location && window.location.pathname ? window.location.pathname : '/';
+    const baseDir = String(path || '/').replace(/[^/]*$/, '');
+
+    if(origin){
+      roots.push(origin + '/');
+      if(baseDir) roots.push(origin + baseDir);
+      const parts = String(path || '').split('/').filter(Boolean);
+      const repoIdx = parts.indexOf('item_key');
+      if(repoIdx >= 0){
+        const repoPath = '/' + parts.slice(0, repoIdx + 1).join('/') + '/';
+        roots.push(origin + repoPath);
+      }
+    }
+
+    return uniq(roots);
+  }
+
+  function buildCandidates(relPath){
+    const cleaned = String(relPath || '').trim().replace(/^\.\//, '');
+    const out = [];
+    try{ out.push(new URL(cleaned, document.baseURI).href); }catch(_){ }
+    for(const root of guessRoots()){
+      try{ out.push(new URL(cleaned, root).href); }catch(_){ }
+    }
+    return uniq(out);
+  }
+
   async function fetchJson(path){
-    const res = await fetch(path, { cache: 'no-store' });
-    if(!res.ok) throw new Error(`fetch failed: ${path}`);
-    return res.json();
+    const urls = buildCandidates(path);
+    let lastErr = null;
+    for(const url of urls){
+      try{
+        const res = await fetch(url, { cache: 'no-store' });
+        if(!res.ok){
+          lastErr = new Error(`HTTP ${res.status}`);
+          continue;
+        }
+        return res.json();
+      }catch(e){
+        lastErr = e;
+      }
+    }
+    const tried = urls.slice(0, 6).join(' | ');
+    throw new Error(`fetch failed: ${path}. tried: ${tried}. ${lastErr && (lastErr.message || lastErr)}`);
   }
 
   async function loadStockSnapshot(){

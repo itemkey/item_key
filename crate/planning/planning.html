@@ -145,7 +145,7 @@
 
 </head>
 
-<body class="page page-planning" data-i18n-page="planning">
+<body class="page page-planning" data-i18n-page="planning" data-ik-loading>
   <!-- декоративные слои -->
   <div class="outer-frame" aria-hidden="true"></div>
   <div class="rays" aria-hidden="true"></div>
@@ -221,7 +221,7 @@
   <footer class="bottombar bottombar--edge">
     <span class="hint">планирование · проекты · задачи</span>
     <span class="sep">•</span>
-    <span class="hint" id="planningCloudBadge" title="planning cloud sync">planning cloud: ...</span>
+    <span class="hint ik-admin-indicator" id="planningCloudBadge" title="planning cloud sync">planning cloud: ...</span>
     <span class="sep">•</span>
     <span class="hint">пре-альфа</span>
   </footer>
@@ -247,6 +247,7 @@
     import { initPlanningCloud } from './js/planning_cloud.js';
     await initPlanningCloud();
     await import('./planning.js');
+    if (window.IKLoading) window.IKLoading.done();
   </script>
 
   <script>

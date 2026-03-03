@@ -195,7 +195,7 @@
 
 </head>
 
-<body class="page page-learning" data-i18n-page="student_helper">
+<body class="page page-learning" data-i18n-page="student_helper" data-ik-loading>
   <div class="veil" aria-hidden="true"></div>
 
   <header class="ik-site-nav" id="ikSiteNav">
@@ -270,10 +270,10 @@
           <div id="panel-dict" role="tabpanel" aria-labelledby="tab-dict" hidden>
             <div class="ik-row">
               <span class="ik-badge" id="dictCountBadge">words: 0</span>
-              <span class="ik-badge" id="dictSeedBadge" title="Автозагрузка json при пустой базе">json: ...</span>
-              <span class="ik-badge" id="dictDbNameLine">db: ...</span>
+              <span class="ik-badge ik-admin-indicator" id="dictSeedBadge" title="Автозагрузка json при пустой базе">json: ...</span>
+              <span class="ik-badge ik-admin-indicator" id="dictDbNameLine">db: ...</span>
               <span class="ik-spacer" aria-hidden="true"></span>
-              <span class="ik-pill" title="Локальная база IndexedDB (в браузере)">
+              <span class="ik-pill ik-admin-indicator" title="Локальная база IndexedDB (в браузере)">
                 <span>dict db</span>
                 <span id="dictDbStatus" class="ik-muted">...</span>
               </span>
@@ -890,10 +890,10 @@
               </select>
 
               <span class="ik-badge" id="taskCountBadge">tasks: 0</span>
-              <span class="ik-badge" id="seedBadge" title="Автозагрузка из json при пустой базе">json: ...</span>
+              <span class="ik-badge ik-admin-indicator" id="seedBadge" title="Автозагрузка из json при пустой базе">json: ...</span>
             </div>
 
-            <p class="ik-footnote" id="dbNameLine">...</p>
+            <p class="ik-footnote ik-admin-indicator" id="dbNameLine">...</p>
 
             <div class="ik-divider"></div>
 
@@ -1026,7 +1026,7 @@
   <footer class="bottombar bottombar--edge sh-footer">
     <span class="hint">student helper</span>
     <span class="sep">•</span>
-    <span class="hint" id="progressCloudBadge" title="progress cloud sync status">progress cloud: ...</span>
+    <span class="hint ik-admin-indicator" id="progressCloudBadge" title="progress cloud sync status">progress cloud: ...</span>
     <span class="sep">•</span>
     <button class="ik-btn" id="shBackupBtn" type="button" title="Экспорт данных Student Helper">backup</button>
     <button class="ik-btn" id="shRestoreBtn" type="button" title="Импорт данных Student Helper">restore</button>
@@ -1079,7 +1079,39 @@
   <script src="./js/structure.js"></script>
   <script src="./js/tenses.js"></script>
   <script src="./js/word_transformation.js"></script>
-  <script src="./js/dictionary.js"></script>
+  <script src="./js/dictionary.js" onerror="window.IKAdminLog && window.IKAdminLog('error','student_helper','dictionary.js failed to load')"></script>
+  <script>
+    (function(){
+      var log = window.IKAdminLog || function(){};
+      var bootIfReady = function(){
+        if(typeof window.dictBoot === 'function' && !window.__dictBooted) window.dictBoot();
+      };
+
+      log('log','student_helper', 'dict tag after: ' + typeof window.dictBoot);
+      if(typeof window.dictBoot === 'function'){
+        bootIfReady();
+        return;
+      }
+
+      fetch('./js/dictionary.js', { cache: 'no-store' })
+        .then(function(r){
+          if(!r.ok) throw new Error('fetch status ' + r.status);
+          return r.text();
+        })
+        .then(function(code){
+          try{
+            (0, eval)(code);
+            log('log','student_helper', 'dict eval ok: ' + typeof window.dictBoot);
+            bootIfReady();
+          }catch(e){
+            log('error','student_helper', 'dict eval failed: ' + (e && (e.message || e)));
+          }
+        })
+        .catch(function(e){
+          log('error','student_helper', 'dict fetch failed: ' + (e && (e.message || e)));
+        });
+    })();
+  </script>
   <script src="./js/dictionary_cloud.js"></script>
   <script src="./js/progress_cloud.js"></script>
   <script src="./js/backup_restore.js"></script>

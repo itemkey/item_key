@@ -1486,7 +1486,7 @@ body.focus-mode .n-col-right{
 
 </head>
 
-<body class="page page-crate" data-i18n-page="onoi_notes">
+<body class="page page-crate" data-i18n-page="onoi_notes" data-ik-loading>
   <!-- фон/рамки - как в item-key -->
   <div class="outer-frame" aria-hidden="true"></div>
   <div class="rays" aria-hidden="true"></div>
@@ -1508,7 +1508,7 @@ body.focus-mode .n-col-right{
         <div class="n-topbar" aria-label="Панель поиска и действий">
           <input class="n-search" id="searchInput" placeholder="Поиск по заметкам…" />
                     <button class="n-btn" id="openDrawerBtn" type="button">Меню</button>
-<div class="n-pill" aria-label="Статус синхронизации">
+          <div class="n-pill ik-admin-indicator" aria-label="Статус синхронизации">
             <span class="dot" id="syncDot"></span>
             <span id="syncText">local</span>
           </div>
@@ -2283,6 +2283,7 @@ body.focus-mode .n-col-right{
       adminPanelMeta.textContent = `errors: ${rows.length} | user: ${mail} | uid: ${uid} | table: ${table}`;
     }
 
+    let lastSyncLog = '';
     function setSync(status, kind, detail){
       // status: 'local'|'syncing'|'ok'|'warn'|'bad'
       syncText.textContent = kind || 'local';
@@ -2291,6 +2292,11 @@ body.focus-mode .n-col-right{
       if(status === 'warn') syncDot.classList.add('warn');
       if(status === 'bad') syncDot.classList.add('bad');
       if(detail) syncText.title = String(detail);
+      const logText = `sync: ${String(status || 'local')} | ${String(kind || 'local')}${detail ? ` | ${String(detail)}` : ''}`;
+      if(logText !== lastSyncLog && window.IKAdminLog){
+        lastSyncLog = logText;
+        window.IKAdminLog('log', 'onoi_notes', logText);
+      }
     }
     function setSaveStatus(mode){
       // 'saved'|'saving'|'dirty'
@@ -7121,11 +7127,13 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
       ensureVisibleAdminBtn();
       bindSettings();
       bindAdminPanel();
+      if(window.IKLoading) window.IKLoading.done();
     });
   } else {
     ensureVisibleAdminBtn();
     bindSettings();
     bindAdminPanel();
+    if(window.IKLoading) window.IKLoading.done();
   }
 })();
 </script>

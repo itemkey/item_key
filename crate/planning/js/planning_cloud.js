@@ -16,6 +16,8 @@ const runtime = {
   authBound: false,
   hooksInstalled: false,
   booting: false,
+  lastBadgeText: '',
+  lastBadgeTitle: ''
 };
 
 function setBadge(text, title){
@@ -23,6 +25,16 @@ function setBadge(text, title){
   if(!el) return;
   el.textContent = `planning cloud: ${text}`;
   if(title) el.title = title;
+  const nextText = String(text || '');
+  const nextTitle = String(title || '');
+  if(nextText !== runtime.lastBadgeText || nextTitle !== runtime.lastBadgeTitle){
+    runtime.lastBadgeText = nextText;
+    runtime.lastBadgeTitle = nextTitle;
+    if(window.IKAdminLog){
+      const payload = nextTitle ? `planning cloud: ${nextText} | ${nextTitle}` : `planning cloud: ${nextText}`;
+      window.IKAdminLog('log', 'planning', payload);
+    }
+  }
 }
 
 function errText(e){

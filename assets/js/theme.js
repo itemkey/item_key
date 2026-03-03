@@ -6,6 +6,8 @@
   const FAB_ID = "ikThemeFab";
   const ADMIN_EMAILS = ["itemkeygithub@gmail.com", "kravetznikita@gmail.com"];
   const ACCOUNT_LINK_STYLE_ID = "ikAccountLinksStyle";
+  const LOADING_ATTR = "data-ik-loading";
+  const LOADING_MIN_MS = 420;
 
   const scriptRef = (() => {
     const direct = document.currentScript;
@@ -43,6 +45,58 @@
     query: "",
     refreshing: false,
   };
+
+  let loadingStartAt = 0;
+  let loadingFallbackTimer = null;
+  let loadingShowTimer = null;
+  let loadingVisible = false;
+
+  function ensureLoadingOverlay() {
+    if (document.querySelector(".ik-loading-overlay")) return;
+    const overlay = document.createElement("div");
+    overlay.className = "ik-loading-overlay";
+    overlay.setAttribute("aria-hidden", "true");
+    overlay.innerHTML = `
+      <div class="ik-loading-card">
+        <div class="ik-loading-line is-long"></div>
+        <div class="ik-loading-line is-mid"></div>
+        <div class="ik-loading-line is-short"></div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+  }
+
+  function showLoading() {
+    if (!document.body) return;
+    if (loadingVisible || loadingShowTimer) return;
+    loadingShowTimer = window.setTimeout(() => {
+      loadingShowTimer = null;
+      ensureLoadingOverlay();
+      loadingStartAt = Date.now();
+      loadingVisible = true;
+      document.body.classList.add("ik-loading");
+      if (loadingFallbackTimer) window.clearTimeout(loadingFallbackTimer);
+      loadingFallbackTimer = window.setTimeout(() => {
+        doneLoading();
+      }, 5000);
+    }, 280);
+  }
+
+  function doneLoading() {
+    if (!document.body) return;
+    if (loadingShowTimer) {
+      window.clearTimeout(loadingShowTimer);
+      loadingShowTimer = null;
+      return;
+    }
+    if (!loadingVisible) return;
+    const elapsed = Date.now() - loadingStartAt;
+    const wait = Math.max(0, LOADING_MIN_MS - elapsed);
+    window.setTimeout(() => {
+      document.body.classList.remove("ik-loading");
+      loadingVisible = false;
+    }, wait);
+  }
 
   function getStoredTheme() {
     try {
@@ -581,11 +635,28 @@
   const bootTheme = getStoredTheme() || document.documentElement.getAttribute("data-theme") || getSystemTheme();
   applyTheme(bootTheme);
 
+  window.IKAdminLog = (level, source, payload) => {
+    try { pushAdminLog(level, source, payload); } catch (_) {}
+  };
+
+  window.IKLoading = {
+    show: showLoading,
+    done: doneLoading
+  };
+
+  if (document.body && document.body.hasAttribute(LOADING_ATTR)) {
+    showLoading();
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
     installAdminHooks();
     ensureAdminStyle();
     enhanceSettingsPanels();
     refreshAdminAccess();
+
+    if (document.body && document.body.hasAttribute(LOADING_ATTR)) {
+      showLoading();
+    }
 
     const observer = new MutationObserver(() => {
       enhanceSettingsPanels();

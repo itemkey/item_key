@@ -67,6 +67,21 @@ html[data-theme="dark"] body::after {
   filter: blur(0.3px);
 }
 
+html[data-theme="dark"] .ik-loading-overlay{
+  background: transparent;
+}
+
+html[data-theme="dark"] .ik-loading-card{
+  background: var(--ik-surface);
+  border-color: var(--ik-border-strong);
+  color: var(--ik-text);
+  box-shadow: var(--ik-shadow);
+}
+
+html[data-theme="dark"] .ik-loading-line{
+  background: linear-gradient(90deg, rgba(237,242,250,.08) 0%, rgba(237,242,250,.18) 50%, rgba(237,242,250,.08) 100%);
+}
+
 html[data-theme="dark"] a {
   color: inherit;
 }
