@@ -50,6 +50,25 @@
   let loadingFallbackTimer = null;
   let loadingShowTimer = null;
   let loadingVisible = false;
+  let pageShellReady = false;
+
+  function ensurePageShell() {
+    if (!document.body || !document.body.hasAttribute(LOADING_ATTR)) return;
+    const shell = document.querySelector("main");
+    if (!shell) return;
+    if (!shell.classList.contains("ik-page-shell")) shell.classList.add("ik-page-shell");
+    if (!pageShellReady) shell.classList.add("is-pending");
+  }
+
+  function markPageShellReady() {
+    pageShellReady = true;
+    if (!document.body) return;
+    document.body.classList.add("ik-page-loaded");
+    const shell = document.querySelector("main.ik-page-shell") || document.querySelector("main");
+    if (!shell) return;
+    shell.classList.add("is-ready");
+    shell.classList.remove("is-pending");
+  }
 
   function ensureLoadingOverlay() {
     if (document.querySelector(".ik-loading-overlay")) return;
@@ -65,6 +84,7 @@
   function showLoading() {
     if (!document.body) return;
     if (loadingVisible || loadingShowTimer) return;
+    ensurePageShell();
     loadingShowTimer = window.setTimeout(() => {
       loadingShowTimer = null;
       ensureLoadingOverlay();
@@ -75,7 +95,7 @@
       loadingFallbackTimer = window.setTimeout(() => {
         doneLoading();
       }, 5000);
-    }, 420);
+    }, 120);
   }
 
   function doneLoading() {
@@ -83,14 +103,19 @@
     if (loadingShowTimer) {
       window.clearTimeout(loadingShowTimer);
       loadingShowTimer = null;
+      markPageShellReady();
       return;
     }
-    if (!loadingVisible) return;
+    if (!loadingVisible) {
+      markPageShellReady();
+      return;
+    }
     const elapsed = Date.now() - loadingStartAt;
     const wait = Math.max(0, LOADING_MIN_MS - elapsed);
     window.setTimeout(() => {
       document.body.classList.remove("ik-loading");
       loadingVisible = false;
+      markPageShellReady();
     }, wait);
   }
 
@@ -641,6 +666,7 @@
   };
 
   if (document.body && document.body.hasAttribute(LOADING_ATTR)) {
+    ensurePageShell();
     showLoading();
   }
 
@@ -651,6 +677,7 @@
     refreshAdminAccess();
 
     if (document.body && document.body.hasAttribute(LOADING_ATTR)) {
+      ensurePageShell();
       showLoading();
     }
 

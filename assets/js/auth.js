@@ -18,6 +18,7 @@
     schemaWarnShown: false,
     refreshingFriends: false,
     lastRegisterEmail: null,
+    workspaceLoaderReady: false,
   };
 
   function getAuthRedirectUrl() {
@@ -77,6 +78,72 @@
     profileView: document.getElementById("profileView"),
     friendsView: document.getElementById("friendsView"),
   };
+
+  function revealNode(node) {
+    if (!node) return;
+    node.classList.remove("ik-reveal-in");
+    void node.offsetWidth;
+    node.classList.add("ik-reveal-in");
+  }
+
+  function ensureWorkspaceLoadingLayer() {
+    if (!el.workspaceBox || state.workspaceLoaderReady) return;
+    if (el.workspaceBox.querySelector(".ik-workspace-loading")) {
+      state.workspaceLoaderReady = true;
+      return;
+    }
+
+    const layer = document.createElement("div");
+    layer.className = "ik-workspace-loading";
+    layer.setAttribute("aria-hidden", "true");
+    layer.innerHTML = [
+      '<div class="ik-skeleton-row is-short"></div>',
+      '<div class="ik-skeleton-row is-mid"></div>',
+      '<div class="ik-skeleton-grid">',
+      '  <div class="ik-skeleton-card">',
+      '    <div class="ik-skeleton-row is-mid"></div>',
+      '    <div class="ik-skeleton-row is-long"></div>',
+      '    <div class="ik-skeleton-row is-short"></div>',
+      '  </div>',
+      '  <div class="ik-skeleton-card">',
+      '    <div class="ik-skeleton-row is-mid"></div>',
+      '    <div class="ik-skeleton-row is-short"></div>',
+      '    <div class="ik-skeleton-row is-short"></div>',
+      '  </div>',
+      '</div>',
+      '<div class="ik-skeleton-pill"></div>',
+      '<div class="ik-skeleton-row is-long"></div>'
+    ].join("");
+
+    el.workspaceBox.appendChild(layer);
+    state.workspaceLoaderReady = true;
+  }
+
+  function setWorkspaceLoading(isLoading) {
+    ensureWorkspaceLoadingLayer();
+    if (!el.workspaceBox) return;
+    el.workspaceBox.classList.toggle("is-loading", !!isLoading);
+    el.workspaceBox.setAttribute("aria-busy", isLoading ? "true" : "false");
+  }
+
+  function renderFriendsSkeleton(container, rows) {
+    if (!container) return;
+    const count = Math.max(1, Number(rows) || 1);
+    container.innerHTML = "";
+    for (let i = 0; i < count; i += 1) {
+      const card = document.createElement("article");
+      card.className = "friend-card friend-card--skeleton";
+      card.innerHTML = [
+        '<div class="friend-avatar" aria-hidden="true">IK</div>',
+        '<div class="friend-main">',
+        '  <div class="friend-name">loading</div>',
+        '  <div class="friend-user-id">@loading</div>',
+        '  <div class="friend-meta">loading</div>',
+        '</div>'
+      ].join("");
+      container.appendChild(card);
+    }
+  }
 
   function ensureNoticeStyles() {
     if (document.getElementById(NOTICE_STYLE_ID)) return;
@@ -281,7 +348,7 @@
     if (persist) persistView(next);
 
     if (next === "friends") {
-      refreshFriendsData(true).catch(() => {});
+      refreshFriendsData({ showErrors: true, withSkeleton: true }).catch(() => {});
       startFriendsPolling();
     } else {
       stopFriendsPolling();
@@ -532,6 +599,7 @@
   }
 
   function setSignedOutUI() {
+    setWorkspaceLoading(false);
     if (el.guestBox) el.guestBox.classList.remove("hidden");
     if (el.workspaceBox) el.workspaceBox.classList.add("hidden");
     if (el.constructorPanel) el.constructorPanel.classList.add("hidden");
@@ -556,14 +624,20 @@
 
     if (el.guestBox) el.guestBox.classList.add("hidden");
     if (el.workspaceBox) el.workspaceBox.classList.remove("hidden");
+    setWorkspaceLoading(true);
 
-    state.user = user;
-    state.profile = await ensureOwnProfile(user, profileOptions || {});
-    setLegacyCurrentUser(user, state.profile);
-    applyProfileToUI(user, state.profile);
+    try {
+      state.user = user;
+      state.profile = await ensureOwnProfile(user, profileOptions || {});
+      setLegacyCurrentUser(user, state.profile);
+      applyProfileToUI(user, state.profile);
 
-    const requested = getRequestedView();
-    setWorkspaceView(requested, false);
+      const requested = getRequestedView();
+      setWorkspaceView(requested, false);
+      revealNode(el.workspaceBox);
+    } finally {
+      setWorkspaceLoading(false);
+    }
   }
 
   function fileToDataUrl(file) {
@@ -605,6 +679,7 @@
     row.className = "friends-empty";
     row.textContent = text;
     container.appendChild(row);
+    revealNode(container);
   }
 
   function friendProfile(map, userId) {
@@ -755,6 +830,7 @@
       card.appendChild(actions);
       el.incomingRequestsList.appendChild(card);
     });
+    revealNode(el.incomingRequestsList);
   }
 
   function renderOutgoing(outgoing, profileMap) {
@@ -770,6 +846,7 @@
       const card = buildFriendCard(profile, `ожидает ответа: ${formatStamp(row.created_at)}`);
       el.outgoingRequestsList.appendChild(card);
     });
+    revealNode(el.outgoingRequestsList);
   }
 
   function renderFriends(friends, profileMap, uid) {
@@ -786,12 +863,26 @@
       const card = buildFriendCard(profile, `с ${formatStamp(row.created_at)}`);
       el.friendsList.appendChild(card);
     });
+    revealNode(el.friendsList);
   }
 
-  async function refreshFriendsData(showErrors) {
+  async function refreshFriendsData(options) {
+    const cfg = typeof options === "boolean"
+      ? { showErrors: options, withSkeleton: false }
+      : {
+          showErrors: !options || typeof options.showErrors === "undefined" ? true : !!options.showErrors,
+          withSkeleton: !!(options && options.withSkeleton),
+        };
+
     if (!state.user || !state.supa) return;
     if (state.refreshingFriends) return;
     state.refreshingFriends = true;
+
+    if (cfg.withSkeleton) {
+      renderFriendsSkeleton(el.incomingRequestsList, 2);
+      renderFriendsSkeleton(el.outgoingRequestsList, 2);
+      renderFriendsSkeleton(el.friendsList, 3);
+    }
 
     try {
       const bundle = await fetchFriendsBundle(state.user);
@@ -801,7 +892,7 @@
     } catch (error) {
       if (looksLikeSchemaError(error)) {
         schemaMissingNotice();
-      } else if (showErrors) {
+      } else if (cfg.showErrors) {
         showNotice(`Ошибка друзей: ${briefError(error)}`);
       }
     } finally {
@@ -1121,6 +1212,7 @@
   }
 
   function bindEvents() {
+    ensureWorkspaceLoadingLayer();
     setupAuthTabs();
     setupWorkspaceTabs();
 
@@ -1160,27 +1252,32 @@
   async function init() {
     bindEvents();
     state.activeView = getRequestedView();
+    try {
+      if (!(window.IKSupabase && typeof window.IKSupabase.getClient === "function")) {
+        showNotice("Ошибка инициализации Supabase");
+        return;
+      }
 
-    if (!(window.IKSupabase && typeof window.IKSupabase.getClient === "function")) {
-      showNotice("Ошибка инициализации Supabase");
-      return;
-    }
+      state.supa = window.IKSupabase.getClient();
+      if (!state.supa) {
+        showNotice("Ошибка инициализации Supabase");
+        return;
+      }
 
-    state.supa = window.IKSupabase.getClient();
-    if (!state.supa) {
-      showNotice("Ошибка инициализации Supabase");
-      return;
-    }
+      const { data: sessionData } = await state.supa.auth.getSession();
+      await setSignedInUI(sessionData && sessionData.session ? sessionData.session.user : null);
 
-    const { data: sessionData } = await state.supa.auth.getSession();
-    await setSignedInUI(sessionData && sessionData.session ? sessionData.session.user : null);
-
-    state.supa.auth.onAuthStateChange((_evt, session) => {
-      const user = session ? session.user : null;
-      setSignedInUI(user).catch((error) => {
-        showNotice(`Ошибка сессии: ${briefError(error)}`);
+      state.supa.auth.onAuthStateChange((_evt, session) => {
+        const user = session ? session.user : null;
+        setSignedInUI(user).catch((error) => {
+          showNotice(`Ошибка сессии: ${briefError(error)}`);
+        });
       });
-    });
+    } finally {
+      if (window.IKLoading && typeof window.IKLoading.done === "function") {
+        window.IKLoading.done();
+      }
+    }
   }
 
   init().catch((error) => {

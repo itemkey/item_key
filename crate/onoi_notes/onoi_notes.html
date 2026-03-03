@@ -65,6 +65,78 @@
       padding: 12px 18px 22px;
       min-width: 0;
       font-family: var(--font-ui);
+      position: relative;
+    }
+
+    .n-shell{
+      transition: opacity .56s cubic-bezier(.22,.61,.36,1), transform .56s cubic-bezier(.22,.61,.36,1);
+    }
+
+    #notesTopPanel{
+      transition: opacity .42s cubic-bezier(.22,.61,.36,1), transform .42s cubic-bezier(.22,.61,.36,1);
+    }
+
+    #notesHero{
+      transition: opacity .4s cubic-bezier(.22,.61,.36,1), transform .4s cubic-bezier(.22,.61,.36,1);
+    }
+
+    .n-col-left,
+    .n-col-right{
+      transition: opacity .52s cubic-bezier(.22,.61,.36,1), transform .52s cubic-bezier(.22,.61,.36,1);
+    }
+
+    body.onoi-booting .n-shell{
+      opacity: .02;
+      transform: translateY(10px);
+    }
+
+    body.onoi-booting #notesTopPanel{
+      opacity: 0;
+      transform: translateY(8px);
+    }
+
+    body.onoi-booting #notesHero{
+      opacity: 0;
+      transform: translateY(6px);
+    }
+
+    body.onoi-booting .n-col-left,
+    body.onoi-booting .n-col-right{
+      opacity: 0;
+      transform: translateY(12px);
+    }
+
+    body.onoi-boot-reveal .n-shell{ transition-delay: 220ms; }
+    body.onoi-boot-reveal .n-col-left{ transition-delay: 280ms; }
+    body.onoi-boot-reveal .n-col-right{ transition-delay: 340ms; }
+
+    body.onoi-boot-skip #notesHero,
+    body.onoi-boot-skip #notesTopPanel,
+    body.onoi-boot-skip .n-shell,
+    body.onoi-boot-skip .n-col-left,
+    body.onoi-boot-skip .n-col-right{
+      transition: none !important;
+      opacity: 1 !important;
+      transform: none !important;
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      #notesTopPanel,
+      #notesHero,
+      .n-shell,
+      .n-col-left,
+      .n-col-right{
+        transition: none;
+      }
+
+      body.onoi-booting #notesTopPanel,
+      body.onoi-booting #notesHero,
+      body.onoi-booting .n-shell,
+      body.onoi-booting .n-col-left,
+      body.onoi-booting .n-col-right{
+        opacity: 1;
+        transform: none;
+      }
     }
 
     .n-title{
@@ -1486,7 +1558,7 @@ body.focus-mode .n-col-right{
 
 </head>
 
-<body class="page page-crate" data-i18n-page="onoi_notes" data-ik-loading>
+<body class="page page-crate onoi-booting" data-i18n-page="onoi_notes" data-ik-loading>
   <!-- фон/рамки - как в item-key -->
   <div class="outer-frame" aria-hidden="true"></div>
   <div class="rays" aria-hidden="true"></div>
@@ -1499,12 +1571,12 @@ body.focus-mode .n-col-right{
 
   <main class="center-stage" aria-label="onoi_notes center">
     <section class="notes-wrap" aria-label="onoi_notes app">
-      <div class="n-title">
+      <div class="n-title" id="notesHero">
         <h1>ЗАМЕТКИ</h1>
         <div class="sub">категории · подкатегории · редактор · whisperer</div>
       </div>
 
-      <div class="n-card">
+      <div class="n-card" id="notesTopPanel">
         <div class="n-topbar" aria-label="Панель поиска и действий">
           <input class="n-search" id="searchInput" placeholder="Поиск по заметкам…" />
                     <button class="n-btn" id="openDrawerBtn" type="button">Меню</button>
@@ -2140,7 +2212,10 @@ body.focus-mode .n-col-right{
       },
 
       diag: {
-        errors: []
+        errors: [],
+        bootMarks: [],
+        bootStartedAt: 0,
+        bootFinishedAt: 0
       }
     };
 
@@ -2237,6 +2312,25 @@ body.focus-mode .n-col-right{
     const adminPanelLog = $('adminPanelLog');
     const adminPanelMeta = $('adminPanelMeta');
 
+    let bootRevealTimer = null;
+
+    window.addEventListener('pagehide', () => {
+      if(bootRevealTimer){
+        clearTimeout(bootRevealTimer);
+        bootRevealTimer = null;
+      }
+    });
+
+    window.addEventListener('pageshow', (ev) => {
+      if(!ev || !ev.persisted) return;
+      document.body.classList.remove('onoi-booting', 'onoi-boot-reveal');
+      document.body.classList.add('onoi-boot-skip');
+      requestAnimationFrame(() => {
+        document.body.classList.remove('onoi-boot-skip');
+      });
+      if(window.IKLoading) window.IKLoading.done();
+    });
+
     function setAuthLocked(locked){
       const v = !!locked;
       try{ newNoteBtn.disabled = v; }catch(_){ }
@@ -2272,15 +2366,53 @@ body.focus-mode .n-col-right{
       if(state.diag.errors.length > 250) state.diag.errors.shift();
     }
 
+    function markBoot(step, extra){
+      const t = Math.round(performance.now());
+      if(!state.diag.bootStartedAt) state.diag.bootStartedAt = t;
+      const since = t - state.diag.bootStartedAt;
+      const row = {
+        at: new Date().toISOString(),
+        step: String(step || 'step'),
+        ms: since,
+        extra: extra || null
+      };
+      state.diag.bootMarks.push(row);
+      if(state.diag.bootMarks.length > 120) state.diag.bootMarks.shift();
+      pushDiag('info', 'boot', `step=${row.step} (+${row.ms}ms)`, extra || null);
+    }
+
+    function finishBoot(extra){
+      state.diag.bootFinishedAt = Math.round(performance.now());
+      markBoot('done', extra || null);
+      if(window.IKAdminLog){
+        const total = state.diag.bootStartedAt && state.diag.bootFinishedAt
+          ? Math.max(0, state.diag.bootFinishedAt - state.diag.bootStartedAt)
+          : 0;
+        window.IKAdminLog('log', 'onoi_notes', `boot total: ${total}ms | marks: ${(state.diag.bootMarks || []).length}`);
+      }
+    }
+
     function renderAdminPanel(){
       if(!adminPanelLog || !adminPanelMeta) return;
       const rows = state.diag.errors || [];
+      const marks = state.diag.bootMarks || [];
+      const bootTotal = state.diag.bootFinishedAt && state.diag.bootStartedAt
+        ? Math.max(0, state.diag.bootFinishedAt - state.diag.bootStartedAt)
+        : 0;
+      const markLines = marks.map((m, i) => `[${i+1}] ${m.at} | ${m.step} | +${m.ms}ms${m.extra ? `\nextra: ${JSON.stringify(m.extra)}` : ''}`);
       const lines = rows.map((r, i) => `[${i+1}] ${r.at} | ${r.level} | ${r.source}\n${r.error}${r.extra ? `\nextra: ${JSON.stringify(r.extra)}` : ''}`);
-      adminPanelLog.value = lines.join('\n\n');
+      adminPanelLog.value = [
+        '=== BOOT TIMELINE ===',
+        `total: ${bootTotal}ms`,
+        (markLines.length ? markLines.join('\n\n') : 'no marks'),
+        '',
+        '=== DIAG LOG ===',
+        (lines.length ? lines.join('\n\n') : 'no diag rows')
+      ].join('\n');
       const uid = state.supa.userId || '-';
       const mail = state.supa.email || '-';
       const table = state.supa.table || '-';
-      adminPanelMeta.textContent = `errors: ${rows.length} | user: ${mail} | uid: ${uid} | table: ${table}`;
+      adminPanelMeta.textContent = `errors: ${rows.length} | boot marks: ${marks.length} | boot total: ${bootTotal}ms | user: ${mail} | uid: ${uid} | table: ${table}`;
     }
 
     let lastSyncLog = '';
@@ -4672,6 +4804,7 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
 
     // ========= init =========
     async function boot(){
+      markBoot('start');
       // UI init
       const sw = Number(lsGet(LS_UI.sidebarW) || 320);
       state.ui.sidebarW = clamp(sw, 220, 520);
@@ -4691,6 +4824,7 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
       // load all from idb
       state.cats = await idb.all(STORE.cats);
       state.notes = await idb.all(STORE.notes);
+      markBoot('idb-loaded', { cats: state.cats.length, notes: state.notes.length });
 
       // Resolve Supabase user and enforce per-account privacy
       state.supa.client = getSupaClient();
@@ -4700,6 +4834,7 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
       state.supa.email = String(user && user.email || '').trim().toLowerCase();
       state.supa.isAdmin = ['itemkeygithub@gmail.com', 'kravetznikita@gmail.com'].includes(state.supa.email);
       state.supa.table = await resolveSupaTable();
+      markBoot('supa-resolved', { hasUser: !!state.supa.userId, table: state.supa.table });
 
       if(!state.supa.enabled){
         // No login -> no notes data shown
@@ -4709,6 +4844,7 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
         state.activeNoteId = null;
         ensureDefaults();
         renderAll();
+        markBoot('render-locked');
         setAuthLocked(true);
         setSync('bad', 'login required', 'Войди в аккаунт item-user, чтобы хранить приватные заметки.');
         return;
@@ -4722,6 +4858,7 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
         await clearLocalNotesStorage();
         state.cats = [];
         state.notes = [];
+        markBoot('owner-switched-local-reset');
       }
       setStoredOwner(state.supa.userId);
 
@@ -4733,6 +4870,7 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
             await importJSON(localSnap, { render:false });
             state.cats = await idb.all(STORE.cats);
             state.notes = await idb.all(STORE.notes);
+            markBoot('local-snapshot-restored', { cats: state.cats.length, notes: state.notes.length });
           }catch(_){ }
         }
       }
@@ -4743,6 +4881,7 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
           await importJSON(remoteSnap, { render:false });
           state.cats = await idb.all(STORE.cats);
           state.notes = await idb.all(STORE.notes);
+          markBoot('cloud-snapshot-restored', { cats: state.cats.length, notes: state.notes.length });
         }
       }catch(e){
         pushDiag('error', 'supaPullSnapshot', e);
@@ -4753,14 +4892,17 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
 
       // render first to hydrate editor/note binding before first persist
       renderAll();
+      markBoot('render-all');
       state.uiHydrated = true;
 
       // persist defaults if needed
       await persistAll();
+      markBoot('persist-local');
 
       // ensure first snapshot exists in cloud
       try{
         await supaPushSnapshot();
+        markBoot('persist-cloud');
       }catch(e){
         pushDiag('error', 'supaPushSnapshot@boot', e);
         setSync('bad', 'private err', errText(e));
@@ -4772,6 +4914,7 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
       // legacy cloud UI remains visible but disabled
       setCloudUI();
       startPolling();
+      markBoot('ui-ready');
 
       if(state.supa.client && state.supa.client.auth && typeof state.supa.client.auth.onAuthStateChange === 'function'){
         state.supa.client.auth.onAuthStateChange((_evt, session) => {
@@ -4783,7 +4926,29 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
       }
     }
 
-    boot();
+    Promise.resolve(boot())
+      .catch((error) => {
+        pushDiag('error', 'boot', error);
+      })
+      .finally(() => {
+        finishBoot({
+          cats: state.cats.length,
+          notes: state.notes.length,
+          activeCatId: state.activeCatId || null,
+          activeNoteId: state.activeNoteId || null
+        });
+        requestAnimationFrame(() => {
+          document.body.classList.add('onoi-boot-reveal');
+          document.body.classList.remove('onoi-booting');
+          bootRevealTimer = window.setTimeout(() => {
+            document.body.classList.remove('onoi-boot-reveal');
+            bootRevealTimer = null;
+          }, 1100);
+        });
+        window.setTimeout(() => {
+          if (window.IKLoading) window.IKLoading.done();
+        }, 140);
+      });
   })();
   </script>
 <script>
@@ -7127,13 +7292,11 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
       ensureVisibleAdminBtn();
       bindSettings();
       bindAdminPanel();
-      if(window.IKLoading) window.IKLoading.done();
     });
   } else {
     ensureVisibleAdminBtn();
     bindSettings();
     bindAdminPanel();
-    if(window.IKLoading) window.IKLoading.done();
   }
 })();
 </script>

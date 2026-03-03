@@ -10,6 +10,7 @@ const projects = new Projects(store, ui);
 const tasks = new Tasks(store, ui);
 
 const els = {
+  shell: document.querySelector(".planning-shell"),
   projectSelect: document.getElementById("projectSelect"),
   projectBar: document.getElementById("projectBar"),
   searchInput: document.getElementById("searchInput"),
@@ -198,6 +199,15 @@ function bootstrap() {
 
   // init
   setView(els.viewSelect.value || "board");
+
+  if (els.shell) {
+    els.shell.classList.remove("is-loading");
+    els.shell.classList.add("ik-reveal-in");
+  }
 }
 
-bootstrap();
+try {
+  bootstrap();
+} finally {
+  if (els.shell) els.shell.classList.remove("is-loading");
+}

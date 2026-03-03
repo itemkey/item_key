@@ -585,7 +585,7 @@
 
 </head>
 
-<body class="page page-crate" data-i18n-page="whisperer">
+<body class="page page-crate" data-i18n-page="whisperer" data-ik-loading>
   <div class="outer-frame" aria-hidden="true"></div>
   <div class="rays" aria-hidden="true"></div>
   <div class="veil" aria-hidden="true"></div>
@@ -849,6 +849,7 @@
   <script src="../../assets/js/main.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function(){
+      if(window.IKLoading) window.IKLoading.done();
       var backBtn = document.getElementById('ikBackBtn');
 
       function safeBrowserBack(fallbackHref){

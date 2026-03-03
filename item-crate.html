@@ -326,7 +326,7 @@
   <link rel="stylesheet" href="assets/css/theme.css" />
 </head>
 
-<body class="page page-crate">
+<body class="page page-crate" data-ik-loading>
   <!-- фон/рамки — как в item-key -->
   <div class="outer-frame" aria-hidden="true"></div>
   <div class="rays" aria-hidden="true"></div>
@@ -573,6 +573,11 @@
   </script>
 
   <script src="assets/js/theme.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      if (window.IKLoading) window.IKLoading.done();
+    });
+  </script>
   <!-- если общий main.js нужен для эффектов/движения -->
   <script src="assets/js/main.js"></script>
 </body>
