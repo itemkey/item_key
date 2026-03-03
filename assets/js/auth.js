@@ -17,7 +17,35 @@
     socialPollId: null,
     schemaWarnShown: false,
     refreshingFriends: false,
+    lastRegisterEmail: null,
   };
+
+  function getAuthRedirectUrl() {
+    const origin = window.location.origin;
+    if (!origin || origin === "null") return null;
+    const path = String(window.location.pathname || "/");
+    const baseDir = path.replace(/[^/]*$/, "");
+    let base = origin + baseDir;
+    if (!base.endsWith("/")) base += "/";
+    return base + "item-user.html";
+  }
+
+  async function resendSignupEmail(email) {
+    if (!state.supa) throw new Error("Нет авторизации");
+    const cleanEmail = normalizeEmail(email);
+    if (!cleanEmail) throw new Error("Нужна почта");
+    const emailRedirectTo = getAuthRedirectUrl();
+    if (typeof state.supa.auth.resend === "function") {
+      const { error } = await state.supa.auth.resend({
+        type: "signup",
+        email: cleanEmail,
+        options: emailRedirectTo ? { emailRedirectTo } : undefined,
+      });
+      if (error) throw error;
+      return;
+    }
+    throw new Error("Функция повторной отправки не поддерживается");
+  }
 
   const el = {
     guestBox: document.getElementById("authGuest"),
@@ -767,6 +795,7 @@
           nickname,
           user_id: userId,
         },
+        emailRedirectTo: getAuthRedirectUrl() || undefined,
       },
     });
 
@@ -798,7 +827,19 @@
       return;
     }
 
-    showNotice("Аккаунт создан. Подтверди почту и войди в аккаунт.");
+    state.lastRegisterEmail = email;
+    showNotice("Аккаунт создан. Подтверди почту и войди в аккаунт.", {
+      actionLabel: "Отправить повторно",
+      closeLabel: "Закрыть",
+      onAction: async () => {
+        try {
+          await resendSignupEmail(state.lastRegisterEmail);
+          showNotice("Письмо отправлено повторно. Проверь почту.");
+        } catch (resendError) {
+          showNotice(`Не удалось отправить письмо: ${briefError(resendError)}`);
+        }
+      },
+    });
   }
 
   async function onLoginSubmit(e) {
@@ -903,7 +944,11 @@
       return;
     }
 
-    const { error } = await state.supa.auth.updateUser({ email: nextEmail });
+    const emailRedirectTo = getAuthRedirectUrl();
+    const { error } = await state.supa.auth.updateUser(
+      { email: nextEmail },
+      emailRedirectTo ? { emailRedirectTo } : undefined
+    );
     if (error) {
       showNotice(`Ошибка смены почты: ${briefError(error)}`);
       return;
