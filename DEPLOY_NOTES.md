@@ -9,6 +9,7 @@ Order for fresh environment:
 5. Run `supabase/sql/stage6_onoi_notes_private.sql`
 6. Run `supabase/sql/stage7_planning_private.sql`
 7. Run `supabase/sql/stage8_accounts_social.sql`
+8. Run `supabase/sql/stage9_planning_collab.sql`
 
 After SQL:
 
@@ -19,6 +20,7 @@ After SQL:
 - Confirm badges:
   - `dictionary` cloud status not failing
   - `progress cloud: ok` after login
+  - `planning cloud: live` after opening planning board
 
 Operational model:
 

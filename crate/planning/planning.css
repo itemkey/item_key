@@ -91,6 +91,46 @@
   align-items: center;
 }
 
+.planning-presence{
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-height: 28px;
+}
+
+.planning-presence__status{
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(0,0,0,.58);
+}
+
+.planning-presence__chip{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid rgba(0,0,0,.14);
+  background: rgba(255,255,255,.9);
+  border-radius: 999px;
+  padding: 4px 8px;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.planning-presence__chip.is-self{
+  border-color: rgba(0,0,0,.35);
+}
+
+.planning-presence__dot{
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #0a9b4b;
+  display: inline-block;
+}
+
 /* Filters toolbar: many controls, so keep them a bit tighter */
 .planning-toolbar .ctl{ min-width: 160px; }
 
@@ -161,6 +201,12 @@
   min-height: 260px;
 }
 
+.column__dropzone.is-drop-target{
+  outline: 2px dashed rgba(0,0,0,.28);
+  outline-offset: 4px;
+  background: rgba(255,255,255,.55);
+}
+
 .card{
   border: 1px solid rgba(0,0,0,.14);
   background: rgba(255,255,255,.94);
@@ -170,6 +216,24 @@
   cursor: grab;
 }
 .card:active{ cursor: grabbing; }
+
+.card.is-drop-before,
+.card.is-drop-after{
+  position: relative;
+}
+
+.card.is-drop-before::after,
+.card.is-drop-after::after{
+  content: "";
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  height: 2px;
+  background: rgba(0,0,0,.62);
+}
+
+.card.is-drop-before::after{ top: -5px; }
+.card.is-drop-after::after{ bottom: -5px; }
 
 .card__name{
   margin: 0;
@@ -182,6 +246,15 @@
   font-size: 11px;
   color: rgba(0,0,0,.70);
   line-height: 1.4;
+}
+
+.card__editing{
+  margin: 0;
+  min-height: 14px;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: rgba(0,0,0,.52);
 }
 
 .schedule{
@@ -326,6 +399,11 @@
 .page-planning .proj-chip__del:hover{
   opacity: 1;
   border-color: rgba(0,0,0,.35);
+}
+
+.page-planning .proj-chip__del[disabled]{
+  opacity: .28;
+  cursor: default;
 }
 
 /* ===========================
