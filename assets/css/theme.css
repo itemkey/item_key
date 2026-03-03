@@ -270,6 +270,7 @@ html[data-theme="dark"] .onoi-img-bubble,
 html[data-theme="dark"] .ik-settings-panel,
 html[data-theme="dark"] .mobile-dock,
 html[data-theme="dark"] .drawer-head,
+html[data-theme="dark"] .account-center,
 html[data-theme="dark"] .constructor-panel,
 html[data-theme="dark"] .friend-card,
 html[data-theme="dark"] .friends-empty {
@@ -283,6 +284,27 @@ html[data-theme="dark"] .profile-avatar {
   border-color: var(--ik-border);
   background: var(--ik-surface-soft);
   color: var(--ik-text);
+}
+
+html[data-theme="dark"] .profile-tab{
+  background: var(--ik-surface-soft);
+  border-color: var(--ik-border);
+  color: var(--ik-text);
+}
+
+html[data-theme="dark"] .profile-tab.is-active{
+  background: var(--ik-surface);
+  border-color: var(--ik-border-strong);
+}
+
+html[data-theme="dark"] .profile-tab-avatar{
+  border-color: var(--ik-border);
+  background: var(--ik-surface);
+  color: var(--ik-text);
+}
+
+html[data-theme="dark"] .profile-field label{
+  color: var(--ik-muted);
 }
 
 html[data-theme="dark"] .btn,

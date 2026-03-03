@@ -59,6 +59,8 @@
     profileBio: document.getElementById("profileBio"),
     profileAvatarInput: document.getElementById("profileAvatarInput"),
     profileAvatarPreview: document.getElementById("profileAvatarPreview"),
+    profileTabAvatar: document.getElementById("profileTabAvatar"),
+    profileTabName: document.getElementById("profileTabName"),
     constructorToggle: document.getElementById("constructorToggle"),
     constructorPanel: document.getElementById("constructorPanel"),
     constructorEmail: document.getElementById("constructorEmail"),
@@ -331,6 +333,31 @@
     el.profileAvatarPreview.appendChild(img);
   }
 
+  function renderTabAvatar(avatarUrl, nickname) {
+    if (!el.profileTabAvatar) return;
+    const url = String(avatarUrl || "").trim();
+    const allowed = /^data:image\//i.test(url) || /^https?:\/\//i.test(url) || /^blob:/i.test(url);
+
+    if (!allowed) {
+      el.profileTabAvatar.innerHTML = "";
+      el.profileTabAvatar.textContent = avatarLetters(nickname);
+      return;
+    }
+
+    const img = document.createElement("img");
+    img.src = url;
+    img.alt = "avatar";
+    img.loading = "lazy";
+
+    el.profileTabAvatar.innerHTML = "";
+    el.profileTabAvatar.appendChild(img);
+  }
+
+  function renderProfileAvatars(avatarUrl, nickname) {
+    renderAvatar(avatarUrl, nickname);
+    renderTabAvatar(avatarUrl, nickname);
+  }
+
   function candidateUserIds(base) {
     const cleaned = normalizeUserId(base);
     let seed = cleaned;
@@ -452,7 +479,8 @@
     if (el.constructorEmail) el.constructorEmail.textContent = String((user && user.email) || "-");
     if (el.constructorMaskedPassword) el.constructorMaskedPassword.textContent = "********";
 
-    renderAvatar(state.avatarDraft || p.avatar_url || "", p.nickname || fallbackNickname(user));
+    if (el.profileTabName) el.profileTabName.textContent = String(p.nickname || fallbackNickname(user));
+    renderProfileAvatars(state.avatarDraft || p.avatar_url || "", p.nickname || fallbackNickname(user));
   }
 
   function stopFriendsPolling() {
@@ -530,7 +558,7 @@
     try {
       const dataUrl = await fileToDataUrl(file);
       state.avatarDraft = dataUrl;
-      renderAvatar(dataUrl, (state.profile && state.profile.nickname) || fallbackNickname(state.user));
+      renderProfileAvatars(dataUrl, (state.profile && state.profile.nickname) || fallbackNickname(state.user));
     } catch (error) {
       showNotice(`Ошибка файла: ${briefError(error)}`);
     }

@@ -168,10 +168,16 @@
     style.id = ACCOUNT_LINK_STYLE_ID;
     style.textContent = [
       ".ik-settings-links { display:grid; gap:8px; margin: 0 0 10px; }",
-      ".ik-settings-link { min-height:42px; border:1px solid rgba(0,0,0,.14); background: rgba(255,255,255,.92); color: rgba(0,0,0,.88); text-decoration:none; display:flex; align-items:center; justify-content:center; letter-spacing:.14em; text-transform:uppercase; font-size:11px; cursor:pointer; transition: border-color .16s ease, background .16s ease, transform .16s ease; }",
-      ".ik-settings-link:hover { border-color: rgba(0,0,0,.34); background: rgba(0,0,0,.04); transform: translateY(-1px); }",
+      ".ik-settings-link { min-height:42px; border:1px solid var(--ik-border-strong); background: var(--ik-surface-soft); color: var(--ik-text); text-decoration:none; display:flex; align-items:center; justify-content:center; letter-spacing:.14em; text-transform:uppercase; font-size:11px; cursor:pointer; transition: border-color .16s ease, background .16s ease, transform .16s ease; border-radius:0; }",
+      ".ik-settings-link:hover { border-color: var(--ik-border-strong); background: var(--ik-surface-alt); transform: translateY(-1px); }",
       ".ik-settings-link:active { transform: translateY(0); }",
-      ".ik-settings-link:focus-visible { outline: 2px solid rgba(0,0,0,.48); outline-offset: 2px; }"
+      ".ik-settings-link:focus-visible { outline: 2px solid var(--ik-focus); outline-offset: 2px; }",
+      ".ik-settings-link--profile { justify-content:flex-start; gap:10px; padding: 6px 10px; text-transform:none; letter-spacing:.06em; }",
+      ".ik-profile-avatar { width:34px; height:34px; border:1px solid var(--ik-border-strong); background: var(--ik-surface); display:grid; place-items:center; font-size:12px; letter-spacing:1px; text-transform:uppercase; overflow:hidden; flex:0 0 auto; border-radius:0; }",
+      ".ik-profile-avatar img { width:100%; height:100%; object-fit:cover; display:block; }",
+      ".ik-profile-meta { display:grid; gap:2px; min-width:0; }",
+      ".ik-profile-name { font-size:12px; font-weight:600; letter-spacing:.08em; text-transform:none; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }",
+      ".ik-profile-sub { font-size:10px; text-transform:uppercase; letter-spacing:.18em; opacity:.7; }"
     ].join("\n");
     document.head.appendChild(style);
   }
@@ -208,8 +214,8 @@
     if (!profileLink) {
       profileLink = document.createElement("a");
       profileLink.id = "ikMyProfileLink";
-      profileLink.className = "ik-settings-link";
-      profileLink.textContent = "my profile";
+      profileLink.className = "ik-settings-link ik-settings-link--profile";
+      profileLink.innerHTML = "<span class=\"ik-profile-avatar\" aria-hidden=\"true\">IK</span><span class=\"ik-profile-meta\"><span class=\"ik-profile-name\">user</span><span class=\"ik-profile-sub\">my profile</span></span>";
       wrap.appendChild(profileLink);
     }
 
@@ -220,6 +226,29 @@
       friendsLink.className = "ik-settings-link";
       friendsLink.textContent = "friends";
       wrap.appendChild(friendsLink);
+    }
+
+    const snapshot = (() => {
+      try {
+        const raw = localStorage.getItem("itemkey.currentUser");
+        return raw ? JSON.parse(raw) : null;
+      } catch {
+        return null;
+      }
+    })();
+
+    const displayName = String((snapshot && snapshot.name) || "user").trim() || "user";
+    const avatarEl = profileLink.querySelector(".ik-profile-avatar");
+    const nameEl = profileLink.querySelector(".ik-profile-name");
+
+    if (nameEl && nameEl.textContent !== displayName) nameEl.textContent = displayName;
+    if (avatarEl) {
+      const parts = displayName.split(/\s+/).filter(Boolean);
+      const letters = parts.length >= 2
+        ? `${parts[0][0] || ""}${parts[1][0] || ""}`
+        : (parts[0] || "").slice(0, 2);
+      const nextLetters = (letters || "IK").toUpperCase();
+      if (avatarEl.textContent !== nextLetters) avatarEl.textContent = nextLetters;
     }
 
     profileLink.href = buildAccountHref("profile");

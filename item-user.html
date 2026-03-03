@@ -60,12 +60,18 @@
     </section>
 
     <!-- ЛК -->
-    <section id="authWorkspace" class="auth-box hidden">
+    <section id="authWorkspace" class="auth-box account-center hidden">
       <h1>account center</h1>
       <p class="muted">управление профилем и друзьями</p>
 
       <div class="auth-tabs auth-tabs--workspace">
-        <button data-view="profile" class="auth-tab auth-view-tab is-active" type="button">my profile</button>
+        <button data-view="profile" class="auth-tab auth-view-tab profile-tab is-active" type="button">
+          <span class="profile-tab-avatar" id="profileTabAvatar" aria-hidden="true">IK</span>
+          <span class="profile-tab-meta">
+            <span class="profile-tab-name" id="profileTabName">user</span>
+            <span class="profile-tab-sub">my profile</span>
+          </span>
+        </button>
         <button data-view="friends" class="auth-tab auth-view-tab" type="button">friends</button>
       </div>
 
@@ -79,9 +85,18 @@
         </div>
 
         <form id="profileForm" class="auth-form">
-          <input required type="text" placeholder="ник" id="profileNick" maxlength="48">
-          <input required type="text" placeholder="user-id" id="profileUserId" minlength="4" maxlength="32" autocomplete="off">
-          <textarea id="profileBio" placeholder="описание профиля" rows="4" maxlength="280"></textarea>
+          <div class="profile-field">
+            <label for="profileNick">ник</label>
+            <input required type="text" placeholder="ник" id="profileNick" maxlength="48">
+          </div>
+          <div class="profile-field">
+            <label for="profileUserId">user-id</label>
+            <input required type="text" placeholder="user-id" id="profileUserId" minlength="4" maxlength="32" autocomplete="off">
+          </div>
+          <div class="profile-field">
+            <label for="profileBio">описание</label>
+            <textarea id="profileBio" placeholder="описание профиля" rows="4" maxlength="280"></textarea>
+          </div>
           <button class="btn btn--primary" type="submit">сохранить профиль</button>
         </form>
 
