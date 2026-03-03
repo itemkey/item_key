@@ -921,23 +921,46 @@ body.page-home{ overflow: hidden; }
   transform: translateY(0);
 }
 
+.ik-site-nav,
+.bottombar{ opacity: 1; }
+
 body.ik-booting [data-ik-stage]{
   opacity: 0;
   transform: translateY(10px);
 }
 
+body.ik-booting .ik-site-nav{
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+body.ik-booting .bottombar{
+  opacity: 0;
+}
+
 body.ik-boot-reveal [data-ik-stage]{
+  transition: opacity .52s cubic-bezier(.22,.61,.36,1), transform .52s cubic-bezier(.22,.61,.36,1);
+  transition-delay: 0ms;
+}
+
+body.ik-boot-reveal .ik-site-nav{
   transition: opacity .52s cubic-bezier(.22,.61,.36,1), transform .52s cubic-bezier(.22,.61,.36,1);
 }
 
-body.ik-boot-reveal [data-ik-stage="hero"]{ transition-delay: 20ms; }
-body.ik-boot-reveal [data-ik-stage="top"]{ transition-delay: 90ms; }
-body.ik-boot-reveal [data-ik-stage="content"]{ transition-delay: 180ms; }
+body.ik-boot-reveal .bottombar{
+  transition: opacity .52s cubic-bezier(.22,.61,.36,1);
+}
 
 body.ik-boot-skip [data-ik-stage]{
   transition: none !important;
   opacity: 1 !important;
   transform: none !important;
+}
+
+body.ik-boot-skip .ik-site-nav,
+body.ik-boot-skip .bottombar{
+  transition: none !important;
+  opacity: 1 !important;
 }
 
 body[data-ik-loading] .ik-page-shell.is-pending{
@@ -950,11 +973,15 @@ body[data-ik-loading].ik-loading .ik-page-shell{
 }
 
 body.ik-page-leaving .ik-site-nav,
-body.ik-page-leaving main,
-body.ik-page-leaving .bottombar{
+body.ik-page-leaving main{
   opacity: 0;
   transform: translateY(6px);
   transition: opacity .18s ease, transform .18s ease;
+}
+
+body.ik-page-leaving .bottombar{
+  opacity: 0;
+  transition: opacity .18s ease;
 }
 
 body[data-ik-loading] .ik-page-shell.is-ready{
@@ -1013,10 +1040,16 @@ body.ik-loading .ik-loading-overlay{ opacity: 1; }
   }
 
   [data-ik-stage],
+  .ik-site-nav,
   body.ik-boot-reveal [data-ik-stage]{
     transition: none !important;
     opacity: 1 !important;
     transform: none !important;
+  }
+
+  .bottombar{
+    transition: none !important;
+    opacity: 1 !important;
   }
 
   .ik-loading-line{ animation: none; }
