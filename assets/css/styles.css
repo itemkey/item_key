@@ -1060,50 +1060,21 @@ body.page-user .center-stage{
   padding: calc(88px + env(safe-area-inset-top, 0px)) var(--safe-x) 32px;
   place-items: center;
   align-content: center;
-  position: relative;
-}
-
-.auth-boot-loader{
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 34px;
-  height: 2px;
-  background: rgba(0,0,0,.18);
-  opacity: 0;
-  transition: opacity .14s ease;
-  pointer-events: none;
-}
-
-.auth-boot-loader::after{
-  content: "";
-  display: block;
-  width: 34px;
-  height: 2px;
-  background: rgba(0,0,0,.62);
-  transform-origin: left center;
-  animation: ik-auth-loader 1s ease infinite;
-}
-
-body.page-user.ik-auth-pending .auth-boot-loader{
   opacity: 1;
+  will-change: opacity;
+  transition: opacity .22s cubic-bezier(.22,.61,.36,1);
+}
+
+body.page-user.ik-auth-pending .center-stage{
+  opacity: 0;
 }
 
 body.page-user.ik-auth-pending .auth-box{
   visibility: hidden;
-  opacity: 0;
 }
 
 body.page-user .auth-box{
   opacity: 1;
-  transition: opacity .18s ease-out;
-}
-
-@keyframes ik-auth-loader{
-  0%{ transform: scaleX(.2); opacity: .35; }
-  50%{ transform: scaleX(1); opacity: 1; }
-  100%{ transform: scaleX(.2); opacity: .35; }
 }
 
 .auth-box{

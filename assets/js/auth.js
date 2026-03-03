@@ -149,7 +149,13 @@
   function finalizeInitialUI() {
     if (state.initialUIReady) return;
     state.initialUIReady = true;
-    if (document.body) document.body.classList.remove("ik-auth-pending");
+    if (document.body) {
+      window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => {
+          document.body.classList.remove("ik-auth-pending");
+        });
+      });
+    }
   }
 
   function ensureNoticeStyles() {
