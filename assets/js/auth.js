@@ -19,6 +19,7 @@
     refreshingFriends: false,
     lastRegisterEmail: null,
     workspaceLoaderReady: false,
+    initialUIReady: false,
   };
 
   function getAuthRedirectUrl() {
@@ -143,6 +144,12 @@
       ].join("");
       container.appendChild(card);
     }
+  }
+
+  function finalizeInitialUI() {
+    if (state.initialUIReady) return;
+    state.initialUIReady = true;
+    if (document.body) document.body.classList.remove("ik-auth-pending");
   }
 
   function ensureNoticeStyles() {
@@ -622,9 +629,26 @@
       return;
     }
 
+    const sameUserReady =
+      !!(state.user && state.profile && user && state.user.id === user.id);
+    if (sameUserReady) {
+      const requested = getRequestedView();
+      setWorkspaceView(requested, false);
+      finalizeInitialUI();
+      return;
+    }
+
+    const initialPaint = !state.initialUIReady;
+
     if (el.guestBox) el.guestBox.classList.add("hidden");
-    if (el.workspaceBox) el.workspaceBox.classList.remove("hidden");
-    setWorkspaceLoading(true);
+    if (el.workspaceBox) {
+      if (initialPaint) {
+        el.workspaceBox.classList.add("hidden");
+      } else {
+        el.workspaceBox.classList.remove("hidden");
+      }
+    }
+    if (!initialPaint) setWorkspaceLoading(true);
 
     try {
       state.user = user;
@@ -634,7 +658,8 @@
 
       const requested = getRequestedView();
       setWorkspaceView(requested, false);
-      revealNode(el.workspaceBox);
+      if (el.workspaceBox) el.workspaceBox.classList.remove("hidden");
+      finalizeInitialUI();
     } finally {
       setWorkspaceLoading(false);
     }
@@ -1267,13 +1292,24 @@
       const { data: sessionData } = await state.supa.auth.getSession();
       await setSignedInUI(sessionData && sessionData.session ? sessionData.session.user : null);
 
-      state.supa.auth.onAuthStateChange((_evt, session) => {
+      state.supa.auth.onAuthStateChange((evt, session) => {
+        if (evt === "INITIAL_SESSION") return;
         const user = session ? session.user : null;
+        if (
+          evt === "SIGNED_IN" &&
+          user &&
+          state.user &&
+          state.profile &&
+          user.id === state.user.id
+        ) {
+          return;
+        }
         setSignedInUI(user).catch((error) => {
           showNotice(`Ошибка сессии: ${briefError(error)}`);
         });
       });
     } finally {
+      finalizeInitialUI();
       if (window.IKLoading && typeof window.IKLoading.done === "function") {
         window.IKLoading.done();
       }

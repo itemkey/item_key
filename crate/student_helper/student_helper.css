@@ -38,6 +38,24 @@ body {
       z-index: auto;
       width: min(860px, calc(100% - max(24px, 2*var(--safe-x))));
       margin: auto auto max(var(--bottom), 14px);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+
+    .sh-footer__actions{
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .sh-footer__btn{
+      min-height: 32px;
+      padding: 7px 10px;
+      font-size: 10px;
+      letter-spacing: 2px;
     }
 
     @media (max-width: 900px){
@@ -51,7 +69,10 @@ body {
       body.page-learning .sh-footer.bottombar--edge{
         width: calc(100% - 16px);
         margin-bottom: 10px;
+        justify-content: center;
       }
+
+      .sh-footer .ik-spacer{ display: none; }
     }
 
     .ik-card{

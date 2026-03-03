@@ -19,7 +19,7 @@
   <link rel="stylesheet" href="assets/css/styles.css" />
   <link rel="stylesheet" href="assets/css/theme.css" />
 </head>
-<body class="page page-user ik-booting" data-ik-loading>
+<body class="page page-user ik-auth-pending" data-ik-loading>
 
   <div class="outer-frame"></div>
 
@@ -30,6 +30,8 @@
   </header>
 
   <main class="center-stage">
+
+    <div id="authBootLoader" class="auth-boot-loader" aria-live="polite" aria-label="loading"></div>
 
     <!-- ГОСТЬ -->
     <section id="authGuest" class="auth-box" data-ik-stage="hero">

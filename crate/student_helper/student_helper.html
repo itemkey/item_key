@@ -1025,13 +1025,13 @@
 
   <footer class="bottombar bottombar--edge sh-footer">
     <span class="hint">student helper</span>
-    <span class="sep">•</span>
     <span class="hint ik-admin-indicator" id="progressCloudBadge" title="progress cloud sync status">progress cloud: ...</span>
-    <span class="sep">•</span>
-    <button class="ik-btn" id="shBackupBtn" type="button" title="Экспорт данных Student Helper">backup</button>
-    <button class="ik-btn" id="shRestoreBtn" type="button" title="Импорт данных Student Helper">restore</button>
+    <span class="ik-spacer" aria-hidden="true"></span>
+    <div class="sh-footer__actions" aria-label="backup actions">
+      <button class="ik-btn sh-footer__btn" id="shBackupBtn" type="button" title="Экспорт данных Student Helper">backup</button>
+      <button class="ik-btn sh-footer__btn" id="shRestoreBtn" type="button" title="Импорт данных Student Helper">restore</button>
+    </div>
     <input type="file" id="shRestoreFile" accept=".json,application/json" hidden />
-    <span class="sep">•</span>
     <span class="hint">pre-alpha</span>
   </footer>
 
