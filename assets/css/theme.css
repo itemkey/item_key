@@ -324,6 +324,12 @@ html[data-theme="dark"] .profile-showcase__value:hover{
   background: rgba(255,255,255,.08);
 }
 
+html[data-theme="dark"] .profile-copy-toast{
+  color: var(--ik-text);
+  border-color: var(--ik-border-strong);
+  background: var(--ik-surface);
+}
+
 html[data-theme="dark"] .profile-stat--cash{
   border-color: var(--ik-border-strong);
 }

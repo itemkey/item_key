@@ -899,8 +899,8 @@ body.page-home{ overflow: hidden; }
 body.page-user .center-stage{
   min-height: 100vh;
   padding: calc(88px + env(safe-area-inset-top, 0px)) var(--safe-x) 32px;
-  place-items: start center;
-  align-content: start;
+  place-items: center;
+  align-content: center;
 }
 
 .auth-box{
@@ -919,6 +919,8 @@ body.page-user .center-stage{
   box-shadow: 0 12px 28px rgba(0,0,0,.16), inset 0 0 0 1px rgba(0,0,0,.08);
   border-radius: 0;
   position: relative;
+  max-height: calc(100vh - 140px);
+  overflow: auto;
 }
 
 .account-center::before{
@@ -1154,6 +1156,7 @@ body.page-user .center-stage{
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
+  position: relative;
 }
 
 .profile-showcase__label{
@@ -1171,6 +1174,30 @@ body.page-user .center-stage{
   cursor: pointer;
   font-family: inherit;
   text-transform: none;
+  position: relative;
+}
+
+.profile-copy-toast{
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translate(-50%, 6px);
+  font-size: 10px;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  opacity: 0;
+  border: 1px solid rgba(0,0,0,.35);
+  background: rgba(255,255,255,.96);
+  padding: 4px 8px;
+  white-space: nowrap;
+  z-index: 2;
+  transition: opacity .18s ease, transform .18s ease;
+  pointer-events: none;
+}
+
+.profile-copy-toast.is-visible{
+  opacity: .95;
+  transform: translate(-50%, 0);
 }
 
 .profile-showcase__value:hover{

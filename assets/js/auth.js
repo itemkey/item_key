@@ -498,7 +498,20 @@
     if (!text) return;
     try {
       await navigator.clipboard.writeText(text);
-      showNotice("user-id скопирован");
+      const host = el.profileShowcaseUserId;
+      if (host) {
+        let toast = host.querySelector(".profile-copy-toast");
+        if (!toast) {
+          toast = document.createElement("span");
+          toast.className = "profile-copy-toast";
+          toast.textContent = "скопировано";
+          host.appendChild(toast);
+        }
+        toast.classList.add("is-visible");
+        window.setTimeout(() => {
+          if (toast) toast.classList.remove("is-visible");
+        }, 900);
+      }
     } catch (error) {
       showNotice(`Не удалось скопировать: ${briefError(error)}`);
     }
