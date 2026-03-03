@@ -172,8 +172,8 @@
       ".ik-settings-link:hover { border-color: var(--ik-border-strong); background: var(--ik-surface-alt); transform: translateY(-1px); }",
       ".ik-settings-link:active { transform: translateY(0); }",
       ".ik-settings-link:focus-visible { outline: 2px solid var(--ik-focus); outline-offset: 2px; }",
-      ".ik-settings-link--profile { justify-content:flex-start; gap:10px; padding: 6px 10px; text-transform:none; letter-spacing:.06em; }",
-      ".ik-profile-avatar { width:34px; height:34px; border:1px solid var(--ik-border-strong); background: var(--ik-surface); display:grid; place-items:center; font-size:12px; letter-spacing:1px; text-transform:uppercase; overflow:hidden; flex:0 0 auto; border-radius:0; }",
+      ".ik-settings-link--profile { justify-content:flex-start; gap:12px; padding: 10px 12px; min-height:56px; text-transform:none; letter-spacing:.06em; }",
+      ".ik-profile-avatar { width:42px; height:42px; border:1px solid var(--ik-border-strong); background: var(--ik-surface); display:grid; place-items:center; font-size:13px; letter-spacing:1px; text-transform:uppercase; overflow:hidden; flex:0 0 auto; border-radius:0; }",
       ".ik-profile-avatar img { width:100%; height:100%; object-fit:cover; display:block; }",
       ".ik-profile-meta { display:grid; gap:2px; min-width:0; }",
       ".ik-profile-name { font-size:12px; font-weight:600; letter-spacing:.08em; text-transform:none; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }",
@@ -238,17 +238,34 @@
     })();
 
     const displayName = String((snapshot && snapshot.name) || "user").trim() || "user";
+    const avatarUrl = String((snapshot && snapshot.avatarUrl) || "").trim();
     const avatarEl = profileLink.querySelector(".ik-profile-avatar");
     const nameEl = profileLink.querySelector(".ik-profile-name");
 
     if (nameEl && nameEl.textContent !== displayName) nameEl.textContent = displayName;
     if (avatarEl) {
-      const parts = displayName.split(/\s+/).filter(Boolean);
-      const letters = parts.length >= 2
-        ? `${parts[0][0] || ""}${parts[1][0] || ""}`
-        : (parts[0] || "").slice(0, 2);
-      const nextLetters = (letters || "IK").toUpperCase();
-      if (avatarEl.textContent !== nextLetters) avatarEl.textContent = nextLetters;
+      const allowed = /^data:image\//i.test(avatarUrl) || /^https?:\/\//i.test(avatarUrl) || /^blob:/i.test(avatarUrl);
+      if (allowed) {
+        const img = avatarEl.querySelector("img");
+        if (!img || img.src !== avatarUrl) {
+          avatarEl.innerHTML = "";
+          const next = document.createElement("img");
+          next.src = avatarUrl;
+          next.alt = "avatar";
+          next.loading = "lazy";
+          avatarEl.appendChild(next);
+        }
+      } else {
+        const parts = displayName.split(/\s+/).filter(Boolean);
+        const letters = parts.length >= 2
+          ? `${parts[0][0] || ""}${parts[1][0] || ""}`
+          : (parts[0] || "").slice(0, 2);
+        const nextLetters = (letters || "IK").toUpperCase();
+        if (avatarEl.textContent !== nextLetters || avatarEl.querySelector("img")) {
+          avatarEl.innerHTML = "";
+          avatarEl.textContent = nextLetters;
+        }
+      }
     }
 
     profileLink.href = buildAccountHref("profile");

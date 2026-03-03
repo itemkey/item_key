@@ -65,44 +65,59 @@
       <p class="muted">управление профилем и друзьями</p>
 
       <div class="auth-tabs auth-tabs--workspace">
-        <button data-view="profile" class="auth-tab auth-view-tab profile-tab is-active" type="button">
-          <span class="profile-tab-avatar" id="profileTabAvatar" aria-hidden="true">IK</span>
-          <span class="profile-tab-meta">
-            <span class="profile-tab-name" id="profileTabName">user</span>
-            <span class="profile-tab-sub">my profile</span>
-          </span>
-        </button>
+        <button data-view="profile" class="auth-tab auth-view-tab profile-tab is-active" type="button">My profile</button>
         <button data-view="friends" class="auth-tab auth-view-tab" type="button">friends</button>
       </div>
 
       <div id="profileView" class="user-view">
-        <div class="profile-avatar-row">
-          <div class="profile-avatar" id="profileAvatarPreview" aria-label="avatar">IK</div>
-          <label class="btn profile-avatar-upload" for="profileAvatarInput">
-            сменить аватар
-          </label>
-          <input class="visually-hidden" type="file" id="profileAvatarInput" accept="image/*">
-        </div>
+        <section class="profile-showcase" aria-label="витрина профиля">
+          <div class="profile-showcase__avatar" aria-hidden="true" id="profileShowcaseAvatar">IK</div>
+          <div class="profile-showcase__info">
+            <div class="profile-showcase__name" id="profileShowcaseName">user</div>
+            <div class="profile-showcase__id">
+              <span class="profile-showcase__label">user-id</span>
+              <button class="profile-showcase__value profile-copy-trigger" id="profileShowcaseUserId" type="button">user_id</button>
+            </div>
+            <p class="profile-showcase__bio" id="profileShowcaseBio">—</p>
+          </div>
+        </section>
 
-        <form id="profileForm" class="auth-form">
-          <div class="profile-field">
-            <label for="profileNick">ник</label>
-            <input required type="text" placeholder="ник" id="profileNick" maxlength="48">
+        <section class="profile-stats" aria-label="статистика аккаунта">
+          <div class="profile-stat">
+            <div class="profile-stat__label">опыт</div>
+            <div class="profile-stat__value" id="profileStatExp">0</div>
           </div>
-          <div class="profile-field">
-            <label for="profileUserId">user-id</label>
-            <input required type="text" placeholder="user-id" id="profileUserId" minlength="4" maxlength="32" autocomplete="off">
+          <div class="profile-stat profile-stat--cash">
+            <div class="profile-stat__label">cash</div>
+            <div class="profile-stat__value" id="profileStatCash">0</div>
           </div>
-          <div class="profile-field">
-            <label for="profileBio">описание</label>
-            <textarea id="profileBio" placeholder="описание профиля" rows="4" maxlength="280"></textarea>
-          </div>
-          <button class="btn btn--primary" type="submit">сохранить профиль</button>
-        </form>
+        </section>
 
         <button id="constructorToggle" class="btn" type="button">конструктор</button>
 
         <section id="constructorPanel" class="constructor-panel hidden" aria-label="конструктор аккаунта">
+          <div class="profile-avatar-row">
+            <div class="profile-avatar" id="profileAvatarPreview" aria-label="avatar">IK</div>
+            <label class="btn profile-avatar-upload" for="profileAvatarInput">
+              сменить аватар
+            </label>
+            <input class="visually-hidden" type="file" id="profileAvatarInput" accept="image/*">
+          </div>
+          <form id="profileForm" class="auth-form constructor-form">
+            <div class="profile-field">
+              <label for="profileNick">ник</label>
+              <input required type="text" placeholder="ник" id="profileNick" maxlength="48">
+            </div>
+            <div class="profile-field">
+              <label for="profileUserId">user-id</label>
+              <input required type="text" placeholder="user-id" id="profileUserId" minlength="4" maxlength="32" autocomplete="off">
+            </div>
+            <div class="profile-field">
+              <label for="profileBio">описание</label>
+              <textarea id="profileBio" placeholder="описание профиля" rows="4" maxlength="280"></textarea>
+            </div>
+            <button class="btn btn--primary" type="submit">сохранить профиль</button>
+          </form>
           <div class="constructor-line"><b>почта:</b> <span id="constructorEmail">-</span></div>
           <div class="constructor-line"><b>пароль:</b> <span id="constructorMaskedPassword">********</span></div>
 

@@ -286,6 +286,48 @@ html[data-theme="dark"] .profile-avatar {
   color: var(--ik-text);
 }
 
+html[data-theme="dark"] .account-center::before{
+  border-color: var(--ik-border);
+}
+
+html[data-theme="dark"] .account-center .auth-form,
+html[data-theme="dark"] .profile-avatar-row{
+  background: var(--ik-surface-soft);
+  border-color: var(--ik-border);
+}
+
+html[data-theme="dark"] .profile-showcase,
+html[data-theme="dark"] .profile-stat{
+  background: var(--ik-surface-soft);
+  border-color: var(--ik-border);
+  color: var(--ik-text);
+}
+
+html[data-theme="dark"] .profile-showcase__bio{
+  color: var(--ik-muted);
+}
+
+html[data-theme="dark"] .profile-showcase__avatar{
+  border-color: var(--ik-border);
+  background: var(--ik-surface);
+  color: var(--ik-text);
+}
+
+html[data-theme="dark"] .profile-showcase__value{
+  border-color: var(--ik-border);
+  background: rgba(255,255,255,.04);
+  color: var(--ik-text);
+}
+
+html[data-theme="dark"] .profile-showcase__value:hover{
+  border-color: var(--ik-border-strong);
+  background: rgba(255,255,255,.08);
+}
+
+html[data-theme="dark"] .profile-stat--cash{
+  border-color: var(--ik-border-strong);
+}
+
 html[data-theme="dark"] .profile-tab{
   background: var(--ik-surface-soft);
   border-color: var(--ik-border);

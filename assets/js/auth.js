@@ -59,8 +59,10 @@
     profileBio: document.getElementById("profileBio"),
     profileAvatarInput: document.getElementById("profileAvatarInput"),
     profileAvatarPreview: document.getElementById("profileAvatarPreview"),
-    profileTabAvatar: document.getElementById("profileTabAvatar"),
-    profileTabName: document.getElementById("profileTabName"),
+    profileShowcaseName: document.getElementById("profileShowcaseName"),
+    profileShowcaseUserId: document.getElementById("profileShowcaseUserId"),
+    profileShowcaseBio: document.getElementById("profileShowcaseBio"),
+    profileShowcaseAvatar: document.getElementById("profileShowcaseAvatar"),
     constructorToggle: document.getElementById("constructorToggle"),
     constructorPanel: document.getElementById("constructorPanel"),
     constructorEmail: document.getElementById("constructorEmail"),
@@ -241,6 +243,7 @@
       name: String((profile && profile.nickname) || fallbackNickname(user)).trim() || "user",
       email: String(user.email || "").trim(),
       userId: String((profile && profile.user_id) || fallbackUserId(user)).trim(),
+      avatarUrl: String((profile && profile.avatar_url) || "").trim(),
       isAdmin: Boolean((profile && profile.is_admin) || isAdminEmail(user.email || "")),
       provider: "supabase",
     };
@@ -333,14 +336,14 @@
     el.profileAvatarPreview.appendChild(img);
   }
 
-  function renderTabAvatar(avatarUrl, nickname) {
-    if (!el.profileTabAvatar) return;
+  function renderShowcaseAvatar(avatarUrl, nickname) {
+    if (!el.profileShowcaseAvatar) return;
     const url = String(avatarUrl || "").trim();
     const allowed = /^data:image\//i.test(url) || /^https?:\/\//i.test(url) || /^blob:/i.test(url);
 
     if (!allowed) {
-      el.profileTabAvatar.innerHTML = "";
-      el.profileTabAvatar.textContent = avatarLetters(nickname);
+      el.profileShowcaseAvatar.innerHTML = "";
+      el.profileShowcaseAvatar.textContent = avatarLetters(nickname);
       return;
     }
 
@@ -349,13 +352,13 @@
     img.alt = "avatar";
     img.loading = "lazy";
 
-    el.profileTabAvatar.innerHTML = "";
-    el.profileTabAvatar.appendChild(img);
+    el.profileShowcaseAvatar.innerHTML = "";
+    el.profileShowcaseAvatar.appendChild(img);
   }
 
   function renderProfileAvatars(avatarUrl, nickname) {
     renderAvatar(avatarUrl, nickname);
-    renderTabAvatar(avatarUrl, nickname);
+    renderShowcaseAvatar(avatarUrl, nickname);
   }
 
   function candidateUserIds(base) {
@@ -476,11 +479,29 @@
     if (el.profileNick) el.profileNick.value = String(p.nickname || "");
     if (el.profileUserId) el.profileUserId.value = String(p.user_id || "");
     if (el.profileBio) el.profileBio.value = String(p.bio || "");
+    if (el.profileShowcaseName) el.profileShowcaseName.textContent = String(p.nickname || fallbackNickname(user));
+    if (el.profileShowcaseUserId) {
+      el.profileShowcaseUserId.textContent = String(p.user_id || fallbackUserId(user));
+      el.profileShowcaseUserId.setAttribute("data-copy", String(p.user_id || fallbackUserId(user)));
+      el.profileShowcaseUserId.setAttribute("aria-label", "Скопировать user-id");
+    }
+    if (el.profileShowcaseBio) el.profileShowcaseBio.textContent = String(p.bio || "").trim() || "—";
     if (el.constructorEmail) el.constructorEmail.textContent = String((user && user.email) || "-");
     if (el.constructorMaskedPassword) el.constructorMaskedPassword.textContent = "********";
 
     if (el.profileTabName) el.profileTabName.textContent = String(p.nickname || fallbackNickname(user));
     renderProfileAvatars(state.avatarDraft || p.avatar_url || "", p.nickname || fallbackNickname(user));
+  }
+
+  async function onCopyUserId() {
+    const text = String((el.profileShowcaseUserId && el.profileShowcaseUserId.getAttribute("data-copy")) || (el.profileShowcaseUserId && el.profileShowcaseUserId.textContent) || "").trim();
+    if (!text) return;
+    try {
+      await navigator.clipboard.writeText(text);
+      showNotice("user-id скопирован");
+    } catch (error) {
+      showNotice(`Не удалось скопировать: ${briefError(error)}`);
+    }
   }
 
   function stopFriendsPolling() {
@@ -1093,6 +1114,7 @@
     if (el.registerForm) el.registerForm.addEventListener("submit", onRegisterSubmit);
     if (el.loginForm) el.loginForm.addEventListener("submit", onLoginSubmit);
     if (el.profileForm) el.profileForm.addEventListener("submit", onProfileSubmit);
+    if (el.profileShowcaseUserId) el.profileShowcaseUserId.addEventListener("click", onCopyUserId);
     if (el.emailChangeForm) el.emailChangeForm.addEventListener("submit", onEmailChangeSubmit);
     if (el.passwordChangeForm) el.passwordChangeForm.addEventListener("submit", onPasswordChangeSubmit);
     if (el.addFriendForm) el.addFriendForm.addEventListener("submit", onAddFriendSubmit);
