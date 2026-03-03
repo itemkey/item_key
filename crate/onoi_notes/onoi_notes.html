@@ -1994,7 +1994,11 @@ body.focus-mode .n-col-right{
         backBtn.addEventListener('click', function(event){
           event.preventDefault();
           if(tryInternalBack()) return;
-          safeBrowserBack('../../index.html');
+          if(window.IKLoading && typeof window.IKLoading.leave === 'function'){
+            window.IKLoading.leave(function(){ safeBrowserBack('../../index.html'); });
+          } else {
+            safeBrowserBack('../../index.html');
+          }
         });
       }
     });

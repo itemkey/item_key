@@ -195,7 +195,7 @@
 
 </head>
 
-<body class="page page-learning" data-i18n-page="student_helper" data-ik-loading>
+<body class="page page-learning ik-booting" data-i18n-page="student_helper" data-ik-loading>
   <div class="veil" aria-hidden="true"></div>
 
   <header class="ik-site-nav" id="ikSiteNav">
@@ -212,9 +212,9 @@
   </div>
 
   <main class="learn-stage" aria-label="Student Helper">
-    <div class="learn-wrap">
+    <div class="learn-wrap" data-ik-stage="content">
 
-      <section id="shLobby" class="ik-card sh-lobby" aria-label="Главное меню">
+      <section id="shLobby" class="ik-card sh-lobby" data-ik-stage="hero" aria-label="Главное меню">
         <div class="ik-inner">
           <p class="ik-title">student helper</p>
           <p class="ik-sub">выбери раздел, чтобы начать</p>
@@ -256,7 +256,7 @@
         </div>
       </section>
 
-      <section id="shApp" class="ik-card" aria-label="Меню обучения" hidden>
+      <section id="shApp" class="ik-card" data-ik-stage="content" aria-label="Меню обучения" hidden>
         <div class="ik-inner">
           <p class="ik-title">обучение</p>
 
@@ -1069,7 +1069,11 @@
       if(backBtn){
         backBtn.addEventListener('click', function(event){
           event.preventDefault();
-          safeBrowserBack('../../index.html');
+          if(window.IKLoading && typeof window.IKLoading.leave === 'function'){
+            window.IKLoading.leave(function(){ safeBrowserBack('../../index.html'); });
+          } else {
+            safeBrowserBack('../../index.html');
+          }
         });
       }
     });

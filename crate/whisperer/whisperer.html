@@ -585,7 +585,7 @@
 
 </head>
 
-<body class="page page-crate" data-i18n-page="whisperer" data-ik-loading>
+<body class="page page-crate ik-booting" data-i18n-page="whisperer" data-ik-loading>
   <div class="outer-frame" aria-hidden="true"></div>
   <div class="rays" aria-hidden="true"></div>
   <div class="veil" aria-hidden="true"></div>
@@ -601,18 +601,18 @@
   <main class="center-stage" aria-label="whisperer center">
     <section class="whisperer-wrap" aria-label="whisperer app">
 
-      <div class="w-title">
+      <div class="w-title" data-ik-stage="hero">
         <h1>whisperer</h1>
         <div class="sub">прошепчи моё имя, пожалуйста</div>
       </div>
 
-      <div class="w-warning" id="supportBox" hidden>
+      <div class="w-warning" id="supportBox" data-ik-stage="top" hidden>
         Ваш браузер не поддерживает Web Speech API (SpeechSynthesis). Попробуйте Chrome / Edge или обновите браузер.
       </div>
 
-      <div class="w-warning" id="noticeBox" hidden aria-live="polite"></div>
+      <div class="w-warning" id="noticeBox" data-ik-stage="top" hidden aria-live="polite"></div>
 
-      <div class="w-grid">
+      <div class="w-grid" data-ik-stage="content">
         <div class="w-card" aria-label="Ввод текста">
           <div class="w-label">text</div>
           <textarea class="w-text" id="textInput" placeholder="Вставь сюда текст..."></textarea>
@@ -916,7 +916,11 @@
         backBtn.addEventListener('click', function(event){
           event.preventDefault();
           if(tryInternalBack()) return;
-          safeBrowserBack('../../index.html');
+          if(window.IKLoading && typeof window.IKLoading.leave === 'function'){
+            window.IKLoading.leave(function(){ safeBrowserBack('../../index.html'); });
+          } else {
+            safeBrowserBack('../../index.html');
+          }
         });
       }
     });

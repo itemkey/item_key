@@ -913,16 +913,48 @@ body.page-home{ overflow: hidden; }
 .ik-page-shell{
   opacity: 1;
   transform: translateY(0);
-  transition: opacity .28s ease, transform .28s ease;
+  transition: opacity .42s cubic-bezier(.22,.61,.36,1), transform .42s cubic-bezier(.22,.61,.36,1);
 }
 
-body[data-ik-loading] .ik-page-shell.is-pending{
+[data-ik-stage]{
   opacity: 1;
   transform: translateY(0);
 }
 
+body.ik-booting [data-ik-stage]{
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+body.ik-boot-reveal [data-ik-stage]{
+  transition: opacity .52s cubic-bezier(.22,.61,.36,1), transform .52s cubic-bezier(.22,.61,.36,1);
+}
+
+body.ik-boot-reveal [data-ik-stage="hero"]{ transition-delay: 20ms; }
+body.ik-boot-reveal [data-ik-stage="top"]{ transition-delay: 90ms; }
+body.ik-boot-reveal [data-ik-stage="content"]{ transition-delay: 180ms; }
+
+body.ik-boot-skip [data-ik-stage]{
+  transition: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+body[data-ik-loading] .ik-page-shell.is-pending{
+  opacity: .16;
+  transform: translateY(8px);
+}
+
 body[data-ik-loading].ik-loading .ik-page-shell{
-  opacity: .94;
+  opacity: .24;
+}
+
+body.ik-page-leaving .ik-site-nav,
+body.ik-page-leaving main,
+body.ik-page-leaving .bottombar{
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity .18s ease, transform .18s ease;
 }
 
 body[data-ik-loading] .ik-page-shell.is-ready{
@@ -978,6 +1010,13 @@ body.ik-loading .ik-loading-overlay{ opacity: 1; }
   .ik-page-shell{
     transition: none;
     transform: none;
+  }
+
+  [data-ik-stage],
+  body.ik-boot-reveal [data-ik-stage]{
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
   }
 
   .ik-loading-line{ animation: none; }

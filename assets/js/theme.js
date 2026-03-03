@@ -51,6 +51,8 @@
   let loadingShowTimer = null;
   let loadingVisible = false;
   let pageShellReady = false;
+  let pageLeaving = false;
+  let bootRevealTimer = null;
 
   function ensurePageShell() {
     if (!document.body || !document.body.hasAttribute(LOADING_ATTR)) return;
@@ -64,6 +66,15 @@
     pageShellReady = true;
     if (!document.body) return;
     document.body.classList.add("ik-page-loaded");
+    if (!document.body.classList.contains("ik-boot-skip")) {
+      document.body.classList.add("ik-boot-reveal");
+      document.body.classList.remove("ik-booting");
+      if (bootRevealTimer) window.clearTimeout(bootRevealTimer);
+      bootRevealTimer = window.setTimeout(() => {
+        document.body.classList.remove("ik-boot-reveal");
+        bootRevealTimer = null;
+      }, 1100);
+    }
     const shell = document.querySelector("main.ik-page-shell") || document.querySelector("main");
     if (!shell) return;
     shell.classList.add("is-ready");
@@ -117,6 +128,84 @@
       loadingVisible = false;
       markPageShellReady();
     }, wait);
+  }
+
+  function beginPageLeave() {
+    if (!document.body || pageLeaving) return false;
+    pageLeaving = true;
+    document.body.classList.add("ik-page-leaving");
+    return true;
+  }
+
+  function leaveWith(action, delayMs) {
+    const delay = Math.max(0, Number(delayMs) || 170);
+    const run = () => {
+      try { action(); } catch (_) {}
+    };
+    if (!beginPageLeave()) {
+      run();
+      return;
+    }
+    window.setTimeout(run, delay);
+  }
+
+  function gotoWithLeave(url, delayMs) {
+    if (!url) return;
+    leaveWith(() => { window.location.href = url; }, delayMs);
+  }
+
+  function shouldInterceptLink(anchor, event) {
+    if (!anchor) return false;
+    if (anchor.hasAttribute("download") || anchor.hasAttribute("data-no-transition")) return false;
+    if (anchor.target && anchor.target !== "_self") return false;
+    if (event && (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)) return false;
+    if (event && typeof event.button === "number" && event.button !== 0) return false;
+    const rawHref = String(anchor.getAttribute("href") || "").trim();
+    if (!rawHref || rawHref.startsWith("#") || /^javascript:/i.test(rawHref) || /^mailto:/i.test(rawHref) || /^tel:/i.test(rawHref)) return false;
+
+    let targetUrl;
+    try {
+      targetUrl = new URL(anchor.href, window.location.href);
+    } catch {
+      return false;
+    }
+
+    if (targetUrl.origin !== window.location.origin) return false;
+    const sameDoc =
+      targetUrl.pathname === window.location.pathname &&
+      targetUrl.search === window.location.search &&
+      targetUrl.hash !== window.location.hash;
+    if (sameDoc) return false;
+    return true;
+  }
+
+  function installPageLeaveHandlers() {
+    if (!document.body) return;
+    window.addEventListener("pagehide", () => {
+      if (bootRevealTimer) {
+        window.clearTimeout(bootRevealTimer);
+        bootRevealTimer = null;
+      }
+    });
+
+    window.addEventListener("pageshow", (ev) => {
+      pageLeaving = false;
+      document.body.classList.remove("ik-page-leaving");
+      if (ev && ev.persisted) {
+        document.body.classList.remove("ik-booting", "ik-boot-reveal");
+        document.body.classList.add("ik-boot-skip");
+        requestAnimationFrame(() => {
+          document.body.classList.remove("ik-boot-skip");
+        });
+      }
+    });
+
+    document.addEventListener("click", (event) => {
+      const anchor = event.target && event.target.closest ? event.target.closest("a[href]") : null;
+      if (!shouldInterceptLink(anchor, event)) return;
+      event.preventDefault();
+      gotoWithLeave(anchor.href, 170);
+    }, true);
   }
 
   function getStoredTheme() {
@@ -662,7 +751,9 @@
 
   window.IKLoading = {
     show: showLoading,
-    done: doneLoading
+    done: doneLoading,
+    leave: leaveWith,
+    go: gotoWithLeave
   };
 
   if (document.body && document.body.hasAttribute(LOADING_ATTR)) {
@@ -693,5 +784,6 @@
     document.addEventListener("ik:authchange", refreshAdminAccess);
 
     initSystemListener();
+    installPageLeaveHandlers();
   });
 })();

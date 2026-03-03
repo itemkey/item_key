@@ -145,7 +145,7 @@
 
 </head>
 
-<body class="page page-planning" data-i18n-page="planning" data-ik-loading>
+<body class="page page-planning ik-booting" data-i18n-page="planning" data-ik-loading>
   <!-- декоративные слои -->
   <div class="outer-frame" aria-hidden="true"></div>
   <div class="rays" aria-hidden="true"></div>
@@ -160,9 +160,9 @@
   
 
   <main class="center-stage" aria-label="центр планирования">
-    <section class="planning-shell is-loading">
+    <section class="planning-shell">
 
-      <header class="planning-head">
+      <header class="planning-head" data-ik-stage="hero">
         <div class="planning-title">
           <div class="kicker">модуль</div>
           <h1>планирование</h1>
@@ -175,7 +175,7 @@
         </div>
       </header>
 
-      <div class="planning-toolbar">
+      <div class="planning-toolbar" data-ik-stage="top">
         <select id="projectSelect" class="ctl" aria-label="Проект"></select>
         <input id="searchInput" class="ctl" type="search" placeholder="поиск задач…" aria-label="Поиск" />
 
@@ -209,9 +209,9 @@
         </select>
       </div>
 
-      <div id="projectBar" class="projectbar" aria-label="Проекты"></div>
+      <div id="projectBar" class="projectbar" aria-label="Проекты" data-ik-stage="top"></div>
 
-      <section class="planning-content">
+      <section class="planning-content" data-ik-stage="content">
         <div id="boardView" class="board" hidden></div>
         <div id="scheduleView" class="schedule" hidden></div>
       </section>
@@ -349,7 +349,11 @@
         backBtn.addEventListener('click', function(event){
           event.preventDefault();
           if(closeOpenModal()) return;
-          safeBrowserBack('../../index.html');
+          if(window.IKLoading && typeof window.IKLoading.leave === 'function'){
+            window.IKLoading.leave(function(){ safeBrowserBack('../../index.html'); });
+          } else {
+            safeBrowserBack('../../index.html');
+          }
         });
       }
     });

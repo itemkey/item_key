@@ -326,7 +326,7 @@
   <link rel="stylesheet" href="assets/css/theme.css" />
 </head>
 
-<body class="page page-crate" data-ik-loading>
+<body class="page page-crate ik-booting" data-ik-loading>
   <!-- фон/рамки — как в item-key -->
   <div class="outer-frame" aria-hidden="true"></div>
   <div class="rays" aria-hidden="true"></div>
@@ -377,12 +377,12 @@
   <!-- центр -->
   <main class="center-stage" aria-label="item-crate center">
     <section class="crate-hub" aria-label="item-crate menu" id="crateHubSection">
-      <div class="crate-title">
+      <div class="crate-title" data-ik-stage="hero">
         <h1 id="cratePageTitle">item-crate</h1>
         <div class="sub" id="cratePageSubtitle">архив знаний</div>
       </div>
 
-      <div class="crate-grid" role="navigation" aria-label="Разделы item-crate" id="crateGridNav">
+      <div class="crate-grid" data-ik-stage="content" role="navigation" aria-label="Разделы item-crate" id="crateGridNav">
         <a class="crate-card" href="crate/onoi_notes/onoi_notes.html">
           <div class="crate-card__kicker" data-i18n="module">module</div>
           <h2 class="crate-card__name" id="cardNotesTitle">заметки</h2>

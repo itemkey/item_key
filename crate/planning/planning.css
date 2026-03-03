@@ -46,42 +46,6 @@
   gap: 14px;
 }
 
-.planning-shell.is-loading .planning-head,
-.planning-shell.is-loading .planning-toolbar,
-.planning-shell.is-loading #projectBar,
-.planning-shell.is-loading .planning-content{
-  position: relative;
-  overflow: hidden;
-}
-
-.planning-shell.is-loading .planning-head,
-.planning-shell.is-loading .planning-toolbar,
-.planning-shell.is-loading #projectBar{
-  min-height: 44px;
-}
-
-.planning-shell.is-loading .planning-content{
-  min-height: 55vh;
-  border: 1px solid rgba(0,0,0,.14);
-  background: rgba(255,255,255,.82);
-}
-
-.planning-shell.is-loading .planning-content::before,
-.planning-shell.is-loading .planning-head::before,
-.planning-shell.is-loading .planning-toolbar::before,
-.planning-shell.is-loading #projectBar::before{
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, rgba(0,0,0,.05) 0%, rgba(0,0,0,.12) 50%, rgba(0,0,0,.05) 100%);
-  background-size: 240% 100%;
-  animation: ik-shimmer 1.2s ease infinite;
-}
-
-.planning-shell.is-loading .planning-content > *{
-  visibility: hidden;
-}
-
 .planning-head{
   display: flex;
   align-items: center;
