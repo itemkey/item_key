@@ -18,6 +18,14 @@
     'student_helper_db__dictionary_Destination_B1_Unit_6.json'
   ];
 
+  const BLOCKED_PERSONAL_SECTION_KEYS = new Set([
+    normalize('Destination B1 Unit 3'),
+    normalize('Destination B1 Unit 6'),
+    normalize('Destination B1 Unit 12'),
+    normalize('destination B1 unit 9 vocabulary'),
+    normalize('189page')
+  ]);
+
   const state = {
     client: null,
     userId: null,
@@ -319,8 +327,22 @@
     return { sections, words };
   }
 
+  function stripBlockedPersonal(snapshot){
+    const src = snapshot || { sections: [], words: [] };
+    const sections = (src.sections || []).filter((s) => {
+      const k = normalize(s.nameKey || s.name || '');
+      return k && !BLOCKED_PERSONAL_SECTION_KEYS.has(k);
+    });
+    const allowed = new Set(sections.map((s) => normalize(s.nameKey || s.name || '')).filter(Boolean));
+    const words = (src.words || []).filter((w) => {
+      const k = normalize(w.sectionNameKey || '');
+      return k && allowed.has(k);
+    });
+    return { sections, words };
+  }
+
   function localToScopedSnapshot(local, stock){
-    const named = localToNamedSnapshot(local);
+    const named = stripBlockedPersonal(localToNamedSnapshot(local));
     const stockKeys = makeStockKeySet(stock);
 
     const sections = named.sections.filter((s) => !stockKeys.sectionKeys.has(normalize(s.nameKey || s.name || '')));
@@ -397,11 +419,12 @@
 
   async function fetchRemoteSnapshot(){
     const raw = await fetchRemoteRaw();
-    return remoteRawToSnapshot(raw.sectionsRaw, raw.wordsRaw);
+    return stripBlockedPersonal(remoteRawToSnapshot(raw.sectionsRaw, raw.wordsRaw));
   }
 
   async function insertRemoteFromSnapshot(snapshot){
-    const sectionsPayload = (snapshot.sections || []).map((s) => ({
+    const safeSnapshot = stripBlockedPersonal(snapshot);
+    const sectionsPayload = (safeSnapshot.sections || []).map((s) => ({
       owner_id: state.userId,
       name: normSpaces(s.name || ''),
       name_key: normalize(s.nameKey || s.name || ''),
@@ -417,7 +440,7 @@
     const sectionIdByKey = new Map();
     mappedSections.forEach((s) => sectionIdByKey.set(normalize(s.name_key), Number(s.id)));
 
-    const wordsPayload = (snapshot.words || []).map((w) => {
+    const wordsPayload = (safeSnapshot.words || []).map((w) => {
       const sectionNameKey = normalize(w.sectionNameKey || '');
       const sectionId = sectionIdByKey.get(sectionNameKey);
       const en = normSpaces(w.en || '');
@@ -569,7 +592,7 @@
     const target = mergeSnapshots(stock, remote);
     await replaceLocal(target);
     setOwnerMarker(state.userId);
-    setBadge('account', 'Показаны стоковые + данные текущего аккаунта');
+    setBadge('account', 'Показаны личные облачные данные');
     await applyToUi();
   }
 

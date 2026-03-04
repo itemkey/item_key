@@ -621,7 +621,6 @@ function dictFilenameForSection(sectionName){
   let publicCounts = { system: new Map(), user: new Map() };
   let publicWordsCache = { system: new Map(), user: new Map() }; // dictId -> words[]
   let publicLoadedDictId = null;
-  const STOCK_CLEAN_KEY = 'dict_personal_stock_cleaned_v1';
   const STOCK_SECTION_KEYS = new Set([
     normalize('Destination B1 Unit 3'),
     normalize('Destination B1 Unit 6'),
@@ -2814,20 +2813,16 @@ function handleMcqHotkeys(e){
   }
 
   async function ensureStockCleanupOnce(){
-    try{
-      if(localStorage.getItem(STOCK_CLEAN_KEY) === '1') return;
-    }catch(_){ }
-
-    let ok = false;
-    try{
-      await clearStockFromRemote();
-      await clearStockFromLocal();
-      ok = true;
-    }catch(_){
-      try{ await clearStockFromLocal(); ok = true; }catch(__){ }
-    }
-    if(ok){
-      try{ localStorage.setItem(STOCK_CLEAN_KEY, '1'); }catch(_){ }
+    // Always enforce cleanup for legacy local stock dictionaries.
+    // This guarantees personal source stays truly personal/cloud-only.
+    for(let pass = 0; pass < 2; pass += 1){
+      let removedRemote = 0;
+      let removedLocal = 0;
+      try{ removedRemote = await clearStockFromRemote(); }catch(_){ }
+      try{ removedLocal = await clearStockFromLocal(); }catch(_){ }
+      await dictRefreshAll();
+      const stillLocal = (dictSections || []).some((s)=> hasStockName(s.nameKey || s.name));
+      if(!stillLocal && removedRemote <= 0 && removedLocal <= 0) break;
     }
   }
 
@@ -2893,6 +2888,29 @@ function handleMcqHotkeys(e){
   async function dictEnsureSectionLoaded(sectionValue){
     if(!isPublicSource()) return true;
     const v = String(sectionValue || '').trim();
+    if(v === 'All'){
+      if(publicLoadedDictId === 'All' && Array.isArray(dictWordsAll) && dictWordsAll.length) return true;
+      const ids = (dictSections || []).map((s)=> Number(s.id || 0)).filter((n)=> n > 0);
+      if(!ids.length){
+        dictWordsAll = [];
+        publicLoadedDictId = 'All';
+        buildCounts();
+        updateGlobalBadges();
+        return true;
+      }
+      const chunks = [];
+      for(const id of ids){
+        try{
+          const words = await ensurePublicWords(dictSource, id);
+          if(Array.isArray(words) && words.length) chunks.push(...words);
+        }catch(_){ }
+      }
+      dictWordsAll = chunks;
+      publicLoadedDictId = 'All';
+      buildCounts();
+      updateGlobalBadges();
+      return true;
+    }
     const sid = Number(v || 0);
     if(!sid) return true;
     if(publicLoadedDictId === sid && Array.isArray(dictWordsAll) && dictWordsAll.length) return true;
@@ -3073,16 +3091,9 @@ function handleMcqHotkeys(e){
       dictShowFirstPick();
       applyDictSourceAccess();
     }catch(e){
-      // fallback to personal if public source isn't available (no auth / schema missing)
-      dictSource = 'personal';
-      publicLoadedDictId = null;
-      try{ localStorage.setItem('student_helper_dict_source_v1', dictSource); }catch(_){ }
-      await dictRefreshAll();
-      buildCounts();
-      updateGlobalBadges();
-      renderSectionsUI();
-      dictShowFirstPick();
-      applyDictSourceAccess();
+      console.error(e);
+      // keep current source and show previous data if available
+      alert(`Не удалось загрузить раздел: ${e && (e.message || e)}`);
       throw e;
     }
   }
@@ -3169,8 +3180,12 @@ function handleMcqHotkeys(e){
 
     const q = String(elFirstPickSearch && elFirstPickSearch.value || '').trim().toLowerCase();
 
+    const totalCount = isPublicSource()
+      ? Array.from((dictCounts && typeof dictCounts.values === 'function') ? dictCounts.values() : []).reduce((sum, n)=> sum + Number(n || 0), 0)
+      : dictWordsAll.length;
+
     const items = [];
-    items.push({ sid:'All', name:'All (все разделы)', count: dictWordsAll.length });
+    items.push({ sid:'All', name:'All (все разделы)', count: totalCount });
 
     dictSections
       .slice()
@@ -4491,10 +4506,12 @@ async function dictSyncFromFolder(opts){
 
   window.dictBoot = dictBoot;
   window.dictCloudRefresh = async function(){
+    if(dictSource !== 'personal') return;
     await dictRefreshAll();
+    buildCounts();
+    updateGlobalBadges();
+    renderSectionsUI();
     renderWordsUI();
-    dictResetCards();
-    dictResetQuiz();
   };
 
 
