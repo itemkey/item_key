@@ -572,6 +572,235 @@ html[data-theme="dark"] .w-reader.is-full {
   box-shadow: var(--ik-shadow);
 }
 
+.ik-notify-btn{
+  position: relative;
+}
+
+.ik-notify-dot{
+  position: absolute;
+  right: -4px;
+  top: -4px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 999px;
+  font-size: 10px;
+  line-height: 16px;
+  text-align: center;
+  background: #111;
+  color: #fff;
+  border: 1px solid rgba(0,0,0,.3);
+}
+
+.ik-notify-panel{
+  position: fixed;
+  right: 14px;
+  top: 62px;
+  width: min(460px, calc(100vw - 28px));
+  max-height: min(78vh, 740px);
+  overflow: hidden;
+  border: 1px solid rgba(0,0,0,.18);
+  background: #fff;
+  z-index: 9997;
+  display: grid;
+  grid-template-rows: auto auto auto 1fr;
+}
+
+.ik-notify-panel[hidden]{
+  display: none !important;
+}
+
+.ik-notify-panel__head,
+.ik-notify-actions{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(0,0,0,.08);
+}
+
+.ik-notify-panel__title{
+  margin: 0;
+  font-weight: 700;
+}
+
+.ik-notify-panel__close,
+.ik-notify-action{
+  border: 1px solid rgba(0,0,0,.18);
+  background: #fff;
+  color: inherit;
+  padding: 6px 10px;
+  cursor: pointer;
+  position: relative;
+  transition: transform .14s ease, border-color .14s ease, background .14s ease;
+}
+
+.ik-notify-action.is-press,
+.ik-notify-panel__close.is-press{
+  transform: translateY(1px) scale(.985);
+}
+
+.ik-notify-tabs{
+  display: flex;
+  gap: 6px;
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(0,0,0,.08);
+  overflow-x: auto;
+}
+
+.ik-notify-tab{
+  border: 1px solid rgba(0,0,0,.16);
+  background: #fff;
+  padding: 6px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.ik-notify-tab.is-active{
+  background: #111;
+  color: #fff;
+}
+
+.ik-notify-list{
+  overflow: auto;
+  padding: 8px;
+  display: grid;
+  gap: 8px;
+}
+
+.ik-notify-item{
+  border: 1px solid rgba(0,0,0,.14);
+  padding: 9px 10px;
+  background: #fff;
+}
+
+.ik-notify-item.is-unread{
+  border-color: rgba(20,20,20,.42);
+  box-shadow: inset 2px 0 0 #111;
+}
+
+.ik-notify-item__head{
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.ik-notify-item p{
+  margin: 6px 0 0;
+  font-size: 13px;
+}
+
+.ik-notify-item__pills{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 7px;
+}
+
+.ik-notify-pill{
+  border: 1px solid rgba(0,0,0,.15);
+  background: #f8f8f8;
+  padding: 2px 7px;
+  font-size: 11px;
+}
+
+.ik-notify-empty{
+  border: 1px dashed rgba(0,0,0,.18);
+  padding: 20px;
+  text-align: center;
+  opacity: .8;
+}
+
+.ik-reward-toast-host{
+  position: fixed;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9998;
+  display: grid;
+  gap: 10px;
+  width: min(540px, calc(100vw - 24px));
+  pointer-events: none;
+}
+
+.ik-reward-toast{
+  pointer-events: auto;
+  border: 1px solid rgba(0,0,0,.16);
+  background: #fff;
+  padding: 10px 12px 11px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.12);
+  transform: translateY(-8px);
+  opacity: 0;
+  transition: transform .2s ease, opacity .2s ease;
+  position: relative;
+}
+
+.ik-reward-toast.is-show{
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.ik-reward-toast__close{
+  position: absolute;
+  right: 6px;
+  top: 6px;
+  border: 1px solid rgba(0,0,0,.15);
+  width: 22px;
+  height: 22px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.ik-reward-toast__title{
+  font-weight: 700;
+  margin-right: 28px;
+}
+
+.ik-reward-toast__body{
+  margin-top: 4px;
+  font-size: 13px;
+  opacity: .9;
+}
+
+.ik-reward-toast__pills{
+  margin-top: 7px;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.ik-reward-pill{
+  border: 1px solid rgba(0,0,0,.15);
+  background: #f8f8f8;
+  padding: 3px 8px;
+  font-size: 12px;
+}
+
+html[data-theme="dark"] .ik-notify-panel,
+html[data-theme="dark"] .ik-notify-item,
+html[data-theme="dark"] .ik-reward-toast,
+html[data-theme="dark"] .ik-notify-panel__close,
+html[data-theme="dark"] .ik-notify-action,
+html[data-theme="dark"] .ik-notify-tab,
+html[data-theme="dark"] .ik-reward-toast__close{
+  background: var(--ik-surface);
+  color: var(--ik-text);
+  border-color: var(--ik-border-strong);
+}
+
+html[data-theme="dark"] .ik-notify-tab.is-active{
+  background: #edf2ff;
+  color: #111;
+}
+
+html[data-theme="dark"] .ik-notify-pill,
+html[data-theme="dark"] .ik-reward-pill{
+  background: rgba(255,255,255,.06);
+  border-color: var(--ik-border);
+}
+
 html[data-theme="dark"] .w-reader.is-full .w-reader-head {
   background: var(--ik-surface);
   border-bottom-color: var(--ik-border);

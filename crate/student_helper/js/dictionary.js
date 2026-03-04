@@ -616,10 +616,19 @@ function dictFilenameForSection(sectionName){
   // - system: site dictionaries (rated)
   // - user: published user dictionaries (rated)
   let dictSource = 'personal';
+  let dictPersonalGuest = false;
   let publicCatalog = { system: [], user: [] };
   let publicCounts = { system: new Map(), user: new Map() };
   let publicWordsCache = { system: new Map(), user: new Map() }; // dictId -> words[]
   let publicLoadedDictId = null;
+  const STOCK_CLEAN_KEY = 'dict_personal_stock_cleaned_v1';
+  const STOCK_SECTION_KEYS = new Set([
+    normalize('Destination B1 Unit 3'),
+    normalize('Destination B1 Unit 6'),
+    normalize('Destination B1 Unit 12'),
+    normalize('destination B1 unit 9 vocabulary'),
+    normalize('189page')
+  ]);
 
   // Cards state
   let cardsDeck = [];
@@ -1968,10 +1977,24 @@ let elLearnMcqButtons = null;
       });
       if(error) throw error;
       if(data && data.awarded){
-        const eco = data.eco != null ? String(data.eco) : '';
+        const eco = data.eco != null ? String(data.eco) : '0';
         const ib = Number(data.ibit || 0);
-        const extra = ib ? ` +${ib} i-bit þ` : '';
-        quizSetFeedback('correct', 'reward', `награда: +${eco} eco${extra}`);
+        const extra = ib ? ` +${ib} I-bit þ` : '';
+        const pct = denom ? Math.round((Number(quizCorrect || 0) / denom) * 100) : 0;
+        quizSetFeedback('correct', 'reward', `награда: +${eco} EKO${extra}`);
+        try{
+          const pills = [];
+          if(Number(eco) > 0) pills.push(`+${eco} EKO`);
+          if(ib > 0) pills.push(`+${ib} I-bit þ`);
+          document.dispatchEvent(new CustomEvent('ik:reward', {
+            detail: {
+              title: 'Награда',
+              body: `словарь: сессия 20 заданий (${pct}%)`,
+              pills,
+              showToast: true,
+            }
+          }));
+        }catch(_){ }
       }else if(data && data.reason){
         quizSetFeedback('idle', 'no reward', String(data.reason));
       }
@@ -2734,6 +2757,80 @@ function handleMcqHotkeys(e){
     }
   }
 
+  function stockNameKey(v){
+    return normalize(String(v || '').trim());
+  }
+
+  function hasStockName(name){
+    return STOCK_SECTION_KEYS.has(stockNameKey(name));
+  }
+
+  async function clearStockFromLocal(){
+    if(!dictDb) return 0;
+    if(!Array.isArray(dictSections) || !dictSections.length) await dictRefreshAll();
+    const target = dictSections.filter((s)=> hasStockName(s.nameKey || s.name));
+    if(!target.length) return 0;
+    for(const sec of target){
+      await dictDeleteSection(dictDb, Number(sec.id));
+    }
+    await dictRefreshAll();
+    return target.length;
+  }
+
+  async function clearStockFromRemote(){
+    const client = getSupaClient();
+    if(!client) return 0;
+    const u = await client.auth.getUser();
+    const uid = u && u.data && u.data.user ? u.data.user.id : null;
+    if(!uid) return 0;
+
+    const { data: remoteSecs, error: secErr } = await client
+      .from('sh_dictionary_sections')
+      .select('id,name,name_key')
+      .eq('owner_id', uid);
+    if(secErr) throw secErr;
+
+    const ids = (remoteSecs || [])
+      .filter((s)=> hasStockName(s.name_key || s.name))
+      .map((s)=> Number(s.id || 0))
+      .filter((n)=> n > 0);
+    if(!ids.length) return 0;
+
+    const { error: wErr } = await client
+      .from('sh_dictionary_words')
+      .delete()
+      .eq('owner_id', uid)
+      .in('section_id', ids);
+    if(wErr) throw wErr;
+
+    const { error: sErr } = await client
+      .from('sh_dictionary_sections')
+      .delete()
+      .eq('owner_id', uid)
+      .in('id', ids);
+    if(sErr) throw sErr;
+
+    return ids.length;
+  }
+
+  async function ensureStockCleanupOnce(){
+    try{
+      if(localStorage.getItem(STOCK_CLEAN_KEY) === '1') return;
+    }catch(_){ }
+
+    let ok = false;
+    try{
+      await clearStockFromRemote();
+      await clearStockFromLocal();
+      ok = true;
+    }catch(_){
+      try{ await clearStockFromLocal(); ok = true; }catch(__){ }
+    }
+    if(ok){
+      try{ localStorage.setItem(STOCK_CLEAN_KEY, '1'); }catch(_){ }
+    }
+  }
+
   async function ensurePublicCatalog(kind){
     const k = (kind === 'system') ? 'system' : 'user';
     if(Array.isArray(publicCatalog[k]) && publicCatalog[k].length) return publicCatalog[k];
@@ -2903,7 +3000,7 @@ function handleMcqHotkeys(e){
   }
 
   function applyDictSourceAccess(){
-    const editable = dictSource === 'personal';
+    const editable = dictSource === 'personal' && !dictPersonalGuest;
     if(dictTabBuilder) dictTabBuilder.style.display = editable ? '' : 'none';
     if(btnFirstPickOpenConstructor) btnFirstPickOpenConstructor.style.display = editable ? '' : 'none';
 
@@ -2936,6 +3033,27 @@ function handleMcqHotkeys(e){
     try{ localStorage.setItem('student_helper_dict_source_v1', dictSource); }catch(_){ }
 
     if(dictSource === 'personal'){
+      dictPersonalGuest = false;
+      const client = getSupaClient();
+      if(client && client.auth && typeof client.auth.getUser === 'function'){
+        try{
+          const out = await client.auth.getUser();
+          const user = out && out.data && out.data.user ? out.data.user : null;
+          if(!user){
+            dictSections = [];
+            dictWordsAll = [];
+            dictCounts = new Map();
+            dictPersonalGuest = true;
+            updateGlobalBadges();
+            renderSectionsUI();
+            dictShowFirstPick();
+            applyDictSourceAccess();
+            return;
+          }
+        }catch(_){ }
+      }
+
+      await ensureStockCleanupOnce();
       await dictRefreshAll();
       buildCounts();
       updateGlobalBadges();
@@ -3040,6 +3158,14 @@ function handleMcqHotkeys(e){
 
   function renderFirstPickUI(){
     if(!elFirstPickList) return;
+
+    if(dictSource === 'personal' && dictPersonalGuest){
+      elFirstPickList.innerHTML = '';
+      const li = document.createElement('li');
+      li.innerHTML = `<p class="ik-itemline"><b>войдите, чтобы видеть личные словари</b></p>`;
+      elFirstPickList.appendChild(li);
+      return;
+    }
 
     const q = String(elFirstPickSearch && elFirstPickSearch.value || '').trim().toLowerCase();
 

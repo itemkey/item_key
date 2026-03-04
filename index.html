@@ -69,9 +69,16 @@ html::after {
   .intro-stage{
     position: fixed;
     inset: 0;
-    z-index: 5;
+    z-index: 1;
     background: var(--bg);
     pointer-events: none; /* do not block clicks */
+  }
+
+  .ik-site-nav,
+  .nav-cluster,
+  .bottombar{
+    position: relative;
+    z-index: 8;
   }
   #introCanvas{
     width: 100vw;
@@ -348,9 +355,17 @@ html::after {
 <script>
 (function(){
   const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const disableIntro = false;
 
   const canvas = document.getElementById('introCanvas');
   if(!canvas) return;
+  const introStage = canvas.closest('.intro-stage');
+
+  // safety mode: disable heavy intro on local dev or reduced motion
+  if(disableIntro || prefersReduced){
+    if(introStage) introStage.style.display = 'none';
+    return;
+  }
 
   const ctx = canvas.getContext('2d', { alpha: true, willReadFrequently: true });
 

@@ -242,59 +242,10 @@
 
   async function loadStockSnapshot(){
     if(state.stock) return state.stock;
-
-    let files = [];
-    for(const mp of MANIFEST_PATHS){
-      try{
-        const man = await fetchJson(mp);
-        if(Array.isArray(man)) files = man;
-        else if(man && Array.isArray(man.dictionary)) files = man.dictionary;
-        else if(man && man.dictionary && Array.isArray(man.dictionary.files)) files = man.dictionary.files;
-        else if(man && man.dictionary && Array.isArray(man.dictionary.dbs)) files = man.dictionary.dbs;
-        else if(man && Array.isArray(man.files)) files = man.files;
-        else if(man && Array.isArray(man.dbs)) files = man.dbs;
-        if(files.length) break;
-      }catch(_){ }
-    }
-
-    if(!files.length) files = DEFAULT_FILES;
-    files = files.map((f) => String(f || '').trim()).filter(Boolean);
-
-    const sections = [];
-    for(const f of files){
-      const rel = f.includes('/') ? f : `${DICT_DIR}${f}`;
-      try{
-        const json = await fetchJson(rel);
-        const fallback = String(f).replace(/^student_helper_db__dictionary_/, '').replace(/\.json$/i, '').replaceAll('_', ' ');
-        const parsed = parseSectionsJson(json, fallback);
-        sections.push(...parsed);
-      }catch(_){ }
-    }
-
-    const bySection = new Map();
-    for(const sec of sections){
-      const name = normSpaces(sec.name || '');
-      const nameKey = normalize(name);
-      if(!name || !nameKey) continue;
-      if(!bySection.has(nameKey)) bySection.set(nameKey, { name, nameKey, words: new Map() });
-      const bucket = bySection.get(nameKey);
-      for(const w of (sec.words || [])){
-        const en = normSpaces(w && w.en || '');
-        const ru = String(w && w.ru || '').trim();
-        if(!en || !ru) continue;
-        const enKey = normEn(en);
-        const ruKey = normRu(ru);
-        bucket.words.set(`${enKey}|${ruKey}`, { en, ru, sectionNameKey: nameKey });
-      }
-    }
-
-    const result = {
-      sections: Array.from(bySection.values()).map((s) => ({ name: s.name, nameKey: s.nameKey })),
-      words: Array.from(bySection.values()).flatMap((s) => Array.from(s.words.values()))
-    };
-
-    state.stock = result;
-    return result;
+    // Local stock dictionaries are intentionally disabled.
+    // Personal dictionary must be user-owned cloud data only.
+    state.stock = { sections: [], words: [] };
+    return state.stock;
   }
 
   function mergeSnapshots(stock, remote){
@@ -609,7 +560,7 @@
     const target = mergeSnapshots(stock, { sections: [], words: [] });
     await replaceLocal(target);
     setOwnerMarker('guest');
-    setBadge('guest', 'Показаны только стоковые категории');
+    setBadge('guest', 'Личные словари доступны после входа');
     await applyToUi();
   }
 
@@ -695,7 +646,7 @@
       if(marker !== 'guest' || reason === 'force-guest' || guestNeedsReset){
         await switchToGuest(stock);
       }else{
-        setBadge('guest', 'Показаны только стоковые категории');
+        setBadge('guest', 'Личные словари доступны после входа');
       }
       return;
     }

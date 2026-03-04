@@ -56,6 +56,21 @@
     dailyClaimed: false,
   };
 
+  const notifyState = {
+    ready: false,
+    panelOpen: false,
+    tab: "all",
+    items: [],
+    unread: 0,
+    loading: false,
+    pendingReload: false,
+    userId: "",
+  };
+
+  const NOTIFY_SEEN_KEY = "ik_notify_seen_v1";
+  const NOTIFY_CACHE_KEY = "ik_notify_cache_v1";
+  const NOTIFY_MAX_ALL = 100;
+
   let loadingStartAt = 0;
   let loadingFallbackTimer = null;
   let loadingShowTimer = null;
@@ -489,6 +504,21 @@
     return false;
   }
 
+  function forceReleaseLoading() {
+    if (!document.body) return;
+    if (loadingShowTimer) {
+      window.clearTimeout(loadingShowTimer);
+      loadingShowTimer = null;
+    }
+    if (loadingFallbackTimer) {
+      window.clearTimeout(loadingFallbackTimer);
+      loadingFallbackTimer = null;
+    }
+    document.body.classList.remove("ik-loading");
+    loadingVisible = false;
+    markPageShellReady();
+  }
+
   let supaEnsurePromise = null;
   function loadScriptOnce(src, id) {
     return new Promise((resolve, reject) => {
@@ -517,6 +547,84 @@
       return true;
     })();
     return supaEnsurePromise;
+  }
+
+  function notifySeenMapLoad() {
+    try {
+      const raw = localStorage.getItem(NOTIFY_SEEN_KEY);
+      const data = raw ? JSON.parse(raw) : {};
+      return data && typeof data === "object" ? data : {};
+    } catch (_) {
+      return {};
+    }
+  }
+
+  function notifySeenMapSave(map) {
+    try { localStorage.setItem(NOTIFY_SEEN_KEY, JSON.stringify(map || {})); } catch (_) {}
+  }
+
+  function notifyCacheLoad() {
+    try {
+      const raw = localStorage.getItem(NOTIFY_CACHE_KEY);
+      const data = raw ? JSON.parse(raw) : {};
+      return data && typeof data === "object" ? data : {};
+    } catch (_) {
+      return {};
+    }
+  }
+
+  function notifyCacheSave(map) {
+    try { localStorage.setItem(NOTIFY_CACHE_KEY, JSON.stringify(map || {})); } catch (_) {}
+  }
+
+  function getNotifyCacheForUser(uid) {
+    const all = notifyCacheLoad();
+    const k = String(uid || "guest");
+    const arr = all[k];
+    return Array.isArray(arr) ? arr : [];
+  }
+
+  function setNotifyCacheForUser(uid, items) {
+    const all = notifyCacheLoad();
+    const k = String(uid || "guest");
+    all[k] = Array.isArray(items) ? items.slice(0, NOTIFY_MAX_ALL) : [];
+    notifyCacheSave(all);
+  }
+
+  function notifyKeyForItem(item) {
+    return `${item.type || "x"}:${item.id || "0"}`;
+  }
+
+  function markNotificationsRead(items) {
+    const uid = String(notifyState.userId || "");
+    if (!uid || !Array.isArray(items) || !items.length) return;
+    const all = notifySeenMapLoad();
+    const mine = (all[uid] && typeof all[uid] === "object") ? all[uid] : {};
+    for (const it of items) mine[notifyKeyForItem(it)] = Date.now();
+    all[uid] = mine;
+    notifySeenMapSave(all);
+  }
+
+  function isNotificationSeen(item) {
+    const uid = String(notifyState.userId || "");
+    if (!uid) return true;
+    const all = notifySeenMapLoad();
+    const mine = (all[uid] && typeof all[uid] === "object") ? all[uid] : {};
+    return !!mine[notifyKeyForItem(item)];
+  }
+
+  function formatRelTime(ts) {
+    if (!ts) return "";
+    const t = Date.parse(ts);
+    if (!Number.isFinite(t)) return "";
+    const d = Math.max(1, Math.floor((Date.now() - t) / 1000));
+    if (d < 60) return `${d}с назад`;
+    const m = Math.floor(d / 60);
+    if (m < 60) return `${m}м назад`;
+    const h = Math.floor(m / 60);
+    if (h < 24) return `${h}ч назад`;
+    const dd = Math.floor(h / 24);
+    return `${dd}д назад`;
   }
 
   function getSupaClient() {
@@ -559,7 +667,25 @@
       if (!rewardState.dailyClaimed) {
         rewardState.dailyClaimed = true;
         try {
-          await client.rpc("ik_claim_daily_visit");
+          const out = await client.rpc("ik_claim_daily_visit");
+          const data = out ? out.data : null;
+          if (data && data.awarded) {
+            const ecoX10 = Number(data.eco_x10 || 0);
+            const eco = ecoX10 / 10;
+            const ib = Number(data.ibit || 0);
+            const pills = [];
+            if (eco > 0) pills.push(`+${Number.isInteger(eco) ? eco.toFixed(0) : eco.toFixed(1)} EKO`);
+            if (ib > 0) pills.push(`+${ib} I-bit þ`);
+            const streak = Number(data.streak || 1);
+            document.dispatchEvent(new CustomEvent("ik:reward", {
+              detail: {
+                title: "Ежедневная награда",
+                body: `ежедневный вход: серия ${streak} дн.`,
+                pills,
+                showToast: true,
+              }
+            }));
+          }
         } catch (_) {}
       }
 
@@ -651,6 +777,65 @@
       .replace(/>/g, "&gt;")
       .replace(/\"/g, "&quot;")
       .replace(/'/g, "&#39;");
+  }
+
+  const toastQueue = [];
+  let toastBusy = false;
+
+  function ensureToastHost() {
+    let host = document.getElementById("ikRewardToastHost");
+    if (host) return host;
+    host = document.createElement("div");
+    host.id = "ikRewardToastHost";
+    host.className = "ik-reward-toast-host";
+    document.body.appendChild(host);
+    return host;
+  }
+
+  function queueToast(payload) {
+    toastQueue.push(payload || {});
+    if (!toastBusy) runToastQueue();
+  }
+
+  function runToastQueue() {
+    if (!toastQueue.length) {
+      toastBusy = false;
+      return;
+    }
+    toastBusy = true;
+    const p = toastQueue.shift() || {};
+    const host = ensureToastHost();
+    const card = document.createElement("div");
+    card.className = "ik-reward-toast";
+    const title = escapeHtml(p.title || "Награда");
+    const body = escapeHtml(p.body || "");
+    const pills = Array.isArray(p.pills) ? p.pills.filter(Boolean).map((x) => `<span class=\"ik-reward-pill\">${escapeHtml(String(x))}</span>`).join("") : "";
+    card.innerHTML = `<button type=\"button\" class=\"ik-reward-toast__close\" aria-label=\"close\">×</button><div class=\"ik-reward-toast__title\">${title}</div><div class=\"ik-reward-toast__body\">${body}</div><div class=\"ik-reward-toast__pills\">${pills}</div>`;
+    host.appendChild(card);
+    window.requestAnimationFrame(() => card.classList.add("is-show"));
+
+    let closed = false;
+    const close = () => {
+      if (closed) return;
+      closed = true;
+      card.classList.remove("is-show");
+      window.setTimeout(() => {
+        card.remove();
+        runToastQueue();
+      }, 220);
+    };
+
+    card.querySelector(".ik-reward-toast__close")?.addEventListener("click", close);
+    let timer = window.setTimeout(close, 5200);
+    card.addEventListener("mouseenter", () => {
+      if (timer) window.clearTimeout(timer);
+      timer = null;
+    });
+    card.addEventListener("mouseleave", () => {
+      if (closed) return;
+      if (timer) window.clearTimeout(timer);
+      timer = window.setTimeout(close, 2600);
+    });
   }
 
   function renderAdministrations(body) {
@@ -1028,6 +1213,409 @@
     panel.appendChild(btn);
   }
 
+  function getNotifyButton() {
+    return document.getElementById("ikGlobalNotifyBtn");
+  }
+
+  function getNotifyPanel() {
+    return document.getElementById("ikNotifyPanel");
+  }
+
+  function updateNotifyBadge() {
+    const btn = getNotifyButton();
+    if (!btn) return;
+    const dot = btn.querySelector(".ik-notify-dot");
+    const n = Number(notifyState.unread || 0);
+    if (!dot) return;
+    dot.textContent = n > 99 ? "99+" : String(n);
+    dot.hidden = !(n > 0);
+  }
+
+  function ensureNotifyPanel() {
+    let panel = getNotifyPanel();
+    if (panel) return panel;
+    panel = document.createElement("div");
+    panel.id = "ikNotifyPanel";
+    panel.className = "ik-notify-panel";
+    panel.hidden = true;
+    panel.innerHTML = `
+      <div class="ik-notify-panel__head">
+        <p class="ik-notify-panel__title">Уведомления</p>
+        <button type="button" class="ik-notify-panel__close" id="ikNotifyClose">Закрыть</button>
+      </div>
+      <div class="ik-notify-tabs" role="tablist">
+        <button type="button" class="ik-notify-tab is-active" data-notify-tab="all">Всё</button>
+        <button type="button" class="ik-notify-tab" data-notify-tab="friends">Друзья</button>
+        <button type="button" class="ik-notify-tab" data-notify-tab="rewards">Награды</button>
+        <button type="button" class="ik-notify-tab" data-notify-tab="alerts">Оповещения</button>
+      </div>
+      <div class="ik-notify-actions">
+        <button type="button" class="ik-notify-action" id="ikNotifyRefresh">Обновить</button>
+        <button type="button" class="ik-notify-action" id="ikNotifyReadAll">Прочитать всё</button>
+      </div>
+      <div class="ik-notify-list" id="ikNotifyList"></div>
+    `;
+    document.body.appendChild(panel);
+
+    const pulseBtn = (btn) => {
+      if (!btn) return;
+      btn.classList.remove("is-press");
+      void btn.offsetWidth;
+      btn.classList.add("is-press");
+      window.setTimeout(() => btn.classList.remove("is-press"), 180);
+    };
+
+    const showBtnToast = (btn, text) => {
+      if (!btn) return;
+      let toast = btn.querySelector(".profile-copy-toast");
+      if (!toast) {
+        toast = document.createElement("span");
+        toast.className = "profile-copy-toast";
+        btn.appendChild(toast);
+      }
+      toast.textContent = text || "готово";
+      toast.classList.add("is-visible");
+      window.setTimeout(() => {
+        if (toast) toast.classList.remove("is-visible");
+      }, 900);
+    };
+
+    panel.querySelector("#ikNotifyClose")?.addEventListener("click", (e) => {
+      pulseBtn(e.currentTarget);
+      closeNotifyPanel();
+    });
+    panel.querySelector("#ikNotifyRefresh")?.addEventListener("click", (e) => {
+      const btn = e.currentTarget;
+      pulseBtn(btn);
+      loadNotifications(true)
+        .then(() => showBtnToast(btn, "Обновлено"))
+        .catch(() => showBtnToast(btn, "Ошибка"));
+    });
+    panel.querySelector("#ikNotifyReadAll")?.addEventListener("click", (e) => {
+      const btn = e.currentTarget;
+      pulseBtn(btn);
+      const base = notifyState.items || [];
+      const affected = notifyState.tab === "all"
+        ? base
+        : base.filter((x) => x.category === notifyState.tab);
+      if (!affected.length) {
+        showBtnToast(btn, "Пусто");
+        return;
+      }
+      markNotificationsRead(affected);
+      const seenKeys = new Set(affected.map((x) => notifyKeyForItem(x)));
+      notifyState.items = base.map((x) => seenKeys.has(notifyKeyForItem(x)) ? { ...x, seen: true } : x);
+      notifyState.unread = (notifyState.items || []).filter((x) => !x.seen).length;
+      setNotifyCacheForUser(notifyState.userId || "guest", notifyState.items || []);
+      updateNotifyBadge();
+      renderNotifyPanel();
+      showBtnToast(btn, "Прочитано");
+    });
+
+    panel.querySelectorAll("[data-notify-tab]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        notifyState.tab = String(btn.getAttribute("data-notify-tab") || "all");
+        panel.querySelectorAll("[data-notify-tab]").forEach((x) => x.classList.toggle("is-active", x === btn));
+        renderNotifyPanel();
+      });
+    });
+
+    panel.addEventListener("click", (e) => e.stopPropagation());
+    panel.querySelector("#ikNotifyList")?.addEventListener("click", (e) => {
+      const item = e.target && e.target.closest ? e.target.closest("[data-notify-key]") : null;
+      if (!item) return;
+      const key = String(item.getAttribute("data-notify-key") || "");
+      if (!key) return;
+      const found = (notifyState.items || []).find((x) => notifyKeyForItem(x) === key);
+      if (!found || found.seen) return;
+      markNotificationsRead([found]);
+      notifyState.items = (notifyState.items || []).map((x) => notifyKeyForItem(x) === key ? { ...x, seen: true } : x);
+      notifyState.unread = (notifyState.items || []).filter((x) => !x.seen).length;
+      setNotifyCacheForUser(notifyState.userId || "guest", notifyState.items || []);
+      updateNotifyBadge();
+      renderNotifyPanel();
+    });
+    return panel;
+  }
+
+  function ensureNotifyButton() {
+    const gear = document.getElementById("ikGlobalSettingsBtn");
+    if (!gear || !gear.parentElement) return;
+    let btn = getNotifyButton();
+    if (btn && btn.parentElement !== gear.parentElement) {
+      btn.remove();
+      btn = null;
+    }
+    if (!btn) {
+      btn = document.createElement("button");
+      btn.type = "button";
+      btn.id = "ikGlobalNotifyBtn";
+      btn.className = "ik-gear-btn ik-notify-btn";
+      btn.setAttribute("aria-label", "Уведомления");
+      btn.setAttribute("title", "Уведомления");
+      btn.innerHTML = `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+          <path d="M12 4.5a4.5 4.5 0 0 0-4.5 4.5v2.3c0 .7-.2 1.4-.6 2L5.8 15c-.5.8 0 1.9 1 1.9h10.4c1 0 1.5-1.1 1-1.9l-1.1-1.7c-.4-.6-.6-1.3-.6-2V9A4.5 4.5 0 0 0 12 4.5Z"/>
+          <path d="M9.8 18.4a2.2 2.2 0 0 0 4.4 0"/>
+        </svg>
+        <span class="ik-notify-dot" hidden>0</span>
+      `;
+      gear.parentElement.insertBefore(btn, gear);
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const panel = ensureNotifyPanel();
+        if (panel.hidden) openNotifyPanel();
+        else closeNotifyPanel();
+      });
+    }
+    updateNotifyBadge();
+  }
+
+  function normalizeNotification(item) {
+    const out = {
+      id: item.id,
+      type: item.type,
+      category: item.category,
+      title: item.title,
+      text: item.text,
+      created_at: item.created_at,
+      pills: item.pills || [],
+      seen: false,
+    };
+    out.seen = isNotificationSeen(out);
+    return out;
+  }
+
+  async function fetchRewardNotifications(client, userId) {
+    const items = [];
+    try {
+      const { data, error } = await client
+        .from("ik_reward_events")
+        .select("id,event_type,source,eco_x10,ibit,meta,created_at")
+        .eq("owner_id", userId)
+        .order("created_at", { ascending: false })
+        .limit(120);
+      if (error) throw error;
+      for (const r of (data || [])) {
+        if (String(r.event_type || "") === "active_minute") continue;
+        const eco = Number(r.eco_x10 || 0) / 10;
+        const ib = Number(r.ibit || 0);
+        const pills = [];
+        if (eco > 0) pills.push(`+${Number.isInteger(eco) ? eco.toFixed(0) : eco.toFixed(1)} EKO`);
+        if (ib > 0) pills.push(`+${ib} I-bit þ`);
+        let reason = "награда";
+        if (r.event_type === "study_session") {
+          const m = r.meta || {};
+          const mod = String(m.module || "задание");
+          const tasks = Number(m.tasks || 0);
+          const corr = Number(m.correct || 0);
+          const pct = tasks > 0 ? Math.round((corr / tasks) * 100) : 0;
+          reason = `${mod}: сессия ${tasks} заданий (${pct}%)`;
+        } else if (r.event_type === "daily_visit") {
+          reason = "ежедневный вход";
+        }
+        items.push(normalizeNotification({
+          id: r.id,
+          type: "reward",
+          category: "rewards",
+          title: "Начисление",
+          text: reason,
+          pills,
+          created_at: r.created_at,
+        }));
+      }
+    } catch (_) {}
+    return items;
+  }
+
+  async function fetchFriendNotifications(client, userId) {
+    const items = [];
+    try {
+      const { data, error } = await client
+        .from("ik_friend_requests")
+        .select("id,status,requester_id,created_at")
+        .eq("addressee_id", userId)
+        .eq("status", "pending")
+        .order("created_at", { ascending: false })
+        .limit(120);
+      if (error) throw error;
+      for (const r of (data || [])) {
+        items.push(normalizeNotification({
+          id: r.id,
+          type: "friend",
+          category: "friends",
+          title: "Запрос в друзья",
+          text: `Новый запрос от пользователя ${String(r.requester_id || "").slice(0, 8)}...`,
+          created_at: r.created_at,
+        }));
+      }
+    } catch (_) {}
+    return items;
+  }
+
+  async function fetchAlertNotifications(client, userId) {
+    const items = [];
+    try {
+      const { data, error } = await client
+        .from("ik_dict_publish_requests")
+        .select("id,status,title,review_note,decision_at,updated_at")
+        .eq("owner_id", userId)
+        .in("status", ["approved", "rejected", "needs_work"])
+        .order("updated_at", { ascending: false })
+        .limit(120);
+      if (error) throw error;
+      for (const r of (data || [])) {
+        const st = String(r.status || "");
+        const title = st === "approved" ? "Словарь принят" : st === "rejected" ? "Словарь отклонён" : "Нужна доработка";
+        const note = String(r.review_note || "").trim();
+        const text = st === "approved"
+          ? `${String(r.title || "dictionary")}${note ? ` — ${note}` : ""}. Начисления смотри в разделе «Награды».`
+          : `${String(r.title || "dictionary")}${note ? ` — ${note}` : ""}`;
+        items.push(normalizeNotification({
+          id: r.id,
+          type: "alert-dict",
+          category: "alerts",
+          title,
+          text,
+          created_at: r.decision_at || r.updated_at,
+        }));
+      }
+    } catch (_) {}
+
+    try {
+      const { data, error } = await client
+        .from("ik_plan_invitations")
+        .select("id,message,status,created_at")
+        .eq("invitee_id", userId)
+        .eq("status", "pending")
+        .order("created_at", { ascending: false })
+        .limit(120);
+      if (error) throw error;
+      for (const r of (data || [])) {
+        items.push(normalizeNotification({
+          id: r.id,
+          type: "alert-plan",
+          category: "alerts",
+          title: "Приглашение в планирование",
+          text: String(r.message || "Тебя пригласили в совместный проект"),
+          created_at: r.created_at,
+        }));
+      }
+    } catch (_) {}
+
+    return items;
+  }
+
+  async function loadNotifications(force) {
+    if (notifyState.loading) {
+      notifyState.pendingReload = true;
+      return;
+    }
+    notifyState.loading = true;
+    try {
+      await ensureSupabaseClientReady();
+      const client = getSupaClient();
+      if (!client) return;
+      const out = await client.auth.getUser();
+      const user = out && out.data && out.data.user ? out.data.user : null;
+      notifyState.userId = user ? user.id : "";
+      if (!user) {
+        const cachedGuest = getNotifyCacheForUser("guest");
+        notifyState.items = cachedGuest;
+        notifyState.unread = 0;
+        renderNotifyPanel();
+        updateNotifyBadge();
+        return;
+      }
+
+      if (!(notifyState.items || []).length) {
+        const cached = getNotifyCacheForUser(user.id);
+        if (cached.length) {
+          notifyState.items = cached.map(normalizeNotification);
+          notifyState.unread = notifyState.items.filter((x) => !x.seen).length;
+          updateNotifyBadge();
+          if (notifyState.panelOpen) renderNotifyPanel();
+        }
+      }
+
+      const [friends, rewards, alerts] = await Promise.all([
+        fetchFriendNotifications(client, user.id),
+        fetchRewardNotifications(client, user.id),
+        fetchAlertNotifications(client, user.id),
+      ]);
+
+      let all = [...friends, ...rewards, ...alerts]
+        .sort((a, b) => Date.parse(b.created_at || 0) - Date.parse(a.created_at || 0));
+      if (all.length > NOTIFY_MAX_ALL) all = all.slice(0, NOTIFY_MAX_ALL);
+      notifyState.items = all;
+      setNotifyCacheForUser(user.id, all);
+      notifyState.unread = all.filter((x) => !x.seen).length;
+      updateNotifyBadge();
+      if (force || notifyState.panelOpen) renderNotifyPanel();
+    } finally {
+      notifyState.loading = false;
+      if (notifyState.pendingReload) {
+        notifyState.pendingReload = false;
+        loadNotifications(false).catch(() => {});
+      }
+    }
+  }
+
+  function renderNotifyPanel() {
+    const panel = getNotifyPanel();
+    if (!panel) return;
+    const list = panel.querySelector("#ikNotifyList");
+    if (!list) return;
+    const refreshBtn = panel.querySelector("#ikNotifyRefresh");
+    const readAllBtn = panel.querySelector("#ikNotifyReadAll");
+    if (refreshBtn) {
+      refreshBtn.disabled = !!notifyState.loading;
+      refreshBtn.textContent = notifyState.loading ? "Обновление..." : "Обновить";
+    }
+    if (readAllBtn) readAllBtn.disabled = !!notifyState.loading;
+
+    let rows = notifyState.items || [];
+    if (notifyState.tab !== "all") rows = rows.filter((x) => x.category === notifyState.tab);
+
+    if (!rows.length) {
+      list.innerHTML = `<div class="ik-notify-empty">Пока пусто</div>`;
+      return;
+    }
+
+    list.innerHTML = rows.map((r) => {
+      const pills = (r.pills || []).map((x) => `<span class="ik-notify-pill">${escapeHtml(String(x))}</span>`).join("");
+      return `<article class="ik-notify-item ${r.seen ? "" : "is-unread"}" data-notify-key="${escapeHtml(notifyKeyForItem(r))}"><div class="ik-notify-item__head"><b>${escapeHtml(r.title || "")}</b><span>${escapeHtml(formatRelTime(r.created_at))}</span></div><p>${escapeHtml(r.text || "")}</p><div class="ik-notify-item__pills">${pills}</div></article>`;
+    }).join("");
+  }
+
+  function openNotifyPanel() {
+    const panel = ensureNotifyPanel();
+    panel.hidden = false;
+    notifyState.panelOpen = true;
+    renderNotifyPanel();
+    loadNotifications(true).catch(() => {});
+  }
+
+  function closeNotifyPanel() {
+    const panel = getNotifyPanel();
+    if (!panel) return;
+    panel.hidden = true;
+    notifyState.panelOpen = false;
+  }
+
+  function hydrateNotificationsFromCache() {
+    try {
+      const raw = localStorage.getItem("itemkey.currentUser");
+      const snapshot = raw ? JSON.parse(raw) : null;
+      const uid = String((snapshot && snapshot.id) || "guest");
+      const cached = getNotifyCacheForUser(uid);
+      notifyState.userId = uid === "guest" ? "" : uid;
+      notifyState.items = cached.map(normalizeNotification);
+      notifyState.unread = notifyState.items.filter((x) => !x.seen).length;
+      updateNotifyBadge();
+    } catch (_) {}
+  }
+
   function installAdminHooks() {
     if (adminState.hooksInstalled) return;
     adminState.hooksInstalled = true;
@@ -1107,6 +1695,7 @@
   function enhanceSettingsPanels() {
     document.querySelectorAll(PANEL_SELECTOR).forEach(enhancePanel);
     document.querySelectorAll(PANEL_SELECTOR).forEach(ensureAdminButton);
+    ensureNotifyButton();
     if (document.querySelector(PANEL_SELECTOR)) {
       removeFab();
     } else {
@@ -1160,24 +1749,70 @@
     installAdminHooks();
     ensureAdminStyle();
     enhanceSettingsPanels();
+    ensureNotifyPanel();
+    hydrateNotificationsFromCache();
     refreshAdminAccess();
     ensureRewardsBoot().catch(() => {});
 
     if (document.body && document.body.hasAttribute(LOADING_ATTR)) {
       ensurePageShell();
       showLoading();
+      // hard failsafe: page must never stay in loading forever
+      window.setTimeout(() => {
+        forceReleaseLoading();
+      }, 9000);
     }
 
+    let panelRefreshQueued = false;
     const observer = new MutationObserver(() => {
-      enhanceSettingsPanels();
+      if (panelRefreshQueued) return;
+      panelRefreshQueued = true;
+      window.setTimeout(() => {
+        panelRefreshQueued = false;
+        enhanceSettingsPanels();
+      }, 120);
     });
-    observer.observe(document.body, { childList: true, subtree: true });
+    observer.observe(document.body, { childList: true, subtree: false });
 
     window.addEventListener("storage", (e) => {
       if (e.key === "itemkey.currentUser") refreshAdminAccess();
     });
 
     document.addEventListener("ik:authchange", refreshAdminAccess);
+
+    document.addEventListener("ik:reward", (e) => {
+      const d = (e && e.detail) || {};
+      const showToast = d.showToast !== false;
+      if (showToast) {
+        queueToast({
+          title: d.title || "Награда",
+          body: d.body || "",
+          pills: Array.isArray(d.pills) ? d.pills : [],
+        });
+      }
+      // refresh bell center shortly after reward events are written
+      window.setTimeout(() => {
+        loadNotifications(false).catch(() => {});
+      }, 500);
+    });
+
+    document.addEventListener("click", (e) => {
+      const panel = getNotifyPanel();
+      if (!panel || panel.hidden) return;
+      const btn = getNotifyButton();
+      const t = e.target;
+      if (btn && btn.contains(t)) return;
+      if (panel.contains(t)) return;
+      closeNotifyPanel();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeNotifyPanel();
+    });
+
+    loadNotifications(false).catch(() => {});
+    window.setInterval(() => {
+      loadNotifications(false).catch(() => {});
+    }, 90000);
 
     initSystemListener();
     installPageLeaveHandlers();
