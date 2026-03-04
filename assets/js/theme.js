@@ -891,6 +891,7 @@
       panel.classList.add("is-collapsed");
       const s = panel.querySelector("#ikFarmCoachStrip");
       if (s) s.hidden = false;
+      placeCoachBelowMenu();
     });
 
     stripBtn?.addEventListener("click", () => {
@@ -900,6 +901,7 @@
       panel.classList.remove("is-pop");
       void panel.offsetWidth;
       panel.classList.add("is-pop");
+      placeCoachBelowMenu();
     });
 
     coachState.ready = true;
@@ -919,7 +921,12 @@
 
   function placeCoachBelowMenu() {
     const panel = document.getElementById("ikFarmCoach");
-    if (!panel) return;
+    if (!panel) {
+      if (document.body && document.body.classList.contains("page-learning")) {
+        document.body.style.setProperty("--ik-coach-shift", "0px");
+      }
+      return;
+    }
     let top = 8;
     try {
       const nav = document.querySelector(".ik-site-nav");
@@ -931,6 +938,16 @@
       }
     } catch (_) {}
     panel.style.top = `${top}px`;
+
+    // Keep learning header/content below coach panel
+    if (document.body && document.body.classList.contains("page-learning")) {
+      let shift = 0;
+      if (!panel.hidden) {
+        const h = Math.ceil(panel.getBoundingClientRect().height || 0);
+        shift = panel.classList.contains("is-collapsed") ? Math.max(0, h - 36) : Math.max(0, h - 56);
+      }
+      document.body.style.setProperty("--ik-coach-shift", `${shift}px`);
+    }
   }
 
   function glitchNoise(len) {
@@ -1095,6 +1112,7 @@
       const panel = document.getElementById("ikFarmCoach");
       if (panel) panel.hidden = true;
       coachState.visible = false;
+      placeCoachBelowMenu();
       return;
     }
     renderCoach(payload);

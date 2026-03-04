@@ -25,7 +25,8 @@ body {
     main.learn-stage{
       flex: 1 1 auto;
       width: 100%;
-      padding: 64px 16px 72px;
+      padding: calc(64px + var(--ik-coach-shift, 0px)) 16px 72px;
+      transition: padding-top .22s ease;
     }
     .learn-wrap{ width:min(980px,100%); margin:0 auto; }
 
