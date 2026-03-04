@@ -4,10 +4,12 @@ import { PlanningCollabApp } from './js/planning_collab.js';
 const ui = new UI();
 
 const app = new PlanningCollabApp(ui, {
+  projectScope: document.getElementById('projectScope'),
   projectSelect: document.getElementById('projectSelect'),
   projectBar: document.getElementById('projectBar'),
   planningPresence: document.getElementById('planningPresence'),
   searchInput: document.getElementById('searchInput'),
+  assigneeFilter: document.getElementById('assigneeFilter'),
   tagsFilter: document.getElementById('tagsFilter'),
   priorityFilter: document.getElementById('priorityFilter'),
   deadlineFilter: document.getElementById('deadlineFilter'),

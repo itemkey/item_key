@@ -4,6 +4,10 @@ const INCOMING_REFRESH_MS = 15000;
 const BOARD_RELOAD_DEBOUNCE_MS = 120;
 const EDITING_TTL_MS = 30000;
 const EDITING_PING_MS = 10000;
+const PROJECTS_RETRY_MS = 6000;
+
+const PROJECT_SCOPES = ['personal', 'shared', 'all'];
+const ASSIGNEE_FILTERS = ['all', 'me', 'unassigned'];
 
 const PRIORITIES = [
   { key: 'low', label: 'LOW' },
@@ -88,11 +92,27 @@ function briefError(error) {
 
 function looksLikeSchemaError(error) {
   const txt = briefError(error).toLowerCase();
+  const code = String((error && error.code) || '').toUpperCase();
+  if (code === '42883' || code === '42P01' || code === '42703') return true;
   return (
-    txt.includes('ik_plan_') ||
-    txt.includes('does not exist') ||
-    txt.includes('schema cache') ||
-    txt.includes('function public.ik_plan')
+    (txt.includes('schema cache') && txt.includes('ik_plan')) ||
+    (txt.includes('function public.ik_plan') && txt.includes('does not exist')) ||
+    (txt.includes('relation') && txt.includes('ik_plan') && txt.includes('does not exist')) ||
+    (txt.includes('column') && txt.includes('ik_plan') && txt.includes('does not exist'))
+  );
+}
+
+function looksTransientError(error) {
+  const txt = briefError(error).toLowerCase();
+  return (
+    txt.includes('failed to fetch') ||
+    txt.includes('network') ||
+    txt.includes('timeout') ||
+    txt.includes('timed out') ||
+    txt.includes('gateway') ||
+    txt.includes('503') ||
+    txt.includes('502') ||
+    txt.includes('429')
   );
 }
 
@@ -125,6 +145,7 @@ export class PlanningCollabApp {
     this.uiPrefs = this.loadUIPrefs();
     this.channel = null;
     this.boardReloadTimer = null;
+    this.projectsRetryTimer = null;
     this.inboxPollTimer = null;
     this.editingGcTimer = null;
     this.editingPingTimer = null;
@@ -143,6 +164,7 @@ export class PlanningCollabApp {
   async init() {
     this.bindHandlers();
     this.applyPrefsToControls();
+    this.renderProjectScopeToggle();
     this.setView(this.uiPrefs.view);
 
     if (!(window.IKSupabase && typeof window.IKSupabase.getClient === 'function')) {
@@ -185,8 +207,25 @@ export class PlanningCollabApp {
     await this.loadIncomingInvitations({ quiet: true });
 
     const loaded = await this.loadProjects();
+    this.renderInboxButton();
     if (!loaded) {
-      this.setActionsDisabled(true);
+      this.state.activeProjectId = null;
+      this.state.board = null;
+      this.renderProjectSelect();
+      this.renderProjectBar();
+      this.renderAssigneeFilter();
+
+      if (this.schemaWarnShown) {
+        this.renderEmptyBoard('Planning schema is outdated. Apply stage9 + stage10 SQL.');
+        this.setActionsDisabled(true);
+        return;
+      }
+
+      this.renderEmptyBoard('Projects unavailable. Check connection and retry.', { retry: true });
+      this.scheduleProjectsRetry();
+      this.startBackgroundLoops();
+      this.setActionsDisabled(false);
+      this.setCloudBadge('sync', 'projects unavailable');
       return;
     }
 
@@ -195,6 +234,14 @@ export class PlanningCollabApp {
       this.state.activeProjectId = this.state.projects[0] ? this.state.projects[0].id : null;
     }
 
+    const scopeProjects = this.getScopeFilteredProjects();
+    if (scopeProjects.length === 0) {
+      this.state.activeProjectId = null;
+    } else if (!scopeProjects.some((p) => String(p.id) === String(this.state.activeProjectId || ''))) {
+      this.state.activeProjectId = scopeProjects[0].id;
+    }
+    this.storeActiveProjectId(this.state.activeProjectId);
+
     this.renderProjectSelect();
     this.renderProjectBar();
     this.renderInboxButton();
@@ -202,17 +249,160 @@ export class PlanningCollabApp {
     if (this.state.activeProjectId) {
       await this.selectProject(this.state.activeProjectId, { force: true });
     } else {
-      this.renderEmptyBoard('No projects yet. Create your first project.');
-      this.setCloudBadge('ready', 'no active project');
+      this.renderAssigneeFilter();
+      this.renderPresence();
+      if (this.state.projects.length > 0) {
+        this.renderEmptyBoard('No projects in this section. Switch scope filter.');
+        this.setCloudBadge('ready', 'no projects in scope');
+      } else {
+        this.renderEmptyBoard('No projects yet. Create your first project.');
+        this.setCloudBadge('ready', 'no active project');
+      }
     }
 
     this.startBackgroundLoops();
     this.setActionsDisabled(false);
   }
 
+  normalizeScopeValue(scope) {
+    const s = String(scope || '').toLowerCase();
+    return PROJECT_SCOPES.includes(s) ? s : 'all';
+  }
+
+  normalizeProjectScope(project) {
+    const scope = String((project && project.scope) || '').toLowerCase();
+    if (scope === 'personal' || scope === 'shared') return scope;
+    let memberCount = Number((project && project.member_count) || 0);
+    let pendingInviteCount = Number((project && project.pending_invite_count) || 0);
+
+    const board = this.state.board;
+    const sameAsBoard = board && board.project && String(board.project.id || '') === String((project && project.id) || '');
+    if (sameAsBoard) {
+      if (memberCount <= 0) memberCount = asArray(board.members).length;
+      if (pendingInviteCount <= 0) {
+        pendingInviteCount = asArray(board.invitations).filter((x) => String(x.status) === 'pending').length;
+      }
+    }
+
+    return memberCount > 1 || pendingInviteCount > 0 ? 'shared' : 'personal';
+  }
+
+  getScopeFilteredProjects() {
+    const mode = this.normalizeScopeValue(this.uiPrefs.projectScope);
+    if (mode === 'all') return this.state.projects.slice();
+    return this.state.projects.filter((p) => this.normalizeProjectScope(p) === mode);
+  }
+
+  renderProjectScopeToggle() {
+    const root = this.els.projectScope;
+    if (!root) return;
+    const current = this.normalizeScopeValue(this.uiPrefs.projectScope);
+    root.querySelectorAll('[data-scope]').forEach((node) => {
+      const mode = this.normalizeScopeValue(node.getAttribute('data-scope'));
+      const active = mode === current;
+      node.classList.toggle('is-active', active);
+      node.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
+  }
+
+  clearProjectsRetry() {
+    if (!this.projectsRetryTimer) return;
+    clearTimeout(this.projectsRetryTimer);
+    this.projectsRetryTimer = null;
+  }
+
+  scheduleProjectsRetry(delay = PROJECTS_RETRY_MS) {
+    this.clearProjectsRetry();
+    this.projectsRetryTimer = setTimeout(() => {
+      this.projectsRetryTimer = null;
+      void this.retryLoadProjects().catch(() => {});
+    }, Math.max(1000, Number(delay) || PROJECTS_RETRY_MS));
+  }
+
+  async retryLoadProjects() {
+    const loaded = await this.loadProjects({ quiet: true });
+    if (!loaded) {
+      if (!this.schemaWarnShown) this.scheduleProjectsRetry();
+      return false;
+    }
+
+    const scoped = this.getScopeFilteredProjects();
+    if (!scoped.length) {
+      await this.unsubscribeProject();
+      this.state.activeProjectId = null;
+      this.storeActiveProjectId(null);
+      this.state.board = null;
+      this.renderProjectSelect();
+      this.renderProjectBar();
+      this.renderPresence();
+      this.renderAssigneeFilter();
+      this.renderBoard();
+      return true;
+    }
+
+    const stillVisible = scoped.some((p) => String(p.id) === String(this.state.activeProjectId || ''));
+    if (!stillVisible) {
+      this.state.activeProjectId = scoped[0].id;
+      this.storeActiveProjectId(this.state.activeProjectId);
+    }
+
+    if (!this.state.activeProjectId) return true;
+    await this.selectProject(this.state.activeProjectId, { force: true });
+    return true;
+  }
+
+  async setProjectScope(scope, options = {}) {
+    const force = !!options.force;
+    const nextScope = this.normalizeScopeValue(scope);
+    if (!force && this.normalizeScopeValue(this.uiPrefs.projectScope) === nextScope) {
+      this.renderProjectScopeToggle();
+      return;
+    }
+
+    this.uiPrefs.projectScope = nextScope;
+    this.persistUIPrefs();
+    this.renderProjectScopeToggle();
+
+    const scoped = this.getScopeFilteredProjects();
+    const currentVisible = scoped.some((p) => String(p.id) === String(this.state.activeProjectId || ''));
+
+    if (currentVisible && this.state.activeProjectId) {
+      this.renderProjectSelect();
+      this.renderProjectBar();
+      this.renderBoard();
+      this.renderAssigneeFilter();
+      this.renderPresence();
+      return;
+    }
+
+    if (!scoped.length) {
+      await this.unsubscribeProject();
+      this.state.activeProjectId = null;
+      this.storeActiveProjectId(null);
+      this.state.board = null;
+      this.renderProjectSelect();
+      this.renderProjectBar();
+      this.renderPresence();
+      this.renderAssigneeFilter();
+      this.renderBoard();
+      return;
+    }
+
+    await this.selectProject(scoped[0].id, { force: true });
+  }
+
   bindHandlers() {
     if (this.handlersBound) return;
     this.handlersBound = true;
+
+    if (this.els.projectScope) {
+      this.els.projectScope.addEventListener('click', (event) => {
+        const btn = event.target.closest('[data-scope]');
+        if (!btn) return;
+        const scope = String(btn.getAttribute('data-scope') || 'all');
+        void this.setProjectScope(scope).catch((error) => this.onMutationError(error));
+      });
+    }
 
     if (this.els.projectSelect) {
       this.els.projectSelect.addEventListener('change', () => {
@@ -233,6 +423,15 @@ export class PlanningCollabApp {
     if (this.els.tagsFilter) {
       this.els.tagsFilter.addEventListener('input', () => {
         this.uiPrefs.tags = String(this.els.tagsFilter.value || '').trim();
+        this.persistUIPrefs();
+        this.renderBoard();
+      });
+    }
+
+    if (this.els.assigneeFilter) {
+      this.els.assigneeFilter.addEventListener('change', () => {
+        const next = String(this.els.assigneeFilter.value || 'all');
+        this.uiPrefs.assignee = next || 'all';
         this.persistUIPrefs();
         this.renderBoard();
       });
@@ -266,6 +465,7 @@ export class PlanningCollabApp {
       this.els.clearFilters.addEventListener('click', () => {
         this.uiPrefs.q = '';
         this.uiPrefs.tags = '';
+        this.uiPrefs.assignee = 'all';
         this.uiPrefs.priority = 'all';
         this.uiPrefs.deadline = 'all';
         this.uiPrefs.sort = 'default';
@@ -325,7 +525,9 @@ export class PlanningCollabApp {
 
   loadUIPrefs() {
     const defaults = {
+      projectScope: 'all',
       q: '',
+      assignee: 'all',
       tags: '',
       priority: 'all',
       deadline: 'all',
@@ -337,8 +539,16 @@ export class PlanningCollabApp {
       const raw = localStorage.getItem(UI_PREFS_KEY);
       if (!raw) return defaults;
       const parsed = JSON.parse(raw);
+      const parsedScope = String(parsed.projectScope || parsed.scope || '').toLowerCase();
+      const parsedAssignee = String(parsed.assignee || '').trim();
+      const parsedAssigneeLower = parsedAssignee.toLowerCase();
+      const safeAssignee = parsedAssignee
+        ? (ASSIGNEE_FILTERS.includes(parsedAssigneeLower) ? parsedAssigneeLower : parsedAssignee)
+        : defaults.assignee;
       return {
+        projectScope: PROJECT_SCOPES.includes(parsedScope) ? parsedScope : defaults.projectScope,
         q: typeof parsed.q === 'string' ? parsed.q : defaults.q,
+        assignee: safeAssignee,
         tags: typeof parsed.tags === 'string' ? parsed.tags : defaults.tags,
         priority: ['all', 'low', 'mid', 'high'].includes(String(parsed.priority)) ? String(parsed.priority) : defaults.priority,
         deadline: ['all', 'today', 'overdue', 'week'].includes(String(parsed.deadline)) ? String(parsed.deadline) : defaults.deadline,
@@ -358,11 +568,13 @@ export class PlanningCollabApp {
 
   applyPrefsToControls() {
     if (this.els.searchInput) this.els.searchInput.value = this.uiPrefs.q;
+    if (this.els.assigneeFilter) this.els.assigneeFilter.value = this.uiPrefs.assignee;
     if (this.els.tagsFilter) this.els.tagsFilter.value = this.uiPrefs.tags;
     if (this.els.priorityFilter) this.els.priorityFilter.value = this.uiPrefs.priority;
     if (this.els.deadlineFilter) this.els.deadlineFilter.value = this.uiPrefs.deadline;
     if (this.els.sortSelect) this.els.sortSelect.value = this.uiPrefs.sort;
     if (this.els.viewSelect) this.els.viewSelect.value = this.uiPrefs.view;
+    this.renderProjectScopeToggle();
   }
 
   readStoredActiveProjectId() {
@@ -403,6 +615,12 @@ export class PlanningCollabApp {
       if (!el) continue;
       el.disabled = !!disabled;
     }
+
+    if (this.els.projectScope) {
+      this.els.projectScope.querySelectorAll('[data-scope]').forEach((el) => {
+        el.disabled = !!disabled;
+      });
+    }
   }
 
   renderFatal(text) {
@@ -410,6 +628,7 @@ export class PlanningCollabApp {
     this.uiPrefs.view = 'board';
     if (this.els.viewSelect) this.els.viewSelect.value = 'board';
     this.setView('board');
+    this.renderAssigneeFilter();
     this.renderEmptyBoard(`Planning unavailable: ${escapeHtml(text)}`);
   }
 
@@ -418,19 +637,27 @@ export class PlanningCollabApp {
     this.uiPrefs.view = 'board';
     if (this.els.viewSelect) this.els.viewSelect.value = 'board';
     this.setView('board');
+    this.renderAssigneeFilter();
     this.renderEmptyBoard('Login required. Open item-user.html and sign in.');
     this.renderProjectSelect();
     this.renderProjectBar();
     this.renderPresence();
   }
 
-  renderEmptyBoard(message) {
+  renderEmptyBoard(message, options = {}) {
     if (!this.els.boardView) return;
+    const showRetry = !!options.retry;
     this.els.boardView.innerHTML = `
       <div style="font-size:11px; letter-spacing:2px; text-transform:uppercase; opacity:.7; line-height:1.5;">
         ${escapeHtml(message)}
       </div>
+      ${showRetry ? '<button class="btn" type="button" data-retry-projects style="margin-top:10px;">retry</button>' : ''}
     `;
+    if (showRetry) {
+      this.els.boardView.querySelector('[data-retry-projects]')?.addEventListener('click', () => {
+        void this.retryLoadProjects().catch((error) => this.onMutationError(error));
+      });
+    }
     this.els.boardView.hidden = false;
   }
 
@@ -456,16 +683,27 @@ export class PlanningCollabApp {
     return data;
   }
 
-  async loadProjects() {
+  async loadProjects(options = {}) {
+    const quiet = !!options.quiet;
     try {
       const data = await this.rpc('ik_plan_list_projects');
-      this.state.projects = asArray(data);
+      this.state.projects = asArray(data).map((p) => ({
+        ...p,
+        scope: this.normalizeProjectScope(p)
+      }));
+      this.clearProjectsRetry();
       this.renderProjectSelect();
       this.renderProjectBar();
       return true;
     } catch (error) {
-      await this.onMutationError(error);
-      this.state.projects = [];
+      if (looksLikeSchemaError(error)) {
+        await this.onMutationError(error);
+      } else if (!quiet) {
+        await this.onMutationError(error);
+      } else if (looksTransientError(error)) {
+        this.setCloudBadge('sync', 'projects retrying');
+      }
+      if (!this.state.projects.length) this.state.projects = [];
       this.renderProjectSelect();
       this.renderProjectBar();
       return false;
@@ -494,6 +732,16 @@ export class PlanningCollabApp {
     const id = String(projectId || '').trim();
     if (!id) return;
 
+    const target = this.state.projects.find((p) => String(p.id) === id);
+    if (!target) return;
+
+    const visible = this.getScopeFilteredProjects().some((p) => String(p.id) === id);
+    if (!visible) {
+      this.uiPrefs.projectScope = 'all';
+      this.persistUIPrefs();
+      this.renderProjectScopeToggle();
+    }
+
     if (!force && this.state.activeProjectId === id) return;
     this.state.activeProjectId = id;
     this.storeActiveProjectId(id);
@@ -510,6 +758,7 @@ export class PlanningCollabApp {
     const id = String(projectId || this.state.activeProjectId || '').trim();
     if (!id) {
       this.state.board = null;
+      this.renderAssigneeFilter();
       this.renderBoard();
       return;
     }
@@ -518,10 +767,12 @@ export class PlanningCollabApp {
       const data = await this.rpc('ik_plan_get_board', { p_project_id: id });
       this.state.board = data && typeof data === 'object' ? data : null;
       this.renderProjectBar();
+      this.renderAssigneeFilter();
       this.renderBoard();
       this.renderPresence();
     } catch (error) {
       this.state.board = null;
+      this.renderAssigneeFilter();
       this.renderBoard();
       this.renderPresence();
       await this.onMutationError(error);
@@ -680,6 +931,80 @@ export class PlanningCollabApp {
     return 'me';
   }
 
+  resolveMemberHandle(member) {
+    const handle = String((member && (member.profile_user_id || member.user_id || member.nickname)) || '').trim();
+    if (handle) return handle;
+    const uidText = String((member && member.user_id) || '').trim();
+    if (!uidText) return 'user';
+    return uidText.slice(0, 8);
+  }
+
+  resolveMemberLabel(member) {
+    const nick = String((member && member.nickname) || '').trim();
+    const handle = this.resolveMemberHandle(member);
+    if (nick && nick.toLowerCase() !== handle.toLowerCase()) {
+      return `${nick} (@${handle})`;
+    }
+    return `@${handle}`;
+  }
+
+  renderAssigneeFilter() {
+    const el = this.els.assigneeFilter;
+    if (!el) return;
+
+    const board = this.state.board;
+    const members = asArray(board && board.members);
+    const selected = String(this.uiPrefs.assignee || 'all');
+
+    const options = [
+      { value: 'all', label: 'исполнитель: все' },
+      { value: 'me', label: 'исполнитель: мои' },
+      { value: 'unassigned', label: 'исполнитель: без ответ.' }
+    ];
+
+    for (const m of members) {
+      const userId = String(m.user_id || '').trim();
+      if (!userId) continue;
+      options.push({ value: userId, label: this.resolveMemberLabel(m) });
+    }
+
+    el.innerHTML = options
+      .map((opt) => `<option value="${escapeAttr(opt.value)}">${escapeHtml(opt.label)}</option>`)
+      .join('');
+
+    const exists = options.some((opt) => String(opt.value) === selected);
+    const safeValue = exists ? selected : 'all';
+    this.uiPrefs.assignee = safeValue;
+    if (safeValue !== selected) this.persistUIPrefs();
+    el.value = safeValue;
+    el.disabled = !board || !board.project;
+  }
+
+  assigneeOptionsHtml(selectedId = '') {
+    const board = this.state.board;
+    const members = asArray(board && board.members);
+    const selected = String(selectedId || '');
+    const out = ['<option value="">unassigned</option>'];
+    for (const m of members) {
+      const userId = String(m.user_id || '').trim();
+      if (!userId) continue;
+      const picked = userId === selected ? 'selected' : '';
+      out.push(`<option value="${escapeAttr(userId)}" ${picked}>${escapeHtml(this.resolveMemberLabel(m))}</option>`);
+    }
+    return out.join('');
+  }
+
+  assigneeLabel(card) {
+    if (!card || !card.assignee_id) return '';
+    const handle = String(card.assignee_user_id || card.assignee_nickname || card.assignee_id).trim();
+    if (!handle) return '';
+    return handle.startsWith('@') ? handle : `@${handle}`;
+  }
+
+  projectScopeText(project) {
+    return this.normalizeProjectScope(project) === 'shared' ? 'общий' : 'личный';
+  }
+
   renderPresence() {
     if (!this.els.planningPresence) return;
 
@@ -736,8 +1061,21 @@ export class PlanningCollabApp {
     const el = this.els.projectSelect;
     if (!el) return;
 
+    const projects = this.getScopeFilteredProjects();
     el.innerHTML = '';
-    for (const p of this.state.projects) {
+
+    if (!projects.length) {
+      const opt = document.createElement('option');
+      opt.value = '';
+      opt.textContent = this.state.projects.length ? 'NO PROJECTS IN SCOPE' : 'NO PROJECTS';
+      opt.selected = true;
+      el.appendChild(opt);
+      el.disabled = true;
+      return;
+    }
+
+    el.disabled = false;
+    for (const p of projects) {
       const opt = document.createElement('option');
       opt.value = p.id;
       opt.textContent = String(p.name || '').toUpperCase();
@@ -750,14 +1088,16 @@ export class PlanningCollabApp {
     const bar = this.els.projectBar;
     if (!bar) return;
 
+    const projects = this.getScopeFilteredProjects();
     bar.innerHTML = '';
 
-    for (const p of this.state.projects) {
+    for (const p of projects) {
       const chip = document.createElement('div');
       const isActive = String(p.id) === String(this.state.activeProjectId || '');
       chip.className = `proj-chip${isActive ? ' is-active' : ''}`;
 
       const role = roleLabel(p.role);
+      const scopeText = this.projectScopeText(p);
       const count =
         this.state.board &&
         this.state.board.project &&
@@ -769,6 +1109,7 @@ export class PlanningCollabApp {
       chip.innerHTML = `
         <span class="proj-chip__name">${escapeHtml(String(p.name || '').toUpperCase())}</span>
         <span class="proj-chip__count">${count}</span>
+        <span class="proj-chip__scope">${escapeHtml(scopeText)}</span>
         <span class="proj-chip__count">${escapeHtml(role)}</span>
         <button class="proj-chip__ctl" type="button" aria-label="manage columns">c</button>
         <button class="proj-chip__del" type="button" aria-label="delete project" ${canDelete ? '' : 'disabled'}>x</button>
@@ -820,6 +1161,7 @@ export class PlanningCollabApp {
 
   filterCards(cards, columnsById) {
     const q = String(this.uiPrefs.q || '').trim().toLowerCase();
+    const wantedAssignee = String(this.uiPrefs.assignee || 'all').trim();
     const wantedTags = parseFilterTags(this.uiPrefs.tags || '');
     const wantedPriority = String(this.uiPrefs.priority || 'all');
     const wantedDeadline = String(this.uiPrefs.deadline || 'all');
@@ -845,6 +1187,17 @@ export class PlanningCollabApp {
 
       if (wantedPriority !== 'all') {
         if (String(card.priority || '').toLowerCase() !== wantedPriority) return false;
+      }
+
+      if (wantedAssignee && wantedAssignee !== 'all') {
+        const assigneeId = String(card.assignee_id || '');
+        if (wantedAssignee === 'me') {
+          if (assigneeId !== String(this.user && this.user.id || '')) return false;
+        } else if (wantedAssignee === 'unassigned') {
+          if (assigneeId) return false;
+        } else if (assigneeId !== wantedAssignee) {
+          return false;
+        }
       }
 
       if (wantedDeadline !== 'all') {
@@ -915,6 +1268,8 @@ export class PlanningCollabApp {
     const parts = [];
     if (card.priority) parts.push(`priority: ${String(card.priority).toUpperCase()}`);
     if (card.deadline) parts.push(`deadline: ${String(card.deadline)}`);
+    const assignee = this.assigneeLabel(card);
+    if (assignee) parts.push(`assignee: ${assignee}`);
     const tags = asArray(card.tags);
     if (tags.length) parts.push(`tags: ${tags.join(' | ')}`);
     return parts.join(' | ') || '-';
@@ -925,7 +1280,13 @@ export class PlanningCollabApp {
 
     const board = this.state.board;
     if (!board || !board.project) {
-      this.renderEmptyBoard('No active project');
+      if (!this.state.projects.length) {
+        this.renderEmptyBoard('No projects yet. Create your first project.');
+      } else if (!this.getScopeFilteredProjects().length) {
+        this.renderEmptyBoard('No projects in this section. Switch scope filter.');
+      } else {
+        this.renderEmptyBoard('No active project');
+      }
       return;
     }
 
@@ -1164,7 +1525,13 @@ export class PlanningCollabApp {
     });
 
     this.ui.closeModal();
-    await this.loadProjects();
+    await this.loadProjects({ quiet: true });
+    const created = this.state.projects.find((p) => String(p.id) === String(projectId));
+    if (created) {
+      this.uiPrefs.projectScope = this.normalizeProjectScope(created);
+      this.persistUIPrefs();
+      this.renderProjectScopeToggle();
+    }
     await this.selectProject(String(projectId), { force: true });
     this.ui.toast('project created');
   }
@@ -1206,10 +1573,11 @@ export class PlanningCollabApp {
 
     this.ui.closeModal();
     await this.unsubscribeProject();
-    await this.loadProjects();
+    await this.loadProjects({ quiet: true });
 
-    const stillActive = this.state.projects.find((p) => String(p.id) === String(prevActiveId || ''));
-    this.state.activeProjectId = stillActive ? stillActive.id : (this.state.projects[0] ? this.state.projects[0].id : null);
+    const scoped = this.getScopeFilteredProjects();
+    const stillActive = scoped.find((p) => String(p.id) === String(prevActiveId || ''));
+    this.state.activeProjectId = stillActive ? stillActive.id : (scoped[0] ? scoped[0].id : null);
     this.storeActiveProjectId(this.state.activeProjectId);
 
     if (this.state.activeProjectId) {
@@ -1218,6 +1586,7 @@ export class PlanningCollabApp {
       this.state.board = null;
       this.renderBoard();
       this.renderPresence();
+      this.renderAssigneeFilter();
     }
 
     this.ui.toast('project deleted');
@@ -1229,6 +1598,9 @@ export class PlanningCollabApp {
       this.ui.toast('select project first');
       return;
     }
+
+    const canManageMembers = ['owner', 'editor'].includes(String(board.project.role || '').toLowerCase());
+    const scopeText = this.projectScopeText(board.project);
 
     const pending = asArray(board.invitations)
       .filter((x) => String(x.status) === 'pending')
@@ -1243,10 +1615,31 @@ export class PlanningCollabApp {
       })
       .join('');
 
+    const members = asArray(board.members)
+      .map((m) => {
+        const userId = String(m.user_id || '').trim();
+        const role = roleLabel(m.role);
+        const label = this.resolveMemberLabel(m);
+        const isSelf = userId === String(this.user && this.user.id || '');
+        const canRemove = canManageMembers && !isSelf;
+        return `
+          <div class="friend-card" style="padding:8px; border:1px solid rgba(0,0,0,.14); display:flex; align-items:center; justify-content:space-between; gap:8px;">
+            <div style="display:grid; gap:2px; min-width:0;">
+              <div style="font-size:11px; letter-spacing:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(label)}</div>
+              <div style="font-size:10px; letter-spacing:2px; text-transform:uppercase; opacity:.65;">${escapeHtml(role)}</div>
+            </div>
+            <button class="btn" type="button" data-remove-member="${escapeAttr(userId)}" ${canRemove ? '' : 'disabled'}>remove</button>
+          </div>
+        `;
+      })
+      .join('');
+
     this.ui.openModal({
       title: 'invite friend',
       bodyHtml: `
         <form class="form" data-invite-form>
+          <div style="font-size:10px; letter-spacing:2px; text-transform:uppercase; opacity:.7;">project scope: ${escapeHtml(scopeText)}</div>
+
           <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
             friend user-id
             <input class="ctl" name="target_user_id" required maxlength="32" autocomplete="off" />
@@ -1267,6 +1660,11 @@ export class PlanningCollabApp {
         <div style="display:grid; gap:8px; margin-top:6px;">
           ${pending || '<div style="font-size:11px; opacity:.7;">no pending invites</div>'}
         </div>
+
+        <div style="font-size:11px; letter-spacing:2px; text-transform:uppercase; opacity:.75; margin-top:8px;">members</div>
+        <div style="display:grid; gap:8px; margin-top:6px;">
+          ${members || '<div style="font-size:11px; opacity:.7;">no members</div>'}
+        </div>
       `,
       onSubmit: (data) => {
         void this.inviteFriendSubmit(data).catch((error) => this.onMutationError(error));
@@ -1274,10 +1672,18 @@ export class PlanningCollabApp {
       onMount: (bodyEl) => {
         bodyEl.addEventListener('click', (event) => {
           const btn = event.target.closest('[data-cancel-invite]');
-          if (!btn) return;
-          const invitationId = String(btn.getAttribute('data-cancel-invite') || '');
-          if (!invitationId) return;
-          void this.cancelInvitation(invitationId).catch((error) => this.onMutationError(error));
+          if (btn) {
+            const invitationId = String(btn.getAttribute('data-cancel-invite') || '');
+            if (!invitationId) return;
+            void this.cancelInvitation(invitationId).catch((error) => this.onMutationError(error));
+            return;
+          }
+
+          const rm = event.target.closest('[data-remove-member]');
+          if (!rm || rm.disabled) return;
+          const memberId = String(rm.getAttribute('data-remove-member') || '').trim();
+          if (!memberId) return;
+          void this.removeMember(memberId).catch((error) => this.onMutationError(error));
         });
       }
     });
@@ -1297,8 +1703,13 @@ export class PlanningCollabApp {
       p_message: message
     });
 
+    this.uiPrefs.projectScope = 'shared';
+    this.persistUIPrefs();
+    this.renderProjectScopeToggle();
     this.ui.closeModal();
-    await this.loadBoard(board.project.id);
+    await this.loadProjects({ quiet: true });
+    await this.setProjectScope('shared', { force: true });
+    await this.selectProject(board.project.id, { force: true });
     await this.loadIncomingInvitations({ quiet: true });
     this.ui.toast('invite sent');
   }
@@ -1308,10 +1719,30 @@ export class PlanningCollabApp {
       p_invitation_id: invitationId
     });
     this.ui.closeModal();
+    await this.loadProjects({ quiet: true });
+    await this.setProjectScope(this.uiPrefs.projectScope, { force: true });
     if (this.state.activeProjectId) {
       await this.loadBoard(this.state.activeProjectId);
     }
     this.ui.toast('invite cancelled');
+  }
+
+  async removeMember(memberId) {
+    const board = this.state.board;
+    if (!board || !board.project) return;
+
+    await this.rpc('ik_plan_remove_member', {
+      p_project_id: board.project.id,
+      p_member_id: memberId
+    });
+
+    this.ui.closeModal();
+    await this.loadProjects({ quiet: true });
+    await this.setProjectScope(this.uiPrefs.projectScope, { force: true });
+    if (this.state.activeProjectId) {
+      await this.loadBoard(this.state.activeProjectId);
+    }
+    this.ui.toast('member removed');
   }
 
   async openIncomingInvitesModal() {
@@ -1362,12 +1793,19 @@ export class PlanningCollabApp {
     const projectId = out && out.project_id ? String(out.project_id) : null;
     this.ui.closeModal();
     await this.loadIncomingInvitations({ quiet: true });
-    await this.loadProjects();
+    await this.loadProjects({ quiet: true });
 
     if (accept && projectId) {
+      this.uiPrefs.projectScope = 'shared';
+      this.persistUIPrefs();
+      this.renderProjectScopeToggle();
+      await this.setProjectScope('shared', { force: true });
       await this.selectProject(projectId, { force: true });
     } else if (this.state.activeProjectId) {
+      await this.setProjectScope(this.uiPrefs.projectScope, { force: true });
       await this.loadBoard(this.state.activeProjectId);
+    } else {
+      await this.setProjectScope(this.uiPrefs.projectScope, { force: true });
     }
 
     this.ui.toast(accept ? 'invitation accepted' : 'invitation rejected');
@@ -1527,6 +1965,7 @@ export class PlanningCollabApp {
     const options = columns
       .map((c) => `<option value="${escapeAttr(c.id)}">${escapeHtml(String(c.name || '').toUpperCase())}</option>`)
       .join('');
+    const assigneeOptions = this.assigneeOptionsHtml('');
 
     this.ui.openModal({
       title: 'new task',
@@ -1568,6 +2007,11 @@ export class PlanningCollabApp {
             </label>
           </div>
 
+          <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+            assignee
+            <select class="ctl" name="assignee_id">${assigneeOptions}</select>
+          </label>
+
           <div class="form__actions">
             <button class="btn" type="button" data-close>cancel</button>
             <button class="btn" type="submit">create</button>
@@ -1595,10 +2039,27 @@ export class PlanningCollabApp {
       p_priority: String(data.priority || 'mid'),
       p_deadline: String(data.deadline || '').trim() || null,
       p_tags: parseTags(data.tags),
+      p_assignee_id: String(data.assignee_id || '').trim() || null,
       p_base_revision: board.project.revision
     };
 
-    await this.rpc('ik_plan_create_card', payload);
+    try {
+      await this.rpc('ik_plan_create_card', payload);
+    } catch (error) {
+      const low = briefError(error).toLowerCase();
+      const code = String((error && error.code) || '').toUpperCase();
+      if (code === '42883' && low.includes('ik_plan_create_card')) {
+        const fallback = { ...payload };
+        delete fallback.p_assignee_id;
+        await this.rpc('ik_plan_create_card', fallback);
+        if (payload.p_assignee_id) {
+          this.ui.toast('apply stage10 sql for assignee support');
+        }
+      } else {
+        throw error;
+      }
+    }
+
     this.ui.closeModal();
     await this.loadBoard(board.project.id);
     this.ui.toast('task created');
@@ -1615,6 +2076,7 @@ export class PlanningCollabApp {
     const colOptions = columns
       .map((c) => `<option value="${escapeAttr(c.id)}" ${String(c.id) === String(card.column_id) ? 'selected' : ''}>${escapeHtml(String(c.name || '').toUpperCase())}</option>`)
       .join('');
+    const assigneeOptions = this.assigneeOptionsHtml(String(card.assignee_id || ''));
 
     this.startCurrentEditing(card.id);
 
@@ -1658,6 +2120,11 @@ export class PlanningCollabApp {
             </label>
           </div>
 
+          <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+            assignee
+            <select class="ctl" name="assignee_id">${assigneeOptions}</select>
+          </label>
+
           <div class="form__actions">
             <button class="btn" type="button" data-close>close</button>
             <button class="btn" type="submit">save</button>
@@ -1677,7 +2144,7 @@ export class PlanningCollabApp {
     const name = String(data.name || '').trim();
     if (!name) return;
 
-    await this.rpc('ik_plan_update_card', {
+    const payload = {
       p_project_id: board.project.id,
       p_card_id: baseCard.id,
       p_name: name,
@@ -1686,9 +2153,27 @@ export class PlanningCollabApp {
       p_deadline: String(data.deadline || '').trim() || null,
       p_tags: parseTags(data.tags),
       p_column_id: String(data.column_id || '').trim() || null,
+      p_assignee_id: String(data.assignee_id || '').trim() || null,
       p_base_version: baseCard.version,
       p_base_revision: board.project.revision
-    });
+    };
+
+    try {
+      await this.rpc('ik_plan_update_card', payload);
+    } catch (error) {
+      const low = briefError(error).toLowerCase();
+      const code = String((error && error.code) || '').toUpperCase();
+      if (code === '42883' && low.includes('ik_plan_update_card')) {
+        const fallback = { ...payload };
+        delete fallback.p_assignee_id;
+        await this.rpc('ik_plan_update_card', fallback);
+        if (payload.p_assignee_id) {
+          this.ui.toast('apply stage10 sql for assignee support');
+        }
+      } else {
+        throw error;
+      }
+    }
 
     this.ui.closeModal();
     await this.loadBoard(board.project.id);
@@ -1856,10 +2341,18 @@ export class PlanningCollabApp {
     if (looksLikeSchemaError(error)) {
       if (!this.schemaWarnShown) {
         this.schemaWarnShown = true;
-        this.ui.toast('apply SQL: supabase/sql/stage9_planning_collab.sql');
+        this.ui.toast('apply SQL: supabase/sql/stage9_planning_collab.sql then supabase/sql/stage10_planning_shared_personal_tasks.sql');
       }
+      this.clearProjectsRetry();
       this.setActionsDisabled(true);
-      this.setCloudBadge('off', 'stage9 sql missing');
+      this.setCloudBadge('off', 'planning sql missing');
+      return;
+    }
+
+    if (looksTransientError(error)) {
+      this.setCloudBadge('sync', 'network issue, retrying');
+      this.scheduleProjectsRetry();
+      this.ui.toast('network issue, retrying');
       return;
     }
 
@@ -1883,6 +2376,31 @@ export class PlanningCollabApp {
 
     if (low.includes('already_member')) {
       this.ui.toast('user is already in project');
+      return;
+    }
+
+    if (low.includes('assignee_not_member')) {
+      this.ui.toast('assignee must be a project member');
+      return;
+    }
+
+    if (low.includes('member_not_found')) {
+      this.ui.toast('member not found');
+      return;
+    }
+
+    if (low.includes('owner_cannot_leave')) {
+      this.ui.toast('owner cannot be removed from project');
+      return;
+    }
+
+    if (low.includes('invitation_not_pending')) {
+      this.ui.toast('invitation already resolved');
+      return;
+    }
+
+    if (low.includes('only_owner_can_delete_project')) {
+      this.ui.toast('only owner can delete project');
       return;
     }
 

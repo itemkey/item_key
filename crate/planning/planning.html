@@ -178,8 +178,20 @@
       </header>
 
       <div class="planning-toolbar" data-ik-stage="top">
+        <div id="projectScope" class="scope-switch" role="tablist" aria-label="Раздел проектов">
+          <button class="scope-switch__btn" id="scopePersonal" type="button" data-scope="personal" aria-pressed="false">Личные</button>
+          <button class="scope-switch__btn" id="scopeShared" type="button" data-scope="shared" aria-pressed="false">Общие</button>
+          <button class="scope-switch__btn is-active" id="scopeAll" type="button" data-scope="all" aria-pressed="true">Все</button>
+        </div>
+
         <select id="projectSelect" class="ctl" aria-label="Проект"></select>
         <input id="searchInput" class="ctl" type="search" placeholder="поиск задач…" aria-label="Поиск" />
+
+        <select id="assigneeFilter" class="ctl" aria-label="Фильтр по исполнителю">
+          <option value="all">исполнитель: все</option>
+          <option value="me">исполнитель: мои</option>
+          <option value="unassigned">исполнитель: без ответ.</option>
+        </select>
 
         <input id="tagsFilter" class="ctl" type="text" placeholder="теги: учёба, работа" aria-label="Фильтр по тегам" />
 
@@ -246,10 +258,29 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../../assets/js/supabase-client.js"></script>
   <script type="module">
-    import { initPlanningCloud } from './js/planning_cloud.js';
-    await initPlanningCloud();
-    await import('./planning.js');
-    if (window.IKLoading) window.IKLoading.done();
+    let bootError = null;
+    try {
+      const { initPlanningCloud } = await import('./js/planning_cloud.js');
+      try {
+        await initPlanningCloud();
+      } catch (error) {
+        console.error('planning cloud init failed', error);
+      }
+      await import('./planning.js');
+    } catch (error) {
+      bootError = error;
+      console.error('planning boot failed', error);
+    } finally {
+      if (window.IKLoading) window.IKLoading.done();
+    }
+
+    if (bootError) {
+      const view = document.getElementById('boardView');
+      if (view) {
+        view.hidden = false;
+        view.innerHTML = '<div style="font-size:11px; letter-spacing:2px; text-transform:uppercase; opacity:.78;">planning boot failed. reload page.</div>';
+      }
+    }
   </script>
 
   <script>
@@ -383,7 +414,12 @@
     ['Планирование', 'Planning'],
     ['+ проект', '+ project'],
     ['+ задача', '+ task'],
+    ['+ друг', '+ friend'],
+    ['входящие', 'inbox'],
     ['+ расписание', '+ schedule'],
+    ['Личные', 'Personal'],
+    ['Общие', 'Shared'],
+    ['Все', 'All'],
     ['проект', 'project'],
     ['проекты', 'projects'],
     ['задача', 'task'],
@@ -396,6 +432,8 @@
     ['Проект', 'Project'],
     ['Поиск', 'Search'],
     ['Фильтр по тегам', 'Filter by tags'],
+    ['Фильтр по исполнителю', 'Filter by assignee'],
+    ['Раздел проектов', 'Project section'],
     ['Фильтр по приоритету', 'Filter by priority'],
     ['Фильтр по сроку', 'Filter by deadline'],
     ['Сортировка задач', 'Sort tasks'],
@@ -405,6 +443,9 @@
     ['Закрыть', 'Close'],
     ['диалог', 'dialog'],
     ['теги: учёба, работа', 'tags: study, work'],
+    ['исполнитель: все', 'assignee: all'],
+    ['исполнитель: мои', 'assignee: mine'],
+    ['исполнитель: без ответ.', 'assignee: unassigned'],
     ['приоритет: все', 'priority: all'],
     ['приоритет: высокий', 'priority: high'],
     ['приоритет: средний', 'priority: mid'],
@@ -520,6 +561,9 @@
     'Close': 'Закрыть',
     'search tasks…': 'поиск задач…',
     'tags: study, work': 'теги: учёба, работа',
+    'assignee: all': 'исполнитель: все',
+    'assignee: mine': 'исполнитель: мои',
+    'assignee: unassigned': 'исполнитель: без ответ.',
     'priority: all': 'приоритет: все',
     'priority: high': 'приоритет: высокий',
     'priority: mid': 'приоритет: средний',
@@ -537,6 +581,8 @@
     'Projects': 'Проекты',
     'Search': 'Поиск',
     'Filter by tags': 'Фильтр по тегам',
+    'Filter by assignee': 'Фильтр по исполнителю',
+    'Project section': 'Раздел проектов',
     'Filter by priority': 'Фильтр по приоритету',
     'Filter by deadline': 'Фильтр по сроку',
     'Sort tasks': 'Сортировка задач',
@@ -598,14 +644,24 @@
       { selector: '.planning-title h1', text: { ru: 'планирование', en: 'planning' } },
       { selector: '#btnNewProject', text: { ru: '+ проект', en: '+ project' } },
       { selector: '#btnNewTask', text: { ru: '+ задача', en: '+ task' } },
+      { selector: '#btnInviteFriend', text: { ru: '+ друг', en: '+ friend' } },
+      { selector: '#btnInvitesInbox', text: { ru: 'входящие', en: 'inbox' } },
       { selector: '#btnNewEvent', text: { ru: '+ расписание', en: '+ schedule' } },
+      { selector: '#scopePersonal', text: { ru: 'Личные', en: 'Personal' } },
+      { selector: '#scopeShared', text: { ru: 'Общие', en: 'Shared' } },
+      { selector: '#scopeAll', text: { ru: 'Все', en: 'All' } },
       { selector: '#clearFilters', text: { ru: 'очистить', en: 'clear' } },
       { selector: '#searchInput', placeholder: { ru: 'поиск задач…', en: 'search tasks…' } },
+      { selector: '#assigneeFilter option[value="all"]', text: { ru: 'исполнитель: все', en: 'assignee: all' } },
+      { selector: '#assigneeFilter option[value="me"]', text: { ru: 'исполнитель: мои', en: 'assignee: mine' } },
+      { selector: '#assigneeFilter option[value="unassigned"]', text: { ru: 'исполнитель: без ответ.', en: 'assignee: unassigned' } },
       { selector: '#tagsFilter', placeholder: { ru: 'теги: учёба, работа', en: 'tags: study, work' } },
       { selector: 'main.center-stage', attr: { 'aria-label': { ru: 'центр планирования', en: 'planning center' } } },
+      { selector: '#projectScope', attr: { 'aria-label': { ru: 'Раздел проектов', en: 'Project section' } } },
       { selector: '#projectSelect', attr: { 'aria-label': { ru: 'Проект', en: 'Project' } } },
       { selector: '#searchInput', attr: { 'aria-label': { ru: 'Поиск', en: 'Search' } } },
       { selector: '#tagsFilter', attr: { 'aria-label': { ru: 'Фильтр по тегам', en: 'Filter by tags' } } },
+      { selector: '#assigneeFilter', attr: { 'aria-label': { ru: 'Фильтр по исполнителю', en: 'Filter by assignee' } } },
       { selector: '#priorityFilter', attr: { 'aria-label': { ru: 'Фильтр по приоритету', en: 'Filter by priority' } } },
       { selector: '#deadlineFilter', attr: { 'aria-label': { ru: 'Фильтр по сроку', en: 'Filter by deadline' } } },
       { selector: '#sortSelect', attr: { 'aria-label': { ru: 'Сортировка задач', en: 'Sort tasks' } } },

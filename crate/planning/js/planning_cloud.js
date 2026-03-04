@@ -27,7 +27,7 @@ function setBadge(text, title) {
   if (safeText !== runtime.lastText || safeTitle !== runtime.lastTitle) {
     runtime.lastText = safeText;
     runtime.lastTitle = safeTitle;
-    if (window.IKAdminLog) {
+    if (typeof window.IKAdminLog === 'function') {
       const payload = safeTitle ? `planning cloud: ${safeText} | ${safeTitle}` : `planning cloud: ${safeText}`;
       window.IKAdminLog('log', 'planning', payload);
     }

@@ -10,6 +10,7 @@ Order for fresh environment:
 6. Run `supabase/sql/stage7_planning_private.sql`
 7. Run `supabase/sql/stage8_accounts_social.sql`
 8. Run `supabase/sql/stage9_planning_collab.sql`
+9. Run `supabase/sql/stage10_planning_shared_personal_tasks.sql`
 
 After SQL:
 
