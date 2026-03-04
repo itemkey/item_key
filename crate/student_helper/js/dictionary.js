@@ -611,6 +611,16 @@ function dictFilenameForSection(sectionName){
   let dictWordsAll = [];
   let dictCounts = new Map();
 
+  // Source:
+  // - personal: user's own dictionaries (non-rated)
+  // - system: site dictionaries (rated)
+  // - user: published user dictionaries (rated)
+  let dictSource = 'personal';
+  let publicCatalog = { system: [], user: [] };
+  let publicCounts = { system: new Map(), user: new Map() };
+  let publicWordsCache = { system: new Map(), user: new Map() }; // dictId -> words[]
+  let publicLoadedDictId = null;
+
   // Cards state
   let cardsDeck = [];
   let cardsHistory = [];
@@ -627,6 +637,7 @@ function dictFilenameForSection(sectionName){
   let quizCheckMode = 'check';
   let quizTotal = 0;
   let quizCorrect = 0;
+  let quizRewarded = false;
 
   
   let quizSeen = new Set();
@@ -731,7 +742,7 @@ function dictFilenameForSection(sectionName){
     if(!item) return '';
     const enK = normEnCmp(stripParenMeta(item.en || ''));
     const ruK = normRuCmp(stripParenMeta(item.ru || ''));
-    return `${item.sectionId}|${enK}|${ruK}`;
+    return `${dictSource}:${item.sectionId}|${enK}|${ruK}`;
   }
   function practiceGetStat(item){
     const key = practiceKey(item);
@@ -1892,6 +1903,7 @@ let elLearnMcqButtons = null;
   const elNewSectionName = document.getElementById('dictNewSectionName');
   const btnAddSection = document.getElementById('dictAddSection');
   const btnDeleteSection = document.getElementById('dictDeleteSection');
+  const btnSubmitModeration = document.getElementById('dictSubmitModeration');
   const elEnInput = document.getElementById('dictEnInput');
   const elRuInput = document.getElementById('dictRuInput');
   const btnAddWord = document.getElementById('dictAddWord');
@@ -1926,6 +1938,46 @@ let elLearnMcqButtons = null;
     const denom = (quizSessionTarget || quizDeck.length || 0);
     const prog = denom ? Math.min(quizSeen.size, denom) : 0;
     elQuizScore.textContent = `${prog}/${denom} | ${quizCorrect}/${quizTotal}`;
+  }
+
+  async function maybeRewardQuizSession(){
+    if(quizRewarded) return;
+    if(!isRatedSource()) return;
+    const cfg = cfgFromUI();
+    if(String(cfg.session || '') !== '20') return;
+    const denom = Number(quizSessionTarget || 0);
+    if(denom !== 20) return;
+    if(quizTotal < denom) return;
+
+    const dictId = Number((elSectionQuiz && elSectionQuiz.value) || 0);
+    if(!dictId) return;
+
+    const client = getSupaClient();
+    if(!client) return;
+
+    try{
+      quizRewarded = true;
+      const { data, error } = await client.rpc('ik_award_study_session', {
+        p_module: 'dictionary',
+        p_dict_id: dictId,
+        p_tasks: denom,
+        p_correct: Number(quizCorrect || 0),
+        p_unique_words: Number(quizSeen && quizSeen.size || 0),
+        p_rated: true,
+        p_source: dictSource
+      });
+      if(error) throw error;
+      if(data && data.awarded){
+        const eco = data.eco != null ? String(data.eco) : '';
+        const ib = Number(data.ibit || 0);
+        const extra = ib ? ` +${ib} i-bit þ` : '';
+        quizSetFeedback('correct', 'reward', `награда: +${eco} eco${extra}`);
+      }else if(data && data.reason){
+        quizSetFeedback('idle', 'no reward', String(data.reason));
+      }
+    }catch(e){
+      quizRewarded = false;
+    }
   }
 
   function setQuizMode(mode){
@@ -2405,6 +2457,7 @@ function quizMcqSelect(idx){
   quizTotal += 1;
   if(isOk) quizCorrect += 1;
   quizUpdateScore();
+  maybeRewardQuizSession().catch(()=>{});
 
   if(isOk){
     // MCQ counts weaker by default
@@ -2449,6 +2502,7 @@ function quizMcqGiveUp(){
 
   quizTotal += 1;
   quizUpdateScore();
+  maybeRewardQuizSession().catch(()=>{});
 
   practiceBump(quizCurrent, quizAskLang, 'wrong');
 
@@ -2632,6 +2686,17 @@ function handleMcqHotkeys(e){
 }
 
   function buildCounts(){
+    if(isPublicSource()){
+      // Keep catalog counts for all public dictionaries.
+      // When we lazily load words for a dict, just ensure its count is correct.
+      if(!(dictCounts instanceof Map) || dictCounts.size === 0){
+        dictCounts = publicCounts[dictSource] || new Map();
+      }
+      const sid = Number(publicLoadedDictId || 0);
+      if(sid) dictCounts.set(sid, Number(dictWordsAll.length || 0));
+      return;
+    }
+
     dictCounts = new Map();
     for(const s of dictSections){
       dictCounts.set(Number(s.id), 0);
@@ -2650,6 +2715,96 @@ function handleMcqHotkeys(e){
   function updateGlobalBadges(){
     setAdminText(elDictDbNameLine, `db: ${dictDbName()}`);
     elDictCountBadge.textContent = `words: ${dictWordsAll.length}`;
+  }
+
+  function isPublicSource(){
+    return dictSource === 'system' || dictSource === 'user';
+  }
+
+  function isRatedSource(){
+    return isPublicSource();
+  }
+
+  function getSupaClient(){
+    try{
+      if(!(window.IKSupabase && typeof window.IKSupabase.getClient === 'function')) return null;
+      return window.IKSupabase.getClient();
+    }catch(_){
+      return null;
+    }
+  }
+
+  async function ensurePublicCatalog(kind){
+    const k = (kind === 'system') ? 'system' : 'user';
+    if(Array.isArray(publicCatalog[k]) && publicCatalog[k].length) return publicCatalog[k];
+    const client = getSupaClient();
+    if(!client) throw new Error('Supabase not available');
+
+    const { data, error } = await client
+      .from('ik_public_dict_catalog')
+      .select('id,title,title_key,dict_type,owner_id,current_version_id,words_count,updated_at')
+      .eq('dict_type', k)
+      .order('updated_at', { ascending:false });
+
+    if(error) throw error;
+    const rows = Array.isArray(data) ? data : [];
+
+    publicCatalog[k] = rows.map((r)=>({
+      id: Number(r.id),
+      name: String(r.title || 'dictionary').trim(),
+      nameKey: String(r.title_key || r.title || '').trim().toLowerCase(),
+      dictType: String(r.dict_type || k),
+      ownerId: r.owner_id || null,
+      currentVersionId: r.current_version_id || null,
+      updatedAt: r.updated_at || null,
+      wordsCount: Number(r.words_count || 0)
+    })).filter((r)=> r.id && r.name);
+
+    publicCounts[k] = new Map(publicCatalog[k].map((r)=> [Number(r.id), Number(r.wordsCount || 0)]));
+    return publicCatalog[k];
+  }
+
+  async function ensurePublicWords(kind, dictId){
+    const k = (kind === 'system') ? 'system' : 'user';
+    const id = Number(dictId || 0);
+    if(!id) return [];
+    const cached = publicWordsCache[k].get(id);
+    if(Array.isArray(cached) && cached.length) return cached;
+
+    const client = getSupaClient();
+    if(!client) throw new Error('Supabase not available');
+
+    const { data, error } = await client
+      .from('ik_public_dict_current_words')
+      .select('id,dict_id,en,ru')
+      .eq('dict_id', id)
+      .order('id', { ascending:true });
+
+    if(error) throw error;
+    const rows = Array.isArray(data) ? data : [];
+    const words = rows.map((w)=>({
+      id: w.id,
+      sectionId: Number(w.dict_id || id),
+      en: String(w.en || '').trim(),
+      ru: String(w.ru || '').trim(),
+    })).filter((w)=> w.sectionId && w.en && w.ru);
+
+    publicWordsCache[k].set(id, words);
+    return words;
+  }
+
+  async function dictEnsureSectionLoaded(sectionValue){
+    if(!isPublicSource()) return true;
+    const v = String(sectionValue || '').trim();
+    const sid = Number(v || 0);
+    if(!sid) return true;
+    if(publicLoadedDictId === sid && Array.isArray(dictWordsAll) && dictWordsAll.length) return true;
+    const words = await ensurePublicWords(dictSource, sid);
+    dictWordsAll = words;
+    publicLoadedDictId = sid;
+    buildCounts();
+    updateGlobalBadges();
+    return true;
   }
 
   function dictShowFirstPick(){
@@ -2686,10 +2841,11 @@ function handleMcqHotkeys(e){
     if(elSectionBuilder && v !== 'All' && elSectionBuilder.value !== v) elSectionBuilder.value = v;
   }
 
-function dictEnterSection(sectionValue, startTab){
+ async function dictEnterSection(sectionValue, startTab){
     const v = String(sectionValue || '').trim();
     if(!v) return;
 
+    await dictEnsureSectionLoaded(v);
     dictSetCurrentSection(v);
 
     if(elDictFirstPick) elDictFirstPick.hidden = true;
@@ -2713,6 +2869,173 @@ function dictEnterSection(sectionValue, startTab){
 
     dictSetSubtab('cards');
     dictResetCards();
+  }
+
+  function ensureDictSourceTabsUI(){
+    if(!elDictFirstPick) return;
+    if(document.getElementById('dictSourceTabs')) return;
+
+    const wrap = document.createElement('div');
+    wrap.id = 'dictSourceTabs';
+    wrap.className = 'ik-tabs';
+    wrap.style.marginTop = '10px';
+
+    const mk = (key, label)=>{
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'ik-tab';
+      b.setAttribute('data-dict-source', key);
+      b.textContent = label;
+      b.setAttribute('aria-selected', String(dictSource === key));
+      return b;
+    };
+
+    wrap.appendChild(mk('personal','личные'));
+    wrap.appendChild(mk('system','системные'));
+    wrap.appendChild(mk('user','пользовательские'));
+
+    const sub = elDictFirstPick.querySelector('.ik-sub');
+    if(sub && sub.parentNode){
+      sub.parentNode.insertBefore(wrap, sub.nextSibling);
+    }else{
+      elDictFirstPick.insertBefore(wrap, elDictFirstPick.firstChild || null);
+    }
+  }
+
+  function applyDictSourceAccess(){
+    const editable = dictSource === 'personal';
+    if(dictTabBuilder) dictTabBuilder.style.display = editable ? '' : 'none';
+    if(btnFirstPickOpenConstructor) btnFirstPickOpenConstructor.style.display = editable ? '' : 'none';
+
+    if(btnAddSection) btnAddSection.disabled = !editable;
+    if(btnDeleteSection) btnDeleteSection.disabled = !editable;
+    if(btnDictExport) btnDictExport.disabled = !editable;
+    if(btnDictImport) btnDictImport.disabled = !editable;
+    if(btnAddWord) btnAddWord.disabled = !editable;
+    if(elNewSectionName) elNewSectionName.disabled = !editable;
+    if(elEnInput) elEnInput.disabled = !editable;
+    if(elRuInput) elRuInput.disabled = !editable;
+    if(elDictImportReplace) elDictImportReplace.disabled = !editable;
+    if(btnSubmitModeration) btnSubmitModeration.style.display = editable ? '' : 'none';
+
+    const tabs = document.querySelectorAll('#dictSourceTabs [data-dict-source]');
+    tabs.forEach((t)=>{
+      const k = t.getAttribute('data-dict-source');
+      t.setAttribute('aria-selected', String(k === dictSource));
+      t.classList.toggle('is-active', k === dictSource);
+    });
+  }
+
+  async function dictSetSource(next){
+    const allowed = ['personal','system','user'];
+    const k = allowed.includes(String(next || '')) ? String(next) : 'personal';
+    dictSource = k;
+    publicLoadedDictId = null;
+    dictCurrentSection = '';
+    quizRewarded = false;
+    try{ localStorage.setItem('student_helper_dict_source_v1', dictSource); }catch(_){ }
+
+    if(dictSource === 'personal'){
+      await dictRefreshAll();
+      buildCounts();
+      updateGlobalBadges();
+      renderSectionsUI();
+      dictShowFirstPick();
+      applyDictSourceAccess();
+      return;
+    }
+
+    try{
+      const cat = await ensurePublicCatalog(dictSource);
+      dictSections = cat.map((d)=>({ id: d.id, name: d.name, nameKey: d.nameKey }));
+      dictCounts = publicCounts[dictSource] || new Map();
+      dictWordsAll = [];
+      updateGlobalBadges();
+      renderSectionsUI();
+      dictShowFirstPick();
+      applyDictSourceAccess();
+    }catch(e){
+      // fallback to personal if public source isn't available (no auth / schema missing)
+      dictSource = 'personal';
+      publicLoadedDictId = null;
+      try{ localStorage.setItem('student_helper_dict_source_v1', dictSource); }catch(_){ }
+      await dictRefreshAll();
+      buildCounts();
+      updateGlobalBadges();
+      renderSectionsUI();
+      dictShowFirstPick();
+      applyDictSourceAccess();
+      throw e;
+    }
+  }
+
+  async function dictSelectSectionAndRun(sectionValue, fn){
+    const v = String(sectionValue || '').trim();
+    if(!v) return;
+    await dictEnsureSectionLoaded(v);
+    dictSetCurrentSection(v);
+    if(typeof fn === 'function') fn();
+  }
+
+  async function submitCurrentSectionToModeration(){
+    if(dictSource !== 'personal') return;
+    const sid = Number(elSectionBuilder && elSectionBuilder.value || 0);
+    if(!sid){
+      alert('Выбери section.');
+      return;
+    }
+    const title = getSectionNameById(sid);
+    const words = dictWordsAll
+      .filter((w)=> Number(w.sectionId) === sid)
+      .map((w)=>({ en: String(w.en || '').trim(), ru: String(w.ru || '').trim() }))
+      .filter((w)=> w.en && w.ru);
+    if(words.length < 5){
+      alert('Слишком мало слов для модерации (минимум 5).');
+      return;
+    }
+
+    const client = getSupaClient();
+    if(!client){
+      alert('Supabase недоступен на этой странице.');
+      return;
+    }
+
+    let targetDictId = null;
+    try{
+      const u = await client.auth.getUser();
+      const uid = u && u.data && u.data.user ? u.data.user.id : null;
+      if(uid){
+        const { data } = await client
+          .from('ik_public_dicts')
+          .select('id,title,updated_at')
+          .eq('owner_id', uid)
+          .eq('dict_type', 'user')
+          .order('updated_at', { ascending:false })
+          .limit(20);
+        const list = Array.isArray(data) ? data : [];
+        if(list.length){
+          const lines = list.map((x)=> `#${x.id}: ${x.title}`).join('\n');
+          const wantsUpdate = confirm(`Отправить как обновление опубликованного словаря?\n\nOK = обновление\nCancel = новая публикация\n\nТвои словари:\n${lines}`);
+          if(wantsUpdate){
+            const raw = prompt('Введи ID словаря для обновления (число):', String(list[0].id));
+            const n = Number(raw || 0);
+            if(Number.isFinite(n) && n > 0) targetDictId = n;
+          }
+        }
+      }
+    }catch(_){ }
+
+    try{
+      const { data, error } = await client.rpc('ik_submit_dict_publish_request', {
+        p_title: title,
+        p_words: words,
+        p_target_dict_id: targetDictId,
+      });
+      if(error) throw error;
+      alert(`Отправлено на модерацию. request_id=${data}`);
+    }catch(e){
+      alert(`Ошибка отправки: ${e && (e.message || e)}`);
+    }
   }
 
   function renderFirstPickUI(){
@@ -2884,6 +3207,15 @@ li.appendChild(left);
   }
 
   function renderWordsUI(){
+    if(isPublicSource()){
+      if(elSectionList) elSectionList.innerHTML = '';
+      if(elWordList) elWordList.innerHTML = '';
+      const li = document.createElement('li');
+      li.innerHTML = `<p class="ik-itemline"><b>read-only</b> <span class="ik-muted">конструктор доступен только в разделе "личные"</span></p>`;
+      if(elWordList) elWordList.appendChild(li);
+      return;
+    }
+
     const sid = Number(elSectionBuilder.value || 0);
     const list = dictWordsAll
       .filter(w => Number(w.sectionId) === sid)
@@ -3243,6 +3575,7 @@ li.appendChild(left);
 
     quizTotal = 0;
     quizCorrect = 0;
+    quizRewarded = false;
     quizSeen = new Set();
     quizUpdateScore();
     quizNext();
@@ -3312,6 +3645,7 @@ li.appendChild(left);
     quizTotal += 1;
     if(accept) quizCorrect += 1;
     quizUpdateScore();
+    maybeRewardQuizSession().catch(()=>{});
 
     if(accept){
       practiceBump(p.item, p.askLang, 'hard');
@@ -3360,6 +3694,7 @@ li.appendChild(left);
       quizTotal += 1;
       quizCorrect += 1;
       quizUpdateScore();
+      maybeRewardQuizSession().catch(()=>{});
 
       practiceBump(quizCurrent, quizAskLang, practiceHintUsed ? 'hard' : 'correct');
 
@@ -3379,6 +3714,7 @@ li.appendChild(left);
     // wrong
     quizTotal += 1;
     quizUpdateScore();
+    maybeRewardQuizSession().catch(()=>{});
 
     practiceBump(quizCurrent, quizAskLang, 'wrong');
 
@@ -3404,6 +3740,7 @@ li.appendChild(left);
 
     quizTotal += 1;
     quizUpdateScore();
+    maybeRewardQuizSession().catch(()=>{});
 
     practiceBump(quizCurrent, quizAskLang, 'wrong');
 
@@ -3688,37 +4025,21 @@ async function dictSyncFromFolder(opts){
       setAdminText(elDictDbStatus, 'opening...');
       dictDb = await dictOpenDB();
       setAdminText(elDictDbStatus, 'ok');
-      const sync = await dictSyncFromFolder({ replaceExisting:false, mergeExisting:false });
-      if(window.IKAdminLog){
-        window.IKAdminLog('log', 'student_helper', `dict: okFiles=${sync.okFiles.length} failFiles=${sync.failFiles.length} manifest=${sync.manifestUsed || 'none'}`);
-      }
 
-if(sync.okFiles.length){
-  const okPart = sync.failFiles.length ? 'partial' : 'ok';
-  setAdminText(elDictSeedBadge, `json: ${okPart} (${sync.okFiles.length}/${sync.filesCount || sync.okFiles.length})`);
-  elDictSeedBadge.title =
-    `manifest: ${sync.manifestUsed || 'none'}\n\nok:\n- ${sync.okFiles.join('\n- ')}\n\nfail:\n- ${sync.failFiles.length ? sync.failFiles.join('\n- ') : 'none'}\n\nhint: для GitHub Pages нужен db/manifest.json (или db/dictionary/manifest.json) со списком файлов`;
-}else if(sync.failFiles.length){
-  setAdminText(elDictSeedBadge, 'json: failed');
-  elDictSeedBadge.title =
-    `manifest tried:\n- ${(sync.manifestErrors && sync.manifestErrors.length) ? sync.manifestErrors.join('\n- ') : 'n/a'}\n\nfail:\n- ${sync.failFiles.join('\n- ')}\n\nhint: проверь пути (GitHub Pages добавляет /<repo>/ в URL) и регистр папок (db vs DB).`;
-}else{
-  setAdminText(elDictSeedBadge, 'json: none');
-  elDictSeedBadge.title = 'manifest не найден и DICT_DEFAULT_FILES пустой.';
-}
+      // Seed from repo JSON is disabled.
+      // Default content lives on Supabase as public dictionaries (system/user).
+      setAdminText(elDictSeedBadge, 'json: off');
+      if(elDictSeedBadge) elDictSeedBadge.title = 'Локальный seed из /db/dictionary отключен. Используй вкладки "системные" / "пользовательские".';
 
       await dictRefreshAll();
       renderWordsUI();
 
-      if(!dictSections.length && !dictWordsAll.length){
-        const retry = await dictSyncFromFolder({ replaceExisting:false, mergeExisting:false });
-        if(retry.okFiles.length){
-          setAdminText(elDictSeedBadge, `json: ok (${retry.okFiles.length}/${retry.filesCount || retry.okFiles.length})`);
-          elDictSeedBadge.title =
-            `manifest: ${retry.manifestUsed || 'none'}\n\nok:\n- ${retry.okFiles.join('\n- ')}\n\nfail:\n- ${retry.failFiles.length ? retry.failFiles.join('\n- ') : 'none'}`;
-          await dictRefreshAll();
-          renderWordsUI();
-        }
+      // apply last selected source (personal/system/user)
+      try{
+        const saved = String(localStorage.getItem('student_helper_dict_source_v1') || 'personal');
+        await dictSetSource(saved);
+      }catch(_){
+        await dictSetSource('personal');
       }
 
       dictShowFirstPick();
@@ -3743,22 +4064,61 @@ if(sync.okFiles.length){
   applyCfgToUI(loadPracticeCfg());
   loadPracticeStats();
 
-  dictTabCards.addEventListener('click', ()=>{ dictSetSubtab('cards'); dictSetCurrentSection((elSectionCards && elSectionCards.value) || dictCurrentSection || 'All'); dictResetCards(); });
-  dictTabQuiz.addEventListener('click', ()=>{ dictSetSubtab('practice'); dictSetCurrentSection((elSectionQuiz && elSectionQuiz.value) || dictCurrentSection || 'All'); dictResetQuiz(); });
-  dictTabLearn && dictTabLearn.addEventListener('click', ()=>{ dictSetSubtab('learn'); dictSetCurrentSection((elSectionLearn && elSectionLearn.value) || dictCurrentSection || 'All'); learnStartSession(true); });
-  dictTabBuilder.addEventListener('click', ()=>{ dictSetSubtab('builder'); dictSetCurrentSection((elSectionBuilder && elSectionBuilder.value) || dictCurrentSection || 'All'); renderWordsUI(); });
+  ensureDictSourceTabsUI();
+  applyDictSourceAccess();
+
+  // Source tabs
+  document.getElementById('dictSourceTabs')?.addEventListener('click', (e)=>{
+    const btn = e.target && e.target.closest ? e.target.closest('[data-dict-source]') : null;
+    if(!btn) return;
+    const next = btn.getAttribute('data-dict-source') || 'personal';
+    dictSetSource(next).catch((err)=>{
+      console.error(err);
+      alert(`Ошибка загрузки источника: ${err && (err.message || err)}`);
+    });
+  });
+
+  // source is applied after dictBoot()
+
+  dictTabCards.addEventListener('click', ()=>{
+    dictSetSubtab('cards');
+    const v = (elSectionCards && elSectionCards.value) || dictCurrentSection || 'All';
+    dictSelectSectionAndRun(v, dictResetCards).catch(()=>{});
+  });
+  dictTabQuiz.addEventListener('click', ()=>{
+    dictSetSubtab('practice');
+    const v = (elSectionQuiz && elSectionQuiz.value) || dictCurrentSection || 'All';
+    dictSelectSectionAndRun(v, dictResetQuiz).catch(()=>{});
+  });
+  dictTabLearn && dictTabLearn.addEventListener('click', ()=>{
+    dictSetSubtab('learn');
+    const v = (elSectionLearn && elSectionLearn.value) || dictCurrentSection || 'All';
+    dictSelectSectionAndRun(v, ()=> learnStartSession(true)).catch(()=>{});
+  });
+  dictTabBuilder.addEventListener('click', ()=>{
+    if(dictSource !== 'personal'){
+      dictShowFirstPick();
+      return;
+    }
+    dictSetSubtab('builder');
+    dictSetCurrentSection((elSectionBuilder && elSectionBuilder.value) || dictCurrentSection || 'All');
+    renderWordsUI();
+  });
 
   if(btnCardsChooseSection) btnCardsChooseSection.addEventListener('click', dictShowFirstPick);
   if(btnQuizChooseSection) btnQuizChooseSection.addEventListener('click', dictShowFirstPick);
   if(btnLearnChooseSection) btnLearnChooseSection.addEventListener('click', dictShowFirstPick);
   if(btnFirstPickOpenConstructor) btnFirstPickOpenConstructor.addEventListener('click', dictOpenConstructorFromPick);
   if(elFirstPickSearch) elFirstPickSearch.addEventListener('input', renderFirstPickUI);
+  if(btnSubmitModeration) btnSubmitModeration.addEventListener('click', ()=> submitCurrentSectionToModeration().catch(()=>{}));
 
   btnCardsPrev.addEventListener('click', cardsGoPrev);
   btnCardsNext.addEventListener('click', cardsGoNext);
   elCardsFront.addEventListener('change', dictResetCards);
   elCardsRandom.addEventListener('change', dictResetCards);
-  elSectionCards.addEventListener('change', ()=>{ dictSetCurrentSection(elSectionCards.value); dictResetCards(); });
+  elSectionCards.addEventListener('change', ()=>{
+    dictSelectSectionAndRun(elSectionCards.value, dictResetCards).catch(()=>{});
+  });
 
   elFlipCard.addEventListener('click', cardsToggleFlip);
   elFlipCard.addEventListener('keydown', (e)=>{
@@ -3768,8 +4128,12 @@ if(sync.okFiles.length){
     }
   });
 
-  elSectionQuiz.addEventListener('change', ()=>{ dictSetCurrentSection(elSectionQuiz.value); dictResetQuiz(); });
-  if(elSectionLearn) elSectionLearn.addEventListener('change', ()=>{ dictSetCurrentSection(elSectionLearn.value); learnStartSession(true); });
+  elSectionQuiz.addEventListener('change', ()=>{
+    dictSelectSectionAndRun(elSectionQuiz.value, dictResetQuiz).catch(()=>{});
+  });
+  if(elSectionLearn) elSectionLearn.addEventListener('change', ()=>{
+    dictSelectSectionAndRun(elSectionLearn.value, ()=> learnStartSession(true)).catch(()=>{});
+  });
   elQuizMode.addEventListener('change', dictResetQuiz);
 
   btnQuizCheckNext.addEventListener('click', quizCheckOrNext);

@@ -2,6 +2,7 @@
   const CURRENT_KEY = "itemkey.currentUser";
   const NOTICE_STYLE_ID = "ikAuthNoticeStyles";
   const PROFILE_TABLE = "ik_user_profiles";
+  const WALLET_TABLE = "ik_wallets";
   const FRIENDS_TABLE = "ik_friendships";
   const REQUESTS_TABLE = "ik_friend_requests";
   const MAX_AVATAR_BYTES = 900 * 1024;
@@ -65,6 +66,8 @@
     profileShowcaseUserId: document.getElementById("profileShowcaseUserId"),
     profileShowcaseBio: document.getElementById("profileShowcaseBio"),
     profileShowcaseAvatar: document.getElementById("profileShowcaseAvatar"),
+    profileStatExp: document.getElementById("profileStatExp"),
+    profileStatCash: document.getElementById("profileStatCash"),
     constructorToggle: document.getElementById("constructorToggle"),
     constructorPanel: document.getElementById("constructorPanel"),
     constructorEmail: document.getElementById("constructorEmail"),
@@ -234,6 +237,58 @@
     if (/user id not found/i.test(text)) return "Пользователь с таким user-id не найден";
     if (/cannot add yourself/i.test(text)) return "Себя добавить нельзя";
     return text;
+  }
+
+  function formatEcoFromX10(v) {
+    const n = Number(v || 0);
+    if (!Number.isFinite(n)) return "0";
+    const eco = n / 10;
+    // show 1 decimal only when needed
+    return (Math.round(eco * 10) / 10).toFixed(eco % 1 ? 1 : 0);
+  }
+
+  async function ensureWalletRow() {
+    if (!state.supa || !state.user) return null;
+    try {
+      // best-effort: if function isn't deployed, fallback to direct select
+      const { error } = await state.supa.rpc("ik_wallet_ensure");
+      if (error) throw error;
+    } catch (_) {
+      // ignore
+    }
+    return true;
+  }
+
+  async function fetchWalletRow(userId) {
+    if (!state.supa || !userId) return null;
+    const { data, error } = await state.supa
+      .from(WALLET_TABLE)
+      .select("owner_id,eco_x10,ibit")
+      .eq("owner_id", userId)
+      .maybeSingle();
+    if (error) throw error;
+    return data || null;
+  }
+
+  async function refreshWalletUI() {
+    if (!state.user || !state.supa) return;
+    if (!el.profileStatExp && !el.profileStatCash) return;
+
+    try {
+      await ensureWalletRow();
+      const w = await fetchWalletRow(state.user.id);
+      const eco = w ? formatEcoFromX10(w.eco_x10) : "0";
+      const ibit = w ? String(Number(w.ibit || 0)) : "0";
+      if (el.profileStatExp) el.profileStatExp.textContent = eco;
+      if (el.profileStatCash) el.profileStatCash.textContent = ibit;
+    } catch (error) {
+      // don't block profile UI if wallet schema isn't deployed yet
+      if (looksLikeSchemaError(error)) {
+        if (el.profileStatExp) el.profileStatExp.textContent = "0";
+        if (el.profileStatCash) el.profileStatCash.textContent = "0";
+        return;
+      }
+    }
   }
 
   function normalizeEmail(v) {
@@ -661,6 +716,7 @@
       state.profile = await ensureOwnProfile(user, profileOptions || {});
       setLegacyCurrentUser(user, state.profile);
       applyProfileToUI(user, state.profile);
+      refreshWalletUI().catch(() => {});
 
       const requested = getRequestedView();
       setWorkspaceView(requested, false);
@@ -1099,6 +1155,7 @@
     setLegacyCurrentUser(state.user, state.profile);
     applyProfileToUI(state.user, state.profile);
     await syncAuthMetadata(state.profile);
+    refreshWalletUI().catch(() => {});
     showNotice("Профиль сохранен");
   }
 

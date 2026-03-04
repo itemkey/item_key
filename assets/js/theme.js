@@ -5,6 +5,7 @@
   const PANEL_SELECTOR = "#ikSiteSettingsPanel";
   const FAB_ID = "ikThemeFab";
   const ADMIN_EMAILS = ["itemkeygithub@gmail.com", "kravetznikita@gmail.com"];
+  const SUPABASE_SDK_SRC = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
   const ACCOUNT_LINK_STYLE_ID = "ikAccountLinksStyle";
   const LOADING_ATTR = "data-ik-loading";
   const LOADING_MIN_MS = 320;
@@ -44,6 +45,15 @@
     filters: { error: true, warn: true, log: true },
     query: "",
     refreshing: false,
+    adminUiReady: false,
+  };
+
+  const rewardState = {
+    booted: false,
+    lastActionAt: 0,
+    actions: 0,
+    tickId: null,
+    dailyClaimed: false,
   };
 
   let loadingStartAt = 0;
@@ -449,6 +459,7 @@
   async function computeAdmin() {
     let email = getLocalUserEmail();
     try {
+      await ensureSupabaseClientReady();
       if (window.IKSupabase && typeof window.IKSupabase.getClient === "function") {
         const client = window.IKSupabase.getClient();
         if (client && client.auth && typeof client.auth.getUser === "function") {
@@ -458,7 +469,129 @@
         }
       }
     } catch {}
-    return ADMIN_EMAILS.includes(email);
+    const emergency = ADMIN_EMAILS.includes(email);
+    if (emergency) return true;
+
+    // Prefer role-based access when available
+    try {
+      await ensureSupabaseClientReady();
+      if (window.IKSupabase && typeof window.IKSupabase.getClient === "function") {
+        const client = window.IKSupabase.getClient();
+        if (client) {
+          const out = await client.rpc("ik_can_open_admin_console");
+          if (out && out.data === true) return true;
+        }
+      }
+    } catch (_) {
+      // fallback to emergency email only
+    }
+
+    return false;
+  }
+
+  let supaEnsurePromise = null;
+  function loadScriptOnce(src, id) {
+    return new Promise((resolve, reject) => {
+      if (id && document.getElementById(id)) return resolve(true);
+      const existing = Array.from(document.querySelectorAll("script[src]")).find((s) => String(s.getAttribute("src") || "").includes(src));
+      if (existing) return resolve(true);
+      const s = document.createElement("script");
+      if (id) s.id = id;
+      s.src = src;
+      s.async = true;
+      s.onload = () => resolve(true);
+      s.onerror = () => reject(new Error(`failed to load ${src}`));
+      document.head.appendChild(s);
+    });
+  }
+
+  async function ensureSupabaseClientReady() {
+    if (supaEnsurePromise) return supaEnsurePromise;
+    supaEnsurePromise = (async () => {
+      if (!(window.supabase && typeof window.supabase.createClient === "function")) {
+        await loadScriptOnce(SUPABASE_SDK_SRC, "ikSupaSdk");
+      }
+      if (!(window.IKSupabase && typeof window.IKSupabase.getClient === "function")) {
+        await loadScriptOnce(`${appPrefix}assets/js/supabase-client.js`, "ikSupaClient");
+      }
+      return true;
+    })();
+    return supaEnsurePromise;
+  }
+
+  function getSupaClient() {
+    try {
+      if (!(window.IKSupabase && typeof window.IKSupabase.getClient === "function")) return null;
+      return window.IKSupabase.getClient();
+    } catch (_) {
+      return null;
+    }
+  }
+
+  async function ensureRewardsBoot() {
+    if (rewardState.booted) return;
+    rewardState.booted = true;
+    rewardState.lastActionAt = Date.now();
+    rewardState.actions = 0;
+
+    const action = () => {
+      rewardState.lastActionAt = Date.now();
+      rewardState.actions += 1;
+    };
+
+    ["keydown", "pointerdown", "mousedown", "touchstart", "wheel", "scroll", "input"].forEach((evt) => {
+      window.addEventListener(evt, action, { passive: true, capture: true });
+    });
+
+    const tick = async () => {
+      const client = getSupaClient();
+      if (!client) return;
+      let user = null;
+      try {
+        const u = await client.auth.getUser();
+        user = u && u.data && u.data.user ? u.data.user : null;
+      } catch (_) {
+        user = null;
+      }
+      if (!user) return;
+
+      // daily visit (best-effort, server is idempotent)
+      if (!rewardState.dailyClaimed) {
+        rewardState.dailyClaimed = true;
+        try {
+          await client.rpc("ik_claim_daily_visit");
+        } catch (_) {}
+      }
+
+      const now = Date.now();
+      const AFK_MS = 5 * 60 * 1000;
+      const last = rewardState.lastActionAt || 0;
+      const isAfk = now - last >= AFK_MS;
+      if (isAfk) {
+        rewardState.actions = 0;
+        return;
+      }
+
+      const actions = Number(rewardState.actions || 0);
+      if (actions <= 0) return;
+      rewardState.actions = 0;
+
+      try {
+        await client.rpc("ik_award_active_minute", { p_actions: actions });
+        document.dispatchEvent(new CustomEvent("ik:walletchanged"));
+      } catch (_) {
+        // ignore
+      }
+    };
+
+    rewardState.tickId = window.setInterval(() => {
+      tick().catch(() => {});
+    }, 60 * 1000);
+
+    // run one tick soon after boot
+    window.setTimeout(() => {
+      tick().catch(() => {});
+    }, 1200);
   }
 
   function pushAdminLog(level, source, payload) {
@@ -476,7 +609,7 @@
     if (adminState.logs.length > adminState.maxLogs) {
       adminState.logs.splice(0, adminState.logs.length - adminState.maxLogs);
     }
-    renderAdminDock();
+    if (adminState.tab !== "administrations") renderAdminDock();
   }
 
   function getAdminDock() {
@@ -490,7 +623,7 @@
     if (!body) return;
 
     if (adminState.tab === "administrations") {
-      body.textContent = "Administrations\n\nReserved for future admin controls (roles, permissions, moderation).";
+      renderAdministrations(body);
       return;
     }
 
@@ -509,6 +642,268 @@
       .map((x, i) => `[${i + 1}] ${x.t} | ${x.level} | ${x.source}\n${x.text}`);
     body.textContent = rows.join("\n\n") || "No logs yet.";
     body.scrollTop = body.scrollHeight;
+  }
+
+  function escapeHtml(s) {
+    return String(s || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/\"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  function renderAdministrations(body) {
+    // interactive admin tools (roles, moderation)
+    body.innerHTML = `
+<div style="display:grid; gap:12px;">
+  <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+    <button type="button" class="ik-admin-tool" id="ikAdminAdmRefresh">refresh</button>
+    <span style="opacity:.7; font-size:11px;">roles + dictionary moderation</span>
+  </div>
+
+  <section style="border:1px solid rgba(255,255,255,.14); padding:10px;">
+    <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:8px;">
+      <b style="font-size:12px; letter-spacing:.04em;">Roles</b>
+      <span style="opacity:.7; font-size:11px;">owner/admin/moderator</span>
+    </div>
+    <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+      <input id="ikAdmRoleUserId" class="ik-admin-search" style="width:260px;" placeholder="user-id or uuid" />
+      <select id="ikAdmRoleName" class="ik-admin-search" style="width:190px;">
+        <option value="moderator">moderator</option>
+        <option value="admin">admin</option>
+        <option value="owner">owner</option>
+      </select>
+      <label style="display:flex; gap:6px; align-items:center; font-size:11px; opacity:.9;">
+        <input id="ikAdmRoleEnabled" type="checkbox" checked />
+        enabled
+      </label>
+      <button type="button" class="ik-admin-tool" id="ikAdmRoleApply">apply</button>
+      <button type="button" class="ik-admin-tool" id="ikAdmRoleFetch">show roles</button>
+    </div>
+    <div id="ikAdmRoleOut" style="margin-top:10px; white-space:pre-wrap; font-size:12px; opacity:.95;"></div>
+  </section>
+
+  <section style="border:1px solid rgba(255,255,255,.14); padding:10px;">
+    <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:8px;">
+      <b style="font-size:12px; letter-spacing:.04em;">Dictionary moderation</b>
+      <span style="opacity:.7; font-size:11px;">publish/update requests</span>
+    </div>
+    <div id="ikAdmModList" style="display:grid; gap:10px;"></div>
+  </section>
+
+  <section style="border:1px solid rgba(255,255,255,.14); padding:10px;">
+    <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:8px;">
+      <b style="font-size:12px; letter-spacing:.04em;">System dictionaries</b>
+      <span style="opacity:.7; font-size:11px;">owner/admin only</span>
+    </div>
+    <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+      <input id="ikAdmSysDictId" class="ik-admin-search" style="width:120px;" placeholder="dict_id (opt)" />
+      <input id="ikAdmSysTitle" class="ik-admin-search" style="width:320px;" placeholder="title" />
+      <button type="button" class="ik-admin-tool" id="ikAdmSysCreate">create/update</button>
+    </div>
+    <textarea id="ikAdmSysWords" placeholder="EN - RU (one per line)" style="margin-top:8px; width:100%; min-height:90px; background:rgba(255,255,255,.04); color:#eee; border:1px solid rgba(255,255,255,.18); padding:8px; font-size:12px;"></textarea>
+    <div id="ikAdmSysOut" style="margin-top:8px; white-space:pre-wrap; font-size:12px; opacity:.95;"></div>
+  </section>
+</div>`;
+
+    const byId = (id) => document.getElementById(id);
+    const refreshBtn = byId("ikAdminAdmRefresh");
+    const roleUser = byId("ikAdmRoleUserId");
+    const roleName = byId("ikAdmRoleName");
+    const roleEnabled = byId("ikAdmRoleEnabled");
+    const roleApply = byId("ikAdmRoleApply");
+    const roleFetch = byId("ikAdmRoleFetch");
+    const roleOut = byId("ikAdmRoleOut");
+    const modList = byId("ikAdmModList");
+
+    const sysDictId = byId("ikAdmSysDictId");
+    const sysTitle = byId("ikAdmSysTitle");
+    const sysWords = byId("ikAdmSysWords");
+    const sysCreate = byId("ikAdmSysCreate");
+    const sysOut = byId("ikAdmSysOut");
+
+    const client = getSupaClient();
+    if (!client) {
+      roleOut.textContent = "loading supabase...";
+      ensureSupabaseClientReady()
+        .then(() => renderAdminDock())
+        .catch((e) => {
+          roleOut.textContent = `Supabase load failed: ${String(e && (e.message || e) || "")}`;
+        });
+      return;
+    }
+
+    const rpc = async (name, params) => {
+      const out = await client.rpc(name, params || {});
+      if (out && out.error) throw out.error;
+      return out ? out.data : null;
+    };
+
+    const shortErr = (e) => {
+      const msg = String((e && (e.message || e.error_description || e.details)) || e || "").trim();
+      return msg || "unknown error";
+    };
+
+    async function doRoleApply() {
+      roleOut.textContent = "...";
+      try {
+        const id = String(roleUser.value || "").trim();
+        const role = String(roleName.value || "moderator").trim();
+        const enabled = !!roleEnabled.checked;
+        const data = await rpc("ik_set_user_role_by_user_id", {
+          p_user: id,
+          p_role: role,
+          p_enabled: enabled,
+        });
+        roleOut.textContent = JSON.stringify(data || { ok: true }, null, 2);
+      } catch (e) {
+        roleOut.textContent = `error: ${shortErr(e)}`;
+      }
+    }
+
+    async function doRoleFetch() {
+      roleOut.textContent = "...";
+      try {
+        const id = String(roleUser.value || "").trim();
+        const data = await rpc("ik_get_user_roles_by_user_id", { p_user: id });
+        roleOut.textContent = JSON.stringify(data || [], null, 2);
+      } catch (e) {
+        roleOut.textContent = `error: ${shortErr(e)}`;
+      }
+    }
+
+    async function renderModeration() {
+      modList.innerHTML = "<div style=\"opacity:.8; font-size:12px;\">loading...</div>";
+      try {
+        const rows = await rpc("ik_list_dict_publish_requests", { p_status: "pending" });
+        const list = Array.isArray(rows) ? rows : [];
+        if (!list.length) {
+          modList.innerHTML = "<div style=\"opacity:.7; font-size:12px;\">no pending requests</div>";
+          return;
+        }
+
+        modList.innerHTML = list.map((r) => {
+          const id = Number(r.id || 0);
+          const title = escapeHtml(r.title || "");
+          const author = escapeHtml(r.author_user_id || r.owner_id || "");
+          const when = escapeHtml(r.created_at || "");
+          const wc = escapeHtml(String(r.words_count || 0));
+          const type = escapeHtml(r.request_type || "publish");
+          const target = r.target_dict_id ? ` target=${escapeHtml(String(r.target_dict_id))}` : "";
+          return `
+<article style="border:1px solid rgba(255,255,255,.12); padding:10px;">
+  <div style="display:flex; gap:10px; align-items:baseline; flex-wrap:wrap;">
+    <b>#${id}</b>
+    <span style="opacity:.95;">${title}</span>
+    <span style="opacity:.6; font-size:11px;">${type}${target}</span>
+    <span style="opacity:.6; font-size:11px;">words: ${wc}</span>
+  </div>
+  <div style="opacity:.7; font-size:11px; margin-top:4px;">by: ${author} | ${when}</div>
+  <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
+    <button type="button" class="ik-admin-tool" data-mod-action="view" data-id="${id}">view</button>
+    <button type="button" class="ik-admin-tool" data-mod-action="approve" data-id="${id}">approve</button>
+    <button type="button" class="ik-admin-tool" data-mod-action="needs_work" data-id="${id}">needs work</button>
+    <button type="button" class="ik-admin-tool" data-mod-action="reject" data-id="${id}">reject</button>
+  </div>
+  <textarea data-mod-note="${id}" placeholder="reason / note" style="margin-top:8px; width:100%; min-height:54px; background:rgba(255,255,255,.04); color:#eee; border:1px solid rgba(255,255,255,.18); padding:8px; font-size:12px;"></textarea>
+  <div data-mod-out="${id}" style="margin-top:8px; white-space:pre-wrap; font-size:12px; opacity:.95;"></div>
+</article>`;
+        }).join("");
+      } catch (e) {
+        modList.innerHTML = `<div style=\"opacity:.85; font-size:12px;\">error: ${escapeHtml(shortErr(e))}</div>`;
+      }
+    }
+
+    async function handleModerationAction(id, action) {
+      const out = document.querySelector(`[data-mod-out=\"${id}\"]`);
+      const noteEl = document.querySelector(`[data-mod-note=\"${id}\"]`);
+      const note = String((noteEl && noteEl.value) || "").trim();
+      if (out) out.textContent = "...";
+      try {
+        if (action === "view") {
+          const data = await rpc("ik_get_dict_publish_request", { p_request_id: Number(id) });
+          if (out) out.textContent = JSON.stringify(data, null, 2);
+          return;
+        }
+        const decision = action === "approve" ? "approve" : action === "reject" ? "reject" : "needs_work";
+        const data = await rpc("ik_review_dict_publish_request", {
+          p_request_id: Number(id),
+          p_decision: decision,
+          p_note: note,
+        });
+        if (out) out.textContent = JSON.stringify(data, null, 2);
+        // refresh list after decision
+        await renderModeration();
+      } catch (e) {
+        if (out) out.textContent = `error: ${shortErr(e)}`;
+      }
+    }
+
+    function parseWordsLines(text) {
+      const out = [];
+      const lines = String(text || "").split(/\r?\n/);
+      for (const raw of lines) {
+        const line = String(raw || "").trim();
+        if (!line) continue;
+        let en = "";
+        let ru = "";
+        if (line.includes(" - ")) {
+          const parts = line.split(" - ");
+          en = String(parts.shift() || "").trim();
+          ru = String(parts.join(" - ") || "").trim();
+        } else if (line.includes("\t")) {
+          const parts = line.split("\t");
+          en = String(parts[0] || "").trim();
+          ru = String(parts.slice(1).join("\t") || "").trim();
+        } else if (line.includes(";")) {
+          const parts = line.split(";");
+          en = String(parts[0] || "").trim();
+          ru = String(parts.slice(1).join(";") || "").trim();
+        }
+        if (!en || !ru) continue;
+        out.push({ en, ru });
+      }
+      return out;
+    }
+
+    async function doSystemCreate() {
+      if (!sysOut) return;
+      sysOut.textContent = "...";
+      try {
+        const title = String((sysTitle && sysTitle.value) || "").trim();
+        const words = parseWordsLines((sysWords && sysWords.value) || "");
+        const dictIdRaw = String((sysDictId && sysDictId.value) || "").trim();
+        const dictId = dictIdRaw ? Number(dictIdRaw) : null;
+        const data = await rpc("ik_admin_create_system_dict", {
+          p_title: title,
+          p_words: words,
+          p_dict_id: dictId && Number.isFinite(dictId) ? dictId : null,
+        });
+        sysOut.textContent = JSON.stringify(data || { ok: true }, null, 2);
+      } catch (e) {
+        sysOut.textContent = `error: ${shortErr(e)}`;
+      }
+    }
+
+    refreshBtn?.addEventListener("click", () => {
+      renderModeration().catch(() => {});
+    });
+    roleApply?.addEventListener("click", () => doRoleApply().catch(() => {}));
+    roleFetch?.addEventListener("click", () => doRoleFetch().catch(() => {}));
+    sysCreate?.addEventListener("click", () => doSystemCreate().catch(() => {}));
+
+    modList.addEventListener("click", (e) => {
+      const btn = e.target && e.target.closest ? e.target.closest("button[data-mod-action]") : null;
+      if (!btn) return;
+      const id = btn.getAttribute("data-id");
+      const action = btn.getAttribute("data-mod-action");
+      if (!id || !action) return;
+      handleModerationAction(id, action).catch(() => {});
+    });
+
+    // initial load
+    renderModeration().catch(() => {});
   }
 
   function exportAdminLogs(kind) {
@@ -573,7 +968,7 @@
         <span class="ik-admin-spacer"></span>
         <button type="button" class="ik-admin-close" id="ikAdminDockClose">close</button>
       </div>
-      <pre class="ik-admin-body" id="ikAdminDockBody"></pre>
+      <div class="ik-admin-body" id="ikAdminDockBody"></div>
     `;
     document.body.appendChild(dock);
 
@@ -766,6 +1161,7 @@
     ensureAdminStyle();
     enhanceSettingsPanels();
     refreshAdminAccess();
+    ensureRewardsBoot().catch(() => {});
 
     if (document.body && document.body.hasAttribute(LOADING_ATTR)) {
       ensurePageShell();
