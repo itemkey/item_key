@@ -4152,8 +4152,30 @@ async function createNote(){
     async function resolveSupaUser(){
       const client = getSupaClient();
       if(!client) return null;
-      const out = await client.auth.getUser();
-      return out && out.data && out.data.user ? out.data.user : null;
+
+      // Prefer getSession() for UI gating: it is local and often works
+      // even when getUser() network call fails (expired token / offline / blocked).
+      for(let i = 0; i < 2; i += 1){
+        try{
+          const sess = await client.auth.getSession();
+          const user = sess && sess.data && sess.data.session && sess.data.session.user ? sess.data.session.user : null;
+          if(user && user.id) return user;
+        }catch(e){
+          pushDiag('warn', 'resolveSupaUser@getSession', e);
+        }
+        // Small retry for cases when auth storage hydrates async
+        if(i === 0) await new Promise(r => setTimeout(r, 80));
+      }
+
+      try{
+        const out = await client.auth.getUser();
+        if(out && out.data && out.data.user) return out.data.user;
+        if(out && out.error) pushDiag('warn', 'resolveSupaUser@getUser', out.error);
+        return null;
+      }catch(e){
+        pushDiag('warn', 'resolveSupaUser@getUser-throw', e);
+        return null;
+      }
     }
 
     async function resolveSupaTable(){
@@ -4869,6 +4891,18 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
         markBoot('render-locked');
         setAuthLocked(true);
         setSync('bad', 'login required', 'Войди в аккаунт item-user, чтобы хранить приватные заметки.');
+
+        // If user signs in in another tab, reload to unlock immediately.
+        try{
+          if(state.supa.client && state.supa.client.auth && typeof state.supa.client.auth.onAuthStateChange === 'function'){
+            state.supa.client.auth.onAuthStateChange((_evt, session) => {
+              const uid = session && session.user ? session.user.id : null;
+              if(uid) window.location.reload();
+            });
+          }
+        }catch(e){
+          pushDiag('warn', 'authStateChange@locked', e);
+        }
         return;
       }
 
