@@ -1772,7 +1772,16 @@
         enhanceSettingsPanels();
       }, 120);
     });
-    observer.observe(document.body, { childList: true, subtree: false });
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    // GitHub Pages can build settings button a bit later;
+    // retry a few times to ensure bell button is injected.
+    const retryMarks = [250, 900, 1800, 3200, 5200];
+    retryMarks.forEach((ms) => {
+      window.setTimeout(() => {
+        enhanceSettingsPanels();
+      }, ms);
+    });
 
     window.addEventListener("storage", (e) => {
       if (e.key === "itemkey.currentUser") refreshAdminAccess();
