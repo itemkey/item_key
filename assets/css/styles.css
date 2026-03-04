@@ -1197,6 +1197,10 @@ body.page-user .auth-box{
   pointer-events: none;
 }
 
+body.page-user .account-center::before{
+  display: none;
+}
+
 .account-center h1{
   margin: 0;
   font-size: 20px;

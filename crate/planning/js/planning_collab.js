@@ -5,6 +5,8 @@ const BOARD_RELOAD_DEBOUNCE_MS = 120;
 const EDITING_TTL_MS = 30000;
 const EDITING_PING_MS = 10000;
 const PROJECTS_RETRY_MS = 6000;
+const LIVE_EVENTS_POLL_MS = 1500;
+const FRIENDS_CACHE_MS = 30000;
 
 const PROJECT_SCOPES = ['personal', 'shared', 'all'];
 const ASSIGNEE_FILTERS = ['all', 'me', 'unassigned'];
@@ -116,12 +118,13 @@ function looksTransientError(error) {
   );
 }
 
-function roleLabel(role) {
+function roleLabel(role, lang = 'en') {
   const r = String(role || '').toLowerCase();
-  if (r === 'owner') return 'OWNER';
-  if (r === 'editor') return 'EDITOR';
-  if (r === 'viewer') return 'VIEWER';
-  return 'MEMBER';
+  const ru = lang === 'ru';
+  if (r === 'owner') return ru ? 'владелец' : 'OWNER';
+  if (r === 'editor') return ru ? 'редактор' : 'EDITOR';
+  if (r === 'viewer') return ru ? 'наблюдатель' : 'VIEWER';
+  return ru ? 'участник' : 'MEMBER';
 }
 
 export class PlanningCollabApp {
@@ -137,6 +140,7 @@ export class PlanningCollabApp {
       projects: [],
       board: null,
       activeProjectId: null,
+      friends: [],
       incomingInvites: [],
       realtimeStatus: 'off',
       presence: []
@@ -146,9 +150,13 @@ export class PlanningCollabApp {
     this.channel = null;
     this.boardReloadTimer = null;
     this.projectsRetryTimer = null;
+    this.liveEventsTimer = null;
     this.inboxPollTimer = null;
     this.editingGcTimer = null;
     this.editingPingTimer = null;
+    this.boardLoadInFlight = false;
+    this.lastRealtimeEventAt = 0;
+    this.friendsLoadedAt = 0;
     this.currentEditingCardId = null;
     this.editingByKey = new Map();
     this.schemaWarnShown = false;
@@ -204,6 +212,7 @@ export class PlanningCollabApp {
     });
 
     await this.loadProfile();
+    await this.loadFriends({ quiet: true });
     await this.loadIncomingInvitations({ quiet: true });
 
     const loaded = await this.loadProjects();
@@ -216,16 +225,16 @@ export class PlanningCollabApp {
       this.renderAssigneeFilter();
 
       if (this.schemaWarnShown) {
-        this.renderEmptyBoard('Planning schema is outdated. Apply stage9 + stage10 SQL.');
+        this.renderEmptyBoard(this.t('структура planning устарела. примените stage9 + stage10 sql.', 'planning schema is outdated. apply stage9 + stage10 sql.'));
         this.setActionsDisabled(true);
         return;
       }
 
-      this.renderEmptyBoard('Projects unavailable. Check connection and retry.', { retry: true });
+      this.renderEmptyBoard(this.t('проекты временно недоступны. проверьте сеть и повторите.', 'projects are temporarily unavailable. check network and retry.'), { retry: true });
       this.scheduleProjectsRetry();
       this.startBackgroundLoops();
       this.setActionsDisabled(false);
-      this.setCloudBadge('sync', 'projects unavailable');
+      this.setCloudBadge('sync', this.t('проекты недоступны', 'projects unavailable'));
       return;
     }
 
@@ -252,16 +261,29 @@ export class PlanningCollabApp {
       this.renderAssigneeFilter();
       this.renderPresence();
       if (this.state.projects.length > 0) {
-        this.renderEmptyBoard('No projects in this section. Switch scope filter.');
-        this.setCloudBadge('ready', 'no projects in scope');
+        this.renderEmptyBoard(this.t('в этом разделе нет проектов. переключите фильтр.', 'no projects in this section. switch scope filter.'));
+        this.setCloudBadge('ready', this.t('нет проектов в разделе', 'no projects in scope'));
       } else {
-        this.renderEmptyBoard('No projects yet. Create your first project.');
-        this.setCloudBadge('ready', 'no active project');
+        this.renderEmptyBoard(this.t('проектов пока нет. создайте первый проект.', 'no projects yet. create your first project.'));
+        this.setCloudBadge('ready', this.t('нет активного проекта', 'no active project'));
       }
     }
 
     this.startBackgroundLoops();
     this.setActionsDisabled(false);
+  }
+
+  getLang() {
+    try {
+      if (window.IKSiteLang && typeof window.IKSiteLang.get === 'function') {
+        return window.IKSiteLang.get() === 'en' ? 'en' : 'ru';
+      }
+    } catch (_) {}
+    return String(document.documentElement.lang || '').toLowerCase().startsWith('en') ? 'en' : 'ru';
+  }
+
+  t(ru, en) {
+    return this.getLang() === 'en' ? en : ru;
   }
 
   normalizeScopeValue(scope) {
@@ -395,6 +417,15 @@ export class PlanningCollabApp {
     if (this.handlersBound) return;
     this.handlersBound = true;
 
+    document.addEventListener('ik:languagechange', () => {
+      this.renderProjectScopeToggle();
+      this.renderProjectSelect();
+      this.renderProjectBar();
+      this.renderInboxButton();
+      this.renderAssigneeFilter();
+      this.renderBoard();
+    });
+
     if (this.els.projectScope) {
       this.els.projectScope.addEventListener('click', (event) => {
         const btn = event.target.closest('[data-scope]');
@@ -472,7 +503,7 @@ export class PlanningCollabApp {
         this.applyPrefsToControls();
         this.persistUIPrefs();
         this.renderBoard();
-        this.ui.toast('filters cleared');
+        this.ui.toast(this.t('фильтры очищены', 'filters cleared'));
       });
     }
 
@@ -493,7 +524,9 @@ export class PlanningCollabApp {
     }
 
     if (this.els.btnInviteFriend) {
-      this.els.btnInviteFriend.addEventListener('click', () => this.openInviteFriendModal());
+      this.els.btnInviteFriend.addEventListener('click', () => {
+        void this.openInviteFriendModal().catch((error) => this.onMutationError(error));
+      });
     }
 
     if (this.els.btnInvitesInbox) {
@@ -504,7 +537,7 @@ export class PlanningCollabApp {
 
     if (this.els.btnNewEvent) {
       this.els.btnNewEvent.addEventListener('click', () => {
-        this.ui.toast('schedule module is not implemented yet');
+        this.ui.toast(this.t('раздел расписания пока не реализован', 'schedule module is not implemented yet'));
       });
     }
   }
@@ -521,6 +554,39 @@ export class PlanningCollabApp {
         this.cleanupEditingMap();
       }, 5000);
     }
+
+    if (!this.liveEventsTimer) {
+      this.liveEventsTimer = setInterval(() => {
+        void this.pollProjectEventsFallback().catch(() => {});
+      }, LIVE_EVENTS_POLL_MS);
+    }
+  }
+
+  async pollProjectEventsFallback() {
+    if (!this.state.activeProjectId || !this.state.board || !this.state.board.project) return;
+    if (this.boardLoadInFlight) return;
+    if (typeof document !== 'undefined' && document.hidden) return;
+
+    const projectId = String(this.state.activeProjectId || '');
+    if (!projectId) return;
+
+    const currentRevision = Number(this.state.board.project.revision || 0);
+    if (!Number.isFinite(currentRevision)) return;
+
+    if (this.state.realtimeStatus === 'SUBSCRIBED' && Date.now() - this.lastRealtimeEventAt < LIVE_EVENTS_POLL_MS * 2) {
+      return;
+    }
+
+    try {
+      const events = await this.rpc('ik_plan_get_events_since', {
+        p_project_id: projectId,
+        p_since: currentRevision
+      });
+      if (asArray(events).length > 0) {
+        this.lastRealtimeEventAt = Date.now();
+        this.scheduleBoardReload(0);
+      }
+    } catch (_) {}
   }
 
   loadUIPrefs() {
@@ -629,7 +695,7 @@ export class PlanningCollabApp {
     if (this.els.viewSelect) this.els.viewSelect.value = 'board';
     this.setView('board');
     this.renderAssigneeFilter();
-    this.renderEmptyBoard(`Planning unavailable: ${escapeHtml(text)}`);
+    this.renderEmptyBoard(`${this.t('planning недоступен', 'planning unavailable')}: ${escapeHtml(text)}`);
   }
 
   renderLoginRequired() {
@@ -638,7 +704,7 @@ export class PlanningCollabApp {
     if (this.els.viewSelect) this.els.viewSelect.value = 'board';
     this.setView('board');
     this.renderAssigneeFilter();
-    this.renderEmptyBoard('Login required. Open item-user.html and sign in.');
+    this.renderEmptyBoard(this.t('требуется вход. откройте item-user.html и авторизуйтесь.', 'login required. open item-user.html and sign in.'));
     this.renderProjectSelect();
     this.renderProjectBar();
     this.renderPresence();
@@ -651,7 +717,7 @@ export class PlanningCollabApp {
       <div style="font-size:11px; letter-spacing:2px; text-transform:uppercase; opacity:.7; line-height:1.5;">
         ${escapeHtml(message)}
       </div>
-      ${showRetry ? '<button class="btn" type="button" data-retry-projects style="margin-top:10px;">retry</button>' : ''}
+      ${showRetry ? `<button class="btn" type="button" data-retry-projects style="margin-top:10px;">${escapeHtml(this.t('повторить', 'retry'))}</button>` : ''}
     `;
     if (showRetry) {
       this.els.boardView.querySelector('[data-retry-projects]')?.addEventListener('click', () => {
@@ -701,12 +767,85 @@ export class PlanningCollabApp {
       } else if (!quiet) {
         await this.onMutationError(error);
       } else if (looksTransientError(error)) {
-        this.setCloudBadge('sync', 'projects retrying');
+        this.setCloudBadge('sync', this.t('повторная загрузка проектов', 'retrying projects load'));
       }
       if (!this.state.projects.length) this.state.projects = [];
       this.renderProjectSelect();
       this.renderProjectBar();
       return false;
+    }
+  }
+
+  async loadFriends(options = {}) {
+    if (!this.client || !this.user) return [];
+    const quiet = !!options.quiet;
+    const force = !!options.force;
+    const now = Date.now();
+
+    if (!force && this.friendsLoadedAt > 0 && now - this.friendsLoadedAt < FRIENDS_CACHE_MS) {
+      return this.state.friends;
+    }
+
+    try {
+      const uid = String(this.user.id);
+      const { data: links, error: linksError } = await this.client
+        .from('ik_friendships')
+        .select('user_low,user_high,created_at')
+        .or(`user_low.eq.${uid},user_high.eq.${uid}`)
+        .order('created_at', { ascending: false });
+
+      if (linksError) throw linksError;
+
+      const friendIds = new Set();
+      asArray(links).forEach((row) => {
+        const low = String(row && row.user_low || '');
+        const high = String(row && row.user_high || '');
+        if (!low || !high) return;
+        friendIds.add(low === uid ? high : low);
+      });
+
+      const ids = Array.from(friendIds);
+      if (!ids.length) {
+        this.state.friends = [];
+        this.friendsLoadedAt = now;
+        return this.state.friends;
+      }
+
+      const { data: profiles, error: profilesError } = await this.client
+        .from('ik_user_profiles')
+        .select('id,user_id,nickname,avatar_url')
+        .in('id', ids);
+
+      if (profilesError) throw profilesError;
+
+      const byId = new Map();
+      asArray(profiles).forEach((p) => {
+        byId.set(String(p.id), p);
+      });
+
+      this.state.friends = ids.map((id) => {
+        const p = byId.get(String(id)) || null;
+        const handle = String((p && p.user_id) || '').trim() || String(id).slice(0, 8);
+        const nickname = String((p && p.nickname) || '').trim();
+        const label = nickname && nickname.toLowerCase() !== handle.toLowerCase()
+          ? `${nickname} (@${handle})`
+          : `@${handle}`;
+        return {
+          id: String(id),
+          user_id: handle,
+          nickname,
+          avatar_url: String((p && p.avatar_url) || ''),
+          label
+        };
+      }).sort((a, b) => {
+        return String(a.label || a.user_id).localeCompare(String(b.label || b.user_id));
+      });
+
+      this.friendsLoadedAt = now;
+      return this.state.friends;
+    } catch (error) {
+      if (!quiet) await this.onMutationError(error);
+      return this.state.friends;
     }
   }
 
@@ -724,7 +863,8 @@ export class PlanningCollabApp {
   renderInboxButton() {
     if (!this.els.btnInvitesInbox) return;
     const count = this.state.incomingInvites.length;
-    this.els.btnInvitesInbox.textContent = count > 0 ? `inbox (${count})` : 'inbox';
+    const base = this.t('входящие', 'inbox');
+    this.els.btnInvitesInbox.textContent = count > 0 ? `${base} (${count})` : base;
   }
 
   async selectProject(projectId, options = {}) {
@@ -763,6 +903,8 @@ export class PlanningCollabApp {
       return;
     }
 
+    this.boardLoadInFlight = true;
+
     try {
       const data = await this.rpc('ik_plan_get_board', { p_project_id: id });
       this.state.board = data && typeof data === 'object' ? data : null;
@@ -776,6 +918,8 @@ export class PlanningCollabApp {
       this.renderBoard();
       this.renderPresence();
       await this.onMutationError(error);
+    } finally {
+      this.boardLoadInFlight = false;
     }
   }
 
@@ -866,6 +1010,7 @@ export class PlanningCollabApp {
   }
 
   onProjectEvent(eventRow) {
+    this.lastRealtimeEventAt = Date.now();
     if (!eventRow || !this.state.board || !this.state.board.project) {
       this.scheduleBoardReload(80);
       return;
@@ -957,9 +1102,9 @@ export class PlanningCollabApp {
     const selected = String(this.uiPrefs.assignee || 'all');
 
     const options = [
-      { value: 'all', label: 'исполнитель: все' },
-      { value: 'me', label: 'исполнитель: мои' },
-      { value: 'unassigned', label: 'исполнитель: без ответ.' }
+      { value: 'all', label: this.t('исполнитель: все', 'assignee: all') },
+      { value: 'me', label: this.t('исполнитель: мои', 'assignee: mine') },
+      { value: 'unassigned', label: this.t('исполнитель: без ответ.', 'assignee: unassigned') }
     ];
 
     for (const m of members) {
@@ -984,7 +1129,7 @@ export class PlanningCollabApp {
     const board = this.state.board;
     const members = asArray(board && board.members);
     const selected = String(selectedId || '');
-    const out = ['<option value="">unassigned</option>'];
+    const out = [`<option value="">${escapeHtml(this.t('без ответственного', 'unassigned'))}</option>`];
     for (const m of members) {
       const userId = String(m.user_id || '').trim();
       if (!userId) continue;
@@ -1002,7 +1147,9 @@ export class PlanningCollabApp {
   }
 
   projectScopeText(project) {
-    return this.normalizeProjectScope(project) === 'shared' ? 'общий' : 'личный';
+    return this.normalizeProjectScope(project) === 'shared'
+      ? this.t('общий', 'shared')
+      : this.t('личный', 'personal');
   }
 
   renderPresence() {
@@ -1020,7 +1167,9 @@ export class PlanningCollabApp {
       memberById.set(String(m.user_id), m);
     });
 
-    const status = this.state.realtimeStatus === 'SUBSCRIBED' ? 'LIVE' : 'SYNC';
+    const status = this.state.realtimeStatus === 'SUBSCRIBED'
+      ? this.t('LIVE', 'LIVE')
+      : this.t('SYNC', 'SYNC');
     const chips = this.state.presence.map((p) => {
       const m = memberById.get(String(p.user_id));
       const nick = String((m && (m.nickname || m.profile_user_id)) || p.nickname || p.user_id).trim() || 'user';
@@ -1030,7 +1179,7 @@ export class PlanningCollabApp {
 
     const totalMembers = members.length;
     const onlineCount = this.state.presence.length;
-    const statusText = `${status} | online ${onlineCount}/${totalMembers || 0}`;
+    const statusText = `${status} | ${this.t('онлайн', 'online')} ${onlineCount}/${totalMembers || 0}`;
 
     this.els.planningPresence.innerHTML = `
       <span class="planning-presence__status">${escapeHtml(statusText)}</span>
@@ -1047,7 +1196,7 @@ export class PlanningCollabApp {
     if (safeView === 'schedule' && this.els.scheduleView) {
       this.els.scheduleView.innerHTML = `
         <div class="schedule-placeholder" style="font-size:11px; letter-spacing:3px; text-transform:uppercase;">
-          schedule is next step
+          ${escapeHtml(this.t('расписание скоро появится', 'schedule is next step'))}
         </div>
       `;
     }
@@ -1067,7 +1216,9 @@ export class PlanningCollabApp {
     if (!projects.length) {
       const opt = document.createElement('option');
       opt.value = '';
-      opt.textContent = this.state.projects.length ? 'NO PROJECTS IN SCOPE' : 'NO PROJECTS';
+      opt.textContent = this.state.projects.length
+        ? this.t('НЕТ ПРОЕКТОВ В РАЗДЕЛЕ', 'NO PROJECTS IN SCOPE')
+        : this.t('НЕТ ПРОЕКТОВ', 'NO PROJECTS');
       opt.selected = true;
       el.appendChild(opt);
       el.disabled = true;
@@ -1096,7 +1247,7 @@ export class PlanningCollabApp {
       const isActive = String(p.id) === String(this.state.activeProjectId || '');
       chip.className = `proj-chip${isActive ? ' is-active' : ''}`;
 
-      const role = roleLabel(p.role);
+      const role = roleLabel(p.role, this.getLang());
       const scopeText = this.projectScopeText(p);
       const count =
         this.state.board &&
@@ -1111,8 +1262,8 @@ export class PlanningCollabApp {
         <span class="proj-chip__count">${count}</span>
         <span class="proj-chip__scope">${escapeHtml(scopeText)}</span>
         <span class="proj-chip__count">${escapeHtml(role)}</span>
-        <button class="proj-chip__ctl" type="button" aria-label="manage columns">c</button>
-        <button class="proj-chip__del" type="button" aria-label="delete project" ${canDelete ? '' : 'disabled'}>x</button>
+        <button class="proj-chip__ctl" type="button" aria-label="${escapeAttr(this.t('управление колонками', 'manage columns'))}">c</button>
+        <button class="proj-chip__del" type="button" aria-label="${escapeAttr(this.t('удалить проект', 'delete project'))}" ${canDelete ? '' : 'disabled'}>x</button>
       `;
 
       chip.addEventListener('click', (event) => {
@@ -1269,7 +1420,7 @@ export class PlanningCollabApp {
     if (card.priority) parts.push(`priority: ${String(card.priority).toUpperCase()}`);
     if (card.deadline) parts.push(`deadline: ${String(card.deadline)}`);
     const assignee = this.assigneeLabel(card);
-    if (assignee) parts.push(`assignee: ${assignee}`);
+    if (assignee) parts.push(`${this.t('ответственный', 'assignee')}: ${assignee}`);
     const tags = asArray(card.tags);
     if (tags.length) parts.push(`tags: ${tags.join(' | ')}`);
     return parts.join(' | ') || '-';
@@ -1281,18 +1432,18 @@ export class PlanningCollabApp {
     const board = this.state.board;
     if (!board || !board.project) {
       if (!this.state.projects.length) {
-        this.renderEmptyBoard('No projects yet. Create your first project.');
+        this.renderEmptyBoard(this.t('проектов пока нет. создайте первый проект.', 'no projects yet. create your first project.'));
       } else if (!this.getScopeFilteredProjects().length) {
-        this.renderEmptyBoard('No projects in this section. Switch scope filter.');
+        this.renderEmptyBoard(this.t('в этом разделе нет проектов. переключите фильтр.', 'no projects in this section. switch scope filter.'));
       } else {
-        this.renderEmptyBoard('No active project');
+        this.renderEmptyBoard(this.t('нет активного проекта', 'no active project'));
       }
       return;
     }
 
     const columns = this.getSortedColumns();
     if (!columns.length) {
-      this.renderEmptyBoard('No columns. Open column settings and create at least one.');
+      this.renderEmptyBoard(this.t('нет колонок. откройте настройки колонок и создайте минимум одну.', 'no columns. open column settings and create at least one.'));
       return;
     }
 
@@ -1357,12 +1508,12 @@ export class PlanningCollabApp {
     cardEl.dataset.columnId = String(card.column_id);
 
     cardEl.innerHTML = `
-      <h3 class="card__name">${escapeHtml(card.name || 'task')}</h3>
+      <h3 class="card__name">${escapeHtml(card.name || this.t('задача', 'task'))}</h3>
       <p class="card__meta">${escapeHtml(this.cardMeta(card))}</p>
       <p class="card__editing" data-editing></p>
       <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:2px;">
-        <button class="btn" type="button" data-act="open">open</button>
-        <button class="btn" type="button" data-act="del">delete</button>
+        <button class="btn" type="button" data-act="open">${escapeHtml(this.t('открыть', 'open'))}</button>
+        <button class="btn" type="button" data-act="del">${escapeHtml(this.t('удалить', 'delete'))}</button>
       </div>
     `;
 
@@ -1477,7 +1628,7 @@ export class PlanningCollabApp {
 
     const res = await this.rpc('ik_plan_move_card', payload);
     if (res && res.rebased) {
-      this.ui.toast('position rebased');
+      this.ui.toast(this.t('позиция пересчитана', 'position rebased'));
     }
     this.scheduleBoardReload(40);
   }
@@ -1533,7 +1684,7 @@ export class PlanningCollabApp {
       this.renderProjectScopeToggle();
     }
     await this.selectProject(String(projectId), { force: true });
-    this.ui.toast('project created');
+    this.ui.toast(this.t('проект создан', 'project created'));
   }
 
   openDeleteProjectModal(projectId) {
@@ -1589,27 +1740,34 @@ export class PlanningCollabApp {
       this.renderAssigneeFilter();
     }
 
-    this.ui.toast('project deleted');
+    this.ui.toast(this.t('проект удален', 'project deleted'));
   }
 
-  openInviteFriendModal() {
+  async openInviteFriendModal() {
     const board = this.state.board;
     if (!board || !board.project) {
-      this.ui.toast('select project first');
+      this.ui.toast(this.t('сначала выберите проект', 'select project first'));
       return;
     }
 
+    await this.loadFriends({ quiet: true, force: true });
+
     const canManageMembers = ['owner', 'editor'].includes(String(board.project.role || '').toLowerCase());
     const scopeText = this.projectScopeText(board.project);
+    const lang = this.getLang();
+
+    const friendOptions = this.state.friends.map((f) => {
+      return `<option value="${escapeAttr(String(f.user_id || ''))}">${escapeHtml(String(f.label || f.user_id || ''))}</option>`;
+    }).join('');
 
     const pending = asArray(board.invitations)
       .filter((x) => String(x.status) === 'pending')
       .map((x) => {
         const invitee = String(x.invitee_user_id || x.invitee_nickname || x.invitee_id || 'user');
         return `
-          <div class="friend-card" style="padding:8px; border:1px solid rgba(0,0,0,.14); display:flex; align-items:center; justify-content:space-between; gap:8px;">
-            <div style="font-size:11px; letter-spacing:1px;">${escapeHtml(invitee)}</div>
-            <button class="btn" type="button" data-cancel-invite="${escapeAttr(String(x.id))}">cancel</button>
+          <div class="planning-member-row">
+            <div class="planning-member-row__main">${escapeHtml(invitee)}</div>
+            <button class="btn" type="button" data-cancel-invite="${escapeAttr(String(x.id))}">${lang === 'en' ? 'cancel' : 'отменить'}</button>
           </div>
         `;
       })
@@ -1618,58 +1776,75 @@ export class PlanningCollabApp {
     const members = asArray(board.members)
       .map((m) => {
         const userId = String(m.user_id || '').trim();
-        const role = roleLabel(m.role);
+        const role = roleLabel(m.role, this.getLang());
         const label = this.resolveMemberLabel(m);
         const isSelf = userId === String(this.user && this.user.id || '');
         const canRemove = canManageMembers && !isSelf;
         return `
-          <div class="friend-card" style="padding:8px; border:1px solid rgba(0,0,0,.14); display:flex; align-items:center; justify-content:space-between; gap:8px;">
-            <div style="display:grid; gap:2px; min-width:0;">
-              <div style="font-size:11px; letter-spacing:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(label)}</div>
-              <div style="font-size:10px; letter-spacing:2px; text-transform:uppercase; opacity:.65;">${escapeHtml(role)}</div>
+          <div class="planning-member-row">
+            <div class="planning-member-row__meta">
+              <div class="planning-member-row__main">${escapeHtml(label)}</div>
+              <div class="planning-member-row__sub">${escapeHtml(role)}</div>
             </div>
-            <button class="btn" type="button" data-remove-member="${escapeAttr(userId)}" ${canRemove ? '' : 'disabled'}>remove</button>
+            <button class="btn" type="button" data-remove-member="${escapeAttr(userId)}" ${canRemove ? '' : 'disabled'}>${lang === 'en' ? 'remove' : 'удалить'}</button>
           </div>
         `;
       })
       .join('');
 
     this.ui.openModal({
-      title: 'invite friend',
+      title: this.t('добавить друга', 'invite friend'),
       bodyHtml: `
         <form class="form" data-invite-form>
-          <div style="font-size:10px; letter-spacing:2px; text-transform:uppercase; opacity:.7;">project scope: ${escapeHtml(scopeText)}</div>
+          <div class="planning-modal-note">${this.t('тип проекта', 'project scope')}: ${escapeHtml(scopeText)}</div>
 
-          <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
-            friend user-id
-            <input class="ctl" name="target_user_id" required maxlength="32" autocomplete="off" />
+          <label class="planning-modal-field">
+            ${this.t('друг из списка', 'friend from list')}
+            <select class="ctl" name="friend_user_id" data-friend-pick>
+              <option value="">${this.state.friends.length ? this.t('выбрать друга', 'choose friend') : this.t('друзей пока нет', 'no friends yet')}</option>
+              ${friendOptions}
+            </select>
           </label>
 
-          <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
-            message (optional)
+          <label class="planning-modal-field">
+            ${this.t('или user-id друга', 'or friend user-id')}
+            <input class="ctl" name="target_user_id" maxlength="32" autocomplete="off" data-friend-user-id />
+          </label>
+
+          <label class="planning-modal-field">
+            ${this.t('сообщение (необязательно)', 'message (optional)')}
             <input class="ctl" name="message" maxlength="300" />
           </label>
 
           <div class="form__actions">
-            <button class="btn" type="button" data-close>close</button>
-            <button class="btn" type="submit">send invite</button>
+            <button class="btn" type="button" data-close>${this.t('закрыть', 'close')}</button>
+            <button class="btn" type="submit">${this.t('отправить приглашение', 'send invite')}</button>
           </div>
         </form>
 
-        <div style="font-size:11px; letter-spacing:2px; text-transform:uppercase; opacity:.75; margin-top:8px;">pending invites</div>
-        <div style="display:grid; gap:8px; margin-top:6px;">
-          ${pending || '<div style="font-size:11px; opacity:.7;">no pending invites</div>'}
+        <div class="planning-modal-title">${this.t('ожидающие приглашения', 'pending invites')}</div>
+        <div class="planning-modal-list">
+          ${pending || `<div class="planning-modal-empty">${this.t('нет ожидающих приглашений', 'no pending invites')}</div>`}
         </div>
 
-        <div style="font-size:11px; letter-spacing:2px; text-transform:uppercase; opacity:.75; margin-top:8px;">members</div>
-        <div style="display:grid; gap:8px; margin-top:6px;">
-          ${members || '<div style="font-size:11px; opacity:.7;">no members</div>'}
+        <div class="planning-modal-title">${this.t('участники', 'members')}</div>
+        <div class="planning-modal-list">
+          ${members || `<div class="planning-modal-empty">${this.t('участников пока нет', 'no members yet')}</div>`}
         </div>
       `,
       onSubmit: (data) => {
         void this.inviteFriendSubmit(data).catch((error) => this.onMutationError(error));
       },
       onMount: (bodyEl) => {
+        const pick = bodyEl.querySelector('[data-friend-pick]');
+        const input = bodyEl.querySelector('[data-friend-user-id]');
+        if (pick && input) {
+          pick.addEventListener('change', () => {
+            const v = String(pick.value || '').trim();
+            if (v) input.value = v;
+          });
+        }
+
         bodyEl.addEventListener('click', (event) => {
           const btn = event.target.closest('[data-cancel-invite]');
           if (btn) {
@@ -1693,9 +1868,14 @@ export class PlanningCollabApp {
     const board = this.state.board;
     if (!board || !board.project) return;
 
-    const targetUserId = String(data.target_user_id || '').trim().toLowerCase();
+    const targetFromInput = String(data.target_user_id || '').trim().toLowerCase();
+    const targetFromPick = String(data.friend_user_id || '').trim().toLowerCase();
+    const targetUserId = targetFromInput || targetFromPick;
     const message = String(data.message || '').trim();
-    if (!targetUserId) return;
+    if (!targetUserId) {
+      this.ui.toast(this.t('выберите друга из списка или введите user-id', 'select friend or enter user-id'));
+      return;
+    }
 
     await this.rpc('ik_plan_invite_friend', {
       p_project_id: board.project.id,
@@ -1711,7 +1891,7 @@ export class PlanningCollabApp {
     await this.setProjectScope('shared', { force: true });
     await this.selectProject(board.project.id, { force: true });
     await this.loadIncomingInvitations({ quiet: true });
-    this.ui.toast('invite sent');
+    this.ui.toast(this.t('приглашение отправлено', 'invite sent'));
   }
 
   async cancelInvitation(invitationId) {
@@ -1724,7 +1904,7 @@ export class PlanningCollabApp {
     if (this.state.activeProjectId) {
       await this.loadBoard(this.state.activeProjectId);
     }
-    this.ui.toast('invite cancelled');
+    this.ui.toast(this.t('приглашение отменено', 'invite cancelled'));
   }
 
   async removeMember(memberId) {
@@ -1742,33 +1922,37 @@ export class PlanningCollabApp {
     if (this.state.activeProjectId) {
       await this.loadBoard(this.state.activeProjectId);
     }
-    this.ui.toast('member removed');
+    this.ui.toast(this.t('участник удален', 'member removed'));
   }
 
   async openIncomingInvitesModal() {
     await this.loadIncomingInvitations({ quiet: true });
     const invites = this.state.incomingInvites;
+    const lang = this.getLang();
 
     const rows = invites.map((row) => {
       const inviter = String(row.inviter_user_id || row.inviter_nickname || row.inviter_id || 'user');
-      const project = String(row.project_name || 'project');
+      const project = String(row.project_name || this.t('проект', 'project'));
+      const expiresAt = String(row.expires_at || '');
+      const expiresText = expiresAt ? new Date(expiresAt).toLocaleString() : '';
       return `
-        <div class="friend-card" style="padding:10px; border:1px solid rgba(0,0,0,.14); display:grid; gap:8px;">
-          <div style="font-size:11px; letter-spacing:2px; text-transform:uppercase;">${escapeHtml(project)}</div>
-          <div style="font-size:12px;">from @${escapeHtml(inviter)}</div>
-          <div style="display:flex; gap:8px; justify-content:flex-end;">
-            <button class="btn" type="button" data-invite-action="reject" data-id="${escapeAttr(String(row.invitation_id))}">reject</button>
-            <button class="btn" type="button" data-invite-action="accept" data-id="${escapeAttr(String(row.invitation_id))}">accept</button>
+        <article class="planning-invite-row">
+          <div class="planning-invite-row__project">${escapeHtml(project)}</div>
+          <div class="planning-invite-row__from">${lang === 'en' ? 'from' : 'от'} @${escapeHtml(inviter)}</div>
+          ${expiresText ? `<div class="planning-invite-row__meta">${lang === 'en' ? 'expires' : 'до'}: ${escapeHtml(expiresText)}</div>` : ''}
+          <div class="planning-invite-row__actions">
+            <button class="btn" type="button" data-invite-action="reject" data-id="${escapeAttr(String(row.invitation_id))}">${lang === 'en' ? 'reject' : 'отклонить'}</button>
+            <button class="btn" type="button" data-invite-action="accept" data-id="${escapeAttr(String(row.invitation_id))}">${lang === 'en' ? 'accept' : 'принять'}</button>
           </div>
-        </div>
+        </article>
       `;
     }).join('');
 
     this.ui.openModal({
-      title: 'incoming invites',
+      title: this.t('входящие приглашения', 'incoming invites'),
       bodyHtml: `
-        <div style="display:grid; gap:10px;">
-          ${rows || '<div style="font-size:11px; opacity:.7; letter-spacing:2px; text-transform:uppercase;">no incoming invites</div>'}
+        <div class="planning-invite-list">
+          ${rows || `<div class="planning-modal-empty">${this.t('нет входящих приглашений', 'no incoming invites')}</div>`}
         </div>
       `,
       onMount: (bodyEl) => {
@@ -1808,13 +1992,13 @@ export class PlanningCollabApp {
       await this.setProjectScope(this.uiPrefs.projectScope, { force: true });
     }
 
-    this.ui.toast(accept ? 'invitation accepted' : 'invitation rejected');
+    this.ui.toast(accept ? this.t('приглашение принято', 'invitation accepted') : this.t('приглашение отклонено', 'invitation rejected'));
   }
 
   openColumnsModal() {
     const board = this.state.board;
     if (!board || !board.project) {
-      this.ui.toast('select project first');
+      this.ui.toast(this.t('сначала выберите проект', 'select project first'));
       return;
     }
 
@@ -1876,7 +2060,7 @@ export class PlanningCollabApp {
           row.querySelector('[data-del]')?.addEventListener('click', () => {
             const rows = list.querySelectorAll('[data-col-row]');
             if (rows.length <= 1) {
-              this.ui.toast('at least one column required');
+              this.ui.toast(this.t('нужна минимум одна колонка', 'at least one column required'));
               return;
             }
             row.remove();
@@ -1918,7 +2102,7 @@ export class PlanningCollabApp {
     const list = form.querySelector('[data-cols-list]');
     const rows = Array.from(list.querySelectorAll('[data-col-row]'));
     if (!rows.length) {
-      this.ui.toast('at least one column required');
+      this.ui.toast(this.t('нужна минимум одна колонка', 'at least one column required'));
       return;
     }
 
@@ -1946,19 +2130,19 @@ export class PlanningCollabApp {
 
     this.ui.closeModal();
     await this.loadBoard(board.project.id);
-    this.ui.toast('columns saved');
+    this.ui.toast(this.t('колонки сохранены', 'columns saved'));
   }
 
   openCreateCardModal() {
     const board = this.state.board;
     if (!board || !board.project) {
-      this.ui.toast('select project first');
+      this.ui.toast(this.t('сначала выберите проект', 'select project first'));
       return;
     }
 
     const columns = this.getSortedColumns();
     if (!columns.length) {
-      this.ui.toast('no columns');
+      this.ui.toast(this.t('нет колонок', 'no columns'));
       return;
     }
 
@@ -2008,7 +2192,7 @@ export class PlanningCollabApp {
           </div>
 
           <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
-            assignee
+            ${this.t('ответственный', 'assignee')}
             <select class="ctl" name="assignee_id">${assigneeOptions}</select>
           </label>
 
@@ -2053,7 +2237,7 @@ export class PlanningCollabApp {
         delete fallback.p_assignee_id;
         await this.rpc('ik_plan_create_card', fallback);
         if (payload.p_assignee_id) {
-          this.ui.toast('apply stage10 sql for assignee support');
+          this.ui.toast(this.t('примените stage10 sql для поддержки ответственного', 'apply stage10 sql for assignee support'));
         }
       } else {
         throw error;
@@ -2062,7 +2246,7 @@ export class PlanningCollabApp {
 
     this.ui.closeModal();
     await this.loadBoard(board.project.id);
-    this.ui.toast('task created');
+    this.ui.toast(this.t('задача создана', 'task created'));
   }
 
   openCardModal(cardId) {
@@ -2121,7 +2305,7 @@ export class PlanningCollabApp {
           </div>
 
           <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
-            assignee
+            ${this.t('ответственный', 'assignee')}
             <select class="ctl" name="assignee_id">${assigneeOptions}</select>
           </label>
 
@@ -2168,7 +2352,7 @@ export class PlanningCollabApp {
         delete fallback.p_assignee_id;
         await this.rpc('ik_plan_update_card', fallback);
         if (payload.p_assignee_id) {
-          this.ui.toast('apply stage10 sql for assignee support');
+          this.ui.toast(this.t('примените stage10 sql для поддержки ответственного', 'apply stage10 sql for assignee support'));
         }
       } else {
         throw error;
@@ -2177,7 +2361,7 @@ export class PlanningCollabApp {
 
     this.ui.closeModal();
     await this.loadBoard(board.project.id);
-    this.ui.toast('task saved');
+    this.ui.toast(this.t('задача сохранена', 'task saved'));
   }
 
   openDeleteCardModal(cardId) {
@@ -2216,7 +2400,7 @@ export class PlanningCollabApp {
 
     this.ui.closeModal();
     await this.loadBoard(board.project.id);
-    this.ui.toast('task deleted');
+    this.ui.toast(this.t('задача удалена', 'task deleted'));
   }
 
   startCurrentEditing(cardId) {
@@ -2341,23 +2525,26 @@ export class PlanningCollabApp {
     if (looksLikeSchemaError(error)) {
       if (!this.schemaWarnShown) {
         this.schemaWarnShown = true;
-        this.ui.toast('apply SQL: supabase/sql/stage9_planning_collab.sql then supabase/sql/stage10_planning_shared_personal_tasks.sql');
+        this.ui.toast(this.t(
+          'примените SQL: supabase/sql/stage9_planning_collab.sql и затем supabase/sql/stage10_planning_shared_personal_tasks.sql',
+          'apply SQL: supabase/sql/stage9_planning_collab.sql then supabase/sql/stage10_planning_shared_personal_tasks.sql'
+        ));
       }
       this.clearProjectsRetry();
       this.setActionsDisabled(true);
-      this.setCloudBadge('off', 'planning sql missing');
+      this.setCloudBadge('off', this.t('отсутствуют planning sql', 'planning sql missing'));
       return;
     }
 
     if (looksTransientError(error)) {
-      this.setCloudBadge('sync', 'network issue, retrying');
+      this.setCloudBadge('sync', this.t('проблема сети, повторяем', 'network issue, retrying'));
       this.scheduleProjectsRetry();
-      this.ui.toast('network issue, retrying');
+      this.ui.toast(this.t('проблема сети, повторяем', 'network issue, retrying'));
       return;
     }
 
     if (low.includes('revision_conflict') || low.includes('version_conflict')) {
-      this.ui.toast('conflict detected, refreshing board');
+      this.ui.toast(this.t('обнаружен конфликт, обновляю доску', 'conflict detected, refreshing board'));
       if (this.state.activeProjectId) {
         await this.loadBoard(this.state.activeProjectId);
       }
@@ -2365,53 +2552,53 @@ export class PlanningCollabApp {
     }
 
     if (low.includes('not_friends')) {
-      this.ui.toast('you can invite only friends');
+      this.ui.toast(this.t('приглашать можно только друзей', 'you can invite only friends'));
       return;
     }
 
     if (low.includes('target_user_not_found')) {
-      this.ui.toast('user-id not found');
+      this.ui.toast(this.t('user-id не найден', 'user-id not found'));
       return;
     }
 
     if (low.includes('already_member')) {
-      this.ui.toast('user is already in project');
+      this.ui.toast(this.t('пользователь уже в проекте', 'user is already in project'));
       return;
     }
 
     if (low.includes('assignee_not_member')) {
-      this.ui.toast('assignee must be a project member');
+      this.ui.toast(this.t('ответственный должен быть участником проекта', 'assignee must be a project member'));
       return;
     }
 
     if (low.includes('member_not_found')) {
-      this.ui.toast('member not found');
+      this.ui.toast(this.t('участник не найден', 'member not found'));
       return;
     }
 
     if (low.includes('owner_cannot_leave')) {
-      this.ui.toast('owner cannot be removed from project');
+      this.ui.toast(this.t('владельца нельзя удалить из проекта', 'owner cannot be removed from project'));
       return;
     }
 
     if (low.includes('invitation_not_pending')) {
-      this.ui.toast('invitation already resolved');
+      this.ui.toast(this.t('приглашение уже обработано', 'invitation already resolved'));
       return;
     }
 
     if (low.includes('only_owner_can_delete_project')) {
-      this.ui.toast('only owner can delete project');
+      this.ui.toast(this.t('только владелец может удалить проект', 'only owner can delete project'));
       return;
     }
 
     if (low.includes('invitation_expired')) {
-      this.ui.toast('invitation expired');
+      this.ui.toast(this.t('срок приглашения истек', 'invitation expired'));
       await this.loadIncomingInvitations({ quiet: true });
       return;
     }
 
     if (low.includes('forbidden')) {
-      this.ui.toast('access denied');
+      this.ui.toast(this.t('доступ запрещен', 'access denied'));
       return;
     }
 
