@@ -28,6 +28,10 @@
     if (panelStruct) panelStruct.hidden = (w !== 'struct');
     if (panelTenses) panelTenses.hidden = (w !== 'tenses');
     if (panelWT)     panelWT.hidden     = (w !== 'wt');
+
+    try{
+      document.dispatchEvent(new CustomEvent('sh:route', { detail: { route: w, main: w } }));
+    }catch(_){ }
   }
 
   function getMainTab(){
@@ -77,6 +81,11 @@
     b.setAttribute('aria-selected', String(!isA));
     pa.hidden = !isA;
     pb.hidden = isA;
+
+    try{
+      const route = isA ? 'wt-practice' : 'wt-builder';
+      document.dispatchEvent(new CustomEvent('sh:route', { detail: { route, main: 'wt', wtSubtab: isA ? 'practice' : 'builder' } }));
+    }catch(_){ }
   }
 
   window.StudentHelperTabs = window.StudentHelperTabs || {};

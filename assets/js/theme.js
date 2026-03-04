@@ -71,6 +71,29 @@
   const NOTIFY_CACHE_KEY = "ik_notify_cache_v1";
   const NOTIFY_MAX_ALL = 100;
 
+  const coachState = {
+    ready: false,
+    visible: false,
+    collapsed: false,
+    payload: null,
+    hideTimer: null,
+    typeTimer: null,
+    typeTimerSub: null,
+    lastLine: "",
+    lastSub: "",
+    route: "",
+    routeTalkTimer: null,
+    routeTalkStep: 0,
+    owner: "",
+  };
+
+  const eyeState = {
+    x: 0,
+    y: 0,
+    lastMoveAt: 0,
+    loopId: null,
+  };
+
   let loadingStartAt = 0;
   let loadingFallbackTimer = null;
   let loadingShowTimer = null;
@@ -836,6 +859,318 @@
       if (timer) window.clearTimeout(timer);
       timer = window.setTimeout(close, 2600);
     });
+  }
+
+  function ensureCoachPanel() {
+    let panel = document.getElementById("ikFarmCoach");
+    if (panel) return panel;
+    panel = document.createElement("section");
+    panel.id = "ikFarmCoach";
+    panel.className = "ik-farm-coach";
+    panel.hidden = true;
+    panel.innerHTML = `
+      <button type="button" class="ik-farm-coach__strip" id="ikFarmCoachStrip" hidden>Farm HUB ▾</button>
+      <div class="ik-farm-coach__avatar" id="ikFarmCoachAvatar" aria-hidden="true"><span class="ik-farm-coach__eye"><span class="ik-farm-coach__pupil" id="ikFarmCoachPupil"></span></span></div>
+      <div class="ik-farm-coach__body" id="ikFarmCoachBody">
+        <div class="ik-farm-coach__head">
+          <b id="ikFarmCoachTitle">Farm HUB</b>
+          <button type="button" class="ik-farm-coach__close" id="ikFarmCoachClose" aria-label="hide">скрыть</button>
+        </div>
+        <p id="ikFarmCoachLine" class="ik-farm-coach__line"></p>
+        <p id="ikFarmCoachSub" class="ik-farm-coach__sub"></p>
+        <div class="ik-farm-coach__bar"><span id="ikFarmCoachBar"></span></div>
+        <div id="ikFarmCoachChips" class="ik-farm-coach__chips"></div>
+      </div>
+    `;
+    document.body.appendChild(panel);
+    const closeBtn = panel.querySelector("#ikFarmCoachClose");
+    const stripBtn = panel.querySelector("#ikFarmCoachStrip");
+
+    closeBtn?.addEventListener("click", () => {
+      coachState.collapsed = true;
+      panel.classList.add("is-collapsed");
+      const s = panel.querySelector("#ikFarmCoachStrip");
+      if (s) s.hidden = false;
+    });
+
+    stripBtn?.addEventListener("click", () => {
+      coachState.collapsed = false;
+      panel.classList.remove("is-collapsed");
+      stripBtn.hidden = true;
+      panel.classList.remove("is-pop");
+      void panel.offsetWidth;
+      panel.classList.add("is-pop");
+    });
+
+    coachState.ready = true;
+    if (!eyeState.loopId) {
+      eyeState.loopId = window.setInterval(() => {
+        paintCoachEye();
+      }, 90);
+      window.addEventListener("mousemove", (e) => {
+        eyeState.x = Number(e.clientX || 0);
+        eyeState.y = Number(e.clientY || 0);
+        eyeState.lastMoveAt = Date.now();
+        paintCoachEye();
+      }, { passive: true });
+    }
+    return panel;
+  }
+
+  function placeCoachBelowMenu() {
+    const panel = document.getElementById("ikFarmCoach");
+    if (!panel) return;
+    let top = 8;
+    try {
+      const nav = document.querySelector(".ik-site-nav");
+      if (nav) {
+        const r = nav.getBoundingClientRect();
+        if (Number.isFinite(r.bottom) && r.bottom > 0) {
+          top = Math.max(8, Math.round(r.bottom + 8));
+        }
+      }
+    } catch (_) {}
+    panel.style.top = `${top}px`;
+  }
+
+  function glitchNoise(len) {
+    const glyphs = "#@%/&<>_01⟐⟡⟁⟢⟣";
+    let out = "";
+    for (let i = 0; i < len; i += 1) out += glyphs[Math.floor(Math.random() * glyphs.length)];
+    return out;
+  }
+
+  function coachLang() {
+    try {
+      const s = String(localStorage.getItem("ik_site_lang_v1") || "").trim().toLowerCase();
+      return s === "en" ? "en" : "ru";
+    } catch (_) {
+      return "ru";
+    }
+  }
+
+  function coachT(ru, en) {
+    return coachLang() === "en" ? en : ru;
+  }
+
+  function typeCoachText(el, text, kind) {
+    if (!el) return;
+    const target = String(text || "");
+    const last = kind === "sub" ? coachState.lastSub : coachState.lastLine;
+    if (target === last) return;
+
+    if (kind === "sub") {
+      if (coachState.typeTimerSub) window.clearInterval(coachState.typeTimerSub);
+    } else {
+      if (coachState.typeTimer) window.clearInterval(coachState.typeTimer);
+    }
+
+    if (!target) {
+      el.textContent = "";
+      el.classList.remove("is-typing");
+      if (kind === "sub") coachState.lastSub = "";
+      else coachState.lastLine = "";
+      return;
+    }
+
+    // Subline updates instantly; main line gets short smooth glitch typing.
+    if (kind === "sub") {
+      el.textContent = target;
+      coachState.lastSub = target;
+      return;
+    }
+
+    const maxDuration = 260;
+    const charsPerTick = target.length > 90 ? 6 : target.length > 54 ? 5 : 4;
+    const ticks = Math.max(5, Math.ceil(target.length / charsPerTick));
+    const stepMs = Math.max(10, Math.floor(maxDuration / ticks));
+    let i = 0;
+    let glitchTicks = 1;
+
+    el.classList.add("is-typing");
+
+    const timer = window.setInterval(() => {
+      i = Math.min(target.length, i + charsPerTick);
+      const head = target.slice(0, i);
+      const rest = Math.max(0, target.length - i);
+      const glitch = rest > 0 && glitchTicks > 0 ? ` ${glitchNoise(Math.min(2, rest))}` : "";
+      el.textContent = `${head}${glitch}`;
+      glitchTicks -= 1;
+
+      if (i >= target.length) {
+        window.clearInterval(timer);
+        el.textContent = target;
+        el.classList.remove("is-typing");
+        coachState.typeTimer = null;
+        coachState.lastLine = target;
+      }
+    }, stepMs);
+
+    coachState.typeTimer = timer;
+  }
+
+  function paintCoachEye() {
+    const panel = document.getElementById("ikFarmCoach");
+    if (!panel || panel.hidden) return;
+    const eye = panel.querySelector(".ik-farm-coach__eye");
+    const pupil = panel.querySelector("#ikFarmCoachPupil");
+    if (!eye || !pupil) return;
+    const rect = eye.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+
+    let tx = eyeState.x;
+    let ty = eyeState.y;
+    const stale = Date.now() - Number(eyeState.lastMoveAt || 0) > 1800;
+    if (stale) {
+      // If cursor is idle, keep watching task zone.
+      tx = window.innerWidth * 0.52;
+      ty = window.innerHeight * 0.56;
+    }
+
+    const dx = tx - cx;
+    const dy = ty - cy;
+    const len = Math.max(1, Math.hypot(dx, dy));
+    const max = 4;
+    const px = (dx / len) * max;
+    const py = (dy / len) * max;
+    pupil.style.transform = `translate(${px}px, ${py}px)`;
+  }
+
+  function renderCoach(payload) {
+    const panel = ensureCoachPanel();
+    const wasHidden = !!panel.hidden;
+    const p = payload || {};
+    const title = panel.querySelector("#ikFarmCoachTitle");
+    const line = panel.querySelector("#ikFarmCoachLine");
+    const sub = panel.querySelector("#ikFarmCoachSub");
+    const bar = panel.querySelector("#ikFarmCoachBar");
+    const chips = panel.querySelector("#ikFarmCoachChips");
+    const avatar = panel.querySelector("#ikFarmCoachAvatar");
+    const strip = panel.querySelector("#ikFarmCoachStrip");
+    const closeBtn = panel.querySelector("#ikFarmCoachClose");
+    const barWrap = panel.querySelector(".ik-farm-coach__bar");
+
+    if (title) title.textContent = String(p.title || "Farm HUB");
+    if (line) typeCoachText(line, String(p.line || ""), "line");
+    if (sub) typeCoachText(sub, String(p.subline || ""), "sub");
+    if (avatar) avatar.setAttribute("data-avatar", String(p.avatar || ""));
+    if (strip) strip.textContent = String(p.stripLabel || "Farm HUB ▾");
+    if (closeBtn) closeBtn.textContent = String(p.hideLabel || "скрыть");
+    if (bar) {
+      const pct = Math.max(0, Math.min(100, Number(p.progressPct || 0)));
+      bar.style.width = `${pct}%`;
+    }
+    if (chips) {
+      const list = Array.isArray(p.chips) ? p.chips : [];
+      chips.innerHTML = list.map((x) => `<span class=\"ik-farm-chip\">${escapeHtml(String(x))}</span>`).join("");
+    }
+    const showStats = p.showStats !== false;
+    if (barWrap) barWrap.hidden = !showStats;
+    if (chips) chips.hidden = !showStats;
+
+    panel.setAttribute("data-mood", String(p.mood || "calm"));
+    coachState.owner = String(p.owner || coachState.owner || "");
+    panel.hidden = false;
+    coachState.visible = true;
+    if (coachState.collapsed) {
+      panel.classList.add("is-collapsed");
+      if (strip) strip.hidden = false;
+      return;
+    }
+    panel.classList.remove("is-collapsed");
+    if (strip) strip.hidden = true;
+    if (wasHidden) {
+      panel.classList.remove("is-pop");
+      void panel.offsetWidth;
+      panel.classList.add("is-pop");
+    }
+    placeCoachBelowMenu();
+    paintCoachEye();
+  }
+
+  function coachUpdate(payload) {
+    coachState.payload = payload || null;
+    if (!payload || payload.active === false) {
+      const panel = document.getElementById("ikFarmCoach");
+      if (panel) panel.hidden = true;
+      coachState.visible = false;
+      return;
+    }
+    renderCoach(payload);
+  }
+
+  function coachPulseDone(payload) {
+    coachUpdate(payload);
+    if (coachState.hideTimer) window.clearTimeout(coachState.hideTimer);
+    coachState.hideTimer = window.setTimeout(() => {
+      const panel = document.getElementById("ikFarmCoach");
+      if (panel) panel.hidden = true;
+      coachState.visible = false;
+    }, 5200);
+  }
+
+  function clearRouteCoachTalk() {
+    if (coachState.routeTalkTimer) {
+      window.clearTimeout(coachState.routeTalkTimer);
+      coachState.routeTalkTimer = null;
+    }
+    coachState.routeTalkStep = 0;
+  }
+
+  function routeTalkLine(route, step) {
+    const r = String(route || "menu");
+    if (r === "menu") {
+      const arrRu = ["Выбери модуль, и начнем.", "Готов? Заходи в любой раздел.", "Учебный центр на месте. Выбирай направление."];
+      const arrEn = ["Pick a module and we start.", "Ready? Enter any section.", "Learning center is online. Choose your track."];
+      const idx = Math.min(arrRu.length - 1, step % arrRu.length);
+      return coachT(arrRu[idx], arrEn[idx]);
+    }
+    if (r === "dict") return coachT("Dictionary открыт. Выбери раздел и режим.", "Dictionary is open. Pick section and mode.");
+    if (r === "struct") return coachT("Structure: разберем правила и закрепим практикой.", "Structure: learn rules and lock with practice.");
+    if (r === "tenses") return coachT("Tenses: держим форму, работаем по шагам.", "Tenses: keep it tight, step by step.");
+    if (r === "wt" || r === "wt-practice") return coachT("Word transformation: аккуратность и ритм.", "Word transformation: precision and rhythm.");
+    if (r === "wt-builder") return coachT("Builder режим: собирай материал, потом в практику.", "Builder mode: craft material, then run practice.");
+    return coachT("Продолжаем работу.", "Continue.");
+  }
+
+  function routeTalkSub(route) {
+    const r = String(route || "menu");
+    if (r === "dict") return coachT("Рейтинг есть в пользовательских и системных словарях.", "Ranked rewards are in user/system dictionaries.");
+    if (r === "menu") return coachT("Farm HUB активен во всем учебном центре.", "Farm HUB is active across the learning center.");
+    return coachT("Подсказки активны. Статистика рейтинга включится в рейтинговых режимах.", "Hints are active. Ranked stats will appear in ranked modes.");
+  }
+
+  function updateCoachForRoute(route) {
+    const next = String(route || "menu");
+    coachState.route = next;
+    const line = routeTalkLine(next, coachState.routeTalkStep);
+    coachUpdate({
+      owner: "route",
+      active: true,
+      title: coachT("Farm HUB · Учебный центр", "Farm HUB · Learning Center"),
+      line,
+      subline: routeTalkSub(next),
+      progressPct: 0,
+      chips: [],
+      showStats: false,
+      mood: "calm",
+      hideLabel: coachT("скрыть", "hide"),
+      stripLabel: "Farm HUB ▾",
+    });
+  }
+
+  function scheduleRouteCoachTalk() {
+    if (coachState.routeTalkTimer) window.clearTimeout(coachState.routeTalkTimer);
+    coachState.routeTalkTimer = window.setTimeout(() => {
+      if (coachState.owner === "dictionary") {
+        scheduleRouteCoachTalk();
+        return;
+      }
+      coachState.routeTalkStep += 1;
+      updateCoachForRoute(coachState.route || "menu");
+      scheduleRouteCoachTalk();
+    }, 8500);
   }
 
   function renderAdministrations(body) {
@@ -1740,6 +2075,12 @@
     go: gotoWithLeave
   };
 
+  window.IKFarmCoach = {
+    update: coachUpdate,
+    finish: coachPulseDone,
+    hide: () => coachUpdate({ active: false }),
+  };
+
   if (document.body && document.body.hasAttribute(LOADING_ATTR)) {
     ensurePageShell();
     showLoading();
@@ -1805,6 +2146,14 @@
       }, 500);
     });
 
+    document.addEventListener("sh:route", (e) => {
+      const d = (e && e.detail) || {};
+      const route = String(d.route || d.main || "menu");
+      clearRouteCoachTalk();
+      updateCoachForRoute(route);
+      scheduleRouteCoachTalk();
+    });
+
     document.addEventListener("click", (e) => {
       const panel = getNotifyPanel();
       if (!panel || panel.hidden) return;
@@ -1818,6 +2167,13 @@
       if (e.key === "Escape") closeNotifyPanel();
     });
 
+    window.addEventListener("resize", () => {
+      placeCoachBelowMenu();
+    }, { passive: true });
+    window.addEventListener("scroll", () => {
+      placeCoachBelowMenu();
+    }, { passive: true });
+
     loadNotifications(false).catch(() => {});
     window.setInterval(() => {
       loadNotifications(false).catch(() => {});
@@ -1825,5 +2181,11 @@
 
     initSystemListener();
     installPageLeaveHandlers();
+
+    if (document.body && document.body.classList.contains("page-learning")) {
+      clearRouteCoachTalk();
+      updateCoachForRoute("menu");
+      scheduleRouteCoachTalk();
+    }
   });
 })();

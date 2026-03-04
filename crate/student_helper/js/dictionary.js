@@ -1934,6 +1934,7 @@ let elLearnMcqButtons = null;
     dictPanelQuiz.hidden = !isPractice;
     if(dictPanelLearn) dictPanelLearn.hidden = !isLearn;
     dictPanelBuilder.hidden = isCards || isPractice || isLearn;
+    coachUpdateFromQuiz();
   }
 
   function quizSetFeedback(state, stamp, line){
@@ -1942,10 +1943,322 @@ let elLearnMcqButtons = null;
     elQuizLine.textContent = line || '';
     pulse(elQuizFeedback, 'ik-pop');
   }
+
+  function uiLang(){
+    try{
+      const s = String(localStorage.getItem('ik_site_lang_v1') || '').trim().toLowerCase();
+      if(s === 'en') return 'en';
+    }catch(_){ }
+    const dl = String(document.documentElement && document.documentElement.lang || '').toLowerCase();
+    if(dl.startsWith('en')) return 'en';
+    return 'ru';
+  }
+
+  function t2(ru, en){
+    return uiLang() === 'en' ? en : ru;
+  }
+
+  function ruN(n, one, few, many){
+    const x = Math.abs(Number(n || 0));
+    const m10 = x % 10;
+    const m100 = x % 100;
+    if(m10 === 1 && m100 !== 11) return one;
+    if(m10 >= 2 && m10 <= 4 && !(m100 >= 12 && m100 <= 14)) return few;
+    return many;
+  }
+
+  function fmtEco(v){
+    const n = Number(v);
+    if(!Number.isFinite(n)) return '0';
+    if(Number.isInteger(n)) return String(n);
+    const s = n.toFixed(1);
+    return s.endsWith('.0') ? s.slice(0, -2) : s;
+  }
+
+  let coachLastEvent = { type:'', at:0, textRu:'', textEn:'' };
+  let coachIdleTimer = null;
+  let coachIdleStep = 0;
+  let coachShownLine = '';
+  let coachShownAt = 0;
+
+  function clearCoachIdleTalk(){
+    if(coachIdleTimer){
+      window.clearTimeout(coachIdleTimer);
+      coachIdleTimer = null;
+    }
+    coachIdleStep = 0;
+    coachShownLine = '';
+    coachShownAt = 0;
+  }
+
+  function coachIdleMessage(done, correct, remain, acc){
+    const step = Number(coachIdleStep || 0);
+    const pick = (arr)=> arr[Math.floor(Math.random() * arr.length)] || '';
+    if(step === 0){
+      return t2('Дарова. Готов начать?', 'Hey. Ready to start?');
+    }
+    if(step === 1){
+      return t2('Окей, поехали. Спокойно и точно.', 'Alright, let’s run it. Calm and accurate.');
+    }
+    if(done === 0){
+      return t2('Начинай, я веду статистику по ходу.', 'Start when ready, I track stats as you go.');
+    }
+    if(remain > 0){
+      return t2(
+        pick([
+          `Темп норм. Осталось ${remain}, точность ${acc}%.`,
+          `Сейчас ${done}/20, правильных ${correct}.`,
+          `Держи ритм, не суетись.`,
+          `Продолжаем. Следующий вопрос.`
+        ]),
+        pick([
+          `Good pace. ${remain} left, accuracy ${acc}%.`,
+          `Now ${done}/20, correct ${correct}.`,
+          'Keep rhythm, no rush.',
+          'Continue. Next question.'
+        ])
+      );
+    }
+    return t2('Финал. Проверяем результат.', 'Final stretch. Checking result.');
+  }
+
+  function scheduleCoachIdleTalk(done, correct, remain, acc){
+    if(coachIdleTimer) window.clearTimeout(coachIdleTimer);
+    const delay = coachIdleStep < 2 ? 2600 : 9000;
+    coachIdleTimer = window.setTimeout(()=>{
+      if(!(window.IKFarmCoach && typeof window.IKFarmCoach.update === 'function')) return;
+      const msg = coachIdleMessage(done, correct, remain, acc);
+      if(msg){
+        coachLastEvent = { type:'idle', at: Date.now(), textRu: msg, textEn: msg };
+        coachUpdateFromQuiz();
+      }
+      coachIdleStep += 1;
+    }, delay);
+  }
+  function coachSignal(type){
+    const now = Date.now();
+    if((now - Number(coachLastEvent.at || 0)) < 2600) return;
+    const t = String(type || '');
+    const pick = (arr)=> arr[Math.floor(Math.random() * arr.length)] || '';
+    let textRu = '';
+    let textEn = '';
+    if(t === 'correct'){
+      textRu = pick([
+        'Засчитано. Двигаемся дальше.',
+        'Чисто. Этот ответ в копилку награды.',
+        'Нормальный ход. Продолжай темп.',
+        'Есть. Шаг к выплате сделан.'
+      ]);
+      textEn = pick([
+        'Counted. Keep moving.',
+        'Clean hit. One step closer.',
+        'Solid answer. Stay on pace.',
+        'Good. Reward track continues.'
+      ]);
+    }else if(t === 'wrong'){
+      textRu = pick([
+        'Промах. Следующий бери чисто.',
+        'Не попал. Выравниваем точность.',
+        'Ладно, продолжаем без суеты.',
+        'Мимо. Идём дальше.'
+      ]);
+      textEn = pick([
+        'Miss. Take the next one clean.',
+        'Not this one. Recover accuracy.',
+        'Missed. Keep pushing.',
+        'Off target. Continue.'
+      ]);
+    }else if(t === 'giveup'){
+      textRu = 'Ответ открыт. Следующий лучше закрыть самостоятельно.';
+      textEn = 'Answer revealed. Take the next one clean yourself.';
+    }else if(t === 'almost'){
+      textRu = 'Почти попал. Одна аккуратная правка — и это твой балл.';
+      textEn = 'So close. One clean tweak and this point is yours.';
+    }
+    coachLastEvent = { type: t, at: now, textRu, textEn };
+  }
+
+  function coachEventTalk(){
+    const age = Date.now() - Number(coachLastEvent.at || 0);
+    if(age > 4500) return '';
+    return t2(coachLastEvent.textRu || '', coachLastEvent.textEn || '');
+  }
+
+  function coachSelectLine(eventLine, baseLine){
+    const now = Date.now();
+    if(eventLine){
+      coachShownLine = eventLine;
+      coachShownAt = now;
+      return eventLine;
+    }
+    if(!coachShownLine || (now - coachShownAt) > 5200){
+      coachShownLine = baseLine;
+      coachShownAt = now;
+    }
+    return coachShownLine || baseLine;
+  }
+
+  function coachUpdateFromQuiz(){
+    if(!(window.IKFarmCoach && typeof window.IKFarmCoach.update === 'function')) return;
+    const inPractice = dictPanelQuiz && dictPanelQuiz.hidden === false;
+    const rated = isRatedSource();
+    if(!inPractice || !rated){
+      clearCoachIdleTalk();
+      const line = !inPractice
+        ? t2('Dictionary открыт. Выбери режим practice, если хочешь вести сессию.', 'Dictionary is open. Pick practice mode to run a session.')
+        : t2('Это личный словарь без рейтинга. Тренировка идёт, но начислений нет.', 'This is personal dictionary (unrated). Training works, no ranked rewards.');
+      const sub = !inPractice
+        ? t2('Я остаюсь здесь. Когда начнешь practice — покажу боевую статистику.', 'I stay online. Start practice and I will show ranked stats.')
+        : t2('Для рейтинга переключись на пользовательские или системные словари.', 'Switch to user/system dictionaries for ranked rewards.');
+      window.IKFarmCoach.update({
+        owner: 'dictionary',
+        active: true,
+        title: t2('Farm HUB · Учебный центр', 'Farm HUB · Learning Center'),
+        line,
+        subline: sub,
+        showStats: false,
+        chips: [],
+        progressPct: 0,
+        mood: 'calm',
+        hideLabel: t2('скрыть', 'hide'),
+        stripLabel: 'Farm HUB ▾',
+      });
+      return;
+    }
+
+    const target = Number(quizSessionTarget || 0);
+    const done = Number(quizTotal || 0);
+    const correct = Number(quizCorrect || 0);
+    const wrong = Math.max(0, done - correct);
+    const remain = Math.max(0, target - done);
+    const toPass = Math.max(0, 15 - correct);
+    const acc = done > 0 ? Math.round((correct / Math.max(1, done)) * 100) : 0;
+    const progressPct = target > 0 ? Math.round((done / target) * 100) : 0;
+    const cfg = cfgFromUI();
+    const ratedEligible = String(cfg.session || '') === '20' && target === 20;
+
+    let mood = 'calm';
+    if(acc >= 85 && done >= 10) mood = 'hot';
+    if(done >= target && correct >= 15) mood = 'done';
+    if(!ratedEligible) mood = 'calm';
+
+    const nowEco = (()=>{
+      if(acc >= 95) return '~22 EKO';
+      if(acc >= 85) return '~18 EKO';
+      if(acc >= 70) return '~14 EKO';
+      return '~10 EKO';
+    })();
+
+    const leftWordRu = ruN(remain, 'задание', 'задания', 'заданий');
+    const passWordRu = ruN(toPass, 'правильный ответ', 'правильных ответа', 'правильных ответов');
+
+    let line = '';
+    let subline = '';
+    let avatar = '⟐';
+    const chips = [];
+
+    const eventTalk = coachEventTalk();
+
+    if(!ratedEligible){
+      const baseLine = t2(
+        'Сейчас рейтинг выключен. Поставь сессию на 20 заданий, чтобы получать EKO и I-bit þ.',
+        'Ranked mode is off. Set session to 20 tasks to earn EKO and I-bit þ.'
+      );
+      line = coachSelectLine(eventTalk, baseLine);
+      subline = t2(
+        `Сейчас сессия: ${String(cfg.session || '?')}. Для рейтинга нужно: 20 заданий и минимум 15 правильных.`,
+        `Current session: ${String(cfg.session || '?')}. Ranked rule: 20 tasks and at least 15 correct.`
+      );
+      chips.push(
+        t2('◈ режим: без рейтинга', '◈ mode: unrated'),
+        t2('⟐ чтобы включить фарм: session = 20', '⟐ to enable farming: session = 20')
+      );
+    }else if(done >= target){
+      if(correct >= 15){
+        const baseLine = t2(
+          'Сессия закончена, условия выполнены. Сейчас отправляю результат на начисление.',
+          'Session complete, conditions met. Sending result for reward credit now.'
+        );
+        line = coachSelectLine(eventTalk, baseLine);
+        subline = t2(
+          `Итог: ${correct}/20 правильных (${acc}%). Ожидай сообщение о фактическом начислении.`,
+          `Final: ${correct}/20 correct (${acc}%). Wait for the final credited reward message.`
+        );
+        avatar = '⟢';
+      }else{
+        const baseLine = t2(
+          'Сессия закончена, но награда не будет начислена: нужно минимум 15 правильных ответов из 20.',
+          'Session complete, but no reward this run: you need at least 15 correct answers out of 20.'
+        );
+        line = coachSelectLine(eventTalk, baseLine);
+        subline = t2(
+          `У тебя ${correct}/20. Попробуй ещё раз и держи точность выше.`,
+          `You got ${correct}/20. Try again and keep accuracy higher.`
+        );
+        avatar = '⟁';
+      }
+    }else if(toPass > 0){
+      const baseLine = t2(
+        `Нужно добрать ещё ${toPass} ${passWordRu}, чтобы включилось начисление.`,
+        `Need ${toPass} more correct answers to unlock reward credit.`
+      );
+      line = coachSelectLine(eventTalk, baseLine);
+      if(wrong >= 3){
+        subline = t2(
+          `Сделано ${done}/20, точность ${acc}%. Подсказка: не спеши, лучше стабильно +верно.`,
+          `Done ${done}/20, accuracy ${acc}%. Hint: slow down a bit; stable correct answers win.`
+        );
+      }else{
+        subline = t2(
+          `Сделано ${done}/20 · осталось ${remain} ${leftWordRu}. Идёшь к награде ровно, продолжай.`,
+          `Done ${done}/20 · ${remain} left. You are on track for reward, keep going.`
+        );
+      }
+      avatar = acc >= 80 ? '⟡' : '⟐';
+    }else{
+      const baseLine = t2(
+        `Условие выполнено: 15+ правильных уже есть. Закрой ещё ${remain} ${leftWordRu} — и будет начисление.`,
+        `Condition met: you already have 15+ correct. Finish ${remain} more tasks for reward credit.`
+      );
+      line = coachSelectLine(eventTalk, baseLine);
+      subline = t2(
+        `Текущая точность ${acc}%. Для I-bit þ постарайся удержать 85%+ к финалу.`,
+        `Current accuracy is ${acc}%. Keep 85%+ by the end to aim for I-bit þ.`
+      );
+      avatar = '⟣';
+      mood = 'hot';
+    }
+
+    chips.push(
+      `${t2('◈ прогресс','◈ progress')}: ${done}/20`,
+      `${t2('⟐ правильных','⟐ correct')}: ${correct}/15`,
+      `${t2('⟁ точность','⟁ accuracy')}: ${acc}%`,
+      `${t2('◉ примерная награда','◉ estimated')}: ${nowEco}`,
+      acc >= 85 ? t2('I-bit þ: шанс высокий', 'I-bit þ: high chance') : t2('I-bit þ: цель 85%+', 'I-bit þ: target 85%+')
+    );
+
+    window.IKFarmCoach.update({
+      owner: 'dictionary',
+      active: true,
+      title: t2('Farm HUB · Рейтинг', 'Farm HUB · Ranked'),
+      line,
+      subline,
+      progressPct,
+      chips,
+      mood,
+      avatar,
+      hideLabel: t2('скрыть', 'hide'),
+      stripLabel: 'Farm HUB ▾',
+    });
+
+    scheduleCoachIdleTalk(done, correct, remain, acc);
+  }
+
   function quizUpdateScore(){
     const denom = (quizSessionTarget || quizDeck.length || 0);
     const prog = denom ? Math.min(quizSeen.size, denom) : 0;
     elQuizScore.textContent = `${prog}/${denom} | ${quizCorrect}/${quizTotal}`;
+    coachUpdateFromQuiz();
   }
 
   async function maybeRewardQuizSession(){
@@ -1976,7 +2289,7 @@ let elLearnMcqButtons = null;
       });
       if(error) throw error;
       if(data && data.awarded){
-        const eco = data.eco != null ? String(data.eco) : '0';
+        const eco = fmtEco(data.eco != null ? data.eco : 0);
         const ib = Number(data.ibit || 0);
         const extra = ib ? ` +${ib} I-bit þ` : '';
         const pct = denom ? Math.round((Number(quizCorrect || 0) / denom) * 100) : 0;
@@ -1994,8 +2307,29 @@ let elLearnMcqButtons = null;
             }
           }));
         }catch(_){ }
+        try{
+          if(window.IKFarmCoach && typeof window.IKFarmCoach.finish === 'function'){
+            window.IKFarmCoach.finish({
+              owner: 'dictionary',
+              active:true,
+              title: t2('Farm HUB · Рейтинг', 'Farm HUB · Ranked'),
+              line: t2('Сессия зачтена. Награда залетела!', 'Session accepted. Reward credited!'),
+              subline: t2('Продолжай в том же духе - серия решает.', 'Keep going - streak matters.'),
+              progressPct: 100,
+              chips: [
+                `+${eco} EKO`,
+                ib > 0 ? `+${ib} I-bit þ` : t2('I-bit þ: в этот раз 0', 'I-bit þ: 0 this time')
+              ],
+              mood: 'done',
+              avatar: '⟢',
+              hideLabel: t2('скрыть', 'hide'),
+              stripLabel: 'Farm HUB ▾',
+            });
+          }
+        }catch(_){ }
       }else if(data && data.reason){
         quizSetFeedback('idle', 'no reward', String(data.reason));
+        coachUpdateFromQuiz();
       }
     }catch(e){
       quizRewarded = false;
@@ -2485,9 +2819,11 @@ function quizMcqSelect(idx){
     // MCQ counts weaker by default
     const bumpAs = (cfg.softMcq !== false) ? 'hard' : 'correct';
     practiceBump(quizCurrent, quizAskLang, bumpAs);
+    if(Math.random() < 0.38) coachSignal('correct');
     quizSetFeedback('correct', 'ok', 'верно');
   }else{
     practiceBump(quizCurrent, quizAskLang, 'wrong');
+    if(Math.random() < 0.38) coachSignal('wrong');
 
     // remember confusion
     mcqBumpConfusion(quizCurrent, quizAskLang, chosenOpt && chosenOpt.norm, correctOpt && correctOpt.norm);
@@ -2527,6 +2863,7 @@ function quizMcqGiveUp(){
   maybeRewardQuizSession().catch(()=>{});
 
   practiceBump(quizCurrent, quizAskLang, 'wrong');
+  if(Math.random() < 0.45) coachSignal('giveup');
 
   const insertAt = Math.min(quizQueue.length, DICT_REASK_GAP);
   quizQueue.splice(insertAt, 0, quizCurrent);
@@ -3045,6 +3382,9 @@ function handleMcqHotkeys(e){
     const allowed = ['personal','system','user'];
     const k = allowed.includes(String(next || '')) ? String(next) : 'personal';
     dictSource = k;
+    if(window.IKFarmCoach && typeof window.IKFarmCoach.hide === 'function'){
+      window.IKFarmCoach.hide();
+    }
     publicLoadedDictId = null;
     dictCurrentSection = '';
     quizRewarded = false;
@@ -3788,13 +4128,15 @@ li.appendChild(left);
     quizUpdateScore();
     maybeRewardQuizSession().catch(()=>{});
 
-    if(accept){
-      practiceBump(p.item, p.askLang, 'hard');
-      quizSetFeedback('correct', 'ok', `засчитано (опечатка ~${p.dist})`);
-      return;
-    }
+  if(accept){
+    practiceBump(p.item, p.askLang, 'hard');
+    if(Math.random() < 0.35) coachSignal('correct');
+    quizSetFeedback('correct', 'ok', `засчитано (опечатка ~${p.dist})`);
+    return;
+  }
 
-    practiceBump(p.item, p.askLang, 'wrong');
+  practiceBump(p.item, p.askLang, 'wrong');
+  if(Math.random() < 0.35) coachSignal('wrong');
     const insertAt = Math.min(quizQueue.length, DICT_REASK_GAP);
     quizQueue.splice(insertAt, 0, p.item);
     quizSetFeedback('wrong', 'no', 'не засчитано - слово вернется позже');
@@ -3838,6 +4180,7 @@ li.appendChild(left);
       maybeRewardQuizSession().catch(()=>{});
 
       practiceBump(quizCurrent, quizAskLang, practiceHintUsed ? 'hard' : 'correct');
+      if(Math.random() < 0.38) coachSignal('correct');
 
       quizSetFeedback('correct', 'ok', practiceHintUsed ? 'верно (с подсказкой)' : 'верно');
       quizLockAfterCheck(true);
@@ -3846,6 +4189,7 @@ li.appendChild(left);
 
     if(res.status === 'almost'){
       practicePendingFuzzy = { item: quizCurrent, askLang: quizAskLang, dist: res.dist };
+      if(Math.random() < 0.5) coachSignal('almost');
       quizSetFeedback('idle', 'almost', `почти! опечатка примерно в ${res.dist} символ(ах)`);
       if(elPracticeFuzzyActions) elPracticeFuzzyActions.style.display = 'flex';
       quizLockAfterCheck(false);
@@ -3858,6 +4202,7 @@ li.appendChild(left);
     maybeRewardQuizSession().catch(()=>{});
 
     practiceBump(quizCurrent, quizAskLang, 'wrong');
+    if(Math.random() < 0.38) coachSignal('wrong');
 
     const insertAt = Math.min(quizQueue.length, DICT_REASK_GAP);
     quizQueue.splice(insertAt, 0, quizCurrent);
@@ -3879,11 +4224,12 @@ li.appendChild(left);
       return;
     }
 
-    quizTotal += 1;
-    quizUpdateScore();
-    maybeRewardQuizSession().catch(()=>{});
+  quizTotal += 1;
+  quizUpdateScore();
+  maybeRewardQuizSession().catch(()=>{});
 
-    practiceBump(quizCurrent, quizAskLang, 'wrong');
+  practiceBump(quizCurrent, quizAskLang, 'wrong');
+  if(Math.random() < 0.45) coachSignal('giveup');
 
     const insertAt = Math.min(quizQueue.length, DICT_REASK_GAP);
     quizQueue.splice(insertAt, 0, quizCurrent);

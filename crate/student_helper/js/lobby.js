@@ -86,6 +86,10 @@
     if(options.syncHash !== false){
       setHashRoute('menu', !!options.replaceHash);
     }
+
+    try{
+      document.dispatchEvent(new CustomEvent('sh:route', { detail: { route: 'menu', main: 'menu' } }));
+    }catch(_){ }
   }
 
   function openModule(mod, opts){
@@ -124,6 +128,13 @@
         : module;
       setHashRoute(routeValue, !!options.replaceHash);
     }
+
+    try{
+      const route = module === 'wt'
+        ? (wtSubtab === 'builder' ? 'wt-builder' : 'wt-practice')
+        : module;
+      document.dispatchEvent(new CustomEvent('sh:route', { detail: { route, main: module, wtSubtab: wtSubtab || '' } }));
+    }catch(_){ }
   }
 
   window.StudentHelperRoute = window.StudentHelperRoute || {};
