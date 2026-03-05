@@ -328,6 +328,8 @@
       grid-template-columns: 280px 260px minmax(0, 1fr);
       gap: 10px;
     }
+    .shared-wrap[hidden]{ display: none !important; }
+    #personalWrap[hidden]{ display: none !important; }
     .shared-col{ min-width: 0; }
     .shared-card{ height: 100%; display: grid; grid-template-rows: auto auto minmax(0,1fr) auto; gap: 10px; }
     .shared-list{ border:1px solid rgba(0,0,0,.14); background:rgba(255,255,255,.88); min-height: 160px; max-height: 56vh; overflow:auto; }
@@ -355,6 +357,11 @@
     .shared-compose{ display:grid; gap:8px; }
     .shared-compose textarea{ width:100%; min-height:96px; resize:vertical; }
     .shared-empty{ padding: 10px; border: 1px dashed rgba(0,0,0,.22); font-size:12px; opacity:.8; }
+    .shared-modal-field{ display:grid; gap:6px; margin-bottom:10px; }
+    .shared-modal-field label{ font-size:10px; letter-spacing:2px; text-transform:uppercase; opacity:.7; }
+    .shared-modal-list{ display:grid; gap:8px; margin-top:10px; max-height: 230px; overflow:auto; }
+    .shared-modal-row{ display:flex; justify-content:space-between; gap:10px; border:1px solid rgba(0,0,0,.12); padding:8px; }
+    .shared-modal-sub{ font-size:11px; opacity:.72; }
     @media (max-width: 1100px){
       .shared-wrap{ grid-template-columns: 1fr; }
       .shared-list, .shared-chat{ max-height: none; }
@@ -1677,6 +1684,7 @@ body.focus-mode .n-col-right{
 </div>
       </div>
 
+      <div id="personalWrap">
             <div class="drawer-overlay" id="drawerOverlay" aria-hidden="true"></div>
 
       <div class="n-shell" aria-label="Основной интерфейс">
@@ -1824,6 +1832,8 @@ body.focus-mode .n-col-right{
         </div>
       </div>
 
+      </div>
+
       <div class="shared-wrap" id="sharedWrap" hidden>
         <div class="shared-col">
           <div class="n-card shared-card" aria-label="Общие категории">
@@ -1911,6 +1921,17 @@ body.focus-mode .n-col-right{
         <button class="n-btn" id="uiModalAlt" type="button" style="display:none">-</button>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- Shared modal (common panel for shared categories/sections/chat actions) -->
+<div class="modal" id="sharedModal" role="dialog" aria-modal="true" aria-label="Shared dialog" style="z-index: 100020;">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h2 class="modal-title" id="sharedModalTitle">shared</h2>
+      <button class="n-btn" id="sharedModalClose" type="button">Закрыть</button>
+    </div>
+    <div class="modal-grid" id="sharedModalBody"></div>
   </div>
 </div>
 

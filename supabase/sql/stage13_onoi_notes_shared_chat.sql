@@ -467,6 +467,33 @@ as $$
   order by s.updated_at desc, s.created_at desc;
 $$;
 
+create or replace function public.ik_onoi_shared_list_members(p_category_id uuid)
+returns table (
+  user_id uuid,
+  role text,
+  profile_user_id text,
+  nickname text,
+  avatar_url text,
+  added_at timestamptz
+)
+language sql
+security definer
+set search_path = public
+as $$
+  select
+    m.user_id,
+    m.role::text,
+    coalesce(up.user_id, '') as profile_user_id,
+    coalesce(up.nickname, '') as nickname,
+    coalesce(up.avatar_url, '') as avatar_url,
+    m.created_at as added_at
+  from public.sh_onoi_shared_members m
+  left join public.ik_user_profiles up on up.id = m.user_id
+  where m.category_id = p_category_id
+    and public.ik_onoi_shared_role_of(m.category_id) is not null
+  order by m.created_at asc;
+$$;
+
 create or replace function public.ik_onoi_shared_create_section(
   p_category_id uuid,
   p_name text
@@ -715,6 +742,9 @@ grant execute on function public.ik_onoi_shared_add_friend(uuid, text, text) to 
 
 revoke all on function public.ik_onoi_shared_list_sections(uuid) from public;
 grant execute on function public.ik_onoi_shared_list_sections(uuid) to authenticated;
+
+revoke all on function public.ik_onoi_shared_list_members(uuid) from public;
+grant execute on function public.ik_onoi_shared_list_members(uuid) to authenticated;
 
 revoke all on function public.ik_onoi_shared_create_section(uuid, text) from public;
 grant execute on function public.ik_onoi_shared_create_section(uuid, text) to authenticated;
