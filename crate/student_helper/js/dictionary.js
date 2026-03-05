@@ -191,14 +191,19 @@ function mcqDisplayRu(raw){
 function mcqNormForLang(s, lang){
   return (lang === 'ru') ? normRuLoose(s) : normEnLoose(s);
 }
+function mcqPreferWholeDisplay(raw){
+  const t = normSpaces(raw);
+  return /\S\/\S/.test(t) && /\s/.test(t);
+}
 function mcqCanonical(item, answerLang){
   const rawAll = answerLang === 'en' ? (item && item.en) : (item && item.ru);
   const parts = splitVariants(rawAll, answerLang === 'en' ? 'en' : 'ru');
   const first = (parts && parts.length) ? parts[0] : (rawAll || '');
+  const source = mcqPreferWholeDisplay(rawAll) ? (rawAll || first) : first;
   const pos = extractPos(first) || extractPos(rawAll);
-  const display = (answerLang === 'en') ? mcqDisplayEn(first) : mcqDisplayRu(first);
+  const display = (answerLang === 'en') ? mcqDisplayEn(source) : mcqDisplayRu(source);
   const norm = mcqNormForLang(display, answerLang === 'en' ? 'en' : 'ru');
-  return { raw:first, display, norm, pos, wc: mcqWordCount(display) };
+  return { raw:source, display, norm, pos, wc: mcqWordCount(display) };
 }
 function mcqAllAcceptedNorms(item, answerLang, cfg){
   if(answerLang === 'en'){
@@ -617,10 +622,16 @@ function dictFilenameForSection(sectionName){
   // - user: published user dictionaries (rated)
   let dictSource = 'personal';
   let dictPersonalGuest = false;
+  const DICT_ADMIN_EMAILS = ['itemkeygithub@gmail.com', 'kravetznikita@gmail.com'];
+  const dictRuntime = {
+    isAdmin: false,
+    refreshingAdmin: false
+  };
   let publicCatalog = { system: [], user: [] };
   let publicCounts = { system: new Map(), user: new Map() };
   let publicWordsCache = { system: new Map(), user: new Map() }; // dictId -> words[]
   let publicLoadedDictId = null;
+  let publicTempWordId = -1;
   const STOCK_SECTION_KEYS = new Set([
     normalize('Destination B1 Unit 3'),
     normalize('Destination B1 Unit 6'),
@@ -1779,18 +1790,24 @@ if(btnLearnCheckNext){ btnLearnCheckNext.textContent = 'далее'; btnLearnChe
   const dictTabCards = document.getElementById('dict-tab-cards');
   const dictTabQuiz = document.getElementById('dict-tab-quiz');
   const dictTabLearn = document.getElementById('dict-tab-learn');
+  const dictTabView = document.getElementById('dict-tab-view');
   const dictTabBuilder = document.getElementById('dict-tab-builder');
   const dictPanelCards = document.getElementById('dict-panel-cards');
   const dictPanelQuiz = document.getElementById('dict-panel-quiz');
   const dictPanelLearn = document.getElementById('dict-panel-learn');
+  const dictPanelView = document.getElementById('dict-panel-view');
   const dictPanelBuilder = document.getElementById('dict-panel-builder');
 
   const elSectionCards = document.getElementById('dictSectionCards');
   const elSectionQuiz = document.getElementById('dictSectionQuiz');
   const elSectionLearn = document.getElementById('dictSectionLearn');
+  const elSectionView = document.getElementById('dictSectionView');
   const elSectionBuilder = document.getElementById('dictBuilderSection');
   const elSectionList = document.getElementById('dictSectionList');
   const elWordList = document.getElementById('dictWordList');
+  const elViewSearch = document.getElementById('dictViewSearch');
+  const elViewList = document.getElementById('dictViewList');
+  const elViewMeta = document.getElementById('dictViewMeta');
 
   const elDictFirstPick = document.getElementById('dictFirstPick');
   const elDictSubtabsWrap = document.getElementById('dictSubtabsWrap');
@@ -1924,16 +1941,19 @@ let elLearnMcqButtons = null;
     const isCards = which === 'cards';
     const isPractice = (which === 'quiz' || which === 'practice');
     const isLearn = which === 'learn';
+    const isView = which === 'view';
 
     dictTabCards.setAttribute('aria-selected', String(isCards));
     dictTabQuiz.setAttribute('aria-selected', String(isPractice));
     if(dictTabLearn) dictTabLearn.setAttribute('aria-selected', String(isLearn));
-    dictTabBuilder.setAttribute('aria-selected', String(!isCards && !isPractice && !isLearn));
+    if(dictTabView) dictTabView.setAttribute('aria-selected', String(isView));
+    dictTabBuilder.setAttribute('aria-selected', String(!isCards && !isPractice && !isLearn && !isView));
 
     dictPanelCards.hidden = !isCards;
     dictPanelQuiz.hidden = !isPractice;
     if(dictPanelLearn) dictPanelLearn.hidden = !isLearn;
-    dictPanelBuilder.hidden = isCards || isPractice || isLearn;
+    if(dictPanelView) dictPanelView.hidden = !isView;
+    dictPanelBuilder.hidden = isCards || isPractice || isLearn || isView;
     coachUpdateFromQuiz();
   }
 
@@ -3093,6 +3113,77 @@ function handleMcqHotkeys(e){
     }
   }
 
+  function localCurrentUser(){
+    try{
+      const raw = localStorage.getItem('itemkey.currentUser');
+      return raw ? JSON.parse(raw) : null;
+    }catch(_){
+      return null;
+    }
+  }
+
+  function canEditCurrentSource(){
+    if(dictSource === 'personal') return !dictPersonalGuest;
+    if(dictSource === 'system' || dictSource === 'user') return !!dictRuntime.isAdmin;
+    return false;
+  }
+
+  function canUseBuilderForCurrentSource(){
+    return canEditCurrentSource();
+  }
+
+  async function refreshDictAdminAccess(){
+    if(dictRuntime.refreshingAdmin) return;
+    dictRuntime.refreshingAdmin = true;
+    try{
+      let isAdmin = false;
+      const localUser = localCurrentUser();
+      const localEmail = String(localUser && localUser.email || '').trim().toLowerCase();
+      if(localUser && localUser.isAdmin === true) isAdmin = true;
+      if(!isAdmin && localEmail && DICT_ADMIN_EMAILS.includes(localEmail)) isAdmin = true;
+
+      const client = getSupaClient();
+      if(client && client.auth && typeof client.auth.getUser === 'function'){
+        try{
+          const out = await client.auth.getUser();
+          const cloudEmail = String(out && out.data && out.data.user && out.data.user.email || '').trim().toLowerCase();
+          if(cloudEmail && DICT_ADMIN_EMAILS.includes(cloudEmail)) isAdmin = true;
+        }catch(_){ }
+      }
+
+      if(!isAdmin && client){
+        try{
+          const out = await client.rpc('ik_can_open_admin_console');
+          if(out && out.data === true) isAdmin = true;
+        }catch(_){ }
+      }
+
+      const changed = dictRuntime.isAdmin !== isAdmin;
+      dictRuntime.isAdmin = isAdmin;
+      if(changed){
+        applyDictSourceAccess();
+        if(!canUseBuilderForCurrentSource() && dictPanelBuilder && !dictPanelBuilder.hidden){
+          dictShowFirstPick();
+        }
+        renderFirstPickUI();
+        if(elDictSubtabsWrap && !elDictSubtabsWrap.hidden && dictPanelBuilder && !dictPanelBuilder.hidden){
+          renderWordsUI();
+        }
+      }
+    }finally{
+      dictRuntime.refreshingAdmin = false;
+    }
+  }
+
+  function scheduleAdminAccessRefresh(){
+    const marks = [250, 900, 1800, 3200, 5200];
+    for(const ms of marks){
+      window.setTimeout(()=>{
+        refreshDictAdminAccess().catch(()=>{});
+      }, ms);
+    }
+  }
+
   function stockNameKey(v){
     return normalize(String(v || '').trim());
   }
@@ -3272,6 +3363,7 @@ function handleMcqHotkeys(e){
   }
 
   function dictOpenConstructorFromPick(){
+    if(!canUseBuilderForCurrentSource()) return;
     if(elDictFirstPick) elDictFirstPick.hidden = true;
     if(elDictSubtabsWrap) elDictSubtabsWrap.hidden = false;
     dictSetSubtab('builder');
@@ -3290,6 +3382,7 @@ function handleMcqHotkeys(e){
     if(elSectionCards && elSectionCards.value !== v) elSectionCards.value = v;
     if(elSectionQuiz && elSectionQuiz.value !== v) elSectionQuiz.value = v;
     if(elSectionLearn && elSectionLearn.value !== v) elSectionLearn.value = v;
+    if(elSectionView && elSectionView.value !== v) elSectionView.value = v;
     if(elSectionBuilder && v !== 'All' && elSectionBuilder.value !== v) elSectionBuilder.value = v;
   }
 
@@ -3311,6 +3404,11 @@ function handleMcqHotkeys(e){
     if(startTab === 'learn'){
       dictSetSubtab('learn');
       learnStartSession(true);
+      return;
+    }
+    if(startTab === 'view'){
+      dictSetSubtab('view');
+      renderViewUI();
       return;
     }
     if(startTab === 'builder'){
@@ -3355,20 +3453,34 @@ function handleMcqHotkeys(e){
   }
 
   function applyDictSourceAccess(){
-    const editable = dictSource === 'personal' && !dictPersonalGuest;
+    const editable = canEditCurrentSource();
+    const isPersonalEditable = dictSource === 'personal' && editable;
+    const isPublicAdminEditable = isPublicSource() && editable;
     if(dictTabBuilder) dictTabBuilder.style.display = editable ? '' : 'none';
     if(btnFirstPickOpenConstructor) btnFirstPickOpenConstructor.style.display = editable ? '' : 'none';
 
-    if(btnAddSection) btnAddSection.disabled = !editable;
-    if(btnDeleteSection) btnDeleteSection.disabled = !editable;
-    if(btnDictExport) btnDictExport.disabled = !editable;
-    if(btnDictImport) btnDictImport.disabled = !editable;
+    if(btnAddSection) btnAddSection.disabled = !isPersonalEditable;
+    if(btnDeleteSection) btnDeleteSection.disabled = !isPersonalEditable;
+    if(btnDictExport) btnDictExport.disabled = !isPersonalEditable;
+    if(btnDictImport) btnDictImport.disabled = !isPersonalEditable;
     if(btnAddWord) btnAddWord.disabled = !editable;
-    if(elNewSectionName) elNewSectionName.disabled = !editable;
+    if(elNewSectionName) elNewSectionName.disabled = !isPersonalEditable;
     if(elEnInput) elEnInput.disabled = !editable;
     if(elRuInput) elRuInput.disabled = !editable;
-    if(elDictImportReplace) elDictImportReplace.disabled = !editable;
-    if(btnSubmitModeration) btnSubmitModeration.style.display = editable ? '' : 'none';
+    if(elDictImportReplace) elDictImportReplace.disabled = !isPersonalEditable;
+    if(btnSubmitModeration){
+      if(isPersonalEditable){
+        btnSubmitModeration.style.display = '';
+        btnSubmitModeration.textContent = 'на модерацию';
+        btnSubmitModeration.title = 'Отправить текущий section на модерацию';
+      }else if(isPublicAdminEditable){
+        btnSubmitModeration.style.display = '';
+        btnSubmitModeration.textContent = 'сохранить в cloud';
+        btnSubmitModeration.title = 'Сохранить изменения текущего словаря';
+      }else{
+        btnSubmitModeration.style.display = 'none';
+      }
+    }
 
     const tabs = document.querySelectorAll('#dictSourceTabs [data-dict-source]');
     tabs.forEach((t)=>{
@@ -3379,6 +3491,7 @@ function handleMcqHotkeys(e){
   }
 
   async function dictSetSource(next){
+    await refreshDictAdminAccess();
     const allowed = ['personal','system','user'];
     const k = allowed.includes(String(next || '')) ? String(next) : 'personal';
     dictSource = k;
@@ -3556,6 +3669,17 @@ function handleMcqHotkeys(e){
       const right = document.createElement('div');
       right.className = 'ik-mini';
 
+      const btnView = document.createElement('button');
+      btnView.className = 'ik-btn';
+      btnView.type = 'button';
+      btnView.textContent = 'просмотр';
+      btnView.addEventListener('click', (e)=>{
+        e.stopPropagation();
+        dictEnterSection(it.sid, 'view');
+      });
+
+      right.appendChild(btnView);
+
       const btnCards = document.createElement('button');
       btnCards.className = 'ik-btn ik-btn--black';
       btnCards.type = 'button';
@@ -3565,17 +3689,7 @@ function handleMcqHotkeys(e){
         dictEnterSection(it.sid, 'cards');
       });
 
-            right.appendChild(btnCards);
-      const btnPractice = document.createElement('button');
-      btnPractice.className = 'ik-btn';
-      btnPractice.type = 'button';
-      btnPractice.textContent = 'practice';
-      btnPractice.addEventListener('click', (e)=>{
-        e.stopPropagation();
-        dictEnterSection(it.sid, 'practice');
-      });
-
-      right.appendChild(btnPractice);
+      right.appendChild(btnCards);
 
 
       const btnLearn = document.createElement('button');
@@ -3587,6 +3701,17 @@ function handleMcqHotkeys(e){
         dictEnterSection(it.sid, 'learn');
       });
       right.appendChild(btnLearn);
+
+      const btnPractice = document.createElement('button');
+      btnPractice.className = 'ik-btn';
+      btnPractice.type = 'button';
+      btnPractice.textContent = 'practice';
+      btnPractice.addEventListener('click', (e)=>{
+        e.stopPropagation();
+        dictEnterSection(it.sid, 'practice');
+      });
+
+      right.appendChild(btnPractice);
 li.appendChild(left);
       li.appendChild(right);
       li.addEventListener('click', ()=> dictEnterSection(it.sid, 'cards'));
@@ -3635,9 +3760,11 @@ li.appendChild(left);
     fillSelect(elSectionCards, true);
     fillSelect(elSectionQuiz, true);
     fillSelect(elSectionLearn, true);
+    if(elSectionView) fillSelect(elSectionView, true);
     fillSelect(elSectionBuilder, false);
 
     renderFirstPickUI();
+    renderViewUI();
 
     elSectionList.innerHTML = '';
     if(!dictSections.length){
@@ -3687,12 +3814,51 @@ li.appendChild(left);
     return dictWordsAll.filter(w => Number(w.sectionId) === sid);
   }
 
+  function renderViewUI(){
+    if(!elViewList || !elViewMeta || !elSectionView) return;
+
+    const selected = String((elSectionView && elSectionView.value) || dictCurrentSection || '').trim();
+    if(!selected){
+      elViewList.innerHTML = '';
+      const li = document.createElement('li');
+      li.innerHTML = `<p class="ik-itemline"><b>выбери section</b></p>`;
+      elViewList.appendChild(li);
+      elViewMeta.textContent = '0';
+      return;
+    }
+
+    const all = wordsForSelection(selected)
+      .slice()
+      .sort((a,b)=> (a.en || '').localeCompare((b.en || ''), 'en'));
+    const q = String(elViewSearch && elViewSearch.value || '').trim().toLowerCase();
+    const filtered = q
+      ? all.filter((w)=> String(w.en || '').toLowerCase().includes(q) || String(w.ru || '').toLowerCase().includes(q))
+      : all;
+
+    elViewList.innerHTML = '';
+    if(!filtered.length){
+      const li = document.createElement('li');
+      li.innerHTML = `<p class="ik-itemline"><b>ничего не найдено</b></p>`;
+      elViewList.appendChild(li);
+      elViewMeta.textContent = `показано 0 из ${all.length}`;
+      return;
+    }
+
+    for(const w of filtered){
+      const li = document.createElement('li');
+      li.innerHTML = `<p class="ik-itemline"><b>${escapeHTML(w.en)}</b> - ${escapeHTML(w.ru)}</p>`;
+      elViewList.appendChild(li);
+    }
+
+    elViewMeta.textContent = `показано ${filtered.length} из ${all.length}`;
+  }
+
   function renderWordsUI(){
-    if(isPublicSource()){
+    if(isPublicSource() && !dictRuntime.isAdmin){
       if(elSectionList) elSectionList.innerHTML = '';
       if(elWordList) elWordList.innerHTML = '';
       const li = document.createElement('li');
-      li.innerHTML = `<p class="ik-itemline"><b>read-only</b> <span class="ik-muted">конструктор доступен только в разделе "личные"</span></p>`;
+      li.innerHTML = `<p class="ik-itemline"><b>read-only</b> <span class="ik-muted">конструктор доступен только администратору</span></p>`;
       if(elWordList) elWordList.appendChild(li);
       return;
     }
@@ -3733,9 +3899,16 @@ li.appendChild(left);
       btnDel.textContent = 'удалить';
       btnDel.addEventListener('click', async ()=>{
         try{
-          await dictDeleteWord(dictDb, w.id);
-          await dictRefreshAll();
+          if(isPublicSource()){
+            dictWordsAll = dictWordsAll.filter((x)=> Number(x.id) !== Number(w.id));
+            publicCounts[dictSource].set(Number(w.sectionId), dictWordsAll.filter((x)=> Number(x.sectionId) === Number(w.sectionId)).length);
+            updateGlobalBadges();
+          }else{
+            await dictDeleteWord(dictDb, w.id);
+            await dictRefreshAll();
+          }
           renderWordsUI();
+          renderViewUI();
           dictResetCards();
           dictResetQuiz();
         }catch(e){
@@ -3747,6 +3920,61 @@ li.appendChild(left);
       li.appendChild(left);
       li.appendChild(right);
       elWordList.appendChild(li);
+    }
+  }
+
+  async function savePublicBuilderSection(){
+    if(!isPublicSource() || !dictRuntime.isAdmin) return;
+    const sid = Number(elSectionBuilder && elSectionBuilder.value || 0);
+    if(!sid){
+      alert('Сначала выбери словарь.');
+      return;
+    }
+
+    const title = getSectionNameById(sid);
+    const rows = dictWordsAll
+      .filter((w)=> Number(w.sectionId) === sid)
+      .map((w)=>({ en: String(w.en || '').trim(), ru: String(w.ru || '').trim() }))
+      .filter((w)=> w.en && w.ru);
+
+    const uniq = [];
+    const seen = new Set();
+    for(const w of rows){
+      const key = `${normEnCmp(w.en)}|${normRuCmp(w.ru)}`;
+      if(seen.has(key)) continue;
+      seen.add(key);
+      uniq.push(w);
+    }
+
+    if(!uniq.length){
+      alert('В словаре нет слов для сохранения.');
+      return;
+    }
+
+    const client = getSupaClient();
+    if(!client){
+      alert('Supabase недоступен на этой странице.');
+      return;
+    }
+
+    const payload = { p_title: title, p_words: uniq, p_dict_id: sid };
+    try{
+      let out;
+      if(dictSource === 'system'){
+        out = await client.rpc('ik_admin_create_system_dict', payload);
+      }else{
+        out = await client.rpc('ik_admin_update_user_dict', payload);
+      }
+      if(out && out.error) throw out.error;
+
+      publicWordsCache[dictSource].delete(sid);
+      publicCatalog[dictSource] = [];
+      publicCounts[dictSource] = new Map();
+      await dictSetSource(dictSource);
+      await dictEnterSection(String(sid), 'builder');
+      alert('Словарь обновлен.');
+    }catch(e){
+      alert(`Ошибка сохранения в cloud: ${e && (e.message || e)}`);
     }
   }
 
@@ -4520,6 +4748,8 @@ async function dictSyncFromFolder(opts){
 
       await dictRefreshAll();
       renderWordsUI();
+      await refreshDictAdminAccess();
+      scheduleAdminAccessRefresh();
 
       // apply last selected source (personal/system/user)
       try{
@@ -4553,6 +4783,19 @@ async function dictSyncFromFolder(opts){
 
   ensureDictSourceTabsUI();
   applyDictSourceAccess();
+  refreshDictAdminAccess().catch(()=>{});
+  scheduleAdminAccessRefresh();
+
+  document.addEventListener('ik:authchange', ()=>{
+    refreshDictAdminAccess().catch(()=>{});
+    scheduleAdminAccessRefresh();
+  });
+  window.addEventListener('storage', (e)=>{
+    if(e && e.key === 'itemkey.currentUser'){
+      refreshDictAdminAccess().catch(()=>{});
+      scheduleAdminAccessRefresh();
+    }
+  });
 
   // Source tabs
   document.getElementById('dictSourceTabs')?.addEventListener('click', (e)=>{
@@ -4582,8 +4825,13 @@ async function dictSyncFromFolder(opts){
     const v = (elSectionLearn && elSectionLearn.value) || dictCurrentSection || 'All';
     dictSelectSectionAndRun(v, ()=> learnStartSession(true)).catch(()=>{});
   });
+  dictTabView && dictTabView.addEventListener('click', ()=>{
+    dictSetSubtab('view');
+    const v = (elSectionView && elSectionView.value) || dictCurrentSection || 'All';
+    dictSelectSectionAndRun(v, renderViewUI).catch(()=>{});
+  });
   dictTabBuilder.addEventListener('click', ()=>{
-    if(dictSource !== 'personal'){
+    if(!canUseBuilderForCurrentSource()){
       dictShowFirstPick();
       return;
     }
@@ -4597,7 +4845,13 @@ async function dictSyncFromFolder(opts){
   if(btnLearnChooseSection) btnLearnChooseSection.addEventListener('click', dictShowFirstPick);
   if(btnFirstPickOpenConstructor) btnFirstPickOpenConstructor.addEventListener('click', dictOpenConstructorFromPick);
   if(elFirstPickSearch) elFirstPickSearch.addEventListener('input', renderFirstPickUI);
-  if(btnSubmitModeration) btnSubmitModeration.addEventListener('click', ()=> submitCurrentSectionToModeration().catch(()=>{}));
+  if(btnSubmitModeration) btnSubmitModeration.addEventListener('click', ()=>{
+    if(isPublicSource() && dictRuntime.isAdmin){
+      savePublicBuilderSection().catch(()=>{});
+      return;
+    }
+    submitCurrentSectionToModeration().catch(()=>{});
+  });
 
   btnCardsPrev.addEventListener('click', cardsGoPrev);
   btnCardsNext.addEventListener('click', cardsGoNext);
@@ -4621,6 +4875,10 @@ async function dictSyncFromFolder(opts){
   if(elSectionLearn) elSectionLearn.addEventListener('change', ()=>{
     dictSelectSectionAndRun(elSectionLearn.value, ()=> learnStartSession(true)).catch(()=>{});
   });
+  if(elSectionView) elSectionView.addEventListener('change', ()=>{
+    dictSelectSectionAndRun(elSectionView.value, renderViewUI).catch(()=>{});
+  });
+  if(elViewSearch) elViewSearch.addEventListener('input', renderViewUI);
   elQuizMode.addEventListener('change', dictResetQuiz);
 
   btnQuizCheckNext.addEventListener('click', quizCheckOrNext);
@@ -4810,18 +5068,41 @@ async function dictSyncFromFolder(opts){
       return;
     }
     try{
-      const res = await dictAddWord(dictDb, sid, en, ru);
-      if(!res.ok && res.reason === 'duplicate'){
-        alert('Такое слово уже есть (дубликат).');
-        return;
+      if(isPublicSource()){
+        if(!dictRuntime.isAdmin){
+          alert('Конструктор доступен только администратору.');
+          return;
+        }
+        const key = `${sid}|${normEnCmp(en)}|${normRuCmp(ru)}`;
+        const hasDuplicate = dictWordsAll.some((w)=> `${Number(w.sectionId)}|${normEnCmp(w.en)}|${normRuCmp(w.ru)}` === key);
+        if(hasDuplicate){
+          alert('Такое слово уже есть (дубликат).');
+          return;
+        }
+        dictWordsAll.push({
+          id: publicTempWordId,
+          sectionId: sid,
+          en,
+          ru
+        });
+        publicTempWordId -= 1;
+        publicCounts[dictSource].set(sid, dictWordsAll.filter((w)=> Number(w.sectionId) === sid).length);
+        updateGlobalBadges();
+      }else{
+        const res = await dictAddWord(dictDb, sid, en, ru);
+        if(!res.ok && res.reason === 'duplicate'){
+          alert('Такое слово уже есть (дубликат).');
+          return;
+        }
+        await dictRefreshAll();
+        notifyDictLocalChanged();
       }
       elEnInput.value = '';
       elRuInput.value = '';
-      await dictRefreshAll();
       renderWordsUI();
+      renderViewUI();
       dictResetCards();
       dictResetQuiz();
-      notifyDictLocalChanged();
     }catch(e){
       alert(`Ошибка сохранения: ${e.message || e}`);
     }
