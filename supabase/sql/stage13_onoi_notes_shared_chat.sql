@@ -370,6 +370,35 @@ begin
 end;
 $$;
 
+create or replace function public.ik_onoi_shared_delete_category(p_category_id uuid)
+returns boolean
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_actor uuid := auth.uid();
+begin
+  if v_actor is null then
+    raise exception 'auth_required';
+  end if;
+
+  if not exists (
+    select 1
+    from public.sh_onoi_shared_categories c
+    where c.id = p_category_id
+      and c.owner_id = v_actor
+  ) then
+    raise exception 'only_owner_can_delete_category';
+  end if;
+
+  delete from public.sh_onoi_shared_categories c
+  where c.id = p_category_id;
+
+  return true;
+end;
+$$;
+
 create or replace function public.ik_onoi_shared_add_friend(
   p_category_id uuid,
   p_target_user_id text,
@@ -736,6 +765,9 @@ grant execute on function public.ik_onoi_shared_list_categories() to authenticat
 
 revoke all on function public.ik_onoi_shared_create_category(text) from public;
 grant execute on function public.ik_onoi_shared_create_category(text) to authenticated;
+
+revoke all on function public.ik_onoi_shared_delete_category(uuid) from public;
+grant execute on function public.ik_onoi_shared_delete_category(uuid) to authenticated;
 
 revoke all on function public.ik_onoi_shared_add_friend(uuid, text, text) from public;
 grant execute on function public.ik_onoi_shared_add_friend(uuid, text, text) to authenticated;

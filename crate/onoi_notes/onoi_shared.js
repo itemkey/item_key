@@ -52,8 +52,10 @@ class OnoiSharedApp {
       sharedCategoryMeta: document.getElementById('sharedCategoryMeta'),
       sharedSectionMeta: document.getElementById('sharedSectionMeta'),
       sharedCreateCategoryBtn: document.getElementById('sharedCreateCategoryBtn'),
+      sharedDeleteCategoryBtn: document.getElementById('sharedDeleteCategoryBtn'),
       sharedInviteBtn: document.getElementById('sharedInviteBtn'),
       sharedCreateSectionBtn: document.getElementById('sharedCreateSectionBtn'),
+      sharedDeleteSectionBtn: document.getElementById('sharedDeleteSectionBtn'),
       sharedComposer: document.getElementById('sharedComposer'),
       sharedSendBtn: document.getElementById('sharedSendBtn'),
       sharedFontSelect: document.getElementById('sharedFontSelect'),
@@ -105,6 +107,12 @@ class OnoiSharedApp {
       });
     }
 
+    if (this.els.sharedDeleteCategoryBtn) {
+      this.els.sharedDeleteCategoryBtn.addEventListener('click', () => {
+        this.openDeleteCategoryModal();
+      });
+    }
+
     if (this.els.sharedInviteBtn) {
       this.els.sharedInviteBtn.addEventListener('click', () => {
         void this.openInviteFriendModal().catch((error) => this.notifyError(error));
@@ -114,6 +122,12 @@ class OnoiSharedApp {
     if (this.els.sharedCreateSectionBtn) {
       this.els.sharedCreateSectionBtn.addEventListener('click', () => {
         this.openCreateSectionModal();
+      });
+    }
+
+    if (this.els.sharedDeleteSectionBtn) {
+      this.els.sharedDeleteSectionBtn.addEventListener('click', () => {
+        this.openDeleteSectionModal();
       });
     }
 
@@ -395,6 +409,8 @@ class OnoiSharedApp {
       if (this.els.sharedCategoryMeta) this.els.sharedCategoryMeta.textContent = 'Общий раздел пуст.';
       if (this.els.sharedInviteBtn) this.els.sharedInviteBtn.disabled = true;
       if (this.els.sharedCreateSectionBtn) this.els.sharedCreateSectionBtn.disabled = true;
+      if (this.els.sharedDeleteCategoryBtn) this.els.sharedDeleteCategoryBtn.disabled = true;
+      if (this.els.sharedDeleteSectionBtn) this.els.sharedDeleteSectionBtn.disabled = true;
       return;
     }
 
@@ -427,6 +443,9 @@ class OnoiSharedApp {
     if (this.els.sharedInviteBtn) {
       this.els.sharedInviteBtn.disabled = !active || String(active.my_role) !== 'owner';
     }
+    if (this.els.sharedDeleteCategoryBtn) {
+      this.els.sharedDeleteCategoryBtn.disabled = !active || String(active.my_role) !== 'owner';
+    }
     if (this.els.sharedCreateSectionBtn) {
       this.els.sharedCreateSectionBtn.disabled = !active || !this.canEditShared();
     }
@@ -438,6 +457,7 @@ class OnoiSharedApp {
     if (!this.state.sections.length) {
       el.innerHTML = '<div class="shared-empty">Нет разделов. Создай первый раздел-чaт.</div>';
       if (this.els.sharedSectionMeta) this.els.sharedSectionMeta.textContent = 'Разделы внутри выбранной категории.';
+      if (this.els.sharedDeleteSectionBtn) this.els.sharedDeleteSectionBtn.disabled = true;
       return;
     }
 
@@ -462,6 +482,9 @@ class OnoiSharedApp {
     const active = this.state.sections.find((x) => String(x.id) === String(this.state.activeSectionId));
     if (this.els.sharedSectionMeta) {
       this.els.sharedSectionMeta.textContent = active ? `Раздел: ${active.name}` : 'Выбери раздел.';
+    }
+    if (this.els.sharedDeleteSectionBtn) {
+      this.els.sharedDeleteSectionBtn.disabled = !active || !this.canEditShared();
     }
   }
 
@@ -577,6 +600,72 @@ class OnoiSharedApp {
         this.closeModal();
         await this.loadSections();
         this.toast('shared', 'Раздел создан.');
+      }
+    });
+  }
+
+  openDeleteSectionModal() {
+    if (!this.state.activeSectionId) {
+      this.toast('shared', 'Сначала выбери раздел.');
+      return;
+    }
+    if (!this.canEditShared()) {
+      this.toast('shared', 'Удалять раздел может owner/editor.');
+      return;
+    }
+
+    const active = this.state.sections.find((x) => String(x.id) === String(this.state.activeSectionId));
+    this.openModal({
+      title: 'Удалить раздел',
+      bodyHtml: `
+        <form>
+          <div class="shared-empty">Удалить раздел ${escapeHtml(active ? active.name : '')} и все его сообщения?</div>
+          <div class="modal-actions" style="grid-template-columns:1fr 1fr;">
+            <button class="n-btn" type="button" data-close>Отмена</button>
+            <button class="n-btn is-primary" type="submit">Удалить</button>
+          </div>
+        </form>
+      `,
+      onSubmit: async () => {
+        await this.rpc('ik_onoi_shared_delete_section', {
+          p_section_id: this.state.activeSectionId
+        });
+        this.closeModal();
+        await this.loadSections();
+        this.toast('shared', 'Раздел удален.');
+      }
+    });
+  }
+
+  openDeleteCategoryModal() {
+    if (!this.state.activeCategoryId) {
+      this.toast('shared', 'Сначала выбери категорию.');
+      return;
+    }
+    if (this.state.activeRole !== 'owner') {
+      this.toast('shared', 'Удалять категорию может только владелец.');
+      return;
+    }
+
+    const active = this.state.categories.find((x) => String(x.id) === String(this.state.activeCategoryId));
+    this.openModal({
+      title: 'Удалить категорию',
+      bodyHtml: `
+        <form>
+          <div class="shared-empty">Удалить категорию ${escapeHtml(active ? active.name : '')} вместе со всеми разделами и сообщениями?</div>
+          <div class="modal-actions" style="grid-template-columns:1fr 1fr;">
+            <button class="n-btn" type="button" data-close>Отмена</button>
+            <button class="n-btn is-primary" type="submit">Удалить</button>
+          </div>
+        </form>
+      `,
+      onSubmit: async () => {
+        await this.rpc('ik_onoi_shared_delete_category', {
+          p_category_id: this.state.activeCategoryId
+        });
+        this.closeModal();
+        await this.loadCategories();
+        this.toast('shared', 'Категория удалена.');
       }
     });
   }
