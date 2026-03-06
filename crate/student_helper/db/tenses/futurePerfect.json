@@ -1,0 +1,304 @@
+{
+  "id": "futurePerfect",
+  "title": "Future Perfect",
+  "subtitle": "действие завершится к моменту в будущем",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Когда используем Future Perfect"
+    },
+    {
+      "type": "text",
+      "text": "Future Perfect (will have + V3) показывает, что действие будет завершено к определенному моменту в будущем."
+    },
+    {
+      "type": "highlight",
+      "title": "Ключевая идея",
+      "lines": [
+        "смотрим из будущей точки назад: к тому времени действие уже закончится",
+        "часто с by, by the time, before"
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Формулы",
+      "columns": [
+        "Тип",
+        "Формула",
+        "Пример"
+      ],
+      "rows": [
+        [
+          "Утверждение",
+          "S + will have + V3",
+          "I will have finished by 6."
+        ],
+        [
+          "Отрицание",
+          "S + will not have + V3",
+          "I won't have finished by 6."
+        ],
+        [
+          "Вопрос",
+          "Will + S + have + V3?",
+          "Will you have finished by 6?"
+        ]
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Маркеры",
+      "columns": [
+        "Тип",
+        "Маркеры"
+      ],
+      "rows": [
+        [
+          "срок",
+          "by 5 o'clock, by tomorrow, by next week"
+        ],
+        [
+          "граница",
+          "by the time, before"
+        ],
+        [
+          "контекст",
+          "in two years (к этому времени), by then"
+        ]
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Future Perfect vs Future Continuous"
+    },
+    {
+      "type": "highlight",
+      "title": "Разница",
+      "lines": [
+        "Future Perfect = результат к моменту (will have done)",
+        "Future Continuous = процесс в моменте (will be doing)"
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": [
+      {
+        "id": "meaning",
+        "title": "Когда используем (Meaning)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "fp_m_1",
+            "instruction": "Выбери объяснение",
+            "prompt": "By 8 p.m., she will have finished the report.",
+            "options": [
+              "результат к моменту в будущем",
+              "процесс в моменте",
+              "привычка"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "fp_m_2",
+            "instruction": "Выбери объяснение",
+            "prompt": "Will they have arrived by noon?",
+            "options": [
+              "вопрос о завершении к сроку",
+              "вопрос о процессе",
+              "вопрос о прошлом"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "fp_m_3",
+            "instruction": "Выбери объяснение",
+            "prompt": "I won't have read the whole book by tomorrow.",
+            "options": [
+              "отрицание завершения к сроку",
+              "действие происходит сейчас",
+              "прошедшее действие"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "fp_m_4",
+            "instruction": "Выбери объяснение",
+            "prompt": "By the time you call, we will have left.",
+            "options": [
+              "действие закончится до другого будущего действия",
+              "действие регулярно повторяется",
+              "длительный процесс в прошлом"
+            ],
+            "correctIndex": 0
+          }
+        ]
+      },
+      {
+        "id": "formula",
+        "title": "Формула (Formula)",
+        "kind": "input",
+        "items": [
+          {
+            "id": "fp_f_1",
+            "instruction": "Вставь форму",
+            "prompt": "By Friday, we ____ (complete) the project.",
+            "accepted": [
+              "will have completed"
+            ]
+          },
+          {
+            "id": "fp_f_2",
+            "instruction": "Сделай отрицание",
+            "prompt": "She ____ (not/finish) by 6.",
+            "accepted": [
+              "will not have finished",
+              "won't have finished"
+            ]
+          },
+          {
+            "id": "fp_f_3",
+            "instruction": "Сделай вопрос",
+            "prompt": "____ they ____ (leave) by then?",
+            "accepted": [
+              "Will they have left"
+            ]
+          },
+          {
+            "id": "fp_f_4",
+            "instruction": "Вставь форму",
+            "prompt": "By next month, I ____ (save) enough money.",
+            "accepted": [
+              "will have saved"
+            ]
+          },
+          {
+            "id": "fp_f_5",
+            "instruction": "Вставь форму",
+            "prompt": "By the time the movie starts, we ____ (eat).",
+            "accepted": [
+              "will have eaten"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "markers",
+        "title": "Маркеры (Markers)",
+        "kind": "multi",
+        "items": [
+          {
+            "id": "fp_mark_1",
+            "instruction": "Выбери маркеры Future Perfect",
+            "prompt": "Выбери подходящие маркеры",
+            "options": [
+              "by tomorrow",
+              "by the time",
+              "right now",
+              "before"
+            ],
+            "correctIndices": [
+              0,
+              1,
+              3
+            ]
+          },
+          {
+            "id": "fp_mark_2",
+            "instruction": "Выбери маркеры Future Perfect",
+            "prompt": "Выбери подходящие маркеры",
+            "options": [
+              "by then",
+              "at the moment",
+              "by next year",
+              "in 2010"
+            ],
+            "correctIndices": [
+              0,
+              2
+            ]
+          }
+        ]
+      },
+      {
+        "id": "mistakes",
+        "title": "Исправь ошибки (Mistakes)",
+        "kind": "correction",
+        "items": [
+          {
+            "id": "fp_c_1",
+            "instruction": "Исправь",
+            "prompt": "She will has finished by 5.",
+            "accepted": [
+              "She will have finished by 5."
+            ]
+          },
+          {
+            "id": "fp_c_2",
+            "instruction": "Исправь",
+            "prompt": "Will they have finish by then?",
+            "accepted": [
+              "Will they have finished by then?"
+            ]
+          },
+          {
+            "id": "fp_c_3",
+            "instruction": "Исправь",
+            "prompt": "I won't have finish it by tomorrow.",
+            "accepted": [
+              "I won't have finished it by tomorrow.",
+              "I will not have finished it by tomorrow."
+            ]
+          },
+          {
+            "id": "fp_c_4",
+            "instruction": "Исправь",
+            "prompt": "By next week, we will have went there.",
+            "accepted": [
+              "By next week, we will have gone there."
+            ]
+          }
+        ]
+      },
+      {
+        "id": "compare",
+        "title": "Сравнение (Compare)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "fp_cmp_1",
+            "instruction": "Выбери время",
+            "prompt": "By 10, he ____ the task.",
+            "options": [
+              "Future Perfect",
+              "Future Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "futurePerfect"
+          },
+          {
+            "id": "fp_cmp_2",
+            "instruction": "Выбери время",
+            "prompt": "At 10, he ____ on the task.",
+            "options": [
+              "Future Perfect",
+              "Future Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "futureContinuous"
+          },
+          {
+            "id": "fp_cmp_3",
+            "instruction": "Выбери время",
+            "prompt": "Will you ____ by Friday?",
+            "options": [
+              "Future Perfect",
+              "Future Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "futurePerfect"
+          }
+        ]
+      }
+    ]
+  }
+}

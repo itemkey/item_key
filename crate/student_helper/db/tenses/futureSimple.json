@@ -1,0 +1,315 @@
+{
+  "id": "futureSimple",
+  "title": "Future Simple",
+  "subtitle": "решение, прогноз, обещание о будущем",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Когда используем Future Simple"
+    },
+    {
+      "type": "text",
+      "text": "Future Simple (will + V1) используем для спонтанных решений, прогнозов, обещаний, предложений и фактов о будущем."
+    },
+    {
+      "type": "highlight",
+      "title": "Основные случаи",
+      "lines": [
+        "решение в момент речи: I'll open the window.",
+        "прогноз/мнение: I think it will rain.",
+        "обещание/угроза/предложение: I will help you. / Will you have some tea?"
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Формулы",
+      "columns": [
+        "Тип",
+        "Формула",
+        "Пример"
+      ],
+      "rows": [
+        [
+          "Утверждение",
+          "S + will + V1",
+          "She will call you later."
+        ],
+        [
+          "Отрицание",
+          "S + will not (won't) + V1",
+          "She won't call today."
+        ],
+        [
+          "Вопрос",
+          "Will + S + V1?",
+          "Will she call today?"
+        ]
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Маркеры",
+      "columns": [
+        "Тип",
+        "Маркеры"
+      ],
+      "rows": [
+        [
+          "типичные",
+          "tomorrow, next week, soon, later"
+        ],
+        [
+          "прогноз",
+          "I think, probably, maybe, I'm sure"
+        ],
+        [
+          "обещание/предложение",
+          "I promise, I will, Shall I...?"
+        ]
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Future Simple vs be going to"
+    },
+    {
+      "type": "highlight",
+      "title": "Быстрое правило",
+      "lines": [
+        "will = решение сейчас / мнение / обещание",
+        "be going to = план заранее или прогноз по видимым признакам"
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": [
+      {
+        "id": "meaning",
+        "title": "Когда используем (Meaning)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "fs_m_1",
+            "instruction": "Выбери объяснение",
+            "prompt": "It's cold. I'll close the window.",
+            "options": [
+              "спонтанное решение",
+              "длительный процесс",
+              "привычка"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "fs_m_2",
+            "instruction": "Выбери объяснение",
+            "prompt": "I think they will win the match.",
+            "options": [
+              "прогноз/мнение",
+              "действие в прошлом",
+              "расписание"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "fs_m_3",
+            "instruction": "Выбери объяснение",
+            "prompt": "Don't worry, I will help you.",
+            "options": [
+              "обещание",
+              "завершенное действие",
+              "фон в прошлом"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "fs_m_4",
+            "instruction": "Выбери объяснение",
+            "prompt": "Will you have some coffee?",
+            "options": [
+              "предложение",
+              "привычка",
+              "длительность до момента"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "fs_m_5",
+            "instruction": "Выбери объяснение",
+            "prompt": "The meeting will start at 10.",
+            "options": [
+              "факт о будущем",
+              "процесс в настоящем",
+              "ошибка"
+            ],
+            "correctIndex": 0
+          }
+        ]
+      },
+      {
+        "id": "formula",
+        "title": "Формула (Formula)",
+        "kind": "input",
+        "items": [
+          {
+            "id": "fs_f_1",
+            "instruction": "Вставь форму",
+            "prompt": "She ____ (call) you tonight.",
+            "accepted": [
+              "will call"
+            ]
+          },
+          {
+            "id": "fs_f_2",
+            "instruction": "Сделай отрицание",
+            "prompt": "I ____ (not/forget) this.",
+            "accepted": [
+              "will not forget",
+              "won't forget"
+            ]
+          },
+          {
+            "id": "fs_f_3",
+            "instruction": "Сделай вопрос",
+            "prompt": "____ you ____ (come) tomorrow?",
+            "accepted": [
+              "Will you come"
+            ]
+          },
+          {
+            "id": "fs_f_4",
+            "instruction": "Вставь форму",
+            "prompt": "I think it ____ (rain) later.",
+            "accepted": [
+              "will rain"
+            ]
+          },
+          {
+            "id": "fs_f_5",
+            "instruction": "Вставь форму",
+            "prompt": "We ____ (finish) this by evening.",
+            "accepted": [
+              "will finish"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "markers",
+        "title": "Маркеры (Markers)",
+        "kind": "multi",
+        "items": [
+          {
+            "id": "fs_mark_1",
+            "instruction": "Выбери маркеры Future Simple",
+            "prompt": "Выбери подходящие маркеры",
+            "options": [
+              "tomorrow",
+              "next month",
+              "yesterday",
+              "I think"
+            ],
+            "correctIndices": [
+              0,
+              1,
+              3
+            ]
+          },
+          {
+            "id": "fs_mark_2",
+            "instruction": "Выбери маркеры Future Simple",
+            "prompt": "Выбери подходящие маркеры",
+            "options": [
+              "probably",
+              "soon",
+              "at the moment",
+              "later"
+            ],
+            "correctIndices": [
+              0,
+              1,
+              3
+            ]
+          }
+        ]
+      },
+      {
+        "id": "mistakes",
+        "title": "Исправь ошибки (Mistakes)",
+        "kind": "correction",
+        "items": [
+          {
+            "id": "fs_c_1",
+            "instruction": "Исправь",
+            "prompt": "She will to call you.",
+            "accepted": [
+              "She will call you."
+            ]
+          },
+          {
+            "id": "fs_c_2",
+            "instruction": "Исправь",
+            "prompt": "Will she calls you?",
+            "accepted": [
+              "Will she call you?"
+            ]
+          },
+          {
+            "id": "fs_c_3",
+            "instruction": "Исправь",
+            "prompt": "I won't to go there.",
+            "accepted": [
+              "I won't go there.",
+              "I will not go there."
+            ]
+          },
+          {
+            "id": "fs_c_4",
+            "instruction": "Исправь",
+            "prompt": "He will goes with us.",
+            "accepted": [
+              "He will go with us."
+            ]
+          }
+        ]
+      },
+      {
+        "id": "compare",
+        "title": "Сравнение (Compare)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "fs_cmp_1",
+            "instruction": "Выбери время",
+            "prompt": "I think she ____ late.",
+            "options": [
+              "Future Simple",
+              "Present Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "futureSimple"
+          },
+          {
+            "id": "fs_cmp_2",
+            "instruction": "Выбери время",
+            "prompt": "Look at those clouds! It ____.",
+            "options": [
+              "Future Simple",
+              "be going to"
+            ],
+            "correctIndex": 1
+          },
+          {
+            "id": "fs_cmp_3",
+            "instruction": "Выбери время",
+            "prompt": "I ____ the door. Wait a second.",
+            "options": [
+              "Future Simple",
+              "be going to"
+            ],
+            "correctIndex": 0
+          }
+        ]
+      }
+    ]
+  }
+}

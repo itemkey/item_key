@@ -1435,6 +1435,11 @@ const QUICK = {
     markers: "before • by (time) • by the time • already",
     formula: "had + V3"
   },
+  pastPerfectContinuous: {
+    when: "процесс/длительность до момента в прошлом • причина результата",
+    markers: "for • since • before • by the time • how long",
+    formula: "had been + V-ing"
+  },
   presentSimple: {
     when: "привычка/рутина • факт • расписание • состояния",
     markers: "always • usually • often • every day • on Mondays",
@@ -1454,6 +1459,26 @@ const QUICK = {
     when: "длительность/процесс до сейчас • видимый результат",
     markers: "for/since • how long • lately/recently",
     formula: "have/has been + V-ing"
+  },
+  futureSimple: {
+    when: "решение в момент речи • прогноз • обещание/предложение",
+    markers: "tomorrow • next ... • soon • probably • I think",
+    formula: "will + V1"
+  },
+  futureContinuous: {
+    when: "процесс в конкретный момент в будущем • вежливый вопрос о планах",
+    markers: "this time tomorrow • at 8 tomorrow • when/while",
+    formula: "will be + V-ing"
+  },
+  futurePerfect: {
+    when: "результат завершится к моменту в будущем",
+    markers: "by • by the time • before • by then",
+    formula: "will have + V3"
+  },
+  futurePerfectContinuous: {
+    when: "длительность процесса к моменту в будущем",
+    markers: "for ... by ... • by the time • how long",
+    formula: "will have been + V-ing"
   }
 };
 
@@ -1480,6 +1505,9 @@ function superRule(aId,bId){
   if (pair==='presentContinuous|presentSimple') return 'Simple = привычка/факт/расписание (точка) • Continuous = процесс/временно (линия)';
   if (pair==='pastContinuous|pastSimple') return 'Past Simple = факт/событие (точка) • Past Continuous = процесс/фон (линия)';
   if (pair==='pastPerfect|pastSimple') return 'Past Perfect = действие до другого/момента в прошлом • Past Simple = факт/событие в прошлом';
+  if (pair==='futureContinuous|futureSimple') return 'Future Simple = решение/факт/прогноз • Future Continuous = процесс в конкретный момент будущего';
+  if (pair==='futurePerfect|futurePerfectContinuous') return 'Future Perfect = результат к сроку • Future Perfect Continuous = длительность к сроку';
+  if (pair==='pastPerfect|pastPerfectContinuous') return 'Past Perfect = результат к моменту в прошлом • Past Perfect Continuous = процесс/длительность к моменту в прошлом';
   return 'Сравни: одно время — “более факт/обычно”, другое — “более процесс/контекст”.';
 }
 

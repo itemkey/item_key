@@ -21,6 +21,13 @@
     "file": "pastPerfect.json"
   },
   {
+    "id": "pastPerfectContinuous",
+    "title": "Past Perfect Continuous",
+    "subtitle": "длительность до момента в прошлом",
+    "hint": "for/since • how long • before • cause/result",
+    "file": "pastPerfectContinuous.json"
+  },
+  {
     "id": "presentSimple",
     "title": "Present Simple",
     "subtitle": "привычка - факт - расписание",
@@ -47,5 +54,33 @@
     "subtitle": "длительность - процесс - видимый результат",
     "hint": "for/since • how long • lately • tired/dirty",
     "file": "presentPerfectContinuous.json"
+  },
+  {
+    "id": "futureSimple",
+    "title": "Future Simple",
+    "subtitle": "решение/прогноз/обещание о будущем",
+    "hint": "will • probably • I think • offer/promise",
+    "file": "futureSimple.json"
+  },
+  {
+    "id": "futureContinuous",
+    "title": "Future Continuous",
+    "subtitle": "процесс в конкретный момент в будущем",
+    "hint": "this time tomorrow • at 8 tomorrow • will be + ing",
+    "file": "futureContinuous.json"
+  },
+  {
+    "id": "futurePerfect",
+    "title": "Future Perfect",
+    "subtitle": "действие завершится к моменту в будущем",
+    "hint": "by/by the time • before • will have + V3",
+    "file": "futurePerfect.json"
+  },
+  {
+    "id": "futurePerfectContinuous",
+    "title": "Future Perfect Continuous",
+    "subtitle": "длительность до момента в будущем",
+    "hint": "for + period by time • will have been + ing",
+    "file": "futurePerfectContinuous.json"
   }
 ]

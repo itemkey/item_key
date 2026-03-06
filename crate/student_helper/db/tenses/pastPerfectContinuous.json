@@ -1,0 +1,330 @@
+{
+  "id": "pastPerfectContinuous",
+  "title": "Past Perfect Continuous",
+  "subtitle": "длительность процесса до момента в прошлом",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Когда используем Past Perfect Continuous"
+    },
+    {
+      "type": "text",
+      "text": "Past Perfect Continuous показывает процесс, который длился до определенного момента в прошлом. Важно не только что действие было, но и как долго оно продолжалось."
+    },
+    {
+      "type": "highlight",
+      "title": "Ключевые случаи",
+      "lines": [
+        "длительность до момента в прошлом: She had been studying for two hours before dinner.",
+        "причина результата в прошлом: He was tired because he had been running.",
+        "вопрос how long до past point: How long had you been waiting before the bus came?"
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Формулы",
+      "columns": [
+        "Тип",
+        "Формула",
+        "Пример"
+      ],
+      "rows": [
+        [
+          "Утверждение",
+          "S + had been + V-ing",
+          "I had been working all day."
+        ],
+        [
+          "Отрицание",
+          "S + had not (hadn't) been + V-ing",
+          "I hadn't been sleeping well."
+        ],
+        [
+          "Вопрос",
+          "Had + S + been + V-ing?",
+          "Had you been waiting long?"
+        ]
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Маркеры",
+      "columns": [
+        "Тип",
+        "Маркеры"
+      ],
+      "rows": [
+        [
+          "длительность",
+          "for two hours, for a long time"
+        ],
+        [
+          "точка отсчета",
+          "since morning, since 5 o'clock"
+        ],
+        [
+          "граница во времени",
+          "before, until, by the time"
+        ]
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Past Perfect vs Past Perfect Continuous"
+    },
+    {
+      "type": "highlight",
+      "title": "Разница",
+      "lines": [
+        "Past Perfect = результат к моменту в прошлом (had done)",
+        "Past Perfect Continuous = длительность/процесс до момента в прошлом (had been doing)"
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        {
+          "en": "She had written five emails before lunch.",
+          "ru": "К обеду она написала пять писем (результат)."
+        },
+        {
+          "en": "She had been writing emails for two hours before lunch.",
+          "ru": "Перед обедом она писала письма два часа (процесс и длительность)."
+        }
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": [
+      {
+        "id": "meaning",
+        "title": "Когда используем (Meaning)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "ppc_m_1",
+            "instruction": "Выбери объяснение",
+            "prompt": "He had been waiting for an hour before the train arrived.",
+            "options": [
+              "длительность до момента в прошлом",
+              "привычка в настоящем",
+              "разовое завершенное действие"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "ppc_m_2",
+            "instruction": "Выбери объяснение",
+            "prompt": "She was upset because she had been arguing with her brother.",
+            "options": [
+              "причина состояния в прошлом",
+              "будущий план",
+              "факт в настоящем"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "ppc_m_3",
+            "instruction": "Выбери объяснение",
+            "prompt": "How long had they been living there before they moved?",
+            "options": [
+              "длительность до прошлого события",
+              "действие сейчас",
+              "расписание"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "ppc_m_4",
+            "instruction": "Выбери объяснение",
+            "prompt": "By the time we met, I had been working on that project for months.",
+            "options": [
+              "процесс, который длился до встречи в прошлом",
+              "прогноз на будущее",
+              "цепочка коротких действий"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "ppc_m_5",
+            "instruction": "Выбери объяснение",
+            "prompt": "They had not been sleeping well before the exam week.",
+            "options": [
+              "длительный процесс в отрицании до прошлого момента",
+              "действие в настоящем времени",
+              "единичное действие с точным временем"
+            ],
+            "correctIndex": 0
+          }
+        ]
+      },
+      {
+        "id": "formula",
+        "title": "Формула (Formula)",
+        "kind": "input",
+        "items": [
+          {
+            "id": "ppc_f_1",
+            "instruction": "Вставь правильную форму",
+            "prompt": "I ____ (work) there for three years before I changed jobs.",
+            "accepted": [
+              "had been working"
+            ]
+          },
+          {
+            "id": "ppc_f_2",
+            "instruction": "Сделай отрицание",
+            "prompt": "She ____ (not/sleep) well before the trip.",
+            "accepted": [
+              "had not been sleeping",
+              "hadn't been sleeping"
+            ]
+          },
+          {
+            "id": "ppc_f_3",
+            "instruction": "Сделай вопрос",
+            "prompt": "____ they ____ (wait) long before the taxi came?",
+            "accepted": [
+              "Had they been waiting"
+            ]
+          },
+          {
+            "id": "ppc_f_4",
+            "instruction": "Вставь форму",
+            "prompt": "By the time the lesson started, we ____ (study) for an hour.",
+            "accepted": [
+              "had been studying"
+            ]
+          },
+          {
+            "id": "ppc_f_5",
+            "instruction": "Вставь форму",
+            "prompt": "He was exhausted because he ____ (run).",
+            "accepted": [
+              "had been running"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "markers",
+        "title": "Маркеры (Markers)",
+        "kind": "multi",
+        "items": [
+          {
+            "id": "ppc_mark_1",
+            "instruction": "Выбери маркеры Past Perfect Continuous",
+            "prompt": "Выбери подходящие маркеры",
+            "options": [
+              "for two hours",
+              "since Monday",
+              "right now",
+              "before"
+            ],
+            "correctIndices": [
+              0,
+              1,
+              3
+            ]
+          },
+          {
+            "id": "ppc_mark_2",
+            "instruction": "Выбери маркеры Past Perfect Continuous",
+            "prompt": "Выбери подходящие маркеры",
+            "options": [
+              "by the time",
+              "at the moment",
+              "until",
+              "for months"
+            ],
+            "correctIndices": [
+              0,
+              2,
+              3
+            ]
+          }
+        ]
+      },
+      {
+        "id": "mistakes",
+        "title": "Исправь ошибки (Mistakes)",
+        "kind": "correction",
+        "items": [
+          {
+            "id": "ppc_c_1",
+            "instruction": "Исправь предложение",
+            "prompt": "She had been worked all day.",
+            "accepted": [
+              "She had been working all day."
+            ]
+          },
+          {
+            "id": "ppc_c_2",
+            "instruction": "Исправь",
+            "prompt": "Had been they waiting long?",
+            "accepted": [
+              "Had they been waiting long?"
+            ]
+          },
+          {
+            "id": "ppc_c_3",
+            "instruction": "Исправь",
+            "prompt": "He hadn't waiting for us.",
+            "accepted": [
+              "He hadn't been waiting for us.",
+              "He had not been waiting for us."
+            ]
+          },
+          {
+            "id": "ppc_c_4",
+            "instruction": "Исправь",
+            "prompt": "I had been work there since 2019.",
+            "accepted": [
+              "I had been working there since 2019."
+            ]
+          }
+        ]
+      },
+      {
+        "id": "compare",
+        "title": "Сравнение (Compare)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "ppc_cmp_1",
+            "instruction": "Выбери время",
+            "prompt": "She ____ for three hours before she took a break.",
+            "options": [
+              "Past Perfect",
+              "Past Perfect Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "pastPerfectContinuous"
+          },
+          {
+            "id": "ppc_cmp_2",
+            "instruction": "Выбери время",
+            "prompt": "She ____ the report before the meeting started.",
+            "options": [
+              "Past Perfect",
+              "Past Perfect Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "pastPerfect"
+          },
+          {
+            "id": "ppc_cmp_3",
+            "instruction": "Выбери время",
+            "prompt": "He was wet because he ____ in the rain.",
+            "options": [
+              "Past Perfect",
+              "Past Perfect Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "pastPerfectContinuous"
+          }
+        ]
+      }
+    ]
+  }
+}

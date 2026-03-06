@@ -1,0 +1,306 @@
+{
+  "id": "futurePerfectContinuous",
+  "title": "Future Perfect Continuous",
+  "subtitle": "длительность процесса до момента в будущем",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Когда используем Future Perfect Continuous"
+    },
+    {
+      "type": "text",
+      "text": "Future Perfect Continuous (will have been + V-ing) показывает, как долго действие будет продолжаться к определенному моменту в будущем."
+    },
+    {
+      "type": "highlight",
+      "title": "Ключевая идея",
+      "lines": [
+        "важна длительность к будущей точке: By June, I will have been working here for five years.",
+        "часто с for + период и by + момент"
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Формулы",
+      "columns": [
+        "Тип",
+        "Формула",
+        "Пример"
+      ],
+      "rows": [
+        [
+          "Утверждение",
+          "S + will have been + V-ing",
+          "I will have been studying for two hours by 9."
+        ],
+        [
+          "Отрицание",
+          "S + will not have been + V-ing",
+          "I won't have been studying for two hours by 9."
+        ],
+        [
+          "Вопрос",
+          "Will + S + have been + V-ing?",
+          "Will you have been studying for two hours by 9?"
+        ]
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Маркеры",
+      "columns": [
+        "Тип",
+        "Маркеры"
+      ],
+      "rows": [
+        [
+          "длительность",
+          "for two hours, for five years"
+        ],
+        [
+          "будущая точка",
+          "by 6 p.m., by next month, by the time"
+        ],
+        [
+          "вопрос",
+          "how long ... by ...?"
+        ]
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Future Perfect vs Future Perfect Continuous"
+    },
+    {
+      "type": "highlight",
+      "title": "Разница",
+      "lines": [
+        "Future Perfect = завершение к сроку (will have done)",
+        "Future Perfect Continuous = длительность к сроку (will have been doing)"
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": [
+      {
+        "id": "meaning",
+        "title": "Когда используем (Meaning)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "fpc_m_1",
+            "instruction": "Выбери объяснение",
+            "prompt": "By next July, I will have been living here for ten years.",
+            "options": [
+              "длительность к будущему моменту",
+              "разовое действие в будущем",
+              "завершенное прошлое"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "fpc_m_2",
+            "instruction": "Выбери объяснение",
+            "prompt": "Will you have been working here for a year by December?",
+            "options": [
+              "вопрос о длительности к сроку",
+              "вопрос о прошлом",
+              "вопрос о привычке"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "fpc_m_3",
+            "instruction": "Выбери объяснение",
+            "prompt": "By 6 p.m., she will have been driving for eight hours.",
+            "options": [
+              "процесс с длительностью к точке в будущем",
+              "прогноз без длительности",
+              "действие в данный момент"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "fpc_m_4",
+            "instruction": "Выбери объяснение",
+            "prompt": "They won't have been waiting long by the time we arrive.",
+            "options": [
+              "отрицание длительности к будущему моменту",
+              "завершенный результат к сроку",
+              "прошлое действие"
+            ],
+            "correctIndex": 0
+          }
+        ]
+      },
+      {
+        "id": "formula",
+        "title": "Формула (Formula)",
+        "kind": "input",
+        "items": [
+          {
+            "id": "fpc_f_1",
+            "instruction": "Вставь форму",
+            "prompt": "By 9, I ____ (study) for three hours.",
+            "accepted": [
+              "will have been studying"
+            ]
+          },
+          {
+            "id": "fpc_f_2",
+            "instruction": "Сделай отрицание",
+            "prompt": "She ____ (not/work) here for a year by May.",
+            "accepted": [
+              "will not have been working",
+              "won't have been working"
+            ]
+          },
+          {
+            "id": "fpc_f_3",
+            "instruction": "Сделай вопрос",
+            "prompt": "____ they ____ (wait) long by the time we arrive?",
+            "accepted": [
+              "Will they have been waiting"
+            ]
+          },
+          {
+            "id": "fpc_f_4",
+            "instruction": "Вставь форму",
+            "prompt": "By next month, he ____ (teach) for 20 years.",
+            "accepted": [
+              "will have been teaching"
+            ]
+          },
+          {
+            "id": "fpc_f_5",
+            "instruction": "Вставь форму",
+            "prompt": "By noon, we ____ (drive) for four hours.",
+            "accepted": [
+              "will have been driving"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "markers",
+        "title": "Маркеры (Markers)",
+        "kind": "multi",
+        "items": [
+          {
+            "id": "fpc_mark_1",
+            "instruction": "Выбери маркеры Future Perfect Continuous",
+            "prompt": "Выбери подходящие маркеры",
+            "options": [
+              "for five years",
+              "by next month",
+              "at the moment",
+              "by the time"
+            ],
+            "correctIndices": [
+              0,
+              1,
+              3
+            ]
+          },
+          {
+            "id": "fpc_mark_2",
+            "instruction": "Выбери маркеры Future Perfect Continuous",
+            "prompt": "Выбери подходящие маркеры",
+            "options": [
+              "for two hours",
+              "by 6 p.m.",
+              "right now",
+              "how long"
+            ],
+            "correctIndices": [
+              0,
+              1,
+              3
+            ]
+          }
+        ]
+      },
+      {
+        "id": "mistakes",
+        "title": "Исправь ошибки (Mistakes)",
+        "kind": "correction",
+        "items": [
+          {
+            "id": "fpc_c_1",
+            "instruction": "Исправь",
+            "prompt": "By July, I will have been work here for 3 years.",
+            "accepted": [
+              "By July, I will have been working here for 3 years.",
+              "By July, I will have been working here for three years."
+            ]
+          },
+          {
+            "id": "fpc_c_2",
+            "instruction": "Исправь",
+            "prompt": "Will she have been work for long by then?",
+            "accepted": [
+              "Will she have been working for long by then?"
+            ]
+          },
+          {
+            "id": "fpc_c_3",
+            "instruction": "Исправь",
+            "prompt": "He won't have being waiting by 5.",
+            "accepted": [
+              "He won't have been waiting by 5.",
+              "He will not have been waiting by 5."
+            ]
+          },
+          {
+            "id": "fpc_c_4",
+            "instruction": "Исправь",
+            "prompt": "They will have been waiting since two hours by then.",
+            "accepted": [
+              "They will have been waiting for two hours by then."
+            ]
+          }
+        ]
+      },
+      {
+        "id": "compare",
+        "title": "Сравнение (Compare)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "fpc_cmp_1",
+            "instruction": "Выбери время",
+            "prompt": "By 6, she ____ the report.",
+            "options": [
+              "Future Perfect",
+              "Future Perfect Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "futurePerfect"
+          },
+          {
+            "id": "fpc_cmp_2",
+            "instruction": "Выбери время",
+            "prompt": "By 6, she ____ on the report for two hours.",
+            "options": [
+              "Future Perfect",
+              "Future Perfect Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "futurePerfectContinuous"
+          },
+          {
+            "id": "fpc_cmp_3",
+            "instruction": "Выбери время",
+            "prompt": "Will you ____ for long by the time I come?",
+            "options": [
+              "Future Perfect",
+              "Future Perfect Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "futurePerfectContinuous"
+          }
+        ]
+      }
+    ]
+  }
+}

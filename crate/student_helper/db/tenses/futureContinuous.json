@@ -1,0 +1,306 @@
+{
+  "id": "futureContinuous",
+  "title": "Future Continuous",
+  "subtitle": "процесс в конкретный момент в будущем",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Когда используем Future Continuous"
+    },
+    {
+      "type": "text",
+      "text": "Future Continuous (will be + V-ing) показывает действие в процессе в определенный момент будущего. Фокус на ходе процесса, а не на результате."
+    },
+    {
+      "type": "highlight",
+      "title": "Типичные случаи",
+      "lines": [
+        "процесс в моменте будущего: This time tomorrow I will be flying to Rome.",
+        "ожидаемая ситуация по плану: At 8 p.m. we will be having dinner.",
+        "вежливый вопрос о планах: Will you be using your laptop tonight?"
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Формулы",
+      "columns": [
+        "Тип",
+        "Формула",
+        "Пример"
+      ],
+      "rows": [
+        [
+          "Утверждение",
+          "S + will be + V-ing",
+          "I will be working at 9."
+        ],
+        [
+          "Отрицание",
+          "S + will not be + V-ing",
+          "I won't be working at 9."
+        ],
+        [
+          "Вопрос",
+          "Will + S + be + V-ing?",
+          "Will you be working at 9?"
+        ]
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Маркеры",
+      "columns": [
+        "Тип",
+        "Маркеры"
+      ],
+      "rows": [
+        [
+          "момент в будущем",
+          "this time tomorrow, at 8 tomorrow, at noon next Friday"
+        ],
+        [
+          "контекст",
+          "while, when (будущее время в придаточном)"
+        ],
+        [
+          "вежливые вопросы",
+          "Will you be ...?"
+        ]
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Future Simple vs Future Continuous"
+    },
+    {
+      "type": "highlight",
+      "title": "Разница",
+      "lines": [
+        "Future Simple = факт/решение/прогноз (will do)",
+        "Future Continuous = процесс в конкретный момент (will be doing)"
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": [
+      {
+        "id": "meaning",
+        "title": "Когда используем (Meaning)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "fc_m_1",
+            "instruction": "Выбери объяснение",
+            "prompt": "At 10 tomorrow, I will be meeting the client.",
+            "options": [
+              "процесс в конкретный момент будущего",
+              "привычка",
+              "прошлый факт"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "fc_m_2",
+            "instruction": "Выбери объяснение",
+            "prompt": "Will you be using the car this evening?",
+            "options": [
+              "вежливый вопрос о планах",
+              "результат к сроку",
+              "ошибка согласования"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "fc_m_3",
+            "instruction": "Выбери объяснение",
+            "prompt": "This time next week we will be lying on the beach.",
+            "options": [
+              "процесс в моменте будущего",
+              "событие в прошлом",
+              "привычка в настоящем"
+            ],
+            "correctIndex": 0
+          },
+          {
+            "id": "fc_m_4",
+            "instruction": "Выбери объяснение",
+            "prompt": "Don't call at 7. We will be having dinner then.",
+            "options": [
+              "действие будет в процессе в тот момент",
+              "разовое действие без контекста",
+              "действие завершится к сроку"
+            ],
+            "correctIndex": 0
+          }
+        ]
+      },
+      {
+        "id": "formula",
+        "title": "Формула (Formula)",
+        "kind": "input",
+        "items": [
+          {
+            "id": "fc_f_1",
+            "instruction": "Вставь форму",
+            "prompt": "At 9 p.m. she ____ (study).",
+            "accepted": [
+              "will be studying"
+            ]
+          },
+          {
+            "id": "fc_f_2",
+            "instruction": "Сделай отрицание",
+            "prompt": "I ____ (not/work) tomorrow morning.",
+            "accepted": [
+              "will not be working",
+              "won't be working"
+            ]
+          },
+          {
+            "id": "fc_f_3",
+            "instruction": "Сделай вопрос",
+            "prompt": "____ you ____ (wait) for me at 6?",
+            "accepted": [
+              "Will you be waiting"
+            ]
+          },
+          {
+            "id": "fc_f_4",
+            "instruction": "Вставь форму",
+            "prompt": "This time tomorrow they ____ (fly) to Berlin.",
+            "accepted": [
+              "will be flying"
+            ]
+          },
+          {
+            "id": "fc_f_5",
+            "instruction": "Вставь форму",
+            "prompt": "When you arrive, we ____ (have) dinner.",
+            "accepted": [
+              "will be having"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "markers",
+        "title": "Маркеры (Markers)",
+        "kind": "multi",
+        "items": [
+          {
+            "id": "fc_mark_1",
+            "instruction": "Выбери маркеры Future Continuous",
+            "prompt": "Выбери подходящие маркеры",
+            "options": [
+              "this time tomorrow",
+              "at 8 tomorrow",
+              "yesterday",
+              "when you arrive"
+            ],
+            "correctIndices": [
+              0,
+              1,
+              3
+            ]
+          },
+          {
+            "id": "fc_mark_2",
+            "instruction": "Выбери маркеры Future Continuous",
+            "prompt": "Выбери подходящие маркеры",
+            "options": [
+              "at noon next Friday",
+              "while",
+              "last year",
+              "tonight at 10"
+            ],
+            "correctIndices": [
+              0,
+              1,
+              3
+            ]
+          }
+        ]
+      },
+      {
+        "id": "mistakes",
+        "title": "Исправь ошибки (Mistakes)",
+        "kind": "correction",
+        "items": [
+          {
+            "id": "fc_c_1",
+            "instruction": "Исправь",
+            "prompt": "She will be study at 9.",
+            "accepted": [
+              "She will be studying at 9."
+            ]
+          },
+          {
+            "id": "fc_c_2",
+            "instruction": "Исправь",
+            "prompt": "Will you be wait for me?",
+            "accepted": [
+              "Will you be waiting for me?"
+            ]
+          },
+          {
+            "id": "fc_c_3",
+            "instruction": "Исправь",
+            "prompt": "I won't be work tomorrow.",
+            "accepted": [
+              "I won't be working tomorrow.",
+              "I will not be working tomorrow."
+            ]
+          },
+          {
+            "id": "fc_c_4",
+            "instruction": "Исправь",
+            "prompt": "They will being sleeping then.",
+            "accepted": [
+              "They will be sleeping then."
+            ]
+          }
+        ]
+      },
+      {
+        "id": "compare",
+        "title": "Сравнение (Compare)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "fc_cmp_1",
+            "instruction": "Выбери время",
+            "prompt": "At 9 tonight, we ____ TV.",
+            "options": [
+              "Future Simple",
+              "Future Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "futureContinuous"
+          },
+          {
+            "id": "fc_cmp_2",
+            "instruction": "Выбери время",
+            "prompt": "I think we ____ late.",
+            "options": [
+              "Future Simple",
+              "Future Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "futureSimple"
+          },
+          {
+            "id": "fc_cmp_3",
+            "instruction": "Выбери время",
+            "prompt": "Will you ____ at home this evening?",
+            "options": [
+              "Future Simple",
+              "Future Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "futureContinuous"
+          }
+        ]
+      }
+    ]
+  }
+}
