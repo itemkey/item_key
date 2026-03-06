@@ -117,6 +117,11 @@
   const cbShowAfter = document.getElementById('tensesShowAfterEach');
   const practiceBody = document.getElementById('tensesPracticeBody');
   const practiceMeta = document.getElementById('tensesPracticeMeta');
+  const customPicker = document.getElementById('tensesCustomPicker');
+  const customGrid = document.getElementById('tensesCustomGrid');
+  const customHint = document.getElementById('tensesCustomHint');
+  const btnCustomSelectAll = document.getElementById('tensesCustomSelectAllBtn');
+  const btnCustomClearAll = document.getElementById('tensesCustomClearAllBtn');
 
   if (!homeView || !listView || !detailView || !practiceView) return;
   if (!btnGoTheory || !btnGoPractice || !listEl) return;
@@ -125,6 +130,7 @@
   let runKeyHandler = null;
 
   const KEY_UI = 'sh_tenses_ui_v1';
+  const CUSTOM_TENSE_ID = 'custom';
 
   const GOALS = [
     { id:'all', title:'общее (all goals)' },
@@ -368,7 +374,20 @@
   function fillTenseOptions(){
     tenseSelect.innerHTML = '';
 
-    for (const meta of REG.INDEX){
+    const metas = Array.isArray(REG.INDEX) ? REG.INDEX : [];
+
+    const optMixedAll = document.createElement('option');
+    optMixedAll.value = 'mixedAll';
+    optMixedAll.textContent = 'Mixed All (12 tenses)';
+    tenseSelect.appendChild(optMixedAll);
+
+    const optCustom = document.createElement('option');
+    optCustom.value = CUSTOM_TENSE_ID;
+    optCustom.textContent = 'Пользовательское (Custom)';
+    tenseSelect.appendChild(optCustom);
+
+    for (let i = 0; i < metas.length; i++){
+      const meta = metas[i];
       const opt = document.createElement('option');
       opt.value = meta.id;
       opt.textContent = meta.title;
@@ -391,10 +410,97 @@
     optMixedPP.textContent = 'Mixed Perfect - Past (Present Perfect + Past Simple)';
     tenseSelect.appendChild(optMixedPP);
 
-    const optMixedAll = document.createElement('option');
-    optMixedAll.value = 'mixedAll';
-    optMixedAll.textContent = 'Mixed All (12 tenses)';
-    tenseSelect.appendChild(optMixedAll);
+  }
+
+  function getCoreTenseIds(){
+    return (REG.INDEX || []).map(x=>x.id).filter(Boolean);
+  }
+
+  function getSavedCustomIds(){
+    const ids = getCoreTenseIds();
+    if (!ids.length) return [];
+    const ui = loadUIState();
+    const saved = Array.isArray(ui.customTenses) ? ui.customTenses : [];
+    const valid = saved.filter(id => ids.includes(id));
+    if (valid.length) return valid;
+    return [...ids];
+  }
+
+  function getCustomSelectedIds(){
+    if (!customGrid) return getSavedCustomIds();
+    const ids = [];
+    customGrid.querySelectorAll('input[type="checkbox"][data-tense-id]').forEach((el)=>{
+      if (el.checked) ids.push(el.getAttribute('data-tense-id'));
+    });
+    return ids;
+  }
+
+  function setCustomPickerVisible(visible){
+    if (!customPicker) return;
+    customPicker.hidden = !visible;
+  }
+
+  function saveCustomSelection(ids){
+    saveUIState({ customTenses: ids });
+    updateCustomHint(ids.length);
+    if (tenseSelect?.value === CUSTOM_TENSE_ID) renderPracticeInfo();
+  }
+
+  function setAllCustomSelection(checked){
+    if (!customGrid) return;
+    customGrid.querySelectorAll('input[type="checkbox"][data-tense-id]').forEach((el)=>{
+      el.checked = !!checked;
+    });
+    saveCustomSelection(getCustomSelectedIds());
+  }
+
+  function renderCustomPicker(){
+    if (!customGrid) return;
+    const selected = new Set(getSavedCustomIds());
+    customGrid.innerHTML = '';
+
+    for (const meta of (REG.INDEX || [])){
+      const label = document.createElement('label');
+      label.className = 'sh-custom-tense';
+
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.className = 'sh-custom-tense__cb';
+      cb.setAttribute('data-tense-id', meta.id);
+      cb.checked = selected.has(meta.id);
+
+      const textWrap = document.createElement('span');
+      textWrap.className = 'sh-custom-tense__text';
+
+      const t = document.createElement('span');
+      t.className = 'sh-custom-tense__title';
+      t.textContent = meta.title || meta.id;
+
+      const s = document.createElement('span');
+      s.className = 'sh-custom-tense__sub';
+      s.textContent = meta.subtitle || '';
+
+      textWrap.appendChild(t);
+      textWrap.appendChild(s);
+      label.appendChild(cb);
+      label.appendChild(textWrap);
+      customGrid.appendChild(label);
+
+      cb.addEventListener('change', ()=>{
+        saveCustomSelection(getCustomSelectedIds());
+      });
+    }
+
+    updateCustomHint(selected.size);
+  }
+
+  function updateCustomHint(selectedCount){
+    if (!customHint) return;
+    if (!selectedCount){
+      customHint.textContent = 'выбери минимум одно время, чтобы начать';
+      return;
+    }
+    customHint.textContent = `выбрано: ${selectedCount} из ${(REG.INDEX || []).length}`;
   }
 
   function buildMixedAllTense(){
@@ -431,8 +537,48 @@
     };
   }
 
+  function buildCustomTense(selectedIds){
+    const picked = Array.isArray(selectedIds) ? selectedIds : [];
+    const grouped = new Map();
+    const selectedSet = new Set(picked);
+
+    for (const meta of (REG.INDEX || [])){
+      if (!selectedSet.has(meta.id)) continue;
+      const t = REG.byId[meta.id];
+      if (!t || !t.practice || !Array.isArray(t.practice.exercises)) continue;
+      for (const ex of t.practice.exercises){
+        const key = ex.id || 'all';
+        if (!grouped.has(key)){
+          grouped.set(key, {
+            id: key,
+            title: `${ex.title || key} - Custom`,
+            kind: ex.kind || 'choice',
+            items: []
+          });
+        }
+        const target = grouped.get(key);
+        if ((target.kind || 'choice') !== (ex.kind || 'choice')) continue;
+        for (const item of (ex.items || [])){
+          const cloned = Object.assign({}, item);
+          cloned.id = `custom_${meta.id}_${item.id || Math.random().toString(36).slice(2)}`;
+          target.items.push(cloned);
+        }
+      }
+    }
+
+    return {
+      id: CUSTOM_TENSE_ID,
+      title: `Пользовательское (${picked.length} т.)`,
+      subtitle: 'набор по выбранным временам',
+      practice: {
+        exercises: Array.from(grouped.values())
+      }
+    };
+  }
+
   function getTenseForPractice(id){
     if (id === 'mixedAll') return buildMixedAllTense();
+    if (id === CUSTOM_TENSE_ID) return buildCustomTense(getCustomSelectedIds());
     const t = REG.byId[id];
     if (t) return t;
     // fallback
@@ -482,6 +628,11 @@
     if (btnRetry){
       btnRetry.disabled = mistakesCount === 0;
       btnRetry.title = mistakesCount ? '' : 'Нет ошибок';
+    }
+
+    if (btnStart){
+      btnStart.disabled = total === 0;
+      btnStart.title = total ? '' : 'Нет заданий: выбери времена';
     }
 
     // Summary card
@@ -707,7 +858,7 @@
       }
 
       const rawId = String(item.id || '');
-      const m = rawId.match(/^mixedAll_([^_]+)_/);
+      const m = rawId.match(/^(?:mixedAll|custom)_([^_]+)_/);
       if (m && m[1]){
         const id = m[1];
         const meta = (REG.INDEX || []).find(x => x.id === id);
@@ -1425,10 +1576,12 @@ btnResetProgress && btnResetProgress.addEventListener('click', ()=>{
   function showPractice(){
     fillGoalOptions();
     fillTenseOptions();
+    renderCustomPicker();
 
     const ui = loadUIState();
     if (ui.goal && GOALS.some(x=>x.id === ui.goal)) goalSelect.value = ui.goal;
     if (ui.tense) tenseSelect.value = ui.tense;
+    setCustomPickerVisible((tenseSelect && tenseSelect.value) === CUSTOM_TENSE_ID);
 
     showOnly('practice');
     renderPracticeInfo();
@@ -1455,7 +1608,14 @@ btnResetProgress && btnResetProgress.addEventListener('click', ()=>{
   });
 
   goalSelect && goalSelect.addEventListener('change', renderPracticeInfo);
-  tenseSelect && tenseSelect.addEventListener('change', renderPracticeInfo);
+  tenseSelect && tenseSelect.addEventListener('change', ()=>{
+    const isCustom = (tenseSelect.value === CUSTOM_TENSE_ID);
+    setCustomPickerVisible(isCustom);
+    if (isCustom) updateCustomHint(getCustomSelectedIds().length);
+    renderPracticeInfo();
+  });
+  btnCustomSelectAll && btnCustomSelectAll.addEventListener('click', ()=> setAllCustomSelection(true));
+  btnCustomClearAll && btnCustomClearAll.addEventListener('click', ()=> setAllCustomSelection(false));
 
   btnStart && btnStart.addEventListener('click', ()=>{
     const tenseId = tenseSelect.value || (REG.INDEX[0] && REG.INDEX[0].id);

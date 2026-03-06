@@ -876,7 +876,7 @@
               <div class="ik-divider"></div>
 
               <p class="ik-title">упражнения по временам</p>
-              <p class="ik-sub">выбери цель и время (или mixed)</p>
+              <p class="ik-sub">выбери цель и время (или mixed/пользовательское)</p>
 
               <div class="ik-row" style="margin-top:8px;">
                 <label class="ik-label" for="tensesGoalSelect">цель</label>
@@ -897,6 +897,16 @@
                   <input type="checkbox" id="tensesShowAfterEach" checked />
                   show answers after each
                 </label>
+              </div>
+
+              <div id="tensesCustomPicker" class="sh-custom-picker" hidden>
+                <p class="sh-custom-picker__title">пользовательское: выбери времена</p>
+                <p class="sh-custom-picker__sub" id="tensesCustomHint">отметь хотя бы одно время</p>
+                <div class="sh-custom-picker__actions">
+                  <button class="ik-btn" id="tensesCustomSelectAllBtn" type="button">выбрать все</button>
+                  <button class="ik-btn" id="tensesCustomClearAllBtn" type="button">снять все</button>
+                </div>
+                <div class="sh-custom-picker__grid" id="tensesCustomGrid" aria-label="Custom tenses list"></div>
               </div>
 
               <div class="ik-divider"></div>
