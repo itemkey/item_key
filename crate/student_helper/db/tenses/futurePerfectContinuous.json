@@ -96,7 +96,8 @@
               "разовое действие в будущем",
               "завершенное прошлое"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "В этом предложении важно значение ситуации, а не только форма. Верный вариант — «длительность к будущему моменту», потому что смысл фразы именно такой. В подсказках контекста: маркер Perfect, есть граница/срок «by/before», есть будущая точка отсчета."
           },
           {
             "id": "fpc_m_2",
@@ -107,7 +108,8 @@
               "вопрос о прошлом",
               "вопрос о привычке"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "В этом предложении важно значение ситуации, а не только форма. Верный вариант — «вопрос о длительности к сроку», потому что смысл фразы именно такой. В подсказках контекста: маркер Perfect, есть граница/срок «by/before»."
           },
           {
             "id": "fpc_m_3",
@@ -118,7 +120,8 @@
               "прогноз без длительности",
               "действие в данный момент"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "В этом предложении важно значение ситуации, а не только форма. Верный вариант — «процесс с длительностью к точке в будущем», потому что смысл фразы именно такой. В подсказках контекста: маркер Perfect, есть граница/срок «by/before»."
           },
           {
             "id": "fpc_m_4",
@@ -129,7 +132,8 @@
               "завершенный результат к сроку",
               "прошлое действие"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "В этом предложении важно значение ситуации, а не только форма. Верный вариант — «отрицание длительности к будущему моменту», потому что смысл фразы именно такой. В подсказках контекста: есть граница/срок «by/before»."
           }
         ]
       },
@@ -144,7 +148,8 @@
             "prompt": "By 9, I ____ (study) for three hours.",
             "accepted": [
               "will have been studying"
-            ]
+            ],
+            "explain": "Здесь нужна точная форма Future Perfect Continuous по формуле этого времени. Корректный ответ: «will have been studying». Сверь вспомогательный глагол и форму смыслового глагола. В подсказках контекста: маркер Perfect, есть граница/срок «by/before»."
           },
           {
             "id": "fpc_f_2",
@@ -153,7 +158,8 @@
             "accepted": [
               "will not have been working",
               "won't have been working"
-            ]
+            ],
+            "explain": "Здесь нужна точная форма Future Perfect Continuous по формуле этого времени. Корректный ответ: «will not have been working». Сверь вспомогательный глагол и форму смыслового глагола. В подсказках контекста: маркер Perfect, есть граница/срок «by/before»."
           },
           {
             "id": "fpc_f_3",
@@ -161,7 +167,8 @@
             "prompt": "____ they ____ (wait) long by the time we arrive?",
             "accepted": [
               "Will they have been waiting"
-            ]
+            ],
+            "explain": "Здесь нужна точная форма Future Perfect Continuous по формуле этого времени. Корректный ответ: «Will they have been waiting». Сверь вспомогательный глагол и форму смыслового глагола. В подсказках контекста: есть граница/срок «by/before»."
           },
           {
             "id": "fpc_f_4",
@@ -169,7 +176,8 @@
             "prompt": "By next month, he ____ (teach) for 20 years.",
             "accepted": [
               "will have been teaching"
-            ]
+            ],
+            "explain": "Здесь нужна точная форма Future Perfect Continuous по формуле этого времени. Корректный ответ: «will have been teaching». Сверь вспомогательный глагол и форму смыслового глагола. В подсказках контекста: маркер Perfect, есть граница/срок «by/before», есть будущая точка отсчета."
           },
           {
             "id": "fpc_f_5",
@@ -177,7 +185,8 @@
             "prompt": "By noon, we ____ (drive) for four hours.",
             "accepted": [
               "will have been driving"
-            ]
+            ],
+            "explain": "Здесь нужна точная форма Future Perfect Continuous по формуле этого времени. Корректный ответ: «will have been driving». Сверь вспомогательный глагол и форму смыслового глагола. В подсказках контекста: маркер Perfect, есть граница/срок «by/before»."
           }
         ]
       },
@@ -200,7 +209,8 @@
               0,
               1,
               3
-            ]
+            ],
+            "explain": "Для этого времени подходят именно эти маркеры: «for five years», «by next month», «by the time». Они сигнализируют нужный тип действия (факт, процесс, результат или длительность)."
           },
           {
             "id": "fpc_mark_2",
@@ -216,7 +226,8 @@
               0,
               1,
               3
-            ]
+            ],
+            "explain": "Для этого времени подходят именно эти маркеры: «for two hours», «by 6 p.m.», «how long». Они сигнализируют нужный тип действия (факт, процесс, результат или длительность)."
           }
         ]
       },
@@ -232,7 +243,8 @@
             "accepted": [
               "By July, I will have been working here for 3 years.",
               "By July, I will have been working here for three years."
-            ]
+            ],
+            "explain": "В исходной фразе нарушена форма времени или порядок слов. Исправленный вариант: «By July, I will have been working here for 3 years.». Проверь вспомогательный глагол, базовую/ing/V3-форму и позицию подлежащего. В подсказках контекста: маркер Perfect, есть граница/срок «by/before»."
           },
           {
             "id": "fpc_c_2",
@@ -240,7 +252,8 @@
             "prompt": "Will she have been work for long by then?",
             "accepted": [
               "Will she have been working for long by then?"
-            ]
+            ],
+            "explain": "В исходной фразе нарушена форма времени или порядок слов. Исправленный вариант: «Will she have been working for long by then?». Проверь вспомогательный глагол, базовую/ing/V3-форму и позицию подлежащего. В подсказках контекста: маркер Perfect, есть граница/срок «by/before»."
           },
           {
             "id": "fpc_c_3",
@@ -249,7 +262,8 @@
             "accepted": [
               "He won't have been waiting by 5.",
               "He will not have been waiting by 5."
-            ]
+            ],
+            "explain": "В исходной фразе нарушена форма времени или порядок слов. Исправленный вариант: «He won't have been waiting by 5.». Проверь вспомогательный глагол, базовую/ing/V3-форму и позицию подлежащего. В подсказках контекста: есть граница/срок «by/before»."
           },
           {
             "id": "fpc_c_4",
@@ -257,7 +271,8 @@
             "prompt": "They will have been waiting since two hours by then.",
             "accepted": [
               "They will have been waiting for two hours by then."
-            ]
+            ],
+            "explain": "В исходной фразе нарушена форма времени или порядок слов. Исправленный вариант: «They will have been waiting for two hours by then.». Проверь вспомогательный глагол, базовую/ing/V3-форму и позицию подлежащего. В подсказках контекста: маркер Perfect, есть граница/срок «by/before»."
           }
         ]
       },
@@ -275,7 +290,8 @@
               "Future Perfect Continuous"
             ],
             "correctIndex": 0,
-            "correctTenseId": "futurePerfect"
+            "correctTenseId": "futurePerfect",
+            "explain": "Здесь нужно различить близкие времена по смыслу. Правильный выбор — «Future Perfect»: именно это время лучше совпадает с контекстом фразы. В подсказках контекста: есть граница/срок «by/before»."
           },
           {
             "id": "fpc_cmp_2",
@@ -286,7 +302,8 @@
               "Future Perfect Continuous"
             ],
             "correctIndex": 1,
-            "correctTenseId": "futurePerfectContinuous"
+            "correctTenseId": "futurePerfectContinuous",
+            "explain": "Здесь нужно различить близкие времена по смыслу. Правильный выбор — «Future Perfect Continuous»: именно это время лучше совпадает с контекстом фразы. В подсказках контекста: маркер Perfect, есть граница/срок «by/before»."
           },
           {
             "id": "fpc_cmp_3",
@@ -297,7 +314,8 @@
               "Future Perfect Continuous"
             ],
             "correctIndex": 1,
-            "correctTenseId": "futurePerfectContinuous"
+            "correctTenseId": "futurePerfectContinuous",
+            "explain": "Здесь нужно различить близкие времена по смыслу. Правильный выбор — «Future Perfect Continuous»: именно это время лучше совпадает с контекстом фразы. В подсказках контекста: маркер Perfect, есть граница/срок «by/before»."
           }
         ]
       }

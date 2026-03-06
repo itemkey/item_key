@@ -253,7 +253,8 @@
               "точное прошлое время",
               "привычка"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "В этом предложении важно значение ситуации, а не только форма. Верный вариант — «длительность/процесс», потому что смысл фразы именно такой. В подсказках контекста: маркер Perfect."
           },
           {
             "id": "ppc_m_2",
@@ -264,7 +265,8 @@
               "расписание",
               "точное прошлое"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "В этом предложении важно значение ситуации, а не только форма. Верный вариант — «видимый результат», потому что смысл фразы именно такой."
           },
           {
             "id": "ppc_m_3",
@@ -275,7 +277,8 @@
               "факт навсегда",
               "процесс сейчас (Present Continuous)"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "В этом предложении важно значение ситуации, а не только форма. Верный вариант — «раздражение/критика», потому что смысл фразы именно такой."
           },
           {
             "id": "ppc_m_4",
@@ -286,7 +289,8 @@
               "когда именно (past)",
               "будущее"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "В этом предложении важно значение ситуации, а не только форма. Верный вариант — «как долго (how long)», потому что смысл фразы именно такой."
           },
           {
             "id": "ppc_m_5",
@@ -297,7 +301,8 @@
               "точное событие вчера",
               "привычка"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "В этом предложении важно значение ситуации, а не только форма. Верный вариант — «since + точка отсчёта», потому что смысл фразы именно такой. В подсказках контекста: маркер Perfect."
           },
           {
             "id": "ppc_m_6",
@@ -308,7 +313,8 @@
               "разовое прошлое",
               "расписание"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "В этом предложении важно значение ситуации, а не только форма. Верный вариант — «процесс/длительность», потому что смысл фразы именно такой."
           },
           {
             "id": "ppc_m_7",
@@ -319,7 +325,8 @@
               "вчера",
               "всегда"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "В этом предложении важно значение ситуации, а не только форма. Верный вариант — «в последнее время», потому что смысл фразы именно такой."
           },
           {
             "id": "ppc_m_8",
@@ -330,7 +337,8 @@
               "точное прошлое время",
               "привычка"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "В этом предложении важно значение ситуации, а не только форма. Верный вариант — «видимый результат (потеешь/устал)», потому что смысл фразы именно такой. В подсказках контекста: есть маркер текущего момента."
           },
           {
             "id": "ppc_m_9",
@@ -341,7 +349,8 @@
               "точное прошлое",
               "расписание"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "В этом предложении важно значение ситуации, а не только форма. Верный вариант — «процесс сейчас (долго)», потому что смысл фразы именно такой. В подсказках контекста: маркер Perfect."
           },
           {
             "id": "ppc_m_10",
@@ -352,7 +361,8 @@
               "когда именно",
               "привычка всегда"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "В этом предложении важно значение ситуации, а не только форма. Верный вариант — «в последнее время», потому что смысл фразы именно такой."
           },
           {
             "id": "ppc_m_11",
@@ -363,7 +373,8 @@
               "расписание",
               "точное прошлое"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "В этом предложении важно значение ситуации, а не только форма. Верный вариант — «длительность + раздражение», потому что смысл фразы именно такой. В подсказках контекста: маркер Perfect."
           },
           {
             "id": "ppc_m_12",
@@ -374,7 +385,8 @@
               "вчера",
               "привычка"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "В этом предложении важно значение ситуации, а не только форма. Верный вариант — «since + точка отсчёта», потому что смысл фразы именно такой. В подсказках контекста: маркер Perfect."
           }
         ]
       },
@@ -390,7 +402,8 @@
             "accepted": [
               "have been working",
               "'ve been working"
-            ]
+            ],
+            "explain": "Здесь нужна точная форма Present Perfect Continuous по формуле этого времени. Корректный ответ: «have been working». Сверь вспомогательный глагол и форму смыслового глагола."
           },
           {
             "id": "ppc_f_2",
@@ -399,7 +412,8 @@
             "accepted": [
               "has been studying",
               "'s been studying"
-            ]
+            ],
+            "explain": "Здесь нужна точная форма Present Perfect Continuous по формуле этого времени. Корректный ответ: «has been studying». Сверь вспомогательный глагол и форму смыслового глагола. В подсказках контекста: маркер Perfect."
           },
           {
             "id": "ppc_f_3",
@@ -408,7 +422,8 @@
             "accepted": [
               "haven't been sleeping",
               "have not been sleeping"
-            ]
+            ],
+            "explain": "Здесь нужна точная форма Present Perfect Continuous по формуле этого времени. Корректный ответ: «haven't been sleeping». Сверь вспомогательный глагол и форму смыслового глагола."
           },
           {
             "id": "ppc_f_4",
@@ -417,7 +432,8 @@
             "accepted": [
               "hasn't been working",
               "has not been working"
-            ]
+            ],
+            "explain": "Здесь нужна точная форма Present Perfect Continuous по формуле этого времени. Корректный ответ: «hasn't been working». Сверь вспомогательный глагол и форму смыслового глагола."
           },
           {
             "id": "ppc_f_5",
@@ -426,7 +442,8 @@
             "accepted": [
               "Have you been waiting long?",
               "Have you been waiting long"
-            ]
+            ],
+            "explain": "Здесь нужна точная форма Present Perfect Continuous по формуле этого времени. Корректный ответ: «Have you been waiting long?». Сверь вспомогательный глагол и форму смыслового глагола."
           },
           {
             "id": "ppc_f_6",
@@ -435,7 +452,8 @@
             "accepted": [
               "Has she been learning English for a year?",
               "Has she been learning English for a year"
-            ]
+            ],
+            "explain": "Здесь нужна точная форма Present Perfect Continuous по формуле этого времени. Корректный ответ: «Has she been learning English for a year?». Сверь вспомогательный глагол и форму смыслового глагола. В подсказках контекста: маркер Perfect."
           },
           {
             "id": "ppc_f_7",
@@ -444,7 +462,8 @@
             "accepted": [
               "has been raining",
               "'s been raining"
-            ]
+            ],
+            "explain": "Здесь нужна точная форма Present Perfect Continuous по формуле этого времени. Корректный ответ: «has been raining». Сверь вспомогательный глагол и форму смыслового глагола. В подсказках контекста: маркер Perfect."
           },
           {
             "id": "ppc_f_8",
@@ -455,7 +474,8 @@
               "have been travelling",
               "'ve been traveling",
               "'ve been travelling"
-            ]
+            ],
+            "explain": "Здесь нужна точная форма Present Perfect Continuous по формуле этого времени. Корректный ответ: «have been traveling». Сверь вспомогательный глагол и форму смыслового глагола. В подсказках контекста: маркер Perfect."
           },
           {
             "id": "ppc_f_9",
@@ -464,7 +484,8 @@
             "accepted": [
               "have you been living here?",
               "have you been living here"
-            ]
+            ],
+            "explain": "Здесь нужна точная форма Present Perfect Continuous по формуле этого времени. Корректный ответ: «have you been living here?». Сверь вспомогательный глагол и форму смыслового глагола."
           },
           {
             "id": "ppc_f_10",
@@ -473,7 +494,8 @@
             "accepted": [
               "have you been doing?",
               "have you been doing"
-            ]
+            ],
+            "explain": "Здесь нужна точная форма Present Perfect Continuous по формуле этого времени. Корректный ответ: «have you been doing?». Сверь вспомогательный глагол и форму смыслового глагола."
           },
           {
             "id": "ppc_f_11",
@@ -482,7 +504,8 @@
             "accepted": [
               "haven't been feeling",
               "have not been feeling"
-            ]
+            ],
+            "explain": "Здесь нужна точная форма Present Perfect Continuous по формуле этого времени. Корректный ответ: «haven't been feeling». Сверь вспомогательный глагол и форму смыслового глагола."
           },
           {
             "id": "ppc_f_12",
@@ -490,7 +513,8 @@
             "prompt": "Someone ____ ____ (use) my phone!",
             "accepted": [
               "has been using"
-            ]
+            ],
+            "explain": "Здесь нужна точная форма Present Perfect Continuous по формуле этого времени. Корректный ответ: «has been using». Сверь вспомогательный глагол и форму смыслового глагола."
           }
         ]
       },
@@ -524,7 +548,8 @@
                   "working"
                 ]
               }
-            ]
+            ],
+            "explain": "Это составная форма Present Perfect Continuous: заполняем оба элемента по формуле времени. Нужные части: «has», «been», «working»."
           },
           {
             "id": "ppc_mi_2",
@@ -550,7 +575,8 @@
                   "waiting"
                 ]
               }
-            ]
+            ],
+            "explain": "Это составная форма Present Perfect Continuous: заполняем оба элемента по формуле времени. Нужные части: «have», «been», «waiting»."
           },
           {
             "id": "ppc_mi_3",
@@ -576,7 +602,8 @@
                   "sleeping"
                 ]
               }
-            ]
+            ],
+            "explain": "Это составная форма Present Perfect Continuous: заполняем оба элемента по формуле времени. Нужные части: «haven't», «been», «sleeping»."
           },
           {
             "id": "ppc_mi_4",
@@ -601,7 +628,8 @@
                   "working"
                 ]
               }
-            ]
+            ],
+            "explain": "Это составная форма Present Perfect Continuous: заполняем оба элемента по формуле времени. Нужные части: «Have», «been», «working»."
           },
           {
             "id": "ppc_mi_5",
@@ -626,7 +654,8 @@
                   "raining"
                 ]
               }
-            ]
+            ],
+            "explain": "Это составная форма Present Perfect Continuous: заполняем оба элемента по формуле времени. Нужные части: «has», «been», «raining»."
           }
         ]
       },
@@ -650,7 +679,8 @@
               0,
               1,
               3
-            ]
+            ],
+            "explain": "Для этого времени подходят именно эти маркеры: «for», «since», «how long». Они сигнализируют нужный тип действия (факт, процесс, результат или длительность)."
           },
           {
             "id": "ppc_mark_2",
@@ -667,7 +697,8 @@
               0,
               1,
               4
-            ]
+            ],
+            "explain": "Для этого времени подходят именно эти маркеры: «lately», «recently», «these days». Они сигнализируют нужный тип действия (факт, процесс, результат или длительность)."
           },
           {
             "id": "ppc_mark_3",
@@ -684,7 +715,8 @@
               0,
               1,
               4
-            ]
+            ],
+            "explain": "Для этого времени подходят именно эти маркеры: «all day», «for ages», «since Monday». Они сигнализируют нужный тип действия (факт, процесс, результат или длительность)."
           }
         ]
       },
@@ -718,7 +750,8 @@
                 "left": "all day",
                 "right": "весь день"
               }
-            ]
+            ],
+            "explain": "Маркеры for/since/how long/lately/all day связаны с длительностью процесса до настоящего момента, поэтому это типичные сигналы Present Perfect Continuous."
           },
           {
             "id": "ppc_match_2",
@@ -744,7 +777,8 @@
                 "left": "tired/dirty/wet",
                 "right": "видимый результат"
               }
-            ]
+            ],
+            "explain": "recently, for ages, these days, since morning и видимый результат (tired/dirty/wet) показывают длительный процесс с эффектом сейчас — это логика Present Perfect Continuous."
           }
         ]
       },
@@ -760,7 +794,8 @@
             "accepted": [
               "I have been working all day.",
               "I've been working all day."
-            ]
+            ],
+            "explain": "В исходной фразе нарушена форма времени или порядок слов. Исправленный вариант: «I have been working all day.». Проверь вспомогательный глагол, базовую/ing/V3-форму и позицию подлежащего."
           },
           {
             "id": "ppc_c_2",
@@ -768,7 +803,8 @@
             "prompt": "He has been work since 9.",
             "accepted": [
               "He has been working since 9."
-            ]
+            ],
+            "explain": "В исходной фразе нарушена форма времени или порядок слов. Исправленный вариант: «He has been working since 9.». Проверь вспомогательный глагол, базовую/ing/V3-форму и позицию подлежащего. В подсказках контекста: маркер Perfect."
           },
           {
             "id": "ppc_c_3",
@@ -777,7 +813,8 @@
             "accepted": [
               "I've been waiting for two hours.",
               "I have been waiting for two hours."
-            ]
+            ],
+            "explain": "В исходной фразе нарушена форма времени или порядок слов. Исправленный вариант: «I've been waiting for two hours.». Проверь вспомогательный глагол, базовую/ing/V3-форму и позицию подлежащего. В подсказках контекста: маркер Perfect."
           },
           {
             "id": "ppc_c_4",
@@ -786,7 +823,8 @@
             "accepted": [
               "I've been working here since 2020.",
               "I have been working here since 2020."
-            ]
+            ],
+            "explain": "В исходной фразе нарушена форма времени или порядок слов. Исправленный вариант: «I've been working here since 2020.». Проверь вспомогательный глагол, базовую/ing/V3-форму и позицию подлежащего. В подсказках контекста: маркер Perfect."
           },
           {
             "id": "ppc_c_5",
@@ -795,7 +833,8 @@
             "accepted": [
               "Have you been working lately?",
               "Have you been working lately"
-            ]
+            ],
+            "explain": "В исходной фразе нарушена форма времени или порядок слов. Исправленный вариант: «Have you been working lately?». Проверь вспомогательный глагол, базовую/ing/V3-форму и позицию подлежащего."
           },
           {
             "id": "ppc_c_6",
@@ -803,7 +842,8 @@
             "prompt": "She have been studying.",
             "accepted": [
               "She has been studying."
-            ]
+            ],
+            "explain": "В исходной фразе нарушена форма времени или порядок слов. Исправленный вариант: «She has been studying.». Проверь вспомогательный глагол, базовую/ing/V3-форму и позицию подлежащего."
           },
           {
             "id": "ppc_c_7",
@@ -812,7 +852,8 @@
             "accepted": [
               "I've known him for years.",
               "I have known him for years."
-            ]
+            ],
+            "explain": "В исходной фразе нарушена форма времени или порядок слов. Исправленный вариант: «I've known him for years.». Проверь вспомогательный глагол, базовую/ing/V3-форму и позицию подлежащего. В подсказках контекста: маркер Perfect."
           },
           {
             "id": "ppc_c_8",
@@ -823,7 +864,8 @@
               "They have not been traveling.",
               "They haven't been travelling.",
               "They have not been travelling."
-            ]
+            ],
+            "explain": "В исходной фразе нарушена форма времени или порядок слов. Исправленный вариант: «They haven't been traveling.». Проверь вспомогательный глагол, базовую/ing/V3-форму и позицию подлежащего."
           },
           {
             "id": "ppc_c_9",
@@ -832,7 +874,8 @@
             "accepted": [
               "It has been raining since morning.",
               "It's been raining since morning."
-            ]
+            ],
+            "explain": "В исходной фразе нарушена форма времени или порядок слов. Исправленный вариант: «It has been raining since morning.». Проверь вспомогательный глагол, базовую/ing/V3-форму и позицию подлежащего. В подсказках контекста: маркер Perfect."
           },
           {
             "id": "ppc_c_10",
@@ -841,7 +884,8 @@
             "accepted": [
               "How long have you been waiting?",
               "How long have you been waiting"
-            ]
+            ],
+            "explain": "В исходной фразе нарушена форма времени или порядок слов. Исправленный вариант: «How long have you been waiting?». Проверь вспомогательный глагол, базовую/ing/V3-форму и позицию подлежащего."
           }
         ]
       },
@@ -859,7 +903,8 @@
               "Present Perfect Continuous"
             ],
             "correctIndex": 0,
-            "correctTenseId": "presentPerfect"
+            "correctTenseId": "presentPerfect",
+            "explain": "Здесь нужно различить близкие времена по смыслу. Правильный выбор — «Present Perfect»: именно это время лучше совпадает с контекстом фразы."
           },
           {
             "id": "ppc_cmp_2",
@@ -870,7 +915,8 @@
               "Present Perfect Continuous"
             ],
             "correctIndex": 1,
-            "correctTenseId": "presentPerfectContinuous"
+            "correctTenseId": "presentPerfectContinuous",
+            "explain": "Здесь нужно различить близкие времена по смыслу. Правильный выбор — «Present Perfect Continuous»: именно это время лучше совпадает с контекстом фразы."
           },
           {
             "id": "ppc_cmp_3",
@@ -881,7 +927,8 @@
               "Present Perfect Continuous"
             ],
             "correctIndex": 0,
-            "correctTenseId": "presentPerfect"
+            "correctTenseId": "presentPerfect",
+            "explain": "Здесь нужно различить близкие времена по смыслу. Правильный выбор — «Present Perfect»: именно это время лучше совпадает с контекстом фразы."
           },
           {
             "id": "ppc_cmp_4",
@@ -892,7 +939,8 @@
               "Present Perfect Continuous"
             ],
             "correctIndex": 1,
-            "correctTenseId": "presentPerfectContinuous"
+            "correctTenseId": "presentPerfectContinuous",
+            "explain": "Здесь нужно различить близкие времена по смыслу. Правильный выбор — «Present Perfect Continuous»: именно это время лучше совпадает с контекстом фразы."
           },
           {
             "id": "ppc_cmp_5",
@@ -903,7 +951,8 @@
               "Present Perfect Continuous"
             ],
             "correctIndex": 0,
-            "correctTenseId": "presentPerfect"
+            "correctTenseId": "presentPerfect",
+            "explain": "Здесь нужно различить близкие времена по смыслу. Правильный выбор — «Present Perfect»: именно это время лучше совпадает с контекстом фразы."
           },
           {
             "id": "ppc_cmp_6",
@@ -914,7 +963,8 @@
               "Present Perfect Continuous"
             ],
             "correctIndex": 1,
-            "correctTenseId": "presentPerfectContinuous"
+            "correctTenseId": "presentPerfectContinuous",
+            "explain": "Здесь нужно различить близкие времена по смыслу. Правильный выбор — «Present Perfect Continuous»: именно это время лучше совпадает с контекстом фразы."
           },
           {
             "id": "ppc_cmp_7",
@@ -925,7 +975,8 @@
               "Present Perfect Continuous"
             ],
             "correctIndex": 0,
-            "correctTenseId": "presentPerfect"
+            "correctTenseId": "presentPerfect",
+            "explain": "Здесь нужно различить близкие времена по смыслу. Правильный выбор — «Present Perfect»: именно это время лучше совпадает с контекстом фразы."
           },
           {
             "id": "ppc_cmp_8",
@@ -936,7 +987,8 @@
               "Present Perfect Continuous"
             ],
             "correctIndex": 1,
-            "correctTenseId": "presentPerfectContinuous"
+            "correctTenseId": "presentPerfectContinuous",
+            "explain": "Здесь нужно различить близкие времена по смыслу. Правильный выбор — «Present Perfect Continuous»: именно это время лучше совпадает с контекстом фразы. В подсказках контекста: маркер Perfect."
           },
           {
             "id": "ppc_cmp_9",
@@ -947,7 +999,8 @@
               "Present Perfect Continuous"
             ],
             "correctIndex": 0,
-            "correctTenseId": "presentPerfect"
+            "correctTenseId": "presentPerfect",
+            "explain": "Здесь нужно различить близкие времена по смыслу. Правильный выбор — «Present Perfect»: именно это время лучше совпадает с контекстом фразы. В подсказках контекста: маркер Perfect."
           },
           {
             "id": "ppc_cmp_10",
@@ -958,7 +1011,8 @@
               "Present Perfect Continuous"
             ],
             "correctIndex": 1,
-            "correctTenseId": "presentPerfectContinuous"
+            "correctTenseId": "presentPerfectContinuous",
+            "explain": "Здесь нужно различить близкие времена по смыслу. Правильный выбор — «Present Perfect Continuous»: именно это время лучше совпадает с контекстом фразы."
           }
         ]
       },
@@ -976,7 +1030,8 @@
               "Past Simple"
             ],
             "correctIndex": 1,
-            "correctTenseId": "pastSimple"
+            "correctTenseId": "pastSimple",
+            "explain": "Правильный ответ — «Past Simple». Его выбираем по смыслу и маркерам в этом предложении. В подсказках контекста: есть указание на конкретное прошлое время."
           },
           {
             "id": "ppc_cmp2_2",
@@ -987,7 +1042,8 @@
               "Past Simple"
             ],
             "correctIndex": 0,
-            "correctTenseId": "presentPerfectContinuous"
+            "correctTenseId": "presentPerfectContinuous",
+            "explain": "Правильный ответ — «Present Perfect Continuous». Его выбираем по смыслу и маркерам в этом предложении. В подсказках контекста: есть маркер текущего момента."
           },
           {
             "id": "ppc_cmp2_3",
@@ -998,7 +1054,8 @@
               "Past Simple"
             ],
             "correctIndex": 1,
-            "correctTenseId": "pastSimple"
+            "correctTenseId": "pastSimple",
+            "explain": "Правильный ответ — «Past Simple». Его выбираем по смыслу и маркерам в этом предложении. В подсказках контекста: есть указание на конкретное прошлое время, маркер Perfect."
           },
           {
             "id": "ppc_cmp2_4",
@@ -1009,7 +1066,8 @@
               "Past Simple"
             ],
             "correctIndex": 0,
-            "correctTenseId": "presentPerfectContinuous"
+            "correctTenseId": "presentPerfectContinuous",
+            "explain": "Правильный ответ — «Present Perfect Continuous». Его выбираем по смыслу и маркерам в этом предложении. В подсказках контекста: есть маркер текущего момента, маркер Perfect."
           },
           {
             "id": "ppc_cmp2_5",
@@ -1020,7 +1078,8 @@
               "Past Simple"
             ],
             "correctIndex": 1,
-            "correctTenseId": "pastSimple"
+            "correctTenseId": "pastSimple",
+            "explain": "Правильный ответ — «Past Simple». Его выбираем по смыслу и маркерам в этом предложении. В подсказках контекста: есть указание на конкретное прошлое время."
           },
           {
             "id": "ppc_cmp2_6",
@@ -1031,7 +1090,8 @@
               "Past Simple"
             ],
             "correctIndex": 0,
-            "correctTenseId": "presentPerfectContinuous"
+            "correctTenseId": "presentPerfectContinuous",
+            "explain": "Правильный ответ — «Present Perfect Continuous». Его выбираем по смыслу и маркерам в этом предложении. В подсказках контекста: маркер Perfect."
           },
           {
             "id": "ppc_cmp2_7",
@@ -1042,7 +1102,8 @@
               "Past Simple"
             ],
             "correctIndex": 1,
-            "correctTenseId": "pastSimple"
+            "correctTenseId": "pastSimple",
+            "explain": "Правильный ответ — «Past Simple». Его выбираем по смыслу и маркерам в этом предложении. В подсказках контекста: есть указание на конкретное прошлое время."
           },
           {
             "id": "ppc_cmp2_8",
@@ -1053,7 +1114,8 @@
               "Past Simple"
             ],
             "correctIndex": 0,
-            "correctTenseId": "presentPerfectContinuous"
+            "correctTenseId": "presentPerfectContinuous",
+            "explain": "Правильный ответ — «Present Perfect Continuous». Его выбираем по смыслу и маркерам в этом предложении. В подсказках контекста: маркер Perfect."
           }
         ]
       }

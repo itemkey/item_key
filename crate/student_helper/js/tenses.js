@@ -390,9 +390,49 @@
     optMixedPP.value = 'mixedPerfectPast';
     optMixedPP.textContent = 'Mixed Perfect - Past (Present Perfect + Past Simple)';
     tenseSelect.appendChild(optMixedPP);
+
+    const optMixedAll = document.createElement('option');
+    optMixedAll.value = 'mixedAll';
+    optMixedAll.textContent = 'Mixed All (12 tenses)';
+    tenseSelect.appendChild(optMixedAll);
+  }
+
+  function buildMixedAllTense(){
+    const grouped = new Map();
+    for (const meta of (REG.INDEX || [])){
+      const t = REG.byId[meta.id];
+      if (!t || !t.practice || !Array.isArray(t.practice.exercises)) continue;
+      for (const ex of t.practice.exercises){
+        const key = ex.id || 'all';
+        if (!grouped.has(key)){
+          grouped.set(key, {
+            id: key,
+            title: `${ex.title || key} - Mixed All`,
+            kind: ex.kind || 'choice',
+            items: []
+          });
+        }
+        const target = grouped.get(key);
+        if ((target.kind || 'choice') !== (ex.kind || 'choice')) continue;
+        for (const item of (ex.items || [])){
+          const cloned = Object.assign({}, item);
+          cloned.id = `mixedAll_${meta.id}_${item.id || Math.random().toString(36).slice(2)}`;
+          target.items.push(cloned);
+        }
+      }
+    }
+    return {
+      id: 'mixedAll',
+      title: 'Mixed All (12 tenses)',
+      subtitle: 'all core tenses together',
+      practice: {
+        exercises: Array.from(grouped.values())
+      }
+    };
   }
 
   function getTenseForPractice(id){
+    if (id === 'mixedAll') return buildMixedAllTense();
     const t = REG.byId[id];
     if (t) return t;
     // fallback
@@ -601,7 +641,7 @@
 
       <div class="ik-row" style="margin-top:12px; gap:10px;">
         <button class="ik-btn ik-btn--black" id="shTRunCheckNext" type="button">check</button>
-        <button class="ik-btn" id="shTRunExplainBtn" type="button" hidden>объяснение</button>
+        <button class="ik-btn" id="shTRunExplainBtn" type="button" aria-disabled="true" title="перед объяснением дайте свой ответ">объяснение</button>
       </div>
 
       <div id="shTRunExplainBox" class="sh-hint" hidden></div>
@@ -647,6 +687,35 @@
       selectedSet = new Set();
       matchState = null;
       multiInputs = null;
+    }
+
+    function setExplainAvailability(isAnswered){
+      if (!btnExplain) return;
+      btnExplain.dataset.locked = isAnswered ? '0' : '1';
+      btnExplain.setAttribute('aria-disabled', isAnswered ? 'false' : 'true');
+      btnExplain.style.opacity = isAnswered ? '' : '0.55';
+      btnExplain.title = isAnswered ? 'показать объяснение' : 'перед объяснением дайте свой ответ';
+      btnExplain.textContent = 'объяснение';
+    }
+
+    function inferQuestionTenseTitle(q){
+      if (!q) return tenseObj.title || tenseObj.id || 'unknown';
+      const item = q.item || {};
+
+      if (item.correctTenseId && REG.byId[item.correctTenseId]?.title){
+        return REG.byId[item.correctTenseId].title;
+      }
+
+      const rawId = String(item.id || '');
+      const m = rawId.match(/^mixedAll_([^_]+)_/);
+      if (m && m[1]){
+        const id = m[1];
+        const meta = (REG.INDEX || []).find(x => x.id === id);
+        if (meta?.title) return meta.title;
+        if (REG.byId[id]?.title) return REG.byId[id].title;
+      }
+
+      return tenseObj.title || tenseObj.id || 'unknown';
     }
 
     function renderChoice(q){
@@ -817,7 +886,7 @@
     function renderCurrent(){
       checked = false;
       btnCheckNext.textContent = 'check';
-      if (btnExplain){ btnExplain.hidden = true; btnExplain.textContent = 'объяснение'; }
+      setExplainAvailability(false);
       if (elExplain){ elExplain.hidden = true; elExplain.textContent = ''; }
       resetPerQuestionState();
       setFeedback('idle', 'ready', 'выбери ответ или введи ответ и нажми check');
@@ -833,22 +902,11 @@ try{
     bar.style.width = pct + '%';
   }
 } catch(_){}
-
-// hint detector (very lightweight)
 try{
   const hintEl = runWrap.querySelector('#shTRunHint');
   if (hintEl){
-    const txt = String(q.item?.prompt || '').toLowerCase();
-    const hints = [];
-    if (/(\bnow\b|at the moment|right now|currently|look!|listen!)/.test(txt)) hints.push('hint: Continuous (now / at the moment)');
-    if (/(\balways\b|\busually\b|\boften\b|\bsometimes\b|\bnever\b|every day|every week|on mondays|at weekends|in general)/.test(txt)) hints.push('hint: Simple (always / usually / every...)');
-    if (hints.length){
-      hintEl.hidden = false;
-      hintEl.textContent = hints.join(' • ');
-    } else {
-      hintEl.hidden = true;
-      hintEl.textContent = '';
-    }
+    hintEl.hidden = true;
+    hintEl.textContent = '';
   }
 } catch(_){}      elEx.textContent = `exercise: ${q.exTitle}`;
       elQ.textContent  = `question: ${idx+1}/${queue.length}`;
@@ -1136,8 +1194,11 @@ try{
 
     if (btnExplain){
       btnExplain.addEventListener('click', ()=>{
+        if (btnExplain.dataset.locked === '1') return;
         const q = queue[idx];
-        const t = (q && q.item && q.item.explain) ? String(q.item.explain) : 'объяснения пока нет';
+        const base = (q && q.item && q.item.explain) ? String(q.item.explain) : 'объяснения пока нет';
+        const tenseTitle = inferQuestionTenseTitle(q);
+        const t = `Время: ${tenseTitle}. ${base}`;
         if (!elExplain) return;
         if (elExplain.hidden){
           elExplain.textContent = t;
@@ -1156,7 +1217,7 @@ try{
         const res = checkCurrent(); // null = ещё не готово
         if (res === null) return;
         checked = true;
-        if (btnExplain) btnExplain.hidden = false;
+        setExplainAvailability(true);
         btnCheckNext.textContent = (idx === queue.length - 1) ? 'finish' : 'next';
         return;
       }

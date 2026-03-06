@@ -54,7 +54,8 @@
               "Present Continuous"
             ],
             "correctIndex": 0,
-            "correctTenseId": "presentSimple"
+            "correctTenseId": "presentSimple",
+            "explain": "В этом предложении важно значение ситуации, а не только форма. Верный вариант — «Present Simple», потому что смысл фразы именно такой. В подсказках контекста: контекст привычки/регулярности, есть граница/срок «by/before»."
           },
           {
             "id": "mpr_m_2",
@@ -65,7 +66,8 @@
               "Present Continuous"
             ],
             "correctIndex": 1,
-            "correctTenseId": "presentContinuous"
+            "correctTenseId": "presentContinuous",
+            "explain": "В этом предложении важно значение ситуации, а не только форма. Верный вариант — «Present Continuous», потому что смысл фразы именно такой. В подсказках контекста: есть маркер текущего момента."
           },
           {
             "id": "mpr_m_3",
@@ -76,7 +78,8 @@
               "Present Continuous"
             ],
             "correctIndex": 0,
-            "correctTenseId": "presentSimple"
+            "correctTenseId": "presentSimple",
+            "explain": "В этом предложении важно значение ситуации, а не только форма. Верный вариант — «Present Simple», потому что смысл фразы именно такой."
           },
           {
             "id": "mpr_m_4",
@@ -87,7 +90,8 @@
               "Present Continuous"
             ],
             "correctIndex": 1,
-            "correctTenseId": "presentContinuous"
+            "correctTenseId": "presentContinuous",
+            "explain": "В этом предложении важно значение ситуации, а не только форма. Верный вариант — «Present Continuous», потому что смысл фразы именно такой. В подсказках контекста: есть маркер текущего момента."
           },
           {
             "id": "mpr_m_5",
@@ -98,7 +102,8 @@
               "Present Continuous"
             ],
             "correctIndex": 0,
-            "correctTenseId": "presentSimple"
+            "correctTenseId": "presentSimple",
+            "explain": "В этом предложении важно значение ситуации, а не только форма. Верный вариант — «Present Simple», потому что смысл фразы именно такой."
           },
           {
             "id": "mpr_m_6",
@@ -109,7 +114,8 @@
               "Present Continuous"
             ],
             "correctIndex": 1,
-            "correctTenseId": "presentContinuous"
+            "correctTenseId": "presentContinuous",
+            "explain": "В этом предложении важно значение ситуации, а не только форма. Верный вариант — «Present Continuous», потому что смысл фразы именно такой."
           },
           {
             "id": "mpr_m_7",
@@ -120,7 +126,8 @@
               "Present Continuous"
             ],
             "correctIndex": 0,
-            "correctTenseId": "presentSimple"
+            "correctTenseId": "presentSimple",
+            "explain": "В этом предложении важно значение ситуации, а не только форма. Верный вариант — «Present Simple», потому что смысл фразы именно такой. В подсказках контекста: есть будущая точка отсчета."
           },
           {
             "id": "mpr_m_8",
@@ -131,7 +138,8 @@
               "Present Continuous"
             ],
             "correctIndex": 1,
-            "correctTenseId": "presentContinuous"
+            "correctTenseId": "presentContinuous",
+            "explain": "В этом предложении важно значение ситуации, а не только форма. Верный вариант — «Present Continuous», потому что смысл фразы именно такой."
           },
           {
             "id": "mpr_m_9",
@@ -142,7 +150,8 @@
               "Present Continuous"
             ],
             "correctIndex": 0,
-            "correctTenseId": "presentSimple"
+            "correctTenseId": "presentSimple",
+            "explain": "В этом предложении важно значение ситуации, а не только форма. Верный вариант — «Present Simple», потому что смысл фразы именно такой."
           },
           {
             "id": "mpr_m_10",
@@ -153,7 +162,8 @@
               "Present Continuous"
             ],
             "correctIndex": 1,
-            "correctTenseId": "presentContinuous"
+            "correctTenseId": "presentContinuous",
+            "explain": "В этом предложении важно значение ситуации, а не только форма. Верный вариант — «Present Continuous», потому что смысл фразы именно такой."
           },
           {
             "id": "mpr_m_11",
@@ -164,7 +174,8 @@
               "Present Continuous"
             ],
             "correctIndex": 0,
-            "correctTenseId": "presentSimple"
+            "correctTenseId": "presentSimple",
+            "explain": "В этом предложении важно значение ситуации, а не только форма. Верный вариант — «Present Simple», потому что смысл фразы именно такой. В подсказках контекста: контекст привычки/регулярности."
           },
           {
             "id": "mpr_m_12",
@@ -175,7 +186,8 @@
               "Present Continuous"
             ],
             "correctIndex": 1,
-            "correctTenseId": "presentContinuous"
+            "correctTenseId": "presentContinuous",
+            "explain": "В этом предложении важно значение ситуации, а не только форма. Верный вариант — «Present Continuous», потому что смысл фразы именно такой. В подсказках контекста: контекст привычки/регулярности."
           },
           {
             "id": "mpr_m_13",
@@ -186,7 +198,8 @@
               "Present Continuous"
             ],
             "correctIndex": 0,
-            "correctTenseId": "presentSimple"
+            "correctTenseId": "presentSimple",
+            "explain": "В этом предложении важно значение ситуации, а не только форма. Верный вариант — «Present Simple», потому что смысл фразы именно такой."
           },
           {
             "id": "mpr_m_14",
@@ -197,7 +210,8 @@
               "Present Continuous"
             ],
             "correctIndex": 1,
-            "correctTenseId": "presentContinuous"
+            "correctTenseId": "presentContinuous",
+            "explain": "В этом предложении важно значение ситуации, а не только форма. Верный вариант — «Present Continuous», потому что смысл фразы именно такой. В подсказках контекста: есть маркер текущего момента."
           },
           {
             "id": "mpr_m_15",
@@ -208,7 +222,8 @@
               "Present Continuous"
             ],
             "correctIndex": 0,
-            "correctTenseId": "presentSimple"
+            "correctTenseId": "presentSimple",
+            "explain": "В этом предложении важно значение ситуации, а не только форма. Верный вариант — «Present Simple», потому что смысл фразы именно такой."
           }
         ]
       },
@@ -236,7 +251,8 @@
                   "working"
                 ]
               }
-            ]
+            ],
+            "explain": "Это составная форма Mixed Present: заполняем оба элемента по формуле времени. Нужные части: «works», «»."
           },
           {
             "id": "mpr_f_2",
@@ -255,7 +271,8 @@
                   "playing"
                 ]
               }
-            ]
+            ],
+            "explain": "Это составная форма Mixed Present: заполняем оба элемента по формуле времени. Нужные части: «are», «playing»."
           },
           {
             "id": "mpr_f_3",
@@ -275,7 +292,8 @@
                   "drink"
                 ]
               }
-            ]
+            ],
+            "explain": "Это составная форма Mixed Present: заполняем оба элемента по формуле времени. Нужные части: «doesn't», «drink»."
           },
           {
             "id": "mpr_f_4",
@@ -294,7 +312,8 @@
                   "watching"
                 ]
               }
-            ]
+            ],
+            "explain": "Это составная форма Mixed Present: заполняем оба элемента по формуле времени. Нужные части: «Are», «watching»."
           },
           {
             "id": "mpr_f_5",
@@ -313,7 +332,8 @@
                   ""
                 ]
               }
-            ]
+            ],
+            "explain": "Это составная форма Mixed Present: заполняем оба элемента по формуле времени. Нужные части: «leaves», «»."
           },
           {
             "id": "mpr_f_6",
@@ -332,7 +352,8 @@
                   "studying"
                 ]
               }
-            ]
+            ],
+            "explain": "Это составная форма Mixed Present: заполняем оба элемента по формуле времени. Нужные части: «am», «studying»."
           }
         ]
       },
@@ -365,7 +386,8 @@
                 "left": "these days",
                 "right": "Present Continuous"
               }
-            ]
+            ],
+            "explain": "В mixed-present маркеры привычки (usually, every day) относятся к Present Simple, а маркеры процесса сейчас (now, at the moment, these days) — к Present Continuous."
           },
           {
             "id": "mpr_match_2",
@@ -391,7 +413,8 @@
                 "left": "always + V-ing (annoyed)",
                 "right": "Present Continuous"
               }
-            ]
+            ],
+            "explain": "on Mondays и always (habit) идут в Present Simple, а right now, Look! и always + V-ing (жалоба/раздражение) — в Present Continuous; именно это и нужно было сопоставить."
           }
         ]
       },
@@ -406,7 +429,8 @@
             "prompt": "She work now.",
             "accepted": [
               "She is working now."
-            ]
+            ],
+            "explain": "В исходной фразе нарушена форма времени или порядок слов. Исправленный вариант: «She is working now.». Проверь вспомогательный глагол, базовую/ing/V3-форму и позицию подлежащего. В подсказках контекста: есть маркер текущего момента."
           },
           {
             "id": "mpr_c_2",
@@ -414,7 +438,8 @@
             "prompt": "I am go to school every day.",
             "accepted": [
               "I go to school every day."
-            ]
+            ],
+            "explain": "В исходной фразе нарушена форма времени или порядок слов. Исправленный вариант: «I go to school every day.». Проверь вспомогательный глагол, базовую/ing/V3-форму и позицию подлежащего. В подсказках контекста: контекст привычки/регулярности."
           },
           {
             "id": "mpr_c_3",
@@ -422,7 +447,8 @@
             "prompt": "Does he working today?",
             "accepted": [
               "Is he working today?"
-            ]
+            ],
+            "explain": "В исходной фразе нарушена форма времени или порядок слов. Исправленный вариант: «Is he working today?». Проверь вспомогательный глагол, базовую/ing/V3-форму и позицию подлежащего."
           },
           {
             "id": "mpr_c_4",
@@ -430,7 +456,8 @@
             "prompt": "He is always forget his keys!",
             "accepted": [
               "He is always forgetting his keys!"
-            ]
+            ],
+            "explain": "В исходной фразе нарушена форма времени или порядок слов. Исправленный вариант: «He is always forgetting his keys!». Проверь вспомогательный глагол, базовую/ing/V3-форму и позицию подлежащего. В подсказках контекста: контекст привычки/регулярности."
           },
           {
             "id": "mpr_c_5",
@@ -438,7 +465,8 @@
             "prompt": "I knowing the answer.",
             "accepted": [
               "I know the answer."
-            ]
+            ],
+            "explain": "В исходной фразе нарушена форма времени или порядок слов. Исправленный вариант: «I know the answer.». Проверь вспомогательный глагол, базовую/ing/V3-форму и позицию подлежащего."
           },
           {
             "id": "mpr_c_6",
@@ -446,7 +474,8 @@
             "prompt": "We are play football on Sundays.",
             "accepted": [
               "We play football on Sundays."
-            ]
+            ],
+            "explain": "В исходной фразе нарушена форма времени или порядок слов. Исправленный вариант: «We play football on Sundays.». Проверь вспомогательный глагол, базовую/ing/V3-форму и позицию подлежащего."
           },
           {
             "id": "mpr_c_7",
@@ -455,7 +484,8 @@
             "accepted": [
               "She isn't studying now.",
               "She is not studying now."
-            ]
+            ],
+            "explain": "В исходной фразе нарушена форма времени или порядок слов. Исправленный вариант: «She isn't studying now.». Проверь вспомогательный глагол, базовую/ing/V3-форму и позицию подлежащего. В подсказках контекста: есть маркер текущего момента."
           },
           {
             "id": "mpr_c_8",
@@ -463,7 +493,8 @@
             "prompt": "Are you watch TV every day?",
             "accepted": [
               "Do you watch TV every day?"
-            ]
+            ],
+            "explain": "В исходной фразе нарушена форма времени или порядок слов. Исправленный вариант: «Do you watch TV every day?». Проверь вспомогательный глагол, базовую/ing/V3-форму и позицию подлежащего. В подсказках контекста: контекст привычки/регулярности."
           }
         ]
       },
@@ -480,7 +511,8 @@
               "привычка/факт",
               "процесс сейчас"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "Здесь нужно различить близкие времена по смыслу. Правильный выбор — «привычка/факт»: именно это время лучше совпадает с контекстом фразы."
           },
           {
             "id": "mpr_cmp_2",
@@ -490,7 +522,8 @@
               "привычка/факт",
               "временно/сейчас"
             ],
-            "correctIndex": 1
+            "correctIndex": 1,
+            "explain": "Здесь нужно различить близкие времена по смыслу. Правильный выбор — «временно/сейчас»: именно это время лучше совпадает с контекстом фразы."
           },
           {
             "id": "mpr_cmp_3",
@@ -500,7 +533,8 @@
               "нейтральная привычка",
               "раздражение"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "Здесь нужно различить близкие времена по смыслу. Правильный выбор — «нейтральная привычка»: именно это время лучше совпадает с контекстом фразы. В подсказках контекста: контекст привычки/регулярности."
           },
           {
             "id": "mpr_cmp_4",
@@ -510,7 +544,8 @@
               "нейтральная привычка",
               "раздражение"
             ],
-            "correctIndex": 1
+            "correctIndex": 1,
+            "explain": "Здесь нужно различить близкие времена по смыслу. Правильный выбор — «раздражение»: именно это время лучше совпадает с контекстом фразы. В подсказках контекста: контекст привычки/регулярности."
           },
           {
             "id": "mpr_cmp_5",
@@ -520,7 +555,8 @@
               "расписание (Simple)",
               "процесс"
             ],
-            "correctIndex": 0
+            "correctIndex": 0,
+            "explain": "Здесь нужно различить близкие времена по смыслу. Правильный выбор — «расписание (Simple)»: именно это время лучше совпадает с контекстом фразы. В подсказках контекста: есть будущая точка отсчета."
           }
         ]
       }
