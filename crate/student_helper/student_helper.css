@@ -266,6 +266,32 @@ body {
     .ik-itemline b{ font-weight:900; }
     .ik-mini{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
 
+    .dict-view-wrap{
+      max-height: 520px;
+      overflow: auto;
+      border: 2px solid #000;
+      background: #fff;
+    }
+    .dict-view-sticky{
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background: #fff;
+      padding: 10px;
+      border-bottom: 1px solid rgba(0,0,0,0.14);
+    }
+    .dict-view-sticky .ik-input{
+      width: 100%;
+      min-width: 0;
+      box-sizing: border-box;
+    }
+    .ik-list.dict-view-list{
+      border: 0;
+      margin: 0;
+      max-height: none;
+      overflow: visible;
+    }
+
     @media (prefers-reduced-motion: no-preference){
       .ik-shake{ animation: ikshake .28s linear; }
       @keyframes ikshake{

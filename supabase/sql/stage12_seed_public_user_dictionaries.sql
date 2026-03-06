@@ -1666,5 +1666,141 @@ begin
     set current_version_id = v_ver_id, updated_at = now()
     where id = v_dict_id;
   end if;
+
+  -- =============================
+  -- Destination B1 Unit 18
+  -- =============================
+  v_title := 'Destination B1 Unit 18';
+  v_title_key := public.ik_title_key(v_title);
+
+  insert into public.ik_public_dicts(dict_type, title, title_key, owner_id, rating_enabled)
+  values ('user', v_title, v_title_key, v_owner, true)
+  on conflict (dict_type, title_key)
+  do update set title = excluded.title, owner_id = excluded.owner_id, rating_enabled = true, updated_at = now();
+
+  select d.id, d.current_version_id
+  into v_dict_id, v_current_ver
+  from public.ik_public_dicts d
+  where d.dict_type = 'user' and d.title_key = v_title_key
+  limit 1;
+
+  if v_current_ver is null then
+    insert into public.ik_public_dict_versions(dict_id, version, status, created_by)
+    values (v_dict_id, 1, 'published', v_owner)
+    returning id into v_ver_id;
+
+    v_payload := $json$
+{
+  "schema": "student_helper_dictionary_section",
+  "schemaVersion": 1,
+  "exportedAt": "2026-03-05T00:00:00Z",
+  "section": "Destination B1 Unit 18",
+  "words": [
+    {"en": "artificial", "ru": "искусственный"},
+    {"en": "automatic", "ru": "автоматический"},
+    {"en": "complicated", "ru": "сложный"},
+    {"en": "decrease", "ru": "уменьшать(ся)"},
+    {"en": "digital", "ru": "цифровой"},
+    {"en": "discover", "ru": "открывать"},
+    {"en": "effect", "ru": "эффект; влияние"},
+    {"en": "equipment", "ru": "оборудование"},
+    {"en": "estimate", "ru": "оценивать; оценка"},
+    {"en": "exact", "ru": "точный"},
+    {"en": "experiment", "ru": "эксперимент; экспериментировать"},
+    {"en": "gadget", "ru": "гаджет"},
+    {"en": "hardware", "ru": "аппаратное обеспечение; железо"},
+    {"en": "invent", "ru": "изобретать"},
+    {"en": "involve", "ru": "вовлекать; включать в себя"},
+    {"en": "laboratory", "ru": "лаборатория"},
+    {"en": "lack", "ru": "нехватка; испытывать недостаток"},
+    {"en": "laptop", "ru": "ноутбук"},
+    {"en": "machine", "ru": "машина; механизм"},
+    {"en": "maximum", "ru": "максимальный; максимум"},
+    {"en": "minimum", "ru": "минимальный; минимум"},
+    {"en": "operate", "ru": "управлять; работать (о машине)"},
+    {"en": "plastic", "ru": "пластик; пластиковый"},
+    {"en": "program", "ru": "программа; программировать"},
+    {"en": "research", "ru": "исследование; исследовать"},
+    {"en": "run", "ru": "работать; запуск"},
+    {"en": "screen", "ru": "экран"},
+    {"en": "software", "ru": "программное обеспечение"},
+    {"en": "sudden", "ru": "внезапный"},
+    {"en": "technology", "ru": "технология"},
+    {"en": "unique", "ru": "уникальный"},
+
+    {"en": "break down", "ru": "сломаться"},
+    {"en": "come across", "ru": "наткнуться (случайно)"},
+    {"en": "find out", "ru": "узнать; выяснить"},
+    {"en": "make up", "ru": "выдумать; придумать"},
+    {"en": "pull off", "ru": "оторвать"},
+    {"en": "throw away", "ru": "выбросить"},
+    {"en": "turn off", "ru": "выключить"},
+    {"en": "turn on", "ru": "включить"},
+
+    {"en": "at last", "ru": "наконец"},
+    {"en": "by chance", "ru": "случайно"},
+    {"en": "in my opinion", "ru": "по моему мнению"},
+    {"en": "in the end", "ru": "в конце концов"},
+    {"en": "in the future", "ru": "в будущем"},
+    {"en": "out of order", "ru": "не в порядке; неисправен; не по порядку"},
+
+    {"en": "boil", "ru": "кипятить(ся)"},
+    {"en": "boiler", "ru": "бойлер; котёл"},
+    {"en": "boiling", "ru": "кипящий; кипячение"},
+    {"en": "chemist", "ru": "химик"},
+    {"en": "chemical", "ru": "химический; химикат"},
+    {"en": "chemistry", "ru": "химия"},
+    {"en": "conclude", "ru": "заключать; делать вывод"},
+    {"en": "conclusion", "ru": "вывод; заключение"},
+    {"en": "examine", "ru": "осматривать; исследовать; экзаменовать"},
+    {"en": "exam (examination)", "ru": "экзамен; обследование"},
+    {"en": "examiner", "ru": "экзаменатор; эксперт"},
+    {"en": "fascinate", "ru": "увлекать; очаровывать"},
+    {"en": "fascination", "ru": "очарование; увлечение"},
+    {"en": "fascinating", "ru": "увлекательный; захватывающий"},
+    {"en": "history", "ru": "история"},
+    {"en": "historic", "ru": "исторический (важный)"},
+    {"en": "historian", "ru": "историк"},
+    {"en": "identify", "ru": "идентифицировать; опознавать"},
+    {"en": "identity", "ru": "личность; идентичность"},
+    {"en": "identical", "ru": "идентичный; одинаковый"},
+    {"en": "long", "ru": "длинный"},
+    {"en": "length", "ru": "длина"},
+    {"en": "measure", "ru": "измерять"},
+    {"en": "measurement", "ru": "измерение"},
+    {"en": "science", "ru": "наука"},
+    {"en": "scientist", "ru": "учёный"},
+
+    {"en": "different from/to", "ru": "отличный от"},
+    {"en": "full of", "ru": "полный (чего-то)"},
+    {"en": "begin sth with", "ru": "начинать что-то с"},
+    {"en": "connect sth to/with", "ru": "соединять что-то с"},
+    {"en": "disconnect sth from", "ru": "отсоединять что-то от"},
+    {"en": "fill sth with", "ru": "наполнять что-то чем-то"},
+    {"en": "result in", "ru": "приводить к"},
+    {"en": "a difference between", "ru": "разница между"},
+    {"en": "an idea about", "ru": "идея о"},
+    {"en": "a number of", "ru": "некоторое количество"},
+    {"en": "a reason for", "ru": "причина (чего-то)"},
+    {"en": "a type of", "ru": "тип (чего-то)"}
+  ]
+}
+    $json$::jsonb;
+
+    insert into public.ik_public_dict_words(dict_version_id, en, ru, en_key, ru_key, pair_key)
+    select
+      v_ver_id,
+      btrim(coalesce(w->>'en','')),
+      btrim(coalesce(w->>'ru','')),
+      public.ik_norm_space_lower(coalesce(w->>'en','')),
+      public.ik_norm_space_lower(coalesce(w->>'ru','')),
+      public.ik_norm_space_lower(coalesce(w->>'en','')) || '|' || public.ik_norm_space_lower(coalesce(w->>'ru',''))
+    from jsonb_array_elements(coalesce(v_payload->'words','[]'::jsonb)) w
+    where btrim(coalesce(w->>'en','')) <> '' and btrim(coalesce(w->>'ru','')) <> '';
+
+    update public.ik_public_dicts
+    set current_version_id = v_ver_id, updated_at = now()
+    where id = v_dict_id;
+  end if;
 end;
 $stage12$;

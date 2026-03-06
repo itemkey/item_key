@@ -300,9 +300,11 @@
 
             <div id="dictSubtabsWrap" hidden>
             <div class="ik-tabs" role="tablist" aria-label="Режимы dictionary">
+              <button class="ik-btn" id="dictCardsChooseSection" type="button" title="Выбрать раздел">разделы</button>
+              <button class="ik-tab" id="dict-tab-view" role="tab" aria-selected="false" aria-controls="dict-panel-view" type="button">просмотр</button>
               <button class="ik-tab" id="dict-tab-cards" role="tab" aria-selected="true" aria-controls="dict-panel-cards" type="button">cards</button>
+              <button class="ik-tab" id="dict-tab-learn" role="tab" aria-selected="false" aria-controls="dict-panel-learn" type="button">learn</button>
               <button class="ik-tab" id="dict-tab-quiz" role="tab" aria-selected="false" aria-controls="dict-panel-quiz" type="button">practice</button>
-                            <button class="ik-tab" id="dict-tab-learn" role="tab" aria-selected="false" aria-controls="dict-panel-learn" type="button">learn</button>
 <button class="ik-tab" id="dict-tab-builder" role="tab" aria-selected="false" aria-controls="dict-panel-builder" type="button">constructor</button>
             </div>
 
@@ -331,7 +333,6 @@
 
                   <label class="ik-label" for="dictSectionCards">section</label>
                   <select class="ik-select" id="dictSectionCards" style="min-width: 260px;"></select>
-                  <button class="ik-btn" id="dictCardsChooseSection" type="button" title="Выбрать раздел">разделы</button>
                 </div>
 
                 <div class="ik-divider"></div>
@@ -565,6 +566,29 @@
                 </div>
 
                 <p class="ik-footnote">слово считается выученным в сессии, если 2 раза подряд ответил верно без подсказок и между ответами было хотя бы 10 заданий.</p>
+              </section>
+            </div>
+
+            <!-- VIEW -->
+            <div id="dict-panel-view" role="tabpanel" aria-labelledby="dict-tab-view" hidden>
+              <section class="ik-ex" aria-label="Просмотр словаря">
+                <p class="ik-title">просмотр слов</p>
+
+                <div class="ik-row">
+                  <label class="ik-label" for="dictSectionView">section</label>
+                  <select class="ik-select" id="dictSectionView" style="min-width: 260px;"></select>
+                  <span class="ik-spacer" aria-hidden="true"></span>
+                  <span class="ik-badge" id="dictViewMeta">0</span>
+                </div>
+
+                <div class="ik-divider"></div>
+
+                <div class="dict-view-wrap">
+                  <div class="dict-view-sticky">
+                    <input class="ik-input" id="dictViewSearch" type="text" autocomplete="off" spellcheck="false" placeholder="поиск по EN/RU..." />
+                  </div>
+                  <ul class="ik-list dict-view-list" id="dictViewList" aria-label="Просмотр слов"></ul>
+                </div>
               </section>
             </div>
 
