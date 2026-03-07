@@ -2217,6 +2217,8 @@ body.focus-mode .n-col-right{
     const ONOI_CLOUD_FALLBACK_TABLE = 'sh_user_state';
     const ONOI_CLOUD_KEY = 'snapshot';
     const ONOI_LOCAL_SNAP_PREFIX = 'onoi_notes_local_snapshot_v2__';
+    const ONOI_SUPA_PENDING_PUSH_PREFIX = 'onoi_notes_supa_pending_push_v1__';
+    const ONOI_ASSET_URI_PREFIX = 'onoi-asset://';
 
     function lsGet(key){
       try{ return localStorage.getItem(key); }catch(e){ return null; }
@@ -2336,6 +2338,144 @@ body.focus-mode .n-col-right{
       }
     }
 
+    function pendingPushKey(ownerId){
+      return ONOI_SUPA_PENDING_PUSH_PREFIX + String(ownerId || 'guest');
+    }
+
+    function markPendingSupaPush(ownerId, pending){
+      try{
+        const key = pendingPushKey(ownerId);
+        if(pending) localStorage.setItem(key, String(Date.now()));
+        else localStorage.removeItem(key);
+      }catch(_){ }
+    }
+
+    function hasPendingSupaPush(ownerId){
+      try{
+        return !!localStorage.getItem(pendingPushKey(ownerId));
+      }catch(_){
+        return false;
+      }
+    }
+
+    function assetHash(input){
+      const s = String(input || '');
+      let h = 2166136261;
+      for(let i = 0; i < s.length; i += 1){
+        h ^= s.charCodeAt(i);
+        h = Math.imul(h, 16777619);
+      }
+      return (h >>> 0).toString(36);
+    }
+
+    function normalizeSnapshotShape(obj){
+      const snap = obj && typeof obj === 'object' ? obj : {};
+      const cats = Array.isArray(snap.cats) ? snap.cats : [];
+      const notes = Array.isArray(snap.notes) ? snap.notes : [];
+      const rawAssets = Array.isArray(snap.assets) ? snap.assets : [];
+      const assets = rawAssets.map((a) => ({
+        id: String(a && a.id || '').trim(),
+        dataUrl: String(a && (a.dataUrl || a.src) || '').trim()
+      })).filter((a) => a.id && a.dataUrl.startsWith('data:'));
+      return {
+        version: Number(snap.version || 1),
+        exportedAt: String(snap.exportedAt || new Date().toISOString()),
+        cats,
+        notes,
+        assets
+      };
+    }
+
+    function snapshotPackAssets(rawSnap){
+      const snap = normalizeSnapshotShape(rawSnap);
+      const byData = new Map();
+      const byId = new Map();
+      const outAssets = [];
+
+      const addAsset = (dataUrl) => {
+        const src = String(dataUrl || '').trim();
+        if(!src.startsWith('data:')) return null;
+        const known = byData.get(src);
+        if(known) return known;
+        let id = 'a_' + assetHash(src);
+        while(byId.has(id)) id = id + '_x';
+        const row = { id, dataUrl: src };
+        byData.set(src, row);
+        byId.set(id, row);
+        outAssets.push(row);
+        return row;
+      };
+
+      snap.assets.forEach((a) => {
+        const src = String(a && a.dataUrl || '').trim();
+        if(!src.startsWith('data:')) return;
+        const known = byData.get(src);
+        if(known) return;
+        let id = String(a && a.id || '').trim() || ('a_' + assetHash(src));
+        while(byId.has(id)) id = id + '_x';
+        const row = { id, dataUrl: src };
+        byData.set(src, row);
+        byId.set(id, row);
+        outAssets.push(row);
+      });
+
+      const outNotes = snap.notes.map((note) => {
+        const html = String(note && note.html || '');
+        if(!html || html.indexOf('<img') < 0) return { ...note, html };
+        const box = document.createElement('div');
+        box.innerHTML = html;
+        box.querySelectorAll('img').forEach((img) => {
+          const src = String(img.getAttribute('src') || '').trim();
+          if(!src) return;
+          if(src.startsWith(ONOI_ASSET_URI_PREFIX)) return;
+          if(!src.startsWith('data:')) return;
+          const row = addAsset(src);
+          if(!row) return;
+          img.setAttribute('src', `${ONOI_ASSET_URI_PREFIX}${row.id}`);
+        });
+        return { ...note, html: box.innerHTML };
+      });
+
+      return {
+        version: snap.version,
+        exportedAt: snap.exportedAt,
+        cats: snap.cats,
+        notes: outNotes,
+        assets: outAssets
+      };
+    }
+
+    function snapshotHydrateAssets(rawSnap){
+      const snap = normalizeSnapshotShape(rawSnap);
+      const byId = new Map();
+      snap.assets.forEach((a) => {
+        byId.set(String(a.id), String(a.dataUrl));
+      });
+
+      const outNotes = snap.notes.map((note) => {
+        const html = String(note && note.html || '');
+        if(!html || html.indexOf('<img') < 0) return { ...note, html };
+        const box = document.createElement('div');
+        box.innerHTML = html;
+        box.querySelectorAll('img').forEach((img) => {
+          const src = String(img.getAttribute('src') || '').trim();
+          if(!src.startsWith(ONOI_ASSET_URI_PREFIX)) return;
+          const id = src.slice(ONOI_ASSET_URI_PREFIX.length).trim();
+          const dataUrl = byId.get(id);
+          if(dataUrl) img.setAttribute('src', dataUrl);
+        });
+        return { ...note, html: box.innerHTML };
+      });
+
+      return {
+        version: snap.version,
+        exportedAt: snap.exportedAt,
+        cats: snap.cats,
+        notes: outNotes,
+        assets: snap.assets
+      };
+    }
+
     // ========= state =========
     const state = {
       cats: [],
@@ -2373,7 +2513,9 @@ body.focus-mode .n-col-right{
         enabled: false,
         isAdmin: false,
         email: '',
-        table: ONOI_CLOUD_TABLE
+        table: ONOI_CLOUD_TABLE,
+        pushInFlight: false,
+        pushRetryTimer: null
       },
 
       diag: {
@@ -3123,7 +3265,8 @@ tgl.addEventListener('click', (e) => {
           state.cats.forEach(c => st[STORE.cats].put(c));
           state.notes.forEach(n => st[STORE.notes].put(n));
         });
-        saveLocalSnapshot(state.supa.userId || getStoredOwner() || 'guest', currentDBSnapshot());
+        const ownerId = state.supa.userId || getStoredOwner() || 'guest';
+        saveLocalSnapshot(ownerId, currentDBSnapshot());
         state.lastSavedAt = now();
         state.dirty = false;
         setSaveStatus('saved');
@@ -3137,17 +3280,25 @@ tgl.addEventListener('click', (e) => {
     function schedulePersist(delay=450){
       state.dirty = true;
       setSaveStatus('dirty');
+      try{
+        const ownerId = state.supa.userId || getStoredOwner() || 'guest';
+        saveLocalSnapshot(ownerId, currentDBSnapshot());
+      }catch(_){ }
       if(state.saveTimer) clearTimeout(state.saveTimer);
       state.saveTimer = setTimeout(async () => {
         await persistAll();
         // push private cloud after local save
         if(state.supa.enabled){
           try{
+            markPendingSupaPush(state.supa.userId, true);
             setSync('warn', 'syncing');
             await supaPushSnapshot();
+            markPendingSupaPush(state.supa.userId, false);
             setSync('ok', 'private');
           }catch(e){
             pushDiag('error', 'supaPushSnapshot', e);
+            markPendingSupaPush(state.supa.userId, true);
+            scheduleSupaPushRetry(2200);
             setSync('bad', 'private err', errText(e));
           }
         }
@@ -4166,12 +4317,12 @@ async function createNote(){
 
     // ========= export/import =========
     function currentDBSnapshot(){
-      return {
+      return snapshotPackAssets({
         version: 1,
         exportedAt: new Date().toISOString(),
         cats: state.cats,
         notes: state.notes
-      };
+      });
     }
 
     function downloadJSON(obj, filename){
@@ -4188,13 +4339,14 @@ async function createNote(){
 
     async function importJSON(obj, opts){
       if(!obj || typeof obj !== 'object') throw new Error('Bad JSON');
-      if(!Array.isArray(obj.cats) || !Array.isArray(obj.notes)) throw new Error('No cats/notes arrays');
+      const hydrated = snapshotHydrateAssets(obj);
+      if(!Array.isArray(hydrated.cats) || !Array.isArray(hydrated.notes)) throw new Error('No cats/notes arrays');
       opts = opts || {};
       const doRender = (opts.render !== false);
 
 
       // very light validation
-      const cats = obj.cats.map(c => ({
+      const cats = hydrated.cats.map(c => ({
         id: String(c.id || uid()),
         parentId: c.parentId ? String(c.parentId) : null,
         name: String(c.name || '-'),
@@ -4202,7 +4354,7 @@ async function createNote(){
         updatedAt: Number(c.updatedAt || now())
       }));
       const catIds = new Set(cats.map(c => c.id));
-      const notes = obj.notes.map(n => ({
+      const notes = hydrated.notes.map(n => ({
         id: String(n.id || uid()),
         catId: catIds.has(String(n.catId)) ? String(n.catId) : (cats[0]?.id || null),
         title: String(n.title || '-'),
@@ -4369,6 +4521,39 @@ async function createNote(){
       if(error) throw error;
     }
 
+    function scheduleSupaPushRetry(delayMs){
+      if(!state.supa.enabled || !state.supa.userId) return;
+      if(state.supa.pushRetryTimer){
+        clearTimeout(state.supa.pushRetryTimer);
+        state.supa.pushRetryTimer = null;
+      }
+      state.supa.pushRetryTimer = setTimeout(() => {
+        state.supa.pushRetryTimer = null;
+        void flushPendingSupaPush('retry').catch(() => {});
+      }, Math.max(300, Number(delayMs || 1200)));
+    }
+
+    async function flushPendingSupaPush(reason){
+      if(!state.supa.enabled || !state.supa.userId) return false;
+      if(state.supa.pushInFlight) return false;
+      if(!hasPendingSupaPush(state.supa.userId)) return false;
+      state.supa.pushInFlight = true;
+      try{
+        setSync('warn', 'syncing', reason || 'pending');
+        await supaPushSnapshot();
+        markPendingSupaPush(state.supa.userId, false);
+        setSync('ok', 'private');
+        return true;
+      }catch(e){
+        pushDiag('error', 'flushPendingSupaPush', e, { reason: String(reason || '') });
+        setSync('bad', 'private err', errText(e));
+        scheduleSupaPushRetry(2500);
+        return false;
+      }finally{
+        state.supa.pushInFlight = false;
+      }
+    }
+
     // ========= cloud sync =========
     function cloudHeaders(){
       const h = { 'Accept': 'application/vnd.github+json' };
@@ -4460,6 +4645,7 @@ async function createNote(){
       const out = currentDBSnapshot();
       const mapCats = new Map();
       const mapNotes = new Map();
+      const mapAssets = new Map();
 
       function upsertCat(c){
         const cur = mapCats.get(c.id);
@@ -4469,11 +4655,20 @@ async function createNote(){
         const cur = mapNotes.get(n.id);
         if(!cur || (Number(n.updatedAt||0) > Number(cur.updatedAt||0))) mapNotes.set(n.id, n);
       }
+      function upsertAsset(a){
+        const id = String(a && a.id || '').trim();
+        const dataUrl = String(a && (a.dataUrl || a.src) || '').trim();
+        if(!id || !dataUrl.startsWith('data:')) return;
+        if(!mapAssets.has(id)) mapAssets.set(id, { id, dataUrl });
+      }
 
       (localSnap?.cats || []).forEach(upsertCat);
       (remoteSnap?.cats || []).forEach(upsertCat);
       (localSnap?.notes || []).forEach(upsertNote);
       (remoteSnap?.notes || []).forEach(upsertNote);
+      (localSnap?.assets || []).forEach(upsertAsset);
+      (remoteSnap?.assets || []).forEach(upsertAsset);
+      (out?.assets || []).forEach(upsertAsset);
 
       out.cats = [...mapCats.values()];
       out.notes = [...mapNotes.values()];
@@ -4482,6 +4677,7 @@ async function createNote(){
       const catIds = new Set(out.cats.map(c => c.id));
       const fallbackCat = out.cats[0]?.id || null;
       out.notes = out.notes.map(n => catIds.has(n.catId) ? n : ({...n, catId: fallbackCat}));
+      out.assets = [...mapAssets.values()];
 
       return out;
     }
@@ -4606,6 +4802,34 @@ async function createNote(){
       updatedText.textContent = 'updated: ' + fmtTime(note.updatedAt);
       renderNotesList();
       schedulePersist();
+    });
+
+    window.addEventListener('online', () => {
+      void flushPendingSupaPush('online').catch(() => {});
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      if(document.visibilityState === 'hidden'){
+        if(state.saveTimer){
+          clearTimeout(state.saveTimer);
+          state.saveTimer = null;
+        }
+        void persistAll().catch(() => {});
+      }else{
+        void flushPendingSupaPush('visible').catch(() => {});
+      }
+    });
+
+    window.addEventListener('beforeunload', (ev) => {
+      const hasPending = !!(state.supa.enabled && state.supa.userId && hasPendingSupaPush(state.supa.userId));
+      if(state.dirty || state.saving || hasPending){
+        try{
+          const ownerId = state.supa.userId || getStoredOwner() || 'guest';
+          saveLocalSnapshot(ownerId, currentDBSnapshot());
+        }catch(_){ }
+        ev.preventDefault();
+        ev.returnValue = '';
+      }
     });
 
     document.querySelectorAll('.tool[data-cmd]').forEach(btn => {
@@ -5100,12 +5324,18 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
 
       // ensure first snapshot exists in cloud
       try{
+        markPendingSupaPush(state.supa.userId, true);
         await supaPushSnapshot();
+        markPendingSupaPush(state.supa.userId, false);
         markBoot('persist-cloud');
       }catch(e){
         pushDiag('error', 'supaPushSnapshot@boot', e);
+        markPendingSupaPush(state.supa.userId, true);
+        scheduleSupaPushRetry(2200);
         setSync('bad', 'private err', errText(e));
       }
+
+      void flushPendingSupaPush('boot').catch(() => {});
 
       // set sync indicator
       setSync('ok', 'private');

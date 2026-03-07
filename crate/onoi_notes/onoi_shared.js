@@ -1,5 +1,7 @@
 const SCOPE_KEY = 'onoi_notes_scope_v1';
 const CHAT_PREFS_KEY = 'onoi_notes_shared_chat_prefs_v1';
+const SHARED_OUTBOX_KEY_PREFIX = 'onoi_notes_shared_outbox_v1__';
+const SHARED_DRAFT_KEY_PREFIX = 'onoi_notes_shared_draft_v1__';
 
 function escapeHtml(str) {
   return String(str ?? '')
@@ -35,6 +37,7 @@ class OnoiSharedApp {
       activeCategoryId: null,
       activeSectionId: null,
       activeRole: '',
+      sendingOutbox: false,
       modalSubmit: null,
       modalMounted: null
     };
@@ -74,6 +77,15 @@ class OnoiSharedApp {
     this.bindSharedActions();
     this.bindModal();
     this.applyChatPrefs();
+
+    window.addEventListener('online', () => {
+      void this.flushOutbox({ quiet: true }).catch(() => {});
+    });
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        void this.flushOutbox({ quiet: true }).catch(() => {});
+      }
+    });
 
     try {
       if (window.IKSupabase && typeof window.IKSupabase.getClient === 'function') {
@@ -143,6 +155,9 @@ class OnoiSharedApp {
           event.preventDefault();
           void this.sendMessage().catch((error) => this.notifyError(error));
         }
+      });
+      this.els.sharedComposer.addEventListener('input', () => {
+        this.saveComposerDraft();
       });
     }
 
@@ -266,6 +281,7 @@ class OnoiSharedApp {
     if (next === 'shared') {
       await this.loadCategories();
       await this.loadFriends();
+      await this.flushOutbox({ quiet: true });
     } else {
       await this.unsubscribeSection();
     }
@@ -288,6 +304,139 @@ class OnoiSharedApp {
     const { data, error } = await this.client.rpc(fn, args || {});
     if (error) throw error;
     return data;
+  }
+
+  ownerStorageId() {
+    return String((this.user && this.user.id) || 'guest');
+  }
+
+  outboxKey() {
+    return `${SHARED_OUTBOX_KEY_PREFIX}${this.ownerStorageId()}`;
+  }
+
+  draftKey(sectionId) {
+    return `${SHARED_DRAFT_KEY_PREFIX}${this.ownerStorageId()}__${String(sectionId || 'none')}`;
+  }
+
+  readOutbox() {
+    try {
+      const raw = localStorage.getItem(this.outboxKey());
+      const arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr : [];
+    } catch (_) {
+      return [];
+    }
+  }
+
+  writeOutbox(items) {
+    try {
+      localStorage.setItem(this.outboxKey(), JSON.stringify(Array.isArray(items) ? items : []));
+    } catch (_) {}
+  }
+
+  enqueueMessage(message) {
+    const items = this.readOutbox();
+    items.push(message);
+    this.writeOutbox(items);
+  }
+
+  saveComposerDraft() {
+    if (!this.els.sharedComposer || !this.state.activeSectionId) return;
+    const value = String(this.els.sharedComposer.value || '');
+    try {
+      if (value.trim()) localStorage.setItem(this.draftKey(this.state.activeSectionId), value);
+      else localStorage.removeItem(this.draftKey(this.state.activeSectionId));
+    } catch (_) {}
+  }
+
+  loadComposerDraft() {
+    if (!this.els.sharedComposer || !this.state.activeSectionId) return;
+    try {
+      const raw = localStorage.getItem(this.draftKey(this.state.activeSectionId));
+      this.els.sharedComposer.value = raw ? String(raw) : '';
+    } catch (_) {
+      this.els.sharedComposer.value = '';
+    }
+  }
+
+  clearComposerDraft(sectionId) {
+    if (!sectionId) return;
+    try {
+      localStorage.removeItem(this.draftKey(sectionId));
+    } catch (_) {}
+  }
+
+  isLikelyAlreadySent(item) {
+    if (!item || !item.body || !item.sectionId) return false;
+    const uid = String((this.user && this.user.id) || '');
+    const nowTs = Date.now();
+    return this.state.messages.some((msg) => {
+      const sectionOk = String(msg.section_id || '') === String(item.sectionId || '');
+      if (!sectionOk) return false;
+      const sameAuthor = uid && String(msg.author_id || '') === uid;
+      if (!sameAuthor) return false;
+      const sameBody = String(msg.body || '').trim() === String(item.body || '').trim();
+      if (!sameBody) return false;
+      const at = Date.parse(String(msg.created_at || '')) || 0;
+      return at > 0 && Math.abs(nowTs - at) <= 10 * 60 * 1000;
+    });
+  }
+
+  async flushOutbox(options = {}) {
+    if (this.state.sendingOutbox) return;
+    if (!this.client || !this.user) return;
+    const quiet = !!options.quiet;
+
+    let items = this.readOutbox();
+    if (!items.length) return;
+
+    this.state.sendingOutbox = true;
+    try {
+      while (items.length) {
+        const item = items[0];
+        if (!item || !item.sectionId || !String(item.body || '').trim()) {
+          items.shift();
+          this.writeOutbox(items);
+          continue;
+        }
+
+        if (this.isLikelyAlreadySent(item)) {
+          items.shift();
+          this.writeOutbox(items);
+          continue;
+        }
+
+        try {
+          await this.rpc('ik_onoi_shared_send_message', {
+            p_section_id: item.sectionId,
+            p_body: String(item.body || '').trim()
+          });
+          items.shift();
+          this.writeOutbox(items);
+          this.clearComposerDraft(item.sectionId);
+        } catch (error) {
+          const low = briefError(error).toLowerCase();
+          if (low.includes('forbidden') || low.includes('not found') || low.includes('does not exist')) {
+            items.shift();
+            this.writeOutbox(items);
+            continue;
+          }
+          if (!quiet) this.notifyError(error);
+          break;
+        }
+      }
+    } finally {
+      this.state.sendingOutbox = false;
+    }
+
+    if (this.state.activeSectionId) {
+      try {
+        await this.loadMessages({ keepScroll: true });
+        this.renderMessages(true);
+      } catch (error) {
+        if (!quiet) this.notifyError(error);
+      }
+    }
   }
 
   canEditShared() {
@@ -337,6 +486,7 @@ class OnoiSharedApp {
       this.state.activeSectionId = this.state.sections[0] ? this.state.sections[0].id : null;
     }
 
+    this.loadComposerDraft();
     this.renderSections();
     await this.loadMessages();
   }
@@ -344,6 +494,7 @@ class OnoiSharedApp {
   async loadMessages(options = {}) {
     if (!this.state.activeSectionId) {
       this.state.messages = [];
+      if (this.els.sharedComposer) this.els.sharedComposer.value = '';
       this.renderMessages();
       await this.unsubscribeSection();
       return;
@@ -833,14 +984,16 @@ class OnoiSharedApp {
     const body = String((this.els.sharedComposer && this.els.sharedComposer.value) || '').trim();
     if (!body) return;
 
-    await this.rpc('ik_onoi_shared_send_message', {
-      p_section_id: this.state.activeSectionId,
-      p_body: body
+    this.enqueueMessage({
+      id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      sectionId: this.state.activeSectionId,
+      body,
+      queuedAt: Date.now()
     });
 
     if (this.els.sharedComposer) this.els.sharedComposer.value = '';
-    await this.loadMessages({ keepScroll: true });
-    this.renderMessages(true);
+    this.clearComposerDraft(this.state.activeSectionId);
+    await this.flushOutbox();
   }
 
   async loadFriends() {

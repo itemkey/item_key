@@ -1,5 +1,6 @@
 const UI_PREFS_KEY = 'itemkey_planning_ui_v2';
 const ACTIVE_PROJECT_KEY = 'itemkey_planning_active_project_v2';
+const CARD_DRAFT_KEY_PREFIX = 'itemkey_planning_card_draft_v1__';
 const INCOMING_REFRESH_MS = 15000;
 const BOARD_RELOAD_DEBOUNCE_MS = 120;
 const EDITING_TTL_MS = 30000;
@@ -655,6 +656,37 @@ export class PlanningCollabApp {
     try {
       if (!projectId) localStorage.removeItem(ACTIVE_PROJECT_KEY);
       else localStorage.setItem(ACTIVE_PROJECT_KEY, String(projectId));
+    } catch (_) {}
+  }
+
+  cardDraftKey(mode, projectId, cardId = '') {
+    const m = mode === 'edit' ? 'edit' : 'create';
+    const p = String(projectId || 'none');
+    const c = String(cardId || 'none');
+    return `${CARD_DRAFT_KEY_PREFIX}${m}__${p}__${c}`;
+  }
+
+  loadCardDraft(mode, projectId, cardId = '') {
+    try {
+      const raw = localStorage.getItem(this.cardDraftKey(mode, projectId, cardId));
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      return parsed && typeof parsed === 'object' ? parsed : null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  saveCardDraft(mode, projectId, cardId, payload) {
+    try {
+      const value = payload && typeof payload === 'object' ? payload : {};
+      localStorage.setItem(this.cardDraftKey(mode, projectId, cardId), JSON.stringify(value));
+    } catch (_) {}
+  }
+
+  clearCardDraft(mode, projectId, cardId = '') {
+    try {
+      localStorage.removeItem(this.cardDraftKey(mode, projectId, cardId));
     } catch (_) {}
   }
 
@@ -2146,10 +2178,8 @@ export class PlanningCollabApp {
       return;
     }
 
-    const options = columns
-      .map((c) => `<option value="${escapeAttr(c.id)}">${escapeHtml(String(c.name || '').toUpperCase())}</option>`)
-      .join('');
-    const assigneeOptions = this.assigneeOptionsHtml('');
+    const draft = this.loadCardDraft('create', board.project.id) || {};
+    const assigneeOptions = this.assigneeOptionsHtml(String(draft.assignee_id || ''));
 
     this.ui.openModal({
       title: 'new task',
@@ -2157,24 +2187,27 @@ export class PlanningCollabApp {
         <form class="form">
           <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
             name
-            <input class="ctl" name="name" required maxlength="240" />
+            <input class="ctl" name="name" required maxlength="240" value="${escapeAttr(draft.name || '')}" />
           </label>
 
           <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
             description
-            <textarea class="ctl" name="description" rows="4" maxlength="4000"></textarea>
+            <textarea class="ctl" name="description" rows="4" maxlength="4000">${escapeHtml(draft.description || '')}</textarea>
           </label>
 
           <div class="form__grid2">
             <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
               column
-              <select class="ctl" name="column_id">${options}</select>
+              <select class="ctl" name="column_id">${columns.map((c) => {
+                const selected = String(c.id) === String(draft.column_id || columns[0]?.id || '') ? 'selected' : '';
+                return `<option value="${escapeAttr(c.id)}" ${selected}>${escapeHtml(String(c.name || '').toUpperCase())}</option>`;
+              }).join('')}</select>
             </label>
 
             <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
               priority
               <select class="ctl" name="priority">
-                ${PRIORITIES.map((p) => `<option value="${p.key}">${p.label}</option>`).join('')}
+                ${PRIORITIES.map((p) => `<option value="${p.key}" ${String(draft.priority || 'mid') === p.key ? 'selected' : ''}>${p.label}</option>`).join('')}
               </select>
             </label>
           </div>
@@ -2182,12 +2215,12 @@ export class PlanningCollabApp {
           <div class="form__grid2">
             <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
               deadline
-              <input class="ctl" name="deadline" type="date" />
+              <input class="ctl" name="deadline" type="date" value="${escapeAttr(draft.deadline || '')}" />
             </label>
 
             <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
               tags
-              <input class="ctl" name="tags" maxlength="120" placeholder="study, work" />
+              <input class="ctl" name="tags" maxlength="120" placeholder="study, work" value="${escapeAttr(draft.tags || '')}" />
             </label>
           </div>
 
@@ -2204,6 +2237,24 @@ export class PlanningCollabApp {
       `,
       onSubmit: (data) => {
         void this.createCardSubmit(data).catch((error) => this.onMutationError(error));
+      },
+      onMount: (bodyEl) => {
+        const form = bodyEl.querySelector('form');
+        if (!form || !board || !board.project) return;
+        const saveDraft = () => {
+          const fd = new FormData(form);
+          this.saveCardDraft('create', board.project.id, '', {
+            name: String(fd.get('name') || ''),
+            description: String(fd.get('description') || ''),
+            column_id: String(fd.get('column_id') || ''),
+            priority: String(fd.get('priority') || 'mid'),
+            deadline: String(fd.get('deadline') || ''),
+            tags: String(fd.get('tags') || ''),
+            assignee_id: String(fd.get('assignee_id') || '')
+          });
+        };
+        form.addEventListener('input', saveDraft);
+        form.addEventListener('change', saveDraft);
       }
     });
   }
@@ -2244,6 +2295,7 @@ export class PlanningCollabApp {
       }
     }
 
+    this.clearCardDraft('create', board.project.id, '');
     this.ui.closeModal();
     await this.loadBoard(board.project.id);
     this.ui.toast(this.t('задача создана', 'task created'));
@@ -2256,11 +2308,23 @@ export class PlanningCollabApp {
     const card = this.findCardById(cardId);
     if (!card) return;
 
+    const draft = this.loadCardDraft('edit', this.state.activeProjectId, card.id) || {};
+    const cardView = {
+      ...card,
+      name: String(draft.name ?? card.name ?? ''),
+      description: String(draft.description ?? card.description ?? ''),
+      column_id: String(draft.column_id ?? card.column_id ?? ''),
+      priority: String(draft.priority ?? card.priority ?? 'mid'),
+      deadline: String(draft.deadline ?? card.deadline ?? ''),
+      tags: typeof draft.tags === 'string' ? parseTags(draft.tags) : asArray(card.tags),
+      assignee_id: String(draft.assignee_id ?? card.assignee_id ?? '')
+    };
+
     const columns = this.getSortedColumns();
     const colOptions = columns
-      .map((c) => `<option value="${escapeAttr(c.id)}" ${String(c.id) === String(card.column_id) ? 'selected' : ''}>${escapeHtml(String(c.name || '').toUpperCase())}</option>`)
+      .map((c) => `<option value="${escapeAttr(c.id)}" ${String(c.id) === String(cardView.column_id) ? 'selected' : ''}>${escapeHtml(String(c.name || '').toUpperCase())}</option>`)
       .join('');
-    const assigneeOptions = this.assigneeOptionsHtml(String(card.assignee_id || ''));
+    const assigneeOptions = this.assigneeOptionsHtml(String(cardView.assignee_id || ''));
 
     this.startCurrentEditing(card.id);
 
@@ -2270,12 +2334,12 @@ export class PlanningCollabApp {
         <form class="form">
           <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
             name
-            <input class="ctl" name="name" required maxlength="240" value="${escapeAttr(card.name || '')}" />
+            <input class="ctl" name="name" required maxlength="240" value="${escapeAttr(cardView.name || '')}" />
           </label>
 
           <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
             description
-            <textarea class="ctl" name="description" rows="5" maxlength="4000">${escapeHtml(card.description || '')}</textarea>
+            <textarea class="ctl" name="description" rows="5" maxlength="4000">${escapeHtml(cardView.description || '')}</textarea>
           </label>
 
           <div class="form__grid2">
@@ -2287,7 +2351,7 @@ export class PlanningCollabApp {
             <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
               priority
               <select class="ctl" name="priority">
-                ${PRIORITIES.map((p) => `<option value="${p.key}" ${String(card.priority) === p.key ? 'selected' : ''}>${p.label}</option>`).join('')}
+                ${PRIORITIES.map((p) => `<option value="${p.key}" ${String(cardView.priority) === p.key ? 'selected' : ''}>${p.label}</option>`).join('')}
               </select>
             </label>
           </div>
@@ -2295,12 +2359,12 @@ export class PlanningCollabApp {
           <div class="form__grid2">
             <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
               deadline
-              <input class="ctl" name="deadline" type="date" value="${escapeAttr(card.deadline || '')}" />
+              <input class="ctl" name="deadline" type="date" value="${escapeAttr(cardView.deadline || '')}" />
             </label>
 
             <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
               tags
-              <input class="ctl" name="tags" maxlength="120" value="${escapeAttr(asArray(card.tags).join(', '))}" />
+              <input class="ctl" name="tags" maxlength="120" value="${escapeAttr(asArray(cardView.tags).join(', '))}" />
             </label>
           </div>
 
@@ -2317,6 +2381,24 @@ export class PlanningCollabApp {
       `,
       onSubmit: (data) => {
         void this.updateCardSubmit(card, data).catch((error) => this.onMutationError(error));
+      },
+      onMount: (bodyEl) => {
+        const form = bodyEl.querySelector('form');
+        if (!form || !this.state.activeProjectId || !card || !card.id) return;
+        const saveDraft = () => {
+          const fd = new FormData(form);
+          this.saveCardDraft('edit', this.state.activeProjectId, card.id, {
+            name: String(fd.get('name') || ''),
+            description: String(fd.get('description') || ''),
+            column_id: String(fd.get('column_id') || ''),
+            priority: String(fd.get('priority') || 'mid'),
+            deadline: String(fd.get('deadline') || ''),
+            tags: String(fd.get('tags') || ''),
+            assignee_id: String(fd.get('assignee_id') || '')
+          });
+        };
+        form.addEventListener('input', saveDraft);
+        form.addEventListener('change', saveDraft);
       }
     });
   }
@@ -2359,6 +2441,7 @@ export class PlanningCollabApp {
       }
     }
 
+    this.clearCardDraft('edit', board.project.id, baseCard.id);
     this.ui.closeModal();
     await this.loadBoard(board.project.id);
     this.ui.toast(this.t('задача сохранена', 'task saved'));
@@ -2398,6 +2481,7 @@ export class PlanningCollabApp {
       p_base_revision: board.project.revision
     });
 
+    this.clearCardDraft('edit', board.project.id, card.id);
     this.ui.closeModal();
     await this.loadBoard(board.project.id);
     this.ui.toast(this.t('задача удалена', 'task deleted'));
