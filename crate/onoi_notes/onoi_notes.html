@@ -2219,6 +2219,7 @@ body.focus-mode .n-col-right{
     const ONOI_LOCAL_SNAP_PREFIX = 'onoi_notes_local_snapshot_v2__';
     const ONOI_SUPA_PENDING_PUSH_PREFIX = 'onoi_notes_supa_pending_push_v1__';
     const ONOI_ASSET_URI_PREFIX = 'onoi-asset://';
+    const ONOI_PRIVATE_PULL_EVERY_MS = 25000;
 
     function lsGet(key){
       try{ return localStorage.getItem(key); }catch(e){ return null; }
@@ -2515,7 +2516,10 @@ body.focus-mode .n-col-right{
         email: '',
         table: ONOI_CLOUD_TABLE,
         pushInFlight: false,
-        pushRetryTimer: null
+        pushRetryTimer: null,
+        pullInFlight: false,
+        channel: null,
+        pollTimer: null
       },
 
       diag: {
@@ -2626,6 +2630,11 @@ body.focus-mode .n-col-right{
         clearTimeout(bootRevealTimer);
         bootRevealTimer = null;
       }
+      if(state && state.supa && state.supa.pollTimer){
+        clearInterval(state.supa.pollTimer);
+        state.supa.pollTimer = null;
+      }
+      void unsubscribePrivateRealtime().catch(() => {});
     });
 
     window.addEventListener('pageshow', (ev) => {
@@ -4558,6 +4567,60 @@ async function createNote(){
       }
     }
 
+    async function pullPrivateSnapshot(reason){
+      if(!state.supa.enabled || !state.supa.userId) return false;
+      if(state.supa.pullInFlight) return false;
+      state.supa.pullInFlight = true;
+      try{
+        const remoteSnap = await supaPullSnapshot();
+        if(!remoteSnap || !Array.isArray(remoteSnap.cats) || !Array.isArray(remoteSnap.notes)) return false;
+        const merged = mergeSnapshots(currentDBSnapshot(), remoteSnap);
+        await importJSON(merged, { render: false });
+        renderAll();
+        setSync('ok', 'private');
+        return true;
+      }catch(e){
+        pushDiag('warn', 'pullPrivateSnapshot', e, { reason: String(reason || '') });
+        return false;
+      }finally{
+        state.supa.pullInFlight = false;
+      }
+    }
+
+    async function unsubscribePrivateRealtime(){
+      if(!state.supa.client || !state.supa.channel) return;
+      try{ await state.supa.client.removeChannel(state.supa.channel); }catch(_){ }
+      state.supa.channel = null;
+    }
+
+    async function subscribePrivateRealtime(){
+      await unsubscribePrivateRealtime();
+      if(!state.supa.enabled || !state.supa.client || !state.supa.userId) return;
+      const table = state.supa.table || ONOI_CLOUD_TABLE;
+      const channel = state.supa.client.channel(`onoi-private-${state.supa.userId}`);
+      channel.on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table,
+        filter: `owner_id=eq.${state.supa.userId}`
+      }, () => {
+        void pullPrivateSnapshot('realtime').catch(() => {});
+      });
+      channel.subscribe();
+      state.supa.channel = channel;
+    }
+
+    function startPrivatePolling(){
+      if(state.supa.pollTimer){
+        clearInterval(state.supa.pollTimer);
+        state.supa.pollTimer = null;
+      }
+      if(!state.supa.enabled || !state.supa.userId) return;
+      state.supa.pollTimer = setInterval(() => {
+        void pullPrivateSnapshot('poll').catch(() => {});
+      }, ONOI_PRIVATE_PULL_EVERY_MS);
+    }
+
     // ========= cloud sync =========
     function cloudHeaders(){
       const h = { 'Accept': 'application/vnd.github+json' };
@@ -4810,6 +4873,7 @@ async function createNote(){
 
     window.addEventListener('online', () => {
       void flushPendingSupaPush('online').catch(() => {});
+      void pullPrivateSnapshot('online').catch(() => {});
     });
 
     document.addEventListener('visibilitychange', () => {
@@ -4821,6 +4885,7 @@ async function createNote(){
         void persistAll().catch(() => {});
       }else{
         void flushPendingSupaPush('visible').catch(() => {});
+        void pullPrivateSnapshot('visible').catch(() => {});
       }
     });
 
@@ -5343,6 +5408,9 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
 
       // set sync indicator
       setSync('ok', 'private');
+
+      await subscribePrivateRealtime();
+      startPrivatePolling();
 
       // legacy cloud UI remains visible but disabled
       setCloudUI();
