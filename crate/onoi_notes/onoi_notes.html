@@ -4361,7 +4361,15 @@ async function createNote(){
       // very light validation
       const cats = hydrated.cats.map(c => ({
         id: String(c.id || uid()),
-        parentId: c.parentId ? String(c.parentId) : null,
+        parentId: (() => {
+          const raw = c.parentId;
+          if(raw === null || raw === undefined) return null;
+          const v = String(raw).trim();
+          if(!v) return null;
+          const low = v.toLowerCase();
+          if(low === 'null' || low === 'undefined') return null;
+          return v;
+        })(),
         name: String(c.name || '-'),
         createdAt: Number(c.createdAt || now()),
         updatedAt: Number(c.updatedAt || now())
