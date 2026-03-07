@@ -3082,7 +3082,7 @@ tgl.addEventListener('click', (e) => {
             }
             renderAll();
             setTimeout(() => { try{ editor.focus(); }catch(e){} }, 0);
-            closeDrawerSoon && closeDrawerSoon();
+            if(typeof closeDrawerSoon === 'function') closeDrawerSoon();
           });
 
           row.addEventListener('keydown', (e) => {
@@ -3203,7 +3203,7 @@ tgl.addEventListener('click', (e) => {
           state.activeNoteId = n.id;
           renderEditor();
           renderNotesList();
-          closeDrawerSoon && closeDrawerSoon();
+          if(typeof closeDrawerSoon === 'function') closeDrawerSoon();
         };
         row.addEventListener('click', openNote);
         row.addEventListener('keydown', (e) => {
@@ -4505,22 +4505,46 @@ async function createNote(){
       return ONOI_CLOUD_TABLE;
     }
 
+    async function supaReadSnapshotFromTable(table){
+      if(!state.supa.client || !state.supa.userId) return null;
+      try{
+        const { data, error } = await state.supa.client
+          .from(table)
+          .select('state_value,updated_at')
+          .eq('owner_id', state.supa.userId)
+          .eq('state_key', ONOI_CLOUD_KEY)
+          .maybeSingle();
+        if(error) return null;
+        if(!data || !data.state_value) return null;
+        return {
+          table,
+          snap: data.state_value,
+          updatedAt: Date.parse(String(data.updated_at || '')) || 0
+        };
+      }catch(_){
+        return null;
+      }
+    }
+
     async function supaPullSnapshot(){
       if(!state.supa.client || !state.supa.userId) return null;
-      const table = state.supa.table || ONOI_CLOUD_TABLE;
-      const { data, error } = await state.supa.client
-        .from(table)
-        .select('state_value')
-        .eq('owner_id', state.supa.userId)
-        .eq('state_key', ONOI_CLOUD_KEY)
-        .maybeSingle();
-      if(error) throw error;
-      return data && data.state_value ? data.state_value : null;
+      const preferred = state.supa.table || ONOI_CLOUD_TABLE;
+      const tables = [preferred, ONOI_CLOUD_TABLE, ONOI_CLOUD_FALLBACK_TABLE]
+        .map((x) => String(x || '').trim())
+        .filter(Boolean)
+        .filter((x, i, arr) => arr.indexOf(x) === i);
+      const rows = [];
+      for(const table of tables){
+        const row = await supaReadSnapshotFromTable(table);
+        if(row && row.snap) rows.push(row);
+      }
+      if(!rows.length) return null;
+      rows.sort((a,b) => Number(b.updatedAt||0) - Number(a.updatedAt||0));
+      return rows[0].snap;
     }
 
     async function supaPushSnapshot(){
       if(!state.supa.client || !state.supa.userId) return;
-      const table = state.supa.table || ONOI_CLOUD_TABLE;
       const snap = currentDBSnapshot();
       const payload = {
         owner_id: state.supa.userId,
@@ -4528,10 +4552,26 @@ async function createNote(){
         state_value: snap,
         state_hash: String((snap.cats||[]).length) + ':' + String((snap.notes||[]).length)
       };
-      const { error } = await state.supa.client
-        .from(table)
-        .upsert(payload, { onConflict: 'owner_id,state_key' });
-      if(error) throw error;
+      const preferred = state.supa.table || ONOI_CLOUD_TABLE;
+      const tables = [preferred, ONOI_CLOUD_TABLE, ONOI_CLOUD_FALLBACK_TABLE]
+        .map((x) => String(x || '').trim())
+        .filter(Boolean)
+        .filter((x, i, arr) => arr.indexOf(x) === i);
+
+      let ok = false;
+      let firstError = null;
+      for(const table of tables){
+        try{
+          const { error } = await state.supa.client
+            .from(table)
+            .upsert(payload, { onConflict: 'owner_id,state_key' });
+          if(error) throw error;
+          ok = true;
+        }catch(e){
+          if(!firstError) firstError = e;
+        }
+      }
+      if(!ok && firstError) throw firstError;
     }
 
     function scheduleSupaPushRetry(delayMs){
