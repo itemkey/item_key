@@ -2220,7 +2220,7 @@ body.focus-mode .n-col-right{
     const ONOI_SUPA_PENDING_PUSH_PREFIX = 'onoi_notes_supa_pending_push_v1__';
     const ONOI_ASSET_URI_PREFIX = 'onoi-asset://';
     const ONOI_PRIVATE_PULL_EVERY_MS = 25000;
-    const ONOI_BUILD_TAG = '20260307-4';
+    const ONOI_BUILD_TAG = '20260307-5';
 
     (function ensureBuildTagInUrl(){
       try{
@@ -2295,6 +2295,19 @@ body.focus-mode .n-col-right{
       all: (store) => idbTx('readonly',[store], st => new Promise((res, rej)=>{ const r=st[store].getAll(); r.onsuccess=()=>res(r.result||[]); r.onerror=()=>rej(r.error); })),
       clear: (store) => idbTx('readwrite',[store], st => new Promise((res, rej)=>{ const r=st[store].clear(); r.onsuccess=()=>res(true); r.onerror=()=>rej(r.error); })),
     };
+
+    async function reloadStateFromIdb(reason){
+      try{
+        const cats = await idb.all(STORE.cats);
+        const notes = await idb.all(STORE.notes);
+        state.cats = Array.isArray(cats) ? cats : [];
+        state.notes = Array.isArray(notes) ? notes : [];
+        return true;
+      }catch(e){
+        pushDiag('warn', 'reloadStateFromIdb', e, { reason: String(reason || '') });
+        return false;
+      }
+    }
 
     async function clearLocalNotesStorage(){
       try{ await idb.clear(STORE.meta); }catch(_){ }
@@ -3284,17 +3297,28 @@ tgl.addEventListener('click', (e) => {
           }
         }catch(e){}
 
-        // write cats and notes
-        await idbTx('readwrite',[STORE.cats, STORE.notes], st => {
-          state.cats.forEach(c => st[STORE.cats].put(c));
-          state.notes.forEach(n => st[STORE.notes].put(n));
-        });
+        // write cats and notes (best-effort, can fail on mobile storage limits)
+        let idbOk = true;
+        try{
+          await idbTx('readwrite',[STORE.cats, STORE.notes], st => {
+            state.cats.forEach(c => st[STORE.cats].put(c));
+            state.notes.forEach(n => st[STORE.notes].put(n));
+          });
+        }catch(e){
+          idbOk = false;
+          pushDiag('warn', 'persistAll@idbTx', e);
+        }
         const ownerId = state.supa.userId || getStoredOwner() || 'guest';
         saveLocalSnapshot(ownerId, currentDBSnapshot());
         state.lastSavedAt = now();
         state.dirty = false;
         setSaveStatus('saved');
+        if(!idbOk){
+          setSync('warn', 'private', 'local cache limited');
+        }
       }catch(e){
+        pushDiag('warn', 'persistAll', e);
+        setSync('warn', 'private', 'local save limited');
         setSaveStatus('dirty');
       }finally{
         state.saving = false;
@@ -4399,12 +4423,16 @@ async function createNote(){
       state.notes = notes;
       ensureDefaults();
 
-      await idb.clear(STORE.cats);
-      await idb.clear(STORE.notes);
-      await idbTx('readwrite',[STORE.cats, STORE.notes], st => {
-        state.cats.forEach(c => st[STORE.cats].put(c));
-        state.notes.forEach(n => st[STORE.notes].put(n));
-      });
+      try{
+        await idb.clear(STORE.cats);
+        await idb.clear(STORE.notes);
+        await idbTx('readwrite',[STORE.cats, STORE.notes], st => {
+          state.cats.forEach(c => st[STORE.cats].put(c));
+          state.notes.forEach(n => st[STORE.notes].put(n));
+        });
+      }catch(e){
+        pushDiag('warn', 'importJSON@idb', e);
+      }
 
       if(doRender){
         renderAll();
@@ -4535,9 +4563,14 @@ async function createNote(){
           .maybeSingle();
         if(error) return null;
         if(!data || !data.state_value) return null;
+        let snap = data.state_value;
+        if(typeof snap === 'string'){
+          try{ snap = JSON.parse(snap); }catch(_){ snap = null; }
+        }
+        if(!snap || typeof snap !== 'object') return null;
         return {
           table,
-          snap: data.state_value,
+          snap,
           updatedAt: Date.parse(String(data.updated_at || '')) || 0
         };
       }catch(_){
@@ -4558,8 +4591,13 @@ async function createNote(){
         if(row && row.snap) rows.push(row);
       }
       if(!rows.length) return null;
-      rows.sort((a,b) => Number(b.updatedAt||0) - Number(a.updatedAt||0));
-      return rows[0].snap;
+      rows.sort((a,b) => Number(a.updatedAt||0) - Number(b.updatedAt||0));
+      let merged = null;
+      for(const row of rows){
+        if(!merged) merged = row.snap;
+        else merged = mergeSnapshots(merged, row.snap);
+      }
+      return merged;
     }
 
     async function supaPushSnapshot(){
@@ -4679,6 +4717,39 @@ async function createNote(){
         void pullPrivateSnapshot('poll').catch(() => {});
       }, ONOI_PRIVATE_PULL_EVERY_MS);
     }
+
+    window.__onoiPrivateDiag = function(){
+      const uid = String(state.supa.userId || '');
+      return {
+        build: ONOI_BUILD_TAG,
+        uid,
+        table: String(state.supa.table || ''),
+        cats: Array.isArray(state.cats) ? state.cats.length : 0,
+        notes: Array.isArray(state.notes) ? state.notes.length : 0,
+        dirty: !!state.dirty,
+        saving: !!state.saving,
+        pendingPush: !!(uid && hasPendingSupaPush(uid)),
+        syncText: String(syncText && syncText.textContent || ''),
+        saveText: String(saveText && saveText.textContent || '')
+      };
+    };
+
+    window.__onoiPullNow = async function(){
+      const snap = await supaPullSnapshot();
+      const out = {
+        build: ONOI_BUILD_TAG,
+        hasSnapshot: !!snap,
+        cats: snap && Array.isArray(snap.cats) ? snap.cats.length : 0,
+        notes: snap && Array.isArray(snap.notes) ? snap.notes.length : 0,
+        assets: snap && Array.isArray(snap.assets) ? snap.assets.length : 0
+      };
+      if(snap && (Array.isArray(snap.notes) || Array.isArray(snap.cats))){
+        const merged = mergeSnapshots(currentDBSnapshot(), snap);
+        await importJSON(merged, { render:false });
+        renderAll();
+      }
+      return out;
+    };
 
     // ========= cloud sync =========
     function cloudHeaders(){
@@ -5361,8 +5432,7 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
       saveCloudSettings();
 
       // load all from idb
-      state.cats = await idb.all(STORE.cats);
-      state.notes = await idb.all(STORE.notes);
+      await reloadStateFromIdb('boot-init');
       markBoot('idb-loaded', { cats: state.cats.length, notes: state.notes.length });
 
       // Resolve Supabase user and enforce per-account privacy
@@ -5419,8 +5489,6 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
         if(localSnap){
           try{
             await importJSON(localSnap, { render:false });
-            state.cats = await idb.all(STORE.cats);
-            state.notes = await idb.all(STORE.notes);
             markBoot('local-snapshot-restored', { cats: state.cats.length, notes: state.notes.length });
           }catch(_){ }
         }
@@ -5436,8 +5504,6 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
         if(remoteSnap && Array.isArray(remoteSnap.cats) && Array.isArray(remoteSnap.notes)){
           remoteHadData = !!(remoteSnap.notes.length > 0 || remoteSnap.cats.length > 0);
           await importJSON(remoteSnap, { render:false });
-          state.cats = await idb.all(STORE.cats);
-          state.notes = await idb.all(STORE.notes);
           markBoot('cloud-snapshot-restored', { cats: state.cats.length, notes: state.notes.length });
         }
       }catch(e){
@@ -5487,10 +5553,12 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
       void flushPendingSupaPush('boot').catch(() => {});
 
       // set sync indicator
-      setSync('ok', 'private');
+      if(state.dirty) setSync('warn', 'private', 'local save limited');
+      else setSync('ok', 'private');
 
       await subscribePrivateRealtime();
       startPrivatePolling();
+      setTimeout(() => { void pullPrivateSnapshot('post-boot').catch(() => {}); }, 900);
 
       // legacy cloud UI remains visible but disabled
       setCloudUI();
