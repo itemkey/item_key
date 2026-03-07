@@ -2220,6 +2220,17 @@ body.focus-mode .n-col-right{
     const ONOI_SUPA_PENDING_PUSH_PREFIX = 'onoi_notes_supa_pending_push_v1__';
     const ONOI_ASSET_URI_PREFIX = 'onoi-asset://';
     const ONOI_PRIVATE_PULL_EVERY_MS = 25000;
+    const ONOI_BUILD_TAG = '20260307-4';
+
+    (function ensureBuildTagInUrl(){
+      try{
+        const u = new URL(window.location.href);
+        const cur = String(u.searchParams.get('v') || '').trim();
+        if(cur === ONOI_BUILD_TAG) return;
+        u.searchParams.set('v', ONOI_BUILD_TAG);
+        window.location.replace(u.toString());
+      }catch(_){ }
+    })();
 
     function lsGet(key){
       try{ return localStorage.getItem(key); }catch(e){ return null; }
@@ -5415,9 +5426,15 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
         }
       }
 
+      const localHadDataAtBoot = !!(state.notes.length > 0 || state.cats.length > 0);
+      let remotePullOk = false;
+      let remoteHadData = false;
+
       try{
         const remoteSnap = await supaPullSnapshot();
+        remotePullOk = true;
         if(remoteSnap && Array.isArray(remoteSnap.cats) && Array.isArray(remoteSnap.notes)){
+          remoteHadData = !!(remoteSnap.notes.length > 0 || remoteSnap.cats.length > 0);
           await importJSON(remoteSnap, { render:false });
           state.cats = await idb.all(STORE.cats);
           state.notes = await idb.all(STORE.notes);
@@ -5440,16 +5457,31 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
       markBoot('persist-local');
 
       // ensure first snapshot exists in cloud
-      try{
-        markPendingSupaPush(state.supa.userId, true);
-        await supaPushSnapshot();
-        markPendingSupaPush(state.supa.userId, false);
-        markBoot('persist-cloud');
-      }catch(e){
-        pushDiag('error', 'supaPushSnapshot@boot', e);
-        markPendingSupaPush(state.supa.userId, true);
-        scheduleSupaPushRetry(2200);
-        setSync('bad', 'private err', errText(e));
+      const hasContentNow = !!(state.notes.length > 0 || state.cats.length > 1);
+      const shouldBootPush = !!(hasContentNow && (localHadDataAtBoot || remoteHadData || hasPendingSupaPush(state.supa.userId)));
+      if(shouldBootPush){
+        try{
+          markPendingSupaPush(state.supa.userId, true);
+          await supaPushSnapshot();
+          markPendingSupaPush(state.supa.userId, false);
+          markBoot('persist-cloud');
+        }catch(e){
+          pushDiag('error', 'supaPushSnapshot@boot', e);
+          markPendingSupaPush(state.supa.userId, true);
+          scheduleSupaPushRetry(2200);
+          setSync('bad', 'private err', errText(e));
+        }
+      }else{
+        if(!remotePullOk){
+          setSync('warn', 'pulling', 'cloud pull pending');
+          setTimeout(() => { void pullPrivateSnapshot('boot-retry').catch(() => {}); }, 2200);
+        }
+        markBoot('skip-boot-cloud-push', {
+          hasContentNow,
+          localHadDataAtBoot,
+          remoteHadData,
+          remotePullOk
+        });
       }
 
       void flushPendingSupaPush('boot').catch(() => {});
