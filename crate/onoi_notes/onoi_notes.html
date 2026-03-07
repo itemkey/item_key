@@ -844,6 +844,7 @@ html[lang="en"] .tree-item[data-depth="0"] .tree-name::after{
       z-index: 9997;
       touch-action: none;
     }
+    body.drawer-open{ overflow: hidden; }
     body.drawer-open .drawer-overlay{ display: block; }
 
     .drawer-head{
@@ -871,6 +872,10 @@ html[lang="en"] .tree-item[data-depth="0"] .tree-name::after{
         --topbarOffset: 60px;
         --footerH: 58px;
         --fs-ui: 13px;
+      }
+
+      .center-stage{
+        padding-bottom: calc(var(--footerH) + 110px + env(safe-area-inset-bottom) + var(--onoiKeyboardInset));
       }
 
       /* hide global rails on phones */
@@ -935,6 +940,26 @@ html[lang="en"] .tree-item[data-depth="0"] .tree-name::after{
       .editor{
         min-height: 55vh;
         padding: 14px 12px;
+      }
+
+      .mobile-dock{
+        position: fixed;
+        left: 10px;
+        right: 10px;
+        bottom: calc(var(--footerH) + 8px + env(safe-area-inset-bottom) + var(--onoiKeyboardInset));
+        z-index: 100050;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 8px;
+        padding: 8px;
+        border: 1px solid rgba(0,0,0,.18);
+        background: rgba(255,255,255,.96);
+      }
+      .mobile-dock .n-btn{
+        min-height: 44px;
+        padding: 8px;
+        font-size: 11px;
+        letter-spacing: 1.2px;
       }
 
       /* Modal: full height comfort */
@@ -1678,6 +1703,7 @@ body.focus-mode .n-col-right{
         </div>
 <div class="n-top-actions">
 <button class="n-btn" id="settingsBtn" type="button">Настройки</button>
+          <button class="n-btn" id="syncNowBtn" type="button">Синхронизировать</button>
           <button class="n-btn" id="exportBtn" type="button">Экспорт JSON</button>
           <button class="n-btn" id="importBtn" type="button">Импорт JSON</button>
           <input id="importFile" type="file" accept="application/json" hidden />
@@ -1894,6 +1920,8 @@ body.focus-mode .n-col-right{
   </main>
 
   <div class="mobile-dock" aria-label="Быстрые действия">
+    <button class="n-btn" id="mobileMenuBtn" type="button">Меню</button>
+    <button class="n-btn" id="mobileSyncBtn" type="button">Синхро</button>
     <button class="n-btn is-primary" id="mobileNewNoteBtn" type="button">Новая заметка</button>
     <button class="n-btn" id="mobileDeleteNoteBtn" type="button">Удалить</button>
     <button class="n-btn" id="mobileWhisperBtn" type="button">Прошептать</button>
@@ -2220,7 +2248,9 @@ body.focus-mode .n-col-right{
     const ONOI_SUPA_PENDING_PUSH_PREFIX = 'onoi_notes_supa_pending_push_v1__';
     const ONOI_ASSET_URI_PREFIX = 'onoi-asset://';
     const ONOI_PRIVATE_PULL_EVERY_MS = 25000;
-    const ONOI_BUILD_TAG = '20260307-5';
+    const ONOI_PRIVATE_RPC_TIMEOUT_MS = 12000;
+    const ONOI_SAVE_WATCHDOG_MS = 7000;
+    const ONOI_BUILD_TAG = '20260307-6';
 
     (function ensureBuildTagInUrl(){
       try{
@@ -2513,6 +2543,7 @@ body.focus-mode .n-col-right{
       uiHydrated: false,
       saving: false,
       saveTimer: null,
+      saveWatchdogTimer: null,
       lastSavedAt: 0,
 
       cloud: {
@@ -2576,6 +2607,7 @@ body.focus-mode .n-col-right{
     const searchInput = $('searchInput');
     const newNoteBtn = $('newNoteBtn');
     const settingsBtn = $('settingsBtn');
+    const syncNowBtn = $('syncNowBtn');
     const exportBtn = $('exportBtn');
     const importBtn = $('importBtn');
     const importFile = $('importFile');
@@ -2658,6 +2690,10 @@ body.focus-mode .n-col-right{
         clearInterval(state.supa.pollTimer);
         state.supa.pollTimer = null;
       }
+      if(state && state.saveWatchdogTimer){
+        clearInterval(state.saveWatchdogTimer);
+        state.saveWatchdogTimer = null;
+      }
       void unsubscribePrivateRealtime().catch(() => {});
     });
 
@@ -2681,6 +2717,7 @@ body.focus-mode .n-col-right{
       try{ deleteCatBtn.disabled = v; }catch(_){ }
       try{ noteTitle.disabled = v; }catch(_){ }
       try{ editor.setAttribute('contenteditable', v ? 'false' : 'true'); }catch(_){ }
+      try{ if(syncNowBtn) syncNowBtn.disabled = v; }catch(_){ }
     }
 
     function errText(e){
@@ -2692,6 +2729,17 @@ body.focus-mode .n-col-right{
       if(e.hint) parts.push(`hint=${e.hint}`);
       if(!parts.length) parts.push(String(e));
       return parts.join(' | ');
+    }
+
+    function withTimeout(promise, ms, tag){
+      const timeoutMs = Math.max(1200, Number(ms || ONOI_PRIVATE_RPC_TIMEOUT_MS));
+      let timer = null;
+      const timeout = new Promise((_, rej) => {
+        timer = setTimeout(() => rej(new Error(`timeout:${String(tag || 'op')}:${timeoutMs}`)), timeoutMs);
+      });
+      return Promise.race([promise, timeout]).finally(() => {
+        if(timer) clearTimeout(timer);
+      });
     }
 
     function pushDiag(level, source, error, extra){
@@ -4555,15 +4603,19 @@ async function createNote(){
     async function supaReadSnapshotFromTable(table){
       if(!state.supa.client || !state.supa.userId) return null;
       try{
-        const { data, error } = await state.supa.client
-          .from(table)
-          .select('state_value,updated_at')
-          .eq('owner_id', state.supa.userId)
-          .eq('state_key', ONOI_CLOUD_KEY)
-          .maybeSingle();
-        if(error) return null;
-        if(!data || !data.state_value) return null;
-        let snap = data.state_value;
+        const { data: outData, error: outErr } = await withTimeout(
+          state.supa.client
+            .from(table)
+            .select('state_value,updated_at')
+            .eq('owner_id', state.supa.userId)
+            .eq('state_key', ONOI_CLOUD_KEY)
+            .maybeSingle(),
+          ONOI_PRIVATE_RPC_TIMEOUT_MS,
+          `pull:${table}`
+        );
+        if(outErr) return null;
+        if(!outData || !outData.state_value) return null;
+        let snap = outData.state_value;
         if(typeof snap === 'string'){
           try{ snap = JSON.parse(snap); }catch(_){ snap = null; }
         }
@@ -4571,7 +4623,7 @@ async function createNote(){
         return {
           table,
           snap,
-          updatedAt: Date.parse(String(data.updated_at || '')) || 0
+          updatedAt: Date.parse(String(outData.updated_at || '')) || 0
         };
       }catch(_){
         return null;
@@ -4619,9 +4671,13 @@ async function createNote(){
       let firstError = null;
       for(const table of tables){
         try{
-          const { error } = await state.supa.client
-            .from(table)
-            .upsert(payload, { onConflict: 'owner_id,state_key' });
+          const { error } = await withTimeout(
+            state.supa.client
+              .from(table)
+              .upsert(payload, { onConflict: 'owner_id,state_key' }),
+            ONOI_PRIVATE_RPC_TIMEOUT_MS,
+            `push:${table}`
+          );
           if(error) throw error;
           ok = true;
         }catch(e){
@@ -4716,6 +4772,23 @@ async function createNote(){
       state.supa.pollTimer = setInterval(() => {
         void pullPrivateSnapshot('poll').catch(() => {});
       }, ONOI_PRIVATE_PULL_EVERY_MS);
+    }
+
+    async function forceSyncNow(reason){
+      const why = String(reason || 'manual');
+      setSync('warn', 'syncing', why);
+      if(state.saveTimer){
+        clearTimeout(state.saveTimer);
+        state.saveTimer = null;
+      }
+      await persistAll();
+      if(state.supa.enabled && state.supa.userId){
+        markPendingSupaPush(state.supa.userId, true);
+        await flushPendingSupaPush(`force:${why}`);
+        await pullPrivateSnapshot(`force:${why}`);
+      }
+      if(state.dirty) setSync('warn', 'private', 'local save limited');
+      else setSync('ok', state.supa.enabled ? 'private' : 'local');
     }
 
     window.__onoiPrivateDiag = function(){
@@ -5363,6 +5436,16 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
     exportBtn.addEventListener('click', () => {
       downloadJSON(currentDBSnapshot(), 'onoi_notes_export.json');
     });
+    if(syncNowBtn){
+      syncNowBtn.addEventListener('click', async () => {
+        try{
+          await forceSyncNow('button');
+          toast('sync', 'Синхронизация выполнена.', { ttl: 2200 });
+        }catch(e){
+          toast('sync', 'Ошибка синхронизации: ' + String((e && e.message) || e), { ttl: 4200 });
+        }
+      });
+    }
     importBtn.addEventListener('click', () => importFile.click());
     importFile.addEventListener('change', async () => {
       const f = importFile.files && importFile.files[0];
@@ -5400,6 +5483,13 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
         e.preventDefault();
         searchInput.focus();
         searchInput.select();
+        return;
+      }
+      if(e.ctrlKey && (e.key.toLowerCase() === 's')){
+        e.preventDefault();
+        void forceSyncNow('shortcut').catch((err) => {
+          toast('sync', 'Ошибка синхронизации: ' + String((err && err.message) || err), { ttl: 4200 });
+        });
         return;
       }
       if(e.key === 'Delete' && !inEditor){
@@ -5559,6 +5649,17 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
       await subscribePrivateRealtime();
       startPrivatePolling();
       setTimeout(() => { void pullPrivateSnapshot('post-boot').catch(() => {}); }, 900);
+
+      if(state.saveWatchdogTimer){
+        clearInterval(state.saveWatchdogTimer);
+        state.saveWatchdogTimer = null;
+      }
+      state.saveWatchdogTimer = setInterval(() => {
+        if(state.saving) return;
+        if(state.saveTimer) return;
+        if(!state.dirty) return;
+        void forceSyncNow('watchdog').catch(() => {});
+      }, ONOI_SAVE_WATCHDOG_MS);
 
       // legacy cloud UI remains visible but disabled
       setCloudUI();
@@ -7804,10 +7905,14 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
   const mobileNew = document.getElementById('mobileNewNoteBtn');
   const mobileDelete = document.getElementById('mobileDeleteNoteBtn');
   const mobileWhisper = document.getElementById('mobileWhisperBtn');
+  const mobileMenu = document.getElementById('mobileMenuBtn');
+  const mobileSync = document.getElementById('mobileSyncBtn');
 
   const newNoteBtn = document.getElementById('newNoteBtn');
   const deleteNoteBtn = document.getElementById('deleteNoteBtn');
   const whisperBtn = document.getElementById('whisperBtn');
+  const openDrawerBtn = document.getElementById('openDrawerBtn');
+  const syncNowBtn = document.getElementById('syncNowBtn');
 
   function forwardClick(from, to){
     if(!from || !to) return;
@@ -7817,6 +7922,8 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
   forwardClick(mobileNew, newNoteBtn);
   forwardClick(mobileDelete, deleteNoteBtn);
   forwardClick(mobileWhisper, whisperBtn);
+  forwardClick(mobileMenu, openDrawerBtn);
+  forwardClick(mobileSync, syncNowBtn);
 
   function syncKeyboardInset(){
     if(!mqPhone.matches){
