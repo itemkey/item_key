@@ -179,7 +179,7 @@
 
     .n-shell{
       display: grid;
-      grid-template-columns: minmax(240px, var(--sidebarW, 320px)) 10px minmax(0, 1fr);
+      grid-template-columns: minmax(280px, var(--sidebarW, 320px)) 10px minmax(0, 1fr);
       gap: 12px;
       align-items: start;
       min-width: 0;
@@ -286,6 +286,13 @@
     .n-btn:disabled{ opacity: .5; cursor: not-allowed; transform: none; }
     .n-btn:focus-visible{ outline: 2px solid rgba(0,0,0,.55); outline-offset: 2px; }
 
+    .notes-wrap .n-btn{
+      letter-spacing: 1.4px;
+      text-transform: none;
+      font-size: 12px;
+    }
+    .notes-wrap .n-btn.is-primary{ letter-spacing: 1.7px; }
+
     .n-pill{
       border: 1px solid var(--bd);
       background: rgba(255,255,255,.82);
@@ -320,6 +327,28 @@
       flex-wrap: wrap;
       margin-top: 10px;
     }
+
+    #quickActionsWrap{
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      align-items: start;
+    }
+    #quickActionsBtn{
+      justify-self: start;
+      min-width: 138px;
+    }
+    #quickActionsWrap.is-open #quickActionsBtn{
+      border-color: rgba(0,0,0,.40);
+      background: rgba(0,0,0,.04);
+    }
+    .quick-actions-panel{
+      width: min(460px, 100%);
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .quick-actions-panel[hidden]{ display: none !important; }
 
     .mobile-dock{ display: none; }
 
@@ -379,6 +408,21 @@
       gap: 8px;
       margin-bottom: 10px;
     }
+
+    .n-col-left .tree-actions,
+    .n-col-left .cat-actions{
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+    .n-col-left .tree-actions .n-btn,
+    .n-col-left .cat-actions .n-btn{
+      width: 100%;
+      white-space: normal;
+      line-height: 1.25;
+      letter-spacing: 1.4px;
+      text-align: left;
+    }
     
 .tree-breadcrumb{
   margin: 6px 0 10px;
@@ -399,9 +443,11 @@
       display: grid;
       gap: 4px;
     }
+    .tree ul,
+    .tree li{ min-width: 0; }
     .tree-item{
   display: grid;
-  grid-template-columns: 22px 1fr auto;
+  grid-template-columns: 22px minmax(0, 1fr) auto;
   gap: 6px;
   align-items: center;
   padding: 8px 10px;
@@ -457,6 +503,7 @@
     .tree-name{
       font-size: 12px;
       letter-spacing: 1px;
+      min-width: 0;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -464,9 +511,11 @@
     .tree-count{
       font-size: 10px;
       color: rgba(0,0,0,.55);
-      letter-spacing: 2px;
+      letter-spacing: 1px;
       text-transform: uppercase;
-      padding: 0 6px;
+      min-width: 2ch;
+      padding: 0 2px;
+      text-align: right;
     }
 
     /* Make category vs subcategory visually distinct */
@@ -502,6 +551,7 @@ html[lang="en"] .tree-item[data-depth="0"] .tree-name::after{
   background: rgba(0,0,0,.04);
   border-radius: 999px;
 }
+.tree-item[data-depth="0"] .tree-name::after{ display: none; }
 .tree-item[data-depth]:not([data-depth="0"]) .tree-name{
   font-weight: 650;
 }
@@ -524,10 +574,10 @@ html[lang="en"] .tree-item[data-depth="0"] .tree-name::after{
     }
 
 
-    .indent{ margin-left: 34px; padding-left: 18px; border-left: 2px dashed rgba(0,0,0,.18); }
+    .indent{ margin-left: 16px; padding-left: 10px; border-left: 2px dashed rgba(0,0,0,.18); }
     .indent > li{ position: relative; }
     .indent > li > .tree-item{ position: relative; }
-    .indent > li > .tree-item::before{ content:''; position:absolute; left:-13px; top:50%; width:10px; border-top:1px dashed rgba(0,0,0,.18); }
+    .indent > li > .tree-item::before{ content:''; position:absolute; left:-9px; top:50%; width:6px; border-top:1px dashed rgba(0,0,0,.18); }
     .indent .tree-item{ background: rgba(255,255,255,.62); } /* (kept for legacy) */
 
     /* Notes list */
@@ -550,11 +600,12 @@ html[lang="en"] .tree-item[data-depth="0"] .tree-name::after{
       gap: 10px;
       align-items: center;
       justify-content: flex-end;
-      flex-wrap: nowrap;
+      flex-wrap: wrap;
     }
     /* В остальном проекте .n-btn.is-primary растягивается на всю ширину.
        В шапке списка заметок нам нужен нормальный "inline" размер. */
     .list-actions .n-btn.is-primary{ width: auto; }
+    .list-actions .n-btn{ white-space: normal; }
     @media (max-width: 520px){
       .list-head{ grid-template-columns: 1fr; gap: 8px; }
       .list-actions{ justify-content: flex-start; }
@@ -645,6 +696,7 @@ html[lang="en"] .tree-item[data-depth="0"] .tree-name::after{
       padding-bottom: 4px;
       align-items: center;
     }
+    .toolbar-row--advanced[hidden]{ display: none !important; }
     .toolbar-row::-webkit-scrollbar{ height: 8px; }
     .toolsep{
       width: 1px;
@@ -672,6 +724,11 @@ html[lang="en"] .tree-item[data-depth="0"] .tree-name::after{
     .tool:focus-visible, .toolsel:focus-visible{ outline: 2px solid rgba(0,0,0,.55); outline-offset: 2px; }
     .toolsel{ cursor: default; }
     .tool.is-primary{ font-weight: 700; letter-spacing: 3px; text-transform: uppercase; }
+    #advancedToolsBtn{ margin-left: auto; }
+    #advancedToolsBtn.is-active{
+      border-color: rgba(0,0,0,.45);
+      background: rgba(0,0,0,.07);
+    }
     .swatch{
       width: 16px; height: 16px; border: 1px solid rgba(0,0,0,.22);
       background: #000;
@@ -896,7 +953,8 @@ html[lang="en"] .tree-item[data-depth="0"] .tree-name::after{
         bottom: calc(var(--footerH) + env(safe-area-inset-bottom));
         width: min(420px, 92vw);
         max-width: 92vw;
-        overflow: auto;
+        overflow-y: auto;
+        overflow-x: hidden;
         z-index: 9998;
         transform: translateX(-110%);
         transition: transform .18s ease;
@@ -942,6 +1000,11 @@ html[lang="en"] .tree-item[data-depth="0"] .tree-name::after{
         padding: 14px 12px;
       }
 
+      .indent{ margin-left: 10px; padding-left: 8px; border-left-width: 1px; }
+      .indent > li > .tree-item::before{ left: -7px; width: 4px; }
+      .tree-item{ gap: 4px; }
+      .tree-count{ min-width: 0; }
+
       .mobile-dock{
         position: fixed;
         left: 10px;
@@ -949,7 +1012,7 @@ html[lang="en"] .tree-item[data-depth="0"] .tree-name::after{
         bottom: calc(var(--footerH) + 8px + env(safe-area-inset-bottom) + var(--onoiKeyboardInset));
         z-index: 100050;
         display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
+        grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 8px;
         padding: 8px;
         border: 1px solid rgba(0,0,0,.18);
@@ -1004,11 +1067,14 @@ html[lang="en"] .tree-item[data-depth="0"] .tree-name::after{
 
     /* Desktop: keep sidebar usable (sticky + scroll) */
     @media (min-width: 901px){
+      .n-shell{ grid-template-columns: minmax(280px, var(--sidebarW, 320px)) 10px minmax(0, 1fr); }
+      .v-splitter{ display: block; }
       .n-col-left{
         position: sticky;
         top: calc(var(--topbarOffset) + 12px);
         max-height: calc(100vh - var(--topbarOffset) - var(--footerH) - 26px);
-        overflow: auto;
+        overflow-y: auto;
+        overflow-x: hidden;
         padding-right: 6px;
         scrollbar-width: thin;
       }
@@ -1028,6 +1094,10 @@ html[lang="en"] .tree-item[data-depth="0"] .tree-name::after{
     .n-btn.is-primary{
       border-color: rgba(0,0,0,.50);
       background: rgba(0,0,0,.03);
+    }
+    #openDrawerBtn.is-active{
+      border-color: rgba(0,0,0,.40);
+      background: rgba(0,0,0,.06);
     }
 
     /* Inputs: stronger focus ring */
@@ -1437,7 +1507,11 @@ body.focus-mode .n-col-right{
     width: 100%;
   }
 
-  .n-top-actions .n-btn:first-child{ grid-column: 1 / -1; }
+  .n-top-actions > .n-btn:first-child{ grid-column: 1 / -1; }
+
+  #quickActionsWrap{ grid-template-columns: 1fr; }
+  #quickActionsBtn{ justify-self: stretch; }
+  .quick-actions-panel{ grid-template-columns: 1fr; width: 100%; }
 
   .n-search,
   .editor-title,
@@ -1527,7 +1601,6 @@ body.focus-mode .n-col-right{
 }
 
 @media (max-width: 380px){
-  .mobile-dock,
   .n-top-actions,
   .tree-actions,
   .cat-actions,
@@ -1542,6 +1615,19 @@ body.focus-mode .n-col-right{
   .toolsel{
     min-height: 50px;
   }
+}
+
+@media (max-width: 380px){
+  .toolbar{ gap: 6px; }
+  .toolbar-row{ gap: 6px; padding-bottom: 2px; }
+  .tool,
+  .toolsel{
+    min-height: 46px;
+    height: 46px;
+    padding: 0 10px;
+    font-size: 13px;
+  }
+  .toolsep{ height: 20px; margin: 0 1px; }
 }
 
 </style>
@@ -1695,18 +1781,21 @@ body.focus-mode .n-col-right{
             <button class="scope-switch__btn is-active" id="scopePersonal" type="button" data-scope="personal" aria-pressed="true">Личные</button>
             <button class="scope-switch__btn" id="scopeShared" type="button" data-scope="shared" aria-pressed="false">Общие</button>
           </div>
-          <button class="n-btn" id="openDrawerBtn" type="button">Меню</button>
+          <button class="n-btn" id="openDrawerBtn" type="button" aria-expanded="false" aria-controls="sidebarCol">Меню</button>
           <div class="n-pill ik-admin-indicator" aria-label="Статус синхронизации">
             <span class="dot" id="syncDot"></span>
             <span id="syncText">local</span>
           </div>
         </div>
-<div class="n-top-actions">
-<button class="n-btn" id="settingsBtn" type="button">Настройки</button>
-          <button class="n-btn" id="syncNowBtn" type="button">Синхронизировать</button>
-          <button class="n-btn" id="exportBtn" type="button">Экспорт JSON</button>
-          <button class="n-btn" id="importBtn" type="button">Импорт JSON</button>
-          <input id="importFile" type="file" accept="application/json" hidden />
+<div class="n-top-actions" id="quickActionsWrap">
+  <button class="n-btn" id="quickActionsBtn" type="button" aria-expanded="false" aria-controls="quickActionsPanel">Ещё</button>
+  <div class="quick-actions-panel" id="quickActionsPanel" hidden>
+    <button class="n-btn" id="settingsBtn" type="button">Настройки</button>
+    <button class="n-btn" id="syncNowBtn" type="button">Синхронизировать</button>
+    <button class="n-btn" id="exportBtn" type="button">Экспорт JSON</button>
+    <button class="n-btn" id="importBtn" type="button">Импорт JSON</button>
+  </div>
+  <input id="importFile" type="file" accept="application/json" hidden />
 </div>
       </div>
 
@@ -1771,20 +1860,28 @@ body.focus-mode .n-col-right{
           </div>
 
           <div class="toolbar" aria-label="Панель форматирования">
-            <div class="toolbar-row">
+            <div class="toolbar-row toolbar-row--basic">
               <button class="tool" type="button" id="undoBtn" title="Ctrl+Z">undo</button>
               <button class="tool" type="button" id="redoBtn" title="Ctrl+Y">redo</button>
               <span class="toolsep" aria-hidden="true"></span>
 
               <button class="tool" type="button" data-cmd="bold" title="Ctrl+B"><b>B</b></button>
               <button class="tool" type="button" data-cmd="italic" title="Ctrl+I"><i>I</i></button>
+              <span class="toolsep" aria-hidden="true"></span>
+
+              <button class="tool" type="button" data-cmd="insertUnorderedList">• list</button>
+              <button class="tool" type="button" id="quoteBtn" title="Ctrl+Shift+Q">quote</button>
+              <button class="tool" type="button" id="linkBtn">link</button>
+
+              <button class="tool" type="button" id="advancedToolsBtn" aria-expanded="false" aria-controls="advancedToolsRow">Расширенно</button>
+            </div>
+
+            <div class="toolbar-row toolbar-row--advanced" id="advancedToolsRow" hidden>
               <button class="tool" type="button" data-cmd="underline" title="Ctrl+U"><u>U</u></button>
               <button class="tool" type="button" data-cmd="strikeThrough"><s>S</s></button>
 
               <span class="toolsep" aria-hidden="true"></span>
-              <button class="tool" type="button" data-cmd="insertUnorderedList">• list</button>
               <button class="tool" type="button" data-cmd="insertOrderedList">1. list</button>
-              <button class="tool" type="button" id="quoteBtn" title="Ctrl+Shift+Q">quote</button>
               <button class="tool" type="button" id="codeBtn" title="Ctrl+`">code</button>
 
               <span class="toolsep" aria-hidden="true"></span>
@@ -1795,9 +1892,8 @@ body.focus-mode .n-col-right{
                 <span class="swatch" id="hlSwatch" style="background:#fff59d"></span>marker
               </button>
               <button class="tool" type="button" id="clearFmtBtn">clear</button>
-            </div>
 
-            <div class="toolbar-row">
+              <span class="toolsep" aria-hidden="true"></span>
               <select class="toolsel" id="blockSelect" aria-label="Стиль блока">
                 <option value="p" selected>P</option>
                 <option value="h1">H1</option>
@@ -1833,7 +1929,6 @@ body.focus-mode .n-col-right{
               <button class="tool" type="button" data-cmd="justifyRight">right</button>
 
               <span class="toolsep" aria-hidden="true"></span>
-              <button class="tool" type="button" id="linkBtn">link</button>
               <button class="tool" type="button" id="imgBtn">image</button>
               <input id="imgFile" type="file" accept="image/*" hidden />
 
@@ -1920,8 +2015,6 @@ body.focus-mode .n-col-right{
   </main>
 
   <div class="mobile-dock" aria-label="Быстрые действия">
-    <button class="n-btn" id="mobileMenuBtn" type="button">Меню</button>
-    <button class="n-btn" id="mobileSyncBtn" type="button">Синхро</button>
     <button class="n-btn is-primary" id="mobileNewNoteBtn" type="button">Новая заметка</button>
     <button class="n-btn" id="mobileDeleteNoteBtn" type="button">Удалить</button>
     <button class="n-btn" id="mobileWhisperBtn" type="button">Прошептать</button>
@@ -2236,7 +2329,8 @@ body.focus-mode .n-col-right{
     const LS_UI = {
       sidebarW: 'onoi_notes_sidebar_w_v1',
       sidebarCollapsed: 'onoi_notes_sidebar_collapsed_v1',
-      catCollapsed: 'onoi_notes_cat_collapsed_v1'
+      catCollapsed: 'onoi_notes_cat_collapsed_v1',
+      advancedTools: 'onoi_notes_advanced_tools_v1'
     };
 
     const ONOI_RESET_MARK = 'onoi_notes_supabase_reset_v1';
@@ -2250,7 +2344,7 @@ body.focus-mode .n-col-right{
     const ONOI_PRIVATE_PULL_EVERY_MS = 25000;
     const ONOI_PRIVATE_RPC_TIMEOUT_MS = 12000;
     const ONOI_SAVE_WATCHDOG_MS = 7000;
-    const ONOI_BUILD_TAG = '20260307-6';
+    const ONOI_BUILD_TAG = '20260308-1';
 
     (function ensureBuildTagInUrl(){
       try{
@@ -2287,6 +2381,33 @@ body.focus-mode .n-col-right{
       if(!collapsed){
         document.documentElement.style.setProperty('--sidebarW', state.ui.sidebarW + 'px');
       }
+      if(openDrawerBtn && !window.matchMedia('(max-width: 900px)').matches){
+        const expanded = !collapsed;
+        openDrawerBtn.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+        openDrawerBtn.classList.remove('is-active');
+      }
+    }
+
+    function setQuickActionsOpen(open){
+      if(!quickActionsWrap || !quickActionsBtn || !quickActionsPanel) return;
+      const isOpen = !!open;
+      quickActionsWrap.classList.toggle('is-open', isOpen);
+      quickActionsBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      quickActionsPanel.hidden = !isOpen;
+    }
+
+    function applyAdvancedToolsUI(){
+      if(!advancedToolsBtn || !advancedToolsRow) return;
+      const isOpen = !!state.ui.advancedTools;
+      advancedToolsRow.hidden = !isOpen;
+      advancedToolsBtn.classList.toggle('is-active', isOpen);
+      advancedToolsBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    }
+
+    function setAdvancedToolsOpen(open, persist=true){
+      state.ui.advancedTools = !!open;
+      if(persist) lsSet(LS_UI.advancedTools, state.ui.advancedTools ? '1' : '0');
+      applyAdvancedToolsUI();
     }
     // ========= IndexedDB =========
     const DB_NAME = 'itemkey_onoi_notes_db_v1';
@@ -2539,7 +2660,7 @@ body.focus-mode .n-col-right{
       activeNoteId: null,
       search: '',
       dirty: false,
-      ui: { sidebarW: 320, sidebarCollapsed: false, collapsedCats: new Set() },
+      ui: { sidebarW: 320, sidebarCollapsed: false, collapsedCats: new Set(), advancedTools: false },
       uiHydrated: false,
       saving: false,
       saveTimer: null,
@@ -2612,6 +2733,23 @@ body.focus-mode .n-col-right{
     const importBtn = $('importBtn');
     const importFile = $('importFile');
     const whisperBtn = $('whisperBtn');
+    const quickActionsWrap = $('quickActionsWrap');
+    const quickActionsBtn = $('quickActionsBtn');
+    const quickActionsPanel = $('quickActionsPanel');
+    const openDrawerBtn = $('openDrawerBtn');
+
+    if(typeof window.closeDrawerSoon !== 'function'){
+      window.closeDrawerSoon = function closeDrawerSoon(){
+        if(!window.matchMedia('(max-width: 900px)').matches) return;
+        window.setTimeout(() => {
+          document.body.classList.remove('drawer-open');
+          if(openDrawerBtn){
+            openDrawerBtn.setAttribute('aria-expanded', 'false');
+            openDrawerBtn.classList.remove('is-active');
+          }
+        }, 80);
+      };
+    }
 
     const syncDot = $('syncDot');
     const syncText = $('syncText');
@@ -2637,13 +2775,13 @@ body.focus-mode .n-col-right{
 
     const fontSelect = $('fontSelect');
     const sizeSelect = $('sizeSelect');
-    const colorPick = $('colorPick');
-    const hlPick = $('hlPick');
     const colorSwatch = $('colorSwatch');
     const hlSwatch = $('hlSwatch');
     const toggleSidebarBtn = $('toggleSidebarBtn');
     const splitter = $('splitter');
     const sidebarCol = $('sidebarCol');
+    const advancedToolsBtn = $('advancedToolsBtn');
+    const advancedToolsRow = $('advancedToolsRow');
 
     const focusBtn = $('focusBtn');
 
@@ -4361,7 +4499,7 @@ async function createNote(){
     async function renameActiveCategory(){
       const c = state.activeCatId ? catById(state.activeCatId) : null;
       if(!c) return;
-      const name = await uiPrompt('Новое имя:', c.name || '', {title:'onoi_notes', label:'Название'});
+      const name = await uiPrompt('Новое имя:', {title:'onoi_notes', label:'Название', value: c.name || ''});
       if(!name) return;
       c.name = name.trim();
       c.updatedAt = now();
@@ -5046,6 +5184,41 @@ async function createNote(){
     if(newNoteBtn) newNoteBtn.addEventListener('click', createNote);
     deleteNoteBtn.addEventListener('click', deleteActiveNote);
 
+    if(quickActionsBtn && quickActionsWrap && quickActionsPanel){
+      quickActionsBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        setQuickActionsOpen(quickActionsPanel.hidden);
+      });
+      quickActionsPanel.addEventListener('click', (e) => {
+        const targetBtn = e.target && e.target.closest ? e.target.closest('.n-btn') : null;
+        if(targetBtn) setQuickActionsOpen(false);
+      });
+      document.addEventListener('pointerdown', (e) => {
+        if(quickActionsPanel.hidden) return;
+        const insideQuickActions = quickActionsWrap.contains(e.target);
+        if(!insideQuickActions) setQuickActionsOpen(false);
+      });
+    }
+
+    if(openDrawerBtn){
+      openDrawerBtn.addEventListener('click', () => {
+        setQuickActionsOpen(false);
+        if(window.matchMedia('(max-width: 900px)').matches){
+          document.body.classList.add('drawer-open');
+          openDrawerBtn.setAttribute('aria-expanded', 'true');
+          openDrawerBtn.classList.add('is-active');
+          return;
+        }
+        setSidebarCollapsed(!state.ui.sidebarCollapsed);
+      });
+    }
+
+    if(advancedToolsBtn && advancedToolsRow){
+      advancedToolsBtn.addEventListener('click', () => {
+        setAdvancedToolsOpen(!state.ui.advancedTools);
+      });
+    }
+
     addCatBtn.addEventListener('click', () => createCategory(null));
     addSubCatBtn.addEventListener('click', () => {
       if(!state.activeCatId){ createCategory(null); return; }
@@ -5262,12 +5435,16 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
       await insertImageFromFile(f);
     });
 
-    focusBtn.addEventListener('click', () => {
-      // simple focus mode: hide left/right rails by toggling body class
-      document.body.classList.toggle('focus-mode');
-      const on = document.body.classList.contains('focus-mode');
-      focusBtn.textContent = on ? 'unfocus' : 'focus';
-    });
+    if(focusBtn){
+      focusBtn.addEventListener('click', () => {
+        setQuickActionsOpen(false);
+        window.setTimeout(() => {
+          if(document.body.classList.contains('focus-mode')){
+            setAdvancedToolsOpen(false);
+          }
+        }, 0);
+      });
+    }
 
 
     // Sidebar toggle + splitter
@@ -5279,12 +5456,21 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
 
     if(toggleSidebarBtn){
       toggleSidebarBtn.addEventListener('click', () => {
+        if(window.matchMedia('(max-width: 900px)').matches){
+          setQuickActionsOpen(false);
+          document.body.classList.add('drawer-open');
+          if(openDrawerBtn){
+            openDrawerBtn.setAttribute('aria-expanded', 'true');
+            openDrawerBtn.classList.add('is-active');
+          }
+          return;
+        }
         setSidebarCollapsed(!state.ui.sidebarCollapsed);
       });
     }
 
     function setSidebarWidth(px){
-      const v = clamp(Number(px) || 320, 220, 520);
+      const v = clamp(Number(px) || 320, 280, 560);
       state.ui.sidebarW = v;
       lsSet(LS_UI.sidebarW, String(v));
       document.documentElement.style.setProperty('--sidebarW', v + 'px');
@@ -5465,6 +5651,25 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
 
     // ========= keyboard shortcuts =========
     window.addEventListener('keydown', (e) => {
+      if(uiModal && uiModal.classList.contains('is-open')) return;
+
+      if(e.key === 'Escape'){
+        let consumed = false;
+        if(quickActionsPanel && !quickActionsPanel.hidden){
+          setQuickActionsOpen(false);
+          consumed = true;
+        }
+        if(state.ui.advancedTools && advancedToolsRow){
+          setAdvancedToolsOpen(false);
+          consumed = true;
+        }
+        if(consumed){
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          return;
+        }
+      }
+
       const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
       const inEditor = (e.target === editor || tag === 'input' || tag === 'textarea' || tag === 'select' || e.target.isContentEditable);
 
@@ -5507,10 +5712,13 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
       markBoot('start');
       // UI init
       const sw = Number(lsGet(LS_UI.sidebarW) || 320);
-      state.ui.sidebarW = clamp(sw, 220, 520);
+      state.ui.sidebarW = clamp(sw, 280, 560);
       state.ui.sidebarCollapsed = (lsGet(LS_UI.sidebarCollapsed) === '1');
       state.ui.collapsedCats = loadCollapsedCats();
+      state.ui.advancedTools = (lsGet(LS_UI.advancedTools) === '1');
       applySidebarUI();
+      applyAdvancedToolsUI();
+      setQuickActionsOpen(false);
 
       // Safety-first: never auto-wipe notes on boot.
 
@@ -6892,30 +7100,32 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
     document.body.classList.toggle('is-sidebar-collapsed', !!collapsed);
     try{ localStorage.setItem(SIDEBAR_KEY, collapsed ? '1':'0'); }catch(e){}
   }
-  function openDrawer(){
-    document.body.classList.add('drawer-open');
+  function syncMenuButtonState(){
+    if(!openDrawerBtn) return;
+    const mobile = isMobile();
+    const expanded = mobile
+      ? document.body.classList.contains('drawer-open')
+      : !document.body.classList.contains('is-sidebar-collapsed');
+    openDrawerBtn.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+    openDrawerBtn.classList.toggle('is-active', mobile && expanded);
   }
   function closeDrawer(){
     document.body.classList.remove('drawer-open');
+    syncMenuButtonState();
   }
+
+  window.closeDrawerSoon = function closeDrawerSoon(){
+    if(!isMobile()) return;
+    window.setTimeout(closeDrawer, 80);
+  };
 
   // init desktop sidebar state
   try{
     const v = localStorage.getItem(SIDEBAR_KEY);
     if(v === '1' && !isMobile()) setSidebarCollapsedDesktop(true);
   }catch(e){}
+  syncMenuButtonState();
 
-  if(toggleSidebarBtn){
-    toggleSidebarBtn.addEventListener('click', () => {
-      if(isMobile()){
-        openDrawer();
-      } else {
-        const next = !document.body.classList.contains('is-sidebar-collapsed');
-        setSidebarCollapsedDesktop(next);
-      }
-    });
-  }
-  if(openDrawerBtn) openDrawerBtn.addEventListener('click', openDrawer);
   if(closeDrawerBtn) closeDrawerBtn.addEventListener('click', closeDrawer);
   if(drawerOverlay) drawerOverlay.addEventListener('click', closeDrawer);
 
@@ -6932,6 +7142,7 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
         if(v === '1') document.body.classList.add('is-sidebar-collapsed');
       }catch(e){}
     }
+    syncMenuButtonState();
   }, {passive:true});
 
   // -------------------------
@@ -7056,6 +7267,9 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
     ['слова', 'words'],
     ['выбери грамматическую тему', 'choose a grammar topic'],
     ['Меню', 'Menu'],
+    ['Ещё', 'More'],
+    ['Расширенно', 'Advanced'],
+    ['Синхронизировать', 'Sync now'],
     ['Экспорт JSON', 'Export JSON'],
     ['Импорт JSON', 'Import JSON'],
     ['+ Категория', '+ Category'],
@@ -7905,14 +8119,10 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
   const mobileNew = document.getElementById('mobileNewNoteBtn');
   const mobileDelete = document.getElementById('mobileDeleteNoteBtn');
   const mobileWhisper = document.getElementById('mobileWhisperBtn');
-  const mobileMenu = document.getElementById('mobileMenuBtn');
-  const mobileSync = document.getElementById('mobileSyncBtn');
 
   const newNoteBtn = document.getElementById('newNoteBtn');
   const deleteNoteBtn = document.getElementById('deleteNoteBtn');
   const whisperBtn = document.getElementById('whisperBtn');
-  const openDrawerBtn = document.getElementById('openDrawerBtn');
-  const syncNowBtn = document.getElementById('syncNowBtn');
 
   function forwardClick(from, to){
     if(!from || !to) return;
@@ -7922,8 +8132,6 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
   forwardClick(mobileNew, newNoteBtn);
   forwardClick(mobileDelete, deleteNoteBtn);
   forwardClick(mobileWhisper, whisperBtn);
-  forwardClick(mobileMenu, openDrawerBtn);
-  forwardClick(mobileSync, syncNowBtn);
 
   function syncKeyboardInset(){
     if(!mqPhone.matches){
