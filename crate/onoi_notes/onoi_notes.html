@@ -920,7 +920,6 @@ html[lang="en"] .tree-item[data-depth="0"] .tree-name::after{
     }
     body.drawer-open{ overflow: hidden; }
     body.drawer-open .drawer-overlay{ display: block; }
-    body.drawer-open .mobile-dock{ opacity: 0; pointer-events: none; }
 
     .drawer-head{
       display: none;
@@ -950,7 +949,7 @@ html[lang="en"] .tree-item[data-depth="0"] .tree-name::after{
       }
 
       .center-stage{
-        padding-bottom: calc(var(--footerH) + 110px + env(safe-area-inset-bottom) + var(--onoiKeyboardInset));
+        padding-bottom: calc(var(--footerH) + 20px + env(safe-area-inset-bottom) + var(--onoiKeyboardInset));
       }
 
       /* hide global rails on phones */
@@ -960,32 +959,33 @@ html[lang="en"] .tree-item[data-depth="0"] .tree-name::after{
       .n-title h1{ letter-spacing: 5px; }
       .n-title .sub{ letter-spacing: 2.5px; }
 
-      /* Keep editor as primary: sidebar becomes a drawer */
+      /* Phone layout: stacked sections, no drawer */
       .n-shell{ grid-template-columns: 1fr; }
       .v-splitter{ display: none !important; }
 
       .n-col-left{
-        position: fixed;
-        left: 0;
-        top: 0;
-        bottom: 0;
-        width: min(460px, 100vw);
-        max-width: 100vw;
-        overflow-y: auto;
-        overflow-x: hidden;
-        z-index: 100070;
-        overscroll-behavior: contain;
-        transform: translateX(-110%);
-        transition: transform .18s ease;
-        box-shadow: 10px 0 40px rgba(0,0,0,.18);
-        background: rgba(250,250,250,.98);
-        padding: 10px 10px calc(10px + env(safe-area-inset-bottom));
+        position: relative !important;
+        left: auto;
+        top: auto;
+        bottom: auto;
+        width: 100%;
+        max-width: none;
+        overflow: visible;
+        z-index: auto;
+        transform: none !important;
+        transition: none;
+        box-shadow: none;
+        background: transparent;
+        padding: 0;
       }
-      body.drawer-open .n-col-left{ transform: translateX(0); }
+      body.drawer-open .n-col-left{ transform: none !important; }
+      body.drawer-open{ overflow: auto !important; }
+      .drawer-overlay,
+      .drawer-head,
+      #openDrawerBtn{ display: none !important; }
+      body.drawer-open .drawer-overlay{ display: none !important; }
 
-      .drawer-head{ display: flex; position: sticky; top: 0; z-index: 1; }
-
-      /* Make the topbar wrap nicely on small screens */
+      /* Controls block */
       .n-topbar{
         grid-template-columns: 1fr;
         gap: 8px;
@@ -993,16 +993,44 @@ html[lang="en"] .tree-item[data-depth="0"] .tree-name::after{
       .n-topbar-controls{
         width: 100%;
         display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: 1fr;
         gap: 8px;
         justify-self: stretch;
       }
-      .n-topbar-controls .scope-switch{ grid-column: 1 / -1; width: 100%; }
+      .n-topbar-controls .scope-switch{ width: 100%; }
       #quickActionsWrap{ width: 100%; }
-      #quickActionsBtn,
-      #openDrawerBtn{ width: 100%; min-width: 0; }
+      #quickActionsBtn{ width: 100%; min-width: 0; }
       .quick-actions-panel{ left: 0; right: 0; width: auto; }
       .n-pill{ justify-content: flex-start; }
+
+      .tree-actions{ grid-template-columns: 1fr; }
+      #addCatBtn,
+      #addSubCatBtn{
+        position: relative;
+        min-height: 56px;
+        padding-left: 56px;
+        text-align: left;
+        font-weight: 700;
+        letter-spacing: 1.2px;
+      }
+      #addCatBtn{
+        color: #fff;
+        border-color: rgba(20,35,255,.8);
+        background: linear-gradient(90deg, #f2f2f2 0 46px, #1c2cff 46px 100%);
+      }
+      #addSubCatBtn{
+        color: #082a08;
+        border-color: rgba(0,170,40,.7);
+        background: linear-gradient(90deg, #f2f2f2 0 46px, #00ef33 46px 100%);
+      }
+
+      #catTree,
+      #notesList{
+        max-height: none;
+        overflow: visible;
+        -webkit-overflow-scrolling: touch;
+      }
+      #notesList{ min-height: 220px; }
 
       /* Buttons and fields: better touch targets */
       .n-btn{ min-height: 44px; padding: 12px 12px; letter-spacing: 2px; }
@@ -1036,19 +1064,7 @@ html[lang="en"] .tree-item[data-depth="0"] .tree-name::after{
       .tree-item{ gap: 4px; }
       .tree-count{ min-width: 0; }
 
-      .mobile-dock{
-        position: fixed;
-        left: 10px;
-        right: 10px;
-        bottom: calc(var(--footerH) + 8px + env(safe-area-inset-bottom) + var(--onoiKeyboardInset));
-        z-index: 100050;
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 8px;
-        padding: 8px;
-        border: 1px solid rgba(0,0,0,.18);
-        background: rgba(255,255,255,.96);
-      }
+      .mobile-dock{ display: none; }
       .mobile-dock .n-btn{
         min-height: 44px;
         padding: 8px;
@@ -1116,6 +1132,17 @@ html[lang="en"] .tree-item[data-depth="0"] .tree-name::after{
       }
       .n-col-left::-webkit-scrollbar{ width: 10px; }
       .n-col-left::-webkit-scrollbar-thumb{ background: rgba(0,0,0,.15); border: 2px solid transparent; background-clip: content-box; }
+
+      #sidebarCol > .n-card:first-child{
+        border-color: rgba(28,44,255,.34);
+        background: linear-gradient(180deg, rgba(28,44,255,.07), rgba(255,255,255,.95) 36%);
+      }
+      #sidebarCol > .n-card:nth-child(2){
+        border-color: rgba(218,33,33,.32);
+        background: linear-gradient(180deg, rgba(230,35,35,.06), rgba(255,255,255,.95) 38%);
+      }
+      #addCatBtn,
+      #addSubCatBtn{ min-height: 48px; font-weight: 700; }
     }
 
     /* Clearer button affordance (still sharp + gothic) */
@@ -1504,7 +1531,7 @@ body.focus-mode .n-col-right{
 
 @media (max-width: 480px){
   .center-stage{
-    padding-bottom: calc(var(--footerH) + 170px + env(safe-area-inset-bottom) + var(--onoiKeyboardInset));
+    padding-bottom: calc(var(--footerH) + 20px + env(safe-area-inset-bottom) + var(--onoiKeyboardInset));
   }
 
   .notes-wrap{
@@ -1592,7 +1619,7 @@ body.focus-mode .n-col-right{
     padding: 16px 14px;
     font-size: 17px;
     line-height: 1.75;
-    scroll-padding-bottom: calc(190px + env(safe-area-inset-bottom) + var(--onoiKeyboardInset));
+    scroll-padding-bottom: calc(28px + env(safe-area-inset-bottom) + var(--onoiKeyboardInset));
   }
 
   .n-btn,
@@ -1618,19 +1645,7 @@ body.focus-mode .n-col-right{
     padding-bottom: calc(8px + env(safe-area-inset-bottom));
   }
 
-  .mobile-dock{
-    position: fixed;
-    left: 10px;
-    right: 10px;
-    bottom: calc(var(--footerH) + 8px + env(safe-area-inset-bottom) + var(--onoiKeyboardInset));
-    z-index: 100050;
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 8px;
-    padding: 8px;
-    border: 1px solid rgba(0,0,0,.18);
-    background: rgba(255,255,255,.96);
-  }
+  .mobile-dock{ display: none; }
 
   .mobile-dock .n-btn{
     min-height: 48px;
@@ -1854,8 +1869,8 @@ body.focus-mode .n-col-right{
           <div class="n-label">categories</div>
 
           <div class="tree-actions">
-            <button class="n-btn" id="addCatBtn" type="button">+ Категория</button>
-            <button class="n-btn" id="addSubCatBtn" type="button">+ Подкатегория</button>
+            <button class="n-btn" id="addCatBtn" type="button">Категории</button>
+            <button class="n-btn" id="addSubCatBtn" type="button">Подкатегории</button>
           </div>
 
           <div class="tree-breadcrumb" id="catBreadcrumb" aria-label="Текущая категория">Не выбрано</div>
@@ -2384,7 +2399,7 @@ body.focus-mode .n-col-right{
     const ONOI_PRIVATE_PULL_EVERY_MS = 25000;
     const ONOI_PRIVATE_RPC_TIMEOUT_MS = 12000;
     const ONOI_SAVE_WATCHDOG_MS = 7000;
-    const ONOI_BUILD_TAG = '20260308-6';
+    const ONOI_BUILD_TAG = '20260308-10';
 
     (function ensureBuildTagInUrl(){
       try{
@@ -5391,10 +5406,10 @@ async function createNote(){
       openDrawerBtn.addEventListener('click', () => {
         setQuickActionsOpen(false);
         if(window.matchMedia('(max-width: 900px)').matches){
-          const nextOpen = !document.body.classList.contains('drawer-open');
-          document.body.classList.toggle('drawer-open', nextOpen);
-          openDrawerBtn.setAttribute('aria-expanded', nextOpen ? 'true' : 'false');
-          openDrawerBtn.classList.toggle('is-active', nextOpen);
+          if(sidebarCol){
+            try{ sidebarCol.scrollIntoView({behavior:'smooth', block:'start'}); }
+            catch(_){ sidebarCol.scrollIntoView(); }
+          }
           return;
         }
         setSidebarCollapsed(!state.ui.sidebarCollapsed);
@@ -5642,11 +5657,9 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
       toggleSidebarBtn.addEventListener('click', () => {
         if(window.matchMedia('(max-width: 900px)').matches){
           setQuickActionsOpen(false);
-          const nextOpen = !document.body.classList.contains('drawer-open');
-          document.body.classList.toggle('drawer-open', nextOpen);
-          if(openDrawerBtn){
-            openDrawerBtn.setAttribute('aria-expanded', nextOpen ? 'true' : 'false');
-            openDrawerBtn.classList.toggle('is-active', nextOpen);
+          if(sidebarCol){
+            try{ sidebarCol.scrollIntoView({behavior:'smooth', block:'start'}); }
+            catch(_){ sidebarCol.scrollIntoView(); }
           }
           return;
         }
@@ -7516,6 +7529,9 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
     ['категории · подкатегории · редактор · озвучка', 'categories · subcategories · editor · whisperer'],
     ['локально', 'local'],
     ['категории', 'categories'],
+    ['Категории', 'Categories'],
+    ['Подкатегории', 'Subcategories'],
+    ['подкатегории', 'subcategories'],
     ['редактор', 'editor'],
     ['отменить', 'undo'],
     ['повторить', 'redo'],
