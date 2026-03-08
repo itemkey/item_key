@@ -1669,6 +1669,152 @@ body.focus-mode .n-col-right{
   .toolsep{ height: 20px; margin: 0 1px; }
 }
 
+.mobile-cat-stack{ display: none; }
+.mobile-cat-row{
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 8px;
+  align-items: stretch;
+}
+.mobile-cat-add{
+  width: 46px;
+  min-width: 46px;
+  min-height: 46px;
+  padding: 0;
+  font-size: 24px;
+  letter-spacing: 0;
+  line-height: 1;
+}
+.mobile-cat-strip-wrap{
+  border: 1px solid rgba(0,0,0,.14);
+  background: rgba(255,255,255,.84);
+  padding: 6px;
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+.mobile-cat-strip-title{
+  font-size: 12px;
+  letter-spacing: 1.2px;
+  line-height: 1.2;
+  color: rgba(0,0,0,.82);
+  text-transform: none;
+}
+.mobile-cat-strip{
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  padding-bottom: 2px;
+  min-height: 40px;
+}
+.mobile-cat-chip{
+  appearance: none;
+  border: 1px solid rgba(0,0,0,.16);
+  background: rgba(255,255,255,.94);
+  color: rgba(0,0,0,.90);
+  min-height: 38px;
+  padding: 8px 12px;
+  font: inherit;
+  font-size: 12px;
+  letter-spacing: 1px;
+  white-space: nowrap;
+  cursor: pointer;
+  flex: 0 0 auto;
+  border-radius: 0;
+}
+.mobile-cat-chip.is-active{
+  border-color: rgba(0,0,0,.42);
+  background: rgba(0,0,0,.05);
+}
+.mobile-cat-chip.is-empty{
+  cursor: default;
+  opacity: .6;
+}
+
+@media (max-width: 900px){
+  body.drawer-open{
+    overflow: auto;
+  }
+  body.drawer-open .mobile-dock{
+    opacity: 1;
+    pointer-events: auto;
+  }
+  body.drawer-open .drawer-overlay,
+  #drawerOverlay,
+  .drawer-head,
+  #openDrawerBtn{
+    display: none !important;
+  }
+
+  .n-col-left{
+    position: static;
+    left: auto;
+    right: auto;
+    top: auto;
+    bottom: auto;
+    width: 100%;
+    max-width: 100%;
+    overflow: visible;
+    transform: none !important;
+    box-shadow: none;
+    background: transparent;
+    padding: 0;
+  }
+  body.drawer-open .n-col-left{
+    transform: none !important;
+  }
+
+  .mobile-cat-stack{
+    display: grid;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  #catCard .tree-actions,
+  #catCard .tree-breadcrumb,
+  #catCard .tree,
+  #catCard .cat-actions{
+    display: none;
+  }
+
+  #notesList{
+    min-height: 38vh;
+  }
+  #notesListCard .list-actions{
+    display: none;
+  }
+
+  .n-topbar{
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .n-topbar-controls{
+    display: grid;
+    grid-template-columns: 1fr;
+    width: 100%;
+    gap: 8px;
+  }
+  .n-topbar-controls .scope-switch{
+    width: 100%;
+    grid-column: auto;
+  }
+  #quickActionsWrap,
+  .n-topbar .ik-admin-indicator{
+    display: none !important;
+  }
+
+  .mobile-dock{
+    grid-template-columns: 1fr;
+  }
+  #mobileDeleteNoteBtn,
+  #mobileWhisperBtn{
+    display: none !important;
+  }
+}
+
 </style>
 
 
@@ -1850,8 +1996,26 @@ body.focus-mode .n-col-right{
   <div class="drawer-title">Меню</div>
   <button class="n-btn" id="closeDrawerBtn" type="button">Закрыть</button>
 </div>
-<div class="n-card" aria-label="Категории">
+<div class="n-card" id="catCard" aria-label="Категории">
           <div class="n-label">categories</div>
+
+          <div class="mobile-cat-stack" id="mobileCatStack" aria-label="Категории и подкатегории">
+            <div class="mobile-cat-row" data-strip="categories">
+              <button class="n-btn mobile-cat-add" id="mobileAddCatBtn" type="button" aria-label="+ Категория">+</button>
+              <div class="mobile-cat-strip-wrap">
+                <div class="mobile-cat-strip-title">категории</div>
+                <div class="mobile-cat-strip" id="mobileCategoryList" aria-label="Категории"></div>
+              </div>
+            </div>
+
+            <div class="mobile-cat-row" data-strip="subcategories">
+              <button class="n-btn mobile-cat-add" id="mobileAddSubCatBtn" type="button" aria-label="+ Подкатегория">+</button>
+              <div class="mobile-cat-strip-wrap">
+                <div class="mobile-cat-strip-title">подкатегории</div>
+                <div class="mobile-cat-strip" id="mobileSubcategoryList" aria-label="Подкатегории"></div>
+              </div>
+            </div>
+          </div>
 
           <div class="tree-actions">
             <button class="n-btn" id="addCatBtn" type="button">+ Категория</button>
@@ -1869,7 +2033,7 @@ body.focus-mode .n-col-right{
 </div>
 
         <!-- Notes list -->
-<div class="n-card" aria-label="Список заметок">
+<div class="n-card" id="notesListCard" aria-label="Список заметок">
           <div class="n-label">notes</div>
 
           <div class="list-head">
@@ -2800,6 +2964,10 @@ body.focus-mode .n-col-right{
     const deleteCatBtn = $('deleteCatBtn');
     const catTree = $('catTree');
     const catBreadcrumb = $('catBreadcrumb');
+    const mobileCategoryList = $('mobileCategoryList');
+    const mobileSubcategoryList = $('mobileSubcategoryList');
+    const mobileAddCatBtn = $('mobileAddCatBtn');
+    const mobileAddSubCatBtn = $('mobileAddSubCatBtn');
 
     const notesList = $('notesList');
     const listMeta = $('listMeta');
@@ -3211,6 +3379,43 @@ async function uiPrompt(msg, opts={}){
       return path.length ? path.join(' / ') : '-';
     }
 
+    function sortCatsByName(list){
+      return (Array.isArray(list) ? list.slice() : []).sort((a, b) =>
+        String(a && a.name || '').localeCompare(String(b && b.name || ''))
+      );
+    }
+
+    function getRootCategoryId(catId){
+      let cur = catById(catId);
+      let guard = 0;
+      while(cur && cur.parentId && guard++ < 30){
+        const parent = catById(cur.parentId);
+        if(!parent) break;
+        cur = parent;
+      }
+      return cur ? cur.id : null;
+    }
+
+    function resolveSubcategoryParentId(){
+      const rootId = getRootCategoryId(state.activeCatId);
+      if(rootId && catById(rootId)) return rootId;
+      return getOrCreateMainCatId();
+    }
+
+    function activateCategory(catId, opts){
+      const next = catById(catId);
+      if(!next) return;
+      const options = opts || {};
+      state.activeCatId = next.id;
+      const list = getVisibleNotes();
+      state.activeNoteId = list[0] ? list[0].id : null;
+      renderAll();
+      if(options.focusEditor){
+        setTimeout(() => { try{ editor.focus(); }catch(_){ } }, 0);
+      }
+      if(options.closeDrawer !== false && typeof closeDrawerSoon === 'function') closeDrawerSoon();
+    }
+
     function noteMatchesSearch(note){
       if(!state.search) return true;
       const s = state.search.toLowerCase();
@@ -3322,17 +3527,7 @@ tgl.addEventListener('click', (e) => {
           row.appendChild(cnt);
 
           row.addEventListener('click', (e) => {
-            state.activeCatId = cat.id;
-            // pick first note in cat
-            const list = getVisibleNotes();
-            if(list.length){
-              state.activeNoteId = list[0].id;
-            } else {
-              state.activeNoteId = null;
-            }
-            renderAll();
-            setTimeout(() => { try{ editor.focus(); }catch(e){} }, 0);
-            if(typeof closeDrawerSoon === 'function') closeDrawerSoon();
+            activateCategory(cat.id, { focusEditor: true });
           });
 
           row.addEventListener('keydown', (e) => {
@@ -3375,6 +3570,56 @@ tgl.addEventListener('click', (e) => {
 
       wrap.appendChild(buildList(null, 0));
       catTree.appendChild(wrap);
+      renderMobileCategoryStrips();
+    }
+
+    function renderMobileCategoryStrips(){
+      if(!mobileCategoryList || !mobileSubcategoryList) return;
+
+      const roots = sortCatsByName(state.cats.filter(c => !c.parentId));
+      const activeRootId = getRootCategoryId(state.activeCatId) || (roots[0] ? roots[0].id : null);
+
+      mobileCategoryList.innerHTML = '';
+      if(!roots.length){
+        const empty = document.createElement('div');
+        empty.className = 'mobile-cat-chip is-empty';
+        empty.textContent = '-';
+        mobileCategoryList.appendChild(empty);
+      }else{
+        roots.forEach((cat) => {
+          const isActive = String(cat.id) === String(activeRootId);
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'mobile-cat-chip' + (isActive ? ' is-active' : '');
+          btn.textContent = cat.name || '-';
+          btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+          btn.addEventListener('click', () => activateCategory(cat.id));
+          mobileCategoryList.appendChild(btn);
+        });
+      }
+
+      const subcats = activeRootId
+        ? sortCatsByName(state.cats.filter(c => String(c.parentId || '') === String(activeRootId)))
+        : [];
+
+      mobileSubcategoryList.innerHTML = '';
+      if(!subcats.length){
+        const empty = document.createElement('div');
+        empty.className = 'mobile-cat-chip is-empty';
+        empty.textContent = '-';
+        mobileSubcategoryList.appendChild(empty);
+      }else{
+        subcats.forEach((cat) => {
+          const isActive = String(cat.id) === String(state.activeCatId || '');
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'mobile-cat-chip' + (isActive ? ' is-active' : '');
+          btn.textContent = cat.name || '-';
+          btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+          btn.addEventListener('click', () => activateCategory(cat.id));
+          mobileSubcategoryList.appendChild(btn);
+        });
+      }
     }
 
     function getVisibleNotes(){
@@ -5409,9 +5654,10 @@ async function createNote(){
 
     addCatBtn.addEventListener('click', () => createCategory(null));
     addSubCatBtn.addEventListener('click', () => {
-      if(!state.activeCatId){ createCategory(null); return; }
-      createCategory(state.activeCatId);
+      createCategory(resolveSubcategoryParentId());
     });
+    if(mobileAddCatBtn) mobileAddCatBtn.addEventListener('click', () => createCategory(null));
+    if(mobileAddSubCatBtn) mobileAddSubCatBtn.addEventListener('click', () => createCategory(resolveSubcategoryParentId()));
     renameCatBtn.addEventListener('click', renameActiveCategory);
     deleteCatBtn.addEventListener('click', deleteActiveCategory);
 
@@ -7516,6 +7762,7 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
     ['категории · подкатегории · редактор · озвучка', 'categories · subcategories · editor · whisperer'],
     ['локально', 'local'],
     ['категории', 'categories'],
+    ['подкатегории', 'subcategories'],
     ['редактор', 'editor'],
     ['отменить', 'undo'],
     ['повторить', 'redo'],
@@ -7959,6 +8206,7 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
     '.note-title',
     '.note-snippet',
     '.tree-name',
+    '.mobile-cat-chip',
     '.tree-breadcrumb',
     '.crumbs',
     '.w-display',
