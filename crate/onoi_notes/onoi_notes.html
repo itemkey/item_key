@@ -229,9 +229,17 @@
     /* Top utility bar */
     .n-topbar{
       display: grid;
-      grid-template-columns: 1fr auto auto auto;
+      grid-template-columns: 1fr auto auto;
       gap: 10px;
       align-items: center;
+    }
+    .n-topbar-controls{
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: nowrap;
+      justify-self: end;
+      min-width: 0;
     }
     .scope-switch{
       display: inline-grid;
@@ -319,7 +327,6 @@
     .dot.warn{ background: rgba(255,170,0,.35); border-color: rgba(255,170,0,.6); }
     .dot.bad{ background: rgba(255,0,0,.25); border-color: rgba(255,0,0,.45); }
 
-    .n-top-actions,
     .cat-actions,
     .editor-status{
       display: flex;
@@ -329,25 +336,34 @@
     }
 
     #quickActionsWrap{
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 10px;
-      align-items: start;
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      min-width: 0;
     }
-    #quickActionsBtn{
-      justify-self: start;
-      min-width: 138px;
+    #quickActionsBtn,
+    #openDrawerBtn{
+      min-width: 104px;
     }
     #quickActionsWrap.is-open #quickActionsBtn{
       border-color: rgba(0,0,0,.40);
       background: rgba(0,0,0,.04);
     }
     .quick-actions-panel{
-      width: min(460px, 100%);
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      width: min(260px, calc(100vw - 24px));
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
+      grid-template-columns: 1fr;
+      gap: 6px;
+      padding: 8px;
+      border: 1px solid rgba(0,0,0,.18);
+      background: rgba(255,255,255,.98);
+      box-shadow: 0 10px 24px rgba(0,0,0,.14);
+      z-index: 10020;
     }
+    .quick-actions-panel .n-btn{ width: 100%; text-align: left; white-space: normal; }
     .quick-actions-panel[hidden]{ display: none !important; }
 
     .mobile-dock{ display: none; }
@@ -445,11 +461,12 @@
     }
     .tree ul,
     .tree li{ min-width: 0; }
-    .tree-item{
+.tree-item{
   display: grid;
   grid-template-columns: 22px minmax(0, 1fr) auto;
   gap: 6px;
   align-items: center;
+  width: 100%;
   padding: 8px 10px;
   border: 1px solid rgba(0,0,0,.10);
   background: rgba(255,255,255,.70);
@@ -971,6 +988,7 @@ html[lang="en"] .tree-item[data-depth="0"] .tree-name::after{
         grid-template-columns: 1fr auto;
         gap: 8px;
       }
+      .n-topbar-controls{ justify-self: end; }
 .n-pill{ grid-column: 1 / -1; justify-content: flex-start; }
 
       /* Buttons and fields: better touch targets */
@@ -1033,6 +1051,12 @@ html[lang="en"] .tree-item[data-depth="0"] .tree-name::after{
     @media (max-width: 520px){
       .n-title h1{ letter-spacing: 4px; }
       .n-title .sub{ font-size: 10px; }
+      .n-topbar-controls{ width: 100%; flex-wrap: wrap; justify-content: flex-end; }
+      .n-topbar-controls .scope-switch{ flex: 1 1 100%; }
+      #quickActionsWrap,
+      #openDrawerBtn{ flex: 1 1 0; min-width: 0; }
+      #quickActionsBtn{ width: 100%; min-width: 0; }
+      .quick-actions-panel{ left: 0; right: 0; width: auto; }
       .editor-head{
         grid-template-columns: 1fr;
         gap: 8px;
@@ -1490,8 +1514,7 @@ body.focus-mode .n-col-right{
 
   .list-actions,
   .tree-actions,
-  .cat-actions,
-  .n-top-actions{
+  .cat-actions{
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
@@ -1500,18 +1523,23 @@ body.focus-mode .n-col-right{
   .list-actions .n-btn,
   .tree-actions .n-btn,
   .cat-actions .n-btn,
-  .n-top-actions .n-btn,
   .n-topbar .n-btn,
   #whisperBtn,
   .mobile-dock .n-btn{
     width: 100%;
   }
 
-  .n-top-actions > .n-btn:first-child{ grid-column: 1 / -1; }
-
-  #quickActionsWrap{ grid-template-columns: 1fr; }
-  #quickActionsBtn{ justify-self: stretch; }
-  .quick-actions-panel{ grid-template-columns: 1fr; width: 100%; }
+  .n-topbar-controls{
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    width: 100%;
+  }
+  .n-topbar-controls .scope-switch{ grid-column: 1 / -1; width: 100%; }
+  #quickActionsWrap{ width: 100%; }
+  #quickActionsBtn,
+  #openDrawerBtn{ width: 100%; min-width: 0; }
+  .quick-actions-panel{ left: 0; right: 0; width: auto; }
 
   .n-search,
   .editor-title,
@@ -1601,7 +1629,6 @@ body.focus-mode .n-col-right{
 }
 
 @media (max-width: 380px){
-  .n-top-actions,
   .tree-actions,
   .cat-actions,
   .list-actions{
@@ -1774,29 +1801,31 @@ body.focus-mode .n-col-right{
         <div class="sub">категории · подкатегории · редактор · whisperer</div>
       </div>
 
-      <div class="n-card" id="notesTopPanel">
+        <div class="n-card" id="notesTopPanel">
         <div class="n-topbar" aria-label="Панель поиска и действий">
           <input class="n-search" id="searchInput" placeholder="Поиск по заметкам…" />
-          <div class="scope-switch" id="notesScopeSwitch" role="tablist" aria-label="Раздел заметок">
-            <button class="scope-switch__btn is-active" id="scopePersonal" type="button" data-scope="personal" aria-pressed="true">Личные</button>
-            <button class="scope-switch__btn" id="scopeShared" type="button" data-scope="shared" aria-pressed="false">Общие</button>
+          <div class="n-topbar-controls">
+            <div class="scope-switch" id="notesScopeSwitch" role="tablist" aria-label="Раздел заметок">
+              <button class="scope-switch__btn is-active" id="scopePersonal" type="button" data-scope="personal" aria-pressed="true">Личные</button>
+              <button class="scope-switch__btn" id="scopeShared" type="button" data-scope="shared" aria-pressed="false">Общие</button>
+            </div>
+            <div id="quickActionsWrap">
+              <button class="n-btn" id="quickActionsBtn" type="button" aria-expanded="false" aria-controls="quickActionsPanel">Ещё</button>
+              <div class="quick-actions-panel" id="quickActionsPanel" hidden>
+                <button class="n-btn" id="settingsBtn" type="button">Настройки</button>
+                <button class="n-btn" id="syncNowBtn" type="button">Синхронизировать</button>
+                <button class="n-btn" id="exportBtn" type="button">Экспорт JSON</button>
+                <button class="n-btn" id="importBtn" type="button">Импорт JSON</button>
+              </div>
+              <input id="importFile" type="file" accept="application/json" hidden />
+            </div>
+            <button class="n-btn" id="openDrawerBtn" type="button" aria-expanded="false" aria-controls="sidebarCol">Меню</button>
           </div>
-          <button class="n-btn" id="openDrawerBtn" type="button" aria-expanded="false" aria-controls="sidebarCol">Меню</button>
           <div class="n-pill ik-admin-indicator" aria-label="Статус синхронизации">
             <span class="dot" id="syncDot"></span>
             <span id="syncText">local</span>
           </div>
         </div>
-<div class="n-top-actions" id="quickActionsWrap">
-  <button class="n-btn" id="quickActionsBtn" type="button" aria-expanded="false" aria-controls="quickActionsPanel">Ещё</button>
-  <div class="quick-actions-panel" id="quickActionsPanel" hidden>
-    <button class="n-btn" id="settingsBtn" type="button">Настройки</button>
-    <button class="n-btn" id="syncNowBtn" type="button">Синхронизировать</button>
-    <button class="n-btn" id="exportBtn" type="button">Экспорт JSON</button>
-    <button class="n-btn" id="importBtn" type="button">Импорт JSON</button>
-  </div>
-  <input id="importFile" type="file" accept="application/json" hidden />
-</div>
       </div>
 
       <div id="personalWrap">
@@ -1870,6 +1899,20 @@ body.focus-mode .n-col-right{
               <span class="toolsep" aria-hidden="true"></span>
 
               <button class="tool" type="button" data-cmd="insertUnorderedList">• list</button>
+              <button class="tool" type="button" data-cmd="insertOrderedList">1. list</button>
+              <select class="toolsel" id="blockSelect" aria-label="Стиль блока">
+                <option value="p" selected>P</option>
+                <option value="h1">H1</option>
+                <option value="h2">H2</option>
+                <option value="h3">H3</option>
+                <option value="h4">H4</option>
+                <option value="blockquote">quote</option>
+                <option value="pre">code</option>
+              </select>
+              <button class="tool" type="button" id="textColorBtn" aria-haspopup="dialog" aria-controls="textColorPop" title="Цвет текста">
+                <span class="swatch" id="colorSwatch"></span>text
+              </button>
+              <span class="toolsep" aria-hidden="true"></span>
               <button class="tool" type="button" id="quoteBtn" title="Ctrl+Shift+Q">quote</button>
               <button class="tool" type="button" id="linkBtn">link</button>
 
@@ -1881,28 +1924,13 @@ body.focus-mode .n-col-right{
               <button class="tool" type="button" data-cmd="strikeThrough"><s>S</s></button>
 
               <span class="toolsep" aria-hidden="true"></span>
-              <button class="tool" type="button" data-cmd="insertOrderedList">1. list</button>
               <button class="tool" type="button" id="codeBtn" title="Ctrl+`">code</button>
 
               <span class="toolsep" aria-hidden="true"></span>
-              <button class="tool" type="button" id="textColorBtn" aria-haspopup="dialog" aria-controls="textColorPop" title="Цвет текста">
-                <span class="swatch" id="colorSwatch"></span>text
-              </button>
               <button class="tool" type="button" id="hlBtn" aria-haspopup="dialog" aria-controls="hlPop" title="Маркер">
                 <span class="swatch" id="hlSwatch" style="background:#fff59d"></span>marker
               </button>
               <button class="tool" type="button" id="clearFmtBtn">clear</button>
-
-              <span class="toolsep" aria-hidden="true"></span>
-              <select class="toolsel" id="blockSelect" aria-label="Стиль блока">
-                <option value="p" selected>P</option>
-                <option value="h1">H1</option>
-                <option value="h2">H2</option>
-                <option value="h3">H3</option>
-                <option value="h4">H4</option>
-                <option value="blockquote">quote</option>
-                <option value="pre">code</option>
-              </select>
 
               <button class="tool" type="button" id="customSizeBtn">size…</button>
               <select class="toolsel" id="fontSelect">
@@ -2344,7 +2372,7 @@ body.focus-mode .n-col-right{
     const ONOI_PRIVATE_PULL_EVERY_MS = 25000;
     const ONOI_PRIVATE_RPC_TIMEOUT_MS = 12000;
     const ONOI_SAVE_WATCHDOG_MS = 7000;
-    const ONOI_BUILD_TAG = '20260308-1';
+    const ONOI_BUILD_TAG = '20260308-4';
 
     (function ensureBuildTagInUrl(){
       try{
@@ -3616,6 +3644,138 @@ tgl.addEventListener('click', (e) => {
       return r;
     }
 
+    const BLOCK_TAGS = new Set(['P','DIV','H1','H2','H3','H4','BLOCKQUOTE','PRE','LI']);
+
+    function closestEditorBlock(node){
+      let cur = node;
+      if(cur && cur.nodeType === 3) cur = cur.parentNode;
+      while(cur && cur !== editor){
+        if(cur.nodeType === 1 && BLOCK_TAGS.has(cur.nodeName)) return cur;
+        cur = cur.parentNode;
+      }
+      return null;
+    }
+
+    function collectBlocksInRange(range){
+      if(!range) return [];
+      const out = [];
+      const seen = new Set();
+      const add = (node) => {
+        const block = closestEditorBlock(node);
+        if(!block || seen.has(block)) return;
+        seen.add(block);
+        out.push(block);
+      };
+
+      add(range.startContainer);
+      add(range.endContainer);
+
+      if(!range.collapsed){
+        const walker = document.createTreeWalker(editor, NodeFilter.SHOW_ELEMENT, {
+          acceptNode(node){
+            if(!BLOCK_TAGS.has(node.nodeName)) return NodeFilter.FILTER_SKIP;
+            try{
+              return range.intersectsNode(node) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
+            }catch(_){
+              return NodeFilter.FILTER_SKIP;
+            }
+          }
+        });
+        while(walker.nextNode()) add(walker.currentNode);
+      }
+
+      return out;
+    }
+
+    function markSelection(){
+      const sel = window.getSelection ? window.getSelection() : null;
+      if(!sel || sel.rangeCount === 0) return null;
+      const r = sel.getRangeAt(0);
+      const start = document.createComment('onoi_fmt_start');
+      const end = document.createComment('onoi_fmt_end');
+
+      const endRange = r.cloneRange();
+      endRange.collapse(false);
+      endRange.insertNode(end);
+
+      const startRange = r.cloneRange();
+      startRange.collapse(true);
+      startRange.insertNode(start);
+
+      return { start, end };
+    }
+
+    function restoreMarkedSelection(markers){
+      if(!markers || !markers.start || !markers.end) return;
+      if(!markers.start.parentNode || !markers.end.parentNode) return;
+
+      const r = document.createRange();
+      r.setStartAfter(markers.start);
+      r.setEndBefore(markers.end);
+
+      const sel = window.getSelection ? window.getSelection() : null;
+      if(sel){
+        sel.removeAllRanges();
+        sel.addRange(r);
+      }
+
+      markers.start.remove();
+      markers.end.remove();
+    }
+
+    function replaceBlockTag(el, tag){
+      if(!el || !el.parentNode) return null;
+      const next = document.createElement(tag);
+      const style = el.getAttribute && el.getAttribute('style');
+      if(style) next.setAttribute('style', style);
+      while(el.firstChild) next.appendChild(el.firstChild);
+      el.replaceWith(next);
+      return next;
+    }
+
+    function applyBlockFormat(tag){
+      const t = String(tag || 'p').toLowerCase();
+      const allowed = new Set(['p','h1','h2','h3','h4','blockquote','pre']);
+      if(!allowed.has(t)) return;
+
+      focusEditor();
+      restoreSelection();
+      const r = getSelRange();
+      if(!r) return;
+
+      if(t === 'p' || t === 'h1' || t === 'h2' || t === 'h3' || t === 'h4'){
+        const blocks = collectBlocksInRange(r);
+        if(blocks.length){
+          const markers = markSelection();
+          let changed = false;
+          blocks.forEach((block) => {
+            if(!block || !block.parentNode) return;
+            const name = block.nodeName.toLowerCase();
+            if(name === t) return;
+            if(name === 'li' || name === 'pre' || name === 'blockquote') return;
+            replaceBlockTag(block, t);
+            changed = true;
+          });
+          restoreMarkedSelection(markers);
+          if(changed){
+            sanitizeEditorHTML();
+            saveSelection();
+            schedulePersist();
+            return;
+          }
+        }
+      }
+
+      let ok = false;
+      try{ ok = document.execCommand('formatBlock', false, t); }catch(_){ ok = false; }
+      if(!ok){
+        try{ document.execCommand('formatBlock', false, '<' + t + '>'); }catch(_){ }
+      }
+      sanitizeEditorHTML();
+      saveSelection();
+      schedulePersist();
+    }
+
     function cssTextFromObj(obj){
       return Object.entries(obj || {})
         .filter(([k,v]) => v !== null && v !== undefined && String(v).trim() !== '')
@@ -3746,6 +3906,21 @@ function setFontFamily(ff){
         if(fs){ setFontSize(fs); sizeSelect.value = fs; }
       }catch(e){}
     }
+
+    function exposeEditorRuntime(){
+      window.renderEditor = renderEditor;
+      window.schedulePersist = schedulePersist;
+      window.sanitizeEditorHTML = sanitizeEditorHTML;
+      window.saveSelection = saveSelection;
+      window.restoreSelection = restoreSelection;
+      window.focusEditor = focusEditor;
+      window.applyStyleToSelection = applyStyleToSelection;
+      window.applyFontSizeToSelection = applyFontSizeToSelection;
+      window.applyBlockFormat = applyBlockFormat;
+      window.execEditorCommand = exec;
+      window.setSidebarCollapsed = setSidebarCollapsed;
+    }
+    exposeEditorRuntime();
 
     // ========= image handling =========
     async function fileToDataURL(file){
@@ -5306,11 +5481,7 @@ async function createNote(){
     if(blockSelect){
       blockSelect.addEventListener('change', () => {
         const v = blockSelect.value || 'p';
-        if(v === 'p') exec('formatBlock', '<p>');
-        else if(v === 'pre') exec('formatBlock', '<pre>');
-        else if(v === 'blockquote') exec('formatBlock', '<blockquote>');
-        else exec('formatBlock', '<' + v + '>');
-        schedulePersist();
+        applyBlockFormat(v);
       });
     }
 
@@ -7759,7 +7930,7 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
       { selector: '#notesSearch', placeholder: { ru: 'Поиск заметок...', en: 'Search notes...' } }
     ],
     onoi_notes: [
-      { selector: 'h1', text: { ru: 'ЗАМЕТКИ', en: 'NOTES' } },
+      { selector: '#notesHero h1', text: { ru: 'ЗАМЕТКИ', en: 'NOTES' } },
       { selector: '.n-title .sub', text: { ru: 'категории · подкатегории · редактор · озвучка', en: 'categories · subcategories · editor · whisperer' } },
       { selector: '#searchInput', placeholder: { ru: 'Поиск по заметкам…', en: 'Search notes…' } },
       { selector: '#noteTitle', placeholder: { ru: 'Название заметки…', en: 'Note title…' } }
