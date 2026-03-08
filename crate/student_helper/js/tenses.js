@@ -523,6 +523,7 @@
         for (const item of (ex.items || [])){
           const cloned = Object.assign({}, item);
           cloned.id = `mixedAll_${meta.id}_${item.id || Math.random().toString(36).slice(2)}`;
+          cloned.sourceTenseId = item.sourceTenseId || item.correctTenseId || meta.id;
           target.items.push(cloned);
         }
       }
@@ -561,6 +562,7 @@
         for (const item of (ex.items || [])){
           const cloned = Object.assign({}, item);
           cloned.id = `custom_${meta.id}_${item.id || Math.random().toString(36).slice(2)}`;
+          cloned.sourceTenseId = item.sourceTenseId || item.correctTenseId || meta.id;
           target.items.push(cloned);
         }
       }
@@ -814,8 +816,14 @@
     const elExplain = runWrap.querySelector('#shTRunExplainBox');
     const cbShowAfterLocal = runWrap.querySelector('#shTRunShowAfter');
 
+    if (elExplain){
+      elExplain.style.display = 'block';
+      elExplain.style.whiteSpace = 'pre-line';
+    }
+
     let idx = 0;
     let checked = false;
+    let lastCheck = null;
 
     // state per question
     let selectedIndex = null;
@@ -838,6 +846,7 @@
       selectedSet = new Set();
       matchState = null;
       multiInputs = null;
+      lastCheck = null;
     }
 
     function setExplainAvailability(isAnswered){
@@ -849,24 +858,377 @@
       btnExplain.textContent = 'объяснение';
     }
 
-    function inferQuestionTenseTitle(q){
-      if (!q) return tenseObj.title || tenseObj.id || 'unknown';
+    const TENSE_TEXT_PATTERNS = [
+      ['presentSimple', /\bpresent simple\b/i],
+      ['presentContinuous', /\bpresent continuous\b/i],
+      ['presentPerfectContinuous', /\bpresent perfect continuous\b/i],
+      ['presentPerfect', /\bpresent perfect\b/i],
+      ['pastSimple', /\bpast simple\b/i],
+      ['pastContinuous', /\bpast continuous\b/i],
+      ['pastPerfectContinuous', /\bpast perfect continuous\b/i],
+      ['pastPerfect', /\bpast perfect\b/i],
+      ['futureSimple', /\bfuture simple\b/i],
+      ['futureContinuous', /\bfuture continuous\b/i],
+      ['futurePerfectContinuous', /\bfuture perfect continuous\b/i],
+      ['futurePerfect', /\bfuture perfect\b/i],
+    ];
+
+    function qText(v){
+      const t = String(v || '').trim();
+      return t ? `«${t}»` : '—';
+    }
+
+    function joinReadable(items){
+      const arr = (items || []).map(x=>String(x || '').trim()).filter(Boolean);
+      return arr.length ? arr.map(x=>`«${x}»`).join(', ') : '—';
+    }
+
+    function pushExplainLine(lines, text){
+      const cleaned = String(text || '').replace(/\s+/g, ' ').trim();
+      if (!cleaned) return;
+      const key = normalize(cleaned).replace(/[^a-zа-я0-9]+/gi, ' ').trim();
+      for (const prev of lines){
+        const prevKey = normalize(prev).replace(/[^a-zа-я0-9]+/gi, ' ').trim();
+        if (prevKey === key) return;
+      }
+      lines.push(cleaned);
+    }
+
+    function getTenseMetaById(id){
+      const key = String(id || '').trim();
+      if (!key) return null;
+      const meta = (REG.INDEX || []).find(x => x.id === key);
+      if (meta) return { id: meta.id, title: meta.title || meta.id, hint: meta.hint || '', subtitle: meta.subtitle || '' };
+      const obj = REG.byId && REG.byId[key];
+      if (obj && obj.title){
+        return { id: obj.id || key, title: obj.title || key, hint: obj.hint || '', subtitle: obj.subtitle || '' };
+      }
+      return null;
+    }
+
+    function detectTenseIdFromText(text){
+      const src = String(text || '');
+      if (!src) return '';
+      for (const [id, re] of TENSE_TEXT_PATTERNS){
+        if (re.test(src)) return id;
+      }
+      return '';
+    }
+
+    function collectAcceptedSamples(item){
+      const out = [];
+      if (Array.isArray(item?.accepted)) out.push(...item.accepted);
+      if (Array.isArray(item?.inputs)){
+        for (const spec of item.inputs){
+          if (Array.isArray(spec?.accepted)) out.push(...spec.accepted);
+        }
+      }
+      return out.map(x=>String(x || '').trim()).filter(Boolean);
+    }
+
+    function detectTenseIdFromAnswerForms(item){
+      const src = normalize(collectAcceptedSamples(item).join(' | '));
+      if (!src) return '';
+
+      const ids = new Set();
+      if (/\bwill have been\b/.test(src) && /\bing\b/.test(src)) ids.add('futurePerfectContinuous');
+      if (/\bhad been\b/.test(src) && /\bing\b/.test(src)) ids.add('pastPerfectContinuous');
+      if (/\b(?:have|has) been\b/.test(src) && /\bing\b/.test(src)) ids.add('presentPerfectContinuous');
+
+      if (/\bwill have\b/.test(src) && /\b(?:done|gone|been|seen|had|made|taken|written|drunk|eaten|finished|worked|studied|arrived|left|bought|told|given|found|known|thought|read)\b/.test(src)) ids.add('futurePerfect');
+      if (/\bhad\b/.test(src) && /\b(?:done|gone|been|seen|had|made|taken|written|drunk|eaten|finished|worked|studied|arrived|left|bought|told|given|found|known|thought|read)\b/.test(src)) ids.add('pastPerfect');
+      if (/\b(?:have|has)\b/.test(src) && /\b(?:done|gone|been|seen|had|made|taken|written|drunk|eaten|finished|worked|studied|arrived|left|bought|told|given|found|known|thought|read)\b/.test(src)) ids.add('presentPerfect');
+
+      if (/\bwill be\b/.test(src) && /\bing\b/.test(src)) ids.add('futureContinuous');
+      if (/\b(?:was|were)\b/.test(src) && /\bing\b/.test(src)) ids.add('pastContinuous');
+      if (/\b(?:am|is|are)\b/.test(src) && /\bing\b/.test(src)) ids.add('presentContinuous');
+
+      if (/\bwill\b/.test(src) && !/\bwill (?:be|have)\b/.test(src)) ids.add('futureSimple');
+      if (/\bdid\b/.test(src) || /\b(?:went|saw|came|got|took|made|wrote|ate|drank|spoke|thought|found|knew|said|left|arrived|started|stopped|rang|called)\b/.test(src)) ids.add('pastSimple');
+      if ((/\b(?:do|does)\b/.test(src) || /\b(?:always|usually|often|sometimes|never|every)\b/.test(src)) && !ids.size) ids.add('presentSimple');
+
+      if (ids.size === 1) return Array.from(ids)[0];
+      return '';
+    }
+
+    function inferQuestionTenseMeta(q, check){
+      if (!q) return getTenseMetaById(tenseObj.id);
       const item = q.item || {};
 
-      if (item.correctTenseId && REG.byId[item.correctTenseId]?.title){
-        return REG.byId[item.correctTenseId].title;
+      const direct = [item.correctTenseId, item.sourceTenseId, item._sourceTenseId];
+      for (const id of direct){
+        const meta = getTenseMetaById(id);
+        if (meta) return meta;
       }
 
       const rawId = String(item.id || '');
-      const m = rawId.match(/^(?:mixedAll|custom)_([^_]+)_/);
+      const m = rawId.match(/^(?:mixedAll|custom|dy)_([^_]+)_/);
       if (m && m[1]){
-        const id = m[1];
-        const meta = (REG.INDEX || []).find(x => x.id === id);
-        if (meta?.title) return meta.title;
-        if (REG.byId[id]?.title) return REG.byId[id].title;
+        const meta = getTenseMetaById(m[1]);
+        if (meta) return meta;
       }
 
-      return tenseObj.title || tenseObj.id || 'unknown';
+      if (Array.isArray(item.candidateTenseIds) && Number.isInteger(item.correctIndex)){
+        const guessed = item.candidateTenseIds[item.correctIndex];
+        const meta = getTenseMetaById(guessed);
+        if (meta) return meta;
+      }
+
+      if (Array.isArray(item.options) && Number.isInteger(item.correctIndex) && item.options[item.correctIndex]){
+        const idFromOption = detectTenseIdFromText(item.options[item.correctIndex]);
+        const meta = getTenseMetaById(idFromOption);
+        if (meta) return meta;
+      }
+
+      if (check && check.correctText){
+        const idFromCheck = detectTenseIdFromText(check.correctText);
+        const meta = getTenseMetaById(idFromCheck);
+        if (meta) return meta;
+      }
+
+      const idFromForms = detectTenseIdFromAnswerForms(item);
+      const metaFromForms = getTenseMetaById(idFromForms);
+      if (metaFromForms) return metaFromForms;
+
+      const fallback = getTenseMetaById(tenseObj.id);
+      if (fallback) return fallback;
+      return null;
+    }
+
+    function detectPromptSignals(prompt){
+      const t = String(prompt || '').toLowerCase();
+      const out = [];
+      const add = (re, text)=>{ if (re.test(t)) out.push(text); };
+
+      add(/\b(now|right now|at the moment|currently)\b|\blook\b|\blisten\b/, 'есть маркер текущего момента');
+      add(/\b(always|usually|often|sometimes|never|generally|normally)\b|\bevery\s+(day|week|month|year)\b|\bon\s+\w+s\b|\bat weekends?\b/, 'есть маркер регулярности/привычки');
+      add(/\b(yesterday|last\s+\w+|\d+\s+ago|in\s+\d{4}|then)\b/, 'есть точка в прошлом');
+      add(/\bwhile\b/, 'есть while (обычно фон/процесс)');
+      add(/\b(already|just|yet|ever|so far|recently|lately)\b/, 'есть perfect-маркер');
+      add(/\b(for|since|how long)\b/, 'есть маркер длительности');
+      add(/\b(by the time|before)\b|\bby\s+(tomorrow|then|next|\d)/, 'есть дедлайн/граница во времени');
+      add(/\b(tomorrow|next\s+\w+|soon|this time tomorrow)\b/, 'есть ориентир на будущее');
+
+      const uniqOut = [];
+      const seen = new Set();
+      for (const v of out){
+        const key = normalize(v);
+        if (!seen.has(key)){
+          seen.add(key);
+          uniqOut.push(v);
+        }
+      }
+      return uniqOut;
+    }
+
+    function nearestAccepted(raw, accepted){
+      const user = normalize(raw);
+      let best = null;
+      for (const candidate of (accepted || [])){
+        const c = String(candidate || '').trim();
+        if (!c) continue;
+        const d = levenshtein(user, normalize(c));
+        if (!best || d < best.dist){
+          best = { text: c, dist: d };
+        }
+      }
+      return best;
+    }
+
+    function tokenDiff(raw, correct){
+      const user = tokensNormalized(raw);
+      const good = tokensNormalized(correct);
+
+      const cntUser = Object.create(null);
+      for (const x of user) cntUser[x] = (cntUser[x] || 0) + 1;
+
+      const missing = [];
+      for (const x of good){
+        if (cntUser[x] > 0) cntUser[x] -= 1;
+        else missing.push(x);
+      }
+
+      const extra = [];
+      for (const x of user){
+        if (cntUser[x] > 0){
+          extra.push(x);
+          cntUser[x] -= 1;
+        }
+      }
+
+      return { missing: uniq(missing), extra: uniq(extra) };
+    }
+
+    function cleanLegacyExplain(raw){
+      let t = String(raw || '').trim();
+      if (!t) return '';
+      t = t.replace(/\s+/g, ' ');
+      t = t.replace(/^В этом предложении важно значение ситуации, а не только форма\.\s*/i, '');
+      t = t.replace(/^В исходной фразе нарушена форма времени или порядок слов\.\s*/i, '');
+      return t.trim();
+    }
+
+    const STATIVE_FORMS = {
+      know: ['know', 'knows', 'knew', 'known'],
+      understand: ['understand', 'understands', 'understood'],
+      believe: ['believe', 'believes', 'believed'],
+      remember: ['remember', 'remembers', 'remembered'],
+      forget: ['forget', 'forgets', 'forgot', 'forgotten'],
+      mean: ['mean', 'means', 'meant'],
+      need: ['need', 'needs', 'needed'],
+      want: ['want', 'wants', 'wanted'],
+      like: ['like', 'likes', 'liked'],
+      love: ['love', 'loves', 'loved'],
+      hate: ['hate', 'hates', 'hated'],
+      prefer: ['prefer', 'prefers', 'preferred'],
+      own: ['own', 'owns', 'owned'],
+      belong: ['belong', 'belongs', 'belonged'],
+      consist: ['consist', 'consists', 'consisted'],
+      contain: ['contain', 'contains', 'contained'],
+      include: ['include', 'includes', 'included'],
+      seem: ['seem', 'seems', 'seemed']
+    };
+
+    const STATIVE_ING_TO_BASE = {
+      knowing: 'know',
+      understanding: 'understand',
+      believing: 'believe',
+      remembering: 'remember',
+      forgetting: 'forget',
+      meaning: 'mean',
+      needing: 'need',
+      wanting: 'want',
+      liking: 'like',
+      loving: 'love',
+      hating: 'hate',
+      preferring: 'prefer',
+      owning: 'own',
+      belonging: 'belong',
+      consisting: 'consist',
+      containing: 'contain',
+      including: 'include',
+      seeming: 'seem'
+    };
+
+    function detectStativeContinuousIssue(prompt, correctText){
+      const src = normalize(prompt || '');
+      if (!src) return null;
+      const ingWords = src.match(/\b[a-z]+ing\b/g) || [];
+      if (!ingWords.length) return null;
+
+      const corrected = normalize(correctText || '');
+      for (const ing of ingWords){
+        const base = STATIVE_ING_TO_BASE[ing] || '';
+        if (!base || !STATIVE_FORMS[base]) continue;
+
+        const hasContinuousAux = new RegExp(`\\b(?:am|is|are|was|were|be|been|being|have been|has been|had been|will be|will have been)\\s+${ing}\\b`).test(src);
+        const hasBareIng = new RegExp(`\\b${ing}\\b`).test(src);
+        if (!hasContinuousAux && !hasBareIng) continue;
+
+        let chosenForm = '';
+        if (corrected){
+          for (const form of STATIVE_FORMS[base]){
+            if (new RegExp(`\\b${form}\\b`).test(corrected)){
+              chosenForm = form;
+              break;
+            }
+          }
+        }
+
+        return { base, ing, chosenForm };
+      }
+
+      return null;
+    }
+
+    function buildSmartExplanation(q, check){
+      const item = q?.item || {};
+      const lines = [];
+      const meta = inferQuestionTenseMeta(q, check);
+
+      if (meta?.title){
+        pushExplainLine(lines, `Время: ${meta.title}.`);
+      }
+
+      const signals = detectPromptSignals(item.prompt || '');
+      if (signals.length){
+        pushExplainLine(lines, `Сигналы в предложении: ${signals.slice(0, 3).join('; ')}.`);
+      }
+
+      if (check){
+        if (check.kind === 'choice'){
+          if (check.ok){
+            pushExplainLine(lines, `Твой выбор ${qText(check.selectedText)} — верно.`);
+          } else {
+            pushExplainLine(lines, `Твой выбор ${qText(check.selectedText)}. Правильно: ${qText(check.correctText)}.`);
+          }
+        } else if (check.kind === 'input' || check.kind === 'correction'){
+          if (check.state === 'correct'){
+            pushExplainLine(lines, `Твой ответ ${qText(check.rawInput)} — верно.`);
+          } else if (check.state === 'almost'){
+            pushExplainLine(lines, `Твой ответ ${qText(check.rawInput)} — почти верно (мелкая опечатка).`);
+            if (check.correctText) pushExplainLine(lines, `Эталонная форма: ${qText(check.correctText)}.`);
+          } else {
+            pushExplainLine(lines, `Твой ответ ${qText(check.rawInput)}. Правильно: ${qText(check.correctText || check.closestText)}.`);
+            const diff = tokenDiff(check.rawInput || '', check.correctText || check.closestText || '');
+            if (diff.missing.length) pushExplainLine(lines, `Добавь: ${joinReadable(diff.missing)}.`);
+            if (diff.extra.length) pushExplainLine(lines, `Убери/проверь: ${joinReadable(diff.extra)}.`);
+          }
+
+          if (check.kind === 'correction' && check.correctText){
+            pushExplainLine(lines, `Исправленный вариант целиком: ${qText(check.correctText)}.`);
+          }
+
+          const stativeIssue = detectStativeContinuousIssue(item.prompt || '', check.correctText || check.closestText || '');
+          if (stativeIssue){
+            pushExplainLine(lines, `Глагол «${stativeIssue.base}» — state verb (состояние), поэтому форма Continuous «${stativeIssue.ing}» здесь не используется.`);
+            if (stativeIssue.chosenForm){
+              pushExplainLine(lines, `Нужна форма без -ing: «${stativeIssue.chosenForm}» (по контексту предложения).`);
+            } else {
+              pushExplainLine(lines, 'Нужна форма без -ing в нужном времени (Simple/Perfect по контексту).');
+            }
+          }
+        } else if (check.kind === 'multi'){
+          if (check.ok){
+            pushExplainLine(lines, `Верно: нужно выбрать ${joinReadable(check.correctLabels)}.`);
+          } else {
+            pushExplainLine(lines, `Твой набор: ${joinReadable(check.selectedLabels)}.`);
+            if (check.missingLabels?.length) pushExplainLine(lines, `Нужно добавить: ${joinReadable(check.missingLabels)}.`);
+            if (check.extraLabels?.length) pushExplainLine(lines, `Лишние варианты: ${joinReadable(check.extraLabels)}.`);
+            pushExplainLine(lines, `Правильный набор: ${joinReadable(check.correctLabels)}.`);
+          }
+        } else if (check.kind === 'match'){
+          if (check.ok){
+            pushExplainLine(lines, 'Все пары собраны верно.');
+          } else {
+            const wrong = (check.mismatches || []).slice(0, 3).map(x=>`${x.left} -> ${x.user || '—'} (нужно: ${x.right})`);
+            if (wrong.length) pushExplainLine(lines, `Неверные пары: ${wrong.join(' | ')}.`);
+          }
+        } else if (check.kind === 'multi_input'){
+          if (check.ok){
+            pushExplainLine(lines, `Верные формы: ${joinReadable(check.correctParts)}.`);
+            if (check.anyAlmost) pushExplainLine(lines, 'Есть мелкие опечатки, но логика формы верная.');
+          } else {
+            const wrong = (check.slots || []).filter(s => s.state === 'wrong').slice(0, 3);
+            const details = wrong.map(s=>`${s.index}) ${qText(s.raw)} -> ${qText(s.correct)}`);
+            if (details.length) pushExplainLine(lines, `Исправь поля: ${details.join(' | ')}.`);
+            if (check.correctParts?.length) pushExplainLine(lines, `Правильные формы: ${joinReadable(check.correctParts)}.`);
+          }
+        }
+      }
+
+      const quickMeta = (meta && typeof QUICK === 'object' && QUICK && QUICK[meta.id]) ? QUICK[meta.id] : null;
+      if (quickMeta?.formula){
+        pushExplainLine(lines, `Формула: ${quickMeta.formula}.`);
+      }
+
+      const base = cleanLegacyExplain(item.explain || '');
+      if (lines.length < 3 && base){
+        pushExplainLine(lines, base);
+      }
+
+      if (!lines.length) return 'Объяснение пока не готово.';
+      return lines.join('\n');
     }
 
     function renderChoice(q){
@@ -1105,10 +1467,13 @@ try{
       if (q.kind === 'choice'){
         if (selectedIndex === null){
           setFeedback('idle', 'pick', 'сначала выбери вариант');
+          lastCheck = null;
           return null;
         }
         countAttempt(q);
         const ok = selectedIndex === q.item.correctIndex;
+        const selectedText = q.item.options?.[selectedIndex] || '';
+        const correctText = q.item.options?.[q.item.correctIndex] || '';
         if (ok){
           exCorrect[q.exId] = (exCorrect[q.exId] || 0) + 1;
           mistakesSet.delete(q.item.id);
@@ -1118,6 +1483,14 @@ try{
           const corr = String.fromCharCode(97 + q.item.correctIndex);
           setFeedback('wrong', 'no', cbShowAfterLocal.checked ? `неверно (правильно: ${corr})` : 'неверно');
         }
+        lastCheck = {
+          kind: 'choice',
+          ok,
+          selectedIndex,
+          correctIndex: q.item.correctIndex,
+          selectedText,
+          correctText
+        };
         markChoice(q.item.correctIndex, selectedIndex);
         saveMistakesSnapshot();
         return ok;
@@ -1126,7 +1499,7 @@ try{
       if (q.kind === 'input' || q.kind === 'correction'){
         const input = elCard.querySelector('#shTRunInput');
         const raw = (input?.value || '').trim();
-        if (!raw){ setFeedback('idle','input','введи ответ'); return null; }
+        if (!raw){ setFeedback('idle','input','введи ответ'); lastCheck = null; return null; }
         const accepted = q.item.accepted || [];
         let acceptedList = accepted;
 
@@ -1140,6 +1513,8 @@ try{
 
         countAttempt(q);
         const res = checkInput(raw, acceptedList);
+        const nearest = nearestAccepted(raw, acceptedList.length ? acceptedList : accepted);
+        const primaryCorrect = (accepted && accepted[0]) ? accepted[0] : (nearest?.text || '');
         if (res.state === 'correct'){
           exCorrect[q.exId] = (exCorrect[q.exId] || 0) + 1;
           mistakesSet.delete(q.item.id);
@@ -1162,14 +1537,28 @@ try{
             setFeedback('wrong', 'no', 'неверно');
           }
         }
+        lastCheck = {
+          kind: q.kind,
+          ok: res.state !== 'wrong',
+          state: res.state,
+          rawInput: raw,
+          correctText: primaryCorrect,
+          closestText: nearest?.text || ''
+        };
         return res.state !== 'wrong';
       }
 
       if (q.kind === 'multi'){
-        if (selectedSet.size === 0){ setFeedback('idle','pick','сначала выбери варианты'); return null; }
+        if (selectedSet.size === 0){ setFeedback('idle','pick','сначала выбери варианты'); lastCheck = null; return null; }
         countAttempt(q);
         const correctSet = new Set((q.item.correctIndices || []).map(x=>Number(x)));
         const ok = sameSet(selectedSet, correctSet);
+        const selectedIdx = Array.from(selectedSet).sort((a,b)=>a-b);
+        const correctIdx = Array.from(correctSet).sort((a,b)=>a-b);
+        const selectedLabels = selectedIdx.map(i => q.item.options?.[i]).filter(Boolean);
+        const correctLabels = correctIdx.map(i => q.item.options?.[i]).filter(Boolean);
+        const missingLabels = correctIdx.filter(i => !selectedSet.has(i)).map(i => q.item.options?.[i]).filter(Boolean);
+        const extraLabels = selectedIdx.filter(i => !correctSet.has(i)).map(i => q.item.options?.[i]).filter(Boolean);
 
         const btns = elCard.querySelectorAll('.sh-choice-list .sh-choice');
         btns.forEach((b, i)=>{
@@ -1184,9 +1573,17 @@ try{
           setFeedback('correct', 'ok', 'верно');
         } else {
           mistakesSet.add(q.item.id);
-          const correctLabels = (q.item.correctIndices || []).map(i => q.item.options?.[i]).filter(Boolean);
           setFeedback('wrong', 'no', cbShowAfterLocal.checked ? `неверно (правильно: ${correctLabels.join(', ')})` : 'неверно');
         }
+
+        lastCheck = {
+          kind: 'multi',
+          ok,
+          selectedLabels,
+          correctLabels,
+          missingLabels,
+          extraLabels
+        };
 
         saveMistakesSnapshot();
         return ok;
@@ -1196,6 +1593,7 @@ try{
         const st = matchState;
         if (!st){
           setFeedback('idle', 'pick', 'сначала выбери варианты');
+          lastCheck = null;
           return null;
         }
 
@@ -1213,11 +1611,15 @@ try{
 
         if (!allPicked){
           setFeedback('idle', 'pick', 'заполни все строки');
+          lastCheck = null;
           return null;
         }
 
         countAttempt(q);
         const ok = okCount === st.pairs.length;
+        const mismatches = st.pairs
+          .map((p, i)=>({ left: p.left, right: p.right, user: st.selects[i]?.value || '' }))
+          .filter(x => x.user !== x.right);
         if (ok){
           exCorrect[q.exId] = (exCorrect[q.exId] || 0) + 1;
           mistakesSet.delete(q.item.id);
@@ -1228,6 +1630,12 @@ try{
           setFeedback('wrong', 'no', cbShowAfterLocal.checked ? `неверно (правильно: ${rightStr})` : 'неверно');
         }
 
+        lastCheck = {
+          kind: 'match',
+          ok,
+          mismatches
+        };
+
         saveMistakesSnapshot();
         return ok;
       }
@@ -1236,18 +1644,29 @@ try{
         const specs = q.item.inputs || [];
         if (!multiInputs || multiInputs.length !== specs.length){
           setFeedback('idle', 'input', 'не удалось создать поля');
+          lastCheck = null;
           return null;
         }
 
         let allOk = true;
         let anyAlmost = false;
+        const slots = [];
 
         for (let i=0;i<specs.length;i++){
           const inputEl = multiInputs[i];
           const raw = (inputEl.value || '').trim();
-          if (!raw){ setFeedback('idle','input','заполни все формы'); return null; }
+          if (!raw){ setFeedback('idle','input','заполни все формы'); lastCheck = null; return null; }
           const accepted = specs[i].accepted || [];
           const res = checkInput(raw, accepted);
+          const nearest = nearestAccepted(raw, accepted);
+          const correct = (accepted && accepted[0]) ? accepted[0] : (nearest?.text || '');
+
+          slots.push({
+            index: i + 1,
+            raw,
+            correct,
+            state: res.state
+          });
 
           inputEl.classList.remove('is-ok','is-bad');
           if (res.state === 'wrong'){
@@ -1270,11 +1689,20 @@ try{
           setFeedback('wrong', 'no', cbShowAfterLocal.checked ? `неверно (пример: ${firstAccepted} ...)` : 'неверно');
         }
 
+        lastCheck = {
+          kind: 'multi_input',
+          ok: allOk,
+          anyAlmost,
+          slots,
+          correctParts: slots.map(x => x.correct).filter(Boolean)
+        };
+
         return allOk;
       }
 
       // fallback
       setFeedback('wrong', 'no', 'unknown task type');
+      lastCheck = { kind: q.kind || 'unknown', ok: false };
       return false;
     }
 
@@ -1347,9 +1775,7 @@ try{
       btnExplain.addEventListener('click', ()=>{
         if (btnExplain.dataset.locked === '1') return;
         const q = queue[idx];
-        const base = (q && q.item && q.item.explain) ? String(q.item.explain) : 'объяснения пока нет';
-        const tenseTitle = inferQuestionTenseTitle(q);
-        const t = `Время: ${tenseTitle}. ${base}`;
+        const t = buildSmartExplanation(q, lastCheck);
         if (!elExplain) return;
         if (elExplain.hidden){
           elExplain.textContent = t;
@@ -1772,12 +2198,17 @@ function buildCompareItems(aId,bId,count){
     const ex = (tenseObj?.practice?.exercises||[]).find(x=>x.id==='meaning');
     if (!ex || !Array.isArray(ex.items)) return;
     for (const it of ex.items.slice(0, 8)){
+      const correctTenseId = correctIndex === 0 ? aId : bId;
       items.push({
         id: `cmp_${aId}_${bId}_${it.id}`,
         instruction: 'Какое время подходит?',
         prompt: it.prompt,
         options: [A?.title||aId, B?.title||bId],
-        correctIndex
+        correctIndex,
+        correctTenseId,
+        sourceTenseId: it.correctTenseId || tenseObj?.id || correctTenseId,
+        candidateTenseIds: [aId, bId],
+        explain: it.explain || ''
       });
     }
   }
@@ -1789,12 +2220,18 @@ function buildCompareItems(aId,bId,count){
   if (pair==='presentContinuous|presentSimple' && REG.byId.mixedPresent){
     const ex = (REG.byId.mixedPresent.practice?.exercises||[]).find(x=>x.id==='meaning');
     for (const it of (ex?.items||[]).slice(0,10)){
+      const correctIndex = (it.correctTenseId===aId)?0:1;
+      const correctTenseId = correctIndex === 0 ? aId : bId;
       items.push({
         id: `cmp_mpr_${it.id}`,
         instruction: it.instruction || 'Какое время?',
         prompt: it.prompt,
         options: [A?.title||aId, B?.title||bId],
-        correctIndex: (it.correctTenseId===aId)?0:1
+        correctIndex,
+        correctTenseId,
+        sourceTenseId: it.correctTenseId || correctTenseId,
+        candidateTenseIds: [aId, bId],
+        explain: it.explain || ''
       });
     }
   }
@@ -1888,7 +2325,12 @@ function startDaily(forceNew){
     const k = q.kind || 'choice';
     byKind[k] = byKind[k] || [];
     // clone item and keep unique id
-    byKind[k].push(Object.assign({}, q.item, { id: `dy_${q.tid}_${q.item.id}` }));
+    const cloned = Object.assign({}, q.item, {
+      id: `dy_${q.tid}_${q.item.id}`,
+      sourceTenseId: q.item?.sourceTenseId || q.item?.correctTenseId || q.tid
+    });
+    if (!cloned.correctTenseId && q.item?.correctTenseId) cloned.correctTenseId = q.item.correctTenseId;
+    byKind[k].push(cloned);
   }
 
   const exs = [];

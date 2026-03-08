@@ -539,7 +539,7 @@
           },
           {
             "id": "pc_err_8",
-            "instruction": "Исправь state verb",
+            "instruction": "Исправь",
             "prompt": "I was knowing the answer.",
             "accepted": [
               "I knew the answer.",
