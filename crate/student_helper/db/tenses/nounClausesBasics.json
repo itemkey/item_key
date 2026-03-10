@@ -1,0 +1,153 @@
+{
+  "id": "nounClausesBasics",
+  "title": "Noun Clauses Basics",
+  "subtitle": "that/if/whether и wh-clause как часть предложения",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Что такое noun clause"
+    },
+    {
+      "type": "text",
+      "text": "Noun clause - это придаточная часть, которая работает как существительное: может быть дополнением, подлежащим или частью сказуемого. Часто используется после know, think, say, wonder, ask, tell, explain."
+    },
+    {
+      "type": "table",
+      "caption": "Базовые типы",
+      "columns": ["Тип", "Связка", "Пример"],
+      "rows": [
+        ["утверждение", "that", "I think that he is right."],
+        ["да/нет", "if/whether", "I wonder whether they agree."],
+        ["вопросительное слово", "where/why/how/what...", "Can you tell me where she lives?"],
+        ["порядок слов", "как в утверждении", "Do you know what time it is?"]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Критично важно",
+      "lines": [
+        "в косвенном вопросе нет инверсии: where he lives, не where does he live",
+        "that часто можно опускать в разговорной речи",
+        "if/whether для yes/no смыслов"
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        { "en": "I know that she works remotely.", "ru": "Я знаю, что она работает удаленно." },
+        { "en": "I wonder if they will join us.", "ru": "Интересно, присоединятся ли они к нам." },
+        { "en": "Could you explain why the app crashed?", "ru": "Не мог бы ты объяснить, почему приложение вылетело?" },
+        { "en": "Do you remember where we parked?", "ru": "Ты помнишь, где мы припарковались?" }
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": [
+      {
+        "id": "meaning",
+        "title": "Когда используем (Meaning)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "ncb_m_1",
+            "instruction": "Выбери правильный вариант",
+            "prompt": "I wonder ____ they are ready.",
+            "options": ["if", "that", "which"],
+            "correctIndex": 0,
+            "explain": "Yes/no смысл -> if/whether."
+          },
+          {
+            "id": "ncb_m_2",
+            "instruction": "Выбери правильный порядок",
+            "prompt": "Can you tell me where ____?",
+            "options": ["does he work", "he works", "works he"],
+            "correctIndex": 1,
+            "explain": "В noun clause порядок как в утверждении: he works."
+          },
+          {
+            "id": "ncb_m_3",
+            "instruction": "Выбери связку",
+            "prompt": "She said ____ she was busy.",
+            "options": ["that", "if", "where"],
+            "correctIndex": 0,
+            "explain": "После said для утверждения ставим that-clause."
+          },
+          {
+            "id": "ncb_m_4",
+            "instruction": "Выбери связку",
+            "prompt": "Do you know ____ he is at home?",
+            "options": ["whether", "that", "whose"],
+            "correctIndex": 0,
+            "explain": "Yes/no вопрос внутри предложения -> whether/if."
+          },
+          {
+            "id": "ncb_m_5",
+            "instruction": "Выбери правильный порядок",
+            "prompt": "I don't know what time ____.",
+            "options": ["is it", "it is", "it does"],
+            "correctIndex": 1,
+            "explain": "Косвенный вопрос: it is."
+          },
+          {
+            "id": "ncb_m_6",
+            "instruction": "Выбери функцию",
+            "prompt": "What I need is a short break.",
+            "options": ["noun clause как подлежащее", "условное предложение", "reported speech"],
+            "correctIndex": 0,
+            "explain": "What I need выполняет роль подлежащего."
+          }
+        ]
+      },
+      {
+        "id": "formula",
+        "title": "Формулы (Formula)",
+        "kind": "input",
+        "items": [
+          {
+            "id": "ncb_f_1",
+            "instruction": "Вставь форму",
+            "prompt": "Can you tell me where she ____ (live)?",
+            "accepted": ["lives"],
+            "explain": "В косвенном вопросе обычный порядок: she lives."
+          },
+          {
+            "id": "ncb_f_2",
+            "instruction": "Вставь форму",
+            "prompt": "I wonder if they ____ (come) tomorrow.",
+            "accepted": ["will come"],
+            "explain": "if-clause здесь noun clause, поэтому возможен future в самой части."
+          },
+          {
+            "id": "ncb_f_3",
+            "instruction": "Вставь форму",
+            "prompt": "The problem is that we ____ (not/have) enough time.",
+            "accepted": ["don't have", "do not have"],
+            "explain": "that-clause с обычным утверждением."
+          },
+          {
+            "id": "ncb_f_4",
+            "instruction": "Вставь форму",
+            "prompt": "Do you know whether he ____ (be) at home?",
+            "accepted": ["is"],
+            "explain": "whether-clause с порядком утверждения."
+          },
+          {
+            "id": "ncb_f_5",
+            "instruction": "Вставь форму",
+            "prompt": "What I need ____ (be) a short break.",
+            "accepted": ["is"],
+            "explain": "What I need рассматривается как единое подлежащее."
+          },
+          {
+            "id": "ncb_f_6",
+            "instruction": "Исправь ошибку",
+            "prompt": "Can you tell me where does he work?",
+            "accepted": ["Can you tell me where he works?"],
+            "acceptedShort": ["where he works"],
+            "explain": "В noun clause после where не ставим does перед подлежащим."
+          }
+        ]
+      }
+    ]
+  }
+}

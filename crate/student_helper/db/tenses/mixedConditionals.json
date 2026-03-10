@@ -1,0 +1,152 @@
+{
+  "id": "mixedConditionals",
+  "title": "Mixed Conditionals",
+  "subtitle": "смешанные условные: прошлое <-> настоящее",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Что такое mixed conditionals"
+    },
+    {
+      "type": "text",
+      "text": "Mixed conditionals соединяют разные временные планы в условии и результате. Самые частые модели: 1) прошлое условие -> результат сейчас: if + had V3, would + V1; 2) нынешнее условие -> результат в прошлом: if + Past Simple, would have + V3."
+    },
+    {
+      "type": "table",
+      "caption": "Две базовые модели",
+      "columns": ["Тип", "Формула", "Пример"],
+      "rows": [
+        ["Past -> Present", "If + had V3, would + V1", "If I had studied medicine, I would be a doctor now."],
+        ["Present -> Past", "If + Past Simple, would have + V3", "If I were more organized, I would have finished on time."],
+        ["Важно", "would не ставим после if", "If I had known, I would be more careful now."]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Как выбрать модель",
+      "lines": [
+        "Сожаление о прошлом, влияющее на настоящее -> had V3 + would V1",
+        "Нынешняя характеристика, объясняющая прошлую неудачу -> past + would have V3",
+        "Mixed conditional обычно выражает причинно-следственную связь"
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        { "en": "If she had taken that job, she would live in Berlin now.", "ru": "Если бы она взяла ту работу, она бы сейчас жила в Берлине." },
+        { "en": "If I were less shy, I would have asked that question yesterday.", "ru": "Если бы я был менее застенчивым, я бы задал тот вопрос вчера." },
+        { "en": "If we had saved more money, we would own a house now.", "ru": "Если бы мы больше откладывали, сейчас у нас был бы дом." },
+        { "en": "If he were more careful, he wouldn't have broken the screen.", "ru": "Если бы он был аккуратнее, он бы не разбил экран." }
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": [
+      {
+        "id": "meaning",
+        "title": "Когда используем (Meaning)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "mxc_m_1",
+            "instruction": "Выбери тип",
+            "prompt": "If I had learned coding earlier, I would have a better job now.",
+            "options": ["Past -> Present", "Present -> Past", "Third Conditional"],
+            "correctIndex": 0,
+            "explain": "Прошлое условие влияет на текущий результат."
+          },
+          {
+            "id": "mxc_m_2",
+            "instruction": "Выбери тип",
+            "prompt": "If she were more confident, she would have spoken at the meeting.",
+            "options": ["Present -> Past", "Past -> Present", "First Conditional"],
+            "correctIndex": 0,
+            "explain": "Текущая характеристика объясняет прошлое действие."
+          },
+          {
+            "id": "mxc_m_3",
+            "instruction": "Выбери объяснение",
+            "prompt": "If they had moved to Canada, they would be closer to us now.",
+            "options": ["прошлое решение и нынешний результат", "реальное будущее", "общий факт"],
+            "correctIndex": 0,
+            "explain": "Здесь типичный mixed формат Past -> Present."
+          },
+          {
+            "id": "mxc_m_4",
+            "instruction": "Выбери объяснение",
+            "prompt": "If I weren't so busy, I would have joined you last weekend.",
+            "options": ["текущее состояние и прошлое следствие", "сожаление только о прошлом", "план на будущее"],
+            "correctIndex": 0,
+            "explain": "Present -> Past mixed conditional."
+          },
+          {
+            "id": "mxc_m_5",
+            "instruction": "Выбери правило",
+            "prompt": "Mixed conditional usually combines...",
+            "options": ["different time references", "only present forms", "only past perfect forms"],
+            "correctIndex": 0,
+            "explain": "Смешанный тип как раз сочетает разные временные планы."
+          },
+          {
+            "id": "mxc_m_6",
+            "instruction": "Выбери правило",
+            "prompt": "What is true after if in mixed conditionals?",
+            "options": ["would is normal", "no would after if", "only will after if"],
+            "correctIndex": 1,
+            "explain": "После if не ставим would."
+          }
+        ]
+      },
+      {
+        "id": "formula",
+        "title": "Формулы (Formula)",
+        "kind": "input",
+        "items": [
+          {
+            "id": "mxc_f_1",
+            "instruction": "Вставь форму",
+            "prompt": "If I had taken that course, I ____ (work) in IT now.",
+            "accepted": ["would work"],
+            "explain": "Past -> Present: if had V3, would V1."
+          },
+          {
+            "id": "mxc_f_2",
+            "instruction": "Вставь форму",
+            "prompt": "If she were more careful, she ____ (not/lose) her keys yesterday.",
+            "accepted": ["wouldn't have lost", "would not have lost"],
+            "explain": "Present -> Past: would have + V3."
+          },
+          {
+            "id": "mxc_f_3",
+            "instruction": "Вставь форму",
+            "prompt": "If they had left earlier, they ____ (be) here now.",
+            "accepted": ["would be"],
+            "explain": "Прошлое условие -> нынешний результат."
+          },
+          {
+            "id": "mxc_f_4",
+            "instruction": "Вставь форму",
+            "prompt": "If I were less nervous, I ____ (give) a better speech yesterday.",
+            "accepted": ["would have given"],
+            "explain": "Нынешняя черта -> прошлый исход."
+          },
+          {
+            "id": "mxc_f_5",
+            "instruction": "Исправь ошибку",
+            "prompt": "If he would have listened, he would be safer now.",
+            "accepted": ["If he had listened, he would be safer now."],
+            "acceptedShort": ["had listened"],
+            "explain": "После if в этой модели нужно had listened, не would have listened."
+          },
+          {
+            "id": "mxc_f_6",
+            "instruction": "Вставь форму",
+            "prompt": "If we had bought that apartment, we ____ (live) near the center now.",
+            "accepted": ["would live"],
+            "explain": "Past -> Present mixed conditional."
+          }
+        ]
+      }
+    ]
+  }
+}

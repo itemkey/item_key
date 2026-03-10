@@ -1,0 +1,160 @@
+{
+  "id": "passiveVoiceBasics",
+  "title": "Passive Voice Basics",
+  "subtitle": "действие важнее исполнителя",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Что такое Passive Voice"
+    },
+    {
+      "type": "text",
+      "text": "Passive Voice используем, когда важнее само действие или результат, а не тот, кто выполняет действие. Формула: be + V3."
+    },
+    {
+      "type": "table",
+      "caption": "Базовые формулы",
+      "columns": ["Время", "Формула", "Пример"],
+      "rows": [
+        ["Present Simple", "am/is/are + V3", "English is spoken here."],
+        ["Past Simple", "was/were + V3", "The bridge was built in 1998."],
+        ["Future Simple", "will be + V3", "The project will be finished soon."]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Когда удобно использовать",
+      "lines": [
+        "неизвестно, кто сделал действие",
+        "исполнитель не важен",
+        "официальный/научный/новостной стиль"
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        { "en": "The documents are checked every morning.", "ru": "Документы проверяются каждое утро." },
+        { "en": "My phone was stolen yesterday.", "ru": "Мой телефон украли вчера." },
+        { "en": "The report will be sent tonight.", "ru": "Отчет будет отправлен сегодня вечером." },
+        { "en": "The room was cleaned by Anna.", "ru": "Комната была убрана Анной." }
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Актив -> Пассив (логика)",
+      "lines": [
+        "Active: People clean the office every day.",
+        "Passive: The office is cleaned every day.",
+        "Объект активного предложения становится подлежащим в пассиве"
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": [
+      {
+        "id": "meaning",
+        "title": "Когда используем (Meaning)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "pvb_m_1",
+            "instruction": "Выбери причину",
+            "prompt": "The road was closed at night.",
+            "options": ["важно действие, не исполнитель", "привычка", "будущий план"],
+            "correctIndex": 0,
+            "explain": "Важен факт закрытия дороги, не кто закрыл."
+          },
+          {
+            "id": "pvb_m_2",
+            "instruction": "Выбери причину",
+            "prompt": "The report will be checked tomorrow.",
+            "options": ["официальный стиль и фокус на действии", "прошлая привычка", "личная договоренность"],
+            "correctIndex": 0,
+            "explain": "Часто в деловой речи используют passive для фокуса на процессе."
+          },
+          {
+            "id": "pvb_m_3",
+            "instruction": "Выбери причину",
+            "prompt": "English is spoken in many countries.",
+            "options": ["общий факт, где исполнитель неважен", "разовое прошлое", "условие"],
+            "correctIndex": 0,
+            "explain": "Факт в Present Simple Passive."
+          },
+          {
+            "id": "pvb_m_4",
+            "instruction": "Выбери причину",
+            "prompt": "My bike was stolen.",
+            "options": ["неизвестный исполнитель", "расписание", "намерение"],
+            "correctIndex": 0,
+            "explain": "Мы не знаем или не называем, кто украл."
+          },
+          {
+            "id": "pvb_m_5",
+            "instruction": "Выбери причину",
+            "prompt": "The museum is visited by thousands of tourists.",
+            "options": ["фокус на объекте", "фокус на исполнителе", "будущее условие"],
+            "correctIndex": 0,
+            "explain": "В центре внимания музей как объект действия."
+          },
+          {
+            "id": "pvb_m_6",
+            "instruction": "Выбери причину",
+            "prompt": "The invitations were sent yesterday.",
+            "options": ["результат действия", "процесс в моменте", "сравнение времен"],
+            "correctIndex": 0,
+            "explain": "Подчеркивается факт отправки приглашений."
+          }
+        ]
+      },
+      {
+        "id": "formula",
+        "title": "Формулы (Formula)",
+        "kind": "input",
+        "items": [
+          {
+            "id": "pvb_f_1",
+            "instruction": "Вставь форму",
+            "prompt": "The room ____ (clean) every day.",
+            "accepted": ["is cleaned"],
+            "explain": "Present Simple Passive: is + V3."
+          },
+          {
+            "id": "pvb_f_2",
+            "instruction": "Вставь форму",
+            "prompt": "The emails ____ (send) this morning.",
+            "accepted": ["were sent"],
+            "explain": "Past Simple Passive: were + V3."
+          },
+          {
+            "id": "pvb_f_3",
+            "instruction": "Вставь форму",
+            "prompt": "The project ____ (finish) next week.",
+            "accepted": ["will be finished"],
+            "explain": "Future Simple Passive: will be + V3."
+          },
+          {
+            "id": "pvb_f_4",
+            "instruction": "Сделай пассив",
+            "prompt": "People speak Spanish here. -> Spanish ____ here.",
+            "accepted": ["is spoken"],
+            "explain": "Объект Spanish становится подлежащим: is spoken."
+          },
+          {
+            "id": "pvb_f_5",
+            "instruction": "Сделай пассив",
+            "prompt": "They built the bridge in 2010. -> The bridge ____ in 2010.",
+            "accepted": ["was built"],
+            "explain": "Past Simple Passive: was built."
+          },
+          {
+            "id": "pvb_f_6",
+            "instruction": "Исправь ошибку",
+            "prompt": "The task will finished tomorrow.",
+            "accepted": ["The task will be finished tomorrow", "The task will be finished tomorrow."],
+            "explain": "В Future Passive нужен вспомогательный be: will be finished."
+          }
+        ]
+      }
+    ]
+  }
+}

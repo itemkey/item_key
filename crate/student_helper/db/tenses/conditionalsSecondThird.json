@@ -1,0 +1,153 @@
+{
+  "id": "conditionalsSecondThird",
+  "title": "Second and Third Conditionals",
+  "subtitle": "нереальное настоящее и прошлое сожаление",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Second vs Third Conditional"
+    },
+    {
+      "type": "text",
+      "text": "Second Conditional описывает нереальные или маловероятные ситуации в настоящем/будущем: if + Past Simple, would + V1. Third Conditional описывает нереальные ситуации в прошлом (сожаление): if + had + V3, would have + V3."
+    },
+    {
+      "type": "table",
+      "caption": "Формулы",
+      "columns": ["Тип", "Формула", "Пример"],
+      "rows": [
+        ["Second", "If + Past Simple, would + V1", "If I had more time, I would learn Spanish."],
+        ["Third", "If + had + V3, would have + V3", "If she had left earlier, she would have caught the train."],
+        ["Нюанс", "were для всех лиц в formal style", "If I were you, I would apologize."]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Как различать",
+      "lines": [
+        "Second: сейчас/будущее, но нереально",
+        "Third: уже в прошлом, изменить нельзя",
+        "would не ставим после if"
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        { "en": "If I were taller, I would play basketball.", "ru": "Если бы я был выше, я бы играл в баскетбол." },
+        { "en": "If they had prepared better, they would have won.", "ru": "Если бы они лучше подготовились, они бы победили." },
+        { "en": "If you were in my place, what would you do?", "ru": "Если бы ты был на моем месте, что бы ты сделал?" },
+        { "en": "If we had booked earlier, we would have paid less.", "ru": "Если бы мы забронировали раньше, мы бы заплатили меньше." }
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": [
+      {
+        "id": "meaning",
+        "title": "Когда используем (Meaning)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "cst_m_1",
+            "instruction": "Выбери тип",
+            "prompt": "If I had a car, I would drive to work.",
+            "options": ["Second Conditional", "Third Conditional", "First Conditional"],
+            "correctIndex": 0,
+            "explain": "Нереальная ситуация в настоящем -> Second Conditional."
+          },
+          {
+            "id": "cst_m_2",
+            "instruction": "Выбери тип",
+            "prompt": "If he had called me, I would have helped him.",
+            "options": ["Zero Conditional", "Second Conditional", "Third Conditional"],
+            "correctIndex": 2,
+            "explain": "Нереальное прошлое -> Third Conditional."
+          },
+          {
+            "id": "cst_m_3",
+            "instruction": "Выбери объяснение",
+            "prompt": "If I were you, I would not wait.",
+            "options": ["совет в нереальной модели", "реальный план", "общий факт"],
+            "correctIndex": 0,
+            "explain": "Классический шаблон совета во 2 условном."
+          },
+          {
+            "id": "cst_m_4",
+            "instruction": "Выбери объяснение",
+            "prompt": "If we had left at 6, we would have arrived on time.",
+            "options": ["сожаление о прошлом", "расписание", "инструкция"],
+            "correctIndex": 0,
+            "explain": "Прошлое действие не случилось -> Third Conditional."
+          },
+          {
+            "id": "cst_m_5",
+            "instruction": "Выбери правило",
+            "prompt": "If she were more confident, she would apply for that job.",
+            "options": ["Second Conditional", "Third Conditional", "Present Perfect"],
+            "correctIndex": 0,
+            "explain": "Нереальная характеристика в настоящем."
+          },
+          {
+            "id": "cst_m_6",
+            "instruction": "Выбери правило",
+            "prompt": "If I had known about the meeting, I would have come.",
+            "options": ["Third Conditional", "Second Conditional", "First Conditional"],
+            "correctIndex": 0,
+            "explain": "Had known + would have come -> Third Conditional."
+          }
+        ]
+      },
+      {
+        "id": "formula",
+        "title": "Формулы (Formula)",
+        "kind": "input",
+        "items": [
+          {
+            "id": "cst_f_1",
+            "instruction": "Вставь форму",
+            "prompt": "If I were you, I ____ (talk) to her.",
+            "accepted": ["would talk"],
+            "explain": "Second Conditional: if + past, would + V1."
+          },
+          {
+            "id": "cst_f_2",
+            "instruction": "Вставь форму",
+            "prompt": "If they had more money, they ____ (travel) more.",
+            "accepted": ["would travel"],
+            "explain": "Нереальное настоящее -> Second Conditional."
+          },
+          {
+            "id": "cst_f_3",
+            "instruction": "Вставь форму",
+            "prompt": "If she had studied harder, she ____ (pass) the exam.",
+            "accepted": ["would have passed"],
+            "explain": "Third Conditional: if + had V3, would have V3."
+          },
+          {
+            "id": "cst_f_4",
+            "instruction": "Вставь форму",
+            "prompt": "If we hadn't missed the bus, we ____ (be) here on time.",
+            "accepted": ["would have been"],
+            "explain": "Прошлое сожаление -> Third Conditional."
+          },
+          {
+            "id": "cst_f_5",
+            "instruction": "Исправь ошибку",
+            "prompt": "If I would know, I would tell you.",
+            "accepted": ["If I knew, I would tell you."],
+            "acceptedShort": ["knew"],
+            "explain": "После if не ставим would."
+          },
+          {
+            "id": "cst_f_6",
+            "instruction": "Исправь ошибку",
+            "prompt": "If he had seen the sign, he would stop.",
+            "accepted": ["If he had seen the sign, he would have stopped."],
+            "acceptedShort": ["would have stopped"],
+            "explain": "Для Third Conditional в результате нужна форма would have + V3."
+          }
+        ]
+      }
+    ]
+  }
+}

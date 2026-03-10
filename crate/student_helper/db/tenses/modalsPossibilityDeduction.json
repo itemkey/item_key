@@ -1,0 +1,153 @@
+{
+  "id": "modalsPossibilityDeduction",
+  "title": "Modals: Possibility and Deduction",
+  "subtitle": "might/may/could, must, can't",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Вероятность и логический вывод"
+    },
+    {
+      "type": "text",
+      "text": "Модальные глаголы помогают оценивать вероятность. might/may/could выражают возможность, must - почти уверенный вывод, can't - логическую невозможность. Для вывода о прошлом: must have + V3 / can't have + V3."
+    },
+    {
+      "type": "table",
+      "caption": "Основные формы",
+      "columns": ["Значение", "Форма", "Пример"],
+      "rows": [
+        ["возможно", "might/may/could + V1", "She might be at home."],
+        ["почти точно", "must + V1", "He must be tired."],
+        ["точно не", "can't + V1", "They can't know the answer."],
+        ["вывод о прошлом", "must/can't have + V3", "You must have seen this film."]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Смысловая шкала",
+      "lines": [
+        "might/may/could = возможно",
+        "must = почти уверен",
+        "can't = уверен, что это неверно"
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        { "en": "It might rain later, so take an umbrella.", "ru": "Позже может пойти дождь, так что возьми зонт." },
+        { "en": "You have worked all day. You must be exhausted.", "ru": "Ты работал весь день. Ты, должно быть, очень устал." },
+        { "en": "He can't be 15. He is a university professor.", "ru": "Ему не может быть 15. Он профессор университета." },
+        { "en": "She must have forgotten about the meeting.", "ru": "Она, должно быть, забыла о встрече." }
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": [
+      {
+        "id": "meaning",
+        "title": "Когда используем (Meaning)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "mpd_m_1",
+            "instruction": "Выбери лучший вариант",
+            "prompt": "The lights are off. They ____ be asleep.",
+            "options": ["must", "can't", "mustn't"],
+            "correctIndex": 0,
+            "explain": "Логичный вероятный вывод -> must be."
+          },
+          {
+            "id": "mpd_m_2",
+            "instruction": "Выбери лучший вариант",
+            "prompt": "I am not sure, but she ____ come later.",
+            "options": ["might", "must", "can't"],
+            "correctIndex": 0,
+            "explain": "Неуверенная возможность -> might."
+          },
+          {
+            "id": "mpd_m_3",
+            "instruction": "Выбери лучший вариант",
+            "prompt": "He has no key, so he ____ be inside.",
+            "options": ["must", "can", "can't"],
+            "correctIndex": 2,
+            "explain": "По логике это невозможно -> can't be."
+          },
+          {
+            "id": "mpd_m_4",
+            "instruction": "Выбери лучший вариант",
+            "prompt": "You look pale. You ____ feel well.",
+            "options": ["must", "may", "can't"],
+            "correctIndex": 2,
+            "explain": "По признакам делаем вывод о невозможности хорошего самочувствия."
+          },
+          {
+            "id": "mpd_m_5",
+            "instruction": "Выбери форму о прошлом",
+            "prompt": "The fridge is empty. They ____ done shopping yet.",
+            "options": ["must have", "can't have", "might have"],
+            "correctIndex": 1,
+            "explain": "Похоже, они точно не сделали покупки -> can't have done."
+          },
+          {
+            "id": "mpd_m_6",
+            "instruction": "Выбери форму о прошлом",
+            "prompt": "She knows every detail. She ____ read the report.",
+            "options": ["can't have", "must have", "might"],
+            "correctIndex": 1,
+            "explain": "Сильный вывод о прошлом -> must have read."
+          }
+        ]
+      },
+      {
+        "id": "formula",
+        "title": "Формулы (Formula)",
+        "kind": "input",
+        "items": [
+          {
+            "id": "mpd_f_1",
+            "instruction": "Вставь форму",
+            "prompt": "I don't know his plan. He ____ (might/be) late.",
+            "accepted": ["might be", "may be", "could be"],
+            "explain": "Вероятность: might/may/could + be."
+          },
+          {
+            "id": "mpd_f_2",
+            "instruction": "Вставь форму",
+            "prompt": "You worked for 14 hours. You ____ (must/be) tired.",
+            "accepted": ["must be"],
+            "explain": "Сильный логический вывод -> must be."
+          },
+          {
+            "id": "mpd_f_3",
+            "instruction": "Вставь форму",
+            "prompt": "This answer is wrong. It ____ (can't/be) correct.",
+            "accepted": ["can't be", "cannot be"],
+            "explain": "Логическая невозможность -> can't be."
+          },
+          {
+            "id": "mpd_f_4",
+            "instruction": "Вставь форму о прошлом",
+            "prompt": "She got 100%. She ____ (must/have/study) a lot.",
+            "accepted": ["must have studied"],
+            "explain": "Вывод о прошлом: must have + V3."
+          },
+          {
+            "id": "mpd_f_5",
+            "instruction": "Вставь форму о прошлом",
+            "prompt": "He wasn't at home all day. He ____ (can't/have/watch) TV at noon.",
+            "accepted": ["can't have watched", "cannot have watched"],
+            "explain": "Невозможность в прошлом: can't have + V3."
+          },
+          {
+            "id": "mpd_f_6",
+            "instruction": "Исправь ошибку",
+            "prompt": "She must to be at work now.",
+            "accepted": ["She must be at work now."],
+            "acceptedShort": ["must be"],
+            "explain": "После must не используем to: must be."
+          }
+        ]
+      }
+    ]
+  }
+}

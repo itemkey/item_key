@@ -1,0 +1,152 @@
+{
+  "id": "wishIfOnly",
+  "title": "wish and if only",
+  "subtitle": "сожаления о настоящем, прошлом и желания о будущем",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Как работают wish и if only"
+    },
+    {
+      "type": "text",
+      "text": "wish и if only выражают желание или сожаление. Для нереального настоящего используем Past Simple (wish I had). Для раздражающего/желаемого изменения в будущем используем would (wish you would stop). Для сожаления о прошлом используем had + V3 (wish I had studied)."
+    },
+    {
+      "type": "table",
+      "caption": "Формулы",
+      "columns": ["Смысл", "Форма", "Пример"],
+      "rows": [
+        ["сейчас не так, как хочется", "wish + Past Simple", "I wish I knew his number."],
+        ["хочу, чтобы что-то изменилось", "wish + would + V1", "I wish you would listen."],
+        ["жалею о прошлом", "wish + had + V3", "I wish we had left earlier."],
+        ["сильная эмоция", "if only + та же схема", "If only I were richer."]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Ключевые отличия",
+      "lines": [
+        "wish/if only + Past Simple -> нереальное настоящее",
+        "wish + would -> раздражение или желаемое изменение",
+        "wish + had V3 -> сожаление о прошлом"
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        { "en": "I wish I were better at math.", "ru": "Жаль, что я не лучше в математике." },
+        { "en": "I wish you would stop interrupting me.", "ru": "Хоть бы ты перестал меня перебивать." },
+        { "en": "If only we had booked tickets earlier.", "ru": "Если бы только мы купили билеты раньше." },
+        { "en": "I wish I hadn't said that.", "ru": "Жаль, что я это сказал." }
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": [
+      {
+        "id": "meaning",
+        "title": "Когда используем (Meaning)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "wio_m_1",
+            "instruction": "Выбери смысл",
+            "prompt": "I wish I knew the answer.",
+            "options": ["сожаление о настоящем", "план на будущее", "привычка"],
+            "correctIndex": 0,
+            "explain": "Говорящий жалеет о текущей ситуации."
+          },
+          {
+            "id": "wio_m_2",
+            "instruction": "Выбери смысл",
+            "prompt": "I wish you would stop shouting.",
+            "options": ["сожаление о прошлом", "желание изменения поведения", "общий факт"],
+            "correctIndex": 1,
+            "explain": "wish + would часто выражает раздражение и просьбу изменить поведение."
+          },
+          {
+            "id": "wio_m_3",
+            "instruction": "Выбери смысл",
+            "prompt": "If only we had left earlier.",
+            "options": ["воображаемое будущее", "сожаление о прошлом", "настоящий план"],
+            "correctIndex": 1,
+            "explain": "had left показывает нереальное прошлое."
+          },
+          {
+            "id": "wio_m_4",
+            "instruction": "Выбери смысл",
+            "prompt": "I wish I could drive.",
+            "options": ["сожаление о текущем ограничении", "запрет", "совет"],
+            "correctIndex": 0,
+            "explain": "Говорящий сожалеет о том, чего сейчас не умеет/не может."
+          },
+          {
+            "id": "wio_m_5",
+            "instruction": "Выбери смысл",
+            "prompt": "If only it weren't so expensive.",
+            "options": ["прошлое сожаление", "нереальное настоящее", "условие первого типа"],
+            "correctIndex": 1,
+            "explain": "weren't указывает на нереальную ситуацию сейчас."
+          },
+          {
+            "id": "wio_m_6",
+            "instruction": "Выбери смысл",
+            "prompt": "I wish I hadn't told him the secret.",
+            "options": ["прошлое сожаление", "текущее желание", "повторяющееся действие"],
+            "correctIndex": 0,
+            "explain": "hadn't told = сожаление о прошлом поступке."
+          }
+        ]
+      },
+      {
+        "id": "formula",
+        "title": "Формулы (Formula)",
+        "kind": "input",
+        "items": [
+          {
+            "id": "wio_f_1",
+            "instruction": "Вставь форму",
+            "prompt": "I wish I ____ (be) taller.",
+            "accepted": ["were", "was"],
+            "explain": "Для wish о настоящем используем Past Simple (formal: were)."
+          },
+          {
+            "id": "wio_f_2",
+            "instruction": "Вставь форму",
+            "prompt": "I wish you ____ (not/be) late every day.",
+            "accepted": ["weren't", "were not"],
+            "explain": "Нереальное настоящее: weren't."
+          },
+          {
+            "id": "wio_f_3",
+            "instruction": "Вставь форму",
+            "prompt": "I wish she ____ (can) come with us.",
+            "accepted": ["could"],
+            "explain": "wish + could для отсутствующей возможности."
+          },
+          {
+            "id": "wio_f_4",
+            "instruction": "Вставь форму",
+            "prompt": "I wish we ____ (book) tickets earlier.",
+            "accepted": ["had booked"],
+            "explain": "Сожаление о прошлом: had + V3."
+          },
+          {
+            "id": "wio_f_5",
+            "instruction": "Вставь форму",
+            "prompt": "If only they ____ (not/miss) the train.",
+            "accepted": ["hadn't missed", "had not missed"],
+            "explain": "If only + had V3 для прошлого сожаления."
+          },
+          {
+            "id": "wio_f_6",
+            "instruction": "Вставь форму",
+            "prompt": "I wish he ____ (stop) making that noise.",
+            "accepted": ["would stop"],
+            "explain": "wish + would для желаемого изменения поведения."
+          }
+        ]
+      }
+    ]
+  }
+}

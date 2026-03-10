@@ -74,6 +74,21 @@
   const btnGoCompare = document.getElementById('tensesGoCompare');
   const btnGoDaily = document.getElementById('tensesGoDaily');
   const btnGoMixedPresent = document.getElementById('tensesGoMixedPresent');
+  const btnGoPresent = document.getElementById('grammarGoPresent');
+  const btnGoPast = document.getElementById('grammarGoPast');
+  const btnGoFuture = document.getElementById('grammarGoFuture');
+  const btnGoUniversal = document.getElementById('grammarGoUniversal');
+
+  const searchInput = document.getElementById('grammarSearchInput');
+  const searchClearBtn = document.getElementById('grammarSearchClearBtn');
+  const searchHint = document.getElementById('grammarSearchHint');
+  const searchResults = document.getElementById('grammarSearchResults');
+
+  const levelBox = document.getElementById('grammarLevelBox');
+  const levelValue = document.getElementById('grammarLevelValue');
+  const levelPrompt = document.getElementById('grammarLevelPrompt');
+  const levelChangeBtn = document.getElementById('grammarLevelChangeBtn');
+  const levelButtons = Array.from(document.querySelectorAll('[data-grammar-level]'));
 
   const btnBackHomeFromCompare = document.getElementById('tensesBackToHomeFromCompare');
   const btnBackHomeFromDaily = document.getElementById('tensesBackToHomeFromDaily');
@@ -99,6 +114,15 @@
 
   const btnBackHomeFromList = document.getElementById('tensesBackToHomeFromList');
   const listEl = document.getElementById('tensesList');
+  const listSubtitleEl = document.getElementById('tensesListSubtitle');
+  const listFlowWrap = document.getElementById('grammarListFlow');
+  const listFlowHint = document.getElementById('grammarListFlowHint');
+  const btnPrevSubgroup = document.getElementById('grammarPrevSubgroupBtn');
+  const btnNextSubgroup = document.getElementById('grammarNextSubgroupBtn');
+  const btnOpenRecommended = document.getElementById('grammarOpenRecommendedBtn');
+  const compactListToggle = document.getElementById('grammarCompactListToggle');
+  const subgroupWrap = document.getElementById('grammarSubgroupWrap');
+  const subgroupBar = document.getElementById('grammarSubgroupBar');
 
   const btnBackToList = document.getElementById('tensesBackToList');
   const btnGoPracticeFromDetail = document.getElementById('tensesGoPracticeFromDetail');
@@ -107,6 +131,8 @@
   const tenseTitleEl = document.getElementById('tenseTitle');
   const tenseSubtitleEl = document.getElementById('tenseSubtitle');
   const tenseMasteryBadge = document.getElementById('tenseMasteryBadge');
+  const ruleModeShortBtn = document.getElementById('tenseRuleModeShortBtn');
+  const ruleModeFullBtn = document.getElementById('tenseRuleModeFullBtn');
   const ruleBody = document.getElementById('tenseRuleBody');
 
   const btnBackHomeFromPractice = document.getElementById('tensesBackToHomeFromPractice');
@@ -130,7 +156,58 @@
   let runKeyHandler = null;
 
   const KEY_UI = 'sh_tenses_ui_v1';
+  const KEY_LEVEL = 'sh_grammar_level_v1';
+  const KEY_CATEGORY = 'sh_grammar_category_v1';
+  const KEY_SUBGROUP = 'sh_grammar_subgroup_v1';
+  const KEY_LIST_COMPACT = 'sh_grammar_list_compact_v1';
+  const KEY_RULE_MODE = 'sh_grammar_rule_mode_v1';
   const CUSTOM_TENSE_ID = 'custom';
+  const LEVELS = ['A2-B1', 'B1-B2', 'B2-C1'];
+  const CATEGORY_LABEL = {
+    all: 'все темы по уровню',
+    present: 'present - настоящее',
+    past: 'past - прошлое',
+    future: 'future - будущее',
+    universal: 'universal - общие структуры'
+  };
+
+  const SUBGROUP_LABEL = {
+    all: 'все подкатегории',
+    simple: 'simple / факт',
+    continuous: 'continuous / процесс',
+    perfect: 'perfect / результат',
+    perfect_continuous: 'perfect continuous / длительность',
+    future_forms: 'future forms / способы',
+    usage_map: 'карта выбора',
+    conditionals: 'conditionals',
+    modals: 'modals',
+    voice: 'passive voice',
+    clauses: 'clauses',
+    verb_patterns: 'verb patterns',
+    articles: 'articles',
+    syntax: 'syntax'
+  };
+
+  const SUBGROUP_ORDER = [
+    'usage_map',
+    'future_forms',
+    'simple',
+    'continuous',
+    'perfect',
+    'perfect_continuous',
+    'conditionals',
+    'modals',
+    'voice',
+    'clauses',
+    'verb_patterns',
+    'articles',
+    'syntax'
+  ];
+
+  let activeCategory = loadCategory();
+  let activeSubgroup = loadSubgroup();
+  let ruleMode = loadRuleMode();
+  if (activeCategory === 'all') activeSubgroup = 'all';
 
   const GOALS = [
     { id:'all', title:'общее (all goals)' },
@@ -187,6 +264,7 @@
     setVisible(practiceView, viewName === 'practice');
     setVisible(compareView, viewName === 'compare');
     setVisible(dailyView, viewName === 'daily');
+    if (viewName !== 'home' && searchResults) searchResults.hidden = true;
     window.scrollTo(0, 0);
   }
 
@@ -201,6 +279,703 @@
   function loadUIState(){
     try{ return JSON.parse(localStorage.getItem(KEY_UI) || '{}') || {}; }
     catch{ return {}; }
+  }
+
+  function normalizeLevel(level){
+    const v = String(level || '').trim();
+    return LEVELS.includes(v) ? v : '';
+  }
+
+  function getLevel(){
+    try{
+      return normalizeLevel(localStorage.getItem(KEY_LEVEL));
+    }catch(_){
+      return '';
+    }
+  }
+
+  function setLevel(level){
+    const next = normalizeLevel(level);
+    if (!next) return;
+    try{ localStorage.setItem(KEY_LEVEL, next); }catch(_){ }
+    refreshLevelUI();
+    renderList();
+    fillTenseOptions();
+    renderCustomPicker();
+    renderPracticeInfo();
+  }
+
+  function clearLevel(){
+    try{ localStorage.removeItem(KEY_LEVEL); }catch(_){ }
+    refreshLevelUI();
+    if (countBadge) countBadge.textContent = 'grammar: 0';
+  }
+
+  function loadCategory(){
+    try{
+      const raw = String(localStorage.getItem(KEY_CATEGORY) || 'all').trim().toLowerCase();
+      return CATEGORY_LABEL[raw] ? raw : 'all';
+    }catch(_){
+      return 'all';
+    }
+  }
+
+  function normalizeSubgroup(subgroup){
+    const raw = String(subgroup || 'all').trim().toLowerCase().replace(/-/g, '_');
+    if (!raw) return 'all';
+    if (raw === 'all') return 'all';
+    return /^[a-z0-9_]+$/.test(raw) ? raw : 'all';
+  }
+
+  function loadSubgroup(){
+    try{
+      return normalizeSubgroup(localStorage.getItem(KEY_SUBGROUP) || 'all');
+    }catch(_){
+      return 'all';
+    }
+  }
+
+  function isCompactList(){
+    try{
+      const raw = localStorage.getItem(KEY_LIST_COMPACT);
+      if (raw == null) return true;
+      return raw !== '0';
+    }catch(_){
+      return true;
+    }
+  }
+
+  function setCompactList(next){
+    const val = !!next;
+    try{ localStorage.setItem(KEY_LIST_COMPACT, val ? '1' : '0'); }catch(_){ }
+    if (compactListToggle) compactListToggle.checked = val;
+  }
+
+  function normalizeRuleMode(mode){
+    return mode === 'full' ? 'full' : 'short';
+  }
+
+  function loadRuleMode(){
+    try{
+      return normalizeRuleMode(localStorage.getItem(KEY_RULE_MODE) || 'short');
+    }catch(_){
+      return 'short';
+    }
+  }
+
+  function setRuleMode(mode){
+    ruleMode = normalizeRuleMode(mode);
+    try{ localStorage.setItem(KEY_RULE_MODE, ruleMode); }catch(_){ }
+    updateRuleModeButtons();
+    if (currentId) renderCurrentRule();
+  }
+
+  function setCategory(category){
+    const next = CATEGORY_LABEL[category] ? category : 'all';
+    activeCategory = next;
+    if (next === 'all' && activeSubgroup !== 'all') setSubgroup('all');
+    try{ localStorage.setItem(KEY_CATEGORY, next); }catch(_){ }
+    saveUIState({ category: next });
+  }
+
+  function setSubgroup(subgroup){
+    const next = normalizeSubgroup(subgroup);
+    activeSubgroup = next;
+    try{
+      if (next === 'all') localStorage.removeItem(KEY_SUBGROUP);
+      else localStorage.setItem(KEY_SUBGROUP, next);
+    }catch(_){ }
+    saveUIState({ subgroup: next });
+  }
+
+  function deriveSubgroup(meta){
+    const id = String(meta?.id || '').toLowerCase();
+    const group = String(meta?.group || '').toLowerCase();
+
+    if (id.includes('usagemap') || id.includes('expressionways')) return 'usage_map';
+
+    if (group === 'present' || group === 'past' || group === 'future'){
+      if (group === 'future' && (id.includes('goingto') || id.includes('timeclauses') || id.includes('presentcontinuous') || id.includes('presentsimple'))){
+        return 'future_forms';
+      }
+      if (id.includes('perfectcontinuous')) return 'perfect_continuous';
+      if (id.includes('perfect')) return 'perfect';
+      if (id.includes('continuous')) return 'continuous';
+      return 'simple';
+    }
+
+    if (group !== 'universal') return 'simple';
+    if (id.includes('conditional')) return 'conditionals';
+    if (id.includes('modal')) return 'modals';
+    if (id.includes('passive')) return 'voice';
+    if (id.includes('clause') || id.includes('reported')) return 'clauses';
+    if (id.includes('article')) return 'articles';
+    if (id.includes('questiontags') || id.includes('inversion') || id.includes('cleft')) return 'syntax';
+    if (id.includes('gerund') || id.includes('wish') || id.includes('causative')) return 'verb_patterns';
+    return 'verb_patterns';
+  }
+
+  function subgroupLabel(subgroup){
+    const key = normalizeSubgroup(subgroup);
+    return SUBGROUP_LABEL[key] || key.replace(/_/g, ' ');
+  }
+
+  function getAvailableSubgroups(category){
+    const metas = getFilteredMetas({ category: category || activeCategory, subgroup: 'all' });
+    const out = [];
+    const seen = new Set();
+
+    for (const meta of metas){
+      const key = deriveSubgroup(meta);
+      if (!key || seen.has(key)) continue;
+      seen.add(key);
+      out.push(key);
+    }
+
+    return sortSubgroups(out);
+  }
+
+  function sortSubgroups(list){
+    const arr = Array.isArray(list) ? [...list] : [];
+    arr.sort((a, b)=>{
+      const ai = SUBGROUP_ORDER.indexOf(a);
+      const bi = SUBGROUP_ORDER.indexOf(b);
+      const aw = ai === -1 ? 999 : ai;
+      const bw = bi === -1 ? 999 : bi;
+      if (aw !== bw) return aw - bw;
+      return String(a).localeCompare(String(b));
+    });
+    return arr;
+  }
+
+  function preferredSubgroup(category){
+    const subgroups = getAvailableSubgroups(category);
+    if (!subgroups.length) return 'all';
+    if (subgroups.includes('usage_map')) return 'usage_map';
+    return subgroups[0];
+  }
+
+  function nextSubgroup(current, direction){
+    const subgroups = getAvailableSubgroups(activeCategory);
+    if (!subgroups.length) return 'all';
+    const idx = subgroups.indexOf(current);
+    if (idx === -1) return subgroups[0];
+    if (direction > 0) return subgroups[Math.min(subgroups.length - 1, idx + 1)];
+    return subgroups[Math.max(0, idx - 1)];
+  }
+
+  function renderListFlow(visibleMetas){
+    if (!listFlowWrap || !listFlowHint) return;
+
+    if (activeCategory === 'all'){
+      listFlowWrap.hidden = true;
+      return;
+    }
+
+    const subgroups = getAvailableSubgroups(activeCategory);
+    if (!subgroups.length){
+      listFlowWrap.hidden = true;
+      return;
+    }
+
+    const current = activeSubgroup === 'all' ? preferredSubgroup(activeCategory) : activeSubgroup;
+    const currentIdx = subgroups.indexOf(current);
+    const step = currentIdx >= 0 ? currentIdx + 1 : 1;
+    const total = subgroups.length;
+    const rec = (visibleMetas && visibleMetas[0]) ? (visibleMetas[0].title || visibleMetas[0].id) : '';
+    const lang = String(document.documentElement.lang || 'ru').toLowerCase();
+    if (lang === 'en'){
+      listFlowHint.textContent = rec
+        ? `step ${step}/${total}: ${subgroupLabel(current)} -> start with "${rec}"`
+        : `step ${step}/${total}: ${subgroupLabel(current)}`;
+    } else {
+      listFlowHint.textContent = rec
+        ? `шаг ${step}/${total}: ${subgroupLabel(current)} -> начни с "${rec}"`
+        : `шаг ${step}/${total}: ${subgroupLabel(current)}`;
+    }
+
+    if (btnPrevSubgroup) btnPrevSubgroup.disabled = currentIdx <= 0;
+    if (btnNextSubgroup) btnNextSubgroup.disabled = currentIdx === -1 || currentIdx >= total - 1;
+    if (btnOpenRecommended) btnOpenRecommended.disabled = !visibleMetas || !visibleMetas.length;
+
+    listFlowWrap.hidden = false;
+  }
+
+  function switchSubgroup(direction){
+    const target = nextSubgroup(activeSubgroup, direction);
+    if (!target || target === activeSubgroup) return;
+    setSubgroup(target);
+    renderList();
+  }
+
+  function openRecommendedFromList(){
+    const metas = sortMetasForDisplay(getFilteredMetas({ category: activeCategory, subgroup: activeSubgroup }));
+    const first = metas[0];
+    if (!first) return;
+    openTense(first.id);
+  }
+
+  function sortMetasForDisplay(metas){
+    const arr = Array.isArray(metas) ? [...metas] : [];
+    arr.sort((a, b)=>{
+      const am = deriveSubgroup(a) === 'usage_map' ? 0 : 1;
+      const bm = deriveSubgroup(b) === 'usage_map' ? 0 : 1;
+      if (am !== bm) return am - bm;
+      return 0;
+    });
+    return arr;
+  }
+
+  function matchesLevel(meta, level){
+    if (!level) return true;
+    if (!meta || !Array.isArray(meta.levels) || !meta.levels.length) return true;
+    return meta.levels.includes(level);
+  }
+
+  function getFilteredMetas(options){
+    const opts = options || {};
+    const level = getLevel();
+    const category = opts.category || 'all';
+    const subgroup = normalizeSubgroup(opts.subgroup || 'all');
+
+    let metas = Array.isArray(REG.INDEX) ? [...REG.INDEX] : [];
+    metas = metas.filter((meta) => matchesLevel(meta, level));
+
+    if (category !== 'all'){
+      metas = metas.filter((meta) => String(meta.group || '').toLowerCase() === category);
+    }
+
+    if (subgroup !== 'all'){
+      metas = metas.filter((meta) => deriveSubgroup(meta) === subgroup);
+    }
+
+    if (opts.onlyComparable){
+      metas = metas.filter((meta) => (meta.kind || 'tense') === 'tense' && meta.compare !== false);
+    }
+
+    return metas;
+  }
+
+  function ensureLevelSelected(){
+    return !!getLevel();
+  }
+
+  function refreshLevelUI(){
+    const level = getLevel();
+    if (levelValue) levelValue.textContent = level || 'не выбран';
+    if (levelPrompt) levelPrompt.hidden = !!level;
+    if (levelBox) levelBox.classList.toggle('is-empty', !level);
+
+    levelButtons.forEach((btn) => {
+      const btnLevel = normalizeLevel(btn.getAttribute('data-grammar-level'));
+      btn.classList.toggle('is-active', !!level && btnLevel === level);
+    });
+  }
+
+  function updateListSubtitle(){
+    if (!listSubtitleEl) return;
+    const base = CATEGORY_LABEL[activeCategory] || CATEGORY_LABEL.all;
+    if (activeSubgroup && activeSubgroup !== 'all'){
+      listSubtitleEl.textContent = `${base} - ${subgroupLabel(activeSubgroup)}`;
+      return;
+    }
+    listSubtitleEl.textContent = base;
+  }
+
+  function renderSubgroupBar(){
+    if (!subgroupWrap || !subgroupBar) return;
+
+    if (activeCategory === 'all'){
+      subgroupWrap.hidden = true;
+      return;
+    }
+
+    const subgroups = getAvailableSubgroups(activeCategory);
+    if (!subgroups.length){
+      subgroupWrap.hidden = true;
+      return;
+    }
+
+    if (activeSubgroup !== 'all' && !subgroups.includes(activeSubgroup)){
+      setSubgroup('all');
+    }
+
+    subgroupBar.innerHTML = '';
+    const allKeys = ['all', ...subgroups];
+    for (const key of allKeys){
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'ik-btn';
+      if (key === activeSubgroup) btn.classList.add('is-active');
+      btn.textContent = subgroupLabel(key);
+      btn.addEventListener('click', ()=>{
+        setSubgroup(key);
+        renderList();
+      });
+      subgroupBar.appendChild(btn);
+    }
+
+    subgroupWrap.hidden = false;
+  }
+
+  const SEARCH_HINT_DEFAULT = searchHint ? searchHint.textContent : '';
+
+  const SEARCH_DOC_CACHE = new Map();
+
+  function normalizeSearchText(text){
+    return String(text || '')
+      .toLowerCase()
+      .replace(/[`´]/g, "'")
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  function splitWords(text){
+    return normalizeSearchText(text)
+      .split(/[^a-z0-9а-яё']+/i)
+      .map((w)=> w.replace(/^'+|'+$/g, ''))
+      .filter(Boolean);
+  }
+
+  function collectStrings(value, out){
+    if (value == null) return;
+    if (Array.isArray(value)){
+      for (const item of value) collectStrings(item, out);
+      return;
+    }
+    if (typeof value === 'object'){
+      for (const v of Object.values(value)) collectStrings(v, out);
+      return;
+    }
+    if (typeof value === 'string' || typeof value === 'number') out.push(String(value));
+  }
+
+  function collectPracticeSearchText(practice, out){
+    if (!practice || !Array.isArray(practice.exercises)) return;
+    for (const ex of practice.exercises){
+      out.push(ex?.title || '', ex?.goal || '');
+    }
+  }
+
+  function hasTokenPrefix(tokens, term){
+    for (const tk of (tokens || [])){
+      if (tk.startsWith(term)) return true;
+    }
+    return false;
+  }
+
+  function countToken(tokens, term){
+    let n = 0;
+    for (const tk of (tokens || [])){
+      if (tk === term) n += 1;
+    }
+    return n;
+  }
+
+  function buildSnippet(tokens, terms){
+    if (!Array.isArray(tokens) || !tokens.length) return '';
+    const queryTerms = Array.isArray(terms) ? terms : [];
+
+    let hitIndex = -1;
+    for (const term of queryTerms){
+      const prefixAllowed = String(term || '').length >= 4;
+      hitIndex = tokens.findIndex((tk)=> tk === term || (prefixAllowed && tk.startsWith(term)));
+      if (hitIndex >= 0) break;
+    }
+
+    if (hitIndex < 0) return '';
+    const from = Math.max(0, hitIndex - 4);
+    const to = Math.min(tokens.length, hitIndex + 5);
+    const chunk = tokens.slice(from, to).join(' ');
+    if (!chunk) return '';
+    return from > 0 ? `... ${chunk}` : chunk;
+  }
+
+  function buildSearchSnippet(doc, terms){
+    return (
+      buildSnippet(doc.titleTokens, terms) ||
+      buildSnippet(doc.metaTokens, terms) ||
+      buildSnippet(doc.ruleTokens, terms)
+    );
+  }
+
+  function buildSearchDoc(meta){
+    const key = String(meta?.id || '');
+    const cached = SEARCH_DOC_CACHE.get(key);
+    if (cached) return cached;
+
+    const group = String(meta?.group || '').toLowerCase();
+    const subgroup = deriveSubgroup(meta);
+    const topic = (REG && REG.byId) ? REG.byId[key] : null;
+
+    const metaParts = [
+      meta?.id,
+      meta?.title,
+      meta?.subtitle,
+      meta?.hint,
+      group,
+      CATEGORY_LABEL[group] || '',
+      subgroup,
+      subgroupLabel(subgroup),
+      Array.isArray(meta?.levels) ? meta.levels.join(' ') : ''
+    ];
+
+    const ruleParts = [];
+
+    if (topic){
+      collectStrings(topic.ruleBlocks || [], ruleParts);
+      collectPracticeSearchText(topic.practice || {}, ruleParts);
+    }
+
+    const metaText = normalizeSearchText(metaParts.filter(Boolean).join(' '));
+    const ruleText = normalizeSearchText(ruleParts.filter(Boolean).join(' '));
+    const text = [metaText, ruleText].filter(Boolean).join(' ');
+
+    const metaTokens = splitWords(metaText);
+    const ruleTokens = splitWords(ruleText);
+    const metaTokenSet = new Set(metaTokens);
+    const ruleTokenSet = new Set(ruleTokens);
+
+    const titleText = normalizeSearchText([meta?.title || '', meta?.id || '', meta?.subtitle || ''].join(' '));
+    const titleTokens = splitWords(titleText);
+    const titleTokenSet = new Set(titleTokens);
+
+    const doc = {
+      meta,
+      group,
+      subgroup,
+      text,
+      metaText,
+      ruleText,
+      metaTokens,
+      ruleTokens,
+      metaTokenSet,
+      ruleTokenSet,
+      titleText,
+      titleTokens,
+      titleTokenSet
+    };
+    SEARCH_DOC_CACHE.set(key, doc);
+    return doc;
+  }
+
+  function getSearchBaseMetas(){
+    return Array.isArray(REG.INDEX) ? [...REG.INDEX] : [];
+  }
+
+  function searchGrammarMetas(query){
+    const q = normalizeSearchText(query || '');
+    const terms = splitWords(q);
+    if (!terms.length) return [];
+
+    const level = getLevel();
+    const rows = [];
+
+    for (const meta of getSearchBaseMetas()){
+      const doc = buildSearchDoc(meta);
+      let score = 0;
+      let allMatch = true;
+      const fieldHits = { title: 0, meta: 0, rules: 0 };
+      const exactMatches = [];
+
+      for (const t of terms){
+        const prefixAllowed = t.length >= 4;
+
+        const titleExact = doc.titleTokenSet.has(t);
+        const titlePrefix = !titleExact && prefixAllowed ? hasTokenPrefix(doc.titleTokens, t) : false;
+
+        const metaExact = doc.metaTokenSet.has(t);
+        const metaPrefix = !metaExact && prefixAllowed ? hasTokenPrefix(doc.metaTokens, t) : false;
+
+        const ruleExact = doc.ruleTokenSet.has(t);
+        const rulePrefix = !ruleExact && prefixAllowed ? hasTokenPrefix(doc.ruleTokens, t) : false;
+        exactMatches.push(!!(titleExact || metaExact || ruleExact));
+
+        if (!titleExact && !titlePrefix && !metaExact && !metaPrefix && !ruleExact && !rulePrefix){
+          allMatch = false;
+          break;
+        }
+
+        if (titleExact) score += 80 + Math.min(30, countToken(doc.titleTokens, t) * 4);
+        else if (titlePrefix) score += 40;
+        if (titleExact || titlePrefix) fieldHits.title += 1;
+
+        if (metaExact) score += 26 + Math.min(18, countToken(doc.metaTokens, t) * 3);
+        else if (metaPrefix) score += 11;
+        if (metaExact || metaPrefix) fieldHits.meta += 1;
+
+        if (ruleExact) score += 9 + Math.min(20, countToken(doc.ruleTokens, t) * 2);
+        else if (rulePrefix) score += 3;
+        if (ruleExact || rulePrefix) fieldHits.rules += 1;
+      }
+
+      if (!allMatch) continue;
+
+      const idNorm = normalizeSearchText(meta.id || '');
+      if (doc.titleText === q) score += 120;
+      else if (doc.titleText.startsWith(q)) score += 50;
+      if (idNorm === q) score += 90;
+      else if (idNorm.startsWith(q)) score += 30;
+
+      const levelMatch = !level || (Array.isArray(meta.levels) && meta.levels.includes(level));
+      if (levelMatch) score += 8;
+
+      const snippet = buildSearchSnippet(doc, terms);
+
+      rows.push({
+        meta,
+        subgroup: doc.subgroup,
+        score,
+        levelMatch,
+        fieldHits,
+        allTermsExact: exactMatches.every(Boolean),
+        snippet
+      });
+    }
+
+    rows.sort((a, b) => {
+      if (b.score !== a.score) return b.score - a.score;
+      if (a.levelMatch !== b.levelMatch) return a.levelMatch ? -1 : 1;
+      return String(a.meta.title || '').localeCompare(String(b.meta.title || ''));
+    });
+
+    if (terms.length === 1 && terms[0].length <= 3){
+      const strictRows = rows.filter((r)=> r.allTermsExact);
+      if (strictRows.length) return strictRows.slice(0, 20);
+    }
+
+    return rows.slice(0, 20);
+  }
+
+  function openFromSearch(meta, subgroup){
+    if (!meta || !meta.id) return;
+
+    if (meta.group) setCategory(String(meta.group).toLowerCase());
+    setSubgroup(subgroup || deriveSubgroup(meta));
+
+    openTense(meta.id);
+    showOnly('detail');
+    setStatus('open');
+
+    if (searchResults){
+      searchResults.innerHTML = '';
+      searchResults.hidden = true;
+    }
+  }
+
+  function renderSearchResults(rawQuery){
+    if (!searchResults) return;
+
+    const query = String(rawQuery || '').trim();
+    if (!query){
+      searchResults.innerHTML = '';
+      searchResults.hidden = true;
+      if (searchHint) searchHint.textContent = SEARCH_HINT_DEFAULT;
+      return;
+    }
+
+    const rows = searchGrammarMetas(query);
+    searchResults.innerHTML = '';
+
+    if (!rows.length){
+      const li = document.createElement('li');
+      li.innerHTML = '<p class="ik-itemline">ничего не найдено</p>';
+      searchResults.appendChild(li);
+      searchResults.hidden = false;
+      return;
+    }
+
+    for (const row of rows){
+      const meta = row.meta;
+      const category = String(meta.group || '').toLowerCase();
+      const categoryLabel = CATEGORY_LABEL[category] || category;
+      const subgroupText = subgroupLabel(row.subgroup);
+      const levelsText = Array.isArray(meta.levels) && meta.levels.length ? meta.levels.join(' / ') : '';
+      const selectedLevel = getLevel();
+      const outOfLevel = !!(selectedLevel && Array.isArray(meta.levels) && !meta.levels.includes(selectedLevel));
+      const matchFields = [];
+      if (row.fieldHits?.title) matchFields.push('title');
+      if (row.fieldHits?.meta) matchFields.push('meta');
+      if (row.fieldHits?.rules) matchFields.push('rules');
+      const matchText = matchFields.length ? `совпадение: ${matchFields.join('/')}` : '';
+      const snippetText = row.snippet ? `найдено: ${row.snippet}` : '';
+      const metaLine = [categoryLabel, subgroupText, levelsText, outOfLevel ? 'другой уровень' : '', matchText].filter(Boolean).join(' • ');
+
+      const li = document.createElement('li');
+      li.className = 'is-clickable';
+
+      const left = document.createElement('div');
+      left.innerHTML = `<p class="ik-itemline"><b>${escapeHtml(meta.title || meta.id)}</b></p>
+                        <p class="ik-itemline ik-muted">${escapeHtml(meta.hint || meta.subtitle || '')}</p>
+                        <p class="ik-itemline ik-muted">${escapeHtml(metaLine)}</p>
+                        ${snippetText ? `<p class="ik-itemline ik-muted">${escapeHtml(snippetText)}</p>` : ''}`;
+
+      const right = document.createElement('div');
+      right.className = 'ik-mini';
+
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'ik-btn ik-btn--black';
+      btn.textContent = 'open';
+      btn.addEventListener('click', (e)=>{
+        e.stopPropagation();
+        openFromSearch(meta, row.subgroup);
+      });
+
+      right.appendChild(btn);
+      li.appendChild(left);
+      li.appendChild(right);
+      li.addEventListener('click', ()=> openFromSearch(meta, row.subgroup));
+      searchResults.appendChild(li);
+    }
+
+    searchResults.hidden = false;
+  }
+
+  function initSearchUI(){
+    if (!searchInput || !searchResults) return;
+
+    searchInput.addEventListener('input', ()=>{
+      renderSearchResults(searchInput.value);
+    });
+
+    searchInput.addEventListener('focus', ()=>{
+      if (searchInput.value.trim()) renderSearchResults(searchInput.value);
+    });
+
+    searchInput.addEventListener('keydown', (e)=>{
+      if (e.key !== 'Enter') return;
+      const firstOpenBtn = searchResults.querySelector('button');
+      if (!firstOpenBtn) return;
+      e.preventDefault();
+      firstOpenBtn.click();
+    });
+
+    searchClearBtn && searchClearBtn.addEventListener('click', ()=>{
+      searchInput.value = '';
+      renderSearchResults('');
+      searchInput.focus();
+    });
+
+    document.addEventListener('click', (e)=>{
+      if (!searchResults || searchResults.hidden) return;
+      if (e.target === searchInput || e.target === searchClearBtn) return;
+      if (searchResults.contains(e.target)) return;
+      searchResults.hidden = true;
+    });
+  }
+
+  function openCategory(category){
+    if (!ensureLevelSelected()){
+      showOnly('home');
+      setStatus('выбери уровень');
+      return;
+    }
+    setCategory(category);
+    setSubgroup(preferredSubgroup(category));
+    renderList();
+    showOnly('list');
+    setStatus('list');
   }
 
   // -------------------------
@@ -298,17 +1073,38 @@
   // List
   // -------------------------
   function renderList(){
-    if (countBadge) countBadge.textContent = `tenses: ${REG.INDEX.length}`;
+    renderSubgroupBar();
+    const visibleMetas = sortMetasForDisplay(getFilteredMetas({ category: activeCategory, subgroup: activeSubgroup }));
+    const compactMode = isCompactList();
+    if (countBadge) countBadge.textContent = `grammar: ${visibleMetas.length}`;
+    updateListSubtitle();
+    renderListFlow(visibleMetas);
 
     listEl.innerHTML = '';
-    for (const meta of REG.INDEX){
+    if (!visibleMetas.length){
+      const li = document.createElement('li');
+      li.innerHTML = '<p class="ik-itemline">Для этого уровня пока нет тем в выбранной категории.</p>';
+      listEl.appendChild(li);
+      return;
+    }
+
+    for (const meta of visibleMetas){
       const prog = loadProgress(meta.id);
+      const subgroupText = subgroupLabel(deriveSubgroup(meta));
+      const metaHint = meta.hint || meta.subtitle || '';
 
       const li = document.createElement('li');
+      li.className = 'is-clickable';
+      li.addEventListener('click', ()=> openTense(meta.id));
 
       const left = document.createElement('div');
-      left.innerHTML = `<p class="ik-itemline"><b>${escapeHtml(meta.title)}</b></p>
-                        <p class="ik-itemline ik-muted">${escapeHtml(meta.hint || meta.subtitle || '')}</p>`;
+      if (compactMode){
+        left.innerHTML = `<p class="ik-itemline"><b>${escapeHtml(meta.title)}</b></p>
+                          <p class="ik-itemline ik-muted">${escapeHtml(subgroupText)}</p>`;
+      } else {
+        left.innerHTML = `<p class="ik-itemline"><b>${escapeHtml(meta.title)}</b></p>
+                          <p class="ik-itemline ik-muted">${escapeHtml(metaHint)} • ${escapeHtml(subgroupText)}</p>`;
+      }
 
       const right = document.createElement('div');
       right.className = 'ik-mini';
@@ -321,7 +1117,10 @@
       btn.className = 'ik-btn ik-btn--black';
       btn.type = 'button';
       btn.textContent = 'open';
-      btn.addEventListener('click', ()=> openTense(meta.id));
+      btn.addEventListener('click', (e)=>{
+        e.stopPropagation();
+        openTense(meta.id);
+      });
 
       right.appendChild(badge);
       right.appendChild(btn);
@@ -335,6 +1134,69 @@
   // -------------------------
   // Detail
   // -------------------------
+  function blocksForRuleMode(blocks){
+    const source = Array.isArray(blocks) ? blocks : [];
+    if (ruleMode === 'full') return source;
+
+    const out = [];
+    let heading = 0;
+    let text = 0;
+    let table = 0;
+    let highlight = 0;
+    let examples = 0;
+
+    for (const block of source){
+      if (!block || typeof block !== 'object') continue;
+
+      if (block.type === 'heading' && heading < 1){
+        out.push(block);
+        heading += 1;
+        continue;
+      }
+
+      if (block.type === 'text' && text < 1){
+        out.push(block);
+        text += 1;
+        continue;
+      }
+
+      if (block.type === 'table' && table < 1){
+        const rows = Array.isArray(block.rows) ? block.rows.slice(0, 4) : [];
+        out.push(Object.assign({}, block, { rows }));
+        table += 1;
+        continue;
+      }
+
+      if (block.type === 'highlight' && highlight < 1){
+        const lines = Array.isArray(block.lines) ? block.lines.slice(0, 4) : [];
+        out.push(Object.assign({}, block, { lines }));
+        highlight += 1;
+        continue;
+      }
+
+      if (block.type === 'examples' && examples < 1){
+        const items = Array.isArray(block.items) ? block.items.slice(0, 2) : [];
+        out.push(Object.assign({}, block, { items }));
+        examples += 1;
+        continue;
+      }
+    }
+
+    return out.length ? out : source.slice(0, 3);
+  }
+
+  function updateRuleModeButtons(){
+    if (ruleModeShortBtn) ruleModeShortBtn.classList.toggle('is-active', ruleMode === 'short');
+    if (ruleModeFullBtn) ruleModeFullBtn.classList.toggle('is-active', ruleMode === 'full');
+  }
+
+  function renderCurrentRule(){
+    if (!currentId) return;
+    const t = REG.byId[currentId];
+    if (!t) return;
+    renderRuleBlocks(ruleBody, blocksForRuleMode(t.ruleBlocks || []));
+  }
+
   function openTense(id){
     const t = REG.byId[id];
     if (!t) return;
@@ -343,9 +1205,10 @@
 
     tenseTitleEl.textContent = t.title || id;
     tenseSubtitleEl.textContent = t.subtitle || '';
-    renderRuleBlocks(ruleBody, t.ruleBlocks || []);
+    renderCurrentRule();
 
     updateMasteryUI(id);
+    updateRuleModeButtons();
     showOnly('detail');
     setStatus('open');
   }
@@ -374,11 +1237,11 @@
   function fillTenseOptions(){
     tenseSelect.innerHTML = '';
 
-    const metas = Array.isArray(REG.INDEX) ? REG.INDEX : [];
+    const metas = sortMetasForDisplay(getFilteredMetas({ category: activeCategory, subgroup: activeSubgroup }));
 
     const optMixedAll = document.createElement('option');
     optMixedAll.value = 'mixedAll';
-    optMixedAll.textContent = 'Mixed All (12 tenses)';
+    optMixedAll.textContent = 'Смешанное: все темы по уровню';
     tenseSelect.appendChild(optMixedAll);
 
     const optCustom = document.createElement('option');
@@ -395,25 +1258,40 @@
     }
 
     // Special
-    const optMixed = document.createElement('option');
-    optMixed.value = 'mixed';
-    optMixed.textContent = 'Mixed (Past Simple + Past Continuous)';
-    tenseSelect.appendChild(optMixed);
+    const allowMixedPast = activeCategory === 'all' ||
+      (activeCategory === 'past' && (activeSubgroup === 'all' || activeSubgroup === 'simple' || activeSubgroup === 'continuous'));
 
-    const optMixedP = document.createElement('option');
-    optMixedP.value = 'mixedPresent';
-    optMixedP.textContent = 'Mixed Present (Present Simple + Present Continuous)';
-    tenseSelect.appendChild(optMixedP);
+    if (REG.byId.mixed && allowMixedPast){
+      const optMixed = document.createElement('option');
+      optMixed.value = 'mixed';
+      optMixed.textContent = 'Mixed (Past Simple + Past Continuous)';
+      tenseSelect.appendChild(optMixed);
+    }
 
-    const optMixedPP = document.createElement('option');
-    optMixedPP.value = 'mixedPerfectPast';
-    optMixedPP.textContent = 'Mixed Perfect - Past (Present Perfect + Past Simple)';
-    tenseSelect.appendChild(optMixedPP);
+    const allowMixedPresent = activeCategory === 'all' ||
+      (activeCategory === 'present' && (activeSubgroup === 'all' || activeSubgroup === 'simple' || activeSubgroup === 'continuous'));
+
+    if (REG.byId.mixedPresent && allowMixedPresent){
+      const optMixedP = document.createElement('option');
+      optMixedP.value = 'mixedPresent';
+      optMixedP.textContent = 'Mixed Present (Present Simple + Present Continuous)';
+      tenseSelect.appendChild(optMixedP);
+    }
+
+    const allowMixedPerfectPast = activeCategory === 'all' ||
+      (activeCategory === 'past' && (activeSubgroup === 'all' || activeSubgroup === 'simple' || activeSubgroup === 'perfect'));
+
+    if (REG.byId.mixedPerfectPast && allowMixedPerfectPast){
+      const optMixedPP = document.createElement('option');
+      optMixedPP.value = 'mixedPerfectPast';
+      optMixedPP.textContent = 'Mixed Perfect - Past (Present Perfect + Past Simple)';
+      tenseSelect.appendChild(optMixedPP);
+    }
 
   }
 
   function getCoreTenseIds(){
-    return (REG.INDEX || []).map(x=>x.id).filter(Boolean);
+    return getFilteredMetas({ category: 'all' }).map(x=>x.id).filter(Boolean);
   }
 
   function getSavedCustomIds(){
@@ -457,9 +1335,10 @@
   function renderCustomPicker(){
     if (!customGrid) return;
     const selected = new Set(getSavedCustomIds());
+    const metas = getFilteredMetas({ category: 'all' });
     customGrid.innerHTML = '';
 
-    for (const meta of (REG.INDEX || [])){
+    for (const meta of metas){
       const label = document.createElement('label');
       label.className = 'sh-custom-tense';
 
@@ -497,15 +1376,19 @@
   function updateCustomHint(selectedCount){
     if (!customHint) return;
     if (!selectedCount){
-      customHint.textContent = 'выбери минимум одно время, чтобы начать';
+      customHint.textContent = 'выбери минимум одну тему, чтобы начать';
       return;
     }
-    customHint.textContent = `выбрано: ${selectedCount} из ${(REG.INDEX || []).length}`;
+    customHint.textContent = `выбрано: ${selectedCount} из ${getFilteredMetas({ category: 'all' }).length}`;
   }
 
   function buildMixedAllTense(){
+    const metas = getFilteredMetas({
+      category: activeCategory === 'all' ? 'all' : activeCategory,
+      subgroup: activeCategory === 'all' ? 'all' : activeSubgroup
+    });
     const grouped = new Map();
-    for (const meta of (REG.INDEX || [])){
+    for (const meta of metas){
       const t = REG.byId[meta.id];
       if (!t || !t.practice || !Array.isArray(t.practice.exercises)) continue;
       for (const ex of t.practice.exercises){
@@ -530,8 +1413,8 @@
     }
     return {
       id: 'mixedAll',
-      title: 'Mixed All (12 tenses)',
-      subtitle: 'all core tenses together',
+      title: 'Смешанное: все темы',
+      subtitle: 'все темы выбранного фильтра и уровня',
       practice: {
         exercises: Array.from(grouped.values())
       }
@@ -543,7 +1426,7 @@
     const grouped = new Map();
     const selectedSet = new Set(picked);
 
-    for (const meta of (REG.INDEX || [])){
+    for (const meta of getFilteredMetas({ category: 'all' })){
       if (!selectedSet.has(meta.id)) continue;
       const t = REG.byId[meta.id];
       if (!t || !t.practice || !Array.isArray(t.practice.exercises)) continue;
@@ -570,8 +1453,8 @@
 
     return {
       id: CUSTOM_TENSE_ID,
-      title: `Пользовательское (${picked.length} т.)`,
-      subtitle: 'набор по выбранным временам',
+      title: `Пользовательское (${picked.length} тем.)`,
+      subtitle: 'набор по выбранным темам',
       practice: {
         exercises: Array.from(grouped.values())
       }
@@ -584,7 +1467,12 @@
     const t = REG.byId[id];
     if (t) return t;
     // fallback
-    return REG.byId[REG.INDEX?.[0]?.id];
+    const fallbackMeta =
+      getFilteredMetas({ category: activeCategory, subgroup: activeSubgroup })[0] ||
+      getFilteredMetas({ category: activeCategory, subgroup: 'all' })[0] ||
+      getFilteredMetas({ category: 'all', subgroup: 'all' })[0] ||
+      REG.INDEX?.[0];
+    return REG.byId[fallbackMeta?.id];
   }
 
   function getSelectedGoalId(){
@@ -613,7 +1501,12 @@
   }
 
   function renderPracticeInfo(){
-    const tenseId = tenseSelect.value || (REG.INDEX[0] && REG.INDEX[0].id);
+    if (!ensureLevelSelected()){
+      if (practiceMeta) practiceMeta.textContent = 'выбери уровень';
+      if (practiceBody) practiceBody.innerHTML = '';
+      return;
+    }
+    const tenseId = tenseSelect.value || tenseSelect.options?.[0]?.value || (REG.INDEX[0] && REG.INDEX[0].id);
     const tenseObj = getTenseForPractice(tenseId);
     const goalId = getSelectedGoalId();
     const exIds = gatherExerciseIds(tenseObj, goalId);
@@ -634,7 +1527,7 @@
 
     if (btnStart){
       btnStart.disabled = total === 0;
-      btnStart.title = total ? '' : 'Нет заданий: выбери времена';
+      btnStart.title = total ? '' : 'Нет заданий: выбери темы';
     }
 
     // Summary card
@@ -668,7 +1561,7 @@
     practiceBody.innerHTML = '';
     practiceBody.appendChild(box);
 
-    saveUIState({ goal: goalId, tense: tenseId });
+    saveUIState({ goal: goalId, tense: tenseId, category: activeCategory, subgroup: activeSubgroup });
   }
 
   // -------------------------
@@ -1932,26 +2825,89 @@ try{
   // Events
   // -------------------------
   btnGoTheory.addEventListener('click', ()=>{
+    if (!ensureLevelSelected()){
+      showOnly('home');
+      setStatus('выбери уровень');
+      return;
+    }
+    setCategory('all');
+    setSubgroup('all');
     renderList();
     showOnly('list');
     setStatus('list');
   });
 
   btnGoPractice.addEventListener('click', ()=>{
-    showPractice();
+    if (!ensureLevelSelected()){
+      showOnly('home');
+      setStatus('выбери уровень');
+      return;
+    }
+    setCategory('all');
+    setSubgroup('all');
+    showPractice({ keepCurrentFilter: true });
   });
+
+  btnGoPresent && btnGoPresent.addEventListener('click', ()=> openCategory('present'));
+  btnGoPast && btnGoPast.addEventListener('click', ()=> openCategory('past'));
+  btnGoFuture && btnGoFuture.addEventListener('click', ()=> openCategory('future'));
+  btnGoUniversal && btnGoUniversal.addEventListener('click', ()=> openCategory('universal'));
+
+  compactListToggle && compactListToggle.addEventListener('change', ()=>{
+    setCompactList(!!compactListToggle.checked);
+    renderList();
+  });
+
+  btnPrevSubgroup && btnPrevSubgroup.addEventListener('click', ()=> switchSubgroup(-1));
+  btnNextSubgroup && btnNextSubgroup.addEventListener('click', ()=> switchSubgroup(1));
+  btnOpenRecommended && btnOpenRecommended.addEventListener('click', ()=> openRecommendedFromList());
+
+  ruleModeShortBtn && ruleModeShortBtn.addEventListener('click', ()=> setRuleMode('short'));
+  ruleModeFullBtn && ruleModeFullBtn.addEventListener('click', ()=> setRuleMode('full'));
+
+  levelButtons.forEach((btn) => {
+    btn.addEventListener('click', ()=>{
+      const level = btn.getAttribute('data-grammar-level');
+      if (!normalizeLevel(level)) return;
+      setLevel(level);
+      setStatus('уровень сохранен');
+    });
+  });
+
+  levelChangeBtn && levelChangeBtn.addEventListener('click', ()=>{
+    clearLevel();
+    setStatus('выбери уровень');
+  });
+
 // Compare / Daily / Mixed Present quick start
 btnGoCompare && btnGoCompare.addEventListener('click', ()=>{
+  if (!ensureLevelSelected()){
+    showOnly('home');
+    setStatus('выбери уровень');
+    return;
+  }
   showCompare();
 });
 
 btnGoDaily && btnGoDaily.addEventListener('click', ()=>{
+  if (!ensureLevelSelected()){
+    showOnly('home');
+    setStatus('выбери уровень');
+    return;
+  }
   showDaily();
 });
 
-btnGoMixedPresent && btnGoMixedPresent.addEventListener('click', ()=>{
+  btnGoMixedPresent && btnGoMixedPresent.addEventListener('click', ()=>{
+  if (!ensureLevelSelected()){
+    showOnly('home');
+    setStatus('выбери уровень');
+    return;
+  }
+  setCategory('present');
+  setSubgroup('all');
   // open practice and start immediately
-  showPractice();
+  showPractice({ keepCurrentFilter: true });
   try{
     goalSelect.value = 'meaning';
     tenseSelect.value = 'mixedPresent';
@@ -1976,7 +2932,7 @@ btnClearMistakes && btnClearMistakes.addEventListener('click', ()=>{
   p.mistakes = [];
   saveProgress(id, p);
   setStatus('mistakes cleared');
-  showPracticeMeta();
+  renderPracticeInfo();
 });
 
 btnResetProgress && btnResetProgress.addEventListener('click', ()=>{
@@ -1984,7 +2940,7 @@ btnResetProgress && btnResetProgress.addEventListener('click', ()=>{
   if (!id) return;
   saveProgress(id, { mastery: 0, best: {}, mistakes: [] });
   setStatus('progress reset');
-  showPracticeMeta();
+  renderPracticeInfo();
 });
 
 
@@ -1999,12 +2955,24 @@ btnResetProgress && btnResetProgress.addEventListener('click', ()=>{
     setStatus('list');
   });
 
-  function showPractice(){
+  function showPractice(options){
+    const opts = options || {};
+    if (!ensureLevelSelected()){
+      showOnly('home');
+      setStatus('выбери уровень');
+      return false;
+    }
+
+    const ui = loadUIState();
+    if (!opts.keepCurrentFilter){
+      if (ui.category && CATEGORY_LABEL[ui.category]) setCategory(ui.category);
+      if (ui.subgroup && (ui.category ? ui.category !== 'all' : activeCategory !== 'all')) setSubgroup(ui.subgroup);
+    }
+
     fillGoalOptions();
     fillTenseOptions();
     renderCustomPicker();
 
-    const ui = loadUIState();
     if (ui.goal && GOALS.some(x=>x.id === ui.goal)) goalSelect.value = ui.goal;
     if (ui.tense) tenseSelect.value = ui.tense;
     setCustomPickerVisible((tenseSelect && tenseSelect.value) === CUSTOM_TENSE_ID);
@@ -2012,6 +2980,7 @@ btnResetProgress && btnResetProgress.addEventListener('click', ()=>{
     showOnly('practice');
     renderPracticeInfo();
     setStatus('practice');
+    return true;
   }
 
   btnBackHomeFromPractice && btnBackHomeFromPractice.addEventListener('click', ()=>{
@@ -2020,9 +2989,25 @@ btnResetProgress && btnResetProgress.addEventListener('click', ()=>{
   });
 
   function goPracticeForTense(id){
-    showPractice();
-    tenseSelect.value = id;
-    saveUIState({ tense: id });
+    const meta = (REG.INDEX || []).find((m) => m.id === id);
+    if (meta && meta.group){
+      setCategory(String(meta.group).toLowerCase());
+      setSubgroup(deriveSubgroup(meta));
+    }
+
+    if (!showPractice({ keepCurrentFilter: true })) return;
+
+    const hasOption = Array.from(tenseSelect.options || []).some((opt) => opt.value === id);
+    if (hasOption){
+      tenseSelect.value = id;
+    } else {
+      setCategory('all');
+      setSubgroup('all');
+      fillTenseOptions();
+      if (Array.from(tenseSelect.options || []).some((opt) => opt.value === id)) tenseSelect.value = id;
+    }
+
+    saveUIState({ tense: id, category: activeCategory, subgroup: activeSubgroup });
     renderPracticeInfo();
   }
 
@@ -2044,7 +3029,7 @@ btnResetProgress && btnResetProgress.addEventListener('click', ()=>{
   btnCustomClearAll && btnCustomClearAll.addEventListener('click', ()=> setAllCustomSelection(false));
 
   btnStart && btnStart.addEventListener('click', ()=>{
-    const tenseId = tenseSelect.value || (REG.INDEX[0] && REG.INDEX[0].id);
+    const tenseId = tenseSelect.value || tenseSelect.options?.[0]?.value || (REG.INDEX[0] && REG.INDEX[0].id);
     const tenseObj = getTenseForPractice(tenseId);
     const goalId = getSelectedGoalId();
     const exIds = gatherExerciseIds(tenseObj, goalId);
@@ -2054,7 +3039,7 @@ btnResetProgress && btnResetProgress.addEventListener('click', ()=>{
   });
 
   btnRetry && btnRetry.addEventListener('click', ()=>{
-    const tenseId = tenseSelect.value || (REG.INDEX[0] && REG.INDEX[0].id);
+    const tenseId = tenseSelect.value || tenseSelect.options?.[0]?.value || (REG.INDEX[0] && REG.INDEX[0].id);
     const tenseObj = getTenseForPractice(tenseId);
     const goalId = getSelectedGoalId();
     const exIds = gatherExerciseIds(tenseObj, goalId);
@@ -2133,7 +3118,8 @@ function fillCompareSelects(){
   if (!cmpASelect || !cmpBSelect) return;
   cmpASelect.innerHTML = '';
   cmpBSelect.innerHTML = '';
-  for (const meta of REG.INDEX){
+  const metas = getFilteredMetas({ category: 'all', onlyComparable: true });
+  for (const meta of metas){
     const o1=document.createElement('option');
     o1.value=meta.id; o1.textContent=meta.title;
     const o2=o1.cloneNode(true);
@@ -2141,9 +3127,9 @@ function fillCompareSelects(){
     cmpBSelect.appendChild(o2);
   }
   // default: first two
-  if (REG.INDEX.length>=2){
-    cmpASelect.value = REG.INDEX[0].id;
-    cmpBSelect.value = REG.INDEX[1].id;
+  if (metas.length>=2){
+    cmpASelect.value = metas[0].id;
+    cmpBSelect.value = metas[1].id;
   }
 }
 
@@ -2247,7 +3233,7 @@ function buildCompareItems(aId,bId,count){
 function startCompareMini(n){
   const aId = cmpASelect.value;
   const bId = cmpBSelect.value;
-  if (aId === bId) return;
+  if (!aId || !bId || aId === bId) return;
   const items = buildCompareItems(aId,bId,n||10);
   const synth = {
     id: `compare_${aId}_vs_${bId}`,
@@ -2259,7 +3245,12 @@ function startCompareMini(n){
 }
 
 function showCompare(){
+  const metas = getFilteredMetas({ category: 'all', onlyComparable: true });
   fillCompareSelects();
+  if (metas.length < 2){
+    if (cmpRule) cmpRule.textContent = 'Для сравнения нужно минимум 2 темы этого уровня.';
+    if (cmpTable) cmpTable.innerHTML = '';
+  }
   renderCompare();
   showOnly('compare');
   setStatus('compare');
@@ -2295,9 +3286,9 @@ function pickDailySet(forceNew){
     return state.items;
   }
 
-  // build pool from all tenses (including mixed + mixedPresent if present)
+  // build pool from level-filtered grammar topics
   const pool=[];
-  const allIds = [...REG.INDEX.map(x=>x.id), 'mixed', 'mixedPresent', 'mixedPerfectPast'].filter(id=>REG.byId[id]);
+  const allIds = getFilteredMetas({ category: 'all' }).map(x=>x.id).filter(id=>REG.byId[id]);
   for (const tid of allIds){
     const t = REG.byId[tid];
     for (const ex of (t.practice?.exercises||[])){
@@ -2354,8 +3345,17 @@ function showDaily(){
 btnDailyStart && btnDailyStart.addEventListener('click', ()=> startDaily(false));
 btnDailyNew && btnDailyNew.addEventListener('click', ()=> startDaily(true));
 
+document.addEventListener('ik:languagechange', ()=>{
+  if (listView && !listView.hidden) renderList();
+  if (searchInput && searchInput.value.trim()) renderSearchResults(searchInput.value);
+});
+
   // Init
-  if (countBadge) countBadge.textContent = `tenses: ${REG.INDEX.length}`;
+  refreshLevelUI();
+  if (compactListToggle) compactListToggle.checked = isCompactList();
+  updateRuleModeButtons();
+  initSearchUI();
+  if (countBadge) countBadge.textContent = `grammar: ${getFilteredMetas({ category: activeCategory, subgroup: activeSubgroup }).length}`;
   showOnly('home');
 
   // -------------------------

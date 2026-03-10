@@ -1,0 +1,153 @@
+{
+  "id": "articlesBasics",
+  "title": "Articles Basics",
+  "subtitle": "a/an, the и нулевой артикль",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Базовая логика артиклей"
+    },
+    {
+      "type": "text",
+      "text": "a/an используем, когда говорим о чем-то впервые или о любом одном предмете из класса. the используем, когда предмет уже известен собеседникам или единственный в ситуации. Нулевой артикль (без артикля) часто идет с общими понятиями и устойчивыми контекстами."
+    },
+    {
+      "type": "table",
+      "caption": "Когда какой артикль",
+      "columns": ["Форма", "Когда", "Пример"],
+      "rows": [
+        ["a", "перед согласным звуком, впервые", "I bought a car."],
+        ["an", "перед гласным звуком, впервые", "She ate an apple."],
+        ["the", "конкретный/уже известный объект", "Please close the window."],
+        ["zero article", "общие понятия, school/work/home в типичных ролях", "Children need sleep."]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Важно",
+      "lines": [
+        "смотрим на звук: an hour, a university",
+        "the нужен, когда ясно, о каком именно объекте речь",
+        "в ряде выражений артикль не ставим: go to school/work, at home"
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        { "en": "I saw a dog near our house.", "ru": "Я увидел собаку возле нашего дома." },
+        { "en": "The dog was very friendly.", "ru": "Эта собака была очень дружелюбной." },
+        { "en": "She is at home now.", "ru": "Она сейчас дома." },
+        { "en": "He is an honest person.", "ru": "Он честный человек." }
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": [
+      {
+        "id": "meaning",
+        "title": "Когда используем (Meaning)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "ab_m_1",
+            "instruction": "Выбери артикль",
+            "prompt": "I need ____ pen. Any pen is fine.",
+            "options": ["a", "the", "zero"],
+            "correctIndex": 0,
+            "explain": "Любой один предмет, первое упоминание -> a."
+          },
+          {
+            "id": "ab_m_2",
+            "instruction": "Выбери артикль",
+            "prompt": "Could you open ____ window? (the one in this room)",
+            "options": ["an", "the", "a"],
+            "correctIndex": 1,
+            "explain": "Конкретное окно, известное по ситуации -> the."
+          },
+          {
+            "id": "ab_m_3",
+            "instruction": "Выбери артикль",
+            "prompt": "She bought ____ umbrella because it was raining.",
+            "options": ["an", "a", "the"],
+            "correctIndex": 0,
+            "explain": "Umbrella начинается с гласного звука -> an."
+          },
+          {
+            "id": "ab_m_4",
+            "instruction": "Выбери артикль",
+            "prompt": "Children need ____ love and support.",
+            "options": ["a", "the", "zero"],
+            "correctIndex": 2,
+            "explain": "Общее абстрактное понятие -> без артикля."
+          },
+          {
+            "id": "ab_m_5",
+            "instruction": "Выбери артикль",
+            "prompt": "____ sun is shining.",
+            "options": ["A", "The", "Zero"],
+            "correctIndex": 1,
+            "explain": "Sun в данном контексте уникален -> the."
+          },
+          {
+            "id": "ab_m_6",
+            "instruction": "Выбери правило",
+            "prompt": "He goes to school every day.",
+            "options": ["school с ролью/функцией часто без артикля", "обязательно the school", "обязательно a school"],
+            "correctIndex": 0,
+            "explain": "В значении деятельности (учиться) обычно без артикля."
+          }
+        ]
+      },
+      {
+        "id": "formula",
+        "title": "Формулы (Formula)",
+        "kind": "input",
+        "items": [
+          {
+            "id": "ab_f_1",
+            "instruction": "Вставь артикль",
+            "prompt": "I saw ____ cat in the yard.",
+            "accepted": ["a"],
+            "explain": "Первое упоминание, единичный объект -> a."
+          },
+          {
+            "id": "ab_f_2",
+            "instruction": "Вставь артикль",
+            "prompt": "She is ____ engineer.",
+            "accepted": ["an"],
+            "explain": "Engineer начинается с гласного звука -> an."
+          },
+          {
+            "id": "ab_f_3",
+            "instruction": "Вставь артикль",
+            "prompt": "Please pass me ____ salt.",
+            "accepted": ["the"],
+            "explain": "Конкретный объект в текущей ситуации -> the."
+          },
+          {
+            "id": "ab_f_4",
+            "instruction": "Вставь артикль",
+            "prompt": "We watched ____ movie and then discussed it.",
+            "accepted": ["a"],
+            "explain": "Первое упоминание фильма -> a movie."
+          },
+          {
+            "id": "ab_f_5",
+            "instruction": "Вставь артикль",
+            "prompt": "I talked to ____ manager you recommended.",
+            "accepted": ["the"],
+            "explain": "Конкретный менеджер, уточнение после существительного -> the."
+          },
+          {
+            "id": "ab_f_6",
+            "instruction": "Исправь ошибку",
+            "prompt": "I go to the school every day.",
+            "accepted": ["I go to school every day."],
+            "acceptedShort": ["go to school"],
+            "explain": "В значении учебной деятельности обычно говорим go to school."
+          }
+        ]
+      }
+    ]
+  }
+}

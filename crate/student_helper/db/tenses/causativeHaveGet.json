@@ -1,0 +1,152 @@
+{
+  "id": "causativeHaveGet",
+  "title": "Causative: have/get something done",
+  "subtitle": "организуем действие другим человеком",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Когда нужен causative"
+    },
+    {
+      "type": "text",
+      "text": "Causative используем, когда не мы сами выполняем действие, а организуем его: have/get + object + V3. Есть также модели have someone do и get someone to do, когда подчеркиваем человека-исполнителя."
+    },
+    {
+      "type": "table",
+      "caption": "Основные шаблоны",
+      "columns": ["Шаблон", "Значение", "Пример"],
+      "rows": [
+        ["have + object + V3", "организовать услугу/работу", "I had my hair cut."],
+        ["get + object + V3", "то же, более разговорно", "We got the windows cleaned."],
+        ["have + person + V1", "попросить/поручить человеку", "I had the assistant print it."],
+        ["get + person + to + V1", "уговорить/добиться действия", "I got him to help me."]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Что не перепутать",
+      "lines": [
+        "I had my car repaired != I repaired my car",
+        "have/get + object + V3: объект подвергается действию",
+        "get someone to do: после человека нужен to + V1"
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        { "en": "She had her laptop repaired yesterday.", "ru": "Она вчера отдала ноутбук в ремонт." },
+        { "en": "We got the office painted last month.", "ru": "Мы покрасили офис (организовали покраску) в прошлом месяце." },
+        { "en": "I had my team update the document.", "ru": "Я поручил команде обновить документ." },
+        { "en": "He got me to check the final version.", "ru": "Он уговорил меня проверить финальную версию." }
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": [
+      {
+        "id": "meaning",
+        "title": "Когда используем (Meaning)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "chg_m_1",
+            "instruction": "Выбери смысл",
+            "prompt": "I had my hair cut yesterday.",
+            "options": ["я сам себя подстриг", "услугу выполнил другой человек", "привычка"],
+            "correctIndex": 1,
+            "explain": "Causative подчеркивает, что действие выполнил не говорящий."
+          },
+          {
+            "id": "chg_m_2",
+            "instruction": "Выбери смысл",
+            "prompt": "We got the office cleaned before the event.",
+            "options": ["организовали уборку", "собираемся убираться", "делали это каждый день"],
+            "correctIndex": 0,
+            "explain": "get + object + V3 = организовали, чтобы это сделали."
+          },
+          {
+            "id": "chg_m_3",
+            "instruction": "Выбери правильный шаблон",
+            "prompt": "I persuaded him to join the project.",
+            "options": ["have + object + V3", "get + person + to + V1", "have + person + V3"],
+            "correctIndex": 1,
+            "explain": "Уговорить кого-то -> get someone to do."
+          },
+          {
+            "id": "chg_m_4",
+            "instruction": "Выбери правильный шаблон",
+            "prompt": "I asked my assistant to print the file.",
+            "options": ["have + person + V1", "have + object + V3", "get + object + V2"],
+            "correctIndex": 0,
+            "explain": "Поручение человеку: have someone do."
+          },
+          {
+            "id": "chg_m_5",
+            "instruction": "Выбери смысл",
+            "prompt": "They had their house painted.",
+            "options": ["они сами красили", "им кто-то покрасил дом", "они собираются красить"],
+            "correctIndex": 1,
+            "explain": "Классическая causative форма услуги."
+          },
+          {
+            "id": "chg_m_6",
+            "instruction": "Выбери смысл",
+            "prompt": "I'll get my passport renewed soon.",
+            "options": ["сам обновлю документ вручную", "организую обновление документа", "не могу обновить"],
+            "correctIndex": 1,
+            "explain": "get + object + V3 = организую, чтобы это сделали."
+          }
+        ]
+      },
+      {
+        "id": "formula",
+        "title": "Формулы (Formula)",
+        "kind": "input",
+        "items": [
+          {
+            "id": "chg_f_1",
+            "instruction": "Вставь форму",
+            "prompt": "I ____ my phone repaired yesterday. (have)",
+            "accepted": ["had"],
+            "explain": "Прошедшее время от have: had + object + V3."
+          },
+          {
+            "id": "chg_f_2",
+            "instruction": "Вставь форму",
+            "prompt": "We need to ____ the windows cleaned today. (get)",
+            "accepted": ["get"],
+            "explain": "Инфинитив после need to: get + object + V3."
+          },
+          {
+            "id": "chg_f_3",
+            "instruction": "Вставь форму",
+            "prompt": "She ____ her assistant send the email. (have)",
+            "accepted": ["had"],
+            "explain": "have + person + V1."
+          },
+          {
+            "id": "chg_f_4",
+            "instruction": "Вставь форму",
+            "prompt": "He ____ me to check the report. (get)",
+            "accepted": ["got"],
+            "explain": "get + person + to + V1: got me to check."
+          },
+          {
+            "id": "chg_f_5",
+            "instruction": "Вставь форму",
+            "prompt": "They ____ the walls painted last week. (have)",
+            "accepted": ["had"],
+            "explain": "Past form: had + object + V3."
+          },
+          {
+            "id": "chg_f_6",
+            "instruction": "Вставь форму",
+            "prompt": "I'll ____ my passport renewed soon. (get)",
+            "accepted": ["get"],
+            "explain": "Future plan: will get + object + V3."
+          }
+        ]
+      }
+    ]
+  }
+}

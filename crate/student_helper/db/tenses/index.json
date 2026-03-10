@@ -4,83 +4,394 @@
     "title": "Past Simple",
     "subtitle": "факт - действие завершено",
     "hint": "законченное действие • цепочка • привычки",
-    "file": "pastSimple.json"
+    "file": "pastSimple.json",
+    "group": "past",
+    "kind": "tense",
+    "levels": ["A2-B1", "B1-B2", "B2-C1"]
   },
   {
     "id": "pastContinuous",
     "title": "Past Continuous",
     "subtitle": "процесс - действие в моменте",
     "hint": "процесс • параллельно • фон • always/constantly",
-    "file": "pastContinuous.json"
+    "file": "pastContinuous.json",
+    "group": "past",
+    "kind": "tense",
+    "levels": ["A2-B1", "B1-B2", "B2-C1"]
   },
   {
     "id": "pastPerfect",
     "title": "Past Perfect",
     "subtitle": "действие до другого в прошлом",
     "hint": "past before past • by/before • order",
-    "file": "pastPerfect.json"
+    "file": "pastPerfect.json",
+    "group": "past",
+    "kind": "tense",
+    "levels": ["B1-B2", "B2-C1"]
   },
   {
     "id": "pastPerfectContinuous",
     "title": "Past Perfect Continuous",
     "subtitle": "длительность до момента в прошлом",
     "hint": "for/since • how long • before • cause/result",
-    "file": "pastPerfectContinuous.json"
+    "file": "pastPerfectContinuous.json",
+    "group": "past",
+    "kind": "tense",
+    "levels": ["B1-B2", "B2-C1"]
+  },
+  {
+    "id": "pastUsageMap",
+    "title": "Past Usage Map",
+    "subtitle": "как выбирать способ говорить о прошлом по смыслу",
+    "hint": "fact vs process vs earlier past vs duration",
+    "file": "pastUsageMap.json",
+    "group": "past",
+    "kind": "structure",
+    "compare": false,
+    "levels": ["A2-B1", "B1-B2", "B2-C1"]
   },
   {
     "id": "presentSimple",
     "title": "Present Simple",
     "subtitle": "привычка - факт - расписание",
     "hint": "habit • facts • schedule • frequency",
-    "file": "presentSimple.json"
+    "file": "presentSimple.json",
+    "group": "present",
+    "kind": "tense",
+    "levels": ["A2-B1", "B1-B2", "B2-C1"]
   },
   {
     "id": "presentContinuous",
     "title": "Present Continuous",
     "subtitle": "процесс - сейчас/временно",
     "hint": "now • temporary • changes • always/annoyed",
-    "file": "presentContinuous.json"
+    "file": "presentContinuous.json",
+    "group": "present",
+    "kind": "tense",
+    "levels": ["A2-B1", "B1-B2", "B2-C1"]
   },
   {
     "id": "presentPerfect",
     "title": "Present Perfect",
     "subtitle": "опыт - результат - период не закончен",
     "hint": "result • experience • unfinished time • already/yet",
-    "file": "presentPerfect.json"
+    "file": "presentPerfect.json",
+    "group": "present",
+    "kind": "tense",
+    "levels": ["B1-B2", "B2-C1"]
   },
   {
     "id": "presentPerfectContinuous",
     "title": "Present Perfect Continuous",
     "subtitle": "длительность - процесс - видимый результат",
     "hint": "for/since • how long • lately • tired/dirty",
-    "file": "presentPerfectContinuous.json"
+    "file": "presentPerfectContinuous.json",
+    "group": "present",
+    "kind": "tense",
+    "levels": ["B1-B2", "B2-C1"]
+  },
+  {
+    "id": "presentUsageMap",
+    "title": "Present Usage Map",
+    "subtitle": "как выбрать настоящее время по задаче",
+    "hint": "habit vs now vs result vs duration",
+    "file": "presentUsageMap.json",
+    "group": "present",
+    "kind": "structure",
+    "compare": false,
+    "levels": ["A2-B1", "B1-B2", "B2-C1"]
   },
   {
     "id": "futureSimple",
     "title": "Future Simple",
     "subtitle": "решение/прогноз/обещание о будущем",
     "hint": "will • probably • I think • offer/promise",
-    "file": "futureSimple.json"
+    "file": "futureSimple.json",
+    "group": "future",
+    "kind": "tense",
+    "levels": ["A2-B1", "B1-B2", "B2-C1"]
+  },
+  {
+    "id": "futureExpressionWays",
+    "title": "Future Expression Ways",
+    "subtitle": "все основные способы говорить о будущем",
+    "hint": "will • going to • present cont/simple • time clauses",
+    "file": "futureExpressionWays.json",
+    "group": "future",
+    "kind": "structure",
+    "compare": false,
+    "levels": ["A2-B1", "B1-B2", "B2-C1"]
   },
   {
     "id": "futureContinuous",
     "title": "Future Continuous",
     "subtitle": "процесс в конкретный момент в будущем",
     "hint": "this time tomorrow • at 8 tomorrow • will be + ing",
-    "file": "futureContinuous.json"
+    "file": "futureContinuous.json",
+    "group": "future",
+    "kind": "tense",
+    "levels": ["B1-B2", "B2-C1"]
   },
   {
     "id": "futurePerfect",
     "title": "Future Perfect",
     "subtitle": "действие завершится к моменту в будущем",
     "hint": "by/by the time • before • will have + V3",
-    "file": "futurePerfect.json"
+    "file": "futurePerfect.json",
+    "group": "future",
+    "kind": "tense",
+    "levels": ["B1-B2", "B2-C1"]
   },
   {
     "id": "futurePerfectContinuous",
     "title": "Future Perfect Continuous",
     "subtitle": "длительность до момента в будущем",
     "hint": "for + period by time • will have been + ing",
-    "file": "futurePerfectContinuous.json"
+    "file": "futurePerfectContinuous.json",
+    "group": "future",
+    "kind": "tense",
+    "levels": ["B2-C1"]
+  },
+  {
+    "id": "futureGoingTo",
+    "title": "be going to",
+    "subtitle": "план заранее и прогноз по видимым признакам",
+    "hint": "am/is/are going to • intention • evidence",
+    "file": "futureGoingTo.json",
+    "group": "future",
+    "kind": "structure",
+    "compare": false,
+    "levels": ["A2-B1", "B1-B2", "B2-C1"]
+  },
+  {
+    "id": "futurePresentContinuous",
+    "title": "Present Continuous for Future",
+    "subtitle": "личные договоренности и фиксированные планы",
+    "hint": "arrangements • meeting • booked tickets",
+    "file": "futurePresentContinuous.json",
+    "group": "future",
+    "kind": "structure",
+    "compare": false,
+    "levels": ["A2-B1", "B1-B2", "B2-C1"]
+  },
+  {
+    "id": "futurePresentSimple",
+    "title": "Present Simple for Future",
+    "subtitle": "расписания, графики, официальные времена",
+    "hint": "timetable • schedule • start/leave",
+    "file": "futurePresentSimple.json",
+    "group": "future",
+    "kind": "structure",
+    "compare": false,
+    "levels": ["A2-B1", "B1-B2", "B2-C1"]
+  },
+  {
+    "id": "futureTimeClauses",
+    "title": "Future Time Clauses",
+    "subtitle": "if/when/as soon as/unless + Present Simple",
+    "hint": "no will in if/when-clause",
+    "file": "futureTimeClauses.json",
+    "group": "future",
+    "kind": "structure",
+    "compare": false,
+    "levels": ["B1-B2", "B2-C1"]
+  },
+  {
+    "id": "pastWouldHabits",
+    "title": "would for Past Habits",
+    "subtitle": "повторяющиеся действия в прошлом",
+    "hint": "would + V1 • habits only • not states",
+    "file": "pastWouldHabits.json",
+    "group": "past",
+    "kind": "structure",
+    "compare": false,
+    "levels": ["B1-B2", "B2-C1"]
+  },
+  {
+    "id": "passiveVoiceBasics",
+    "title": "Passive Voice Basics",
+    "subtitle": "действие важнее исполнителя",
+    "hint": "be + V3 • by + agent",
+    "file": "passiveVoiceBasics.json",
+    "group": "universal",
+    "kind": "structure",
+    "compare": false,
+    "levels": ["B1-B2", "B2-C1"]
+  },
+  {
+    "id": "universalUsageMap",
+    "title": "Universal Usage Map",
+    "subtitle": "как выбирать структуру вне одной временной линии",
+    "hint": "conditionals • modals • passive • clauses",
+    "file": "universalUsageMap.json",
+    "group": "universal",
+    "kind": "structure",
+    "compare": false,
+    "levels": ["A2-B1", "B1-B2", "B2-C1"]
+  },
+  {
+    "id": "conditionalsZeroFirst",
+    "title": "Zero and First Conditionals",
+    "subtitle": "if + Present: факты и реальное будущее",
+    "hint": "zero = truths • first = real future",
+    "file": "conditionalsZeroFirst.json",
+    "group": "universal",
+    "kind": "structure",
+    "compare": false,
+    "levels": ["A2-B1", "B1-B2"]
+  },
+  {
+    "id": "conditionalsSecondThird",
+    "title": "Second and Third Conditionals",
+    "subtitle": "нереальное настоящее и прошлое сожаление",
+    "hint": "if + past, would ... • if + had V3, would have V3",
+    "file": "conditionalsSecondThird.json",
+    "group": "universal",
+    "kind": "structure",
+    "compare": false,
+    "levels": ["B1-B2", "B2-C1"]
+  },
+  {
+    "id": "modalsObligationAdvice",
+    "title": "Modals: Obligation and Advice",
+    "subtitle": "must / have to / should / mustn't / don't have to",
+    "hint": "обязанность, запрет, совет, отсутствие необходимости",
+    "file": "modalsObligationAdvice.json",
+    "group": "universal",
+    "kind": "structure",
+    "compare": false,
+    "levels": ["A2-B1", "B1-B2", "B2-C1"]
+  },
+  {
+    "id": "reportedSpeechBasics",
+    "title": "Reported Speech Basics",
+    "subtitle": "передача чужих слов без кавычек",
+    "hint": "say/tell • backshift • pronouns/time",
+    "file": "reportedSpeechBasics.json",
+    "group": "universal",
+    "kind": "structure",
+    "compare": false,
+    "levels": ["B1-B2", "B2-C1"]
+  },
+  {
+    "id": "relativeClausesBasics",
+    "title": "Relative Clauses Basics",
+    "subtitle": "who/which/that/where/whose в определяющих придаточных",
+    "hint": "соединяем две идеи в одном предложении",
+    "file": "relativeClausesBasics.json",
+    "group": "universal",
+    "kind": "structure",
+    "compare": false,
+    "levels": ["B1-B2", "B2-C1"]
+  },
+  {
+    "id": "gerundInfinitiveBasics",
+    "title": "Gerund and Infinitive Basics",
+    "subtitle": "verb + ing и verb + to + infinitive",
+    "hint": "enjoy doing • want to do • stop doing/to do",
+    "file": "gerundInfinitiveBasics.json",
+    "group": "universal",
+    "kind": "structure",
+    "compare": false,
+    "levels": ["B1-B2", "B2-C1"]
+  },
+  {
+    "id": "articlesBasics",
+    "title": "Articles Basics",
+    "subtitle": "a/an, the и нулевой артикль",
+    "hint": "первое упоминание, конкретика, общие понятия",
+    "file": "articlesBasics.json",
+    "group": "universal",
+    "kind": "structure",
+    "compare": false,
+    "levels": ["A2-B1", "B1-B2"]
+  },
+  {
+    "id": "modalsPossibilityDeduction",
+    "title": "Modals: Possibility and Deduction",
+    "subtitle": "might/may/could, must, can't",
+    "hint": "вероятность и логический вывод",
+    "file": "modalsPossibilityDeduction.json",
+    "group": "universal",
+    "kind": "structure",
+    "compare": false,
+    "levels": ["B1-B2", "B2-C1"]
+  },
+  {
+    "id": "wishIfOnly",
+    "title": "wish and if only",
+    "subtitle": "сожаления о настоящем, прошлом и желания о будущем",
+    "hint": "wish + past / would / had V3",
+    "file": "wishIfOnly.json",
+    "group": "universal",
+    "kind": "structure",
+    "compare": false,
+    "levels": ["B1-B2", "B2-C1"]
+  },
+  {
+    "id": "causativeHaveGet",
+    "title": "Causative: have/get something done",
+    "subtitle": "организуем действие другим человеком",
+    "hint": "have/get + object + V3",
+    "file": "causativeHaveGet.json",
+    "group": "universal",
+    "kind": "structure",
+    "compare": false,
+    "levels": ["B1-B2", "B2-C1"]
+  },
+  {
+    "id": "questionTagsBasics",
+    "title": "Question Tags Basics",
+    "subtitle": "короткие хвостики: isn't it?, don't you?",
+    "hint": "positive -> negative tag, negative -> positive",
+    "file": "questionTagsBasics.json",
+    "group": "universal",
+    "kind": "structure",
+    "compare": false,
+    "levels": ["A2-B1", "B1-B2"]
+  },
+  {
+    "id": "nounClausesBasics",
+    "title": "Noun Clauses Basics",
+    "subtitle": "that/if/whether и wh-clause как часть предложения",
+    "hint": "I know that... / I wonder if... / where he lives",
+    "file": "nounClausesBasics.json",
+    "group": "universal",
+    "kind": "structure",
+    "compare": false,
+    "levels": ["B1-B2", "B2-C1"]
+  },
+  {
+    "id": "inversionAdvanced",
+    "title": "Inversion for Emphasis",
+    "subtitle": "формальный порядок: Never have I..., Only then did...",
+    "hint": "negative adverbials + inversion",
+    "file": "inversionAdvanced.json",
+    "group": "universal",
+    "kind": "structure",
+    "compare": false,
+    "levels": ["B2-C1"]
+  },
+  {
+    "id": "mixedConditionals",
+    "title": "Mixed Conditionals",
+    "subtitle": "смешанные условные: прошлое <-> настоящее",
+    "hint": "if + had V3, would V1 / if + past, would have V3",
+    "file": "mixedConditionals.json",
+    "group": "universal",
+    "kind": "structure",
+    "compare": false,
+    "levels": ["B2-C1"]
+  },
+  {
+    "id": "cleftSentencesBasics",
+    "title": "Cleft Sentences Basics",
+    "subtitle": "it/what-clefts для логического акцента",
+    "hint": "It is/was ... that/who ... • What ... is/was ...",
+    "file": "cleftSentencesBasics.json",
+    "group": "universal",
+    "kind": "structure",
+    "compare": false,
+    "levels": ["B2-C1"]
   }
 ]

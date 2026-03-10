@@ -1,0 +1,152 @@
+{
+  "id": "inversionAdvanced",
+  "title": "Inversion for Emphasis",
+  "subtitle": "формальный порядок: Never have I..., Only then did...",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Что такое inversion"
+    },
+    {
+      "type": "text",
+      "text": "Inversion - это обратный порядок слов (auxiliary + subject), который обычно используется в формальном или выразительном стиле после отрицательных/ограничивающих наречий: never, rarely, hardly, no sooner, only then, not until."
+    },
+    {
+      "type": "table",
+      "caption": "Типовые схемы",
+      "columns": ["Триггер", "Схема", "Пример"],
+      "rows": [
+        ["Never / Rarely", "Aux + subject + V", "Never have I seen this before."],
+        ["Not until ...", "Not until ... + aux + subject", "Not until midnight did he call."],
+        ["Only then / only later", "Only then + aux + subject", "Only then did I understand."],
+        ["No sooner ... than", "No sooner had ... than ...", "No sooner had we arrived than it started raining."]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Как строить",
+      "lines": [
+        "если нет вспомогательного глагола - используем do/does/did",
+        "инверсия нужна не везде, а после специальных триггеров",
+        "часто это более формальный стиль"
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        { "en": "Rarely do we see such commitment.", "ru": "Редко мы видим такую самоотдачу." },
+        { "en": "Only then did she realize the risk.", "ru": "Только тогда она осознала риск." },
+        { "en": "Not until Friday did they announce the results.", "ru": "Только в пятницу они объявили результаты." },
+        { "en": "Under no circumstances should you share this key.", "ru": "Ни при каких обстоятельствах не следует делиться этим ключом." }
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": [
+      {
+        "id": "meaning",
+        "title": "Когда используем (Meaning)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "iva_m_1",
+            "instruction": "Выбери корректный вариант",
+            "prompt": "Never ____ such a difficult task.",
+            "options": ["I have seen", "have I seen", "I saw have"],
+            "correctIndex": 1,
+            "explain": "После Never нужна инверсия: have I seen."
+          },
+          {
+            "id": "iva_m_2",
+            "instruction": "Выбери корректный вариант",
+            "prompt": "Rarely ____ this team lose at home.",
+            "options": ["does", "do", "is"],
+            "correctIndex": 0,
+            "explain": "С подлежащим this team и V1 lose в Present Simple нужен does."
+          },
+          {
+            "id": "iva_m_3",
+            "instruction": "Выбери корректный вариант",
+            "prompt": "Only then ____ what was happening.",
+            "options": ["I understood", "did I understand", "understood I"],
+            "correctIndex": 1,
+            "explain": "Only then запускает инверсию: did I understand."
+          },
+          {
+            "id": "iva_m_4",
+            "instruction": "Выбери корректный вариант",
+            "prompt": "Not until 2020 ____ the company launch the app.",
+            "options": ["did", "was", "has"],
+            "correctIndex": 0,
+            "explain": "Для Past Simple с смысловым глаголом нужен did."
+          },
+          {
+            "id": "iva_m_5",
+            "instruction": "Выбери корректный вариант",
+            "prompt": "No sooner ____ down than the alarm went off.",
+            "options": ["we sat", "had we sat", "did we sat"],
+            "correctIndex": 1,
+            "explain": "Устойчивая схема: No sooner had + subject + V3."
+          },
+          {
+            "id": "iva_m_6",
+            "instruction": "Выбери корректный вариант",
+            "prompt": "Under no circumstances ____ this password.",
+            "options": ["you should share", "should you share", "you share should"],
+            "correctIndex": 1,
+            "explain": "После Under no circumstances используем inversion."
+          }
+        ]
+      },
+      {
+        "id": "formula",
+        "title": "Формулы (Formula)",
+        "kind": "input",
+        "items": [
+          {
+            "id": "iva_f_1",
+            "instruction": "Вставь форму",
+            "prompt": "Never ____ I seen such a view.",
+            "accepted": ["have"],
+            "explain": "Present Perfect inversion: have I seen."
+          },
+          {
+            "id": "iva_f_2",
+            "instruction": "Вставь форму",
+            "prompt": "Rarely ____ she arrive late.",
+            "accepted": ["does"],
+            "explain": "Present Simple inversion: does she arrive."
+          },
+          {
+            "id": "iva_f_3",
+            "instruction": "Вставь форму",
+            "prompt": "Only then ____ I understand the problem.",
+            "accepted": ["did"],
+            "explain": "Past Simple inversion: did I understand."
+          },
+          {
+            "id": "iva_f_4",
+            "instruction": "Вставь форму",
+            "prompt": "No sooner ____ we arrived than it started raining.",
+            "accepted": ["had"],
+            "explain": "No sooner had we arrived than..."
+          },
+          {
+            "id": "iva_f_5",
+            "instruction": "Вставь форму",
+            "prompt": "Not until midnight ____ he call me.",
+            "accepted": ["did"],
+            "explain": "Для Past Simple после not until: did he call."
+          },
+          {
+            "id": "iva_f_6",
+            "instruction": "Вставь форму",
+            "prompt": "Under no circumstances ____ you share this code.",
+            "accepted": ["should"],
+            "explain": "Modal inversion: should you share."
+          }
+        ]
+      }
+    ]
+  }
+}

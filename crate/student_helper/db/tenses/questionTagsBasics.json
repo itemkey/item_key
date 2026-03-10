@@ -1,0 +1,152 @@
+{
+  "id": "questionTagsBasics",
+  "title": "Question Tags Basics",
+  "subtitle": "короткие хвостики: isn't it?, don't you?",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Что такое question tags"
+    },
+    {
+      "type": "text",
+      "text": "Question tag - короткий вопрос в конце предложения для подтверждения: It's cold, isn't it? Обычно положительное утверждение берет отрицательный хвостик, а отрицательное - положительный."
+    },
+    {
+      "type": "table",
+      "caption": "Базовые схемы",
+      "columns": ["Основная часть", "Tag", "Пример"],
+      "rows": [
+        ["positive", "negative tag", "You work here, don't you?"],
+        ["negative", "positive tag", "She isn't late, is she?"],
+        ["модальный глагол", "тот же modal", "We can start, can't we?"],
+        ["I am", "aren't I?", "I'm next, aren't I?"]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Быстрые правила",
+      "lines": [
+        "в tag повторяем вспомогательный глагол из основы",
+        "местоимение в tag должно соответствовать подлежащему",
+        "I am -> aren't I? в стандартном разговорном варианте"
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        { "en": "They are coming, aren't they?", "ru": "Они же придут, правда?" },
+        { "en": "You don't eat meat, do you?", "ru": "Ты ведь не ешь мясо, да?" },
+        { "en": "She has finished, hasn't she?", "ru": "Она уже закончила, не так ли?" },
+        { "en": "Let's go, shall we?", "ru": "Давай пойдем, хорошо?" }
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": [
+      {
+        "id": "meaning",
+        "title": "Когда используем (Meaning)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "qtb_m_1",
+            "instruction": "Выбери правильный tag",
+            "prompt": "She works here, ____?",
+            "options": ["doesn't she", "isn't she", "don't she"],
+            "correctIndex": 0,
+            "explain": "Present Simple с she -> doesn't she?"
+          },
+          {
+            "id": "qtb_m_2",
+            "instruction": "Выбери правильный tag",
+            "prompt": "They aren't ready, ____?",
+            "options": ["aren't they", "are they", "do they"],
+            "correctIndex": 1,
+            "explain": "Основа отрицательная, tag положительный: are they?"
+          },
+          {
+            "id": "qtb_m_3",
+            "instruction": "Выбери правильный tag",
+            "prompt": "You can swim, ____?",
+            "options": ["can't you", "don't you", "are you"],
+            "correctIndex": 0,
+            "explain": "С modal can -> can't you?"
+          },
+          {
+            "id": "qtb_m_4",
+            "instruction": "Выбери правильный tag",
+            "prompt": "He didn't call, ____?",
+            "options": ["didn't he", "did he", "was he"],
+            "correctIndex": 1,
+            "explain": "После отрицания нужен положительный хвостик: did he?"
+          },
+          {
+            "id": "qtb_m_5",
+            "instruction": "Выбери правильный tag",
+            "prompt": "I'm late, ____?",
+            "options": ["amn't I", "aren't I", "isn't I"],
+            "correctIndex": 1,
+            "explain": "Устойчивый вариант: aren't I?"
+          },
+          {
+            "id": "qtb_m_6",
+            "instruction": "Выбери правильный tag",
+            "prompt": "Let's start now, ____?",
+            "options": ["will we", "shall we", "do we"],
+            "correctIndex": 1,
+            "explain": "После Let's... обычно: shall we?"
+          }
+        ]
+      },
+      {
+        "id": "formula",
+        "title": "Формулы (Formula)",
+        "kind": "input",
+        "items": [
+          {
+            "id": "qtb_f_1",
+            "instruction": "Вставь tag",
+            "prompt": "They are tired, ____?",
+            "accepted": ["aren't they", "aren't they?"],
+            "explain": "Positive + negative tag."
+          },
+          {
+            "id": "qtb_f_2",
+            "instruction": "Вставь tag",
+            "prompt": "You didn't call me, ____?",
+            "accepted": ["did you", "did you?"],
+            "explain": "Negative + positive tag."
+          },
+          {
+            "id": "qtb_f_3",
+            "instruction": "Вставь tag",
+            "prompt": "She has finished, ____?",
+            "accepted": ["hasn't she", "hasn't she?"],
+            "explain": "Вспомогательный has -> hasn't she?"
+          },
+          {
+            "id": "qtb_f_4",
+            "instruction": "Вставь tag",
+            "prompt": "We can leave now, ____?",
+            "accepted": ["can't we", "can't we?"],
+            "explain": "С modal can хвостик: can't we?"
+          },
+          {
+            "id": "qtb_f_5",
+            "instruction": "Вставь tag",
+            "prompt": "I'm next, ____?",
+            "accepted": ["aren't i", "aren't i?"],
+            "explain": "Стандартный tag: aren't I?"
+          },
+          {
+            "id": "qtb_f_6",
+            "instruction": "Вставь tag",
+            "prompt": "Let's take a break, ____?",
+            "accepted": ["shall we", "shall we?"],
+            "explain": "После let's: shall we?"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,154 @@
+{
+  "id": "cleftSentencesBasics",
+  "title": "Cleft Sentences Basics",
+  "subtitle": "it/what-clefts для логического акцента",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Зачем нужны cleft sentences"
+    },
+    {
+      "type": "text",
+      "text": "Cleft sentences помогают выделить важную часть сообщения. Самые частые модели: It is/was ... that/who ... и What ... is/was .... Их используют, когда нужно сделать акцент и избежать нейтрального порядка слов."
+    },
+    {
+      "type": "table",
+      "caption": "Основные модели",
+      "columns": ["Модель", "Схема", "Пример"],
+      "rows": [
+        ["it-cleft", "It is/was + focus + that/who + clause", "It was Anna who solved the problem."],
+        ["what-cleft", "What + clause + is/was + focus", "What I need is a day off."],
+        ["all-cleft", "All + clause + is/was + focus", "All we want is clear feedback."],
+        ["the reason", "The reason why ... is/was ...", "The reason why I left was stress."]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Практический смысл",
+      "lines": [
+        "it-cleft хорошо подчеркивает человека/объект",
+        "what-cleft делает фокус на результате/потребности",
+        "в академическом и формальном стиле cleft-структуры встречаются часто"
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        { "en": "It was Mike who called you, not me.", "ru": "Именно Майк звонил тебе, не я." },
+        { "en": "What surprised me was her calm reaction.", "ru": "Меня удивила ее спокойная реакция." },
+        { "en": "All they need is a bit more practice.", "ru": "Все, что им нужно, - немного больше практики." },
+        { "en": "The thing I dislike is the unclear deadline.", "ru": "То, что мне не нравится, - неясный дедлайн." }
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": [
+      {
+        "id": "meaning",
+        "title": "Когда используем (Meaning)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "clf_m_1",
+            "instruction": "Выбери цель структуры",
+            "prompt": "It was Lena who found the bug.",
+            "options": ["выделить, кто именно сделал действие", "описать привычку", "задать условие"],
+            "correctIndex": 0,
+            "explain": "it-cleft ставит акцент на Lena."
+          },
+          {
+            "id": "clf_m_2",
+            "instruction": "Выбери цель структуры",
+            "prompt": "What we need is a clear plan.",
+            "options": ["акцент на том, что нужно", "прошлое сожаление", "будущая договоренность"],
+            "correctIndex": 0,
+            "explain": "what-cleft фокусирует внимание на ключевом результате."
+          },
+          {
+            "id": "clf_m_3",
+            "instruction": "Выбери правильную модель",
+            "prompt": "... surprised me was his confidence.",
+            "options": ["It was", "What", "If"],
+            "correctIndex": 1,
+            "explain": "Для этой структуры нужна what-cleft: What surprised me was..."
+          },
+          {
+            "id": "clf_m_4",
+            "instruction": "Выбери правильную модель",
+            "prompt": "... was Julia who suggested this idea.",
+            "options": ["It", "What", "All"],
+            "correctIndex": 0,
+            "explain": "Это it-cleft: It was Julia who..."
+          },
+          {
+            "id": "clf_m_5",
+            "instruction": "Выбери объяснение",
+            "prompt": "All I asked for was honesty.",
+            "options": ["акцент на минимальном запросе", "описание места", "временное условие"],
+            "correctIndex": 0,
+            "explain": "all-cleft подчеркивает единственное требование."
+          },
+          {
+            "id": "clf_m_6",
+            "instruction": "Выбери объяснение",
+            "prompt": "The reason why she left was stress.",
+            "options": ["акцент на причине", "привычка в прошлом", "модальный вывод"],
+            "correctIndex": 0,
+            "explain": "Конструкция раскрывает именно причину."
+          }
+        ]
+      },
+      {
+        "id": "formula",
+        "title": "Формулы (Formula)",
+        "kind": "input",
+        "items": [
+          {
+            "id": "clf_f_1",
+            "instruction": "Вставь форму",
+            "prompt": "It ____ Tom who sent the file.",
+            "accepted": ["was"],
+            "explain": "it-cleft в прошлом: It was ... who ..."
+          },
+          {
+            "id": "clf_f_2",
+            "instruction": "Вставь форму",
+            "prompt": "What I need ____ more time.",
+            "accepted": ["is"],
+            "explain": "what-cleft с настоящим: What ... is ..."
+          },
+          {
+            "id": "clf_f_3",
+            "instruction": "Вставь форму",
+            "prompt": "It was the manager ____ approved the budget.",
+            "accepted": ["who", "that"],
+            "explain": "После фокуса на человеке обычно who/that."
+          },
+          {
+            "id": "clf_f_4",
+            "instruction": "Вставь форму",
+            "prompt": "All we want ____ a quick answer.",
+            "accepted": ["is"],
+            "explain": "All ... is ... для акцента на результате."
+          },
+          {
+            "id": "clf_f_5",
+            "instruction": "Исправь ошибку",
+            "prompt": "What I need are a break.",
+            "accepted": ["What I need is a break."],
+            "acceptedShort": ["is"],
+            "explain": "В этом шаблоне нужно согласование: What I need is ..."
+          },
+          {
+            "id": "clf_f_6",
+            "instruction": "Исправь ошибку",
+            "prompt": "It was my friend which helped me.",
+            "accepted": ["It was my friend who helped me.", "It was my friend that helped me."],
+            "acceptedShort": ["who", "that"],
+            "explain": "Для человека в it-cleft используем who/that, не which."
+          }
+        ]
+      }
+    ]
+  }
+}

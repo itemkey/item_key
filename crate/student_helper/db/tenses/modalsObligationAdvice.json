@@ -1,0 +1,156 @@
+{
+  "id": "modalsObligationAdvice",
+  "title": "Modals: Obligation and Advice",
+  "subtitle": "must / have to / should / mustn't / don't have to",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Обязанность, запрет, совет"
+    },
+    {
+      "type": "text",
+      "text": "must и have to выражают обязанность, should - совет. mustn't означает запрет, а don't have to - отсутствует необходимость (можно, но не обязательно)."
+    },
+    {
+      "type": "table",
+      "caption": "Смысловые различия",
+      "columns": ["Форма", "Значение", "Пример"],
+      "rows": [
+        ["must", "сильная обязанность (часто от говорящего)", "You must wear a helmet."],
+        ["have to", "внешнее правило/обстоятельство", "I have to be at work at 8."],
+        ["should", "совет", "You should get more sleep."],
+        ["mustn't", "запрет", "You mustn't smoke here."],
+        ["don't have to", "нет необходимости", "You don't have to come early."]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Типичные ошибки",
+      "lines": [
+        "mustn't != don't have to",
+        "после модальных используем V1 без to",
+        "в 3-м лице не добавляем -s после modal"
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        { "en": "You must finish this report today.", "ru": "Ты должен закончить этот отчет сегодня." },
+        { "en": "We have to wear ID badges at work.", "ru": "Мы обязаны носить бейджи на работе." },
+        { "en": "You should talk to your manager first.", "ru": "Тебе стоит сначала поговорить с менеджером." },
+        { "en": "You mustn't park here.", "ru": "Здесь нельзя парковаться." },
+        { "en": "You don't have to bring food. We already ordered.", "ru": "Тебе не нужно приносить еду. Мы уже заказали." }
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": [
+      {
+        "id": "meaning",
+        "title": "Когда используем (Meaning)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "moa_m_1",
+            "instruction": "Выбери лучший вариант",
+            "prompt": "It is a legal rule. Drivers ____ stop at red lights.",
+            "options": ["don't have to", "have to", "should maybe"],
+            "correctIndex": 1,
+            "explain": "Внешнее обязательное правило -> have to."
+          },
+          {
+            "id": "moa_m_2",
+            "instruction": "Выбери лучший вариант",
+            "prompt": "I think you look tired. You ____ rest more.",
+            "options": ["mustn't", "should", "have to"],
+            "correctIndex": 1,
+            "explain": "Это совет -> should."
+          },
+          {
+            "id": "moa_m_3",
+            "instruction": "Выбери лучший вариант",
+            "prompt": "This area is dangerous. You ____ enter without permission.",
+            "options": ["mustn't", "don't have to", "should"],
+            "correctIndex": 0,
+            "explain": "Запрет -> mustn't."
+          },
+          {
+            "id": "moa_m_4",
+            "instruction": "Выбери лучший вариант",
+            "prompt": "It's optional. You ____ come to the meeting if you are busy.",
+            "options": ["must", "don't have to", "mustn't"],
+            "correctIndex": 1,
+            "explain": "Отсутствие необходимости -> don't have to."
+          },
+          {
+            "id": "moa_m_5",
+            "instruction": "Выбери объяснение",
+            "prompt": "You must call your mom today.",
+            "options": ["сильная рекомендация/обязанность", "нет необходимости", "запрет"],
+            "correctIndex": 0,
+            "explain": "must показывает сильную обязанность."
+          },
+          {
+            "id": "moa_m_6",
+            "instruction": "Выбери объяснение",
+            "prompt": "You don't have to wear a tie here.",
+            "options": ["это запрещено", "это необязательно", "это обязательно"],
+            "correctIndex": 1,
+            "explain": "Можно надеть, но не нужно обязательно."
+          }
+        ]
+      },
+      {
+        "id": "formula",
+        "title": "Формулы (Formula)",
+        "kind": "input",
+        "items": [
+          {
+            "id": "moa_f_1",
+            "instruction": "Вставь форму",
+            "prompt": "Students ____ submit the form before Friday. (obligation)",
+            "accepted": ["must", "have to"],
+            "explain": "Обе формы возможны для обязанности в этом контексте."
+          },
+          {
+            "id": "moa_f_2",
+            "instruction": "Вставь форму",
+            "prompt": "You ____ smoke in the hospital. (prohibition)",
+            "accepted": ["mustn't", "must not"],
+            "explain": "Для запрета используем mustn't."
+          },
+          {
+            "id": "moa_f_3",
+            "instruction": "Вставь форму",
+            "prompt": "You ____ drink more water. (advice)",
+            "accepted": ["should"],
+            "explain": "Совет -> should + V1."
+          },
+          {
+            "id": "moa_f_4",
+            "instruction": "Вставь форму",
+            "prompt": "He ____ wear a suit. The office is casual. (no necessity)",
+            "accepted": ["doesn't have to", "does not have to"],
+            "explain": "В 3-м лице: does not have to."
+          },
+          {
+            "id": "moa_f_5",
+            "instruction": "Исправь ошибку",
+            "prompt": "She musts finish this today.",
+            "accepted": ["She must finish this today."],
+            "acceptedShort": ["must"],
+            "explain": "После modal не добавляем -s."
+          },
+          {
+            "id": "moa_f_6",
+            "instruction": "Исправь ошибку",
+            "prompt": "You mustn't to be late.",
+            "accepted": ["You mustn't be late.", "You must not be late."],
+            "acceptedShort": ["mustn't be", "must not be"],
+            "explain": "После mustn't ставим V1 без to."
+          }
+        ]
+      }
+    ]
+  }
+}

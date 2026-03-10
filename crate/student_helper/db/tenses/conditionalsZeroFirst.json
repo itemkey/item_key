@@ -1,0 +1,152 @@
+{
+  "id": "conditionalsZeroFirst",
+  "title": "Zero and First Conditionals",
+  "subtitle": "if + Present: факты и реальное будущее",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Zero vs First Conditional"
+    },
+    {
+      "type": "text",
+      "text": "Zero Conditional используем для фактов и закономерностей: if + Present Simple, Present Simple. First Conditional используем для реальной возможности в будущем: if + Present Simple, will + V1."
+    },
+    {
+      "type": "table",
+      "caption": "Формулы",
+      "columns": ["Тип", "Формула", "Пример"],
+      "rows": [
+        ["Zero", "If + Present Simple, Present Simple", "If you heat water to 100C, it boils."],
+        ["First", "If + Present Simple, will + V1", "If it rains, we will stay home."],
+        ["Важно", "В if-clause не ставим will", "If I see him, I will tell him."]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Как быстро выбрать",
+      "lines": [
+        "Факт/правило/инструкция -> Zero Conditional",
+        "Реальный результат в будущем -> First Conditional",
+        "После if используем Present, а не will"
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        { "en": "If you don't water this plant, it dies.", "ru": "Если не поливать это растение, оно погибает." },
+        { "en": "If I finish early, I will call you.", "ru": "Если я закончу рано, я тебе позвоню." },
+        { "en": "If people eat too much sugar, they gain weight.", "ru": "Если люди едят слишком много сахара, они набирают вес." },
+        { "en": "If she misses the bus, she will take a taxi.", "ru": "Если она пропустит автобус, она возьмет такси." }
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": [
+      {
+        "id": "meaning",
+        "title": "Когда используем (Meaning)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "czf_m_1",
+            "instruction": "Выбери тип",
+            "prompt": "If you mix blue and yellow, you get green.",
+            "options": ["Zero Conditional", "First Conditional", "Past Conditional"],
+            "correctIndex": 0,
+            "explain": "Это общий факт, поэтому Zero Conditional."
+          },
+          {
+            "id": "czf_m_2",
+            "instruction": "Выбери тип",
+            "prompt": "If he studies tonight, he will pass the test.",
+            "options": ["Zero Conditional", "First Conditional", "Reported Speech"],
+            "correctIndex": 1,
+            "explain": "Это реальное будущее последствие, значит First Conditional."
+          },
+          {
+            "id": "czf_m_3",
+            "instruction": "Выбери объяснение",
+            "prompt": "If babies are hungry, they cry.",
+            "options": ["закономерность", "план на будущее", "сожаление о прошлом"],
+            "correctIndex": 0,
+            "explain": "Типичная закономерность -> Zero Conditional."
+          },
+          {
+            "id": "czf_m_4",
+            "instruction": "Выбери объяснение",
+            "prompt": "If we leave now, we will catch the train.",
+            "options": ["воображаемая ситуация", "реальная возможность в будущем", "общее правило"],
+            "correctIndex": 1,
+            "explain": "Реальный шанс в будущем -> First Conditional."
+          },
+          {
+            "id": "czf_m_5",
+            "instruction": "Выбери правильное правило",
+            "prompt": "If I see Anna, I will invite her.",
+            "options": ["после if можно will", "после if нужен Present", "после if нужен Past Perfect"],
+            "correctIndex": 1,
+            "explain": "В if-clause используем Present Simple."
+          },
+          {
+            "id": "czf_m_6",
+            "instruction": "Выбери тип",
+            "prompt": "If the alarm goes off, press this red button.",
+            "options": ["Zero Conditional", "First Conditional", "Second Conditional"],
+            "correctIndex": 0,
+            "explain": "Инструкция/правило поведения -> Zero Conditional."
+          }
+        ]
+      },
+      {
+        "id": "formula",
+        "title": "Формулы (Formula)",
+        "kind": "input",
+        "items": [
+          {
+            "id": "czf_f_1",
+            "instruction": "Вставь форму",
+            "prompt": "If water ____ (freeze), it turns into ice.",
+            "accepted": ["freezes"],
+            "explain": "Zero Conditional: Present + Present."
+          },
+          {
+            "id": "czf_f_2",
+            "instruction": "Вставь форму",
+            "prompt": "If I have time tomorrow, I ____ (help) you.",
+            "accepted": ["will help"],
+            "explain": "First Conditional: if + Present, will + V1."
+          },
+          {
+            "id": "czf_f_3",
+            "instruction": "Исправь форму",
+            "prompt": "If she will call, I will answer.",
+            "accepted": ["If she calls, I will answer."],
+            "acceptedShort": ["calls"],
+            "explain": "После if не ставим will."
+          },
+          {
+            "id": "czf_f_4",
+            "instruction": "Вставь форму",
+            "prompt": "If they ____ (not/eat) now, they will be hungry later.",
+            "accepted": ["don't eat", "do not eat"],
+            "explain": "Отрицание в if-clause в Present Simple."
+          },
+          {
+            "id": "czf_f_5",
+            "instruction": "Вставь форму",
+            "prompt": "If people ____ (not/sleep) enough, they feel tired.",
+            "accepted": ["don't sleep", "do not sleep"],
+            "explain": "Это общая закономерность -> Zero Conditional."
+          },
+          {
+            "id": "czf_f_6",
+            "instruction": "Вставь форму",
+            "prompt": "If the weather is good, we ____ (go) to the beach.",
+            "accepted": ["will go"],
+            "explain": "Реальный план на будущее -> First Conditional."
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,151 @@
+{
+  "id": "pastWouldHabits",
+  "title": "would for Past Habits",
+  "subtitle": "повторяющиеся действия в прошлом",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Когда используем would в прошлом"
+    },
+    {
+      "type": "text",
+      "text": "would + V1 описывает привычные/повторяющиеся действия в прошлом, особенно в рассказах. Для состояний (be, know, like, have в значении 'иметь') обычно используем used to."
+    },
+    {
+      "type": "table",
+      "caption": "Сравнение",
+      "columns": ["Форма", "Когда", "Пример"],
+      "rows": [
+        ["would + V1", "повторяющееся действие в прошлом", "Every summer we would swim in the lake."],
+        ["used to + V1", "прошлая привычка или состояние", "I used to live near the sea."],
+        ["Past Simple", "разовое завершенное действие", "I visited that town last year."]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Главные ограничения",
+      "lines": [
+        "would обычно не для состояний: would be/know/have (state) - чаще неверно",
+        "часто есть контекст прошлого: when I was a child, every Sunday, in those days",
+        "вопрос/отрицание про прошлые привычки чаще строят через used to или Past Simple"
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        { "en": "When we were kids, we would build tree houses.", "ru": "Когда мы были детьми, мы строили домики на деревьях (регулярно)." },
+        { "en": "My grandpa used to be a pilot.", "ru": "Мой дедушка раньше был пилотом (состояние/факт)." },
+        { "en": "Every evening she would read us a story.", "ru": "Каждый вечер она читала нам историю." },
+        { "en": "I used to have long hair.", "ru": "У меня раньше были длинные волосы (состояние)." }
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": [
+      {
+        "id": "meaning",
+        "title": "Когда используем (Meaning)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "pwh_m_1",
+            "instruction": "Выбери вариант",
+            "prompt": "Every winter we ____ skate on the frozen river.",
+            "options": ["would", "used to be", "had been"],
+            "correctIndex": 0,
+            "explain": "Повторяющееся действие в прошлом -> would + V1."
+          },
+          {
+            "id": "pwh_m_2",
+            "instruction": "Выбери вариант",
+            "prompt": "I ____ very shy when I was 10.",
+            "options": ["would be", "used to be", "would"],
+            "correctIndex": 1,
+            "explain": "Состояние в прошлом -> used to be."
+          },
+          {
+            "id": "pwh_m_3",
+            "instruction": "Выбери вариант",
+            "prompt": "On Sundays Dad ____ us to the park.",
+            "options": ["would take", "used to be", "would be"],
+            "correctIndex": 0,
+            "explain": "Регулярное действие в прошлом -> would take."
+          },
+          {
+            "id": "pwh_m_4",
+            "instruction": "Выбери вариант",
+            "prompt": "She ____ blue eyes and curly hair as a child.",
+            "options": ["would have", "used to have", "would"],
+            "correctIndex": 1,
+            "explain": "Описание состояния/характеристики -> used to have."
+          },
+          {
+            "id": "pwh_m_5",
+            "instruction": "Выбери вариант",
+            "prompt": "In those days, we ____ letters every week.",
+            "options": ["would write", "used to be", "were writing always"],
+            "correctIndex": 0,
+            "explain": "Повторяемое действие в прошлом -> would write."
+          },
+          {
+            "id": "pwh_m_6",
+            "instruction": "Выбери вариант",
+            "prompt": "He ____ our neighbor before he moved away.",
+            "options": ["would be", "used to be", "would"],
+            "correctIndex": 1,
+            "explain": "Факт состояния/роли -> used to be."
+          }
+        ]
+      },
+      {
+        "id": "formula",
+        "title": "Формулы (Formula)",
+        "kind": "input",
+        "items": [
+          {
+            "id": "pwh_f_1",
+            "instruction": "Вставь форму",
+            "prompt": "When we were children, we ____ (play) outside all day.",
+            "accepted": ["would play"],
+            "explain": "Повторяющееся действие в прошлом -> would + V1."
+          },
+          {
+            "id": "pwh_f_2",
+            "instruction": "Вставь форму",
+            "prompt": "I ____ (be) afraid of dogs.",
+            "accepted": ["used to be"],
+            "explain": "Состояние -> used to be."
+          },
+          {
+            "id": "pwh_f_3",
+            "instruction": "Вставь форму",
+            "prompt": "Every summer, they ____ (visit) their grandparents.",
+            "accepted": ["would visit"],
+            "explain": "Регулярность в прошлом -> would visit."
+          },
+          {
+            "id": "pwh_f_4",
+            "instruction": "Исправь ошибку",
+            "prompt": "She would have long hair when she was young.",
+            "accepted": ["She used to have long hair when she was young", "She used to have long hair when she was young."],
+            "explain": "Для состояния/внешности используем used to have."
+          },
+          {
+            "id": "pwh_f_5",
+            "instruction": "Вставь форму",
+            "prompt": "On Friday nights, my brother ____ (watch) old movies.",
+            "accepted": ["would watch"],
+            "explain": "Привычка в прошлом -> would watch."
+          },
+          {
+            "id": "pwh_f_6",
+            "instruction": "Вставь форму",
+            "prompt": "We ____ (know) that teacher very well.",
+            "accepted": ["used to know"],
+            "explain": "Глагол состояния know -> used to, не would."
+          }
+        ]
+      }
+    ]
+  }
+}

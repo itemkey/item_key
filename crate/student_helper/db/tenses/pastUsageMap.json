@@ -1,0 +1,156 @@
+{
+  "id": "pastUsageMap",
+  "title": "Past Usage Map",
+  "subtitle": "как выбирать способ говорить о прошлом по смыслу",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Способы описывать прошлое"
+    },
+    {
+      "type": "text",
+      "text": "Для прошлого мы выбираем форму по смыслу: Past Simple (факт/цепочка), Past Continuous (процесс в моменте), Past Perfect (что-то произошло раньше другого прошлого момента), Past Perfect Continuous (длительность до прошлого момента), would/used to (привычки в прошлом)."
+    },
+    {
+      "type": "table",
+      "caption": "Карта выбора",
+      "columns": ["Форма", "Когда", "Формула", "Пример"],
+      "rows": [
+        ["Past Simple", "факт/завершенное событие", "V2 / did + V1", "I met him yesterday."],
+        ["Past Continuous", "процесс в конкретный момент", "was/were + V-ing", "I was reading at 9."],
+        ["Past Perfect", "действие до другого прошлого", "had + V3", "I had left before he came."],
+        ["Past Perfect Continuous", "длительность до прошлого момента", "had been + V-ing", "I had been working for 3 hours."],
+        ["would / used to", "повторяющиеся привычки в прошлом", "would + V1 / used to + V1", "We would play outside every day."]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Опорные вопросы",
+      "lines": [
+        "Это просто факт в прошлом? -> Past Simple",
+        "Нужен фон/процесс в моменте? -> Past Continuous",
+        "Что из двух прошлых действий было раньше? -> Past Perfect",
+        "Важна длительность до прошлого момента? -> Past Perfect Continuous",
+        "Привычка раньше? -> would/used to"
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        { "en": "When I arrived, they were having dinner.", "ru": "Когда я пришел, они ужинали." },
+        { "en": "She had finished the report before the meeting started.", "ru": "Она закончила отчет до начала встречи." },
+        { "en": "I had been waiting for an hour when the bus finally came.", "ru": "Я ждал уже час, когда автобус наконец приехал." },
+        { "en": "Every summer, we would visit our grandparents.", "ru": "Каждое лето мы навещали бабушку с дедушкой." }
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": [
+      {
+        "id": "meaning",
+        "title": "Когда используем (Meaning)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "pam_m_1",
+            "instruction": "Выбери форму",
+            "prompt": "I ____ him two days ago.",
+            "options": ["met", "was meeting", "had met"],
+            "correctIndex": 0,
+            "explain": "Точное завершенное событие в прошлом -> Past Simple."
+          },
+          {
+            "id": "pam_m_2",
+            "instruction": "Выбери форму",
+            "prompt": "At 7 pm yesterday, we ____ dinner.",
+            "options": ["had", "were having", "have had"],
+            "correctIndex": 1,
+            "explain": "Процесс в конкретный момент прошлого -> Past Continuous."
+          },
+          {
+            "id": "pam_m_3",
+            "instruction": "Выбери форму",
+            "prompt": "By the time I got there, the film ____.",
+            "options": ["started", "had started", "was starting"],
+            "correctIndex": 1,
+            "explain": "Одно действие произошло раньше другого прошлого -> Past Perfect."
+          },
+          {
+            "id": "pam_m_4",
+            "instruction": "Выбери форму",
+            "prompt": "She ____ for two hours before the doctor arrived.",
+            "options": ["waited", "had been waiting", "was waited"],
+            "correctIndex": 1,
+            "explain": "Длительность до прошлого момента -> Past Perfect Continuous."
+          },
+          {
+            "id": "pam_m_5",
+            "instruction": "Выбери форму",
+            "prompt": "When I was a child, we ____ by the sea every summer.",
+            "options": ["would stay", "had stayed", "are staying"],
+            "correctIndex": 0,
+            "explain": "Повторяющаяся привычка в прошлом -> would."
+          },
+          {
+            "id": "pam_m_6",
+            "instruction": "Выбери форму",
+            "prompt": "I ____ TV when the lights went out.",
+            "options": ["watched", "was watching", "had watched"],
+            "correctIndex": 1,
+            "explain": "Процесс + короткое событие -> Past Continuous + Past Simple."
+          }
+        ]
+      },
+      {
+        "id": "formula",
+        "title": "Формулы (Formula)",
+        "kind": "input",
+        "items": [
+          {
+            "id": "pam_f_1",
+            "instruction": "Вставь форму",
+            "prompt": "They ____ (arrive) late yesterday.",
+            "accepted": ["arrived"],
+            "explain": "Завершенный факт -> Past Simple."
+          },
+          {
+            "id": "pam_f_2",
+            "instruction": "Вставь форму",
+            "prompt": "At midnight, I ____ (drive) home.",
+            "accepted": ["was driving"],
+            "explain": "Процесс в моменте прошлого -> Past Continuous."
+          },
+          {
+            "id": "pam_f_3",
+            "instruction": "Вставь форму",
+            "prompt": "She ____ (leave) before I called her.",
+            "accepted": ["had left"],
+            "explain": "Более раннее прошлое -> Past Perfect."
+          },
+          {
+            "id": "pam_f_4",
+            "instruction": "Вставь форму",
+            "prompt": "We ____ (work) for hours when they finally replied.",
+            "accepted": ["had been working"],
+            "explain": "Длительность до прошлого результата -> Past Perfect Continuous."
+          },
+          {
+            "id": "pam_f_5",
+            "instruction": "Вставь форму",
+            "prompt": "When he was younger, he ____ (play) tennis every weekend.",
+            "accepted": ["would play", "used to play"],
+            "explain": "Привычка в прошлом -> would/used to."
+          },
+          {
+            "id": "pam_f_6",
+            "instruction": "Исправь ошибку",
+            "prompt": "When I arrived, they had dinner.",
+            "accepted": ["When I arrived, they were having dinner."],
+            "acceptedShort": ["were having"],
+            "explain": "Нужен процесс в момент прихода, поэтому Past Continuous."
+          }
+        ]
+      }
+    ]
+  }
+}

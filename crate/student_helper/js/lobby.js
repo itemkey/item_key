@@ -4,18 +4,17 @@
 
   const btnHome = document.getElementById('shHomeBtn');
   const btnDict = document.getElementById('shGoDict');
-  const btnStruct = document.getElementById('shGoStruct');
-  const btnTenses = document.getElementById('shGoTenses');
+  const btnGrammar = document.getElementById('shGoGrammar');
   const btnWT = document.getElementById('shGoWT');
   const btnContinue = document.getElementById('shContinue');
 
   const KEY_LAST = 'sh_last_module';
   const KEY_SEEN = 'sh_seen_lobby';
-  const VALID_ROUTES = new Set(['menu', 'dict', 'struct', 'tenses', 'wt', 'wt-practice', 'wt-builder']);
+  const VALID_ROUTES = new Set(['menu', 'dict', 'grammar', 'struct', 'tenses', 'wt', 'wt-practice', 'wt-builder']);
 
   let ignoreNextHashChange = false;
 
-  if (!lobby || !app || !btnDict || !btnWT || !btnHome) return;
+  if (!lobby || !app || !btnDict || !btnGrammar || !btnWT || !btnHome) return;
 
   function setVisible(el, visible){
     el.hidden = !visible;
@@ -35,6 +34,7 @@
     if(!normalized) return null;
 
     if(normalized === 'menu') return { main: 'menu', wtSubtab: '' };
+    if(normalized === 'struct' || normalized === 'tenses') return { main: 'grammar', wtSubtab: '' };
     if(normalized === 'wt-practice') return { main: 'wt', wtSubtab: 'practice' };
     if(normalized === 'wt-builder') return { main: 'wt', wtSubtab: 'builder' };
     return { main: normalized, wtSubtab: '' };
@@ -75,8 +75,7 @@
     if (btnContinue){
       btnContinue.hidden = !last;
       if (last === 'dict') btnContinue.textContent = 'продолжить: dictionary';
-      if (last === 'struct') btnContinue.textContent = 'продолжить: structure';
-      if (last === 'tenses') btnContinue.textContent = 'продолжить: tenses';
+      if (last === 'grammar' || last === 'struct' || last === 'tenses') btnContinue.textContent = 'продолжить: grammar';
       if (last === 'wt') btnContinue.textContent = 'продолжить: word transformation';
     }
 
@@ -97,9 +96,9 @@
     const parsed = parseRoute(mod) || { main: 'dict', wtSubtab: '' };
 
     const module =
+      (parsed.main === 'grammar') ? 'grammar' :
       (parsed.main === 'wt') ? 'wt' :
-      (parsed.main === 'struct') ? 'struct' :
-      (parsed.main === 'tenses') ? 'tenses' :
+      (parsed.main === 'struct' || parsed.main === 'tenses') ? 'grammar' :
       'dict';
 
     let wtSubtab = parsed.wtSubtab;
@@ -114,7 +113,7 @@
     setVisible(app, true);
 
     if (window.StudentHelperTabs && typeof window.StudentHelperTabs.setMainTab === 'function'){
-      window.StudentHelperTabs.setMainTab(module);
+      window.StudentHelperTabs.setMainTab(module === 'grammar' ? 'tenses' : module);
     }
     if(module === 'wt' && window.StudentHelperTabs && typeof window.StudentHelperTabs.setWTSubTab === 'function'){
       window.StudentHelperTabs.setWTSubTab(wtSubtab);
@@ -125,14 +124,14 @@
     if(options.syncHash !== false){
       const routeValue = module === 'wt'
         ? (wtSubtab === 'builder' ? 'wt-builder' : 'wt-practice')
-        : module;
+        : (module === 'grammar' ? 'grammar' : module);
       setHashRoute(routeValue, !!options.replaceHash);
     }
 
     try{
       const route = module === 'wt'
         ? (wtSubtab === 'builder' ? 'wt-builder' : 'wt-practice')
-        : module;
+        : (module === 'grammar' ? 'grammar' : module);
       document.dispatchEvent(new CustomEvent('sh:route', { detail: { route, main: module, wtSubtab: wtSubtab || '' } }));
     }catch(_){ }
   }
@@ -159,6 +158,7 @@
     if(window.StudentHelperTabs && typeof window.StudentHelperTabs.getMainTab === 'function'){
       main = window.StudentHelperTabs.getMainTab() || 'dict';
     }
+    if(main === 'tenses' || main === 'struct') return 'grammar';
     if(main !== 'wt') return main;
 
     if(window.StudentHelperTabs && typeof window.StudentHelperTabs.getWTSubTab === 'function'){
@@ -168,20 +168,20 @@
   };
 
   btnDict.addEventListener('click', ()=> openModule('dict'));
-  if (btnStruct) btnStruct.addEventListener('click', ()=> openModule('struct'));
-  if (btnTenses) btnTenses.addEventListener('click', ()=> openModule('tenses'));
+  btnGrammar.addEventListener('click', ()=> openModule('grammar'));
   btnWT.addEventListener('click', ()=> openModule('wt'));
   btnHome.addEventListener('click', showLobby);
 
   if (btnContinue){
     btnContinue.addEventListener('click', ()=>{
-      const last = localStorage.getItem(KEY_LAST);
+      const rawLast = localStorage.getItem(KEY_LAST);
+      const last = (rawLast === 'tenses' || rawLast === 'struct') ? 'grammar' : rawLast;
       if (last) openModule(last);
       else showLobby();
     });
   }
 
-  // Hash controls: #dict, #struct, #tenses, #wt, #menu
+  // Hash controls: #dict, #grammar, #wt, #menu
   function applyHash(){
     const raw = (location.hash || '').replace('#', '').trim();
     const parsed = parseRoute(raw);
@@ -211,7 +211,8 @@
 
   const hashApplied = applyHash();
   const seen = localStorage.getItem(KEY_SEEN);
-  const last = localStorage.getItem(KEY_LAST);
+  const rawLast = localStorage.getItem(KEY_LAST);
+  const last = (rawLast === 'tenses' || rawLast === 'struct') ? 'grammar' : rawLast;
 
   if (!hashApplied){
     if (!seen){

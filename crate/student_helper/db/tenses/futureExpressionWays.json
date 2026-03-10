@@ -1,0 +1,157 @@
+{
+  "id": "futureExpressionWays",
+  "title": "Future Expression Ways",
+  "subtitle": "все основные способы говорить о будущем",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Способы выражения будущего"
+    },
+    {
+      "type": "text",
+      "text": "В английском нет одного универсального будущего времени. Мы выбираем форму по смыслу: will, be going to, Present Continuous, Present Simple, а также Present Simple в придаточных времени и условия (if/when/as soon as/unless)."
+    },
+    {
+      "type": "table",
+      "caption": "Быстрая карта выбора",
+      "columns": ["Способ", "Когда", "Формула", "Пример"],
+      "rows": [
+        ["will", "решение в момент речи, обещание, мнение", "will + V1", "I'll help you."],
+        ["be going to", "план заранее, прогноз по признакам", "am/is/are going to + V1", "It's going to rain."],
+        ["Present Continuous", "личная договоренность", "am/is/are + V-ing", "I'm meeting Kate tonight."],
+        ["Present Simple", "расписание/график", "V1 / V-s", "The train leaves at 7."],
+        ["if/when-clause", "придаточные времени/условия", "Present Simple (без will)", "I'll call you when I arrive."]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Алгоритм",
+      "lines": [
+        "Решил прямо сейчас? -> will",
+        "План уже есть или видны признаки? -> be going to",
+        "Есть конкретная договоренность? -> Present Continuous",
+        "Официальное расписание? -> Present Simple",
+        "После if/when/as soon as/unless в будущем контексте -> Present Simple"
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        { "en": "I'll take your bag. It looks heavy.", "ru": "Я возьму твою сумку. Она выглядит тяжелой." },
+        { "en": "I'm going to start a new course next month.", "ru": "Я собираюсь начать новый курс в следующем месяце." },
+        { "en": "We're flying to Rome on Friday.", "ru": "Мы летим в Рим в пятницу." },
+        { "en": "The movie starts at 8:30.", "ru": "Фильм начинается в 8:30." },
+        { "en": "I'll text you as soon as I get home.", "ru": "Я напишу тебе, как только доберусь домой." }
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": [
+      {
+        "id": "meaning",
+        "title": "Когда используем (Meaning)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "few_m_1",
+            "instruction": "Выбери лучший вариант",
+            "prompt": "A: The phone is ringing. B: I ____ answer it.",
+            "options": ["will", "am going to", "am answering"],
+            "correctIndex": 0,
+            "explain": "Решение принимается в момент речи -> will."
+          },
+          {
+            "id": "few_m_2",
+            "instruction": "Выбери лучший вариант",
+            "prompt": "Look at those clouds! It ____ rain.",
+            "options": ["will", "is going to", "rains"],
+            "correctIndex": 1,
+            "explain": "Есть явные признаки -> be going to."
+          },
+          {
+            "id": "few_m_3",
+            "instruction": "Выбери лучший вариант",
+            "prompt": "I have a ticket. I ____ my dentist at 6 pm.",
+            "options": ["see", "am seeing", "will seeing"],
+            "correctIndex": 1,
+            "explain": "Конкретная договоренность -> Present Continuous."
+          },
+          {
+            "id": "few_m_4",
+            "instruction": "Выбери лучший вариант",
+            "prompt": "The train ____ at 07:10 tomorrow.",
+            "options": ["is leaving", "will leave", "leaves"],
+            "correctIndex": 2,
+            "explain": "Расписание/таймтабл -> Present Simple."
+          },
+          {
+            "id": "few_m_5",
+            "instruction": "Выбери лучший вариант",
+            "prompt": "I'll call you when I ____ home.",
+            "options": ["will get", "get", "am getting"],
+            "correctIndex": 1,
+            "explain": "После when в future context ставим Present Simple."
+          },
+          {
+            "id": "few_m_6",
+            "instruction": "Выбери лучший вариант",
+            "prompt": "If she ____ late, we'll start without her.",
+            "options": ["is", "will be", "would be"],
+            "correctIndex": 0,
+            "explain": "После if (реальное условие будущего) -> Present Simple."
+          }
+        ]
+      },
+      {
+        "id": "formula",
+        "title": "Формулы (Formula)",
+        "kind": "input",
+        "items": [
+          {
+            "id": "few_f_1",
+            "instruction": "Вставь форму",
+            "prompt": "I ____ (help) you with that box. (decision now)",
+            "accepted": ["will help"],
+            "explain": "Решение сейчас -> will help."
+          },
+          {
+            "id": "few_f_2",
+            "instruction": "Вставь форму",
+            "prompt": "They ____ (buy) a new car next month. (plan already made)",
+            "accepted": ["are going to buy"],
+            "explain": "План заранее -> are going to buy."
+          },
+          {
+            "id": "few_f_3",
+            "instruction": "Вставь форму",
+            "prompt": "We ____ (meet) our clients at 5 pm. (arrangement)",
+            "accepted": ["are meeting"],
+            "explain": "Договоренность -> Present Continuous."
+          },
+          {
+            "id": "few_f_4",
+            "instruction": "Вставь форму",
+            "prompt": "The conference ____ (start) at 9 tomorrow.",
+            "accepted": ["starts"],
+            "explain": "Расписание -> Present Simple."
+          },
+          {
+            "id": "few_f_5",
+            "instruction": "Вставь форму",
+            "prompt": "I'll text you when I ____ (arrive).",
+            "accepted": ["arrive"],
+            "explain": "После when в таком контексте -> Present Simple."
+          },
+          {
+            "id": "few_f_6",
+            "instruction": "Исправь ошибку",
+            "prompt": "If I will see him, I'll tell him.",
+            "accepted": ["If I see him, I'll tell him.", "If I see him, I will tell him."],
+            "acceptedShort": ["see"],
+            "explain": "После if убираем will: If I see him..."
+          }
+        ]
+      }
+    ]
+  }
+}

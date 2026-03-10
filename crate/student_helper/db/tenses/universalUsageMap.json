@@ -1,0 +1,154 @@
+{
+  "id": "universalUsageMap",
+  "title": "Universal Usage Map",
+  "subtitle": "как выбирать структуру вне одной временной линии",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Карта универсальных структур"
+    },
+    {
+      "type": "text",
+      "text": "Universal структуры работают не как отдельное время, а как логические инструменты: conditionals для условий, modals для оценки/обязанности, passive для фокуса на действии, reported speech для передачи чужих слов, clauses для связной сложной речи."
+    },
+    {
+      "type": "table",
+      "caption": "Что выбирать по задаче",
+      "columns": ["Задача", "Структура", "Пример"],
+      "rows": [
+        ["условие и результат", "conditionals", "If it rains, we'll stay home."],
+        ["обязанность/совет/вероятность", "modals", "You should rest."] ,
+        ["важно действие, не исполнитель", "passive", "The report was sent yesterday."],
+        ["передать чужую речь", "reported speech", "He said he was tired."],
+        ["уточнить существительное", "relative clauses", "The app that we use is fast."]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Как мыслить",
+      "lines": [
+        "Сначала определи коммуникативную задачу, а не время",
+        "Выбери блок: условие, модальность, пассив, передача речи, связывание идей",
+        "Потом подставь нужную временную форму внутрь структуры"
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        { "en": "If I had more time, I would learn Japanese.", "ru": "Если бы у меня было больше времени, я бы учил японский." },
+        { "en": "You must be very tired after that trip.", "ru": "Ты, должно быть, очень устал после той поездки." },
+        { "en": "The final version was approved this morning.", "ru": "Финальная версия была утверждена этим утром." },
+        { "en": "She told me that she would call later.", "ru": "Она сказала мне, что позвонит позже." }
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": [
+      {
+        "id": "meaning",
+        "title": "Когда используем (Meaning)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "uvm_m_1",
+            "instruction": "Выбери блок",
+            "prompt": "If she studies harder, she will pass.",
+            "options": ["conditionals", "passive", "reported speech"],
+            "correctIndex": 0,
+            "explain": "Условие + результат -> conditional."
+          },
+          {
+            "id": "uvm_m_2",
+            "instruction": "Выбери блок",
+            "prompt": "You should see a doctor.",
+            "options": ["modals", "relative clauses", "gerund"],
+            "correctIndex": 0,
+            "explain": "Совет выражается modal should."
+          },
+          {
+            "id": "uvm_m_3",
+            "instruction": "Выбери блок",
+            "prompt": "The package was delivered yesterday.",
+            "options": ["passive", "question tags", "future forms"],
+            "correctIndex": 0,
+            "explain": "Фокус на действии/результате -> passive."
+          },
+          {
+            "id": "uvm_m_4",
+            "instruction": "Выбери блок",
+            "prompt": "He said that he was busy.",
+            "options": ["reported speech", "conditionals", "cleft sentence"],
+            "correctIndex": 0,
+            "explain": "Передаем слова другого человека."
+          },
+          {
+            "id": "uvm_m_5",
+            "instruction": "Выбери блок",
+            "prompt": "The woman who called me is my manager.",
+            "options": ["relative clause", "passive", "modal deduction"],
+            "correctIndex": 0,
+            "explain": "who-clause уточняет существительное woman."
+          },
+          {
+            "id": "uvm_m_6",
+            "instruction": "Выбери блок",
+            "prompt": "I wish I had studied harder.",
+            "options": ["wish pattern", "present perfect", "zero conditional"],
+            "correctIndex": 0,
+            "explain": "Сожаление о прошлом -> wish + had V3."
+          }
+        ]
+      },
+      {
+        "id": "formula",
+        "title": "Формулы (Formula)",
+        "kind": "input",
+        "items": [
+          {
+            "id": "uvm_f_1",
+            "instruction": "Вставь форму",
+            "prompt": "If it ____ (rain), we'll cancel the picnic.",
+            "accepted": ["rains"],
+            "explain": "First conditional: if + Present Simple."
+          },
+          {
+            "id": "uvm_f_2",
+            "instruction": "Вставь форму",
+            "prompt": "You ____ (should/sleep) more.",
+            "accepted": ["should sleep"],
+            "explain": "Совет: should + V1."
+          },
+          {
+            "id": "uvm_f_3",
+            "instruction": "Вставь форму",
+            "prompt": "The file ____ (send) this morning.",
+            "accepted": ["was sent"],
+            "explain": "Passive в Past Simple: was + V3."
+          },
+          {
+            "id": "uvm_f_4",
+            "instruction": "Вставь форму",
+            "prompt": "She said that she ____ (be) tired.",
+            "accepted": ["was"],
+            "explain": "Reported speech с backshift: was."
+          },
+          {
+            "id": "uvm_f_5",
+            "instruction": "Вставь форму",
+            "prompt": "The app ____ we use at work is secure.",
+            "accepted": ["that", "which"],
+            "explain": "Relative clause для предмета: that/which."
+          },
+          {
+            "id": "uvm_f_6",
+            "instruction": "Исправь ошибку",
+            "prompt": "If he will call, tell me.",
+            "accepted": ["If he calls, tell me."],
+            "acceptedShort": ["calls"],
+            "explain": "После if в таких условиях не ставим will."
+          }
+        ]
+      }
+    ]
+  }
+}

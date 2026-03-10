@@ -1,0 +1,154 @@
+{
+  "id": "presentUsageMap",
+  "title": "Present Usage Map",
+  "subtitle": "как выбрать настоящее время по задаче",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Способы говорить о настоящем"
+    },
+    {
+      "type": "text",
+      "text": "Для настоящего в английском нужны разные формы: Present Simple (привычки/факты), Present Continuous (процесс сейчас/временно), Present Perfect (результат к настоящему), Present Perfect Continuous (длительность до сейчас)."
+    },
+    {
+      "type": "table",
+      "caption": "Карта выбора",
+      "columns": ["Форма", "Смысл", "Формула", "Пример"],
+      "rows": [
+        ["Present Simple", "привычка, факт, расписание", "V1 / V-s", "She works from home."],
+        ["Present Continuous", "процесс сейчас, временная ситуация", "am/is/are + V-ing", "She is working now."],
+        ["Present Perfect", "результат/опыт до текущего момента", "have/has + V3", "She has finished her task."],
+        ["Present Perfect Continuous", "процесс и длительность до сейчас", "have/has been + V-ing", "She has been working since 9."]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Логика выбора",
+      "lines": [
+        "Рутина/факт -> Present Simple",
+        "Прямо сейчас / временно -> Present Continuous",
+        "Важен результат к настоящему -> Present Perfect",
+        "Важна длительность процесса -> Present Perfect Continuous"
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        { "en": "I usually drink coffee in the morning.", "ru": "Я обычно пью кофе утром." },
+        { "en": "I am drinking tea now.", "ru": "Я сейчас пью чай." },
+        { "en": "I have already sent the email.", "ru": "Я уже отправил письмо." },
+        { "en": "I have been studying for two hours.", "ru": "Я учусь уже два часа." }
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": [
+      {
+        "id": "meaning",
+        "title": "Когда используем (Meaning)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "prm_m_1",
+            "instruction": "Выбери форму",
+            "prompt": "She usually ____ to work by bus.",
+            "options": ["goes", "is going", "has gone"],
+            "correctIndex": 0,
+            "explain": "Обычная привычка -> Present Simple."
+          },
+          {
+            "id": "prm_m_2",
+            "instruction": "Выбери форму",
+            "prompt": "Look! He ____ over there.",
+            "options": ["runs", "is running", "has run"],
+            "correctIndex": 1,
+            "explain": "Процесс в момент речи -> Present Continuous."
+          },
+          {
+            "id": "prm_m_3",
+            "instruction": "Выбери форму",
+            "prompt": "I ____ my keys, so I can't open the door.",
+            "options": ["lose", "have lost", "am losing"],
+            "correctIndex": 1,
+            "explain": "Важен текущий результат -> Present Perfect."
+          },
+          {
+            "id": "prm_m_4",
+            "instruction": "Выбери форму",
+            "prompt": "They ____ for three hours.",
+            "options": ["work", "have been working", "are working"],
+            "correctIndex": 1,
+            "explain": "Длительность процесса -> Present Perfect Continuous."
+          },
+          {
+            "id": "prm_m_5",
+            "instruction": "Выбери форму",
+            "prompt": "The meeting ____ at 10 every Monday.",
+            "options": ["starts", "is starting", "has started"],
+            "correctIndex": 0,
+            "explain": "Регулярное расписание -> Present Simple."
+          },
+          {
+            "id": "prm_m_6",
+            "instruction": "Выбери форму",
+            "prompt": "We ____ this project since January.",
+            "options": ["do", "have done", "have been doing"],
+            "correctIndex": 2,
+            "explain": "С since + акцентом на процессе естественно Present Perfect Continuous."
+          }
+        ]
+      },
+      {
+        "id": "formula",
+        "title": "Формулы (Formula)",
+        "kind": "input",
+        "items": [
+          {
+            "id": "prm_f_1",
+            "instruction": "Вставь форму",
+            "prompt": "He ____ (work) in a bank. (fact)",
+            "accepted": ["works"],
+            "explain": "Факт -> Present Simple."
+          },
+          {
+            "id": "prm_f_2",
+            "instruction": "Вставь форму",
+            "prompt": "She ____ (talk) on the phone right now.",
+            "accepted": ["is talking"],
+            "explain": "Right now -> Present Continuous."
+          },
+          {
+            "id": "prm_f_3",
+            "instruction": "Вставь форму",
+            "prompt": "I ____ (already/finish) my homework.",
+            "accepted": ["have already finished"],
+            "explain": "already + результат -> Present Perfect."
+          },
+          {
+            "id": "prm_f_4",
+            "instruction": "Вставь форму",
+            "prompt": "They ____ (study) since morning.",
+            "accepted": ["have been studying"],
+            "explain": "since morning + процесс -> Present Perfect Continuous."
+          },
+          {
+            "id": "prm_f_5",
+            "instruction": "Вставь форму",
+            "prompt": "My sister ____ (not/like) cold weather.",
+            "accepted": ["doesn't like", "does not like"],
+            "explain": "Состояние/мнение -> Present Simple."
+          },
+          {
+            "id": "prm_f_6",
+            "instruction": "Исправь ошибку",
+            "prompt": "I am knowing the answer.",
+            "accepted": ["I know the answer."],
+            "acceptedShort": ["know"],
+            "explain": "know - стативный глагол, обычно используем Present Simple."
+          }
+        ]
+      }
+    ]
+  }
+}

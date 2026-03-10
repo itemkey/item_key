@@ -1,0 +1,160 @@
+{
+  "id": "futureGoingTo",
+  "title": "be going to",
+  "subtitle": "план заранее и прогноз по признакам",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Когда используем be going to"
+    },
+    {
+      "type": "text",
+      "text": "be going to + V1 используем, когда решение уже принято заранее, или когда есть видимые признаки будущего события прямо сейчас."
+    },
+    {
+      "type": "table",
+      "caption": "Формулы",
+      "columns": ["Тип", "Формула", "Пример"],
+      "rows": [
+        ["Утверждение", "S + am/is/are going to + V1", "I am going to buy a new laptop."],
+        ["Отрицание", "S + am/is/are not going to + V1", "She isn't going to stay."],
+        ["Вопрос", "Am/Is/Are + S + going to + V1?", "Are they going to join us?"]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Главная идея",
+      "lines": [
+        "going to = план уже есть",
+        "going to = прогноз по тому, что видно/слышно сейчас",
+        "после going to всегда V1, не V-ing и не V2"
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        { "en": "I've saved some money. I'm going to take a course.", "ru": "Я уже отложил деньги. Я собираюсь пройти курс." },
+        { "en": "Look at those black clouds! It's going to rain.", "ru": "Посмотри на эти черные тучи! Сейчас пойдет дождь." },
+        { "en": "We aren't going to move this year.", "ru": "Мы не собираемся переезжать в этом году." },
+        { "en": "Are you going to call him tonight?", "ru": "Ты собираешься позвонить ему сегодня вечером?" }
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Сравнение с will",
+      "lines": [
+        "will = решение в момент речи / мнение",
+        "going to = план заранее / видимые признаки",
+        "I think ... will ... / Look! ... is going to ..."
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": [
+      {
+        "id": "meaning",
+        "title": "Когда используем (Meaning)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "fg_m_1",
+            "instruction": "Выбери объяснение",
+            "prompt": "I bought the ingredients. I'm going to cook tonight.",
+            "options": ["план заранее", "решение в момент речи", "привычка"],
+            "correctIndex": 0,
+            "explain": "Есть подготовка заранее, значит это план: be going to."
+          },
+          {
+            "id": "fg_m_2",
+            "instruction": "Выбери объяснение",
+            "prompt": "Look! The baby is going to cry.",
+            "options": ["прогноз по признакам", "расписание", "прошлый опыт"],
+            "correctIndex": 0,
+            "explain": "Видимый признак в текущем моменте -> going to."
+          },
+          {
+            "id": "fg_m_3",
+            "instruction": "Выбери объяснение",
+            "prompt": "We're going to visit grandma this weekend.",
+            "options": ["длительность в будущем", "договоренность/план", "общий факт"],
+            "correctIndex": 1,
+            "explain": "По смыслу это заранее намеченный план."
+          },
+          {
+            "id": "fg_m_4",
+            "instruction": "Выбери объяснение",
+            "prompt": "Be careful! You're going to drop your phone.",
+            "options": ["прогноз по признакам", "цепочка действий в прошлом", "привычка"],
+            "correctIndex": 0,
+            "explain": "Есть явный признак опасной ситуации сейчас."
+          },
+          {
+            "id": "fg_m_5",
+            "instruction": "Выбери объяснение",
+            "prompt": "I'm not going to change my job this year.",
+            "options": ["решение в момент речи", "отрицательный план", "расписание"],
+            "correctIndex": 1,
+            "explain": "Отрицание будущего намерения -> am not going to."
+          },
+          {
+            "id": "fg_m_6",
+            "instruction": "Выбери объяснение",
+            "prompt": "Are they going to buy a car?",
+            "options": ["вопрос о намерении/плане", "вопрос о прошлом", "просьба"],
+            "correctIndex": 0,
+            "explain": "Вопрос о запланированном действии."
+          }
+        ]
+      },
+      {
+        "id": "formula",
+        "title": "Формулы (Formula)",
+        "kind": "input",
+        "items": [
+          {
+            "id": "fg_f_1",
+            "instruction": "Вставь форму",
+            "prompt": "I ____ (go) to start a new project next month.",
+            "accepted": ["am going to"],
+            "explain": "I + am going to + V1."
+          },
+          {
+            "id": "fg_f_2",
+            "instruction": "Вставь форму",
+            "prompt": "She ____ (not/stay) at home tonight.",
+            "accepted": ["isn't going to stay", "is not going to stay"],
+            "explain": "Отрицание: is not going to + V1."
+          },
+          {
+            "id": "fg_f_3",
+            "instruction": "Сделай вопрос",
+            "prompt": "____ you ____ (join) us for dinner?",
+            "accepted": ["Are you going to join"],
+            "explain": "Вопрос: Are + S + going to + V1?"
+          },
+          {
+            "id": "fg_f_4",
+            "instruction": "Вставь форму",
+            "prompt": "Look at the sky. It ____ (rain).",
+            "accepted": ["is going to rain"],
+            "explain": "Прогноз по видимому признаку -> is going to rain."
+          },
+          {
+            "id": "fg_f_5",
+            "instruction": "Вставь форму",
+            "prompt": "We ____ (not/buy) anything expensive this month.",
+            "accepted": ["aren't going to buy", "are not going to buy"],
+            "explain": "We + are not going to + V1."
+          },
+          {
+            "id": "fg_f_6",
+            "instruction": "Сделай вопрос",
+            "prompt": "____ he ____ (call) you later?",
+            "accepted": ["Is he going to call"],
+            "explain": "He -> Is he going to + V1?"
+          }
+        ]
+      }
+    ]
+  }
+}

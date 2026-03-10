@@ -1,0 +1,160 @@
+{
+  "id": "futurePresentSimple",
+  "title": "Present Simple for Future",
+  "subtitle": "расписания и официальные графики",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Когда Present Simple выражает будущее"
+    },
+    {
+      "type": "text",
+      "text": "Present Simple используем для расписаний, графиков и официальных программ: транспорт, занятия, события по плану."
+    },
+    {
+      "type": "table",
+      "caption": "Суть правила",
+      "columns": ["Где", "Форма", "Пример"],
+      "rows": [
+        ["расписание", "Present Simple", "The train leaves at 7:40."],
+        ["программа", "Present Simple", "The lesson starts at 9."],
+        ["афиша", "Present Simple", "The movie begins at 8." ]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Маркеры",
+      "lines": [
+        "at 6, at 7:30, tomorrow (по расписанию)",
+        "next Monday (по официальному графику)",
+        "start, leave, arrive, begin, open, close"
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        { "en": "The bus arrives at 6:15 tomorrow.", "ru": "Автобус прибывает завтра в 6:15 (по расписанию)." },
+        { "en": "Our exam starts next Tuesday.", "ru": "Наш экзамен начинается в следующий вторник (по графику)." },
+        { "en": "The museum doesn't open on Mondays.", "ru": "Музей не открывается по понедельникам." },
+        { "en": "What time does the conference begin?", "ru": "Во сколько начинается конференция?" }
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Не путай",
+      "lines": [
+        "личные планы -> чаще Present Continuous / going to",
+        "официальный график -> Present Simple",
+        "в 3-м лице ед. числа не забывай -s/-es"
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": [
+      {
+        "id": "meaning",
+        "title": "Когда используем (Meaning)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "fpsf_m_1",
+            "instruction": "Выбери объяснение",
+            "prompt": "The train leaves at 8 tomorrow.",
+            "options": ["расписание", "спонтанное решение", "привычка в прошлом"],
+            "correctIndex": 0,
+            "explain": "Это фиксированное расписание транспорта."
+          },
+          {
+            "id": "fpsf_m_2",
+            "instruction": "Выбери объяснение",
+            "prompt": "The lesson starts at 9 on Monday.",
+            "options": ["официальный график", "процесс сейчас", "оценка результата"],
+            "correctIndex": 0,
+            "explain": "Расписание занятий."
+          },
+          {
+            "id": "fpsf_m_3",
+            "instruction": "Выбери объяснение",
+            "prompt": "What time does the museum open tomorrow?",
+            "options": ["вопрос о графике", "прошлое событие", "обещание"],
+            "correctIndex": 0,
+            "explain": "Вопрос о времени по расписанию."
+          },
+          {
+            "id": "fpsf_m_4",
+            "instruction": "Выбери объяснение",
+            "prompt": "The conference begins next week.",
+            "options": ["план по программе", "желание", "длительность"],
+            "correctIndex": 0,
+            "explain": "Событие идет по официальной программе."
+          },
+          {
+            "id": "fpsf_m_5",
+            "instruction": "Выбери объяснение",
+            "prompt": "The shop closes at 6 tomorrow.",
+            "options": ["график работы", "спонтанное обещание", "временный план"],
+            "correctIndex": 0,
+            "explain": "Время закрытия - это режим работы."
+          },
+          {
+            "id": "fpsf_m_6",
+            "instruction": "Выбери объяснение",
+            "prompt": "Our flight arrives at 11:20.",
+            "options": ["расписание рейса", "процесс сейчас", "привычка"],
+            "correctIndex": 0,
+            "explain": "Прибытие рейса по графику."
+          }
+        ]
+      },
+      {
+        "id": "formula",
+        "title": "Формулы (Formula)",
+        "kind": "input",
+        "items": [
+          {
+            "id": "fpsf_f_1",
+            "instruction": "Вставь форму",
+            "prompt": "The bus ____ (leave) at 7 tomorrow.",
+            "accepted": ["leaves"],
+            "explain": "3-е лицо ед. числа: leaves."
+          },
+          {
+            "id": "fpsf_f_2",
+            "instruction": "Вставь форму",
+            "prompt": "Our classes ____ (start) next Monday.",
+            "accepted": ["start"],
+            "explain": "Our classes (мн. число) -> start."
+          },
+          {
+            "id": "fpsf_f_3",
+            "instruction": "Сделай отрицание",
+            "prompt": "The library ____ (not/open) on Sunday.",
+            "accepted": ["doesn't open", "does not open"],
+            "explain": "Отрицание в Present Simple: does not + V1."
+          },
+          {
+            "id": "fpsf_f_4",
+            "instruction": "Сделай вопрос",
+            "prompt": "____ the train ____ (arrive) at 6:50?",
+            "accepted": ["Does the train arrive"],
+            "explain": "Вопрос: Does + S + V1?"
+          },
+          {
+            "id": "fpsf_f_5",
+            "instruction": "Вставь форму",
+            "prompt": "The film ____ (begin) at 8:30.",
+            "accepted": ["begins"],
+            "explain": "3-е лицо ед. числа: begins."
+          },
+          {
+            "id": "fpsf_f_6",
+            "instruction": "Сделай вопрос",
+            "prompt": "What time ____ the meeting ____ (finish)?",
+            "accepted": ["does the meeting finish"],
+            "explain": "Wh-question + does + subject + V1."
+          }
+        ]
+      }
+    ]
+  }
+}

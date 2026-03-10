@@ -1,0 +1,160 @@
+{
+  "id": "futurePresentContinuous",
+  "title": "Present Continuous for Future",
+  "subtitle": "договоренности и фиксированные планы",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Когда используем Present Continuous для будущего"
+    },
+    {
+      "type": "text",
+      "text": "Present Continuous может говорить о будущем, если это личная договоренность: встреча назначена, билет куплен, время уже согласовано."
+    },
+    {
+      "type": "table",
+      "caption": "Формулы",
+      "columns": ["Тип", "Формула", "Пример"],
+      "rows": [
+        ["Утверждение", "S + am/is/are + V-ing", "I'm meeting Tom tomorrow."],
+        ["Отрицание", "S + am/is/are not + V-ing", "She isn't coming tonight."],
+        ["Вопрос", "Am/Is/Are + S + V-ing?", "Are you working on Saturday?"]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Сигналы",
+      "lines": [
+        "this evening, tonight, tomorrow, next week",
+        "there is a plan/arrangement",
+        "часто с глаголами meet, fly, leave, visit, have dinner"
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        { "en": "I'm seeing my dentist on Friday.", "ru": "В пятницу у меня прием у стоматолога." },
+        { "en": "We're flying to Rome next month.", "ru": "В следующем месяце мы летим в Рим." },
+        { "en": "She's not working this weekend.", "ru": "В эти выходные она не работает." },
+        { "en": "Are they staying with us tonight?", "ru": "Они остаются у нас сегодня вечером?" }
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Не путай",
+      "lines": [
+        "Present Continuous for Future = договоренность",
+        "be going to = намерение/план вообще",
+        "will = решение сейчас или мнение"
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": [
+      {
+        "id": "meaning",
+        "title": "Когда используем (Meaning)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "fpcf_m_1",
+            "instruction": "Выбери объяснение",
+            "prompt": "I'm meeting my manager tomorrow at 10.",
+            "options": ["личная договоренность", "привычка", "прошлая привычка"],
+            "correctIndex": 0,
+            "explain": "Встреча уже назначена -> arrangement."
+          },
+          {
+            "id": "fpcf_m_2",
+            "instruction": "Выбери объяснение",
+            "prompt": "We're having dinner with Anna tonight.",
+            "options": ["спонтанное решение", "договоренность", "факт в прошлом"],
+            "correctIndex": 1,
+            "explain": "План конкретный и согласованный."
+          },
+          {
+            "id": "fpcf_m_3",
+            "instruction": "Выбери объяснение",
+            "prompt": "Are you working this Saturday?",
+            "options": ["вопрос о договоренности", "вопрос о прошлом", "вопрос о привычке"],
+            "correctIndex": 0,
+            "explain": "Спрашиваем о конкретном плане на ближайшее будущее."
+          },
+          {
+            "id": "fpcf_m_4",
+            "instruction": "Выбери объяснение",
+            "prompt": "She's not coming to the party tomorrow.",
+            "options": ["отрицательная договоренность", "мнение о будущем", "общий факт"],
+            "correctIndex": 0,
+            "explain": "Есть конкретное ближайшее событие и отказ от участия."
+          },
+          {
+            "id": "fpcf_m_5",
+            "instruction": "Выбери объяснение",
+            "prompt": "We're leaving early in the morning.",
+            "options": ["расписание транспорта", "личный согласованный план", "разовая ошибка"],
+            "correctIndex": 1,
+            "explain": "Это план группы людей, уже решенный."
+          },
+          {
+            "id": "fpcf_m_6",
+            "instruction": "Выбери объяснение",
+            "prompt": "I'm seeing my coach after work.",
+            "options": ["договоренность", "прошлое действие", "желание"],
+            "correctIndex": 0,
+            "explain": "Назначенная встреча после работы."
+          }
+        ]
+      },
+      {
+        "id": "formula",
+        "title": "Формулы (Formula)",
+        "kind": "input",
+        "items": [
+          {
+            "id": "fpcf_f_1",
+            "instruction": "Вставь форму",
+            "prompt": "I ____ (meet) Sarah tonight.",
+            "accepted": ["am meeting"],
+            "explain": "I + am + V-ing."
+          },
+          {
+            "id": "fpcf_f_2",
+            "instruction": "Вставь форму",
+            "prompt": "They ____ (fly) to Berlin next week.",
+            "accepted": ["are flying"],
+            "explain": "They + are + V-ing."
+          },
+          {
+            "id": "fpcf_f_3",
+            "instruction": "Сделай отрицание",
+            "prompt": "She ____ (not/work) tomorrow.",
+            "accepted": ["isn't working", "is not working"],
+            "explain": "Отрицание: is not + V-ing."
+          },
+          {
+            "id": "fpcf_f_4",
+            "instruction": "Сделай вопрос",
+            "prompt": "____ you ____ (come) with us tonight?",
+            "accepted": ["Are you coming"],
+            "explain": "Вопрос: Are + S + V-ing?"
+          },
+          {
+            "id": "fpcf_f_5",
+            "instruction": "Вставь форму",
+            "prompt": "We ____ (have) lunch with clients tomorrow.",
+            "accepted": ["are having"],
+            "explain": "We + are having (arrangement)."
+          },
+          {
+            "id": "fpcf_f_6",
+            "instruction": "Сделай вопрос",
+            "prompt": "____ he ____ (stay) here this weekend?",
+            "accepted": ["Is he staying"],
+            "explain": "He -> Is he staying...?"
+          }
+        ]
+      }
+    ]
+  }
+}

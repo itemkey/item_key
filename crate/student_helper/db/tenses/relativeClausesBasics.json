@@ -1,0 +1,155 @@
+{
+  "id": "relativeClausesBasics",
+  "title": "Relative Clauses Basics",
+  "subtitle": "who/which/that/where/whose в определяющих придаточных",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Зачем нужны relative clauses"
+    },
+    {
+      "type": "text",
+      "text": "Relative clauses помогают соединять две идеи в одно предложение и уточнять существительное: кто, какой, где, чей. В определяющих придаточных чаще используем who, which, that, where, whose."
+    },
+    {
+      "type": "table",
+      "caption": "Базовые слова",
+      "columns": ["Связка", "Когда используем", "Пример"],
+      "rows": [
+        ["who", "для людей", "The woman who called me is my teacher."],
+        ["which", "для предметов/животных", "The book which you gave me is great."],
+        ["that", "для людей и предметов (часто в разговорной речи)", "The phone that I bought is fast."],
+        ["where", "для места", "This is the cafe where we met."],
+        ["whose", "чей/чья/чье", "I know a girl whose brother is a pilot."]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Что важно помнить",
+      "lines": [
+        "that можно использовать вместо who/which в defining clauses",
+        "после where не добавляем предлог in в простых школьных шаблонах",
+        "в defining clauses запятые обычно не нужны"
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        { "en": "The man who lives next door is a doctor.", "ru": "Мужчина, который живет по соседству, - врач." },
+        { "en": "The laptop that I bought yesterday is already broken.", "ru": "Ноутбук, который я купил вчера, уже сломался." },
+        { "en": "This is the city where my parents met.", "ru": "Это город, где познакомились мои родители." },
+        { "en": "I met a student whose project won the competition.", "ru": "Я встретил студента, чей проект выиграл конкурс." }
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": [
+      {
+        "id": "meaning",
+        "title": "Когда используем (Meaning)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "rcb_m_1",
+            "instruction": "Выбери связку",
+            "prompt": "The woman ____ teaches us math is very kind.",
+            "options": ["where", "who", "whose"],
+            "correctIndex": 1,
+            "explain": "Для человека используем who."
+          },
+          {
+            "id": "rcb_m_2",
+            "instruction": "Выбери связку",
+            "prompt": "This is the film ____ won three awards.",
+            "options": ["which", "who", "where"],
+            "correctIndex": 0,
+            "explain": "Для предмета/фильма используем which (или that)."
+          },
+          {
+            "id": "rcb_m_3",
+            "instruction": "Выбери связку",
+            "prompt": "I remember the cafe ____ we had breakfast.",
+            "options": ["who", "where", "whose"],
+            "correctIndex": 1,
+            "explain": "Для места используем where."
+          },
+          {
+            "id": "rcb_m_4",
+            "instruction": "Выбери связку",
+            "prompt": "I know a boy ____ sister studies in London.",
+            "options": ["whose", "which", "where"],
+            "correctIndex": 0,
+            "explain": "Для принадлежности используем whose."
+          },
+          {
+            "id": "rcb_m_5",
+            "instruction": "Выбери объяснение",
+            "prompt": "The app that we use at work is secure.",
+            "options": ["that нельзя для предметов", "that можно для людей и предметов", "that используется только в вопросах"],
+            "correctIndex": 1,
+            "explain": "В defining clause that нормален для предметов и людей."
+          },
+          {
+            "id": "rcb_m_6",
+            "instruction": "Выбери правило",
+            "prompt": "Defining relative clauses usually need...",
+            "options": ["no commas", "two commas always", "past perfect"],
+            "correctIndex": 0,
+            "explain": "Определяющие придаточные обычно пишутся без запятых."
+          }
+        ]
+      },
+      {
+        "id": "formula",
+        "title": "Формулы (Formula)",
+        "kind": "input",
+        "items": [
+          {
+            "id": "rcb_f_1",
+            "instruction": "Вставь слово",
+            "prompt": "The teacher ____ helped me was very patient.",
+            "accepted": ["who", "that"],
+            "explain": "О человеке: who/that."
+          },
+          {
+            "id": "rcb_f_2",
+            "instruction": "Вставь слово",
+            "prompt": "The phone ____ I lost was new.",
+            "accepted": ["which", "that"],
+            "explain": "О предмете: which/that."
+          },
+          {
+            "id": "rcb_f_3",
+            "instruction": "Вставь слово",
+            "prompt": "This is the town ____ I was born.",
+            "accepted": ["where"],
+            "explain": "О месте: where."
+          },
+          {
+            "id": "rcb_f_4",
+            "instruction": "Вставь слово",
+            "prompt": "I spoke to a woman ____ son is a programmer.",
+            "accepted": ["whose"],
+            "explain": "Принадлежность: whose son."
+          },
+          {
+            "id": "rcb_f_5",
+            "instruction": "Исправь ошибку",
+            "prompt": "The man which called me is my boss.",
+            "accepted": ["The man who called me is my boss.", "The man that called me is my boss."],
+            "acceptedShort": ["who", "that"],
+            "explain": "Для людей обычно who/that, не which."
+          },
+          {
+            "id": "rcb_f_6",
+            "instruction": "Исправь ошибку",
+            "prompt": "This is the office which we work.",
+            "accepted": ["This is the office where we work."],
+            "acceptedShort": ["where"],
+            "explain": "Когда нужно указать место действия, используем where."
+          }
+        ]
+      }
+    ]
+  }
+}

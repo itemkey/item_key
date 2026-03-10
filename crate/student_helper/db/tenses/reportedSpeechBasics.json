@@ -1,0 +1,154 @@
+{
+  "id": "reportedSpeechBasics",
+  "title": "Reported Speech Basics",
+  "subtitle": "передача чужих слов без кавычек",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Основы Reported Speech"
+    },
+    {
+      "type": "text",
+      "text": "Reported Speech передает чужую речь косвенно: кавычки исчезают, часто сдвигаем время назад (backshift), а также меняем местоимения и указатели времени (today -> that day, now -> then)."
+    },
+    {
+      "type": "table",
+      "caption": "Базовые сдвиги",
+      "columns": ["Direct", "Reported", "Пример"],
+      "rows": [
+        ["Present Simple", "Past Simple", "He said, \"I work.\" -> He said (that) he worked."],
+        ["Present Continuous", "Past Continuous", "She said, \"I am waiting.\" -> She said she was waiting."],
+        ["will", "would", "They said, \"We will help.\" -> They said they would help."],
+        ["can", "could", "Tom said, \"I can swim.\" -> Tom said he could swim."]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Ключевые моменты",
+      "lines": [
+        "say + that-clause, tell + object + that-clause",
+        "backshift часто нужен, если вводный глагол в прошлом",
+        "если факт все еще верен, backshift иногда можно не делать"
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        { "en": "Anna said, \"I am busy now.\" -> Anna said she was busy then.", "ru": "Анна сказала: \"Я сейчас занята\" -> Анна сказала, что тогда была занята." },
+        { "en": "He said, \"I will call you tomorrow.\" -> He said he would call me the next day.", "ru": "Он сказал: \"Я позвоню тебе завтра\" -> Он сказал, что позвонит мне на следующий день." },
+        { "en": "She told me, \"You should rest.\" -> She told me that I should rest.", "ru": "Она сказала мне: \"Тебе стоит отдохнуть\" -> Она сказала мне, что мне стоит отдохнуть." },
+        { "en": "Mike said, \"I can help.\" -> Mike said he could help.", "ru": "Майк сказал: \"Я могу помочь\" -> Майк сказал, что мог помочь." }
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": [
+      {
+        "id": "meaning",
+        "title": "Когда используем (Meaning)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "rsb_m_1",
+            "instruction": "Выбери правильный reported вариант",
+            "prompt": "He said, \"I am tired.\"",
+            "options": ["He said that he is tired.", "He said that he was tired.", "He told that he was tired."],
+            "correctIndex": 1,
+            "explain": "Вводный глагол в прошлом -> обычно backshift: am -> was."
+          },
+          {
+            "id": "rsb_m_2",
+            "instruction": "Выбери правильный reported вариант",
+            "prompt": "They said, \"We will come later.\"",
+            "options": ["They said that they would come later.", "They said that they will come later.", "They told they would come later."],
+            "correctIndex": 0,
+            "explain": "will -> would в reported speech."
+          },
+          {
+            "id": "rsb_m_3",
+            "instruction": "Выбери правильный глагол",
+            "prompt": "She ____ me that she was busy.",
+            "options": ["said", "told", "spoke"],
+            "correctIndex": 1,
+            "explain": "tell требует объект: tell me/us/him..."
+          },
+          {
+            "id": "rsb_m_4",
+            "instruction": "Выбери правильный reported вариант",
+            "prompt": "Tom said, \"I can swim.\"",
+            "options": ["Tom said that he could swim.", "Tom said that he can swimed.", "Tom told that he could swim."],
+            "correctIndex": 0,
+            "explain": "can -> could; said that + clause."
+          },
+          {
+            "id": "rsb_m_5",
+            "instruction": "Выбери правильный reported вариант",
+            "prompt": "Nina said, \"I saw him today.\"",
+            "options": ["Nina said that she had seen him that day.", "Nina said that she sees him today.", "Nina told she had seen him this day."],
+            "correctIndex": 0,
+            "explain": "saw -> had seen, today -> that day."
+          },
+          {
+            "id": "rsb_m_6",
+            "instruction": "Выбери правило",
+            "prompt": "What's true about reported speech?",
+            "options": ["tell используется без объекта", "после said всегда нужен объект", "tell обычно требует объект"],
+            "correctIndex": 2,
+            "explain": "tell + object - базовое правило."
+          }
+        ]
+      },
+      {
+        "id": "formula",
+        "title": "Формулы (Formula)",
+        "kind": "input",
+        "items": [
+          {
+            "id": "rsb_f_1",
+            "instruction": "Передай косвенно",
+            "prompt": "She said, \"I work from home.\"",
+            "accepted": ["She said that she worked from home.", "She said she worked from home."],
+            "explain": "Present Simple -> Past Simple."
+          },
+          {
+            "id": "rsb_f_2",
+            "instruction": "Передай косвенно",
+            "prompt": "He said, \"I will call you tomorrow.\"",
+            "accepted": ["He said that he would call me the next day.", "He said he would call me the next day."],
+            "explain": "will -> would; tomorrow -> the next day; you -> me."
+          },
+          {
+            "id": "rsb_f_3",
+            "instruction": "Вставь форму",
+            "prompt": "Anna told me that she ____ (not/have) enough time.",
+            "accepted": ["didn't have", "did not have"],
+            "explain": "Отрицание в Past Simple после backshift."
+          },
+          {
+            "id": "rsb_f_4",
+            "instruction": "Исправь ошибку",
+            "prompt": "He told that he was late.",
+            "accepted": ["He said that he was late."],
+            "acceptedShort": ["said"],
+            "explain": "Без объекта используем said, не told."
+          },
+          {
+            "id": "rsb_f_5",
+            "instruction": "Исправь ошибку",
+            "prompt": "She said me that she could help.",
+            "accepted": ["She told me that she could help."],
+            "acceptedShort": ["told me"],
+            "explain": "С объектом естественно tell: told me."
+          },
+          {
+            "id": "rsb_f_6",
+            "instruction": "Передай косвенно",
+            "prompt": "They said, \"We are waiting now.\"",
+            "accepted": ["They said that they were waiting then.", "They said they were waiting then."],
+            "explain": "are waiting -> were waiting; now -> then."
+          }
+        ]
+      }
+    ]
+  }
+}

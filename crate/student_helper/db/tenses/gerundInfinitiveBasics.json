@@ -1,0 +1,154 @@
+{
+  "id": "gerundInfinitiveBasics",
+  "title": "Gerund and Infinitive Basics",
+  "subtitle": "verb + ing и verb + to + infinitive",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Gerund vs Infinitive"
+    },
+    {
+      "type": "text",
+      "text": "После одних глаголов используем форму с -ing (gerund), после других - to + infinitive. Это вопрос управления глагола, поэтому важно запоминать шаблоны."
+    },
+    {
+      "type": "table",
+      "caption": "Частые шаблоны",
+      "columns": ["Шаблон", "Глаголы", "Пример"],
+      "rows": [
+        ["verb + ing", "enjoy, avoid, suggest, finish", "I enjoy reading before bed."],
+        ["verb + to + V1", "want, decide, hope, plan", "We decided to leave early."],
+        ["stop + ing", "прекратить действие", "He stopped smoking."],
+        ["stop + to + V1", "остановиться, чтобы сделать что-то", "He stopped to smoke."]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Короткая памятка",
+      "lines": [
+        "enjoy/avoid/suggest -> -ing",
+        "want/need/plan/decide -> to + V1",
+        "stop doing и stop to do - разные значения"
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        { "en": "She enjoys cooking for her friends.", "ru": "Ей нравится готовить для друзей." },
+        { "en": "They decided to move to another city.", "ru": "Они решили переехать в другой город." },
+        { "en": "Please avoid using your phone during the lesson.", "ru": "Пожалуйста, избегай использовать телефон во время урока." },
+        { "en": "I stopped to drink some water.", "ru": "Я остановился, чтобы выпить воды." }
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": [
+      {
+        "id": "meaning",
+        "title": "Когда используем (Meaning)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "gib_m_1",
+            "instruction": "Выбери форму",
+            "prompt": "I enjoy ____ books in English.",
+            "options": ["read", "reading", "to read"],
+            "correctIndex": 1,
+            "explain": "После enjoy ставим gerund: reading."
+          },
+          {
+            "id": "gib_m_2",
+            "instruction": "Выбери форму",
+            "prompt": "We decided ____ at home tonight.",
+            "options": ["staying", "to stay", "stay"],
+            "correctIndex": 1,
+            "explain": "После decide -> to + V1."
+          },
+          {
+            "id": "gib_m_3",
+            "instruction": "Выбери форму",
+            "prompt": "Please avoid ____ loud here.",
+            "options": ["to be", "being", "be"],
+            "correctIndex": 1,
+            "explain": "После avoid -> -ing."
+          },
+          {
+            "id": "gib_m_4",
+            "instruction": "Выбери значение",
+            "prompt": "He stopped smoking.",
+            "options": ["он сделал паузу, чтобы курить", "он бросил курить", "он планирует курить"],
+            "correctIndex": 1,
+            "explain": "stop + ing = прекратить действие."
+          },
+          {
+            "id": "gib_m_5",
+            "instruction": "Выбери значение",
+            "prompt": "He stopped to smoke.",
+            "options": ["он остановился, чтобы покурить", "он бросил курить навсегда", "он никогда не курил"],
+            "correctIndex": 0,
+            "explain": "stop + to do = остановиться, чтобы сделать действие."
+          },
+          {
+            "id": "gib_m_6",
+            "instruction": "Выбери форму",
+            "prompt": "She plans ____ a new language this year.",
+            "options": ["to learn", "learning", "learned"],
+            "correctIndex": 0,
+            "explain": "После plan обычно to + V1."
+          }
+        ]
+      },
+      {
+        "id": "formula",
+        "title": "Формулы (Formula)",
+        "kind": "input",
+        "items": [
+          {
+            "id": "gib_f_1",
+            "instruction": "Вставь форму",
+            "prompt": "I want ____ (improve) my pronunciation.",
+            "accepted": ["to improve"],
+            "explain": "want + to + V1."
+          },
+          {
+            "id": "gib_f_2",
+            "instruction": "Вставь форму",
+            "prompt": "They finished ____ (write) the report.",
+            "accepted": ["writing"],
+            "explain": "finish + gerund."
+          },
+          {
+            "id": "gib_f_3",
+            "instruction": "Вставь форму",
+            "prompt": "We hope ____ (see) you soon.",
+            "accepted": ["to see"],
+            "explain": "hope + to + V1."
+          },
+          {
+            "id": "gib_f_4",
+            "instruction": "Вставь форму",
+            "prompt": "She suggested ____ (take) a short break.",
+            "accepted": ["taking"],
+            "explain": "suggest + gerund."
+          },
+          {
+            "id": "gib_f_5",
+            "instruction": "Исправь ошибку",
+            "prompt": "I enjoy to cook at home.",
+            "accepted": ["I enjoy cooking at home."],
+            "acceptedShort": ["cooking"],
+            "explain": "После enjoy нужен gerund: cooking."
+          },
+          {
+            "id": "gib_f_6",
+            "instruction": "Исправь ошибку",
+            "prompt": "They decided moving next month.",
+            "accepted": ["They decided to move next month."],
+            "acceptedShort": ["to move"],
+            "explain": "После decide нужен infinitive с to."
+          }
+        ]
+      }
+    ]
+  }
+}
