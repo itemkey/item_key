@@ -1802,5 +1802,154 @@ begin
     set current_version_id = v_ver_id, updated_at = now()
     where id = v_dict_id;
   end if;
+
+  -- =============================
+  -- Destination B1 Unit 21
+  -- =============================
+  v_title := 'Destination B1 Unit 21';
+  v_title_key := public.ik_title_key(v_title);
+
+  insert into public.ik_public_dicts(dict_type, title, title_key, owner_id, rating_enabled)
+  values ('user', v_title, v_title_key, v_owner, true)
+  on conflict (dict_type, title_key)
+  do update set title = excluded.title, owner_id = excluded.owner_id, rating_enabled = true, updated_at = now();
+
+  select d.id, d.current_version_id
+  into v_dict_id, v_current_ver
+  from public.ik_public_dicts d
+  where d.dict_type = 'user' and d.title_key = v_title_key
+  limit 1;
+
+  if v_current_ver is null then
+    insert into public.ik_public_dict_versions(dict_id, version, status, created_by)
+    values (v_dict_id, 1, 'published', v_owner)
+    returning id into v_ver_id;
+
+    v_payload := $json$
+{
+  "schema": "student_helper_dictionary_section",
+  "schemaVersion": 1,
+  "exportedAt": "2026-03-10T00:00:00Z",
+  "section": "Destination B1 Unit 21",
+  "words": [
+    {"en": "accent", "ru": "акцент, произношение, ударение"},
+    {"en": "announcement", "ru": "объявление, сообщение"},
+    {"en": "broadcast", "ru": "транслировать, вещать"},
+    {"en": "channel", "ru": "телевизионный канал"},
+    {"en": "clear", "ru": "ясный"},
+    {"en": "click", "ru": "щелкать"},
+    {"en": "contact", "ru": "контактировать"},
+    {"en": "file", "ru": "файл, папка"},
+    {"en": "formal", "ru": "формальный, официальный"},
+    {"en": "image", "ru": "образ, имидж"},
+    {"en": "informal", "ru": "неофициальный, неформальный"},
+    {"en": "internet", "ru": "интернет"},
+    {"en": "interrupt", "ru": "прерывать, перебивать"},
+    {"en": "link", "ru": "ссылка"},
+    {"en": "media", "ru": "средства массовой информации"},
+    {"en": "mobile phone", "ru": "мобильный телефон"},
+    {"en": "online", "ru": "онлайн, в интернете"},
+    {"en": "pause", "ru": "делать паузу"},
+    {"en": "persuade", "ru": "уговаривать, убеждать"},
+    {"en": "pronounce", "ru": "произносить, заявлять"},
+    {"en": "publish", "ru": "публиковать, издавать"},
+    {"en": "report", "ru": "докладывать"},
+    {"en": "request", "ru": "просьба, запрос"},
+    {"en": "ring", "ru": "звонить"},
+    {"en": "signal", "ru": "знак, сигнал"},
+    {"en": "swear", "ru": "клясться, ругаться"},
+    {"en": "type", "ru": "печатать"},
+    {"en": "viewer", "ru": "телезритель"},
+    {"en": "website", "ru": "веб-сайт"},
+    {"en": "whisper", "ru": "шептать, шепот"},
+
+    {"en": "call back", "ru": "перезвонить"},
+    {"en": "come out", "ru": "появляться, выходить в свет"},
+    {"en": "cut off", "ru": "отключать, отрезать, отсекать"},
+    {"en": "fill in", "ru": "заполнить (форму, анкету)"},
+    {"en": "hang up", "ru": "повесить трубку, отключиться"},
+    {"en": "log off", "ru": "выйти из сайта, интернета"},
+    {"en": "log on (to)", "ru": "подключиться, войти в систему"},
+    {"en": "print out", "ru": "распечатать, распечатывать"},
+
+    {"en": "by e-mail, phone, letter", "ru": "по почте/телефону/письму"},
+    {"en": "on the Internet", "ru": "по интернету"},
+    {"en": "on the news", "ru": "в новостях"},
+    {"en": "on the phone", "ru": "по телефону"},
+    {"en": "on the radio", "ru": "по радио"},
+    {"en": "on TV", "ru": "по телевизору"},
+
+    {"en": "certain", "ru": "определенный, уверенный"},
+    {"en": "certainly", "ru": "конечно, безусловно"},
+    {"en": "certainty", "ru": "определенность, уверенность"},
+
+    {"en": "communicate", "ru": "общаться"},
+    {"en": "communication", "ru": "общение"},
+
+    {"en": "connect", "ru": "соединять"},
+    {"en": "connection", "ru": "связь, соединение"},
+    {"en": "disconnect", "ru": "разъединять"},
+
+    {"en": "deliver", "ru": "доставлять"},
+    {"en": "delivery", "ru": "поставка, доставка"},
+
+    {"en": "express", "ru": "выражать"},
+    {"en": "expression", "ru": "выражение"},
+    {"en": "expressive", "ru": "выразительный"},
+
+    {"en": "inform", "ru": "информировать"},
+    {"en": "informative", "ru": "информативный"},
+    {"en": "information", "ru": "информация"},
+
+    {"en": "predict", "ru": "предсказывать"},
+    {"en": "prediction", "ru": "предсказание"},
+    {"en": "unpredictable", "ru": "непредсказуемый"},
+
+    {"en": "secret", "ru": "секрет, тайна"},
+    {"en": "secretly", "ru": "секретно, тайно"},
+    {"en": "secrecy", "ru": "секретность, конфиденциальность"},
+
+    {"en": "speak", "ru": "говорить, разговаривать"},
+    {"en": "spoke", "ru": "говорил"},
+    {"en": "spoken", "ru": "устный, разговорный"},
+    {"en": "speaker", "ru": "оратор"},
+    {"en": "speech", "ru": "речь, выступление"},
+
+    {"en": "translate", "ru": "переводить"},
+    {"en": "translation", "ru": "перевод"},
+    {"en": "translator / interpreter", "ru": "переводчик (письменный) / переводчик (устный)"},
+
+    {"en": "comment on", "ru": "комментировать что-либо"},
+    {"en": "communicate with", "ru": "общаться с"},
+    {"en": "glance at", "ru": "взглянуть на"},
+    {"en": "receive sth from", "ru": "получать что-то от"},
+    {"en": "reply to", "ru": "отвечать на"},
+    {"en": "send sth to sb", "ru": "послать что-то кому-то"},
+    {"en": "talk to sb about", "ru": "говорить кому-то о"},
+    {"en": "tell sb about sth/doing", "ru": "рассказать кому-то о чем-то"},
+    {"en": "translate (from sth) into", "ru": "переводить с чего-то на"},
+    {"en": "write (to sb) about", "ru": "написать кому-то о"},
+
+    {"en": "information about", "ru": "информация о"},
+    {"en": "a letter (from sb) about", "ru": "письмо от кого-то о"}
+  ]
+}
+    $json$::jsonb;
+
+    insert into public.ik_public_dict_words(dict_version_id, en, ru, en_key, ru_key, pair_key)
+    select
+      v_ver_id,
+      btrim(coalesce(w->>'en','')),
+      btrim(coalesce(w->>'ru','')),
+      public.ik_norm_space_lower(coalesce(w->>'en','')),
+      public.ik_norm_space_lower(coalesce(w->>'ru','')),
+      public.ik_norm_space_lower(coalesce(w->>'en','')) || '|' || public.ik_norm_space_lower(coalesce(w->>'ru',''))
+    from jsonb_array_elements(coalesce(v_payload->'words','[]'::jsonb)) w
+    where btrim(coalesce(w->>'en','')) <> '' and btrim(coalesce(w->>'ru','')) <> '';
+
+    update public.ik_public_dicts
+    set current_version_id = v_ver_id, updated_at = now()
+    where id = v_dict_id;
+  end if;
 end;
 $stage12$;
