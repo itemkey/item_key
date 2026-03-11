@@ -1,0 +1,154 @@
+{
+  "id": "modalsWouldIdeas",
+  "title": "would for Ideas and Soft Suggestions",
+  "subtitle": "было бы неплохо: it would be good/nice/better + to",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "would для мягких идей и предложений"
+    },
+    {
+      "type": "text",
+      "text": "Форма would часто нужна не для плана, а для мягкой идеи/оценки: It would be good/nice/better to... Это не то же самое, что be going to (план). Если мысль типа \"было бы неплохо\", чаще подходит would."
+    },
+    {
+      "type": "table",
+      "caption": "Когда и как используем",
+      "columns": ["Шаблон", "Когда", "Пример"],
+      "rows": [
+        ["It would be good/nice to + V1", "мягкая идея/предложение", "It would be good to leave earlier."],
+        ["It would be better to + V1", "совет в мягкой форме", "It would be better to wait."],
+        ["I would like to + V1", "вежливое желание", "I would like to ask a question."],
+        ["Would you like to + V1?", "вежливое предложение", "Would you like to join us?"]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Как не перепутать",
+      "lines": [
+        "было бы неплохо/хорошо/лучше -> often would",
+        "точный план заранее -> чаще be going to или Present Continuous",
+        "would be good to ... = идея/оценка, не жесткий план"
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        { "en": "It would be good to go to school tomorrow.", "ru": "Было бы неплохо пойти завтра в школу." },
+        { "en": "It would be better to call him first.", "ru": "Было бы лучше сначала ему позвонить." },
+        { "en": "I would like to discuss this point.", "ru": "Я хотел бы обсудить этот пункт." },
+        { "en": "Would you like to come with us?", "ru": "Хотел бы ты пойти с нами?" }
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": [
+      {
+        "id": "meaning",
+        "title": "Когда используем (Meaning)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "mwi_m_1",
+            "instruction": "Выбери лучший вариант",
+            "prompt": "Было бы неплохо выйти пораньше.",
+            "options": ["It would be good to leave earlier.", "It is going to leave earlier.", "I am leaving earlier always."],
+            "correctIndex": 0,
+            "explain": "Мягкая идея/оценка -> It would be good to..."
+          },
+          {
+            "id": "mwi_m_2",
+            "instruction": "Выбери лучший вариант",
+            "prompt": "It's already arranged and booked.",
+            "options": ["It would be good to meet at 6.", "We are meeting at 6.", "We would meeting at 6."],
+            "correctIndex": 1,
+            "explain": "Если это уже договоренность, чаще Present Continuous for future."
+          },
+          {
+            "id": "mwi_m_3",
+            "instruction": "Выбери объяснение",
+            "prompt": "It would be better to wait a bit.",
+            "options": ["мягкий совет/оценка", "жесткий план", "привычка в прошлом"],
+            "correctIndex": 0,
+            "explain": "would be better to... = мягкий совет."
+          },
+          {
+            "id": "mwi_m_4",
+            "instruction": "Выбери вариант",
+            "prompt": "Would you like to join us?",
+            "options": ["вежливое предложение", "описание расписания", "прогноз по признакам"],
+            "correctIndex": 0,
+            "explain": "Would you like to...? - вежливое приглашение/предложение."
+          },
+          {
+            "id": "mwi_m_5",
+            "instruction": "Выбери лучший перевод",
+            "prompt": "Было бы лучше сначала проверить данные.",
+            "options": ["It would be better to check the data first.", "It is better checking data first.", "I am going to better check data."],
+            "correctIndex": 0,
+            "explain": "It would be better to + V1."
+          },
+          {
+            "id": "mwi_m_6",
+            "instruction": "Выбери правило",
+            "prompt": "It would be good to call her now.",
+            "options": ["мягкая идея, не обязательно план", "обязательное правило", "форма для прошлого опыта"],
+            "correctIndex": 0,
+            "explain": "Это мягкая рекомендация/идея на сейчас/будущее."
+          }
+        ]
+      },
+      {
+        "id": "formula",
+        "title": "Формулы (Formula)",
+        "kind": "input",
+        "items": [
+          {
+            "id": "mwi_f_1",
+            "instruction": "Вставь форму",
+            "prompt": "It ____ (be) good to start now.",
+            "accepted": ["would be"],
+            "explain": "Шаблон: It would be good to..."
+          },
+          {
+            "id": "mwi_f_2",
+            "instruction": "Вставь форму",
+            "prompt": "I ____ like to ask a question.",
+            "accepted": ["would"],
+            "explain": "Вежливое желание: I would like to..."
+          },
+          {
+            "id": "mwi_f_3",
+            "instruction": "Вставь форму",
+            "prompt": "Would you like ____ (come) with us?",
+            "accepted": ["to come"],
+            "explain": "После would like нужен to + infinitive."
+          },
+          {
+            "id": "mwi_f_4",
+            "instruction": "Вставь форму",
+            "prompt": "It ____ better to wait until tomorrow.",
+            "accepted": ["would be"],
+            "explain": "Шаблон: It would be better to..."
+          },
+          {
+            "id": "mwi_f_5",
+            "instruction": "Исправь ошибку",
+            "prompt": "It is going to be good to call him now. (soft idea)",
+            "accepted": ["It would be good to call him now."],
+            "acceptedShort": ["would be good"],
+            "explain": "Для мягкой идеи лучше It would be good to..."
+          },
+          {
+            "id": "mwi_f_6",
+            "instruction": "Исправь ошибку",
+            "prompt": "I would to like some tea.",
+            "accepted": ["I would like some tea."],
+            "acceptedShort": ["would like"],
+            "explain": "Правильно: would like (без to между ними)."
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -693,6 +693,131 @@ body {
   max-height: 280px;
 }
 
+.sh-builder-box{
+  border: 2px solid #000;
+  background: #fff;
+  padding: 12px;
+  margin: 0 0 12px;
+}
+
+.sh-builder-box__title{
+  margin: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 11px;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  font-weight: 900;
+}
+
+.sh-builder-box__sub{
+  margin: 8px 0 10px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 12px;
+  line-height: 1.45;
+  opacity: .84;
+}
+
+.sh-builder{
+  border: 2px solid #000;
+  background: #fff;
+  padding: 12px;
+}
+
+.sh-builder-phrase{
+  border: 2px solid #000;
+  background: #fff;
+  padding: 10px;
+  margin: 0 0 10px;
+}
+
+.sh-builder-phrase__title{
+  margin: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 11px;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  font-weight: 900;
+}
+
+.sh-builder-phrase__hint{
+  margin: 8px 0 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 11px;
+  line-height: 1.4;
+  opacity: .82;
+}
+
+.sh-builder__q{
+  margin: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 14px;
+  font-weight: 900;
+  line-height: 1.45;
+}
+
+.sh-builder__hint{
+  margin: 8px 0 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 11px;
+  line-height: 1.45;
+  opacity: .82;
+}
+
+.sh-builder__options{
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.sh-builder__result{
+  display: grid;
+  gap: 10px;
+}
+
+.sh-builder__result-title{
+  margin: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 12px;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  font-weight: 900;
+}
+
+.sh-builder__main{
+  border: 2px solid #000;
+  padding: 10px;
+  background: rgba(0,0,0,0.03);
+}
+
+.sh-builder__main h4,
+.sh-builder__alt h4{
+  margin: 0 0 6px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 13px;
+}
+
+.sh-builder__main p,
+.sh-builder__alt p{
+  margin: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.sh-builder__actions,
+.sh-builder__alt-actions{
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.sh-builder__alt{
+  border: 2px solid #000;
+  padding: 10px;
+  background: #fff;
+}
+
 @media (max-width: 760px){
   .sh-search-box__row{
     flex-wrap: wrap;
@@ -954,37 +1079,6 @@ body {
 .sh-subgroup__bar .ik-btn.is-active{
   background: #000;
   color: #fff;
-}
-
-.sh-list-flow{
-  border: 2px solid #000;
-  background: #fff;
-  padding: 10px;
-  margin: 0 0 10px;
-}
-
-.sh-list-flow__title{
-  margin: 0;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  font-size: 11px;
-  letter-spacing: .05em;
-  text-transform: uppercase;
-  font-weight: 900;
-}
-
-.sh-list-flow__row{
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-top: 8px;
-}
-
-.sh-list-flow__hint{
-  margin: 8px 0 0;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  font-size: 11px;
-  line-height: 1.4;
-  opacity: .82;
 }
 
 .sh-list-compact-toggle{

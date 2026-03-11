@@ -730,6 +730,12 @@
                 <ul class="ik-list sh-search-results" id="grammarSearchResults" aria-label="Результаты поиска grammar" hidden></ul>
               </div>
 
+              <div class="sh-builder-box" id="grammarBuilderBox">
+                <p class="sh-builder-box__title">конструктор по грамматике</p>
+                <p class="sh-builder-box__sub">простые вопросы в 2-4 шага -> 1 главный вариант + 2 альтернативы</p>
+                <button class="ik-btn ik-btn--black" id="grammarOpenConstructorBtn" type="button">запустить конструктор</button>
+              </div>
+
               <div class="sh-level-box" id="grammarLevelBox">
                 <p class="sh-level-box__title">уровень обучения</p>
                 <p class="sh-level-box__value" id="grammarLevelValue">не выбран</p>
@@ -799,7 +805,30 @@
               </div>
 
               <p class="ik-footnote">подсказка: вернуться сюда можно кнопкой "меню" сверху</p>
-            </section><!-- COMPARE -->
+            </section>
+
+            <section class="ik-ex" id="tensesConstructorView" aria-label="Grammar constructor" hidden>
+              <div class="ik-row">
+                <button class="ik-btn" id="tensesBackToHomeFromConstructor" type="button">назад</button>
+                <span class="ik-spacer" aria-hidden="true"></span>
+                <span class="ik-badge" id="grammarBuilderStepBadge">шаг 1</span>
+              </div>
+
+              <div class="ik-divider"></div>
+
+              <p class="ik-title">конструктор по грамматике</p>
+              <p class="ik-sub" id="grammarBuilderSubtitle">выбери смысл, а мы подскажем лучшую тему</p>
+
+              <div class="sh-builder-phrase">
+                <p class="sh-builder-phrase__title">твоя фраза (необязательно)</p>
+                <input class="ik-input" id="grammarBuilderPhraseInput" type="text" autocomplete="off" spellcheck="false" placeholder="например: я хочу домой" />
+                <p class="sh-builder-phrase__hint">чем точнее пример, тем точнее рекомендация</p>
+              </div>
+
+              <div class="sh-builder" id="grammarBuilderBody" aria-label="Grammar constructor flow"></div>
+            </section>
+
+<!-- COMPARE -->
 <section class="ik-ex" id="tensesCompareView" aria-label="Grammar compare" hidden>
   <div class="ik-row">
     <button class="ik-btn" id="tensesBackToHomeFromCompare" type="button">назад</button>
@@ -871,16 +900,6 @@
 
               <p class="ik-title">грамматика</p>
               <p class="ik-sub" id="tensesListSubtitle">выбери тему</p>
-
-              <div class="sh-list-flow" id="grammarListFlow" hidden>
-                <p class="sh-list-flow__title">пошаговая навигация</p>
-                <div class="sh-list-flow__row">
-                  <button class="ik-btn" id="grammarPrevSubgroupBtn" type="button">предыдущий шаг</button>
-                  <button class="ik-btn" id="grammarNextSubgroupBtn" type="button">следующий шаг</button>
-                  <button class="ik-btn ik-btn--black" id="grammarOpenRecommendedBtn" type="button">открыть рекомендованную тему</button>
-                </div>
-                <p class="sh-list-flow__hint" id="grammarListFlowHint">шаг 1: начни с карты выбора, потом переходи к форме</p>
-              </div>
 
               <label class="ik-label sh-list-compact-toggle">
                 <input type="checkbox" id="grammarCompactListToggle" checked />
@@ -1181,7 +1200,7 @@
   <script src="./js/lobby.js"></script>
   <script src="./js/structure_data.js"></script>
   <script src="./js/structure.js"></script>
-  <script src="./js/tenses.js?v=20260310-3"></script>
+  <script src="./js/tenses.js?v=20260310-11"></script>
   <script src="./js/word_transformation.js"></script>
   <script src="./js/dictionary.js" onerror="window.IKAdminLog && window.IKAdminLog('error','student_helper','dictionary.js failed to load')"></script>
   <script>
@@ -1269,6 +1288,13 @@
     ['очистить', 'clear'],
     ['Поиск по grammar', 'Search grammar'],
     ['Результаты поиска grammar', 'Grammar search results'],
+    ['конструктор по грамматике', 'grammar constructor'],
+    ['простые вопросы в 2-4 шага -> 1 главный вариант + 2 альтернативы', 'simple questions in 2-4 steps -> 1 main option + 2 alternatives'],
+    ['запустить конструктор', 'start constructor'],
+    ['выбери смысл, а мы подскажем лучшую тему', 'choose meaning and we suggest the best topic'],
+    ['твоя фраза (необязательно)', 'your sentence (optional)'],
+    ['например: я хочу домой', 'for example: I want to go home'],
+    ['чем точнее пример, тем точнее рекомендация', 'the more precise your example is, the better recommendation you get'],
     ['карта грамматики', 'grammar map'],
     ['все темы по уровню: теория + правила + формулы', 'all level topics: theory + rules + formulas'],
     ['все темы по уровню', 'all level topics'],
@@ -1289,14 +1315,19 @@
     ['тема', 'topic'],
     ['подкатегория', 'subcategory'],
     ['все подкатегории', 'all subcategories'],
-    ['пошаговая навигация', 'step-by-step navigation'],
-    ['предыдущий шаг', 'previous step'],
-    ['следующий шаг', 'next step'],
-    ['открыть рекомендованную тему', 'open recommended topic'],
-    ['шаг 1: начни с карты выбора, потом переходи к форме', 'step 1: start with usage map, then move to forms'],
     ['минимальный список (без перегруза)', 'minimal list (no overload)'],
     ['кратко', 'short'],
     ['полно', 'full'],
+    ['назад к вопросу', 'back to question'],
+    ['сбросить', 'reset'],
+    ['главный вариант', 'main option'],
+    ['альтернативы', 'alternatives'],
+    ['открыть правило', 'open rule'],
+    ['сразу к упражнениям', 'go to practice now'],
+    ['начать заново', 'start again'],
+    ['тема выше/ниже текущего уровня, но по смыслу самая точная.', 'this topic is above/below your current level but is the most accurate by meaning.'],
+    ['Не удалось подобрать тему. Попробуй начать заново.', 'Could not pick a topic. Try again from start.'],
+    ['упражнения', 'practice'],
     ['Смешанное: все темы по уровню', 'Mixed: all level topics'],
     ['Пользовательское (Custom)', 'Custom'],
     ['набор по выбранным темам', 'set by selected topics'],

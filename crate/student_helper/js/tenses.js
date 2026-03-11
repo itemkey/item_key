@@ -64,6 +64,7 @@
   const statusEl = document.getElementById('tensesStatus');
 
   const homeView = document.getElementById('tensesHomeView');
+  const constructorView = document.getElementById('tensesConstructorView');
   const listView = document.getElementById('tensesListView');
   const detailView = document.getElementById('tensesDetailView');
   const practiceView = document.getElementById('tensesPracticeView');
@@ -83,6 +84,7 @@
   const searchClearBtn = document.getElementById('grammarSearchClearBtn');
   const searchHint = document.getElementById('grammarSearchHint');
   const searchResults = document.getElementById('grammarSearchResults');
+  const btnOpenConstructor = document.getElementById('grammarOpenConstructorBtn');
 
   const levelBox = document.getElementById('grammarLevelBox');
   const levelValue = document.getElementById('grammarLevelValue');
@@ -92,6 +94,7 @@
 
   const btnBackHomeFromCompare = document.getElementById('tensesBackToHomeFromCompare');
   const btnBackHomeFromDaily = document.getElementById('tensesBackToHomeFromDaily');
+  const btnBackHomeFromConstructor = document.getElementById('tensesBackToHomeFromConstructor');
 
   const cmpASelect = document.getElementById('tensesCompareA');
   const cmpBSelect = document.getElementById('tensesCompareB');
@@ -115,11 +118,6 @@
   const btnBackHomeFromList = document.getElementById('tensesBackToHomeFromList');
   const listEl = document.getElementById('tensesList');
   const listSubtitleEl = document.getElementById('tensesListSubtitle');
-  const listFlowWrap = document.getElementById('grammarListFlow');
-  const listFlowHint = document.getElementById('grammarListFlowHint');
-  const btnPrevSubgroup = document.getElementById('grammarPrevSubgroupBtn');
-  const btnNextSubgroup = document.getElementById('grammarNextSubgroupBtn');
-  const btnOpenRecommended = document.getElementById('grammarOpenRecommendedBtn');
   const compactListToggle = document.getElementById('grammarCompactListToggle');
   const subgroupWrap = document.getElementById('grammarSubgroupWrap');
   const subgroupBar = document.getElementById('grammarSubgroupBar');
@@ -148,6 +146,11 @@
   const customHint = document.getElementById('tensesCustomHint');
   const btnCustomSelectAll = document.getElementById('tensesCustomSelectAllBtn');
   const btnCustomClearAll = document.getElementById('tensesCustomClearAllBtn');
+
+  const builderBody = document.getElementById('grammarBuilderBody');
+  const builderStepBadge = document.getElementById('grammarBuilderStepBadge');
+  const builderSubtitle = document.getElementById('grammarBuilderSubtitle');
+  const builderPhraseInput = document.getElementById('grammarBuilderPhraseInput');
 
   if (!homeView || !listView || !detailView || !practiceView) return;
   if (!btnGoTheory || !btnGoPractice || !listEl) return;
@@ -178,7 +181,7 @@
     perfect: 'perfect / результат',
     perfect_continuous: 'perfect continuous / длительность',
     future_forms: 'future forms / способы',
-    usage_map: 'карта выбора',
+    usage_map: 'быстрый выбор грамматики',
     conditionals: 'conditionals',
     modals: 'modals',
     voice: 'passive voice',
@@ -217,6 +220,259 @@
     { id:'mistakes', title:'ошибки (mistakes)' },
     { id:'compare', title:'сравнение (compare)' },
   ];
+
+  const CONSTRUCTOR_NODES = {
+    root: {
+      q: 'К какому промежутку времени относится твое предложение?',
+      hint: 'Если не уверен, выбери "не про время / не уверен".',
+      options: [
+        { id: 'present', label: 'Настоящее', next: 'present_stage' },
+        { id: 'past', label: 'Прошлое', next: 'past_stage' },
+        { id: 'future', label: 'Будущее', next: 'future_stage' },
+        { id: 'universal', label: 'Не про время, а про структуру', next: 'universal_stage' },
+        { id: 'unknown', label: 'Не уверен', result: 'global_map' }
+      ]
+    },
+    present_stage: {
+      q: 'В настоящем что тебе нужно?',
+      options: [
+        { id: 'habit', label: 'Обычно / регулярно / факт', next: 'present_habit_stage' },
+        { id: 'now_type', label: 'Прямо сейчас', next: 'present_now_stage' },
+        { id: 'link_now', label: 'Связь с текущим моментом', next: 'present_link_stage' },
+        { id: 'map', label: 'Не уверен, помоги быстро выбрать', result: 'present_map' }
+      ]
+    },
+    present_habit_stage: {
+      q: 'Уточни про настоящее:',
+      options: [
+        { id: 'habit_fact', label: 'Это факт или рутина (обычно/каждый день)', result: 'present_habit' },
+        { id: 'state', label: 'Это состояние/желание/мнение (know/like/want)', result: 'present_state' },
+        { id: 'map', label: 'Не уверен, помоги быстро выбрать', result: 'present_map' }
+      ]
+    },
+    present_now_stage: {
+      q: 'Прямо сейчас это что?',
+      options: [
+        { id: 'action', label: 'Действие в процессе (делаю/иду/пишу)', result: 'present_process' },
+        { id: 'state', label: 'Состояние/желание/мнение (want/know/like)', result: 'present_state' },
+        { id: 'map', label: 'Не уверен, помоги быстро выбрать', result: 'present_map' }
+      ]
+    },
+    present_link_stage: {
+      q: 'Связь с сейчас: что важнее?',
+      options: [
+        { id: 'result', label: 'Результат к текущему моменту', result: 'present_result' },
+        { id: 'duration', label: 'Как долго длится до сейчас', result: 'present_duration' },
+        { id: 'map', label: 'Не уверен, помоги быстро выбрать', result: 'present_map' }
+      ]
+    },
+    past_stage: {
+      q: 'В прошлом что тебе нужно?',
+      options: [
+        { id: 'fact', label: 'Завершенный факт/событие', next: 'past_fact_stage' },
+        { id: 'process', label: 'Процесс в момент в прошлом', result: 'past_process' },
+        { id: 'habit', label: 'Повторялось раньше / раньше было так', next: 'past_habit_stage' },
+        { id: 'map', label: 'Не уверен, помоги быстро выбрать', result: 'past_map' }
+      ]
+    },
+    past_fact_stage: {
+      q: 'Про прошлое событие: что важно?',
+      options: [
+        { id: 'single', label: 'Просто факт в прошлом', result: 'past_fact' },
+        { id: 'earlier', label: 'Одно действие было раньше другого', result: 'past_earlier' },
+        { id: 'duration', label: 'Нужна длительность до прошлого момента', result: 'past_duration' },
+        { id: 'habit', label: 'Скорее это привычка в прошлом', result: 'past_habit' },
+        { id: 'map', label: 'Не уверен, помоги быстро выбрать', result: 'past_map' }
+      ]
+    },
+    past_habit_stage: {
+      q: 'Это про что именно?',
+      options: [
+        { id: 'habit_action', label: 'Повторяющееся действие (играл, ходил)', result: 'past_habit' },
+        { id: 'habit_state', label: 'Состояние раньше (был/имел/знал)', result: 'past_habit_state' },
+        { id: 'map', label: 'Не уверен, помоги быстро выбрать', result: 'past_map' }
+      ]
+    },
+    future_stage: {
+      q: 'Про будущее: какой это тип мысли?',
+      options: [
+        { id: 'decision_now', label: 'Решение прямо сейчас / обещание', result: 'future_decision' },
+        { id: 'intent_prediction', label: 'План / прогноз / идея', next: 'future_intent_stage' },
+        { id: 'time_clause', label: 'После if/when/as soon as/unless', result: 'future_time_clause' },
+        { id: 'advanced', label: 'Процесс/завершение/длительность в будущем', next: 'future_advanced_stage' },
+        { id: 'map', label: 'Не уверен, помоги быстро выбрать', result: 'future_map' }
+      ]
+    },
+    future_intent_stage: {
+      q: 'Уточни, что именно ты имеешь в виду:',
+      options: [
+        { id: 'plan', label: 'Реальный план/намерение (я собираюсь)', next: 'future_plan_confirm' },
+        { id: 'signs', label: 'Прогноз по признакам (смотри тучи)', result: 'future_signs' },
+        { id: 'arrangement', label: 'Договоренность (встреча/билеты)', result: 'future_arrangement' },
+        { id: 'timetable', label: 'Расписание / график', result: 'future_timetable' },
+        { id: 'soft_idea', label: 'Мягкая идея: было бы неплохо...', result: 'would_idea' },
+        { id: 'map', label: 'Не уверен, помоги быстро выбрать', result: 'future_map' }
+      ]
+    },
+    future_plan_confirm: {
+      q: 'Проверка: это точно план, а не мягкая идея?',
+      options: [
+        { id: 'yes_plan', label: 'Да, это мой конкретный план (реально собираюсь)', result: 'future_plan' },
+        { id: 'soft_idea', label: 'Нет, это скорее "было бы неплохо"', result: 'would_idea' },
+        { id: 'arrangement', label: 'Скорее это уже договоренность (встреча/билеты)', result: 'future_arrangement' },
+        { id: 'map', label: 'Не уверен, помоги быстро выбрать', result: 'future_map' }
+      ]
+    },
+    future_advanced_stage: {
+      q: 'Что именно нужно в будущем?',
+      options: [
+        { id: 'process', label: 'Процесс в момент в будущем', result: 'future_process' },
+        { id: 'finish', label: 'Завершение к сроку', result: 'future_finish' },
+        { id: 'duration', label: 'Длительность к сроку', result: 'future_duration' },
+        { id: 'map', label: 'Не уверен, помоги быстро выбрать', result: 'future_map' }
+      ]
+    },
+    universal_stage: {
+      q: 'Если это не про время, то что нужно?',
+      options: [
+        { id: 'condition', label: 'Условие (if ...)', next: 'universal_condition_stage' },
+        { id: 'modal', label: 'Обязанность/совет/вероятность', next: 'universal_modal_stage' },
+        { id: 'passive', label: 'Важно действие, а не исполнитель', next: 'universal_passive_stage' },
+        { id: 'report', label: 'Передаю чужие слова', next: 'universal_report_stage' },
+        { id: 'connect', label: 'Связать/уточнить части фразы', next: 'universal_connect_stage' },
+        { id: 'emphasis', label: 'Нужен акцент в форме', next: 'universal_emphasis_stage' },
+        { id: 'map', label: 'Не уверен, помоги быстро выбрать', result: 'universal_map' }
+      ]
+    },
+    universal_condition_stage: {
+      q: 'Какой тип условия?',
+      options: [
+        { id: 'real', label: 'Реальное условие / правило', result: 'cond_real' },
+        { id: 'unreal_or_regret', label: 'Нереально или сожаление', next: 'universal_condition_unreal_stage' },
+        { id: 'mixed', label: 'Смешанное условие', result: 'cond_mixed' }
+      ]
+    },
+    universal_condition_unreal_stage: {
+      q: 'Что ближе?',
+      options: [
+        { id: 'unreal_now', label: 'Нереально сейчас/в будущем', result: 'cond_unreal_now' },
+        { id: 'past_regret', label: 'Сожаление о прошлом', result: 'cond_past_regret' },
+        { id: 'mixed', label: 'Сложно выбрать, дай смешанный вариант', result: 'cond_mixed' }
+      ]
+    },
+    universal_modal_stage: {
+      q: 'Что нужно передать?',
+      options: [
+        { id: 'obligation', label: 'Обязанность / совет / запрет', next: 'universal_modal_obligation_stage' },
+        { id: 'deduction', label: 'Вероятность / логический вывод', result: 'modal_deduction' },
+        { id: 'soft_idea', label: 'Мягкая идея: было бы неплохо...', result: 'would_idea' },
+        { id: 'map', label: 'Не уверен, помоги быстро выбрать', result: 'universal_map' }
+      ]
+    },
+    universal_modal_obligation_stage: {
+      q: 'Насколько сильная мысль?',
+      options: [
+        { id: 'strict', label: 'Строго: обязан / нельзя / надо', result: 'modal_obligation' },
+        { id: 'advice', label: 'Мягко: стоит / лучше', result: 'modal_advice' },
+        { id: 'soft_idea', label: 'Еще мягче: было бы неплохо', result: 'would_idea' },
+        { id: 'map', label: 'Не уверен, помоги быстро выбрать', result: 'universal_map' }
+      ]
+    },
+    universal_passive_stage: {
+      q: 'Что ты хочешь подчеркнуть?',
+      options: [
+        { id: 'passive', label: 'Само действие важно, исполнитель не важен', result: 'passive' },
+        { id: 'causative', label: 'Я организую, чтобы это сделали', result: 'emphasis_causative' },
+        { id: 'map', label: 'Не уверен, помоги быстро выбрать', result: 'universal_map' }
+      ]
+    },
+    universal_report_stage: {
+      q: 'Какой тип пересказа?',
+      options: [
+        { id: 'report', label: 'Передаю чьи-то слова/мысли', result: 'report' },
+        { id: 'embedded_q', label: 'Встраиваю косвенный вопрос (where he lives)', result: 'connect_noun' },
+        { id: 'map', label: 'Не уверен, помоги быстро выбрать', result: 'universal_map' }
+      ]
+    },
+    universal_connect_stage: {
+      q: 'Что ты хочешь связать?',
+      options: [
+        { id: 'relative', label: 'Уточнить существительное (who/which/that)', result: 'connect_relative' },
+        { id: 'noun_clause', label: 'Часть после know/think/wonder', result: 'connect_noun' },
+        { id: 'articles', label: 'Выбрать a/an/the', result: 'connect_articles' },
+        { id: 'verb_pattern', label: 'Выбрать -ing или to + do', result: 'connect_verb_pattern' }
+      ]
+    },
+    universal_emphasis_stage: {
+      q: 'Какой акцент тебе нужен?',
+      options: [
+        { id: 'wish', label: 'Сожаление / wish / if only', result: 'emphasis_wish' },
+        { id: 'inversion', label: 'Формальный акцент (inversion)', result: 'emphasis_inversion' },
+        { id: 'cleft', label: 'Выделить часть фразы (cleft)', result: 'emphasis_cleft' },
+        { id: 'tag', label: 'Короткое подтверждение в конце', result: 'emphasis_tag' },
+        { id: 'causative', label: 'Организовать действие другим человеком', result: 'emphasis_causative' }
+      ]
+    }
+  };
+
+  const CONSTRUCTOR_RESULTS = {
+    global_map: { reason: 'Начнем с быстрой навигации по грамматике: так проще сразу выбрать нужную форму.', picks: ['futureExpressionWays', 'presentUsageMap', 'pastUsageMap'] },
+
+    present_habit: { reason: 'Ты описываешь регулярность или факт в настоящем.', picks: ['presentSimple', 'presentUsageMap', 'presentContinuous'] },
+    present_state: { reason: 'Это состояние/желание/мнение, обычно нужна форма Present Simple (например: I want...).', picks: ['presentSimple', 'presentUsageMap', 'presentContinuous'] },
+    present_process: { reason: 'Ты говоришь о процессе прямо сейчас.', picks: ['presentContinuous', 'presentUsageMap', 'presentSimple'] },
+    present_result: { reason: 'Тебе важен результат к текущему моменту.', picks: ['presentPerfect', 'presentUsageMap', 'presentPerfectContinuous'] },
+    present_duration: { reason: 'Тебе нужна длительность процесса до сейчас.', picks: ['presentPerfectContinuous', 'presentUsageMap', 'presentPerfect'] },
+    present_map: { reason: 'Нужна быстрая помощь, чтобы сразу выбрать форму в настоящем.', picks: ['presentUsageMap', 'presentSimple', 'presentContinuous'] },
+
+    past_fact: { reason: 'Ты описываешь завершенное событие/факт в прошлом.', picks: ['pastSimple', 'pastUsageMap', 'pastContinuous'] },
+    past_process: { reason: 'Важен процесс в конкретный момент прошлого.', picks: ['pastContinuous', 'pastUsageMap', 'pastSimple'] },
+    past_earlier: { reason: 'Нужно показать, что одно прошлое действие произошло раньше.', picks: ['pastPerfect', 'pastUsageMap', 'pastSimple'] },
+    past_duration: { reason: 'Ты подчеркиваешь длительность до прошлого момента.', picks: ['pastPerfectContinuous', 'pastUsageMap', 'pastPerfect'] },
+    past_habit: { reason: 'Ты говоришь о повторяющейся привычке в прошлом.', picks: ['pastWouldHabits', 'pastSimple', 'pastUsageMap'] },
+    past_habit_state: { reason: 'Это состояние в прошлом (был/имел/знал), в таких случаях чаще нужен used to, а не would.', picks: ['pastWouldHabits', 'pastSimple', 'pastUsageMap'] },
+    past_map: { reason: 'Нужна быстрая помощь, чтобы выбрать past-форму по смыслу.', picks: ['pastUsageMap', 'pastSimple', 'pastContinuous'] },
+
+    future_decision: { reason: 'Решение принимается прямо в момент речи.', picks: ['futureSimple', 'futureExpressionWays', 'futureGoingTo'] },
+    future_plan: { reason: 'Это реальный план/намерение (не мягкая оценка), поэтому обычно be going to.', picks: ['futureGoingTo', 'futureExpressionWays', 'modalsWouldIdeas'] },
+    future_signs: { reason: 'Прогноз основан на видимых признаках.', picks: ['futureGoingTo', 'futureExpressionWays', 'futureSimple'] },
+    future_arrangement: { reason: 'Есть конкретная договоренность (встреча, куплены билеты), поэтому обычно Present Continuous for Future.', picks: ['futurePresentContinuous', 'futureExpressionWays', 'futureGoingTo'] },
+    future_timetable: { reason: 'Это расписание или официальный график.', picks: ['futurePresentSimple', 'futureExpressionWays', 'futureSimple'] },
+    future_time_clause: { reason: 'После if/when/as soon as/unless в будущем контексте нужна специальная форма.', picks: ['futureTimeClauses', 'futureExpressionWays', 'futureSimple'] },
+    future_process: { reason: 'Нужен процесс в конкретный момент будущего.', picks: ['futureContinuous', 'futureExpressionWays', 'futureSimple'] },
+    future_finish: { reason: 'Нужно показать завершение к будущему сроку.', picks: ['futurePerfect', 'futureExpressionWays', 'futurePerfectContinuous'] },
+    future_duration: { reason: 'Нужна длительность до будущего момента.', picks: ['futurePerfectContinuous', 'futurePerfect', 'futureExpressionWays'] },
+    future_map: { reason: 'Нужна быстрая помощь, чтобы выбрать способ выражения будущего.', picks: ['futureExpressionWays', 'futureSimple', 'futureGoingTo'] },
+
+    cond_real: { reason: 'Ты описываешь реальное условие/закономерность.', picks: ['conditionalsZeroFirst', 'futureTimeClauses', 'universalUsageMap'] },
+    cond_unreal_now: { reason: 'Это нереальная ситуация в настоящем/будущем.', picks: ['conditionalsSecondThird', 'mixedConditionals', 'universalUsageMap'] },
+    cond_past_regret: { reason: 'Ты выражаешь сожаление о прошлом.', picks: ['conditionalsSecondThird', 'wishIfOnly', 'mixedConditionals'] },
+    cond_mixed: { reason: 'Ты смешиваешь временные планы в условии и результате.', picks: ['mixedConditionals', 'conditionalsSecondThird', 'universalUsageMap'] },
+
+    modal_obligation: { reason: 'Тебе нужно передать обязанность, совет или запрет.', picks: ['modalsObligationAdvice', 'universalUsageMap', 'modalsPossibilityDeduction'] },
+    modal_advice: { reason: 'Это мягкий совет (стоит/лучше), поэтому чаще нужны should / had better / would be better.', picks: ['modalsObligationAdvice', 'modalsWouldIdeas', 'universalUsageMap'] },
+    modal_deduction: { reason: 'Нужно выразить вероятность или логический вывод.', picks: ['modalsPossibilityDeduction', 'universalUsageMap', 'modalsObligationAdvice'] },
+    would_idea: { reason: 'Здесь мягкая идея/оценка ("было бы неплохо"), поэтому лучше шаблоны с would: It would be good/better to...', picks: ['modalsWouldIdeas', 'futureExpressionWays', 'modalsObligationAdvice'] },
+
+    passive: { reason: 'Фокус на действии/результате, а не на исполнителе.', picks: ['passiveVoiceBasics', 'universalUsageMap', 'causativeHaveGet'] },
+    report: { reason: 'Ты передаешь чужие слова в косвенной речи.', picks: ['reportedSpeechBasics', 'nounClausesBasics', 'universalUsageMap'] },
+    universal_map: { reason: 'Нужна быстрая помощь, чтобы выбрать структуру по смыслу (не только время).', picks: ['universalUsageMap', 'conditionalsZeroFirst', 'modalsObligationAdvice'] },
+
+    connect_relative: { reason: 'Нужно уточнить существительное через who/which/that/where.', picks: ['relativeClausesBasics', 'nounClausesBasics', 'universalUsageMap'] },
+    connect_noun: { reason: 'Нужна часть типа that/if/whether/wh-clause после think/know/wonder.', picks: ['nounClausesBasics', 'reportedSpeechBasics', 'relativeClausesBasics'] },
+    connect_articles: { reason: 'Проблема выбора a/an/the/zero article.', picks: ['articlesBasics', 'presentUsageMap', 'universalUsageMap'] },
+    connect_verb_pattern: { reason: 'Нужно выбрать между -ing и to + infinitive.', picks: ['gerundInfinitiveBasics', 'wishIfOnly', 'universalUsageMap'] },
+
+    emphasis_wish: { reason: 'Ты хочешь выразить сожаление или желание о другой реальности.', picks: ['wishIfOnly', 'conditionalsSecondThird', 'mixedConditionals'] },
+    emphasis_inversion: { reason: 'Нужен формальный/сильный акцент в порядке слов.', picks: ['inversionAdvanced', 'cleftSentencesBasics', 'questionTagsBasics'] },
+    emphasis_cleft: { reason: 'Нужно выделить важную часть высказывания.', picks: ['cleftSentencesBasics', 'inversionAdvanced', 'nounClausesBasics'] },
+    emphasis_tag: { reason: 'Нужно короткое подтверждение в конце фразы.', picks: ['questionTagsBasics', 'modalsObligationAdvice', 'presentSimple'] },
+    emphasis_causative: { reason: 'Ты описываешь действие, которое выполняет другой человек.', picks: ['causativeHaveGet', 'passiveVoiceBasics', 'universalUsageMap'] }
+  };
+
+  let builderPath = [];
+  let builderNode = 'root';
+  let builderLastRec = null;
 
   // -------------------------
   // Storage (localStorage)
@@ -259,6 +515,7 @@
 
   function showOnly(viewName){
     setVisible(homeView, viewName === 'home');
+    setVisible(constructorView, viewName === 'constructor');
     setVisible(listView, viewName === 'list');
     setVisible(detailView, viewName === 'detail');
     setVisible(practiceView, viewName === 'practice');
@@ -446,73 +703,6 @@
       return String(a).localeCompare(String(b));
     });
     return arr;
-  }
-
-  function preferredSubgroup(category){
-    const subgroups = getAvailableSubgroups(category);
-    if (!subgroups.length) return 'all';
-    if (subgroups.includes('usage_map')) return 'usage_map';
-    return subgroups[0];
-  }
-
-  function nextSubgroup(current, direction){
-    const subgroups = getAvailableSubgroups(activeCategory);
-    if (!subgroups.length) return 'all';
-    const idx = subgroups.indexOf(current);
-    if (idx === -1) return subgroups[0];
-    if (direction > 0) return subgroups[Math.min(subgroups.length - 1, idx + 1)];
-    return subgroups[Math.max(0, idx - 1)];
-  }
-
-  function renderListFlow(visibleMetas){
-    if (!listFlowWrap || !listFlowHint) return;
-
-    if (activeCategory === 'all'){
-      listFlowWrap.hidden = true;
-      return;
-    }
-
-    const subgroups = getAvailableSubgroups(activeCategory);
-    if (!subgroups.length){
-      listFlowWrap.hidden = true;
-      return;
-    }
-
-    const current = activeSubgroup === 'all' ? preferredSubgroup(activeCategory) : activeSubgroup;
-    const currentIdx = subgroups.indexOf(current);
-    const step = currentIdx >= 0 ? currentIdx + 1 : 1;
-    const total = subgroups.length;
-    const rec = (visibleMetas && visibleMetas[0]) ? (visibleMetas[0].title || visibleMetas[0].id) : '';
-    const lang = String(document.documentElement.lang || 'ru').toLowerCase();
-    if (lang === 'en'){
-      listFlowHint.textContent = rec
-        ? `step ${step}/${total}: ${subgroupLabel(current)} -> start with "${rec}"`
-        : `step ${step}/${total}: ${subgroupLabel(current)}`;
-    } else {
-      listFlowHint.textContent = rec
-        ? `шаг ${step}/${total}: ${subgroupLabel(current)} -> начни с "${rec}"`
-        : `шаг ${step}/${total}: ${subgroupLabel(current)}`;
-    }
-
-    if (btnPrevSubgroup) btnPrevSubgroup.disabled = currentIdx <= 0;
-    if (btnNextSubgroup) btnNextSubgroup.disabled = currentIdx === -1 || currentIdx >= total - 1;
-    if (btnOpenRecommended) btnOpenRecommended.disabled = !visibleMetas || !visibleMetas.length;
-
-    listFlowWrap.hidden = false;
-  }
-
-  function switchSubgroup(direction){
-    const target = nextSubgroup(activeSubgroup, direction);
-    if (!target || target === activeSubgroup) return;
-    setSubgroup(target);
-    renderList();
-  }
-
-  function openRecommendedFromList(){
-    const metas = sortMetasForDisplay(getFilteredMetas({ category: activeCategory, subgroup: activeSubgroup }));
-    const first = metas[0];
-    if (!first) return;
-    openTense(first.id);
   }
 
   function sortMetasForDisplay(metas){
@@ -965,6 +1155,363 @@
     });
   }
 
+  function getMetaById(id){
+    return (REG.INDEX || []).find((m) => m.id === id) || null;
+  }
+
+  function isLevelMatchId(id){
+    const meta = getMetaById(id);
+    if (!meta) return false;
+    return matchesLevel(meta, getLevel());
+  }
+
+  function normalizeBuilderPicks(picks){
+    const out = [];
+    const seen = new Set();
+    for (const id of (picks || [])){
+      const k = String(id || '').trim();
+      if (!k || seen.has(k)) continue;
+      if (!REG.byId[k]) continue;
+      seen.add(k);
+      out.push(k);
+    }
+    return out;
+  }
+
+  function getBuilderPhraseText(){
+    return normalizeSearchText(builderPhraseInput?.value || '');
+  }
+
+  function analyzeBuilderPhrase(){
+    const text = getBuilderPhraseText();
+    if (!text) return { hasText: false, text: '' };
+
+    const words = splitWords(text);
+    const hasWord = (arr) => arr.some((w) => words.includes(w));
+    const hasChunk = (arr) => arr.some((s) => text.includes(s));
+
+    const hasNow =
+      hasWord(['сейчас', 'теперь', 'now']) ||
+      hasChunk(['прямо сейчас', 'в данный момент', 'at the moment', 'right now']);
+
+    const isStative =
+      hasWord([
+        'want', 'wants', 'wanted', 'need', 'needs', 'know', 'knows', 'like', 'likes',
+        'love', 'loves', 'believe', 'believes', 'understand', 'understands', 'remember',
+        'remembers', 'prefer', 'prefers', 'seem', 'seems'
+      ]) ||
+      hasChunk([
+        'хочу', 'хочешь', 'хочет', 'хотим', 'хотите', 'хотят',
+        'нравится', 'люблю', 'любит', 'любят', 'знаю', 'знает', 'знают',
+        'понимаю', 'понимает', 'помню', 'помнит', 'верю', 'верит', 'кажется', 'нужно', 'надо'
+      ]);
+
+    const hasPlan =
+      hasWord(['plan', 'planned', 'intend', 'intends', 'going']) ||
+      hasChunk(['планирую', 'собираюсь', 'собираемся', 'собирается', 'going to', 'intend to']);
+
+    const isWouldIdea =
+      hasChunk([
+        'было бы неплохо',
+        'было бы не плохо',
+        'было бы хорошо',
+        'было бы лучше',
+        'было бы здорово',
+        'было бы классно',
+        'было бы круто',
+        'было бы полезно',
+        'would be good',
+        'would be nice',
+        'would be better',
+        'it would be good',
+        'it would be nice',
+        'it would be better'
+      ]) ||
+      /было\s*бы\s*(не\s*)?(плохо|хорошо|лучше|здорово|классно|круто|полезно)/i.test(text) ||
+      (words.includes('would') && (words.includes('good') || words.includes('nice') || words.includes('better')));
+
+    return { hasText: true, text, hasNow, isStative, hasPlan, isWouldIdea };
+  }
+
+  function tuneResultByPhrase(resultKey){
+    const info = analyzeBuilderPhrase();
+    let key = resultKey;
+    let noteKey = '';
+
+    if (!info.hasText) return { key, noteKey };
+
+    if (info.isWouldIdea && (
+      key.startsWith('future_') ||
+      key === 'modal_obligation' ||
+      key === 'modal_deduction' ||
+      key === 'present_process' ||
+      key === 'present_habit' ||
+      key === 'present_state' ||
+      key === 'present_map'
+    )){
+      key = 'would_idea';
+      noteKey = 'would_idea';
+    } else if ((key === 'present_process' || key === 'present_duration' || key === 'present_habit') && info.isStative){
+      key = 'present_state';
+      noteKey = 'stative';
+    } else if ((key === 'present_habit' || key === 'present_state') && info.hasNow && !info.isStative){
+      key = 'present_process';
+      noteKey = 'now_process';
+    } else if (key === 'future_decision' && info.hasPlan){
+      key = 'future_plan';
+      noteKey = 'plan';
+    }
+
+    return { key, noteKey };
+  }
+
+  function smartNoteText(noteKey){
+    if (!noteKey) return '';
+    if (isEnLang()){
+      if (noteKey === 'stative') return 'Smart check: your phrase looks like a state/desire (want/know/like), so Present Simple is usually better.';
+      if (noteKey === 'now_process') return 'Smart check: your phrase has a "now" marker and looks dynamic, so Present Continuous is likely better.';
+      if (noteKey === 'plan') return 'Smart check: your phrase sounds like a plan/intention, so be going to is likely better.';
+      if (noteKey === 'would_idea') return 'Smart check: your phrase sounds like a soft idea ("it would be good/better"), so would-patterns fit better than be going to.';
+      return '';
+    }
+    if (noteKey === 'stative') return 'Умная проверка: по фразе это похоже на состояние/желание (want/know/like), поэтому обычно лучше Present Simple.';
+    if (noteKey === 'now_process') return 'Умная проверка: во фразе есть маркер "сейчас" и динамика действия, поэтому вероятнее Present Continuous.';
+    if (noteKey === 'plan') return 'Умная проверка: во фразе заметен план/намерение, поэтому чаще подходит be going to.';
+    if (noteKey === 'would_idea') return 'Умная проверка: фраза похожа на мягкую идею ("было бы неплохо/лучше"), поэтому лучше использовать would-шаблон, а не be going to.';
+    return '';
+  }
+
+  function buildConstructorRecommendation(resultKey){
+    const tuned = tuneResultByPhrase(resultKey);
+    const raw = CONSTRUCTOR_RESULTS[tuned.key] || CONSTRUCTOR_RESULTS[resultKey];
+    if (!raw) return null;
+
+    const picks = normalizeBuilderPicks(raw.picks);
+    if (!picks.length) return null;
+
+    const level = getLevel();
+    let mainId = picks[0];
+    if (level && !isLevelMatchId(mainId)){
+      const fit = picks.find((id) => isLevelMatchId(id));
+      if (fit) mainId = fit;
+    }
+
+    const alternatives = picks
+      .filter((id) => id !== mainId)
+      .map((id, i) => ({ id, i, fit: isLevelMatchId(id) ? 1 : 0 }))
+      .sort((a, b) => b.fit - a.fit || a.i - b.i)
+      .slice(0, 2)
+      .map((x) => x.id);
+
+    return {
+      sourceKey: resultKey,
+      tunedKey: tuned.key,
+      reason: raw.reason || '',
+      smartNote: smartNoteText(tuned.noteKey),
+      mainId,
+      alternatives,
+      outOfLevel: !!(level && !isLevelMatchId(mainId))
+    };
+  }
+
+  function isEnLang(){
+    return String(document.documentElement.lang || 'ru').toLowerCase() === 'en';
+  }
+
+  function renderBuilderQuestion(){
+    if (!builderBody) return;
+    builderLastRec = null;
+    const node = CONSTRUCTOR_NODES[builderNode] || CONSTRUCTOR_NODES.root;
+    const step = builderPath.length + 1;
+    if (builderStepBadge) builderStepBadge.textContent = isEnLang() ? `step ${step}` : `шаг ${step}`;
+    if (builderSubtitle) builderSubtitle.textContent = isEnLang() ? 'choose meaning and we suggest the best topic' : 'выбери смысл, а мы подскажем лучшую тему';
+
+    builderBody.innerHTML = '';
+
+    const q = document.createElement('p');
+    q.className = 'sh-builder__q';
+    q.textContent = node.q || '';
+    builderBody.appendChild(q);
+
+    if (node.hint){
+      const hint = document.createElement('p');
+      hint.className = 'sh-builder__hint';
+      hint.textContent = node.hint;
+      builderBody.appendChild(hint);
+    }
+
+    const phrase = getBuilderPhraseText();
+    if (phrase){
+      const hint2 = document.createElement('p');
+      hint2.className = 'sh-builder__hint';
+      hint2.textContent = isEnLang() ? `Your phrase is considered: "${phrase}"` : `Учитываю твою фразу: "${phrase}"`;
+      builderBody.appendChild(hint2);
+    }
+
+    const options = document.createElement('div');
+    options.className = 'sh-builder__options';
+
+    for (const opt of (node.options || [])){
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'ik-btn';
+      btn.textContent = opt.label || opt.id || '...';
+      btn.addEventListener('click', ()=>{
+        builderPath.push({ node: builderNode, option: opt.id || '' });
+        if (opt.next){
+          builderNode = opt.next;
+          renderBuilderQuestion();
+          return;
+        }
+        const rec = buildConstructorRecommendation(opt.result);
+        renderBuilderResult(rec);
+      });
+      options.appendChild(btn);
+    }
+
+    if (builderPath.length){
+      const backBtn = document.createElement('button');
+      backBtn.type = 'button';
+      backBtn.className = 'ik-btn';
+      backBtn.textContent = isEnLang() ? 'back to question' : 'назад к вопросу';
+      backBtn.addEventListener('click', ()=>{
+        const prev = builderPath.pop();
+        builderNode = prev && prev.node ? prev.node : 'root';
+        renderBuilderQuestion();
+      });
+      options.appendChild(backBtn);
+    }
+
+    const resetBtn = document.createElement('button');
+    resetBtn.type = 'button';
+    resetBtn.className = 'ik-btn';
+    resetBtn.textContent = isEnLang() ? 'reset' : 'сбросить';
+    resetBtn.addEventListener('click', resetConstructor);
+    options.appendChild(resetBtn);
+
+    builderBody.appendChild(options);
+  }
+
+  function openConstructorRule(id){
+    if (!id || !REG.byId[id]) return;
+    const meta = getMetaById(id);
+    if (meta && meta.group) setCategory(String(meta.group).toLowerCase());
+    setSubgroup('all');
+    openTense(id);
+  }
+
+  function renderBuilderResult(rec){
+    if (!builderBody) return;
+    if (!rec || !rec.mainId){
+      builderBody.innerHTML = `<p class="ik-itemline">${isEnLang() ? 'Could not pick a topic. Try again from start.' : 'Не удалось подобрать тему. Попробуй начать заново.'}</p>`;
+      return;
+    }
+
+    builderLastRec = rec;
+
+    if (builderStepBadge) builderStepBadge.textContent = isEnLang() ? 'result' : 'результат';
+    if (builderSubtitle) builderSubtitle.textContent = isEnLang() ? '1 main option + 2 alternatives' : '1 главный вариант + 2 альтернативы';
+
+    const mainMeta = getMetaById(rec.mainId);
+    const altMetas = (rec.alternatives || []).map((id)=> getMetaById(id)).filter(Boolean);
+
+    builderBody.innerHTML = '';
+
+    const wrap = document.createElement('div');
+    wrap.className = 'sh-builder__result';
+
+    const title = document.createElement('p');
+    title.className = 'sh-builder__result-title';
+    title.textContent = isEnLang() ? 'main option' : 'главный вариант';
+    wrap.appendChild(title);
+
+    const main = document.createElement('div');
+    main.className = 'sh-builder__main';
+    main.innerHTML = `<h4>${escapeHtml(mainMeta?.title || rec.mainId)}</h4>
+                      <p>${escapeHtml(mainMeta?.subtitle || mainMeta?.hint || '')}</p>
+                      <p style="margin-top:8px;">${escapeHtml(rec.reason || '')}</p>
+                      ${rec.smartNote ? `<p style="margin-top:8px;">${escapeHtml(rec.smartNote)}</p>` : ''}
+                      ${rec.outOfLevel ? `<p style="margin-top:8px;">${isEnLang() ? 'this topic is above/below your current level but is the most accurate by meaning.' : 'тема выше/ниже текущего уровня, но по смыслу самая точная.'}</p>` : ''}`;
+
+    const mainActions = document.createElement('div');
+    mainActions.className = 'sh-builder__actions';
+
+    const btnRule = document.createElement('button');
+    btnRule.type = 'button';
+    btnRule.className = 'ik-btn ik-btn--black';
+    btnRule.textContent = isEnLang() ? 'open rule' : 'открыть правило';
+    btnRule.addEventListener('click', ()=> openConstructorRule(rec.mainId));
+
+    const btnPracticeMain = document.createElement('button');
+    btnPracticeMain.type = 'button';
+    btnPracticeMain.className = 'ik-btn';
+    btnPracticeMain.textContent = isEnLang() ? 'go to practice now' : 'сразу к упражнениям';
+    btnPracticeMain.addEventListener('click', ()=> goPracticeForTense(rec.mainId));
+
+    const btnRestartMain = document.createElement('button');
+    btnRestartMain.type = 'button';
+    btnRestartMain.className = 'ik-btn';
+    btnRestartMain.textContent = isEnLang() ? 'start again' : 'начать заново';
+    btnRestartMain.addEventListener('click', resetConstructor);
+
+    mainActions.appendChild(btnRule);
+    mainActions.appendChild(btnPracticeMain);
+    mainActions.appendChild(btnRestartMain);
+    main.appendChild(mainActions);
+
+    wrap.appendChild(main);
+
+    if (altMetas.length){
+      const altTitle = document.createElement('p');
+      altTitle.className = 'sh-builder__result-title';
+      altTitle.textContent = isEnLang() ? 'alternatives' : 'альтернативы';
+      wrap.appendChild(altTitle);
+
+      for (const meta of altMetas){
+        const alt = document.createElement('div');
+        alt.className = 'sh-builder__alt';
+        alt.innerHTML = `<h4>${escapeHtml(meta.title || meta.id)}</h4>
+                         <p>${escapeHtml(meta.subtitle || meta.hint || '')}</p>`;
+
+        const altActions = document.createElement('div');
+        altActions.className = 'sh-builder__alt-actions';
+
+        const btnAltRule = document.createElement('button');
+        btnAltRule.type = 'button';
+        btnAltRule.className = 'ik-btn';
+        btnAltRule.textContent = isEnLang() ? 'open rule' : 'открыть правило';
+        btnAltRule.addEventListener('click', ()=> openConstructorRule(meta.id));
+
+        const btnAltPractice = document.createElement('button');
+        btnAltPractice.type = 'button';
+        btnAltPractice.className = 'ik-btn';
+        btnAltPractice.textContent = isEnLang() ? 'practice' : 'упражнения';
+        btnAltPractice.addEventListener('click', ()=> goPracticeForTense(meta.id));
+
+        altActions.appendChild(btnAltRule);
+        altActions.appendChild(btnAltPractice);
+        alt.appendChild(altActions);
+        wrap.appendChild(alt);
+      }
+    }
+
+    builderBody.appendChild(wrap);
+  }
+
+  function resetConstructor(){
+    builderPath = [];
+    builderNode = 'root';
+    builderLastRec = null;
+    renderBuilderQuestion();
+  }
+
+  function showConstructor(){
+    if (!builderBody) return;
+    resetConstructor();
+    showOnly('constructor');
+    setStatus('constructor');
+  }
+
   function openCategory(category){
     if (!ensureLevelSelected()){
       showOnly('home');
@@ -972,7 +1519,7 @@
       return;
     }
     setCategory(category);
-    setSubgroup(preferredSubgroup(category));
+    setSubgroup('all');
     renderList();
     showOnly('list');
     setStatus('list');
@@ -1078,7 +1625,6 @@
     const compactMode = isCompactList();
     if (countBadge) countBadge.textContent = `grammar: ${visibleMetas.length}`;
     updateListSubtitle();
-    renderListFlow(visibleMetas);
 
     listEl.innerHTML = '';
     if (!visibleMetas.length){
@@ -2852,15 +3398,22 @@ try{
   btnGoPast && btnGoPast.addEventListener('click', ()=> openCategory('past'));
   btnGoFuture && btnGoFuture.addEventListener('click', ()=> openCategory('future'));
   btnGoUniversal && btnGoUniversal.addEventListener('click', ()=> openCategory('universal'));
+  btnOpenConstructor && btnOpenConstructor.addEventListener('click', ()=> showConstructor());
+  btnBackHomeFromConstructor && btnBackHomeFromConstructor.addEventListener('click', ()=>{
+    showOnly('home');
+    setStatus('home');
+  });
+  builderPhraseInput && builderPhraseInput.addEventListener('input', ()=>{
+    if (!constructorView || constructorView.hidden) return;
+    if (!builderLastRec || !builderLastRec.sourceKey) return;
+    const rec = buildConstructorRecommendation(builderLastRec.sourceKey);
+    if (rec) renderBuilderResult(rec);
+  });
 
   compactListToggle && compactListToggle.addEventListener('change', ()=>{
     setCompactList(!!compactListToggle.checked);
     renderList();
   });
-
-  btnPrevSubgroup && btnPrevSubgroup.addEventListener('click', ()=> switchSubgroup(-1));
-  btnNextSubgroup && btnNextSubgroup.addEventListener('click', ()=> switchSubgroup(1));
-  btnOpenRecommended && btnOpenRecommended.addEventListener('click', ()=> openRecommendedFromList());
 
   ruleModeShortBtn && ruleModeShortBtn.addEventListener('click', ()=> setRuleMode('short'));
   ruleModeFullBtn && ruleModeFullBtn.addEventListener('click', ()=> setRuleMode('full'));
@@ -3347,6 +3900,10 @@ btnDailyNew && btnDailyNew.addEventListener('click', ()=> startDaily(true));
 
 document.addEventListener('ik:languagechange', ()=>{
   if (listView && !listView.hidden) renderList();
+  if (constructorView && !constructorView.hidden){
+    if (builderLastRec) renderBuilderResult(builderLastRec);
+    else renderBuilderQuestion();
+  }
   if (searchInput && searchInput.value.trim()) renderSearchResults(searchInput.value);
 });
 

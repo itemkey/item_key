@@ -263,6 +263,17 @@
     "levels": ["A2-B1", "B1-B2", "B2-C1"]
   },
   {
+    "id": "modalsWouldIdeas",
+    "title": "would for Ideas and Soft Suggestions",
+    "subtitle": "было бы неплохо: it would be good/nice/better + to",
+    "hint": "would be good to ... • would like to ... • soft ideas",
+    "file": "modalsWouldIdeas.json",
+    "group": "universal",
+    "kind": "structure",
+    "compare": false,
+    "levels": ["A2-B1", "B1-B2", "B2-C1"]
+  },
+  {
     "id": "reportedSpeechBasics",
     "title": "Reported Speech Basics",
     "subtitle": "передача чужих слов без кавычек",
