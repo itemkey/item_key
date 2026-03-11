@@ -18,6 +18,11 @@ const PRIORITIES = [
   { key: 'high', label: 'HIGH' }
 ];
 
+const SCHEDULE_RANGES = ['today', 'this_week', 'next_week', 'two_weeks', 'month'];
+const SCHEDULE_TEMPLATE_KEYS = ['none', 'study', 'work', 'balanced'];
+const PERSONAL_SCHEDULE_TABS = ['today', 'lists', 'calendar'];
+const PERSONAL_REPEAT_RULES = ['none', 'daily', 'weekly', 'monthly', 'yearly', 'weekdays', 'weekends'];
+
 function escapeHtml(str) {
   return String(str ?? '')
     .replaceAll('&', '&amp;')
@@ -71,6 +76,90 @@ function addDaysLocal(date, days) {
   const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
   d.setDate(d.getDate() + Number(days || 0));
   return d;
+}
+
+function addMinutes(date, minutes) {
+  return new Date(date.getTime() + Number(minutes || 0) * 60000);
+}
+
+function startOfWeekLocal(date) {
+  const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  const day = d.getDay();
+  const shift = day === 0 ? -6 : 1 - day;
+  d.setDate(d.getDate() + shift);
+  return d;
+}
+
+function startOfMonthLocal(date) {
+  return new Date(date.getFullYear(), date.getMonth(), 1);
+}
+
+function formatTimeHM(date) {
+  return `${pad2(date.getHours())}:${pad2(date.getMinutes())}`;
+}
+
+function formatDateTimeInputValue(date) {
+  return `${formatLocalISO(date)}T${formatTimeHM(date)}`;
+}
+
+function parseDateTimeInput(value) {
+  const s = String(value || '').trim();
+  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(s)) return null;
+  const [datePart, timePart] = s.split('T');
+  const [y, m, d] = datePart.split('-').map(Number);
+  const [hh, mm] = timePart.split(':').map(Number);
+  return new Date(y, (m || 1) - 1, d || 1, hh || 0, mm || 0, 0, 0);
+}
+
+function toLocalDayKey(dateValue) {
+  const d = dateValue instanceof Date ? dateValue : new Date(dateValue);
+  if (!(d instanceof Date) || Number.isNaN(d.getTime())) return '';
+  return formatLocalISO(new Date(d.getFullYear(), d.getMonth(), d.getDate()));
+}
+
+function eventTimeLabel(startAt, endAt, allDay, lang = 'ru') {
+  const start = new Date(startAt);
+  const end = new Date(endAt);
+  if (!(start instanceof Date) || Number.isNaN(start.getTime()) || !(end instanceof Date) || Number.isNaN(end.getTime())) {
+    return lang === 'en' ? 'time unknown' : 'время не указано';
+  }
+  if (allDay) return lang === 'en' ? 'all day' : 'весь день';
+  return `${formatTimeHM(start)} - ${formatTimeHM(end)}`;
+}
+
+function shortText(value, limit = 140) {
+  const text = String(value || '').replace(/\s+/g, ' ').trim();
+  if (!text) return '';
+  if (text.length <= limit) return text;
+  return `${text.slice(0, Math.max(1, limit - 1)).trimEnd()}…`;
+}
+
+function normalizeTimeText(value) {
+  const raw = String(value || '').trim();
+  if (!raw) return '';
+  const m = raw.match(/^(\d{2}:\d{2})(?::\d{2})?$/);
+  return m ? m[1] : '';
+}
+
+function normalizeRepeatRule(value) {
+  const key = String(value || '').toLowerCase();
+  return PERSONAL_REPEAT_RULES.includes(key) ? key : 'none';
+}
+
+function dayDiffLocal(a, b) {
+  const ad = new Date(a.getFullYear(), a.getMonth(), a.getDate());
+  const bd = new Date(b.getFullYear(), b.getMonth(), b.getDate());
+  const ms = bd.getTime() - ad.getTime();
+  return Math.round(ms / 86400000);
+}
+
+function timeLabelHM(startTime, endTime, lang = 'ru') {
+  const st = normalizeTimeText(startTime);
+  const et = normalizeTimeText(endTime);
+  if (st && et) return `${st} - ${et}`;
+  if (st) return st;
+  if (et) return et;
+  return lang === 'en' ? 'no time' : 'без времени';
 }
 
 function asArray(v) {
@@ -133,6 +222,8 @@ export class PlanningCollabApp {
     this.ui = ui;
     this.els = els;
 
+    const todayIso = formatLocalISO(new Date());
+
     this.client = null;
     this.user = null;
     this.profile = null;
@@ -144,10 +235,36 @@ export class PlanningCollabApp {
       friends: [],
       incomingInvites: [],
       realtimeStatus: 'off',
-      presence: []
+      presence: [],
+      schedule: {
+        events: [],
+        loading: false,
+        available: true,
+        unavailableReason: '',
+        lastRangeKey: '',
+        workspace: {
+          lists: [],
+          plans: [],
+          calendarCounts: [],
+          loading: false,
+          available: true,
+          unavailableReason: '',
+          lastProjectId: '',
+          selectedDay: todayIso,
+          monthAnchor: todayIso,
+          tab: 'today'
+        }
+      }
     };
 
     this.uiPrefs = this.loadUIPrefs();
+    this.state.schedule.workspace.tab = this.normalizePersonalScheduleTab(this.uiPrefs.scheduleTab);
+    this.state.schedule.workspace.selectedDay = parseISOToLocalDate(this.uiPrefs.scheduleSelectedDay)
+      ? String(this.uiPrefs.scheduleSelectedDay)
+      : todayIso;
+    this.state.schedule.workspace.monthAnchor = parseISOToLocalDate(this.uiPrefs.scheduleMonthAnchor)
+      ? String(this.uiPrefs.scheduleMonthAnchor)
+      : todayIso;
     this.channel = null;
     this.boardReloadTimer = null;
     this.projectsRetryTimer = null;
@@ -161,6 +278,9 @@ export class PlanningCollabApp {
     this.currentEditingCardId = null;
     this.editingByKey = new Map();
     this.schemaWarnShown = false;
+    this.scheduleSchemaWarnShown = false;
+    this.personalScheduleSchemaWarnShown = false;
+    this.actionsHardDisabled = false;
     this.handlersBound = false;
 
     const baseCloseModal = this.ui.closeModal.bind(this.ui);
@@ -221,9 +341,12 @@ export class PlanningCollabApp {
     if (!loaded) {
       this.state.activeProjectId = null;
       this.state.board = null;
+      this.state.schedule.events = [];
+      this.state.schedule.lastRangeKey = '';
       this.renderProjectSelect();
       this.renderProjectBar();
       this.renderAssigneeFilter();
+      this.renderSchedule();
 
       if (this.schemaWarnShown) {
         this.renderEmptyBoard(this.t('структура planning устарела. примените stage9 + stage10 sql.', 'planning schema is outdated. apply stage9 + stage10 sql.'));
@@ -235,6 +358,7 @@ export class PlanningCollabApp {
       this.scheduleProjectsRetry();
       this.startBackgroundLoops();
       this.setActionsDisabled(false);
+      this.syncToolbarByProject();
       this.setCloudBadge('sync', this.t('проекты недоступны', 'projects unavailable'));
       return;
     }
@@ -272,6 +396,7 @@ export class PlanningCollabApp {
 
     this.startBackgroundLoops();
     this.setActionsDisabled(false);
+    this.syncToolbarByProject();
   }
 
   getLang() {
@@ -292,7 +417,46 @@ export class PlanningCollabApp {
     return PROJECT_SCOPES.includes(s) ? s : 'all';
   }
 
+  normalizeProjectKind(kind) {
+    return String(kind || '').toLowerCase() === 'schedule' ? 'schedule' : 'board';
+  }
+
+  normalizeScheduleRange(range) {
+    const value = String(range || '').toLowerCase();
+    return SCHEDULE_RANGES.includes(value) ? value : 'this_week';
+  }
+
+  normalizePersonalScheduleTab(tab) {
+    const value = String(tab || '').toLowerCase();
+    return PERSONAL_SCHEDULE_TABS.includes(value) ? value : 'today';
+  }
+
+  activeProjectMeta() {
+    const activeId = String(this.state.activeProjectId || '');
+    if (!activeId) return null;
+    return this.state.projects.find((p) => String(p.id) === activeId) || null;
+  }
+
+  activeProjectKind() {
+    const target = this.activeProjectMeta();
+    return this.normalizeProjectKind(target && target.kind);
+  }
+
+  isScheduleProject(project = null) {
+    const target = project || this.activeProjectMeta();
+    return this.normalizeProjectKind(target && target.kind) === 'schedule';
+  }
+
+  readScheduleAnchorDate() {
+    const parsed = parseISOToLocalDate(this.uiPrefs.scheduleAnchor);
+    if (parsed) return parsed;
+    return new Date();
+  }
+
   normalizeProjectScope(project) {
+    if (this.normalizeProjectKind(project && project.kind) === 'schedule') {
+      return 'personal';
+    }
     const scope = String((project && project.scope) || '').toLowerCase();
     if (scope === 'personal' || scope === 'shared') return scope;
     let memberCount = Number((project && project.member_count) || 0);
@@ -355,11 +519,15 @@ export class PlanningCollabApp {
       this.state.activeProjectId = null;
       this.storeActiveProjectId(null);
       this.state.board = null;
+      this.state.schedule.events = [];
+      this.state.schedule.lastRangeKey = '';
       this.renderProjectSelect();
       this.renderProjectBar();
       this.renderPresence();
       this.renderAssigneeFilter();
       this.renderBoard();
+      this.renderSchedule();
+      this.syncToolbarByProject();
       return true;
     }
 
@@ -393,8 +561,10 @@ export class PlanningCollabApp {
       this.renderProjectSelect();
       this.renderProjectBar();
       this.renderBoard();
+      this.renderSchedule();
       this.renderAssigneeFilter();
       this.renderPresence();
+      this.syncToolbarByProject();
       return;
     }
 
@@ -403,11 +573,15 @@ export class PlanningCollabApp {
       this.state.activeProjectId = null;
       this.storeActiveProjectId(null);
       this.state.board = null;
+      this.state.schedule.events = [];
+      this.state.schedule.lastRangeKey = '';
       this.renderProjectSelect();
       this.renderProjectBar();
       this.renderPresence();
       this.renderAssigneeFilter();
       this.renderBoard();
+      this.renderSchedule();
+      this.syncToolbarByProject();
       return;
     }
 
@@ -418,13 +592,19 @@ export class PlanningCollabApp {
     if (this.handlersBound) return;
     this.handlersBound = true;
 
+    const refreshViews = () => {
+      this.renderBoard();
+      this.renderSchedule();
+    };
+
     document.addEventListener('ik:languagechange', () => {
       this.renderProjectScopeToggle();
       this.renderProjectSelect();
       this.renderProjectBar();
       this.renderInboxButton();
       this.renderAssigneeFilter();
-      this.renderBoard();
+      this.syncToolbarByProject();
+      refreshViews();
     });
 
     if (this.els.projectScope) {
@@ -448,7 +628,7 @@ export class PlanningCollabApp {
       this.els.searchInput.addEventListener('input', () => {
         this.uiPrefs.q = String(this.els.searchInput.value || '').trim();
         this.persistUIPrefs();
-        this.renderBoard();
+        refreshViews();
       });
     }
 
@@ -456,7 +636,7 @@ export class PlanningCollabApp {
       this.els.tagsFilter.addEventListener('input', () => {
         this.uiPrefs.tags = String(this.els.tagsFilter.value || '').trim();
         this.persistUIPrefs();
-        this.renderBoard();
+        refreshViews();
       });
     }
 
@@ -465,7 +645,7 @@ export class PlanningCollabApp {
         const next = String(this.els.assigneeFilter.value || 'all');
         this.uiPrefs.assignee = next || 'all';
         this.persistUIPrefs();
-        this.renderBoard();
+        refreshViews();
       });
     }
 
@@ -473,7 +653,7 @@ export class PlanningCollabApp {
       this.els.priorityFilter.addEventListener('change', () => {
         this.uiPrefs.priority = String(this.els.priorityFilter.value || 'all');
         this.persistUIPrefs();
-        this.renderBoard();
+        refreshViews();
       });
     }
 
@@ -481,7 +661,7 @@ export class PlanningCollabApp {
       this.els.deadlineFilter.addEventListener('change', () => {
         this.uiPrefs.deadline = String(this.els.deadlineFilter.value || 'all');
         this.persistUIPrefs();
-        this.renderBoard();
+        refreshViews();
       });
     }
 
@@ -489,7 +669,7 @@ export class PlanningCollabApp {
       this.els.sortSelect.addEventListener('change', () => {
         this.uiPrefs.sort = String(this.els.sortSelect.value || 'default');
         this.persistUIPrefs();
-        this.renderBoard();
+        refreshViews();
       });
     }
 
@@ -503,7 +683,7 @@ export class PlanningCollabApp {
         this.uiPrefs.sort = 'default';
         this.applyPrefsToControls();
         this.persistUIPrefs();
-        this.renderBoard();
+        refreshViews();
         this.ui.toast(this.t('фильтры очищены', 'filters cleared'));
       });
     }
@@ -538,7 +718,81 @@ export class PlanningCollabApp {
 
     if (this.els.btnNewEvent) {
       this.els.btnNewEvent.addEventListener('click', () => {
-        this.ui.toast(this.t('раздел расписания пока не реализован', 'schedule module is not implemented yet'));
+        void this.openCreateScheduleProjectModal().catch((error) => this.onMutationError(error));
+      });
+    }
+
+    if (this.els.scheduleView) {
+      this.els.scheduleView.addEventListener('click', (event) => {
+        if (this.isScheduleProject()) {
+          this.handlePersonalScheduleClick(event);
+          return;
+        }
+
+        const rangeBtn = event.target.closest('[data-schedule-range]');
+        if (rangeBtn) {
+          const range = String(rangeBtn.getAttribute('data-schedule-range') || 'this_week');
+          void this.setScheduleRange(range).catch((error) => this.onMutationError(error));
+          return;
+        }
+
+        const navBtn = event.target.closest('[data-schedule-nav]');
+        if (navBtn) {
+          const mode = String(navBtn.getAttribute('data-schedule-nav') || 'today');
+          if (mode === 'today') {
+            void this.setScheduleAnchor(new Date(), { forceReload: true }).catch((error) => this.onMutationError(error));
+          } else {
+            void this.shiftScheduleWindow(mode === 'prev' ? -1 : 1).catch((error) => this.onMutationError(error));
+          }
+          return;
+        }
+
+        const addDayBtn = event.target.closest('[data-schedule-add-day]');
+        if (addDayBtn) {
+          const dayKey = String(addDayBtn.getAttribute('data-schedule-add-day') || '');
+          void this.openCreateScheduleEventModal({ day: dayKey }).catch((error) => this.onMutationError(error));
+          return;
+        }
+
+        const openBtn = event.target.closest('[data-schedule-open]');
+        if (openBtn) {
+          const eventId = String(openBtn.getAttribute('data-schedule-open') || '');
+          if (eventId) void this.openScheduleEventModal(eventId).catch((error) => this.onMutationError(error));
+          return;
+        }
+
+        const delBtn = event.target.closest('[data-schedule-del]');
+        if (delBtn) {
+          const eventId = String(delBtn.getAttribute('data-schedule-del') || '');
+          if (eventId) void this.openDeleteScheduleEventModal(eventId).catch((error) => this.onMutationError(error));
+          return;
+        }
+
+        const addBtn = event.target.closest('[data-schedule-new]');
+        if (addBtn) {
+          void this.openCreateScheduleEventModal().catch((error) => this.onMutationError(error));
+          return;
+        }
+
+        const copyBtn = event.target.closest('[data-schedule-copy-week]');
+        if (copyBtn) {
+          void this.copyCurrentWeekToNext().catch((error) => this.onMutationError(error));
+        }
+      });
+
+      this.els.scheduleView.addEventListener('submit', (event) => {
+        if (this.isScheduleProject()) {
+          this.handlePersonalScheduleSubmit(event);
+          return;
+        }
+
+        const form = event.target.closest('[data-schedule-quick-form]');
+        if (!form) return;
+        event.preventDefault();
+        const fd = new FormData(form);
+        const raw = String(fd.get('quick') || '').trim();
+        if (!raw) return;
+        void this.quickAddSchedule(raw).catch((error) => this.onMutationError(error));
       });
     }
   }
@@ -586,11 +840,15 @@ export class PlanningCollabApp {
       if (asArray(events).length > 0) {
         this.lastRealtimeEventAt = Date.now();
         this.scheduleBoardReload(0);
+        if (this.uiPrefs.view === 'schedule') {
+          void this.loadScheduleWindow({ force: true }).catch(() => {});
+        }
       }
     } catch (_) {}
   }
 
   loadUIPrefs() {
+    const todayIso = formatLocalISO(new Date());
     const defaults = {
       projectScope: 'all',
       q: '',
@@ -599,7 +857,12 @@ export class PlanningCollabApp {
       priority: 'all',
       deadline: 'all',
       sort: 'default',
-      view: 'board'
+      view: 'board',
+      scheduleRange: 'this_week',
+      scheduleAnchor: todayIso,
+      scheduleTab: 'today',
+      scheduleSelectedDay: todayIso,
+      scheduleMonthAnchor: todayIso
     };
 
     try {
@@ -620,7 +883,12 @@ export class PlanningCollabApp {
         priority: ['all', 'low', 'mid', 'high'].includes(String(parsed.priority)) ? String(parsed.priority) : defaults.priority,
         deadline: ['all', 'today', 'overdue', 'week'].includes(String(parsed.deadline)) ? String(parsed.deadline) : defaults.deadline,
         sort: ['default', 'deadline', 'priority', 'newest'].includes(String(parsed.sort)) ? String(parsed.sort) : defaults.sort,
-        view: ['board', 'schedule'].includes(String(parsed.view)) ? String(parsed.view) : defaults.view
+        view: ['board', 'schedule'].includes(String(parsed.view)) ? String(parsed.view) : defaults.view,
+        scheduleRange: this.normalizeScheduleRange(parsed.scheduleRange),
+        scheduleAnchor: parseISOToLocalDate(parsed.scheduleAnchor) ? String(parsed.scheduleAnchor) : todayIso,
+        scheduleTab: this.normalizePersonalScheduleTab(parsed.scheduleTab),
+        scheduleSelectedDay: parseISOToLocalDate(parsed.scheduleSelectedDay) ? String(parsed.scheduleSelectedDay) : todayIso,
+        scheduleMonthAnchor: parseISOToLocalDate(parsed.scheduleMonthAnchor) ? String(parsed.scheduleMonthAnchor) : todayIso
       };
     } catch (_) {
       return defaults;
@@ -702,12 +970,14 @@ export class PlanningCollabApp {
   }
 
   setActionsDisabled(disabled) {
+    this.actionsHardDisabled = !!disabled;
     const ids = [
       this.els.btnNewProject,
       this.els.btnNewTask,
       this.els.btnInviteFriend,
       this.els.btnInvitesInbox,
-      this.els.btnNewEvent
+      this.els.btnNewEvent,
+      this.els.viewSelect
     ];
     for (const el of ids) {
       if (!el) continue;
@@ -718,6 +988,80 @@ export class PlanningCollabApp {
       this.els.projectScope.querySelectorAll('[data-scope]').forEach((el) => {
         el.disabled = !!disabled;
       });
+    }
+  }
+
+  syncToolbarByProject() {
+    const body = typeof document !== 'undefined' ? document.body : null;
+    const titleEl = typeof document !== 'undefined' ? document.querySelector('.planning-title h1') : null;
+
+    if (this.actionsHardDisabled) {
+      if (body) body.classList.remove('planning-mode-schedule');
+      if (titleEl) {
+        titleEl.textContent = this.t('планирование', 'planning');
+      }
+      return;
+    }
+
+    const hasProject = !!this.state.activeProjectId;
+    const scheduleMode = hasProject && this.isScheduleProject();
+
+    if (body) {
+      body.classList.toggle('planning-mode-schedule', scheduleMode);
+    }
+
+    if (titleEl) {
+      titleEl.textContent = scheduleMode
+        ? this.t('расписание', 'schedule')
+        : this.t('планирование', 'planning');
+    }
+
+    if (this.els.searchInput) {
+      this.els.searchInput.placeholder = scheduleMode
+        ? this.t('поиск планов…', 'search plans…')
+        : this.t('поиск задач…', 'search tasks…');
+    }
+
+    const hiddenInSchedule = [
+      this.els.projectScope,
+      this.els.assigneeFilter,
+      this.els.tagsFilter,
+      this.els.deadlineFilter,
+      this.els.sortSelect,
+      this.els.clearFilters,
+      this.els.viewSelect,
+      this.els.planningPresence,
+      this.els.btnNewTask,
+      this.els.btnInviteFriend
+    ];
+    for (const el of hiddenInSchedule) {
+      if (!el) continue;
+      el.hidden = scheduleMode;
+    }
+
+    if (this.els.btnNewTask) {
+      this.els.btnNewTask.disabled = !hasProject || scheduleMode;
+    }
+
+    if (this.els.btnInviteFriend) {
+      this.els.btnInviteFriend.disabled = !hasProject || scheduleMode;
+    }
+
+    if (this.els.viewSelect) {
+      if (scheduleMode && this.els.viewSelect.value !== 'schedule') {
+        this.els.viewSelect.value = 'schedule';
+      }
+      this.els.viewSelect.disabled = scheduleMode;
+    }
+
+    const scheduleOnlyControls = [
+      this.els.tagsFilter,
+      this.els.deadlineFilter,
+      this.els.sortSelect
+    ];
+    for (const el of scheduleOnlyControls) {
+      if (!el) continue;
+      el.disabled = scheduleMode;
     }
   }
 
@@ -785,10 +1129,16 @@ export class PlanningCollabApp {
     const quiet = !!options.quiet;
     try {
       const data = await this.rpc('ik_plan_list_projects');
-      this.state.projects = asArray(data).map((p) => ({
-        ...p,
-        scope: this.normalizeProjectScope(p)
-      }));
+      this.state.projects = asArray(data).map((p) => {
+        const project = {
+          ...p,
+          kind: this.normalizeProjectKind(p && p.kind)
+        };
+        return {
+          ...project,
+          scope: this.normalizeProjectScope(project)
+        };
+      });
       this.clearProjectsRetry();
       this.renderProjectSelect();
       this.renderProjectBar();
@@ -921,17 +1271,42 @@ export class PlanningCollabApp {
     this.renderProjectSelect();
     this.renderProjectBar();
 
+    const kind = this.normalizeProjectKind(target.kind);
+
+    if (kind === 'schedule') {
+      await this.unsubscribeProject();
+      this.state.board = null;
+      this.state.presence = [];
+      this.state.realtimeStatus = 'off';
+      this.setCloudBadge('ready', this.t('личное расписание', 'personal schedule'));
+      this.renderPresence();
+      this.renderAssigneeFilter();
+      this.setView('schedule');
+      await this.loadPersonalScheduleWorkspace({ force: true });
+      this.syncToolbarByProject();
+      return;
+    }
+
+    if (this.uiPrefs.view !== 'board') {
+      this.setView('board');
+    }
+
     await this.loadBoard(id);
     await this.subscribeProject(id);
     this.renderPresence();
+    this.syncToolbarByProject();
+    this.renderSchedule();
   }
 
   async loadBoard(projectId) {
     const id = String(projectId || this.state.activeProjectId || '').trim();
     if (!id) {
       this.state.board = null;
+      this.state.schedule.events = [];
+      this.state.schedule.lastRangeKey = '';
       this.renderAssigneeFilter();
       this.renderBoard();
+      this.renderSchedule();
       return;
     }
 
@@ -943,11 +1318,15 @@ export class PlanningCollabApp {
       this.renderProjectBar();
       this.renderAssigneeFilter();
       this.renderBoard();
+      this.renderSchedule();
       this.renderPresence();
     } catch (error) {
       this.state.board = null;
+      this.state.schedule.events = [];
+      this.state.schedule.lastRangeKey = '';
       this.renderAssigneeFilter();
       this.renderBoard();
+      this.renderSchedule();
       this.renderPresence();
       await this.onMutationError(error);
     } finally {
@@ -1043,8 +1422,12 @@ export class PlanningCollabApp {
 
   onProjectEvent(eventRow) {
     this.lastRealtimeEventAt = Date.now();
+    const eventType = String((eventRow && eventRow.event_type) || '');
     if (!eventRow || !this.state.board || !this.state.board.project) {
       this.scheduleBoardReload(80);
+      if (this.uiPrefs.view === 'schedule' && eventType.startsWith('schedule.')) {
+        void this.loadScheduleWindow({ force: true }).catch(() => {});
+      }
       return;
     }
 
@@ -1053,6 +1436,9 @@ export class PlanningCollabApp {
 
     if (!incomingRevision) {
       this.scheduleBoardReload(80);
+      if (this.uiPrefs.view === 'schedule' && eventType.startsWith('schedule.')) {
+        void this.loadScheduleWindow({ force: true }).catch(() => {});
+      }
       return;
     }
 
@@ -1060,10 +1446,16 @@ export class PlanningCollabApp {
 
     if (incomingRevision > localRevision + 1) {
       this.scheduleBoardReload(0);
+      if (this.uiPrefs.view === 'schedule' && eventType.startsWith('schedule.')) {
+        void this.loadScheduleWindow({ force: true }).catch(() => {});
+      }
       return;
     }
 
     this.scheduleBoardReload(90);
+    if (this.uiPrefs.view === 'schedule' && eventType.startsWith('schedule.')) {
+      void this.loadScheduleWindow({ force: true }).catch(() => {});
+    }
   }
 
   syncPresence() {
@@ -1220,22 +1612,2032 @@ export class PlanningCollabApp {
   }
 
   setView(view) {
-    const safeView = view === 'schedule' ? 'schedule' : 'board';
+    const forcedSchedule = this.isScheduleProject();
+    const safeView = forcedSchedule ? 'schedule' : (view === 'schedule' ? 'schedule' : 'board');
+    this.uiPrefs.view = safeView;
+    this.persistUIPrefs();
+
+    if (this.els.viewSelect && this.els.viewSelect.value !== safeView) {
+      this.els.viewSelect.value = safeView;
+    }
 
     if (this.els.boardView) this.els.boardView.hidden = safeView !== 'board';
     if (this.els.scheduleView) this.els.scheduleView.hidden = safeView !== 'schedule';
 
-    if (safeView === 'schedule' && this.els.scheduleView) {
-      this.els.scheduleView.innerHTML = `
-        <div class="schedule-placeholder" style="font-size:11px; letter-spacing:3px; text-transform:uppercase;">
-          ${escapeHtml(this.t('расписание скоро появится', 'schedule is next step'))}
-        </div>
-      `;
-    }
-
     if (safeView === 'board') {
       this.renderBoard();
+      return;
     }
+
+    this.renderSchedule();
+    if (forcedSchedule) {
+      void this.loadPersonalScheduleWorkspace().catch((error) => this.onMutationError(error));
+    } else {
+      void this.loadScheduleWindow().catch((error) => this.onMutationError(error));
+    }
+  }
+
+  getScheduleWindow() {
+    const range = this.normalizeScheduleRange(this.uiPrefs.scheduleRange);
+    const anchor = this.readScheduleAnchorDate();
+    const anchorDate = new Date(anchor.getFullYear(), anchor.getMonth(), anchor.getDate());
+
+    let startDate;
+    let endDate;
+
+    if (range === 'today') {
+      startDate = anchorDate;
+      endDate = addDaysLocal(startDate, 1);
+    } else if (range === 'this_week') {
+      startDate = startOfWeekLocal(anchorDate);
+      endDate = addDaysLocal(startDate, 7);
+    } else if (range === 'next_week') {
+      startDate = addDaysLocal(startOfWeekLocal(anchorDate), 7);
+      endDate = addDaysLocal(startDate, 7);
+    } else if (range === 'two_weeks') {
+      startDate = startOfWeekLocal(anchorDate);
+      endDate = addDaysLocal(startDate, 14);
+    } else {
+      startDate = startOfMonthLocal(anchorDate);
+      endDate = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 1);
+    }
+
+    const days = [];
+    for (let d = new Date(startDate); d < endDate; d = addDaysLocal(d, 1)) {
+      days.push(new Date(d.getFullYear(), d.getMonth(), d.getDate()));
+    }
+
+    return {
+      key: range,
+      startDate,
+      endDate,
+      fromIso: startDate.toISOString(),
+      toIso: endDate.toISOString(),
+      dayKeys: days.map((d) => formatLocalISO(d)),
+      days,
+      isGrid: days.length <= 14
+    };
+  }
+
+  scheduleRangeLabel(rangeKey) {
+    const key = this.normalizeScheduleRange(rangeKey);
+    if (key === 'today') return this.t('сегодня', 'today');
+    if (key === 'this_week') return this.t('эта неделя', 'this week');
+    if (key === 'next_week') return this.t('следующая неделя', 'next week');
+    if (key === 'two_weeks') return this.t('2 недели', '2 weeks');
+    return this.t('месяц', 'month');
+  }
+
+  formatScheduleRangeTitle(win) {
+    const locale = this.getLang() === 'en' ? 'en-US' : 'ru-RU';
+    const fmt = new Intl.DateTimeFormat(locale, { day: '2-digit', month: 'short' });
+    const endInclusive = addDaysLocal(win.endDate, -1);
+    return `${fmt.format(win.startDate)} - ${fmt.format(endInclusive)}`;
+  }
+
+  formatScheduleDayLabel(day) {
+    const locale = this.getLang() === 'en' ? 'en-US' : 'ru-RU';
+    const fmt = new Intl.DateTimeFormat(locale, { weekday: 'short', day: '2-digit', month: 'short' });
+    return fmt.format(day);
+  }
+
+  async setScheduleRange(range) {
+    const next = this.normalizeScheduleRange(range);
+    if (next === this.normalizeScheduleRange(this.uiPrefs.scheduleRange)) {
+      this.renderSchedule();
+      await this.loadScheduleWindow({ force: false });
+      return;
+    }
+
+    this.uiPrefs.scheduleRange = next;
+    if (!parseISOToLocalDate(this.uiPrefs.scheduleAnchor)) {
+      this.uiPrefs.scheduleAnchor = formatLocalISO(new Date());
+    }
+    this.persistUIPrefs();
+    this.renderSchedule();
+    await this.loadScheduleWindow({ force: true });
+  }
+
+  async setScheduleAnchor(dateValue, options = {}) {
+    const forceReload = !!options.forceReload;
+    const date = dateValue instanceof Date ? dateValue : new Date(dateValue);
+    if (!(date instanceof Date) || Number.isNaN(date.getTime())) return;
+    this.uiPrefs.scheduleAnchor = formatLocalISO(date);
+    this.persistUIPrefs();
+    this.renderSchedule();
+    await this.loadScheduleWindow({ force: forceReload });
+  }
+
+  async shiftScheduleWindow(step) {
+    const dir = Number(step || 0);
+    if (!dir) return;
+
+    const range = this.normalizeScheduleRange(this.uiPrefs.scheduleRange);
+    const anchor = this.readScheduleAnchorDate();
+    const base = new Date(anchor.getFullYear(), anchor.getMonth(), anchor.getDate());
+
+    if (range === 'month') {
+      base.setMonth(base.getMonth() + dir);
+    } else if (range === 'today') {
+      base.setDate(base.getDate() + dir);
+    } else {
+      base.setDate(base.getDate() + dir * 7);
+    }
+
+    await this.setScheduleAnchor(base, { forceReload: true });
+  }
+
+  looksLikeScheduleSchemaError(error) {
+    const txt = briefError(error).toLowerCase();
+    const code = String((error && error.code) || '').toUpperCase();
+    if (code === '42883' || code === '42P01' || code === '42703') {
+      return txt.includes('ik_plan_schedule') || txt.includes('ik_plan_list_schedule_events');
+    }
+    return txt.includes('ik_plan_schedule_events') || txt.includes('ik_plan_list_schedule_events');
+  }
+
+  disableSchedule(reason) {
+    this.state.schedule.available = false;
+    this.state.schedule.unavailableReason = String(reason || '').trim();
+    this.state.schedule.loading = false;
+    this.state.schedule.events = [];
+    this.state.schedule.lastRangeKey = '';
+    this.renderSchedule();
+  }
+
+  resetScheduleAvailability() {
+    this.state.schedule.available = true;
+    this.state.schedule.unavailableReason = '';
+  }
+
+  async loadScheduleWindow(options = {}) {
+    const force = !!options.force;
+    if (this.isScheduleProject()) {
+      this.renderSchedule();
+      return;
+    }
+
+    if (!this.state.activeProjectId || !(this.state.board && this.state.board.project)) {
+      this.state.schedule.events = [];
+      this.state.schedule.lastRangeKey = '';
+      this.renderSchedule();
+      return;
+    }
+
+    if (!this.state.schedule.available) {
+      this.renderSchedule();
+      return;
+    }
+
+    const win = this.getScheduleWindow();
+    const rangeKey = `${this.state.activeProjectId}:${win.fromIso}:${win.toIso}`;
+    if (!force && this.state.schedule.lastRangeKey === rangeKey) {
+      this.renderSchedule();
+      return;
+    }
+
+    this.state.schedule.loading = true;
+    this.renderSchedule();
+
+    try {
+      const data = await this.rpc('ik_plan_list_schedule_events', {
+        p_project_id: this.state.activeProjectId,
+        p_from: win.fromIso,
+        p_to: win.toIso
+      });
+      this.state.schedule.events = asArray(data);
+      this.state.schedule.lastRangeKey = rangeKey;
+      this.resetScheduleAvailability();
+    } catch (error) {
+      if (this.looksLikeScheduleSchemaError(error)) {
+        if (!this.scheduleSchemaWarnShown) {
+          this.scheduleSchemaWarnShown = true;
+          this.ui.toast(this.t(
+            'для расписания примените SQL: supabase/sql/stage15_planning_schedule.sql',
+            'for schedule apply SQL: supabase/sql/stage15_planning_schedule.sql'
+          ));
+        }
+        this.disableSchedule(this.t('расписание недоступно: требуется stage15 sql', 'schedule unavailable: stage15 sql required'));
+      } else {
+        this.state.schedule.events = [];
+        this.state.schedule.lastRangeKey = '';
+        this.state.schedule.loading = false;
+        await this.onMutationError(error);
+      }
+    } finally {
+      this.state.schedule.loading = false;
+      this.renderSchedule();
+    }
+  }
+
+  looksLikePersonalScheduleSchemaError(error) {
+    const txt = briefError(error).toLowerCase();
+    const code = String((error && error.code) || '').toUpperCase();
+    if (code === '42883' || code === '42P01' || code === '42703') {
+      return txt.includes('ik_plan_create_schedule')
+        || txt.includes('ik_plan_get_schedule_workspace')
+        || txt.includes('ik_plan_create_schedule_plan')
+        || txt.includes('ik_plan_update_schedule_plan')
+        || txt.includes('ik_plan_schedule_lists')
+        || txt.includes('ik_plan_schedule_plans');
+    }
+    return txt.includes('ik_plan_schedule_lists')
+      || txt.includes('ik_plan_schedule_plans')
+      || txt.includes('ik_plan_create_schedule_plan')
+      || txt.includes('ik_plan_update_schedule_plan')
+      || txt.includes('ik_plan_get_schedule_workspace')
+      || txt.includes('schedule_project_required');
+  }
+
+  personalScheduleState() {
+    return this.state.schedule.workspace;
+  }
+
+  persistPersonalSchedulePrefs() {
+    const ws = this.personalScheduleState();
+    this.uiPrefs.scheduleTab = this.normalizePersonalScheduleTab(ws.tab);
+    this.uiPrefs.scheduleSelectedDay = String(ws.selectedDay || formatLocalISO(new Date()));
+    this.uiPrefs.scheduleMonthAnchor = String(ws.monthAnchor || formatLocalISO(new Date()));
+    this.persistUIPrefs();
+  }
+
+  clearPersonalScheduleWorkspace() {
+    const ws = this.personalScheduleState();
+    ws.lists = [];
+    ws.plans = [];
+    ws.calendarCounts = [];
+    ws.loading = false;
+    ws.available = true;
+    ws.unavailableReason = '';
+    ws.lastProjectId = '';
+  }
+
+  disablePersonalScheduleWorkspace(reason) {
+    const ws = this.personalScheduleState();
+    ws.available = false;
+    ws.unavailableReason = String(reason || '').trim();
+    ws.loading = false;
+    ws.lists = [];
+    ws.plans = [];
+    ws.calendarCounts = [];
+    this.renderSchedule();
+  }
+
+  resetPersonalScheduleAvailability() {
+    const ws = this.personalScheduleState();
+    ws.available = true;
+    ws.unavailableReason = '';
+  }
+
+  setPersonalScheduleTab(tabKey) {
+    const ws = this.personalScheduleState();
+    ws.tab = this.normalizePersonalScheduleTab(tabKey);
+    this.persistPersonalSchedulePrefs();
+    this.renderSchedule();
+  }
+
+  setPersonalScheduleSelectedDay(dayIso, options = {}) {
+    const ws = this.personalScheduleState();
+    const date = parseISOToLocalDate(dayIso);
+    if (!date) return;
+    ws.selectedDay = formatLocalISO(date);
+    if (options.syncMonth) {
+      ws.monthAnchor = formatLocalISO(new Date(date.getFullYear(), date.getMonth(), 1));
+    }
+    this.persistPersonalSchedulePrefs();
+    this.renderSchedule();
+  }
+
+  shiftPersonalScheduleMonth(step) {
+    const ws = this.personalScheduleState();
+    const anchorDate = parseISOToLocalDate(ws.monthAnchor) || parseISOToLocalDate(ws.selectedDay) || new Date();
+    const next = new Date(anchorDate.getFullYear(), anchorDate.getMonth() + Number(step || 0), 1);
+    ws.monthAnchor = formatLocalISO(next);
+    this.persistPersonalSchedulePrefs();
+    this.renderSchedule();
+  }
+
+  async loadPersonalScheduleWorkspace(options = {}) {
+    const force = !!options.force;
+    const ws = this.personalScheduleState();
+    const active = this.activeProjectMeta();
+    const projectId = String(active && active.id || '');
+
+    if (!projectId || !this.isScheduleProject(active)) {
+      this.clearPersonalScheduleWorkspace();
+      this.renderSchedule();
+      return;
+    }
+
+    if (!force && ws.lastProjectId === projectId) {
+      this.renderSchedule();
+      return;
+    }
+
+    ws.loading = true;
+    this.renderSchedule();
+
+    try {
+      const data = await this.rpc('ik_plan_get_schedule_workspace', {
+        p_project_id: projectId
+      });
+      ws.lists = asArray(data && data.lists);
+      ws.plans = asArray(data && data.plans);
+      ws.calendarCounts = asArray(data && data.calendar_counts);
+      ws.lastProjectId = projectId;
+      this.resetPersonalScheduleAvailability();
+    } catch (error) {
+      if (this.looksLikePersonalScheduleSchemaError(error)) {
+        if (!this.personalScheduleSchemaWarnShown) {
+          this.personalScheduleSchemaWarnShown = true;
+          this.ui.toast(this.t(
+            'для личного расписания примените SQL: supabase/sql/stage16_planning_personal_schedule.sql',
+            'for personal schedule apply SQL: supabase/sql/stage16_planning_personal_schedule.sql'
+          ));
+        }
+        this.disablePersonalScheduleWorkspace(this.t(
+          'расписание недоступно: требуется stage16 sql',
+          'schedule unavailable: stage16 sql required'
+        ));
+      } else {
+        ws.lists = [];
+        ws.plans = [];
+        ws.calendarCounts = [];
+        ws.lastProjectId = '';
+        await this.onMutationError(error);
+      }
+    } finally {
+      ws.loading = false;
+      this.renderSchedule();
+    }
+  }
+
+  scheduleListsSorted() {
+    const ws = this.personalScheduleState();
+    return asArray(ws.lists).slice().sort((a, b) => {
+      const ap = toPositionNumber(a.position);
+      const bp = toPositionNumber(b.position);
+      if (ap !== bp) return ap - bp;
+      return String(a.id || '').localeCompare(String(b.id || ''));
+    });
+  }
+
+  scheduleListById(listId) {
+    const id = String(listId || '').trim();
+    if (!id) return null;
+    return this.scheduleListsSorted().find((x) => String(x.id) === id) || null;
+  }
+
+  schedulePlanById(planId) {
+    const ws = this.personalScheduleState();
+    const id = String(planId || '').trim();
+    if (!id) return null;
+    return asArray(ws.plans).find((x) => String(x.id) === id) || null;
+  }
+
+  sortPersonalPlans(rows) {
+    return asArray(rows).slice().sort((a, b) => {
+      const ad = !!a.is_done;
+      const bd = !!b.is_done;
+      if (ad !== bd) return ad ? 1 : -1;
+
+      const adate = String(a._occursOn || a.plan_date || '');
+      const bdate = String(b._occursOn || b.plan_date || '');
+      if (adate !== bdate) {
+        if (!adate) return 1;
+        if (!bdate) return -1;
+        return adate.localeCompare(bdate);
+      }
+
+      const atime = normalizeTimeText(a.start_time) || '99:99';
+      const btime = normalizeTimeText(b.start_time) || '99:99';
+      if (atime !== btime) return atime.localeCompare(btime);
+
+      return String(a.title || '').localeCompare(String(b.title || ''));
+    });
+  }
+
+  personalRepeatLabel(ruleValue) {
+    const rule = normalizeRepeatRule(ruleValue);
+    if (rule === 'daily') return this.t('ежедневно', 'daily');
+    if (rule === 'weekly') return this.t('еженедельно', 'weekly');
+    if (rule === 'monthly') return this.t('ежемесячно', 'monthly');
+    if (rule === 'yearly') return this.t('ежегодно', 'yearly');
+    if (rule === 'weekdays') return this.t('каждый будний день', 'every weekday');
+    if (rule === 'weekends') return this.t('каждый выходной', 'every weekend');
+    return this.t('не повторять', 'no repeat');
+  }
+
+  schedulePlanOccursOnDay(plan, dayIso) {
+    const day = parseISOToLocalDate(dayIso);
+    if (!day) return false;
+
+    const baseKey = String(plan && plan.plan_date || '').trim();
+    const repeatRule = normalizeRepeatRule(plan && plan.repeat_rule);
+
+    if (!baseKey) {
+      return repeatRule === 'none' ? false : false;
+    }
+
+    if (repeatRule === 'none') {
+      return baseKey === dayIso;
+    }
+
+    const baseDate = parseISOToLocalDate(baseKey);
+    if (!baseDate) return false;
+    const targetDate = day;
+    if (targetDate.getTime() < baseDate.getTime()) return false;
+
+    const untilDate = parseISOToLocalDate(plan && plan.repeat_until);
+    if (untilDate && targetDate.getTime() > untilDate.getTime()) return false;
+
+    const diff = dayDiffLocal(baseDate, targetDate);
+    const targetWeekDay = targetDate.getDay();
+
+    if (repeatRule === 'daily') return true;
+    if (repeatRule === 'weekly') return targetWeekDay === baseDate.getDay() && diff % 7 === 0;
+    if (repeatRule === 'monthly') return targetDate.getDate() === baseDate.getDate();
+    if (repeatRule === 'yearly') return targetDate.getDate() === baseDate.getDate() && targetDate.getMonth() === baseDate.getMonth();
+    if (repeatRule === 'weekdays') return targetWeekDay >= 1 && targetWeekDay <= 5;
+    if (repeatRule === 'weekends') return targetWeekDay === 0 || targetWeekDay === 6;
+    return false;
+  }
+
+  expandPlansForDay(dayIso, rows = null) {
+    const targetDay = String(dayIso || '').trim();
+    if (!targetDay) return [];
+    const source = rows || this.filteredPersonalSchedulePlans();
+    const out = [];
+    for (const row of source) {
+      if (!this.schedulePlanOccursOnDay(row, targetDay)) continue;
+      out.push({ ...row, _occursOn: targetDay });
+    }
+    return this.sortPersonalPlans(out);
+  }
+
+  countPlansForDay(dayIso, rows = null) {
+    return this.expandPlansForDay(dayIso, rows).length;
+  }
+
+  filteredPersonalSchedulePlans() {
+    const ws = this.personalScheduleState();
+    const q = String(this.uiPrefs.q || '').trim().toLowerCase();
+    const priority = String(this.uiPrefs.priority || 'all').toLowerCase();
+    return asArray(ws.plans).filter((row) => {
+      if (q) {
+        const hay = `${row.title || ''} ${row.note || ''}`.toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      if (priority !== 'all' && String(row.priority || '').toLowerCase() !== priority) {
+        return false;
+      }
+      return true;
+    });
+  }
+
+  plansForDay(dayIso, rows = null) {
+    return this.expandPlansForDay(dayIso, rows);
+  }
+
+  scheduleListOptionsHtml(selectedId = '') {
+    const selected = String(selectedId || '');
+    const options = [`<option value="">${escapeHtml(this.t('без списка', 'no list'))}</option>`];
+    for (const list of this.scheduleListsSorted()) {
+      const id = String(list.id || '');
+      if (!id) continue;
+      const pick = id === selected ? 'selected' : '';
+      options.push(`<option value="${escapeAttr(id)}" ${pick}>${escapeHtml(String(list.name || 'list'))}</option>`);
+    }
+    return options.join('');
+  }
+
+  scheduleRepeatRuleOptionsHtml(selectedRule = 'none') {
+    const selected = normalizeRepeatRule(selectedRule);
+    const options = [
+      { key: 'none', label: this.t('не повторять', 'no repeat') },
+      { key: 'daily', label: this.t('ежедневно', 'daily') },
+      { key: 'weekly', label: this.t('еженедельно', 'weekly') },
+      { key: 'monthly', label: this.t('ежемесячно', 'monthly') },
+      { key: 'yearly', label: this.t('ежегодно', 'yearly') },
+      { key: 'weekdays', label: this.t('каждый будний день', 'every weekday') },
+      { key: 'weekends', label: this.t('каждый выходной', 'every weekend') }
+    ];
+    return options
+      .map((opt) => `<option value="${opt.key}" ${opt.key === selected ? 'selected' : ''}>${escapeHtml(opt.label)}</option>`)
+      .join('');
+  }
+
+  renderPersonalPlanRow(row, listById = new Map()) {
+    const planId = String(row.id || '');
+    const list = row.list_id ? listById.get(String(row.list_id)) : null;
+    const dateText = String(row._occursOn || row.plan_date || '') || this.t('без даты', 'no date');
+    const timeText = timeLabelHM(row.start_time, row.end_time, this.getLang());
+    const done = !!row.is_done;
+    const priority = String(row.priority || 'mid').toLowerCase();
+    const repeatRule = normalizeRepeatRule(row.repeat_rule);
+
+    const meta = [
+      `${this.t('дата', 'date')}: ${dateText}`,
+      `${this.t('время', 'time')}: ${timeText}`,
+      `${this.t('приоритет', 'priority')}: ${priority.toUpperCase()}`
+    ];
+
+    if (repeatRule !== 'none') {
+      const repeatText = this.personalRepeatLabel(repeatRule);
+      const untilText = String(row.repeat_until || '').trim();
+      meta.push(untilText
+        ? `${this.t('повтор', 'repeat')}: ${repeatText} (${this.t('до', 'until')} ${untilText})`
+        : `${this.t('повтор', 'repeat')}: ${repeatText}`);
+    }
+
+    if (list) {
+      meta.push(`${this.t('список', 'list')}: ${String(list.name || '')}`);
+    }
+
+    return `
+      <article class="ps-plan${done ? ' is-done' : ''}" data-ps-plan-id="${escapeAttr(planId)}">
+        <div class="ps-plan__left">
+          <input type="checkbox" data-ps-toggle="${escapeAttr(planId)}" ${done ? 'checked' : ''} />
+        </div>
+        <div class="ps-plan__body">
+          <div class="ps-plan__title">${escapeHtml(String(row.title || this.t('план', 'plan')))}</div>
+          <div class="ps-plan__meta">${escapeHtml(meta.join(' | '))}</div>
+          ${row.note ? `<div class="ps-plan__note">${escapeHtml(shortText(row.note, 200))}</div>` : ''}
+        </div>
+        <div class="ps-plan__actions">
+          <button class="btn btn--thin" type="button" data-ps-open-plan="${escapeAttr(planId)}">${escapeHtml(this.t('открыть', 'open'))}</button>
+          <button class="btn btn--thin" type="button" data-ps-del-plan="${escapeAttr(planId)}">${escapeHtml(this.t('удалить', 'delete'))}</button>
+        </div>
+      </article>
+    `;
+  }
+
+  renderPersonalScheduleToday() {
+    const todayIso = formatLocalISO(new Date());
+    const all = this.filteredPersonalSchedulePlans();
+    const listById = new Map(this.scheduleListsSorted().map((x) => [String(x.id), x]));
+
+    const today = this.plansForDay(todayIso, all);
+    const overdue = this.sortPersonalPlans(all.filter((x) => {
+      const day = String(x.plan_date || '');
+      const repeatRule = normalizeRepeatRule(x.repeat_rule);
+      return repeatRule === 'none' && day && day < todayIso && !x.is_done;
+    }));
+    const inbox = this.sortPersonalPlans(all.filter((x) => {
+      const repeatRule = normalizeRepeatRule(x.repeat_rule);
+      return repeatRule === 'none' && !String(x.plan_date || '').trim() && !x.is_done;
+    }));
+
+    const renderBlock = (title, rows, emptyText, attrs = '') => {
+      const listHtml = rows.length
+        ? rows.map((row) => this.renderPersonalPlanRow(row, listById)).join('')
+        : `<div class="ps-empty">${escapeHtml(emptyText)}</div>`;
+      return `
+        <section class="ps-block">
+          <header class="ps-block__head">
+            <div class="ps-block__title">${escapeHtml(title)}</div>
+            <button class="btn btn--thin" type="button" data-ps-new-plan ${attrs}>+ ${escapeHtml(this.t('план', 'plan'))}</button>
+          </header>
+          <div class="ps-block__body">${listHtml}</div>
+        </section>
+      `;
+    };
+
+    return `
+      <div class="ps-layout">
+        ${renderBlock(this.t('сегодня', 'today'), today, this.t('на сегодня планов нет', 'no plans for today'), `data-day="${escapeAttr(todayIso)}"`)}
+        ${renderBlock(this.t('просрочено', 'overdue'), overdue, this.t('просроченных планов нет', 'no overdue plans'))}
+        ${renderBlock(this.t('без даты', 'no date'), inbox, this.t('пусто', 'empty'))}
+      </div>
+    `;
+  }
+
+  renderPersonalScheduleLists() {
+    const rows = this.filteredPersonalSchedulePlans();
+    const byListId = new Map();
+    this.scheduleListsSorted().forEach((list) => {
+      byListId.set(String(list.id), []);
+    });
+
+    const unassigned = [];
+    rows.forEach((row) => {
+      const listId = String(row.list_id || '');
+      if (!listId || !byListId.has(listId)) {
+        unassigned.push(row);
+        return;
+      }
+      byListId.get(listId).push(row);
+    });
+
+    const sections = this.scheduleListsSorted().map((list) => {
+      const listId = String(list.id || '');
+      const listRows = this.sortPersonalPlans(byListId.get(listId) || []);
+      const content = listRows.length
+        ? listRows.map((row) => this.renderPersonalPlanRow(row, new Map([[listId, list]]))).join('')
+        : `<div class="ps-empty">${escapeHtml(this.t('в этом списке пока пусто', 'this list is empty'))}</div>`;
+      return `
+        <section class="ps-list-block">
+          <header class="ps-list-block__head">
+            <div class="ps-list-block__title"><span class="ps-dot" style="--ps-dot:${escapeAttr(String(list.color || '#2f6f4f'))}"></span>${escapeHtml(String(list.name || 'list'))}</div>
+            <div class="ps-list-block__actions">
+              <button class="btn btn--thin" type="button" data-ps-new-plan data-list-id="${escapeAttr(listId)}">+ ${escapeHtml(this.t('план', 'plan'))}</button>
+              <button class="btn btn--thin" type="button" data-ps-edit-list="${escapeAttr(listId)}">${escapeHtml(this.t('редакт', 'edit'))}</button>
+              <button class="btn btn--thin" type="button" data-ps-del-list="${escapeAttr(listId)}">${escapeHtml(this.t('удалить', 'delete'))}</button>
+            </div>
+          </header>
+          <div class="ps-list-block__body">${content}</div>
+        </section>
+      `;
+    }).join('');
+
+    const unassignedHtml = this.sortPersonalPlans(unassigned);
+
+    return `
+      <div class="ps-layout">
+        <div class="ps-top-actions">
+          <button class="btn" type="button" data-ps-new-list>+ ${escapeHtml(this.t('список', 'list'))}</button>
+        </div>
+        ${sections || `<div class="ps-empty">${escapeHtml(this.t('создайте первый список', 'create your first list'))}</div>`}
+        <section class="ps-list-block">
+          <header class="ps-list-block__head">
+            <div class="ps-list-block__title">${escapeHtml(this.t('без списка', 'no list'))}</div>
+            <button class="btn btn--thin" type="button" data-ps-new-plan>+ ${escapeHtml(this.t('план', 'plan'))}</button>
+          </header>
+          <div class="ps-list-block__body">
+            ${unassignedHtml.length ? unassignedHtml.map((row) => this.renderPersonalPlanRow(row)).join('') : `<div class="ps-empty">${escapeHtml(this.t('пусто', 'empty'))}</div>`}
+          </div>
+        </section>
+      </div>
+    `;
+  }
+
+  renderPersonalScheduleCalendar() {
+    const ws = this.personalScheduleState();
+    const listById = new Map(this.scheduleListsSorted().map((x) => [String(x.id), x]));
+    const selected = parseISOToLocalDate(ws.selectedDay) || new Date();
+    const monthAnchor = parseISOToLocalDate(ws.monthAnchor) || new Date(selected.getFullYear(), selected.getMonth(), 1);
+    const monthStart = new Date(monthAnchor.getFullYear(), monthAnchor.getMonth(), 1);
+    const monthEnd = new Date(monthAnchor.getFullYear(), monthAnchor.getMonth() + 1, 1);
+    const gridStart = startOfWeekLocal(monthStart);
+
+    let gridEnd = new Date(monthEnd.getFullYear(), monthEnd.getMonth(), monthEnd.getDate());
+    while (gridEnd.getDay() !== 1) {
+      gridEnd = addDaysLocal(gridEnd, 1);
+    }
+
+    const allPlans = this.filteredPersonalSchedulePlans();
+    const countMap = new Map();
+    for (let d = new Date(gridStart); d < gridEnd; d = addDaysLocal(d, 1)) {
+      const dayKey = formatLocalISO(d);
+      countMap.set(dayKey, this.countPlansForDay(dayKey, allPlans));
+    }
+
+    const dayButtons = [];
+    for (let d = new Date(gridStart); d < gridEnd; d = addDaysLocal(d, 1)) {
+      const dayKey = formatLocalISO(d);
+      const inMonth = d.getMonth() === monthStart.getMonth();
+      const selectedDay = dayKey === formatLocalISO(selected);
+      const count = Number(countMap.get(dayKey) || 0);
+      dayButtons.push(`
+        <button class="ps-cal__day${inMonth ? '' : ' is-out'}${selectedDay ? ' is-selected' : ''}" type="button" data-ps-day="${escapeAttr(dayKey)}">
+          <span class="ps-cal__num">${d.getDate()}</span>
+          <span class="ps-cal__count">${count > 0 ? count : ''}</span>
+        </button>
+      `);
+    }
+
+    const selectedDayKey = formatLocalISO(selected);
+    const selectedPlans = this.plansForDay(selectedDayKey, allPlans);
+    const selectedPlansHtml = selectedPlans.length
+      ? selectedPlans.map((row) => this.renderPersonalPlanRow(row, listById)).join('')
+      : `<div class="ps-empty">${escapeHtml(this.t('на этот день планов нет', 'no plans for this day'))}</div>`;
+
+    const locale = this.getLang() === 'en' ? 'en-US' : 'ru-RU';
+    const monthTitle = new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric' }).format(monthStart);
+
+    return `
+      <div class="ps-calendar-layout">
+        <section class="ps-cal">
+          <header class="ps-cal__head">
+            <button class="btn btn--thin" type="button" data-ps-month-nav="prev">${escapeHtml(this.t('назад', 'prev'))}</button>
+            <div class="ps-cal__title">${escapeHtml(monthTitle)}</div>
+            <div class="ps-cal__head-actions">
+              <button class="btn btn--thin" type="button" data-ps-month-nav="today">${escapeHtml(this.t('сегодня', 'today'))}</button>
+              <button class="btn btn--thin" type="button" data-ps-month-nav="next">${escapeHtml(this.t('вперед', 'next'))}</button>
+            </div>
+          </header>
+          <div class="ps-cal__grid">${dayButtons.join('')}</div>
+        </section>
+        <section class="ps-day-panel">
+          <header class="ps-day-panel__head">
+            <div class="ps-day-panel__title-wrap">
+              <div class="ps-day-panel__label">${escapeHtml(this.t('выбранный день', 'selected day'))}</div>
+              <div class="ps-day-panel__date">${escapeHtml(selectedDayKey)}</div>
+              <div class="ps-day-panel__sub">${escapeHtml(`${selectedPlans.length} ${this.t('планов', 'plans')}`)}</div>
+            </div>
+            <button class="btn" type="button" data-ps-new-plan data-day="${escapeAttr(selectedDayKey)}">+ ${escapeHtml(this.t('план', 'plan'))}</button>
+          </header>
+          <div class="ps-day-panel__body">${selectedPlansHtml}</div>
+        </section>
+      </div>
+    `;
+  }
+
+  renderPersonalScheduleWorkspace() {
+    if (!this.els.scheduleView || this.uiPrefs.view !== 'schedule') return;
+    if (this.els.boardView) this.els.boardView.hidden = true;
+    const ws = this.personalScheduleState();
+    const active = this.activeProjectMeta();
+
+    if (!active || !this.isScheduleProject(active)) {
+      this.els.scheduleView.innerHTML = `<div class="schedule-placeholder">${escapeHtml(this.t('сначала выберите расписание', 'select schedule first'))}</div>`;
+      return;
+    }
+
+    if (!ws.available) {
+      this.els.scheduleView.innerHTML = `
+        <div class="schedule-unavailable">
+          <div class="schedule-unavailable__title">${escapeHtml(this.t('расписание временно недоступно', 'schedule is temporarily unavailable'))}</div>
+          <div class="schedule-unavailable__text">${escapeHtml(ws.unavailableReason || this.t('примените stage16 sql', 'apply stage16 sql'))}</div>
+        </div>
+      `;
+      return;
+    }
+
+    const tab = this.normalizePersonalScheduleTab(ws.tab);
+    const tabItems = [
+      { key: 'today', label: this.t('сегодня', 'today') },
+      { key: 'lists', label: this.t('списки', 'lists') },
+      { key: 'calendar', label: this.t('календарь', 'calendar') }
+    ];
+
+    let contentHtml = '';
+    if (ws.loading) {
+      contentHtml = `<div class="schedule-loading">${escapeHtml(this.t('загрузка расписания...', 'loading schedule...'))}</div>`;
+    } else if (tab === 'today') {
+      contentHtml = this.renderPersonalScheduleToday();
+    } else if (tab === 'lists') {
+      contentHtml = this.renderPersonalScheduleLists();
+    } else {
+      contentHtml = this.renderPersonalScheduleCalendar();
+    }
+
+    this.els.scheduleView.innerHTML = `
+      <div class="ps-shell">
+        <header class="ps-shell__head">
+          <div class="ps-shell__title-wrap">
+            <div class="ps-shell__kicker">${escapeHtml(this.t('личное расписание', 'personal schedule'))}</div>
+            <div class="ps-shell__title">${escapeHtml(String(active.name || this.t('расписание', 'schedule')))}</div>
+          </div>
+          <div class="ps-shell__actions">
+            <button class="btn btn--thin" type="button" data-ps-new-list>+ ${escapeHtml(this.t('список', 'list'))}</button>
+            <button class="btn" type="button" data-ps-new-plan>+ ${escapeHtml(this.t('план', 'plan'))}</button>
+          </div>
+        </header>
+
+        <div class="ps-tabs" role="tablist" aria-label="schedule tabs">
+          ${tabItems.map((item) => `<button class="ps-tab${item.key === tab ? ' is-active' : ''}" type="button" data-ps-tab="${item.key}">${escapeHtml(item.label)}</button>`).join('')}
+        </div>
+
+        <div class="ps-content">${contentHtml}</div>
+      </div>
+    `;
+  }
+
+  handlePersonalScheduleClick(event) {
+    const tabBtn = event.target.closest('[data-ps-tab]');
+    if (tabBtn) {
+      const tab = String(tabBtn.getAttribute('data-ps-tab') || 'today');
+      this.setPersonalScheduleTab(tab);
+      return;
+    }
+
+    const monthBtn = event.target.closest('[data-ps-month-nav]');
+    if (monthBtn) {
+      const mode = String(monthBtn.getAttribute('data-ps-month-nav') || 'today');
+      if (mode === 'today') {
+        const today = new Date();
+        const todayIso = formatLocalISO(today);
+        const ws = this.personalScheduleState();
+        ws.monthAnchor = formatLocalISO(new Date(today.getFullYear(), today.getMonth(), 1));
+        ws.selectedDay = todayIso;
+        this.persistPersonalSchedulePrefs();
+        this.renderSchedule();
+      } else {
+        this.shiftPersonalScheduleMonth(mode === 'prev' ? -1 : 1);
+      }
+      return;
+    }
+
+    const dayBtn = event.target.closest('[data-ps-day]');
+    if (dayBtn) {
+      const day = String(dayBtn.getAttribute('data-ps-day') || '');
+      this.setPersonalScheduleSelectedDay(day, { syncMonth: true });
+      return;
+    }
+
+    const newListBtn = event.target.closest('[data-ps-new-list]');
+    if (newListBtn) {
+      this.openScheduleListModal();
+      return;
+    }
+
+    const editListBtn = event.target.closest('[data-ps-edit-list]');
+    if (editListBtn) {
+      const listId = String(editListBtn.getAttribute('data-ps-edit-list') || '');
+      if (listId) this.openScheduleListModal(listId);
+      return;
+    }
+
+    const delListBtn = event.target.closest('[data-ps-del-list]');
+    if (delListBtn) {
+      const listId = String(delListBtn.getAttribute('data-ps-del-list') || '');
+      if (listId) this.openDeleteScheduleListModal(listId);
+      return;
+    }
+
+    const newPlanBtn = event.target.closest('[data-ps-new-plan]');
+    if (newPlanBtn) {
+      const listId = String(newPlanBtn.getAttribute('data-list-id') || '').trim();
+      const day = String(newPlanBtn.getAttribute('data-day') || '').trim();
+      this.openCreatePersonalSchedulePlanModal({
+        list_id: listId || null,
+        plan_date: day || null
+      });
+      return;
+    }
+
+    const openPlanBtn = event.target.closest('[data-ps-open-plan]');
+    if (openPlanBtn) {
+      const planId = String(openPlanBtn.getAttribute('data-ps-open-plan') || '');
+      if (planId) this.openEditPersonalSchedulePlanModal(planId);
+      return;
+    }
+
+    const delPlanBtn = event.target.closest('[data-ps-del-plan]');
+    if (delPlanBtn) {
+      const planId = String(delPlanBtn.getAttribute('data-ps-del-plan') || '');
+      if (planId) this.openDeletePersonalSchedulePlanModal(planId);
+      return;
+    }
+
+    const toggle = event.target.closest('[data-ps-toggle]');
+    if (toggle) {
+      const planId = String(toggle.getAttribute('data-ps-toggle') || '');
+      if (!planId) return;
+      const isDone = !!toggle.checked;
+      void this.toggleSchedulePlanDone(planId, isDone).catch((error) => this.onMutationError(error));
+    }
+  }
+
+  handlePersonalScheduleSubmit(event) {
+    event.preventDefault();
+    const form = event.target.closest('[data-ps-quick-form]');
+    if (!form) return;
+  }
+
+  async openCreateScheduleProjectModal() {
+    this.ui.openModal({
+      title: this.t('новое расписание', 'new schedule'),
+      bodyHtml: `
+        <form class="form">
+          <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+            ${this.t('название', 'name')}
+            <input class="ctl" name="name" required maxlength="120" />
+          </label>
+          <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+            ${this.t('описание', 'description')}
+            <textarea class="ctl" name="description" rows="3" maxlength="500"></textarea>
+          </label>
+          <div class="planning-modal-note">${escapeHtml(this.t('это личное расписание с вкладками: сегодня, списки, календарь', 'this is personal schedule with tabs: today, lists, calendar'))}</div>
+          <div class="form__actions">
+            <button class="btn" type="button" data-close>${this.t('отмена', 'cancel')}</button>
+            <button class="btn" type="submit">${this.t('создать', 'create')}</button>
+          </div>
+        </form>
+      `,
+      onSubmit: (data) => {
+        void this.createScheduleProjectSubmit(data).catch((error) => this.onMutationError(error));
+      }
+    });
+  }
+
+  async createScheduleProjectSubmit(data) {
+    const name = String(data.name || '').trim();
+    if (!name) {
+      this.ui.toast(this.t('укажите название', 'name is required'));
+      return;
+    }
+    const description = String(data.description || '').trim();
+    const scheduleId = await this.rpc('ik_plan_create_schedule', {
+      p_name: name,
+      p_description: description
+    });
+
+    this.ui.closeModal();
+    await this.loadProjects({ quiet: true });
+    await this.selectProject(String(scheduleId), { force: true });
+    this.setView('schedule');
+    this.ui.toast(this.t('расписание создано', 'schedule created'));
+  }
+
+  openScheduleListModal(listId = '') {
+    const base = listId ? this.scheduleListById(listId) : null;
+    const title = base ? this.t('список: редактирование', 'edit list') : this.t('новый список', 'new list');
+    this.ui.openModal({
+      title,
+      bodyHtml: `
+        <form class="form">
+          <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+            ${this.t('название', 'name')}
+            <input class="ctl" name="name" required maxlength="80" value="${escapeAttr(String(base && base.name || ''))}" />
+          </label>
+          <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+            ${this.t('цвет', 'color')}
+            <input class="ctl" name="color" type="color" value="${escapeAttr(String(base && base.color || '#2f6f4f'))}" />
+          </label>
+          <div class="form__actions">
+            <button class="btn" type="button" data-close>${this.t('отмена', 'cancel')}</button>
+            <button class="btn" type="submit">${this.t('сохранить', 'save')}</button>
+          </div>
+        </form>
+      `,
+      onSubmit: (data) => {
+        void this.saveScheduleListSubmit(base, data).catch((error) => this.onMutationError(error));
+      }
+    });
+  }
+
+  async saveScheduleListSubmit(base, data) {
+    const active = this.activeProjectMeta();
+    if (!active || !this.isScheduleProject(active)) return;
+    const name = String(data.name || '').trim();
+    if (!name) {
+      this.ui.toast(this.t('укажите название списка', 'list name is required'));
+      return;
+    }
+    const color = String(data.color || '#2f6f4f');
+
+    if (base && base.id) {
+      await this.rpc('ik_plan_update_schedule_list', {
+        p_project_id: active.id,
+        p_list_id: base.id,
+        p_name: name,
+        p_color: color,
+        p_position: base.position
+      });
+    } else {
+      await this.rpc('ik_plan_create_schedule_list', {
+        p_project_id: active.id,
+        p_name: name,
+        p_color: color
+      });
+    }
+
+    this.ui.closeModal();
+    await this.refreshPersonalScheduleAfterMutation();
+    this.ui.toast(this.t('список сохранен', 'list saved'));
+  }
+
+  openDeleteScheduleListModal(listId) {
+    const list = this.scheduleListById(listId);
+    if (!list) return;
+    this.ui.openModal({
+      title: this.t('удалить список', 'delete list'),
+      bodyHtml: `
+        <form class="form">
+          <div style="font-size:11px; letter-spacing:2px; text-transform:uppercase; opacity:.82; line-height:1.5;">
+            ${escapeHtml(this.t('удалить список', 'delete list'))}: ${escapeHtml(String(list.name || ''))}?
+          </div>
+          <div class="planning-modal-note">${escapeHtml(this.t('планы из списка останутся и будут без списка', 'plans stay, but without list'))}</div>
+          <div class="form__actions">
+            <button class="btn" type="button" data-close>${this.t('отмена', 'cancel')}</button>
+            <button class="btn" type="submit">${this.t('удалить', 'delete')}</button>
+          </div>
+        </form>
+      `,
+      onSubmit: () => {
+        void this.deleteScheduleListSubmit(list).catch((error) => this.onMutationError(error));
+      }
+    });
+  }
+
+  async deleteScheduleListSubmit(list) {
+    const active = this.activeProjectMeta();
+    if (!active || !this.isScheduleProject(active)) return;
+    await this.rpc('ik_plan_delete_schedule_list', {
+      p_project_id: active.id,
+      p_list_id: list.id,
+      p_move_plan_to: null
+    });
+    this.ui.closeModal();
+    await this.refreshPersonalScheduleAfterMutation();
+    this.ui.toast(this.t('список удален', 'list deleted'));
+  }
+
+  buildSchedulePlanPayloadFromForm(data) {
+    const title = String(data.title || '').trim();
+    if (!title) {
+      this.ui.toast(this.t('укажите название плана', 'plan title is required'));
+      return null;
+    }
+
+    const planDate = parseISOToLocalDate(data.plan_date)
+      ? String(data.plan_date)
+      : null;
+    const startTime = normalizeTimeText(data.start_time) || null;
+    const endTime = normalizeTimeText(data.end_time) || null;
+    if (startTime && endTime && endTime <= startTime) {
+      this.ui.toast(this.t('конец должен быть позже начала', 'end must be later than start'));
+      return null;
+    }
+
+    const priority = ['low', 'mid', 'high'].includes(String(data.priority || '').toLowerCase())
+      ? String(data.priority).toLowerCase()
+      : 'mid';
+
+    const repeatRule = normalizeRepeatRule(data.repeat_rule);
+    const repeatUntil = parseISOToLocalDate(data.repeat_until)
+      ? String(data.repeat_until)
+      : null;
+
+    if (repeatRule !== 'none' && !planDate) {
+      this.ui.toast(this.t('для повторения укажите дату', 'set a date for repeat'));
+      return null;
+    }
+
+    if (repeatRule !== 'none' && repeatUntil && planDate && repeatUntil < planDate) {
+      this.ui.toast(this.t('дата окончания повторения не может быть раньше даты плана', 'repeat end date cannot be earlier than plan date'));
+      return null;
+    }
+
+    return {
+      list_id: String(data.list_id || '').trim() || null,
+      title,
+      note: String(data.note || '').trim(),
+      plan_date: planDate,
+      start_time: startTime,
+      end_time: endTime,
+      priority,
+      repeat_rule: repeatRule,
+      repeat_until: repeatRule === 'none' ? null : repeatUntil,
+      is_done: data.is_done === 'on' || String(data.is_done || '').toLowerCase() === 'true'
+    };
+  }
+
+  openCreatePersonalSchedulePlanModal(seed = {}) {
+    const ws = this.personalScheduleState();
+    const day = parseISOToLocalDate(seed.plan_date || ws.selectedDay) || new Date();
+    const listId = String(seed.list_id || '').trim();
+    const repeatRule = normalizeRepeatRule(seed.repeat_rule || 'none');
+    const repeatUntil = parseISOToLocalDate(seed.repeat_until) ? String(seed.repeat_until) : '';
+    this.ui.openModal({
+      title: this.t('новый план', 'new plan'),
+      bodyHtml: `
+        <form class="form">
+          <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+            ${this.t('название', 'title')}
+            <input class="ctl" name="title" required maxlength="220" />
+          </label>
+          <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+            ${this.t('заметка', 'note')}
+            <textarea class="ctl" name="note" rows="3" maxlength="2000"></textarea>
+          </label>
+          <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+            ${this.t('список', 'list')}
+            <select class="ctl" name="list_id">${this.scheduleListOptionsHtml(listId)}</select>
+          </label>
+          <div class="form__grid2">
+            <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+              ${this.t('дата', 'date')}
+              <input class="ctl" type="date" name="plan_date" value="${escapeAttr(formatLocalISO(day))}" />
+            </label>
+            <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+              ${this.t('приоритет', 'priority')}
+              <select class="ctl" name="priority">
+                <option value="low">LOW</option>
+                <option value="mid" selected>MID</option>
+                <option value="high">HIGH</option>
+              </select>
+            </label>
+          </div>
+          <div class="form__grid2">
+            <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+              ${this.t('повторение', 'repeat')}
+              <select class="ctl" name="repeat_rule">${this.scheduleRepeatRuleOptionsHtml(repeatRule)}</select>
+            </label>
+            <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+              ${this.t('повторять до', 'repeat until')}
+              <input class="ctl" type="date" name="repeat_until" value="${escapeAttr(repeatUntil)}" />
+            </label>
+          </div>
+          <div class="form__grid2">
+            <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+              ${this.t('начало', 'start')}
+              <input class="ctl" type="time" name="start_time" />
+            </label>
+            <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+              ${this.t('конец', 'end')}
+              <input class="ctl" type="time" name="end_time" />
+            </label>
+          </div>
+          <div class="form__actions">
+            <button class="btn" type="button" data-close>${this.t('отмена', 'cancel')}</button>
+            <button class="btn" type="submit">${this.t('сохранить', 'save')}</button>
+          </div>
+        </form>
+      `,
+      onSubmit: (data) => {
+        void this.saveSchedulePlanSubmit(null, data).catch((error) => this.onMutationError(error));
+      }
+    });
+  }
+
+  openEditPersonalSchedulePlanModal(planId) {
+    const plan = this.schedulePlanById(planId);
+    if (!plan) return;
+    this.ui.openModal({
+      title: this.t('редактировать план', 'edit plan'),
+      bodyHtml: `
+        <form class="form">
+          <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+            ${this.t('название', 'title')}
+            <input class="ctl" name="title" required maxlength="220" value="${escapeAttr(String(plan.title || ''))}" />
+          </label>
+          <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+            ${this.t('заметка', 'note')}
+            <textarea class="ctl" name="note" rows="3" maxlength="2000">${escapeHtml(String(plan.note || ''))}</textarea>
+          </label>
+          <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+            ${this.t('список', 'list')}
+            <select class="ctl" name="list_id">${this.scheduleListOptionsHtml(String(plan.list_id || ''))}</select>
+          </label>
+          <div class="form__grid2">
+            <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+              ${this.t('дата', 'date')}
+              <input class="ctl" type="date" name="plan_date" value="${escapeAttr(String(plan.plan_date || ''))}" />
+            </label>
+            <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+              ${this.t('приоритет', 'priority')}
+              <select class="ctl" name="priority">
+                <option value="low" ${String(plan.priority) === 'low' ? 'selected' : ''}>LOW</option>
+                <option value="mid" ${String(plan.priority) !== 'low' && String(plan.priority) !== 'high' ? 'selected' : ''}>MID</option>
+                <option value="high" ${String(plan.priority) === 'high' ? 'selected' : ''}>HIGH</option>
+              </select>
+            </label>
+          </div>
+          <div class="form__grid2">
+            <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+              ${this.t('повторение', 'repeat')}
+              <select class="ctl" name="repeat_rule">${this.scheduleRepeatRuleOptionsHtml(String(plan.repeat_rule || 'none'))}</select>
+            </label>
+            <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+              ${this.t('повторять до', 'repeat until')}
+              <input class="ctl" type="date" name="repeat_until" value="${escapeAttr(String(plan.repeat_until || ''))}" />
+            </label>
+          </div>
+          <div class="form__grid2">
+            <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+              ${this.t('начало', 'start')}
+              <input class="ctl" type="time" name="start_time" value="${escapeAttr(normalizeTimeText(plan.start_time))}" />
+            </label>
+            <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+              ${this.t('конец', 'end')}
+              <input class="ctl" type="time" name="end_time" value="${escapeAttr(normalizeTimeText(plan.end_time))}" />
+            </label>
+          </div>
+          <label style="display:flex; align-items:center; gap:8px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+            <input type="checkbox" name="is_done" ${plan.is_done ? 'checked' : ''} />
+            ${this.t('выполнено', 'done')}
+          </label>
+          <div class="form__actions">
+            <button class="btn" type="button" data-close>${this.t('отмена', 'cancel')}</button>
+            <button class="btn" type="submit">${this.t('сохранить', 'save')}</button>
+          </div>
+        </form>
+      `,
+      onSubmit: (data) => {
+        void this.saveSchedulePlanSubmit(plan, data).catch((error) => this.onMutationError(error));
+      }
+    });
+  }
+
+  async saveSchedulePlanSubmit(basePlan, data) {
+    const active = this.activeProjectMeta();
+    if (!active || !this.isScheduleProject(active)) return;
+    const payload = this.buildSchedulePlanPayloadFromForm(data);
+    if (!payload) return;
+
+    if (basePlan && basePlan.id) {
+      await this.rpc('ik_plan_update_schedule_plan', {
+        p_project_id: active.id,
+        p_plan_id: basePlan.id,
+        p_list_id: payload.list_id,
+        p_title: payload.title,
+        p_note: payload.note,
+        p_plan_date: payload.plan_date,
+        p_start_time: payload.start_time,
+        p_end_time: payload.end_time,
+        p_priority: payload.priority,
+        p_repeat_rule: payload.repeat_rule,
+        p_repeat_until: payload.repeat_until,
+        p_is_done: payload.is_done
+      });
+    } else {
+      await this.rpc('ik_plan_create_schedule_plan', {
+        p_project_id: active.id,
+        p_list_id: payload.list_id,
+        p_title: payload.title,
+        p_note: payload.note,
+        p_plan_date: payload.plan_date,
+        p_start_time: payload.start_time,
+        p_end_time: payload.end_time,
+        p_priority: payload.priority,
+        p_repeat_rule: payload.repeat_rule,
+        p_repeat_until: payload.repeat_until
+      });
+    }
+
+    this.ui.closeModal();
+    await this.refreshPersonalScheduleAfterMutation();
+    this.ui.toast(this.t('план сохранен', 'plan saved'));
+  }
+
+  openDeletePersonalSchedulePlanModal(planId) {
+    const plan = this.schedulePlanById(planId);
+    if (!plan) return;
+    this.ui.openModal({
+      title: this.t('удалить план', 'delete plan'),
+      bodyHtml: `
+        <form class="form">
+          <div style="font-size:11px; letter-spacing:2px; text-transform:uppercase; opacity:.82; line-height:1.5;">
+            ${escapeHtml(this.t('удалить план', 'delete plan'))}: ${escapeHtml(String(plan.title || ''))}?
+          </div>
+          <div class="form__actions">
+            <button class="btn" type="button" data-close>${this.t('отмена', 'cancel')}</button>
+            <button class="btn" type="submit">${this.t('удалить', 'delete')}</button>
+          </div>
+        </form>
+      `,
+      onSubmit: () => {
+        void this.deleteSchedulePlanSubmit(plan).catch((error) => this.onMutationError(error));
+      }
+    });
+  }
+
+  async deleteSchedulePlanSubmit(plan) {
+    const active = this.activeProjectMeta();
+    if (!active || !this.isScheduleProject(active)) return;
+    await this.rpc('ik_plan_delete_schedule_plan', {
+      p_project_id: active.id,
+      p_plan_id: plan.id
+    });
+    this.ui.closeModal();
+    await this.refreshPersonalScheduleAfterMutation();
+    this.ui.toast(this.t('план удален', 'plan deleted'));
+  }
+
+  async toggleSchedulePlanDone(planId, isDone) {
+    const active = this.activeProjectMeta();
+    if (!active || !this.isScheduleProject(active)) return;
+    await this.rpc('ik_plan_toggle_schedule_plan_done', {
+      p_project_id: active.id,
+      p_plan_id: planId,
+      p_is_done: !!isDone
+    });
+    await this.loadPersonalScheduleWorkspace({ force: true });
+    void this.loadProjects({ quiet: true });
+  }
+
+  async refreshPersonalScheduleAfterMutation() {
+    await this.loadProjects({ quiet: true });
+    await this.loadPersonalScheduleWorkspace({ force: true });
+    this.renderProjectSelect();
+    this.renderProjectBar();
+  }
+
+  eventAssigneeLabel(eventRow) {
+    const handle = String(eventRow.assignee_user_id || eventRow.assignee_nickname || eventRow.assignee_id || '').trim();
+    if (!handle) return '';
+    return handle.startsWith('@') ? handle : `@${handle}`;
+  }
+
+  scheduleEventMatchesFilters(row) {
+    const assignee = String(this.uiPrefs.assignee || 'all');
+    const assigneeId = String((row && row.assignee_id) || '');
+
+    if (assignee === 'me' && assigneeId !== String(this.user && this.user.id || '')) return false;
+    if (assignee === 'unassigned' && assigneeId) return false;
+    if (assignee !== 'all' && assignee !== 'me' && assignee !== 'unassigned' && assigneeId !== assignee) return false;
+
+    const q = String(this.uiPrefs.q || '').trim().toLowerCase();
+    if (q) {
+      const hay = `${row.title || ''} ${row.description || ''} ${row.location || ''} ${asArray(row.tags).join(' ')}`.toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+
+    const wantedTags = parseFilterTags(this.uiPrefs.tags || '');
+    if (wantedTags.length) {
+      const eventTags = asArray(row.tags).map((x) => String(x).toLowerCase());
+      for (const tag of wantedTags) {
+        if (!eventTags.includes(tag)) return false;
+      }
+    }
+
+    return true;
+  }
+
+  getTaskDeadlinesByDay(dayKeys) {
+    const result = new Map(dayKeys.map((k) => [k, []]));
+    const board = this.state.board;
+    if (!board || !board.project) return result;
+
+    const q = String(this.uiPrefs.q || '').trim().toLowerCase();
+    const wantedTags = parseFilterTags(this.uiPrefs.tags || '');
+    const wantedAssignee = String(this.uiPrefs.assignee || 'all').trim();
+    const wantedPriority = String(this.uiPrefs.priority || 'all').trim();
+
+    const cards = this.getCardsForProject().filter((card) => {
+      const key = String(card.deadline || '').trim();
+      if (!key || !result.has(key)) return false;
+
+      if (q) {
+        const hay = `${card.name || ''} ${card.description || ''} ${asArray(card.tags).join(' ')}`.toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+
+      if (wantedTags.length) {
+        const taskTags = asArray(card.tags).map((x) => String(x).toLowerCase());
+        for (const tag of wantedTags) {
+          if (!taskTags.includes(tag)) return false;
+        }
+      }
+
+      if (wantedPriority !== 'all' && String(card.priority || '').toLowerCase() !== wantedPriority) {
+        return false;
+      }
+
+      const assigneeId = String(card.assignee_id || '');
+      if (wantedAssignee === 'me' && assigneeId !== String(this.user && this.user.id || '')) return false;
+      if (wantedAssignee === 'unassigned' && assigneeId) return false;
+      if (wantedAssignee !== 'all' && wantedAssignee !== 'me' && wantedAssignee !== 'unassigned' && assigneeId !== wantedAssignee) {
+        return false;
+      }
+
+      return true;
+    });
+
+    for (const card of cards) {
+      const key = String(card.deadline || '').trim();
+      if (!key || !result.has(key)) continue;
+      result.get(key).push(card);
+    }
+
+    for (const [key, list] of result.entries()) {
+      list.sort((a, b) => {
+        const ap = { high: 3, mid: 2, low: 1 }[String(a.priority || '').toLowerCase()] || 0;
+        const bp = { high: 3, mid: 2, low: 1 }[String(b.priority || '').toLowerCase()] || 0;
+        if (bp !== ap) return bp - ap;
+        return String(a.name || '').localeCompare(String(b.name || ''));
+      });
+      result.set(key, list.slice(0, 6));
+    }
+
+    return result;
+  }
+
+  renderScheduleEventRow(row) {
+    const assignee = this.eventAssigneeLabel(row);
+    const tags = asArray(row.tags);
+    const pieces = [];
+    if (assignee) pieces.push(`${this.t('ответственный', 'assignee')}: ${assignee}`);
+    if (row.location) pieces.push(`${this.t('место', 'location')}: ${String(row.location)}`);
+    if (tags.length) pieces.push(`#${tags.slice(0, 4).join(' #')}`);
+
+    return `
+      <article class="schedule-item${row.all_day ? ' is-all-day' : ''}" data-event-id="${escapeAttr(String(row.id))}">
+        <div class="schedule-item__time">${escapeHtml(eventTimeLabel(row.start_at, row.end_at, !!row.all_day, this.getLang()))}</div>
+        <div class="schedule-item__title">${escapeHtml(String(row.title || this.t('событие', 'event')))}</div>
+        ${row.description ? `<div class="schedule-item__desc">${escapeHtml(shortText(row.description, 130))}</div>` : ''}
+        ${pieces.length ? `<div class="schedule-item__meta">${escapeHtml(pieces.join(' | '))}</div>` : ''}
+        <div class="schedule-item__actions">
+          <button class="btn btn--thin" type="button" data-schedule-open="${escapeAttr(String(row.id))}">${escapeHtml(this.t('открыть', 'open'))}</button>
+          <button class="btn btn--thin" type="button" data-schedule-del="${escapeAttr(String(row.id))}">${escapeHtml(this.t('удалить', 'delete'))}</button>
+        </div>
+      </article>
+    `;
+  }
+
+  renderSchedule() {
+    if (!this.els.scheduleView || this.uiPrefs.view !== 'schedule') return;
+
+    if (this.isScheduleProject()) {
+      this.renderPersonalScheduleWorkspace();
+      return;
+    }
+
+    const board = this.state.board;
+    if (!board || !board.project) {
+      this.els.scheduleView.innerHTML = `
+        <div class="schedule-placeholder">${escapeHtml(this.t('сначала выберите проект', 'select project first'))}</div>
+      `;
+      return;
+    }
+
+    if (!this.state.schedule.available) {
+      this.els.scheduleView.innerHTML = `
+        <div class="schedule-unavailable">
+          <div class="schedule-unavailable__title">${escapeHtml(this.t('расписание временно недоступно', 'schedule is temporarily unavailable'))}</div>
+          <div class="schedule-unavailable__text">${escapeHtml(this.state.schedule.unavailableReason || this.t('примените stage15 sql', 'apply stage15 sql'))}</div>
+        </div>
+      `;
+      return;
+    }
+
+    const win = this.getScheduleWindow();
+    const allEvents = asArray(this.state.schedule.events).filter((row) => this.scheduleEventMatchesFilters(row));
+    const eventsByDay = new Map(win.dayKeys.map((k) => [k, []]));
+
+    for (const row of allEvents) {
+      const key = toLocalDayKey(row.start_at);
+      if (!eventsByDay.has(key)) continue;
+      eventsByDay.get(key).push(row);
+    }
+
+    for (const [key, list] of eventsByDay.entries()) {
+      list.sort((a, b) => {
+        const ad = Date.parse(String(a.start_at || ''));
+        const bd = Date.parse(String(b.start_at || ''));
+        return ad - bd;
+      });
+      eventsByDay.set(key, list);
+    }
+
+    const deadlineByDay = this.getTaskDeadlinesByDay(win.dayKeys);
+    const totalEvents = allEvents.length;
+    const rangeButtons = [
+      { key: 'today', label: this.t('сегодня', 'today') },
+      { key: 'this_week', label: this.t('эта неделя', 'this week') },
+      { key: 'next_week', label: this.t('следующая неделя', 'next week') },
+      { key: 'two_weeks', label: this.t('2 недели', '2 weeks') },
+      { key: 'month', label: this.t('месяц', 'month') }
+    ];
+
+    const headerHtml = `
+      <div class="schedule-headline">
+        <div class="schedule-headline__left">
+          <div class="schedule-headline__kicker">${escapeHtml(this.t('расписание', 'schedule'))}</div>
+          <div class="schedule-headline__range">${escapeHtml(this.formatScheduleRangeTitle(win))}</div>
+          <div class="schedule-headline__meta">${escapeHtml(this.t('событий', 'events'))}: ${totalEvents}</div>
+        </div>
+        <div class="schedule-headline__actions">
+          <button class="btn btn--thin" type="button" data-schedule-nav="prev">${escapeHtml(this.t('назад', 'prev'))}</button>
+          <button class="btn btn--thin" type="button" data-schedule-nav="today">${escapeHtml(this.t('сегодня', 'today'))}</button>
+          <button class="btn btn--thin" type="button" data-schedule-nav="next">${escapeHtml(this.t('вперед', 'next'))}</button>
+          <button class="btn" type="button" data-schedule-new>${escapeHtml(this.t('+ событие', '+ event'))}</button>
+        </div>
+      </div>
+
+      <div class="schedule-ranges">
+        ${rangeButtons.map((x) => `<button class="schedule-ranges__btn${x.key === win.key ? ' is-active' : ''}" type="button" data-schedule-range="${x.key}">${escapeHtml(x.label)}</button>`).join('')}
+        <button class="schedule-ranges__btn" type="button" data-schedule-copy-week>${escapeHtml(this.t('копировать неделю +1', 'copy week +1'))}</button>
+      </div>
+
+      <form class="schedule-quick" data-schedule-quick-form>
+        <input class="ctl schedule-quick__input" name="quick" placeholder="${escapeAttr(this.t('быстро: пн 14:00-15:30 математика', 'quick: mon 14:00-15:30 math'))}" />
+        <button class="btn" type="submit">${escapeHtml(this.t('добавить', 'add'))}</button>
+      </form>
+    `;
+
+    if (this.state.schedule.loading) {
+      this.els.scheduleView.innerHTML = `
+        <div class="schedule-app">
+          ${headerHtml}
+          <div class="schedule-loading">${escapeHtml(this.t('загрузка расписания...', 'loading schedule...'))}</div>
+        </div>
+      `;
+      return;
+    }
+
+    const gridHtml = win.days.map((day) => {
+      const dayKey = formatLocalISO(day);
+      const events = eventsByDay.get(dayKey) || [];
+      const cards = deadlineByDay.get(dayKey) || [];
+      const eventsHtml = events.length
+        ? events.map((row) => this.renderScheduleEventRow(row)).join('')
+        : `<div class="schedule-day__empty">${escapeHtml(this.t('нет событий', 'no events'))}</div>`;
+      const cardsHtml = cards.length
+        ? `<div class="schedule-day__tasks">${cards.map((card) => `<span class="schedule-task-chip schedule-task-chip--${escapeAttr(String(card.priority || 'mid'))}">${escapeHtml(shortText(card.name, 42))}</span>`).join('')}</div>`
+        : '';
+      return `
+        <section class="schedule-day" data-day="${escapeAttr(dayKey)}">
+          <header class="schedule-day__head">
+            <div class="schedule-day__title">${escapeHtml(this.formatScheduleDayLabel(day))}</div>
+            <button class="btn btn--thin" type="button" data-schedule-add-day="${escapeAttr(dayKey)}">+ ${escapeHtml(this.t('событие', 'event'))}</button>
+          </header>
+          <div class="schedule-day__body">${eventsHtml}</div>
+          ${cardsHtml}
+        </section>
+      `;
+    }).join('');
+
+    this.els.scheduleView.innerHTML = `
+      <div class="schedule-app">
+        ${headerHtml}
+        <div class="schedule-grid schedule-grid--${win.days.length}">
+          ${gridHtml}
+        </div>
+      </div>
+    `;
+  }
+
+  findScheduleEventById(eventId) {
+    return asArray(this.state.schedule.events).find((x) => String(x.id) === String(eventId)) || null;
+  }
+
+  buildSchedulePayloadFromForm(data) {
+    const title = String(data.title || '').trim();
+    if (!title) {
+      this.ui.toast(this.t('укажите название события', 'event title is required'));
+      return null;
+    }
+
+    const day = parseISOToLocalDate(data.date);
+    if (!day) {
+      this.ui.toast(this.t('укажите дату', 'date is required'));
+      return null;
+    }
+
+    const allDay = data.all_day === 'on' || data.all_day === true || String(data.all_day || '') === 'true';
+    const startText = String(data.start_time || '').trim() || '09:00';
+    const endText = String(data.end_time || '').trim() || '10:00';
+
+    let startAt;
+    let endAt;
+
+    if (allDay) {
+      startAt = new Date(day.getFullYear(), day.getMonth(), day.getDate(), 0, 0, 0, 0);
+      endAt = addDaysLocal(startAt, 1);
+    } else {
+      const startMatch = startText.match(/^(\d{1,2}):(\d{2})$/);
+      const endMatch = endText.match(/^(\d{1,2}):(\d{2})$/);
+      if (!startMatch || !endMatch) {
+        this.ui.toast(this.t('проверьте формат времени HH:MM', 'check time format HH:MM'));
+        return null;
+      }
+
+      startAt = new Date(day.getFullYear(), day.getMonth(), day.getDate(), Number(startMatch[1]), Number(startMatch[2]), 0, 0);
+      endAt = new Date(day.getFullYear(), day.getMonth(), day.getDate(), Number(endMatch[1]), Number(endMatch[2]), 0, 0);
+      if (endAt.getTime() <= startAt.getTime()) {
+        endAt = addMinutes(startAt, 60);
+      }
+    }
+
+    let repeatRule = String(data.repeat_rule || 'none').trim().toLowerCase();
+    if (!['none', 'weekly'].includes(repeatRule)) repeatRule = 'none';
+    const repeatUntil = repeatRule === 'weekly' && parseISOToLocalDate(data.repeat_until)
+      ? String(data.repeat_until)
+      : null;
+
+    return {
+      title,
+      description: String(data.description || '').trim(),
+      start_at: startAt.toISOString(),
+      end_at: endAt.toISOString(),
+      all_day: allDay,
+      location: String(data.location || '').trim(),
+      tags: parseTags(data.tags),
+      assignee_id: String(data.assignee_id || '').trim() || null,
+      repeat_rule: repeatRule,
+      repeat_until: repeatUntil
+    };
+  }
+
+  async createScheduleEvent(payload, options = {}) {
+    const board = this.state.board;
+    if (!board || !board.project) return null;
+    const skipReload = !!options.skipReload;
+
+    const result = await this.rpc('ik_plan_create_schedule_event', {
+      p_project_id: board.project.id,
+      p_title: payload.title,
+      p_description: payload.description,
+      p_start_at: payload.start_at,
+      p_end_at: payload.end_at,
+      p_all_day: payload.all_day,
+      p_location: payload.location,
+      p_tags: payload.tags,
+      p_assignee_id: payload.assignee_id,
+      p_repeat_rule: payload.repeat_rule,
+      p_repeat_until: payload.repeat_until,
+      p_base_revision: board.project.revision
+    });
+
+    if (!skipReload) {
+      await this.loadBoard(board.project.id);
+      await this.loadScheduleWindow({ force: true });
+    }
+
+    return result;
+  }
+
+  async quickAddSchedule(raw) {
+    const payload = this.parseQuickSchedule(raw);
+    if (!payload) {
+      this.ui.toast(this.t('формат: пн 14:00-15:30 математика', 'format: mon 14:00-15:30 math'));
+      return;
+    }
+
+    await this.createScheduleEvent(payload);
+    const input = this.els.scheduleView && this.els.scheduleView.querySelector('[name="quick"]');
+    if (input) input.value = '';
+    this.ui.toast(this.t('событие добавлено', 'event added'));
+    this.renderSchedule();
+  }
+
+  parseQuickSchedule(raw) {
+    const text = String(raw || '').trim();
+    if (!text) return null;
+
+    const dayMap = {
+      'пн': 1, 'пон': 1, mon: 1,
+      'вт': 2, 'вто': 2, tue: 2,
+      'ср': 3, 'сре': 3, wed: 3,
+      'чт': 4, 'чет': 4, thu: 4,
+      'пт': 5, 'пят': 5, fri: 5,
+      'сб': 6, 'суб': 6, sat: 6,
+      'вс': 0, 'воск': 0, sun: 0
+    };
+
+    const match = text.match(/^(?:(\S+)\s+)?(?:(\d{1,2}:\d{2})(?:\s*[-–]\s*(\d{1,2}:\d{2}))?\s+)?(.+)$/i);
+    if (!match) return null;
+
+    const dayToken = String(match[1] || '').toLowerCase();
+    const startTime = String(match[2] || '').trim();
+    const endTime = String(match[3] || '').trim();
+    const title = String(match[4] || '').trim();
+    if (!title) return null;
+
+    const win = this.getScheduleWindow();
+    let dayDate = win.startDate;
+
+    if (dayToken && Object.prototype.hasOwnProperty.call(dayMap, dayToken)) {
+      const wanted = dayMap[dayToken];
+      const found = win.days.find((d) => d.getDay() === wanted) || null;
+      dayDate = found || win.startDate;
+    }
+
+    let startAt;
+    let endAt;
+    let allDay = false;
+
+    if (startTime) {
+      const s = startTime.match(/^(\d{1,2}):(\d{2})$/);
+      if (!s) return null;
+      const e = endTime ? endTime.match(/^(\d{1,2}):(\d{2})$/) : null;
+      startAt = new Date(dayDate.getFullYear(), dayDate.getMonth(), dayDate.getDate(), Number(s[1]), Number(s[2]), 0, 0);
+      if (e) {
+        endAt = new Date(dayDate.getFullYear(), dayDate.getMonth(), dayDate.getDate(), Number(e[1]), Number(e[2]), 0, 0);
+      } else {
+        endAt = addMinutes(startAt, 60);
+      }
+      if (endAt.getTime() <= startAt.getTime()) endAt = addMinutes(startAt, 60);
+    } else {
+      allDay = true;
+      startAt = new Date(dayDate.getFullYear(), dayDate.getMonth(), dayDate.getDate(), 0, 0, 0, 0);
+      endAt = addDaysLocal(startAt, 1);
+    }
+
+    return {
+      title,
+      description: '',
+      start_at: startAt.toISOString(),
+      end_at: endAt.toISOString(),
+      all_day: allDay,
+      location: '',
+      tags: [],
+      assignee_id: null,
+      repeat_rule: 'none',
+      repeat_until: null
+    };
+  }
+
+  async openCreateScheduleEventModal(seed = {}) {
+    const board = this.state.board;
+    if (!board || !board.project) {
+      this.ui.toast(this.t('сначала выберите проект', 'select project first'));
+      return;
+    }
+
+    const day = parseISOToLocalDate(seed.day) || new Date();
+    const dateValue = formatLocalISO(day);
+    const startValue = '09:00';
+    const endValue = '10:00';
+    const assigneeOptions = this.assigneeOptionsHtml('');
+
+    this.ui.openModal({
+      title: this.t('новое событие', 'new event'),
+      bodyHtml: `
+        <form class="form" data-schedule-form>
+          <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+            ${this.t('название', 'title')}
+            <input class="ctl" name="title" required maxlength="180" />
+          </label>
+
+          <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+            ${this.t('описание', 'description')}
+            <textarea class="ctl" name="description" rows="3" maxlength="500"></textarea>
+          </label>
+
+          <div class="form__grid2">
+            <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+              ${this.t('дата', 'date')}
+              <input class="ctl" name="date" type="date" required value="${escapeAttr(dateValue)}" />
+            </label>
+
+            <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+              ${this.t('весь день', 'all day')}
+              <select class="ctl" name="all_day">
+                <option value="false">${this.t('нет', 'no')}</option>
+                <option value="true">${this.t('да', 'yes')}</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="form__grid2">
+            <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+              ${this.t('начало', 'start')}
+              <input class="ctl" name="start_time" type="time" value="${escapeAttr(startValue)}" />
+            </label>
+
+            <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+              ${this.t('конец', 'end')}
+              <input class="ctl" name="end_time" type="time" value="${escapeAttr(endValue)}" />
+            </label>
+          </div>
+
+          <div class="form__grid2">
+            <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+              ${this.t('место', 'location')}
+              <input class="ctl" name="location" maxlength="120" />
+            </label>
+
+            <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+              ${this.t('теги', 'tags')}
+              <input class="ctl" name="tags" maxlength="120" placeholder="study, work" />
+            </label>
+          </div>
+
+          <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+            ${this.t('ответственный', 'assignee')}
+            <select class="ctl" name="assignee_id">${assigneeOptions}</select>
+          </label>
+
+          <div class="form__grid2">
+            <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+              ${this.t('повтор', 'repeat')}
+              <select class="ctl" name="repeat_rule">
+                <option value="none">${this.t('без повтора', 'none')}</option>
+                <option value="weekly">${this.t('каждую неделю', 'weekly')}</option>
+              </select>
+            </label>
+
+            <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+              ${this.t('повторять до', 'repeat until')}
+              <input class="ctl" name="repeat_until" type="date" />
+            </label>
+          </div>
+
+          <div class="form__actions">
+            <button class="btn" type="button" data-close>${this.t('отмена', 'cancel')}</button>
+            <button class="btn" type="submit">${this.t('сохранить', 'save')}</button>
+          </div>
+        </form>
+      `,
+      onSubmit: (data) => {
+        void this.createScheduleEventSubmit(data).catch((error) => this.onMutationError(error));
+      }
+    });
+  }
+
+  async createScheduleEventSubmit(data) {
+    const payload = this.buildSchedulePayloadFromForm(data);
+    if (!payload) return;
+
+    try {
+      const out = await this.createScheduleEvent(payload);
+      const created = Number(out && out.created || 1);
+      this.ui.closeModal();
+      this.ui.toast(created > 1
+        ? this.t(`добавлено событий: ${created}`, `events added: ${created}`)
+        : this.t('событие создано', 'event created'));
+    } catch (error) {
+      if (this.looksLikeScheduleSchemaError(error)) {
+        this.disableSchedule(this.t('расписание недоступно: требуется stage15 sql', 'schedule unavailable: stage15 sql required'));
+        if (!this.scheduleSchemaWarnShown) {
+          this.scheduleSchemaWarnShown = true;
+          this.ui.toast(this.t(
+            'для расписания примените SQL: supabase/sql/stage15_planning_schedule.sql',
+            'for schedule apply SQL: supabase/sql/stage15_planning_schedule.sql'
+          ));
+        }
+        return;
+      }
+      throw error;
+    }
+  }
+
+  async openScheduleEventModal(eventId) {
+    const row = this.findScheduleEventById(eventId);
+    if (!row) return;
+
+    const start = new Date(row.start_at);
+    const end = new Date(row.end_at);
+    const dateValue = formatLocalISO(start);
+    const startValue = formatTimeHM(start);
+    const endValue = formatTimeHM(end);
+    const assigneeOptions = this.assigneeOptionsHtml(String(row.assignee_id || ''));
+
+    this.ui.openModal({
+      title: this.t('редактировать событие', 'edit event'),
+      bodyHtml: `
+        <form class="form">
+          <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+            ${this.t('название', 'title')}
+            <input class="ctl" name="title" required maxlength="180" value="${escapeAttr(String(row.title || ''))}" />
+          </label>
+
+          <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+            ${this.t('описание', 'description')}
+            <textarea class="ctl" name="description" rows="3" maxlength="500">${escapeHtml(String(row.description || ''))}</textarea>
+          </label>
+
+          <div class="form__grid2">
+            <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+              ${this.t('дата', 'date')}
+              <input class="ctl" name="date" type="date" required value="${escapeAttr(dateValue)}" />
+            </label>
+            <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+              ${this.t('весь день', 'all day')}
+              <select class="ctl" name="all_day">
+                <option value="false" ${row.all_day ? '' : 'selected'}>${this.t('нет', 'no')}</option>
+                <option value="true" ${row.all_day ? 'selected' : ''}>${this.t('да', 'yes')}</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="form__grid2">
+            <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+              ${this.t('начало', 'start')}
+              <input class="ctl" name="start_time" type="time" value="${escapeAttr(startValue)}" />
+            </label>
+            <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+              ${this.t('конец', 'end')}
+              <input class="ctl" name="end_time" type="time" value="${escapeAttr(endValue)}" />
+            </label>
+          </div>
+
+          <div class="form__grid2">
+            <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+              ${this.t('место', 'location')}
+              <input class="ctl" name="location" maxlength="120" value="${escapeAttr(String(row.location || ''))}" />
+            </label>
+            <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+              ${this.t('теги', 'tags')}
+              <input class="ctl" name="tags" maxlength="120" value="${escapeAttr(asArray(row.tags).join(', '))}" />
+            </label>
+          </div>
+
+          <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+            ${this.t('ответственный', 'assignee')}
+            <select class="ctl" name="assignee_id">${assigneeOptions}</select>
+          </label>
+
+          <div class="form__actions">
+            <button class="btn" type="button" data-close>${this.t('отмена', 'cancel')}</button>
+            <button class="btn" type="submit">${this.t('сохранить', 'save')}</button>
+          </div>
+        </form>
+      `,
+      onSubmit: (data) => {
+        void this.updateScheduleEventSubmit(row, data).catch((error) => this.onMutationError(error));
+      }
+    });
+  }
+
+  async updateScheduleEventSubmit(baseRow, data) {
+    const board = this.state.board;
+    if (!board || !board.project) return;
+    const payload = this.buildSchedulePayloadFromForm(data);
+    if (!payload) return;
+
+    try {
+      await this.rpc('ik_plan_update_schedule_event', {
+        p_project_id: board.project.id,
+        p_event_id: baseRow.id,
+        p_title: payload.title,
+        p_description: payload.description,
+        p_start_at: payload.start_at,
+        p_end_at: payload.end_at,
+        p_all_day: payload.all_day,
+        p_location: payload.location,
+        p_tags: payload.tags,
+        p_assignee_id: payload.assignee_id,
+        p_base_version: baseRow.version,
+        p_base_revision: board.project.revision
+      });
+      this.ui.closeModal();
+      await this.loadBoard(board.project.id);
+      await this.loadScheduleWindow({ force: true });
+      this.ui.toast(this.t('событие сохранено', 'event saved'));
+    } catch (error) {
+      if (this.looksLikeScheduleSchemaError(error)) {
+        this.disableSchedule(this.t('расписание недоступно: требуется stage15 sql', 'schedule unavailable: stage15 sql required'));
+        return;
+      }
+      throw error;
+    }
+  }
+
+  async openDeleteScheduleEventModal(eventId) {
+    const row = this.findScheduleEventById(eventId);
+    if (!row) return;
+    this.ui.openModal({
+      title: this.t('удалить событие', 'delete event'),
+      bodyHtml: `
+        <form class="form">
+          <div style="font-size:11px; letter-spacing:2px; text-transform:uppercase; opacity:.8; line-height:1.5;">
+            ${escapeHtml(this.t('удалить событие', 'delete event'))}: ${escapeHtml(String(row.title || ''))}?
+          </div>
+          <div class="form__actions">
+            <button class="btn" type="button" data-close>${this.t('отмена', 'cancel')}</button>
+            <button class="btn" type="submit">${this.t('удалить', 'delete')}</button>
+          </div>
+        </form>
+      `,
+      onSubmit: () => {
+        void this.deleteScheduleEventSubmit(row).catch((error) => this.onMutationError(error));
+      }
+    });
+  }
+
+  async deleteScheduleEventSubmit(row) {
+    const board = this.state.board;
+    if (!board || !board.project) return;
+
+    try {
+      await this.rpc('ik_plan_delete_schedule_event', {
+        p_project_id: board.project.id,
+        p_event_id: row.id,
+        p_base_version: row.version,
+        p_base_revision: board.project.revision
+      });
+    } catch (error) {
+      if (this.looksLikeScheduleSchemaError(error)) {
+        this.disableSchedule(this.t('расписание недоступно: требуется stage15 sql', 'schedule unavailable: stage15 sql required'));
+        return;
+      }
+      throw error;
+    }
+
+    this.ui.closeModal();
+    await this.loadBoard(board.project.id);
+    await this.loadScheduleWindow({ force: true });
+    this.ui.toast(this.t('событие удалено', 'event deleted'));
+  }
+
+  async copyCurrentWeekToNext() {
+    const board = this.state.board;
+    if (!board || !board.project) return;
+
+    const win = this.getScheduleWindow();
+    if (!['this_week', 'next_week', 'two_weeks'].includes(win.key)) {
+      this.ui.toast(this.t('копирование недели доступно в недельном режиме', 'week copy is available in week mode'));
+      return;
+    }
+
+    const sourceStart = formatLocalISO(startOfWeekLocal(win.startDate));
+    const targetStart = formatLocalISO(addDaysLocal(startOfWeekLocal(win.startDate), 7));
+
+    let copied = 0;
+    try {
+      copied = await this.rpc('ik_plan_copy_schedule_week', {
+        p_project_id: board.project.id,
+        p_source_week_start: sourceStart,
+        p_target_week_start: targetStart,
+        p_base_revision: board.project.revision
+      });
+    } catch (error) {
+      if (this.looksLikeScheduleSchemaError(error)) {
+        this.disableSchedule(this.t('расписание недоступно: требуется stage15 sql', 'schedule unavailable: stage15 sql required'));
+        return;
+      }
+      throw error;
+    }
+
+    await this.loadBoard(board.project.id);
+    await this.loadScheduleWindow({ force: true });
+    this.ui.toast(this.t(`скопировано событий: ${copied}`, `events copied: ${copied}`));
   }
 
   renderProjectSelect() {
@@ -1261,7 +3663,11 @@ export class PlanningCollabApp {
     for (const p of projects) {
       const opt = document.createElement('option');
       opt.value = p.id;
-      opt.textContent = String(p.name || '').toUpperCase();
+      const projectName = String(p.name || '').toUpperCase();
+      const kind = this.normalizeProjectKind(p.kind);
+      opt.textContent = kind === 'schedule'
+        ? `${this.t('РАСПИСАНИЕ', 'SCHEDULE')} · ${projectName}`
+        : projectName;
       if (String(p.id) === String(this.state.activeProjectId || '')) opt.selected = true;
       el.appendChild(opt);
     }
@@ -1278,24 +3684,39 @@ export class PlanningCollabApp {
       const chip = document.createElement('div');
       const isActive = String(p.id) === String(this.state.activeProjectId || '');
       chip.className = `proj-chip${isActive ? ' is-active' : ''}`;
+      const kind = this.normalizeProjectKind(p.kind);
+      chip.setAttribute('data-kind', kind);
 
       const role = roleLabel(p.role, this.getLang());
       const scopeText = this.projectScopeText(p);
-      const count =
-        this.state.board &&
-        this.state.board.project &&
-        String(this.state.board.project.id) === String(p.id)
-          ? asArray(this.state.board.cards).length
-          : Number(p.card_count || 0);
+      const count = kind === 'schedule'
+        ? Number(p.plan_count || 0)
+        : (
+          this.state.board &&
+          this.state.board.project &&
+          String(this.state.board.project.id) === String(p.id)
+            ? asArray(this.state.board.cards).length
+            : Number(p.card_count || 0)
+        );
       const canDelete = String(p.role || '') === 'owner';
+      const kindText = kind === 'schedule'
+        ? this.t('расписание', 'schedule')
+        : this.t('проект', 'project');
+      const deleteLabel = kind === 'schedule'
+        ? this.t('удалить расписание', 'delete schedule')
+        : this.t('удалить проект', 'delete project');
+      const controlsHtml = kind === 'board'
+        ? `<button class="proj-chip__ctl" type="button" aria-label="${escapeAttr(this.t('управление колонками', 'manage columns'))}">c</button>`
+        : '';
 
       chip.innerHTML = `
         <span class="proj-chip__name">${escapeHtml(String(p.name || '').toUpperCase())}</span>
         <span class="proj-chip__count">${count}</span>
         <span class="proj-chip__scope">${escapeHtml(scopeText)}</span>
+        <span class="proj-chip__kind">${escapeHtml(kindText)}</span>
         <span class="proj-chip__count">${escapeHtml(role)}</span>
-        <button class="proj-chip__ctl" type="button" aria-label="${escapeAttr(this.t('управление колонками', 'manage columns'))}">c</button>
-        <button class="proj-chip__del" type="button" aria-label="${escapeAttr(this.t('удалить проект', 'delete project'))}" ${canDelete ? '' : 'disabled'}>x</button>
+        ${controlsHtml}
+        <button class="proj-chip__del" type="button" aria-label="${escapeAttr(deleteLabel)}" ${canDelete ? '' : 'disabled'}>x</button>
       `;
 
       chip.addEventListener('click', (event) => {
@@ -1533,19 +3954,44 @@ export class PlanningCollabApp {
   renderCard(card, column) {
     const cardEl = document.createElement('article');
     const isDone = String(column.role || '') === 'done';
-    cardEl.className = `card${isDone ? ' card--done' : ''}`;
+    const priorityKey = String(card.priority || 'mid').toLowerCase();
+    const deadlineDate = parseISOToLocalDate(card.deadline);
+    const today = new Date();
+    const todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const isOverdue = !!deadlineDate && deadlineDate.getTime() < todayDate.getTime() && !isDone;
+    const isToday = !!deadlineDate && deadlineDate.getTime() === todayDate.getTime();
+
+    cardEl.className = `card${isDone ? ' card--done' : ''}${isOverdue ? ' card--overdue' : ''}${isToday ? ' card--today' : ''}`;
     cardEl.style.setProperty('--accent', column.color || '#111111');
     cardEl.draggable = true;
     cardEl.dataset.id = String(card.id);
     cardEl.dataset.columnId = String(card.column_id);
 
+    const assignee = this.assigneeLabel(card);
+    const tags = asArray(card.tags).slice(0, 5);
+    const description = shortText(card.description, 130);
+    const priorityLabel = this.t('приоритет', 'priority');
+    const deadlineLabel = this.t('срок', 'deadline');
+    const deadlineText = card.deadline
+      ? String(card.deadline)
+      : this.t('без срока', 'no deadline');
+
     cardEl.innerHTML = `
-      <h3 class="card__name">${escapeHtml(card.name || this.t('задача', 'task'))}</h3>
-      <p class="card__meta">${escapeHtml(this.cardMeta(card))}</p>
+      <div class="card__top">
+        <h3 class="card__name">${escapeHtml(card.name || this.t('задача', 'task'))}</h3>
+        <span class="card__priority card__priority--${escapeAttr(priorityKey)}">${escapeHtml(String(priorityKey || 'mid').toUpperCase())}</span>
+      </div>
+      ${description ? `<p class="card__desc">${escapeHtml(description)}</p>` : ''}
+      <div class="card__facts">
+        <span class="card__fact"><strong>${escapeHtml(priorityLabel)}:</strong> ${escapeHtml(String(priorityKey || 'mid').toUpperCase())}</span>
+        <span class="card__fact"><strong>${escapeHtml(deadlineLabel)}:</strong> ${escapeHtml(deadlineText)}</span>
+        ${assignee ? `<span class="card__fact"><strong>${escapeHtml(this.t('ответственный', 'assignee'))}:</strong> ${escapeHtml(assignee)}</span>` : ''}
+      </div>
+      ${tags.length ? `<div class="card__tags">${tags.map((tag) => `<span class="card__tag">#${escapeHtml(tag)}</span>`).join('')}</div>` : ''}
       <p class="card__editing" data-editing></p>
-      <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:2px;">
-        <button class="btn" type="button" data-act="open">${escapeHtml(this.t('открыть', 'open'))}</button>
-        <button class="btn" type="button" data-act="del">${escapeHtml(this.t('удалить', 'delete'))}</button>
+      <div class="card__actions">
+        <button class="btn btn--thin" type="button" data-act="open">${escapeHtml(this.t('открыть', 'open'))}</button>
+        <button class="btn btn--thin" type="button" data-act="del">${escapeHtml(this.t('удалить', 'delete'))}</button>
       </div>
     `;
 
@@ -1670,29 +4116,268 @@ export class PlanningCollabApp {
     return cards.find((c) => String(c.id) === String(cardId)) || null;
   }
 
+  boardPresetColumns(preset) {
+    const key = String(preset || 'classic').toLowerCase();
+    if (key === 'study') {
+      return [
+        { id: uid(), name: 'ideas', color: '#264653', role: 'todo' },
+        { id: uid(), name: 'this week', color: '#1d3557', role: 'doing' },
+        { id: uid(), name: 'today', color: '#e09f3e', role: 'doing' },
+        { id: uid(), name: 'done', color: '#2a9d8f', role: 'done' }
+      ];
+    }
+    if (key === 'lean') {
+      return [
+        { id: uid(), name: 'todo', color: '#1f2937', role: 'todo' },
+        { id: uid(), name: 'in progress', color: '#c26d1f', role: 'doing' },
+        { id: uid(), name: 'done', color: '#2f855a', role: 'done' }
+      ];
+    }
+    return [
+      { id: uid(), name: 'backlog', color: '#111111', role: 'todo' },
+      { id: uid(), name: 'in progress', color: '#aa5f00', role: 'doing' },
+      { id: uid(), name: 'review', color: '#005aaa', role: 'doing' },
+      { id: uid(), name: 'done', color: '#008c46', role: 'done' }
+    ];
+  }
+
+  buildTemplateScheduleEntries(template, weekOffset) {
+    const key = SCHEDULE_TEMPLATE_KEYS.includes(String(template || '').toLowerCase())
+      ? String(template || '').toLowerCase()
+      : 'none';
+    if (key === 'none') return [];
+
+    const start = addDaysLocal(startOfWeekLocal(new Date()), Number(weekOffset || 0) * 7);
+    const entries = [];
+
+    const addEntry = (dayOffset, startTime, endTime, title, description = '', tags = []) => {
+      const day = addDaysLocal(start, dayOffset);
+      const s = startTime.match(/^(\d{1,2}):(\d{2})$/);
+      const e = endTime.match(/^(\d{1,2}):(\d{2})$/);
+      if (!s || !e) return;
+      const startAt = new Date(day.getFullYear(), day.getMonth(), day.getDate(), Number(s[1]), Number(s[2]), 0, 0);
+      const endAt = new Date(day.getFullYear(), day.getMonth(), day.getDate(), Number(e[1]), Number(e[2]), 0, 0);
+      entries.push({
+        title,
+        description,
+        start_at: startAt.toISOString(),
+        end_at: endAt.getTime() > startAt.getTime() ? endAt.toISOString() : addMinutes(startAt, 60).toISOString(),
+        all_day: false,
+        location: '',
+        tags,
+        assignee_id: null,
+        repeat_rule: 'none',
+        repeat_until: null
+      });
+    };
+
+    if (key === 'study') {
+      for (let i = 0; i < 5; i += 1) {
+        addEntry(i, '09:00', '10:30', this.t('фокус-блок', 'focus block'), this.t('главная учебная цель дня', 'main study goal of the day'), ['study']);
+        addEntry(i, '11:00', '12:30', this.t('практика', 'practice'), this.t('закрепление материала', 'practice and reinforcement'), ['practice']);
+      }
+      addEntry(5, '11:00', '12:00', this.t('повторение недели', 'weekly recap'), this.t('разбор сложных тем', 'review difficult topics'), ['recap']);
+    } else if (key === 'work') {
+      for (let i = 0; i < 5; i += 1) {
+        addEntry(i, '09:00', '13:00', this.t('рабочий блок', 'work block'), this.t('ключевые задачи', 'key priorities'), ['work']);
+        addEntry(i, '14:00', '17:30', this.t('глубокая работа', 'deep work'), this.t('без отвлечений', 'no distractions'), ['deep']);
+      }
+    } else if (key === 'balanced') {
+      for (let i = 0; i < 5; i += 1) {
+        addEntry(i, '09:00', '10:30', this.t('план дня', 'day planning'), this.t('определить главное', 'define key outcomes'), ['plan']);
+        addEntry(i, '11:00', '13:00', this.t('главный блок', 'main block'), this.t('самое важное', 'highest impact task'), ['focus']);
+        addEntry(i, '18:00', '19:00', this.t('личные дела', 'personal time'), this.t('дом, спорт, отдых', 'home, fitness, rest'), ['life']);
+      }
+      addEntry(6, '12:00', '13:00', this.t('подготовка следующей недели', 'next week prep'), this.t('план + приоритеты', 'plan and priorities'), ['weekly']);
+    }
+
+    return entries;
+  }
+
+  parseScheduleSeedLines(raw, weekOffset) {
+    const lines = String(raw || '').split(/\r?\n/).map((x) => x.trim()).filter(Boolean).slice(0, 40);
+    if (!lines.length) return [];
+
+    const start = addDaysLocal(startOfWeekLocal(new Date()), Number(weekOffset || 0) * 7);
+    const dayMap = {
+      'пн': 0, 'пон': 0, mon: 0,
+      'вт': 1, 'вто': 1, tue: 1,
+      'ср': 2, 'сре': 2, wed: 2,
+      'чт': 3, 'чет': 3, thu: 3,
+      'пт': 4, 'пят': 4, fri: 4,
+      'сб': 5, 'суб': 5, sat: 5,
+      'вс': 6, 'воск': 6, sun: 6
+    };
+
+    const out = [];
+
+    for (const line of lines) {
+      const m = line.match(/^(\S+)\s+(\d{1,2}:\d{2})(?:\s*[-–]\s*(\d{1,2}:\d{2}))?\s+(.+)$/i);
+      if (!m) continue;
+      const dayToken = String(m[1] || '').toLowerCase();
+      if (!Object.prototype.hasOwnProperty.call(dayMap, dayToken)) continue;
+      const day = addDaysLocal(start, dayMap[dayToken]);
+
+      const st = String(m[2] || '09:00');
+      const et = String(m[3] || '');
+      const title = String(m[4] || '').trim();
+      if (!title) continue;
+
+      const s = st.match(/^(\d{1,2}):(\d{2})$/);
+      const e = et.match(/^(\d{1,2}):(\d{2})$/);
+      if (!s) continue;
+
+      const startAt = new Date(day.getFullYear(), day.getMonth(), day.getDate(), Number(s[1]), Number(s[2]), 0, 0);
+      const endAt = e
+        ? new Date(day.getFullYear(), day.getMonth(), day.getDate(), Number(e[1]), Number(e[2]), 0, 0)
+        : addMinutes(startAt, 60);
+
+      out.push({
+        title,
+        description: '',
+        start_at: startAt.toISOString(),
+        end_at: endAt.getTime() > startAt.getTime() ? endAt.toISOString() : addMinutes(startAt, 60).toISOString(),
+        all_day: false,
+        location: '',
+        tags: [],
+        assignee_id: null,
+        repeat_rule: 'none',
+        repeat_until: null
+      });
+    }
+
+    return out;
+  }
+
+  async seedScheduleEntries(projectId, entries) {
+    const rows = asArray(entries).filter(Boolean);
+    if (!rows.length) return 0;
+
+    let count = 0;
+    for (const row of rows) {
+      try {
+        await this.rpc('ik_plan_create_schedule_event', {
+          p_project_id: projectId,
+          p_title: row.title,
+          p_description: row.description || '',
+          p_start_at: row.start_at,
+          p_end_at: row.end_at,
+          p_all_day: !!row.all_day,
+          p_location: row.location || '',
+          p_tags: asArray(row.tags),
+          p_assignee_id: row.assignee_id || null,
+          p_repeat_rule: 'none',
+          p_repeat_until: null,
+          p_base_revision: null
+        });
+        count += 1;
+      } catch (error) {
+        if (this.looksLikeScheduleSchemaError(error)) {
+          if (!this.scheduleSchemaWarnShown) {
+            this.scheduleSchemaWarnShown = true;
+            this.ui.toast(this.t(
+              'для расписания примените SQL: supabase/sql/stage15_planning_schedule.sql',
+              'for schedule apply SQL: supabase/sql/stage15_planning_schedule.sql'
+            ));
+          }
+          this.disableSchedule(this.t('расписание недоступно: требуется stage15 sql', 'schedule unavailable: stage15 sql required'));
+          break;
+        }
+        throw error;
+      }
+    }
+
+    return count;
+  }
+
   openCreateProjectModal() {
     this.ui.openModal({
-      title: 'new project',
+      title: this.t('новый проект', 'new project'),
       bodyHtml: `
-        <form class="form">
-          <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
-            name
-            <input class="ctl" name="name" required maxlength="120" />
-          </label>
+        <form class="form" data-project-wizard>
+          <div class="planning-wizard-tabs" role="tablist" aria-label="project create tabs">
+            <button class="planning-wizard-tab is-active" type="button" data-wizard-tab="project">${escapeHtml(this.t('проект', 'project'))}</button>
+            <button class="planning-wizard-tab" type="button" data-wizard-tab="board">${escapeHtml(this.t('доска', 'board'))}</button>
+            <button class="planning-wizard-tab" type="button" data-wizard-tab="schedule">${escapeHtml(this.t('расписание', 'schedule'))}</button>
+          </div>
 
-          <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
-            description
-            <textarea class="ctl" name="description" rows="3" maxlength="500"></textarea>
-          </label>
+          <section class="planning-wizard-panel" data-wizard-panel="project">
+            <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+              ${this.t('название', 'name')}
+              <input class="ctl" name="name" required maxlength="120" />
+            </label>
+
+            <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+              ${this.t('описание', 'description')}
+              <textarea class="ctl" name="description" rows="3" maxlength="500"></textarea>
+            </label>
+          </section>
+
+          <section class="planning-wizard-panel" data-wizard-panel="board" hidden>
+            <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+              ${this.t('шаблон доски', 'board preset')}
+              <select class="ctl" name="board_preset">
+                <option value="classic">${this.t('классический', 'classic')}</option>
+                <option value="study">${this.t('учебный', 'study')}</option>
+                <option value="lean">${this.t('компактный', 'lean')}</option>
+              </select>
+            </label>
+            <div class="planning-modal-note">${escapeHtml(this.t('можно изменить потом через управление колонками', 'you can change later in columns settings'))}</div>
+          </section>
+
+          <section class="planning-wizard-panel" data-wizard-panel="schedule" hidden>
+            <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+              ${this.t('старт расписания', 'schedule start')}
+              <select class="ctl" name="schedule_start_week">
+                <option value="0">${this.t('эта неделя', 'this week')}</option>
+                <option value="1">${this.t('следующая неделя', 'next week')}</option>
+              </select>
+            </label>
+
+            <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+              ${this.t('шаблон расписания', 'schedule template')}
+              <select class="ctl" name="schedule_template">
+                <option value="none">${this.t('без шаблона', 'none')}</option>
+                <option value="study">${this.t('учебная неделя', 'study week')}</option>
+                <option value="work">${this.t('рабочая неделя', 'work week')}</option>
+                <option value="balanced">${this.t('сбалансированная', 'balanced')}</option>
+              </select>
+            </label>
+
+            <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+              ${this.t('быстрые строки расписания', 'quick schedule lines')}
+              <textarea class="ctl" name="schedule_lines" rows="5" placeholder="пн 14:00-15:30 математика&#10;вт 10:00-11:00 english"></textarea>
+            </label>
+            <div class="planning-modal-note">${escapeHtml(this.t('формат строки: день время-время название', 'line format: day time-time title'))}</div>
+          </section>
 
           <div class="form__actions">
-            <button class="btn" type="button" data-close>cancel</button>
-            <button class="btn" type="submit">create</button>
+            <button class="btn" type="button" data-close>${this.t('отмена', 'cancel')}</button>
+            <button class="btn" type="submit">${this.t('создать', 'create')}</button>
           </div>
         </form>
       `,
       onSubmit: (data) => {
         void this.createProjectSubmit(data).catch((error) => this.onMutationError(error));
+      },
+      onMount: (bodyEl) => {
+        const tabs = Array.from(bodyEl.querySelectorAll('[data-wizard-tab]'));
+        const panels = Array.from(bodyEl.querySelectorAll('[data-wizard-panel]'));
+        const switchTab = (key) => {
+          tabs.forEach((tab) => {
+            const active = String(tab.getAttribute('data-wizard-tab')) === key;
+            tab.classList.toggle('is-active', active);
+          });
+          panels.forEach((panel) => {
+            panel.hidden = String(panel.getAttribute('data-wizard-panel')) !== key;
+          });
+        };
+
+        tabs.forEach((tab) => {
+          tab.addEventListener('click', () => {
+            switchTab(String(tab.getAttribute('data-wizard-tab') || 'project'));
+          });
+        });
       }
     });
   }
@@ -1701,6 +4386,14 @@ export class PlanningCollabApp {
     const name = String(data.name || '').trim();
     if (!name) return;
     const description = String(data.description || '').trim();
+    const boardPreset = ['classic', 'study', 'lean'].includes(String(data.board_preset || ''))
+      ? String(data.board_preset)
+      : 'classic';
+    const scheduleTemplate = SCHEDULE_TEMPLATE_KEYS.includes(String(data.schedule_template || '').toLowerCase())
+      ? String(data.schedule_template || '').toLowerCase()
+      : 'none';
+    const scheduleWeekOffset = Number.parseInt(String(data.schedule_start_week || '0'), 10) === 1 ? 1 : 0;
+    const scheduleLines = String(data.schedule_lines || '');
 
     const projectId = await this.rpc('ik_plan_create_project', {
       p_name: name,
@@ -1715,24 +4408,54 @@ export class PlanningCollabApp {
       this.persistUIPrefs();
       this.renderProjectScopeToggle();
     }
+
+    if (boardPreset !== 'classic') {
+      await this.rpc('ik_plan_save_columns', {
+        p_project_id: projectId,
+        p_columns: this.boardPresetColumns(boardPreset),
+        p_base_revision: null
+      });
+    }
+
+    const scheduleEntries = [
+      ...this.buildTemplateScheduleEntries(scheduleTemplate, scheduleWeekOffset),
+      ...this.parseScheduleSeedLines(scheduleLines, scheduleWeekOffset)
+    ];
+
+    let seeded = 0;
+    if (scheduleEntries.length) {
+      seeded = await this.seedScheduleEntries(projectId, scheduleEntries);
+    }
+
     await this.selectProject(String(projectId), { force: true });
+    if (this.uiPrefs.view === 'schedule') {
+      await this.loadScheduleWindow({ force: true });
+    }
+
     this.ui.toast(this.t('проект создан', 'project created'));
+    if (seeded > 0) {
+      this.ui.toast(this.t(`добавлено событий: ${seeded}`, `events added: ${seeded}`));
+    }
   }
 
   openDeleteProjectModal(projectId) {
     const target = this.state.projects.find((p) => String(p.id) === String(projectId));
     if (!target) return;
 
+    const isSchedule = this.normalizeProjectKind(target.kind) === 'schedule';
+    const noun = isSchedule ? this.t('расписание', 'schedule') : this.t('проект', 'project');
+    const title = `${this.t('удалить', 'delete')} ${noun}`;
+
     this.ui.openModal({
-      title: 'delete project',
+      title,
       bodyHtml: `
         <form class="form">
           <div style="font-size:11px; letter-spacing:2px; text-transform:uppercase; opacity:.8; line-height:1.5;">
-            delete project ${escapeHtml(String(target.name || '').toUpperCase())}? this action cannot be undone.
+            ${escapeHtml(this.t('удалить', 'delete'))} ${escapeHtml(noun)} ${escapeHtml(String(target.name || '').toUpperCase())}? ${escapeHtml(this.t('действие необратимо', 'this action cannot be undone'))}.
           </div>
           <div class="form__actions">
-            <button class="btn" type="button" data-close>cancel</button>
-            <button class="btn" type="submit">delete</button>
+            <button class="btn" type="button" data-close>${this.t('отмена', 'cancel')}</button>
+            <button class="btn" type="submit">${this.t('удалить', 'delete')}</button>
           </div>
         </form>
       `,
@@ -1767,9 +4490,13 @@ export class PlanningCollabApp {
       await this.selectProject(this.state.activeProjectId, { force: true });
     } else {
       this.state.board = null;
+      this.state.schedule.events = [];
+      this.state.schedule.lastRangeKey = '';
       this.renderBoard();
+      this.renderSchedule();
       this.renderPresence();
       this.renderAssigneeFilter();
+      this.syncToolbarByProject();
     }
 
     this.ui.toast(this.t('проект удален', 'project deleted'));
@@ -2606,6 +5333,23 @@ export class PlanningCollabApp {
     const text = briefError(error);
     const low = text.toLowerCase();
 
+    if (this.looksLikePersonalScheduleSchemaError(error)) {
+      if (!this.personalScheduleSchemaWarnShown) {
+        this.personalScheduleSchemaWarnShown = true;
+        this.ui.toast(this.t(
+          'примените SQL: supabase/sql/stage16_planning_personal_schedule.sql',
+          'apply SQL: supabase/sql/stage16_planning_personal_schedule.sql'
+        ));
+      }
+      if (this.isScheduleProject()) {
+        this.disablePersonalScheduleWorkspace(this.t(
+          'расписание недоступно: требуется stage16 sql',
+          'schedule unavailable: stage16 sql required'
+        ));
+      }
+      return;
+    }
+
     if (looksLikeSchemaError(error)) {
       if (!this.schemaWarnShown) {
         this.schemaWarnShown = true;
@@ -2630,8 +5374,56 @@ export class PlanningCollabApp {
     if (low.includes('revision_conflict') || low.includes('version_conflict')) {
       this.ui.toast(this.t('обнаружен конфликт, обновляю доску', 'conflict detected, refreshing board'));
       if (this.state.activeProjectId) {
-        await this.loadBoard(this.state.activeProjectId);
+        if (this.isScheduleProject()) {
+          await this.loadPersonalScheduleWorkspace({ force: true });
+          await this.loadProjects({ quiet: true });
+        } else {
+          await this.loadBoard(this.state.activeProjectId);
+          if (this.uiPrefs.view === 'schedule') {
+            await this.loadScheduleWindow({ force: true });
+          }
+        }
       }
+      return;
+    }
+
+    if (low.includes('invalid_time_range')) {
+      this.ui.toast(this.t('проверьте время события: конец должен быть позже начала', 'check event time: end must be after start'));
+      return;
+    }
+
+    if (low.includes('repeat_requires_date')) {
+      this.ui.toast(this.t('для повторения укажите дату', 'set a date for repeat'));
+      return;
+    }
+
+    if (low.includes('invalid_repeat_until')) {
+      this.ui.toast(this.t('дата окончания повторения не может быть раньше даты плана', 'repeat end date cannot be earlier than plan date'));
+      return;
+    }
+
+    if (low.includes('schedule_event_not_found')) {
+      this.ui.toast(this.t('событие не найдено', 'event not found'));
+      return;
+    }
+
+    if (low.includes('schedule_list_not_found')) {
+      this.ui.toast(this.t('список не найден', 'list not found'));
+      return;
+    }
+
+    if (low.includes('schedule_plan_not_found')) {
+      this.ui.toast(this.t('план не найден', 'plan not found'));
+      return;
+    }
+
+    if (low.includes('schedule_project_required')) {
+      this.ui.toast(this.t('нужен проект типа расписание', 'schedule project is required'));
+      return;
+    }
+
+    if (low.includes('invalid_week_range')) {
+      this.ui.toast(this.t('некорректный диапазон недели', 'invalid week range'));
       return;
     }
 

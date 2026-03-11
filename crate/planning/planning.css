@@ -44,6 +44,19 @@
   margin: 0 auto;
   display: grid;
   gap: 14px;
+  padding-bottom: 180px;
+}
+
+.page.page-planning{
+  padding-bottom: 120px;
+}
+
+.page-planning .center-stage{
+  min-height: 0;
+  display: block;
+  place-items: initial;
+  padding-top: 8px;
+  padding-bottom: 100px;
 }
 
 .planning-head{
@@ -85,10 +98,25 @@
 .btn:hover{ border-color: rgba(0,0,0,.25); }
 
 .planning-toolbar{
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 10px;
-  flex-wrap: wrap;
-  align-items: center;
+  align-items: stretch;
+}
+
+.planning-toolbar > *{
+  min-width: 0;
+}
+
+.planning-toolbar .btn,
+.planning-toolbar .ctl,
+.planning-toolbar .scope-switch{
+  width: 100%;
+}
+
+.planning-toolbar .scope-switch{
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .scope-switch{
@@ -186,8 +214,10 @@
   display: inline-block;
 }
 
-/* Filters toolbar: many controls, so keep them a bit tighter */
-.planning-toolbar .ctl{ min-width: 160px; }
+/* Filters toolbar */
+.planning-toolbar .ctl{
+  min-width: 0;
+}
 
 .btn--thin{
   padding: 10px 10px;
@@ -207,16 +237,22 @@
 
 .planning-content{ min-height: 55vh; }
 
+.page-planning #boardView[hidden],
+.page-planning #scheduleView[hidden]{
+  display: none !important;
+}
+
 .board{
   display: grid;
-  grid-template-columns: repeat(4, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 12px;
   overflow: auto;
   padding-bottom: 6px;
+  align-items: start;
 }
 
 @media (max-width: 980px){
-  .board{ grid-template-columns: repeat(2, minmax(240px, 1fr)); }
+  .board{ grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
 }
 @media (max-width: 620px){
   .board{ grid-template-columns: 1fr; }
@@ -231,7 +267,8 @@
   padding: 10px;
   display: grid;
   gap: 10px;
-  min-height: 340px;
+  min-height: 0;
+  align-self: start;
 }
 
 .column__head{
@@ -255,7 +292,8 @@
   display: grid;
   gap: 10px;
   align-content: start;
-  min-height: 260px;
+  min-height: 120px;
+  grid-auto-rows: max-content;
 }
 
 .column__dropzone.is-drop-target{
@@ -271,6 +309,7 @@
   display: grid;
   gap: 8px;
   cursor: grab;
+  align-content: start;
 }
 .card:active{ cursor: grabbing; }
 
@@ -439,6 +478,22 @@
   border-radius: 0;
   padding: 2px 6px;
   opacity: .75;
+}
+
+.page-planning .proj-chip__kind{
+  font-size: 9px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border: 1px solid rgba(0,0,0,.14);
+  border-radius: 0;
+  padding: 2px 6px;
+  opacity: .75;
+}
+
+.page-planning .proj-chip[data-kind="schedule"]{
+  background: rgba(246,250,255,.95);
+  border-color: rgba(0,0,0,.22);
+  padding-right: 32px;
 }
 
 .page-planning .proj-chip__ctl,
@@ -913,4 +968,676 @@
 @media (max-width: 520px){
   .ik-site-nav{ padding: 14px 12px; margin-bottom: 14px; }
   .ik-site-nav__link{ padding: 10px 12px; letter-spacing: 3px; }
+}
+
+/* =============================
+   Planning UX refresh
+   ============================= */
+
+.page-planning .card{
+  gap: 10px;
+  box-shadow: 0 8px 18px rgba(0,0,0,.07);
+  transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+}
+
+.page-planning .card:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(0,0,0,.10);
+}
+
+.page-planning .card.card--overdue{
+  border-color: rgba(176,32,32,.42);
+}
+
+.page-planning .card.card--today{
+  border-color: rgba(24,94,180,.42);
+}
+
+.page-planning .card__top{
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.page-planning .card__name{
+  margin: 0;
+  line-height: 1.28;
+  letter-spacing: 1.3px;
+}
+
+.page-planning .card__priority{
+  border: 1px solid rgba(0,0,0,.18);
+  padding: 2px 7px;
+  font-size: 9px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.page-planning .card__priority--high{ background: rgba(178,34,34,.12); }
+.page-planning .card__priority--mid{ background: rgba(204,122,0,.14); }
+.page-planning .card__priority--low{ background: rgba(5,102,60,.13); }
+
+.page-planning .card__desc{
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.45;
+  color: rgba(0,0,0,.8);
+}
+
+.page-planning .card__facts{
+  display: grid;
+  gap: 4px;
+}
+
+.page-planning .card__fact{
+  font-size: 10px;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  color: rgba(0,0,0,.72);
+}
+
+.page-planning .card__fact strong{
+  font-weight: 700;
+}
+
+.page-planning .card__tags{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.page-planning .card__tag{
+  border: 1px solid rgba(0,0,0,.14);
+  padding: 2px 6px;
+  font-size: 9px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  background: rgba(255,255,255,.76);
+}
+
+.page-planning .card__actions{
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 2px;
+}
+
+.page-planning .schedule{
+  border: 1px solid rgba(0,0,0,.16);
+  background: rgba(255,255,255,.9);
+  padding: 14px;
+}
+
+.page-planning .schedule-app{
+  display: grid;
+  gap: 12px;
+}
+
+.page-planning .schedule-headline{
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.page-planning .schedule-headline__kicker{
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(0,0,0,.58);
+}
+
+.page-planning .schedule-headline__range{
+  font-size: 13px;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+}
+
+.page-planning .schedule-headline__meta{
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(0,0,0,.56);
+}
+
+.page-planning .schedule-headline__actions{
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.page-planning .schedule-ranges{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.page-planning .schedule-ranges__btn{
+  border: 1px solid rgba(0,0,0,.16);
+  background: rgba(255,255,255,.92);
+  padding: 8px 10px;
+  font-size: 10px;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.page-planning .schedule-ranges__btn.is-active{
+  background: rgba(0,0,0,.08);
+  border-color: rgba(0,0,0,.34);
+}
+
+.page-planning .schedule-quick{
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+}
+
+.page-planning .schedule-quick__input{
+  min-width: 0;
+}
+
+.page-planning .schedule-grid{
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(7, minmax(190px, 1fr));
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.page-planning .schedule-grid--1{ grid-template-columns: minmax(240px, 1fr); }
+
+.page-planning .schedule-day{
+  border: 1px solid rgba(0,0,0,.14);
+  background: rgba(255,255,255,.94);
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  min-height: 260px;
+}
+
+.page-planning .schedule-day__head{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.page-planning .schedule-day__title{
+  font-size: 11px;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+}
+
+.page-planning .schedule-day__body{
+  display: grid;
+  align-content: start;
+  gap: 8px;
+}
+
+.page-planning .schedule-day__empty{
+  font-size: 10px;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+  color: rgba(0,0,0,.5);
+}
+
+.page-planning .schedule-day__tasks{
+  border-top: 1px dashed rgba(0,0,0,.16);
+  padding-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.page-planning .schedule-task-chip{
+  border: 1px solid rgba(0,0,0,.14);
+  padding: 2px 6px;
+  font-size: 9px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  background: rgba(255,255,255,.92);
+}
+
+.page-planning .schedule-task-chip--high{ border-color: rgba(176,32,32,.38); }
+.page-planning .schedule-task-chip--mid{ border-color: rgba(204,122,0,.38); }
+.page-planning .schedule-task-chip--low{ border-color: rgba(5,102,60,.38); }
+
+.page-planning .schedule-item{
+  border: 1px solid rgba(0,0,0,.14);
+  padding: 8px;
+  display: grid;
+  gap: 5px;
+  background: rgba(255,255,255,.98);
+}
+
+.page-planning .schedule-item.is-all-day{
+  border-style: dashed;
+}
+
+.page-planning .schedule-item__time{
+  font-size: 10px;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: rgba(0,0,0,.6);
+}
+
+.page-planning .schedule-item__title{
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.page-planning .schedule-item__desc{
+  font-size: 11px;
+  line-height: 1.38;
+  color: rgba(0,0,0,.77);
+}
+
+.page-planning .schedule-item__meta{
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: rgba(0,0,0,.62);
+}
+
+.page-planning .schedule-item__actions{
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.page-planning .schedule-loading,
+.page-planning .schedule-placeholder,
+.page-planning .schedule-unavailable{
+  border: 1px solid rgba(0,0,0,.14);
+  background: rgba(255,255,255,.96);
+  padding: 16px;
+  font-size: 11px;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  color: rgba(0,0,0,.72);
+}
+
+.page-planning .schedule-unavailable{
+  display: grid;
+  gap: 8px;
+}
+
+.page-planning .schedule-unavailable__title{
+  font-size: 11px;
+  letter-spacing: 2px;
+}
+
+.page-planning .schedule-unavailable__text{
+  font-size: 10px;
+  letter-spacing: 1.3px;
+  color: rgba(0,0,0,.62);
+}
+
+.page-planning .planning-wizard-tabs{
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.page-planning .planning-wizard-tab{
+  border: 1px solid rgba(0,0,0,.14);
+  background: rgba(255,255,255,.92);
+  min-height: 40px;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.page-planning .planning-wizard-tab.is-active{
+  border-color: rgba(0,0,0,.34);
+  background: rgba(0,0,0,.08);
+}
+
+.page-planning .planning-wizard-panel{
+  display: grid;
+  gap: 10px;
+}
+
+.page-planning.planning-mode-schedule .planning-content{
+  min-height: 0;
+}
+
+.page-planning.planning-mode-schedule .planning-toolbar{
+  display: none;
+}
+
+.page-planning.planning-mode-schedule .schedule{
+  border: 0;
+  background: transparent;
+  padding: 0;
+}
+
+.page-planning.planning-mode-schedule .projectbar{
+  margin-top: 2px;
+}
+
+.page-planning .ps-shell{
+  display: grid;
+  gap: 12px;
+}
+
+.page-planning .ps-shell__head{
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.page-planning .ps-shell__kicker{
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(0,0,0,.58);
+}
+
+.page-planning .ps-shell__title{
+  font-size: 14px;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+}
+
+.page-planning .ps-shell__actions{
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.page-planning .ps-tabs{
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.page-planning .ps-tab{
+  border: 1px solid rgba(0,0,0,.16);
+  background: rgba(255,255,255,.92);
+  min-height: 36px;
+  padding: 0 12px;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.page-planning .ps-tab.is-active{
+  border-color: rgba(0,0,0,.34);
+  background: rgba(0,0,0,.08);
+}
+
+.page-planning .ps-content,
+.page-planning .ps-layout{
+  display: grid;
+  gap: 10px;
+}
+
+.page-planning .ps-top-actions{
+  display: flex;
+  justify-content: flex-end;
+}
+
+.page-planning .ps-block,
+.page-planning .ps-list-block,
+.page-planning .ps-cal{
+  border: 1px solid rgba(0,0,0,.14);
+  background: rgba(255,255,255,.96);
+  padding: 10px;
+  display: grid;
+  gap: 8px;
+}
+
+.page-planning .ps-day-panel{
+  border: 1px solid rgba(0,0,0,.14);
+  background: rgba(255,255,255,.98);
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 0;
+  min-height: 420px;
+  overflow: hidden;
+}
+
+.page-planning .ps-block__head,
+.page-planning .ps-list-block__head,
+.page-planning .ps-cal__head{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.page-planning .ps-day-panel__head{
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 12px;
+  padding: 12px;
+  border-bottom: 1px dashed rgba(0,0,0,.16);
+  background:
+    linear-gradient(180deg, rgba(0,0,0,.04), rgba(0,0,0,0)),
+    rgba(255,255,255,.98);
+}
+
+.page-planning .ps-day-panel__head .btn{
+  justify-self: end;
+}
+
+.page-planning .ps-day-panel__title-wrap{
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.page-planning .ps-day-panel__label{
+  font-size: 10px;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  color: rgba(0,0,0,.56);
+}
+
+.page-planning .ps-day-panel__date{
+  font-size: 15px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.page-planning .ps-day-panel__sub{
+  font-size: 10px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: rgba(0,0,0,.62);
+}
+
+.page-planning .ps-block__title,
+.page-planning .ps-list-block__title,
+.page-planning .ps-cal__title{
+  font-size: 11px;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+}
+
+.page-planning .ps-list-block__actions,
+.page-planning .ps-cal__head-actions{
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.page-planning .ps-dot{
+  width: 10px;
+  height: 10px;
+  border: 1px solid rgba(0,0,0,.18);
+  display: inline-block;
+  margin-right: 6px;
+  background: var(--ps-dot, #2f6f4f);
+}
+
+.page-planning .ps-empty{
+  font-size: 10px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: rgba(0,0,0,.56);
+  padding: 6px 2px;
+}
+
+.page-planning .ps-plan{
+  border: 1px solid rgba(0,0,0,.14);
+  background: rgba(255,255,255,.98);
+  padding: 8px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 8px;
+  align-items: start;
+}
+
+.page-planning .ps-plan.is-done{
+  opacity: .72;
+}
+
+.page-planning .ps-plan__left{
+  padding-top: 3px;
+}
+
+.page-planning .ps-plan__body{
+  display: grid;
+  gap: 4px;
+}
+
+.page-planning .ps-plan__title{
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.page-planning .ps-plan.is-done .ps-plan__title{
+  text-decoration: line-through;
+}
+
+.page-planning .ps-plan__meta{
+  font-size: 10px;
+  color: rgba(0,0,0,.62);
+  letter-spacing: .8px;
+}
+
+.page-planning .ps-plan__note{
+  font-size: 11px;
+  line-height: 1.4;
+  color: rgba(0,0,0,.78);
+}
+
+.page-planning .ps-plan__actions{
+  display: flex;
+  gap: 6px;
+}
+
+.page-planning .ps-calendar-layout{
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 1.3fr .9fr;
+}
+
+.page-planning .ps-cal__grid{
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.page-planning .ps-cal__day{
+  border: 1px solid rgba(0,0,0,.14);
+  background: rgba(255,255,255,.95);
+  min-height: 62px;
+  display: grid;
+  align-content: space-between;
+  justify-items: start;
+  gap: 6px;
+  padding: 7px;
+  cursor: pointer;
+}
+
+.page-planning .ps-cal__day.is-out{
+  opacity: .55;
+}
+
+.page-planning .ps-cal__day.is-selected{
+  border-color: rgba(0,0,0,.45);
+  background: rgba(0,0,0,.06);
+}
+
+.page-planning .ps-cal__num{
+  font-size: 12px;
+}
+
+.page-planning .ps-cal__count{
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: rgba(0,0,0,.62);
+}
+
+.page-planning .ps-day-panel__body{
+  display: grid;
+  gap: 8px;
+  align-content: start;
+  padding: 12px;
+  max-height: min(68vh, 620px);
+  overflow: auto;
+}
+
+@media (max-width: 680px){
+  .page-planning .ps-day-panel__head{
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+  .page-planning .ps-day-panel__head .btn{
+    justify-self: start;
+    width: 100%;
+  }
+}
+
+@media (max-width: 940px){
+  .page-planning .ps-calendar-layout{
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 680px){
+  .page-planning .ps-plan{
+    grid-template-columns: auto 1fr;
+  }
+  .page-planning .ps-plan__actions{
+    grid-column: 1 / -1;
+    justify-content: flex-end;
+  }
+}
+
+@media (max-width: 780px){
+  .page-planning .schedule-grid{
+    grid-template-columns: repeat(2, minmax(240px, 1fr));
+  }
+}
+
+@media (max-width: 640px){
+  .page-planning .schedule-quick{
+    grid-template-columns: 1fr;
+  }
+
+  .page-planning .schedule-grid{
+    grid-template-columns: 1fr;
+  }
+
+  .page-planning .planning-wizard-tabs{
+    grid-template-columns: 1fr;
+  }
 }

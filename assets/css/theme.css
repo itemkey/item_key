@@ -468,6 +468,17 @@ html[data-theme="dark"] .page-planning .planning-shell,
 html[data-theme="dark"] .page-planning .column,
 html[data-theme="dark"] .page-planning .schedule,
 html[data-theme="dark"] .page-planning .card,
+html[data-theme="dark"] .page-planning .ps-block,
+html[data-theme="dark"] .page-planning .ps-list-block,
+html[data-theme="dark"] .page-planning .ps-cal,
+html[data-theme="dark"] .page-planning .ps-day-panel,
+html[data-theme="dark"] .page-planning .ps-plan,
+html[data-theme="dark"] .page-planning .ps-cal__day,
+html[data-theme="dark"] .page-planning .schedule-day,
+html[data-theme="dark"] .page-planning .schedule-item,
+html[data-theme="dark"] .page-planning .schedule-loading,
+html[data-theme="dark"] .page-planning .schedule-unavailable,
+html[data-theme="dark"] .page-planning .schedule-placeholder,
 html[data-theme="dark"] .page-planning .proj-chip,
 html[data-theme="dark"] .page-planning .modal__panel,
 html[data-theme="dark"] .page-planning .toast {
@@ -484,8 +495,48 @@ html[data-theme="dark"] .page-planning .card::before {
   background: color-mix(in srgb, var(--accent, #d7e4ff) 70%, #eef4ff);
 }
 
-html[data-theme="dark"] .page-planning .schedule-placeholder {
+html[data-theme="dark"] .page-planning .schedule-placeholder,
+html[data-theme="dark"] .page-planning .schedule-unavailable__text,
+html[data-theme="dark"] .page-planning .schedule-day__empty,
+html[data-theme="dark"] .page-planning .ps-shell__kicker,
+html[data-theme="dark"] .page-planning .ps-empty,
+html[data-theme="dark"] .page-planning .ps-plan__meta,
+html[data-theme="dark"] .page-planning .ps-cal__count,
+html[data-theme="dark"] .page-planning .ps-day-panel__label,
+html[data-theme="dark"] .page-planning .ps-day-panel__sub,
+html[data-theme="dark"] .page-planning .schedule-headline__kicker,
+html[data-theme="dark"] .page-planning .schedule-headline__meta,
+html[data-theme="dark"] .page-planning .schedule-item__meta,
+html[data-theme="dark"] .page-planning .schedule-item__time,
+html[data-theme="dark"] .page-planning .card__fact,
+html[data-theme="dark"] .page-planning .card__editing {
   color: var(--ik-muted);
+}
+
+html[data-theme="dark"] .page-planning .schedule-ranges__btn,
+html[data-theme="dark"] .page-planning .planning-wizard-tab,
+html[data-theme="dark"] .page-planning .ps-tab,
+html[data-theme="dark"] .page-planning .card__tag,
+html[data-theme="dark"] .page-planning .schedule-task-chip,
+html[data-theme="dark"] .page-planning .card__priority {
+  background: var(--ik-surface-soft);
+  color: var(--ik-text);
+  border-color: var(--ik-border);
+}
+
+html[data-theme="dark"] .page-planning .schedule-ranges__btn.is-active,
+html[data-theme="dark"] .page-planning .planning-wizard-tab.is-active,
+html[data-theme="dark"] .page-planning .ps-tab.is-active,
+html[data-theme="dark"] .page-planning .ps-cal__day.is-selected {
+  background: var(--ik-surface-alt);
+  border-color: var(--ik-border-strong);
+}
+
+html[data-theme="dark"] .page-planning .ps-day-panel__head {
+  border-bottom-color: var(--ik-border);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,0)),
+    var(--ik-surface);
 }
 
 html[data-theme="dark"] .page-learning .ik-card,

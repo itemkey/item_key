@@ -12,7 +12,9 @@ Order for fresh environment:
 8. Run `supabase/sql/stage9_planning_collab.sql`
 9. Run `supabase/sql/stage10_planning_shared_personal_tasks.sql`
 10. Run `supabase/sql/stage11_economy_roles_public_dictionary.sql`
-11. (Optional) Run `supabase/sql/stage12_seed_public_user_dictionaries.sql`
+11. Run `supabase/sql/stage15_planning_schedule.sql`
+12. Run `supabase/sql/stage16_planning_personal_schedule.sql`
+13. (Optional) Run `supabase/sql/stage12_seed_public_user_dictionaries.sql`
 
 After SQL:
 
@@ -24,6 +26,9 @@ After SQL:
   - `dictionary` cloud status not failing
   - `progress cloud: ok` after login
   - `planning cloud: live` after opening planning board
+  - schedule view opens and can create/edit weekly events
+  - `+ расписание` creates personal schedule chip with tabs today/lists/calendar
+  - in personal schedule plan modal, repeat options work (daily/weekly/monthly/yearly/weekdays/weekends)
 
 Operational model:
 
