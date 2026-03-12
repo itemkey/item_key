@@ -327,11 +327,6 @@
 </head>
 
 <body class="page page-crate ik-booting" data-ik-loading>
-  <!-- фон/рамки — как в item-key -->
-  <div class="outer-frame" aria-hidden="true"></div>
-  <div class="rays" aria-hidden="true"></div>
-  <div class="veil" aria-hidden="true"></div>
-
   <!-- site nav -->
   <header class="ik-site-nav" id="ikSiteNav">
     <a class="ik-site-nav__link" id="ikMainMenuLink" href="index.html">Главное меню</a>
@@ -409,11 +404,6 @@
       </div>
     </section>
   </main>
-
-  <footer class="bottombar bottombar--edge">
-    <span class="hint" id="footerHintLeft">crate · hub</span>
-    <span class="hint" id="footerHintRight">pre-alpha</span>
-  </footer>
 
   <script>
     (() => {
@@ -516,8 +506,10 @@
         byId('cardStudyMeta').textContent = t.studyMeta;
         byId('cardWhispererTitle').textContent = t.whispererTitle;
         byId('cardWhispererMeta').textContent = t.whispererMeta;
-        byId('footerHintLeft').textContent = t.footerLeft;
-        byId('footerHintRight').textContent = t.footerRight;
+        const footerHintLeft = byId('footerHintLeft');
+        const footerHintRight = byId('footerHintRight');
+        if (footerHintLeft) footerHintLeft.textContent = t.footerLeft;
+        if (footerHintRight) footerHintRight.textContent = t.footerRight;
         byId('crateHubSection').setAttribute('aria-label', t.sectionAria);
         byId('crateGridNav').setAttribute('aria-label', t.navAria);
 

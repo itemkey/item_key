@@ -196,8 +196,6 @@
 </head>
 
 <body class="page page-learning ik-booting" data-i18n-page="student_helper" data-ik-loading>
-  <div class="veil" aria-hidden="true"></div>
-
   <header class="ik-site-nav" id="ikSiteNav">
     <button type="button" class="ik-site-nav__link" id="ikBackBtn" title="Вернуться назад">← Назад</button>
     <a class="ik-site-nav__link" href="../../index.html">Главное меню</a>
@@ -1141,18 +1139,6 @@
 
     </div>
   </main>
-
-  <footer class="bottombar bottombar--edge sh-footer">
-    <span class="hint">student helper</span>
-    <span class="hint ik-admin-indicator" id="progressCloudBadge" title="progress cloud sync status">progress cloud: ...</span>
-    <span class="ik-spacer" aria-hidden="true"></span>
-    <div class="sh-footer__actions" aria-label="backup actions">
-      <button class="ik-btn sh-footer__btn" id="shBackupBtn" type="button" title="Экспорт данных Student Helper">backup</button>
-      <button class="ik-btn sh-footer__btn" id="shRestoreBtn" type="button" title="Импорт данных Student Helper">restore</button>
-    </div>
-    <input type="file" id="shRestoreFile" accept=".json,application/json" hidden />
-    <span class="hint">pre-alpha</span>
-  </footer>
 
   <script src="../../assets/js/theme.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

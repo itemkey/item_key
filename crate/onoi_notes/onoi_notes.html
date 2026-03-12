@@ -29,7 +29,7 @@
        ========================================================= */
     .notes-wrap, .notes-wrap *{ box-sizing: border-box; }
     :root{
-      --footerH: 56px;
+      --footerH: 0px;
       --topbarOffset: 0px;
 
       --bgCard: rgba(255,255,255,.86);
@@ -945,7 +945,7 @@ html[lang="en"] .tree-item[data-depth="0"] .tree-name::after{
       /* maximize content area */
       :root{
         --topbarOffset: 60px;
-        --footerH: 58px;
+        --footerH: 0px;
         --fs-ui: 13px;
       }
 
@@ -1993,11 +1993,6 @@ body.focus-mode .n-col-right{
 </head>
 
 <body class="page page-crate onoi-booting" data-i18n-page="onoi_notes" data-ik-loading>
-  <!-- фон/рамки - как в item-key -->
-  <div class="outer-frame" aria-hidden="true"></div>
-  <div class="rays" aria-hidden="true"></div>
-  <div class="veil" aria-hidden="true"></div>
-
   <header class="ik-site-nav" id="ikSiteNav">
     <button type="button" class="ik-site-nav__link" id="ikBackBtn" title="Вернуться назад">← Назад</button>
     <a class="ik-site-nav__link" href="../../index.html">Главное меню</a>
@@ -2274,11 +2269,6 @@ body.focus-mode .n-col-right{
     <button class="n-btn" id="mobileDeleteNoteBtn" type="button">Удалить</button>
     <button class="n-btn" id="mobileWhisperBtn" type="button">Прошептать</button>
   </div>
-
-  <footer class="bottombar bottombar--edge">
-    <span class="hint">onoi_notes</span>
-    <span class="hint">autosave · categories · whisperer</span>
-  </footer>
 
 <!-- UI modal (prompt/confirm/alert replacement) -->
 <div class="modal" id="uiModal" role="dialog" aria-modal="true" aria-label="Диалог" style="z-index: 100000;">

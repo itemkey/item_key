@@ -1743,3 +1743,28 @@ body.page-user .account-center::before{
   margin-left: 0;
   margin-right: 0;
 }
+
+/* Minimal background mode: remove static decorative layers */
+.outer-frame,
+.rays,
+.veil,
+.logo-circle,
+.window,
+.tracery,
+.arch,
+.arch--free,
+.rose,
+.buttress,
+.marginalia{
+  display: none !important;
+}
+
+html::before,
+html::after,
+body::before,
+body::after,
+.center-stage::before{
+  content: none !important;
+  display: none !important;
+  background: none !important;
+}

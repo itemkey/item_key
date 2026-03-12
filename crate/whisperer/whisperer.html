@@ -25,7 +25,7 @@
     .whisperer-wrap, .whisperer-wrap * { box-sizing: border-box; }
 
     :root{
-      --footerH: 56px;      /* measured in JS */
+      --footerH: 0px;       /* measured in JS */
       --floatH: 60px;       /* measured in JS */
       --topbarOffset: 74px; /* safety spacing under header */
 
@@ -586,10 +586,6 @@
 </head>
 
 <body class="page page-crate ik-booting" data-i18n-page="whisperer" data-ik-loading>
-  <div class="outer-frame" aria-hidden="true"></div>
-  <div class="rays" aria-hidden="true"></div>
-  <div class="veil" aria-hidden="true"></div>
-
   <header class="ik-site-nav" id="ikSiteNav">
     <button type="button" class="ik-site-nav__link" id="ikBackBtn" title="Вернуться назад">← Назад</button>
     <a class="ik-site-nav__link" href="../../index.html">Главное меню</a>
@@ -709,11 +705,6 @@
     <button class="w-btn w-btn--primary" id="floatSpeakBtn" type="button">Озвучить</button>
     <button class="w-btn" id="pauseBtn" type="button" disabled hidden>Пауза</button>
   </div>
-
-  <footer class="bottombar bottombar--edge">
-    <span class="hint">whisperer</span>
-    <span class="hint">speech · follow</span>
-  </footer>
 
   <!-- Notes picker modal -->
   <div class="modal" id="notesModal" role="dialog" aria-modal="true" aria-label="Заметки">
@@ -971,7 +962,7 @@ const menuSpeakBtn = document.getElementById('menuSpeakBtn');
       const followScrim = document.getElementById('followScrim');
 
       function measureBottom(){
-        const fh = footer ? footer.getBoundingClientRect().height : 56;
+        const fh = footer ? footer.getBoundingClientRect().height : 0;
         const bh = floatbar ? floatbar.getBoundingClientRect().height : 60;
         document.documentElement.style.setProperty('--footerH', Math.ceil(fh) + 'px');
         document.documentElement.style.setProperty('--floatH', Math.ceil(bh) + 'px');
