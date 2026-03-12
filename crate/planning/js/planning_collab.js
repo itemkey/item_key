@@ -8,6 +8,7 @@ const EDITING_PING_MS = 10000;
 const PROJECTS_RETRY_MS = 6000;
 const LIVE_EVENTS_POLL_MS = 1500;
 const FRIENDS_CACHE_MS = 30000;
+const PERSONAL_PLAN_ORDER_KEY_PREFIX = 'itemkey_planning_ps_plan_order_v1__';
 
 const PROJECT_SCOPES = ['personal', 'shared', 'all'];
 const ASSIGNEE_FILTERS = ['all', 'me', 'unassigned'];
@@ -282,6 +283,10 @@ export class PlanningCollabApp {
     this.personalScheduleSchemaWarnShown = false;
     this.actionsHardDisabled = false;
     this.handlersBound = false;
+    this.personalScheduleDrag = null;
+    this.personalPlanOrderProjectId = '';
+    this.personalPlanOrderByList = new Map();
+    this.scopeReturnProjectId = '';
 
     const baseCloseModal = this.ui.closeModal.bind(this.ui);
     this.ui.closeModal = () => {
@@ -323,11 +328,18 @@ export class PlanningCollabApp {
       return;
     }
 
-    this.client.auth.onAuthStateChange((_evt, session) => {
+    this.client.auth.onAuthStateChange((evt, session) => {
       const nextUser = session && session.user ? session.user : null;
       const nextId = nextUser ? String(nextUser.id) : '';
       const currentId = this.user ? String(this.user.id) : '';
-      if (!nextId || nextId !== currentId) {
+
+      const eventType = String(evt || '').toUpperCase();
+      if (nextId && nextId !== currentId) {
+        window.location.reload();
+        return;
+      }
+
+      if (!nextId && (eventType === 'SIGNED_OUT' || eventType === 'USER_DELETED')) {
         window.location.reload();
       }
     });
@@ -480,6 +492,40 @@ export class PlanningCollabApp {
     return this.state.projects.filter((p) => this.normalizeProjectScope(p) === mode);
   }
 
+  rememberScopeReturnProject(projectId) {
+    const id = String(projectId || '').trim();
+    if (!id) return;
+    if (!this.state.projects.some((p) => String(p.id) === id)) return;
+    this.scopeReturnProjectId = id;
+  }
+
+  resolveScopedProjectId(scopedProjects, options = {}) {
+    const rows = asArray(scopedProjects);
+    if (!rows.length) return '';
+
+    const rowById = new Map(rows.map((project) => [String(project.id || ''), project]));
+    const preferred = [];
+    const pushPreferred = (value) => {
+      const id = String(value || '').trim();
+      if (!id) return;
+      if (preferred.includes(id)) return;
+      preferred.push(id);
+    };
+
+    pushPreferred(options.preferId);
+    pushPreferred(this.scopeReturnProjectId);
+    pushPreferred(this.readStoredActiveProjectId());
+
+    for (const id of preferred) {
+      if (rowById.has(id)) return id;
+    }
+
+    const boardFirst = rows.find((project) => this.normalizeProjectKind(project && project.kind) !== 'schedule');
+    if (boardFirst && boardFirst.id) return String(boardFirst.id);
+
+    return String(rows[0] && rows[0].id || '');
+  }
+
   renderProjectScopeToggle() {
     const root = this.els.projectScope;
     if (!root) return;
@@ -515,9 +561,9 @@ export class PlanningCollabApp {
 
     const scoped = this.getScopeFilteredProjects();
     if (!scoped.length) {
+      this.rememberScopeReturnProject(this.state.activeProjectId);
       await this.unsubscribeProject();
       this.state.activeProjectId = null;
-      this.storeActiveProjectId(null);
       this.state.board = null;
       this.state.schedule.events = [];
       this.state.schedule.lastRangeKey = '';
@@ -533,7 +579,10 @@ export class PlanningCollabApp {
 
     const stillVisible = scoped.some((p) => String(p.id) === String(this.state.activeProjectId || ''));
     if (!stillVisible) {
-      this.state.activeProjectId = scoped[0].id;
+      const nextId = this.resolveScopedProjectId(scoped, {
+        preferId: this.state.activeProjectId
+      });
+      this.state.activeProjectId = nextId || scoped[0].id;
       this.storeActiveProjectId(this.state.activeProjectId);
     }
 
@@ -569,9 +618,9 @@ export class PlanningCollabApp {
     }
 
     if (!scoped.length) {
+      this.rememberScopeReturnProject(this.state.activeProjectId);
       await this.unsubscribeProject();
       this.state.activeProjectId = null;
-      this.storeActiveProjectId(null);
       this.state.board = null;
       this.state.schedule.events = [];
       this.state.schedule.lastRangeKey = '';
@@ -585,7 +634,10 @@ export class PlanningCollabApp {
       return;
     }
 
-    await this.selectProject(scoped[0].id, { force: true });
+    const nextId = this.resolveScopedProjectId(scoped, {
+      preferId: this.state.activeProjectId
+    });
+    await this.selectProject(nextId || scoped[0].id, { force: true });
   }
 
   bindHandlers() {
@@ -793,6 +845,33 @@ export class PlanningCollabApp {
         const raw = String(fd.get('quick') || '').trim();
         if (!raw) return;
         void this.quickAddSchedule(raw).catch((error) => this.onMutationError(error));
+      });
+
+      this.els.scheduleView.addEventListener('dragstart', (event) => {
+        if (!this.isScheduleProject()) return;
+        this.handlePersonalScheduleDragStart(event);
+      });
+
+      this.els.scheduleView.addEventListener('dragover', (event) => {
+        if (!this.isScheduleProject()) return;
+        this.handlePersonalScheduleDragOver(event);
+      });
+
+      this.els.scheduleView.addEventListener('drop', (event) => {
+        if (!this.isScheduleProject()) return;
+        void this.handlePersonalScheduleDrop(event).catch((error) => this.onMutationError(error));
+      });
+
+      this.els.scheduleView.addEventListener('dragend', () => {
+        if (!this.isScheduleProject()) return;
+        this.handlePersonalScheduleDragEnd();
+      });
+
+      this.els.scheduleView.addEventListener('dragleave', (event) => {
+        if (!this.isScheduleProject()) return;
+        const related = event.relatedTarget;
+        if (related instanceof Node && this.els.scheduleView.contains(related)) return;
+        this.clearPersonalScheduleDragHints();
       });
     }
   }
@@ -1265,6 +1344,7 @@ export class PlanningCollabApp {
     }
 
     if (!force && this.state.activeProjectId === id) return;
+    this.rememberScopeReturnProject(id);
     this.state.activeProjectId = id;
     this.storeActiveProjectId(id);
 
@@ -1870,6 +1950,8 @@ export class PlanningCollabApp {
     ws.available = true;
     ws.unavailableReason = '';
     ws.lastProjectId = '';
+    this.personalPlanOrderProjectId = '';
+    this.personalPlanOrderByList = new Map();
   }
 
   disablePersonalScheduleWorkspace(reason) {
@@ -1919,6 +2001,7 @@ export class PlanningCollabApp {
 
   async loadPersonalScheduleWorkspace(options = {}) {
     const force = !!options.force;
+    const silent = !!options.silent;
     const ws = this.personalScheduleState();
     const active = this.activeProjectMeta();
     const projectId = String(active && active.id || '');
@@ -1930,12 +2013,15 @@ export class PlanningCollabApp {
     }
 
     if (!force && ws.lastProjectId === projectId) {
+      this.ensurePersonalPlanOrderReady(projectId);
       this.renderSchedule();
       return;
     }
 
-    ws.loading = true;
-    this.renderSchedule();
+    if (!silent) {
+      ws.loading = true;
+      this.renderSchedule();
+    }
 
     try {
       const data = await this.rpc('ik_plan_get_schedule_workspace', {
@@ -1945,6 +2031,7 @@ export class PlanningCollabApp {
       ws.plans = asArray(data && data.plans);
       ws.calendarCounts = asArray(data && data.calendar_counts);
       ws.lastProjectId = projectId;
+      this.ensurePersonalPlanOrderReady(projectId);
       this.resetPersonalScheduleAvailability();
     } catch (error) {
       if (this.looksLikePersonalScheduleSchemaError(error)) {
@@ -1964,10 +2051,12 @@ export class PlanningCollabApp {
         ws.plans = [];
         ws.calendarCounts = [];
         ws.lastProjectId = '';
+        this.personalPlanOrderProjectId = '';
+        this.personalPlanOrderByList = new Map();
         await this.onMutationError(error);
       }
     } finally {
-      ws.loading = false;
+      if (!silent) ws.loading = false;
       this.renderSchedule();
     }
   }
@@ -1993,6 +2082,181 @@ export class PlanningCollabApp {
     const id = String(planId || '').trim();
     if (!id) return null;
     return asArray(ws.plans).find((x) => String(x.id) === id) || null;
+  }
+
+  normalizePersonalPlanOrderListKey(listId) {
+    return String(listId || '').trim();
+  }
+
+  personalPlanOrderStorageKey(projectId) {
+    const id = String(projectId || '').trim() || 'none';
+    return `${PERSONAL_PLAN_ORDER_KEY_PREFIX}${id}`;
+  }
+
+  serializePersonalPlanOrder() {
+    const out = {};
+    for (const [listKey, ids] of this.personalPlanOrderByList.entries()) {
+      const safeKey = this.normalizePersonalPlanOrderListKey(listKey);
+      const safeIds = asArray(ids)
+        .map((id) => String(id || '').trim())
+        .filter(Boolean);
+      if (!safeIds.length) continue;
+      out[safeKey] = Array.from(new Set(safeIds));
+    }
+    return out;
+  }
+
+  restorePersonalPlanOrder(rawValue) {
+    const next = new Map();
+    if (rawValue && typeof rawValue === 'object') {
+      for (const [listKey, ids] of Object.entries(rawValue)) {
+        const key = this.normalizePersonalPlanOrderListKey(listKey);
+        const safeIds = asArray(ids)
+          .map((id) => String(id || '').trim())
+          .filter(Boolean);
+        if (!safeIds.length) continue;
+        next.set(key, Array.from(new Set(safeIds)));
+      }
+    }
+    this.personalPlanOrderByList = next;
+  }
+
+  loadPersonalPlanOrder(projectId) {
+    const id = String(projectId || '').trim();
+    this.personalPlanOrderProjectId = id;
+    this.personalPlanOrderByList = new Map();
+    if (!id) return;
+    try {
+      const raw = localStorage.getItem(this.personalPlanOrderStorageKey(id));
+      if (!raw) return;
+      this.restorePersonalPlanOrder(JSON.parse(raw));
+    } catch (_) {
+      this.personalPlanOrderByList = new Map();
+    }
+  }
+
+  savePersonalPlanOrder() {
+    const projectId = String(this.personalPlanOrderProjectId || '').trim();
+    if (!projectId) return;
+    try {
+      localStorage.setItem(
+        this.personalPlanOrderStorageKey(projectId),
+        JSON.stringify(this.serializePersonalPlanOrder())
+      );
+    } catch (_) {}
+  }
+
+  ensurePersonalPlanOrderReady(projectId = '') {
+    const active = this.activeProjectMeta();
+    const targetId = String(projectId || (active && active.id) || '').trim();
+    if (!targetId) {
+      this.personalPlanOrderProjectId = '';
+      this.personalPlanOrderByList = new Map();
+      return;
+    }
+    if (this.personalPlanOrderProjectId !== targetId) {
+      this.loadPersonalPlanOrder(targetId);
+    }
+    this.syncPersonalPlanOrderWithWorkspace();
+  }
+
+  syncPersonalPlanOrderWithWorkspace() {
+    const ws = this.personalScheduleState();
+    const rows = asArray(ws.plans);
+    const rowsByList = new Map();
+    rows.forEach((row) => {
+      const key = this.normalizePersonalPlanOrderListKey(row && row.list_id);
+      if (!rowsByList.has(key)) rowsByList.set(key, []);
+      rowsByList.get(key).push(row);
+    });
+
+    const knownListKeys = new Set(['']);
+    rowsByList.forEach((_value, key) => knownListKeys.add(key));
+    this.scheduleListsSorted().forEach((list) => {
+      knownListKeys.add(this.normalizePersonalPlanOrderListKey(list && list.id));
+    });
+
+    const prevJson = JSON.stringify(this.serializePersonalPlanOrder());
+    const next = new Map();
+
+    knownListKeys.forEach((listKey) => {
+      const listRows = asArray(rowsByList.get(listKey));
+      const existing = asArray(this.personalPlanOrderByList.get(listKey));
+      const rowIdsSet = new Set(listRows.map((row) => String(row && row.id || '').trim()).filter(Boolean));
+      const orderedIds = [];
+      const seen = new Set();
+
+      for (const id of existing) {
+        const safeId = String(id || '').trim();
+        if (!safeId || !rowIdsSet.has(safeId) || seen.has(safeId)) continue;
+        orderedIds.push(safeId);
+        seen.add(safeId);
+      }
+
+      for (const row of this.sortPersonalPlans(listRows)) {
+        const safeId = String(row && row.id || '').trim();
+        if (!safeId || seen.has(safeId)) continue;
+        orderedIds.push(safeId);
+        seen.add(safeId);
+      }
+
+      if (orderedIds.length) {
+        next.set(listKey, orderedIds);
+      }
+    });
+
+    this.personalPlanOrderByList = next;
+    const nextJson = JSON.stringify(this.serializePersonalPlanOrder());
+    if (nextJson !== prevJson) {
+      this.savePersonalPlanOrder();
+    }
+  }
+
+  sortPersonalPlansForList(rows, listId = '') {
+    const sorted = this.sortPersonalPlans(rows);
+    const key = this.normalizePersonalPlanOrderListKey(listId);
+    const order = asArray(this.personalPlanOrderByList.get(key));
+    if (!order.length) return sorted;
+
+    const rank = new Map(order.map((id, index) => [String(id || ''), index]));
+    const fallback = new Map(sorted.map((row, index) => [String(row && row.id || ''), index]));
+
+    return sorted.slice().sort((a, b) => {
+      const aid = String(a && a.id || '');
+      const bid = String(b && b.id || '');
+      const ar = rank.has(aid) ? rank.get(aid) : Number.MAX_SAFE_INTEGER;
+      const br = rank.has(bid) ? rank.get(bid) : Number.MAX_SAFE_INTEGER;
+      if (ar !== br) return ar - br;
+      const af = fallback.has(aid) ? fallback.get(aid) : Number.MAX_SAFE_INTEGER;
+      const bf = fallback.has(bid) ? fallback.get(bid) : Number.MAX_SAFE_INTEGER;
+      return af - bf;
+    });
+  }
+
+  applyPersonalPlanOrderMove(planId, targetListId, options = {}) {
+    const id = String(planId || '').trim();
+    if (!id) return;
+    this.ensurePersonalPlanOrderReady();
+
+    const insertKey = this.normalizePersonalPlanOrderListKey(targetListId);
+    for (const [listKey, ids] of this.personalPlanOrderByList.entries()) {
+      const filtered = asArray(ids).map((x) => String(x || '').trim()).filter((x) => x && x !== id);
+      if (filtered.length) this.personalPlanOrderByList.set(listKey, filtered);
+      else this.personalPlanOrderByList.delete(listKey);
+    }
+
+    const targetIds = asArray(this.personalPlanOrderByList.get(insertKey))
+      .map((x) => String(x || '').trim())
+      .filter(Boolean);
+
+    const rawIndex = Number(options.insertIndex);
+    const insertIndex = Number.isFinite(rawIndex)
+      ? Math.max(0, Math.min(targetIds.length, Math.floor(rawIndex)))
+      : targetIds.length;
+
+    targetIds.splice(insertIndex, 0, id);
+    this.personalPlanOrderByList.set(insertKey, targetIds);
+    this.savePersonalPlanOrder();
   }
 
   sortPersonalPlans(rows) {
@@ -2127,41 +2391,50 @@ export class PlanningCollabApp {
       .join('');
   }
 
-  renderPersonalPlanRow(row, listById = new Map()) {
+  renderPersonalPlanRow(row, listById = new Map(), options = {}) {
     const planId = String(row.id || '');
-    const list = row.list_id ? listById.get(String(row.list_id)) : null;
+    const overrideListId = Object.prototype.hasOwnProperty.call(options, 'listId')
+      ? String(options.listId || '')
+      : String(row.list_id || '');
+    const list = overrideListId ? listById.get(overrideListId) : null;
     const dateText = String(row._occursOn || row.plan_date || '') || this.t('без даты', 'no date');
     const timeText = timeLabelHM(row.start_time, row.end_time, this.getLang());
     const done = !!row.is_done;
-    const priority = String(row.priority || 'mid').toLowerCase();
+    const priorityRaw = String(row.priority || 'mid').toLowerCase();
+    const priority = ['low', 'mid', 'high'].includes(priorityRaw) ? priorityRaw : 'mid';
     const repeatRule = normalizeRepeatRule(row.repeat_rule);
+    const dragEnabled = !!options.dragEnabled;
 
-    const meta = [
+    const facts = [
       `${this.t('дата', 'date')}: ${dateText}`,
-      `${this.t('время', 'time')}: ${timeText}`,
-      `${this.t('приоритет', 'priority')}: ${priority.toUpperCase()}`
+      `${this.t('время', 'time')}: ${timeText}`
     ];
 
     if (repeatRule !== 'none') {
       const repeatText = this.personalRepeatLabel(repeatRule);
       const untilText = String(row.repeat_until || '').trim();
-      meta.push(untilText
+      facts.push(untilText
         ? `${this.t('повтор', 'repeat')}: ${repeatText} (${this.t('до', 'until')} ${untilText})`
         : `${this.t('повтор', 'repeat')}: ${repeatText}`);
     }
 
     if (list) {
-      meta.push(`${this.t('список', 'list')}: ${String(list.name || '')}`);
+      facts.push(`${this.t('список', 'list')}: ${String(list.name || '')}`);
     }
 
+    const dragAttrs = dragEnabled ? ' draggable="true" data-ps-plan-draggable="1"' : '';
+
     return `
-      <article class="ps-plan${done ? ' is-done' : ''}" data-ps-plan-id="${escapeAttr(planId)}">
+      <article class="ps-plan${done ? ' is-done' : ''}${dragEnabled ? ' is-draggable' : ''}" data-ps-plan-id="${escapeAttr(planId)}" data-ps-plan-list-id="${escapeAttr(overrideListId)}"${dragAttrs}>
         <div class="ps-plan__left">
           <input type="checkbox" data-ps-toggle="${escapeAttr(planId)}" ${done ? 'checked' : ''} />
         </div>
         <div class="ps-plan__body">
-          <div class="ps-plan__title">${escapeHtml(String(row.title || this.t('план', 'plan')))}</div>
-          <div class="ps-plan__meta">${escapeHtml(meta.join(' | '))}</div>
+          <div class="ps-plan__title-row">
+            <div class="ps-plan__title">${escapeHtml(String(row.title || this.t('план', 'plan')))}</div>
+            <span class="ps-plan__priority ps-plan__priority--${escapeAttr(priority)}">${escapeHtml(priority.toUpperCase())}</span>
+          </div>
+          <div class="ps-plan__facts">${facts.map((entry) => `<span class="ps-plan__fact">${escapeHtml(entry)}</span>`).join('')}</div>
           ${row.note ? `<div class="ps-plan__note">${escapeHtml(shortText(row.note, 200))}</div>` : ''}
         </div>
         <div class="ps-plan__actions">
@@ -2170,6 +2443,101 @@ export class PlanningCollabApp {
         </div>
       </article>
     `;
+  }
+
+  formatPersonalScheduleDayLabel(dayIso) {
+    const day = parseISOToLocalDate(dayIso);
+    if (!day) return String(dayIso || '');
+    const locale = this.getLang() === 'en' ? 'en-US' : 'ru-RU';
+    return new Intl.DateTimeFormat(locale, {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    }).format(day);
+  }
+
+  renderPersonalScheduleDayListBlock(options = {}) {
+    const listId = String(options.listId || '');
+    const title = String(options.title || this.t('список', 'list'));
+    const color = String(options.color || '#2f6f4f');
+    const dayIso = String(options.dayIso || '');
+    const rows = this.sortPersonalPlansForList(options.rows || [], listId);
+    const listById = options.listById instanceof Map ? options.listById : new Map();
+    const allowListDrag = !!options.allowListDrag && !!listId;
+    const listAttr = listId ? `data-list-id="${escapeAttr(listId)}"` : '';
+    const bodyHtml = rows.length
+      ? rows.map((row) => this.renderPersonalPlanRow(row, listById, {
+          dragEnabled: true,
+          listId
+        })).join('')
+      : `<div class="ps-empty">${escapeHtml(this.t('в этом блоке пока пусто', 'this block is empty'))}</div>`;
+
+    return `
+      <section class="ps-day-list${listId ? '' : ' is-no-list'}" data-ps-day-list-id="${escapeAttr(listId)}" data-ps-day-list-drop-id="${escapeAttr(listId)}"${allowListDrag ? ` draggable="true" data-ps-list-drag-handle="${escapeAttr(listId)}"` : ''}>
+        <header class="ps-day-list__head">
+          <div class="ps-day-list__title-wrap">
+            ${allowListDrag
+              ? `<span class="ps-day-list__drag" aria-hidden="true">::</span>`
+              : '<span class="ps-day-list__drag is-static" aria-hidden="true">::</span>'}
+            <div class="ps-day-list__title"><span class="ps-dot" style="--ps-dot:${escapeAttr(color)}"></span>${escapeHtml(title)}</div>
+            <div class="ps-day-list__count">${escapeHtml(`${rows.length} ${this.t('планов', 'plans')}`)}</div>
+          </div>
+          <div class="ps-day-list__actions">
+            <button class="btn btn--thin" type="button" data-ps-new-plan ${listAttr} data-day="${escapeAttr(dayIso)}">+ ${escapeHtml(this.t('план', 'plan'))}</button>
+          </div>
+        </header>
+        <div class="ps-day-list__body">${bodyHtml}</div>
+      </section>
+    `;
+  }
+
+  renderPersonalScheduleDayPanel(selectedDayKey, selectedPlans, listById) {
+    this.ensurePersonalPlanOrderReady();
+    const lists = this.scheduleListsSorted();
+    const groupedByList = new Map();
+    lists.forEach((list) => {
+      groupedByList.set(String(list.id || ''), []);
+    });
+
+    const noListRows = [];
+    selectedPlans.forEach((plan) => {
+      const listId = String(plan.list_id || '');
+      if (!listId || !groupedByList.has(listId)) {
+        noListRows.push(plan);
+        return;
+      }
+      groupedByList.get(listId).push(plan);
+    });
+
+    const listBlocks = lists.map((list) => this.renderPersonalScheduleDayListBlock({
+      listId: String(list.id || ''),
+      title: String(list.name || this.t('список', 'list')),
+      color: String(list.color || '#2f6f4f'),
+      rows: groupedByList.get(String(list.id || '')) || [],
+      dayIso: selectedDayKey,
+      listById,
+      allowListDrag: true
+    })).join('');
+
+    const noListBlock = this.renderPersonalScheduleDayListBlock({
+      listId: '',
+      title: this.t('без списка', 'no list'),
+      color: '#6b7280',
+      rows: noListRows,
+      dayIso: selectedDayKey,
+      listById,
+      allowListDrag: false
+    });
+
+    const totalBlocks = lists.length + 1;
+    const subLine = `${selectedPlans.length} ${this.t('планов', 'plans')} | ${totalBlocks} ${this.t('блоков', 'blocks')}`;
+
+    return {
+      dateLabel: this.formatPersonalScheduleDayLabel(selectedDayKey),
+      subLine,
+      bodyHtml: `<div class="ps-day-lists" data-ps-day-lists-root>${listBlocks}${noListBlock}</div>`
+    };
   }
 
   renderPersonalScheduleToday() {
@@ -2308,9 +2676,7 @@ export class PlanningCollabApp {
 
     const selectedDayKey = formatLocalISO(selected);
     const selectedPlans = this.plansForDay(selectedDayKey, allPlans);
-    const selectedPlansHtml = selectedPlans.length
-      ? selectedPlans.map((row) => this.renderPersonalPlanRow(row, listById)).join('')
-      : `<div class="ps-empty">${escapeHtml(this.t('на этот день планов нет', 'no plans for this day'))}</div>`;
+    const dayPanel = this.renderPersonalScheduleDayPanel(selectedDayKey, selectedPlans, listById);
 
     const locale = this.getLang() === 'en' ? 'en-US' : 'ru-RU';
     const monthTitle = new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric' }).format(monthStart);
@@ -2332,12 +2698,13 @@ export class PlanningCollabApp {
           <header class="ps-day-panel__head">
             <div class="ps-day-panel__title-wrap">
               <div class="ps-day-panel__label">${escapeHtml(this.t('выбранный день', 'selected day'))}</div>
-              <div class="ps-day-panel__date">${escapeHtml(selectedDayKey)}</div>
-              <div class="ps-day-panel__sub">${escapeHtml(`${selectedPlans.length} ${this.t('планов', 'plans')}`)}</div>
+              <div class="ps-day-panel__date">${escapeHtml(dayPanel.dateLabel)}</div>
+              <div class="ps-day-panel__iso">${escapeHtml(selectedDayKey)}</div>
+              <div class="ps-day-panel__sub">${escapeHtml(dayPanel.subLine)}</div>
             </div>
             <button class="btn" type="button" data-ps-new-plan data-day="${escapeAttr(selectedDayKey)}">+ ${escapeHtml(this.t('план', 'plan'))}</button>
           </header>
-          <div class="ps-day-panel__body">${selectedPlansHtml}</div>
+          <div class="ps-day-panel__body">${dayPanel.bodyHtml}</div>
         </section>
       </div>
     `;
@@ -2496,6 +2863,377 @@ export class PlanningCollabApp {
     if (!form) return;
   }
 
+  clearPersonalScheduleDragHints(options = {}) {
+    if (!this.els.scheduleView) return;
+    const keepDragging = !!options.keepDragging;
+    this.els.scheduleView.querySelectorAll('.ps-day-list.is-plan-drop-target,.ps-day-list.is-list-drop-before,.ps-day-list.is-list-drop-after').forEach((node) => {
+      node.classList.remove('is-plan-drop-target', 'is-list-drop-before', 'is-list-drop-after');
+    });
+    this.els.scheduleView.querySelectorAll('.ps-plan.is-drop-before,.ps-plan.is-drop-after').forEach((node) => {
+      node.classList.remove('is-drop-before', 'is-drop-after');
+    });
+    if (!keepDragging) {
+      this.els.scheduleView.querySelectorAll('.ps-day-list.is-dragging,.ps-plan.is-dragging').forEach((node) => {
+        node.classList.remove('is-dragging');
+      });
+    }
+  }
+
+  handlePersonalScheduleDragStart(event) {
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+
+    const planNode = target.closest('[data-ps-plan-id][data-ps-plan-draggable]');
+    if (planNode) {
+      const planId = String(planNode.getAttribute('data-ps-plan-id') || '').trim();
+      if (!planId) return;
+      const sourceListId = String(planNode.getAttribute('data-ps-plan-list-id') || '').trim();
+
+      this.personalScheduleDrag = {
+        type: 'plan',
+        planId,
+        sourceListId
+      };
+
+      planNode.classList.add('is-dragging');
+      if (event.dataTransfer) {
+        event.dataTransfer.effectAllowed = 'move';
+        try {
+          event.dataTransfer.setData('text/ps-plan-id', planId);
+        } catch (_) {}
+      }
+      this.clearPersonalScheduleDragHints({ keepDragging: true });
+      return;
+    }
+
+    const listHandle = target.closest('[data-ps-list-drag-handle]');
+    if (listHandle) {
+      if (target.closest('button,input,select,textarea,a,label')) return;
+      const listId = String(listHandle.getAttribute('data-ps-list-drag-handle') || '').trim();
+      if (!listId) return;
+      this.personalScheduleDrag = {
+        type: 'list',
+        listId
+      };
+
+      const listBlock = listHandle.closest('[data-ps-day-list-id]');
+      if (listBlock) listBlock.classList.add('is-dragging');
+
+      if (event.dataTransfer) {
+        event.dataTransfer.effectAllowed = 'move';
+        try {
+          event.dataTransfer.setData('text/ps-list-id', listId);
+        } catch (_) {}
+      }
+      this.clearPersonalScheduleDragHints({ keepDragging: true });
+      return;
+    }
+  }
+
+  resolvePersonalScheduleListDropTarget(target, clientY, sourceListId = '') {
+    if (!(target instanceof Element)) return null;
+
+    const sourceId = String(sourceListId || '').trim();
+    const direct = target.closest('[data-ps-day-list-id]');
+    if (direct) {
+      const directId = String(direct.getAttribute('data-ps-day-list-id') || '').trim();
+      if (directId && directId !== sourceId) {
+        return direct;
+      }
+    }
+
+    const root = target.closest('[data-ps-day-lists-root]');
+    if (!root) return null;
+
+    const candidates = Array.from(root.querySelectorAll('[data-ps-day-list-id]')).filter((node) => {
+      const id = String(node.getAttribute('data-ps-day-list-id') || '').trim();
+      return !!id && id !== sourceId;
+    });
+    if (!candidates.length) return null;
+
+    let best = candidates[0];
+    let bestDistance = Number.POSITIVE_INFINITY;
+    for (const node of candidates) {
+      const rect = node.getBoundingClientRect();
+      const center = rect.top + rect.height / 2;
+      const dist = Math.abs(Number(clientY) - center);
+      if (dist < bestDistance) {
+        best = node;
+        bestDistance = dist;
+      }
+    }
+
+    return best;
+  }
+
+  handlePersonalScheduleDragOver(event) {
+    const drag = this.personalScheduleDrag;
+    if (!drag || !drag.type) return;
+
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+
+    if (drag.type === 'list') {
+      const sourceId = String(drag.listId || '').trim();
+      const listBlock = this.resolvePersonalScheduleListDropTarget(target, event.clientY, sourceId);
+      if (!listBlock) return;
+      const targetListId = String(listBlock.getAttribute('data-ps-day-list-id') || '').trim();
+      if (!targetListId || !sourceId || targetListId === sourceId) return;
+
+      event.preventDefault();
+      if (event.dataTransfer) event.dataTransfer.dropEffect = 'move';
+      this.clearPersonalScheduleDragHints({ keepDragging: true });
+
+      const dropAfter = this.personalScheduleListDropAfter(listBlock, event.clientY);
+      listBlock.classList.add(dropAfter ? 'is-list-drop-after' : 'is-list-drop-before');
+      return;
+    }
+
+    if (drag.type === 'plan') {
+      const listBlock = target.closest('[data-ps-day-list-drop-id]');
+      if (!listBlock) return;
+
+      event.preventDefault();
+      if (event.dataTransfer) event.dataTransfer.dropEffect = 'move';
+      this.clearPersonalScheduleDragHints({ keepDragging: true });
+      listBlock.classList.add('is-plan-drop-target');
+
+      const targetPlan = target.closest('[data-ps-plan-id]');
+      if (targetPlan) {
+        const targetPlanId = String(targetPlan.getAttribute('data-ps-plan-id') || '').trim();
+        const draggedPlanId = String(drag.planId || '').trim();
+        if (targetPlanId && draggedPlanId && targetPlanId !== draggedPlanId) {
+          const rect = targetPlan.getBoundingClientRect();
+          const dropAfter = (event.clientY - rect.top) > rect.height / 2;
+          targetPlan.classList.add(dropAfter ? 'is-drop-after' : 'is-drop-before');
+        }
+      }
+    }
+  }
+
+  handlePersonalScheduleDragEnd() {
+    this.personalScheduleDrag = null;
+    this.clearPersonalScheduleDragHints();
+  }
+
+  personalScheduleListDropAfter(listBlock, clientY) {
+    if (!(listBlock instanceof Element)) return false;
+    const rect = listBlock.getBoundingClientRect();
+    if (!rect || rect.height <= 0) return false;
+    const ratio = (Number(clientY) - rect.top) / rect.height;
+    return ratio >= 0.55;
+  }
+
+  async handlePersonalScheduleDrop(event) {
+    const drag = this.personalScheduleDrag;
+    if (!drag || !drag.type) return;
+
+    const target = event.target;
+    if (!(target instanceof Element)) {
+      this.handlePersonalScheduleDragEnd();
+      return;
+    }
+
+    if (drag.type === 'list') {
+      const sourceListId = String(drag.listId || '').trim();
+      const listBlock = this.resolvePersonalScheduleListDropTarget(target, event.clientY, sourceListId);
+      if (!listBlock) {
+        this.handlePersonalScheduleDragEnd();
+        return;
+      }
+
+      const targetListId = String(listBlock.getAttribute('data-ps-day-list-id') || '').trim();
+      if (!targetListId || !sourceListId || targetListId === sourceListId) {
+        this.handlePersonalScheduleDragEnd();
+        return;
+      }
+
+      event.preventDefault();
+      const dropAfter = this.personalScheduleListDropAfter(listBlock, event.clientY);
+      this.handlePersonalScheduleDragEnd();
+      await this.movePersonalScheduleList(sourceListId, targetListId, { dropAfter });
+      return;
+    }
+
+    if (drag.type === 'plan') {
+      const targetPlan = target.closest('[data-ps-plan-id]');
+      const listBlock = target.closest('[data-ps-day-list-drop-id]');
+      if (!listBlock) {
+        this.handlePersonalScheduleDragEnd();
+        return;
+      }
+
+      event.preventDefault();
+      const planId = String(drag.planId || '').trim();
+      const rawListId = String(listBlock.getAttribute('data-ps-day-list-drop-id') || '').trim();
+      const targetListId = rawListId || null;
+      let insertIndex = null;
+
+      const planIdsInBlock = Array.from(listBlock.querySelectorAll('[data-ps-plan-id]'))
+        .map((node) => String(node.getAttribute('data-ps-plan-id') || '').trim())
+        .filter((id) => id && id !== planId);
+
+      if (targetPlan) {
+        const targetPlanId = String(targetPlan.getAttribute('data-ps-plan-id') || '').trim();
+        const idx = planIdsInBlock.indexOf(targetPlanId);
+        if (idx >= 0) {
+          const rect = targetPlan.getBoundingClientRect();
+          const dropAfter = (event.clientY - rect.top) > rect.height / 2;
+          insertIndex = dropAfter ? idx + 1 : idx;
+        }
+      }
+
+      if (insertIndex === null) {
+        insertIndex = planIdsInBlock.length;
+      }
+
+      this.handlePersonalScheduleDragEnd();
+      await this.movePersonalSchedulePlanToList(planId, targetListId, { insertIndex });
+    }
+  }
+
+  async movePersonalScheduleList(listId, targetListId, options = {}) {
+    const active = this.activeProjectMeta();
+    if (!active || !this.isScheduleProject(active)) return;
+
+    const sourceId = String(listId || '').trim();
+    const targetId = String(targetListId || '').trim();
+    if (!sourceId || !targetId || sourceId === targetId) return;
+
+    const sortedLists = this.scheduleListsSorted().filter((list) => String(list.id || '').trim());
+    const currentOrder = sortedLists.map((list) => String(list.id || '').trim());
+    if (!currentOrder.includes(sourceId) || !currentOrder.includes(targetId)) return;
+
+    const buildOrder = (dropAfter) => {
+      const order = currentOrder.filter((id) => id !== sourceId);
+      const targetIndex = order.indexOf(targetId);
+      if (targetIndex < 0) return currentOrder.slice();
+      const insertIndex = dropAfter ? targetIndex + 1 : targetIndex;
+      order.splice(insertIndex, 0, sourceId);
+      return order;
+    };
+
+    let nextOrder = buildOrder(!!options.dropAfter);
+    if (nextOrder.join('|') === currentOrder.join('|')) {
+      const flippedOrder = buildOrder(!options.dropAfter);
+      if (flippedOrder.join('|') === currentOrder.join('|')) return;
+      nextOrder = flippedOrder;
+    }
+
+    const ws = this.personalScheduleState();
+    const prevLists = asArray(ws.lists).map((list) => ({ ...list }));
+    const byId = new Map(asArray(ws.lists).map((list) => [String(list && list.id || ''), { ...list }]));
+
+    let cursor = 1024;
+    for (const id of nextOrder) {
+      const list = byId.get(id);
+      if (!list) continue;
+      list.position = cursor;
+      cursor += 1024;
+      byId.set(id, list);
+    }
+
+    ws.lists = asArray(ws.lists).map((list) => {
+      const id = String(list && list.id || '');
+      return byId.get(id) || list;
+    });
+    this.renderSchedule();
+
+    const updates = [];
+    const prevById = new Map(prevLists.map((list) => [String(list && list.id || ''), list]));
+    for (const id of nextOrder) {
+      const nextList = byId.get(id);
+      if (!nextList) continue;
+      const prevList = prevById.get(id);
+      const prevPos = prevList ? toPositionNumber(prevList.position) : Number.NaN;
+      const nextPos = toPositionNumber(nextList.position);
+      if (Number.isFinite(prevPos) && Math.abs(prevPos - nextPos) < 0.0001) continue;
+      updates.push({
+        p_project_id: active.id,
+        p_list_id: nextList.id,
+        p_name: String(nextList.name || 'list'),
+        p_color: String(nextList.color || '#2f6f4f'),
+        p_position: nextList.position
+      });
+    }
+
+    try {
+      for (const payload of updates) {
+        await this.rpc('ik_plan_update_schedule_list', payload);
+      }
+      void this.refreshPersonalScheduleAfterMutation({ silent: true }).catch((error) => this.onMutationError(error));
+    } catch (error) {
+      ws.lists = prevLists;
+      this.renderSchedule();
+      throw error;
+    }
+  }
+
+  async movePersonalSchedulePlanToList(planId, targetListId, options = {}) {
+    const active = this.activeProjectMeta();
+    if (!active || !this.isScheduleProject(active)) return;
+
+    const id = String(planId || '').trim();
+    if (!id) return;
+
+    const ws = this.personalScheduleState();
+    const plan = this.schedulePlanById(id);
+    if (!plan) return;
+
+    const currentListId = String(plan.list_id || '').trim() || null;
+    const nextListId = String(targetListId || '').trim() || null;
+
+    const rawInsertIndex = Number(options.insertIndex);
+    const insertIndex = Number.isFinite(rawInsertIndex)
+      ? Math.max(0, Math.floor(rawInsertIndex))
+      : null;
+
+    const sameList = (currentListId || '') === (nextListId || '');
+    if (sameList && insertIndex === null) return;
+
+    const prevPlans = asArray(ws.plans).map((row) => ({ ...row }));
+    const prevOrder = this.serializePersonalPlanOrder();
+
+    ws.plans = asArray(ws.plans).map((row) => {
+      if (String(row && row.id || '') !== id) return row;
+      return {
+        ...row,
+        list_id: nextListId
+      };
+    });
+    this.applyPersonalPlanOrderMove(id, nextListId, { insertIndex });
+    this.renderSchedule();
+
+    if (sameList) return;
+
+    const priorityRaw = String(plan.priority || 'mid').toLowerCase();
+    const priority = ['low', 'mid', 'high'].includes(priorityRaw) ? priorityRaw : 'mid';
+
+    try {
+      await this.rpc('ik_plan_update_schedule_plan', {
+        p_project_id: active.id,
+        p_plan_id: plan.id,
+        p_list_id: nextListId,
+        p_title: String(plan.title || 'plan'),
+        p_note: String(plan.note || ''),
+        p_plan_date: String(plan.plan_date || '').trim() || null,
+        p_start_time: normalizeTimeText(plan.start_time) || null,
+        p_end_time: normalizeTimeText(plan.end_time) || null,
+        p_priority: priority,
+        p_repeat_rule: normalizeRepeatRule(plan.repeat_rule),
+        p_repeat_until: String(plan.repeat_until || '').trim() || null,
+        p_is_done: !!plan.is_done
+      });
+      void this.loadProjects({ quiet: true });
+    } catch (error) {
+      ws.plans = prevPlans;
+      this.restorePersonalPlanOrder(prevOrder);
+      this.savePersonalPlanOrder();
+      this.renderSchedule();
+      throw error;
+    }
+  }
+
   async openCreateScheduleProjectModal() {
     this.ui.openModal({
       title: this.t('новое расписание', 'new schedule'),
@@ -2571,12 +3309,14 @@ export class PlanningCollabApp {
   async saveScheduleListSubmit(base, data) {
     const active = this.activeProjectMeta();
     if (!active || !this.isScheduleProject(active)) return;
+    const ws = this.personalScheduleState();
     const name = String(data.name || '').trim();
     if (!name) {
       this.ui.toast(this.t('укажите название списка', 'list name is required'));
       return;
     }
     const color = String(data.color || '#2f6f4f');
+    const nowIso = new Date().toISOString();
 
     if (base && base.id) {
       await this.rpc('ik_plan_update_schedule_list', {
@@ -2586,16 +3326,47 @@ export class PlanningCollabApp {
         p_color: color,
         p_position: base.position
       });
+
+      ws.lists = asArray(ws.lists).map((row) => {
+        if (String(row && row.id || '') !== String(base.id)) return row;
+        return {
+          ...row,
+          name,
+          color,
+          position: base.position,
+          updated_at: nowIso
+        };
+      });
     } else {
-      await this.rpc('ik_plan_create_schedule_list', {
+      const listId = await this.rpc('ik_plan_create_schedule_list', {
         p_project_id: active.id,
         p_name: name,
         p_color: color
       });
+
+      const maxPos = asArray(ws.lists).reduce((maxValue, row) => {
+        return Math.max(maxValue, toPositionNumber(row && row.position));
+      }, 0);
+
+      ws.lists = [
+        ...asArray(ws.lists),
+        {
+          id: String(listId || ''),
+          project_id: String(active.id),
+          name,
+          color,
+          position: maxPos + 1024,
+          version: 1,
+          created_at: nowIso,
+          updated_at: nowIso
+        }
+      ];
     }
 
     this.ui.closeModal();
-    await this.refreshPersonalScheduleAfterMutation();
+    this.ensurePersonalPlanOrderReady(String(active.id));
+    this.renderSchedule();
+    void this.refreshPersonalScheduleAfterMutation({ silent: true }).catch((error) => this.onMutationError(error));
     this.ui.toast(this.t('список сохранен', 'list saved'));
   }
 
@@ -2625,13 +3396,28 @@ export class PlanningCollabApp {
   async deleteScheduleListSubmit(list) {
     const active = this.activeProjectMeta();
     if (!active || !this.isScheduleProject(active)) return;
+    const ws = this.personalScheduleState();
+
     await this.rpc('ik_plan_delete_schedule_list', {
       p_project_id: active.id,
       p_list_id: list.id,
       p_move_plan_to: null
     });
+
+    ws.lists = asArray(ws.lists).filter((row) => String(row && row.id || '') !== String(list.id || ''));
+    ws.plans = asArray(ws.plans).map((row) => {
+      if (String(row && row.list_id || '') !== String(list.id || '')) return row;
+      return {
+        ...row,
+        list_id: null
+      };
+    });
+    this.ensurePersonalPlanOrderReady(String(active.id));
+    this.syncPersonalPlanOrderWithWorkspace();
+
     this.ui.closeModal();
-    await this.refreshPersonalScheduleAfterMutation();
+    this.renderSchedule();
+    void this.refreshPersonalScheduleAfterMutation({ silent: true }).catch((error) => this.onMutationError(error));
     this.ui.toast(this.t('список удален', 'list deleted'));
   }
 
@@ -2825,8 +3611,10 @@ export class PlanningCollabApp {
   async saveSchedulePlanSubmit(basePlan, data) {
     const active = this.activeProjectMeta();
     if (!active || !this.isScheduleProject(active)) return;
+    const ws = this.personalScheduleState();
     const payload = this.buildSchedulePlanPayloadFromForm(data);
     if (!payload) return;
+    const nowIso = new Date().toISOString();
 
     if (basePlan && basePlan.id) {
       await this.rpc('ik_plan_update_schedule_plan', {
@@ -2843,8 +3631,32 @@ export class PlanningCollabApp {
         p_repeat_until: payload.repeat_until,
         p_is_done: payload.is_done
       });
+
+      ws.plans = asArray(ws.plans).map((row) => {
+        if (String(row && row.id || '') !== String(basePlan.id || '')) return row;
+        return {
+          ...row,
+          list_id: payload.list_id,
+          title: payload.title,
+          note: payload.note,
+          plan_date: payload.plan_date,
+          start_time: payload.start_time,
+          end_time: payload.end_time,
+          priority: payload.priority,
+          repeat_rule: payload.repeat_rule,
+          repeat_until: payload.repeat_until,
+          is_done: payload.is_done,
+          updated_at: nowIso
+        };
+      });
+
+      const prevListId = String(basePlan.list_id || '').trim() || null;
+      const nextListId = String(payload.list_id || '').trim() || null;
+      if ((prevListId || '') !== (nextListId || '')) {
+        this.applyPersonalPlanOrderMove(String(basePlan.id || ''), payload.list_id, {});
+      }
     } else {
-      await this.rpc('ik_plan_create_schedule_plan', {
+      const planId = await this.rpc('ik_plan_create_schedule_plan', {
         p_project_id: active.id,
         p_list_id: payload.list_id,
         p_title: payload.title,
@@ -2856,10 +3668,36 @@ export class PlanningCollabApp {
         p_repeat_rule: payload.repeat_rule,
         p_repeat_until: payload.repeat_until
       });
+
+      const id = String(planId || '');
+      ws.plans = [
+        ...asArray(ws.plans),
+        {
+          id,
+          project_id: String(active.id),
+          list_id: payload.list_id,
+          title: payload.title,
+          note: payload.note,
+          plan_date: payload.plan_date,
+          start_time: payload.start_time,
+          end_time: payload.end_time,
+          priority: payload.priority,
+          repeat_rule: payload.repeat_rule,
+          repeat_until: payload.repeat_until,
+          is_done: false,
+          version: 1,
+          created_at: nowIso,
+          updated_at: nowIso
+        }
+      ];
+      this.applyPersonalPlanOrderMove(id, payload.list_id, {});
     }
 
     this.ui.closeModal();
-    await this.refreshPersonalScheduleAfterMutation();
+    this.ensurePersonalPlanOrderReady(String(active.id));
+    this.syncPersonalPlanOrderWithWorkspace();
+    this.renderSchedule();
+    void this.refreshPersonalScheduleAfterMutation({ silent: true }).catch((error) => this.onMutationError(error));
     this.ui.toast(this.t('план сохранен', 'plan saved'));
   }
 
@@ -2888,30 +3726,56 @@ export class PlanningCollabApp {
   async deleteSchedulePlanSubmit(plan) {
     const active = this.activeProjectMeta();
     if (!active || !this.isScheduleProject(active)) return;
+    const ws = this.personalScheduleState();
+
     await this.rpc('ik_plan_delete_schedule_plan', {
       p_project_id: active.id,
       p_plan_id: plan.id
     });
+
+    ws.plans = asArray(ws.plans).filter((row) => String(row && row.id || '') !== String(plan.id || ''));
+    this.ensurePersonalPlanOrderReady(String(active.id));
+    this.syncPersonalPlanOrderWithWorkspace();
+
     this.ui.closeModal();
-    await this.refreshPersonalScheduleAfterMutation();
+    this.renderSchedule();
+    void this.refreshPersonalScheduleAfterMutation({ silent: true }).catch((error) => this.onMutationError(error));
     this.ui.toast(this.t('план удален', 'plan deleted'));
   }
 
   async toggleSchedulePlanDone(planId, isDone) {
     const active = this.activeProjectMeta();
     if (!active || !this.isScheduleProject(active)) return;
-    await this.rpc('ik_plan_toggle_schedule_plan_done', {
-      p_project_id: active.id,
-      p_plan_id: planId,
-      p_is_done: !!isDone
+
+    const ws = this.personalScheduleState();
+    const prevPlans = asArray(ws.plans).map((row) => ({ ...row }));
+    ws.plans = asArray(ws.plans).map((row) => {
+      if (String(row && row.id || '') !== String(planId || '')) return row;
+      return {
+        ...row,
+        is_done: !!isDone
+      };
     });
-    await this.loadPersonalScheduleWorkspace({ force: true });
-    void this.loadProjects({ quiet: true });
+    this.renderSchedule();
+
+    try {
+      await this.rpc('ik_plan_toggle_schedule_plan_done', {
+        p_project_id: active.id,
+        p_plan_id: planId,
+        p_is_done: !!isDone
+      });
+      await this.refreshPersonalScheduleAfterMutation({ silent: true });
+    } catch (error) {
+      ws.plans = prevPlans;
+      this.renderSchedule();
+      throw error;
+    }
   }
 
-  async refreshPersonalScheduleAfterMutation() {
+  async refreshPersonalScheduleAfterMutation(options = {}) {
+    const silent = options.silent !== false;
     await this.loadProjects({ quiet: true });
-    await this.loadPersonalScheduleWorkspace({ force: true });
+    await this.loadPersonalScheduleWorkspace({ force: true, silent });
     this.renderProjectSelect();
     this.renderProjectBar();
   }
@@ -4483,7 +5347,8 @@ export class PlanningCollabApp {
 
     const scoped = this.getScopeFilteredProjects();
     const stillActive = scoped.find((p) => String(p.id) === String(prevActiveId || ''));
-    this.state.activeProjectId = stillActive ? stillActive.id : (scoped[0] ? scoped[0].id : null);
+    const fallbackId = this.resolveScopedProjectId(scoped, { preferId: prevActiveId });
+    this.state.activeProjectId = stillActive ? stillActive.id : (fallbackId || (scoped[0] ? scoped[0].id : null));
     this.storeActiveProjectId(this.state.activeProjectId);
 
     if (this.state.activeProjectId) {
