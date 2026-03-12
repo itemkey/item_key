@@ -1815,6 +1815,25 @@ body.focus-mode .n-col-right{
   }
 }
 
+@media (max-width: 480px){
+  #notesListCard{
+    min-width: 0;
+  }
+  #notesListCard .list-meta{
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  #notesList{
+    min-height: clamp(150px, 26vh, 220px);
+    min-height: clamp(150px, 26dvh, 220px);
+    max-height: 42vh;
+    max-height: 42dvh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-right: 2px;
+  }
+}
+
 </style>
 
 
