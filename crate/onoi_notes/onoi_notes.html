@@ -950,7 +950,7 @@ html[lang="en"] .tree-item[data-depth="0"] .tree-name::after{
       }
 
       .center-stage{
-        padding-bottom: calc(var(--footerH) + 110px + env(safe-area-inset-bottom) + var(--onoiKeyboardInset));
+        padding-bottom: calc(var(--footerH) + 54px + env(safe-area-inset-bottom) + var(--onoiKeyboardInset));
       }
 
       /* hide global rails on phones */
@@ -1504,7 +1504,7 @@ body.focus-mode .n-col-right{
 
 @media (max-width: 480px){
   .center-stage{
-    padding-bottom: calc(var(--footerH) + 170px + env(safe-area-inset-bottom) + var(--onoiKeyboardInset));
+    padding-bottom: calc(var(--footerH) + 72px + env(safe-area-inset-bottom) + var(--onoiKeyboardInset));
   }
 
   .notes-wrap{
@@ -1781,9 +1781,30 @@ body.focus-mode .n-col-right{
   }
 
   #notesList{
-    min-height: 38vh;
+    min-height: 0;
+    align-content: start;
+    grid-auto-rows: max-content;
+  }
+  #notesList > *{
+    align-self: start;
+  }
+  #notesListCard .list-head{
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+    align-items: start;
   }
   #notesListCard .list-actions{
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: nowrap;
+    gap: 8px;
+  }
+  #notesListCard .list-actions .n-btn{
+    width: auto;
+    white-space: nowrap;
+  }
+  #notesListCard #deleteNoteBtn{
     display: none;
   }
 
@@ -1807,8 +1828,9 @@ body.focus-mode .n-col-right{
   }
 
   .mobile-dock{
-    grid-template-columns: 1fr;
+    display: none !important;
   }
+  #mobileNewNoteBtn,
   #mobileDeleteNoteBtn,
   #mobileWhisperBtn{
     display: none !important;
@@ -1823,14 +1845,24 @@ body.focus-mode .n-col-right{
     min-width: 0;
     overflow-wrap: anywhere;
   }
+  #notesListCard .list-actions .n-btn{
+    min-height: 38px;
+    padding: 8px 10px;
+    font-size: 11px;
+    letter-spacing: 1.4px;
+  }
   #notesList{
-    min-height: clamp(150px, 26vh, 220px);
-    min-height: clamp(150px, 26dvh, 220px);
-    max-height: 42vh;
-    max-height: 42dvh;
+    max-height: min(34vh, 240px);
+    max-height: min(34dvh, 240px);
     overflow-y: auto;
     overscroll-behavior: contain;
     padding-right: 2px;
+  }
+  #notesList .note-row{
+    padding: 9px;
+  }
+  #notesList .note-row.is-active{
+    box-shadow: inset 2px 0 0 0 rgba(0,0,0,.82);
   }
 }
 
