@@ -889,8 +889,15 @@ body {
 .sh-custom-picker{
   border: 2px solid #000;
   background: linear-gradient(180deg, rgba(0,0,0,0.045), rgba(0,0,0,0.015));
-  padding: 12px;
-  margin: 10px 0 0;
+  padding: 14px;
+  margin: 12px 0 0;
+}
+
+.sh-practice-mode{
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 10px 0 6px;
 }
 
 .sh-custom-picker__title{
@@ -918,6 +925,63 @@ body {
 
 .sh-custom-picker__grid{
   display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.sh-custom-group{
+  border: 2px solid #000;
+  background: #fff;
+  padding: 10px;
+}
+
+.sh-custom-group__head{
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.sh-custom-group__title{
+  margin: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.sh-custom-group__actions{
+  justify-self: end;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.sh-custom-group__body{
+  display: grid;
+  gap: 8px;
+}
+
+.sh-custom-subgroup{
+  border: 1px solid #000;
+  background: rgba(0,0,0,0.03);
+  padding: 8px;
+}
+
+.sh-custom-subgroup__title{
+  margin: 0 0 8px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+  opacity: .88;
+}
+
+.sh-custom-subgroup__items{
+  display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
 }
@@ -930,6 +994,10 @@ body {
   background: #fff;
   padding: 8px;
   cursor: pointer;
+}
+
+.sh-custom-tense:hover{
+  background: rgba(0,0,0,0.04);
 }
 
 .sh-custom-tense__cb{
@@ -959,7 +1027,18 @@ body {
 }
 
 @media (max-width: 760px){
-  .sh-custom-picker__grid{ grid-template-columns: 1fr; }
+  .sh-custom-group__head{
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .sh-custom-group__actions{
+    justify-self: start;
+  }
+
+  .sh-custom-subgroup__items{
+    grid-template-columns: 1fr;
+  }
 }
 
 .sh-run-card{
@@ -1104,4 +1183,18 @@ body {
 #tenseRuleModeFullBtn.is-active{
   background: #000;
   color: #fff;
+}
+
+/* Grammar home tab filters: strict separation */
+#tensesHomeView[data-grammar-home-tab="rules"] #grammarHomeTileGrid [data-grammar-home-group="practice"]{
+  display: none;
+}
+
+#tensesHomeView[data-grammar-home-tab="practice"] #grammarHomeTileGrid [data-grammar-home-group="rules"]{
+  display: none;
+}
+
+#tensesHomeView[data-grammar-home-tab="practice"] #grammarBuilderBox,
+#tensesHomeView[data-grammar-home-tab="practice"] #grammarSearchBox{
+  display: none;
 }

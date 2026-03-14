@@ -74,7 +74,7 @@
 
   const btnGoCompare = document.getElementById('tensesGoCompare');
   const btnGoDaily = document.getElementById('tensesGoDaily');
-  const btnGoMixedPresent = document.getElementById('tensesGoMixedPresent');
+  const btnGoMixed = document.getElementById('tensesGoMixed');
   const btnGoPresent = document.getElementById('grammarGoPresent');
   const btnGoPast = document.getElementById('grammarGoPast');
   const btnGoFuture = document.getElementById('grammarGoFuture');
@@ -85,6 +85,9 @@
   const searchHint = document.getElementById('grammarSearchHint');
   const searchResults = document.getElementById('grammarSearchResults');
   const btnOpenConstructor = document.getElementById('grammarOpenConstructorBtn');
+  const grammarHomeTabs = document.getElementById('grammarHomeTabs');
+  const grammarHomeTabHint = document.getElementById('grammarHomeTabHint');
+  const grammarHomeTileGrid = document.getElementById('grammarHomeTileGrid');
 
   const levelBox = document.getElementById('grammarLevelBox');
   const levelValue = document.getElementById('grammarLevelValue');
@@ -123,6 +126,7 @@
   const subgroupBar = document.getElementById('grammarSubgroupBar');
 
   const btnBackToList = document.getElementById('tensesBackToList');
+  const btnBackToRunFromDetail = document.getElementById('tensesBackToRunFromDetail');
   const btnGoPracticeFromDetail = document.getElementById('tensesGoPracticeFromDetail');
   const btnGoPracticeBottom = document.getElementById('tensesGoPracticeBottom');
 
@@ -136,6 +140,9 @@
   const btnBackHomeFromPractice = document.getElementById('tensesBackToHomeFromPractice');
   const goalSelect = document.getElementById('tensesGoalSelect');
   const tenseSelect = document.getElementById('tensesTenseSelect');
+  const modeMixedBtn = document.getElementById('tensesModeMixedBtn');
+  const modeCustomBtn = document.getElementById('tensesModeCustomBtn');
+  const modeHintEl = document.getElementById('tensesPracticeModeHint');
   const btnStart = document.getElementById('tensesStartBtn');
   const btnRetry = document.getElementById('tensesRetryMistakesBtn');
   const cbShowAfter = document.getElementById('tensesShowAfterEach');
@@ -157,8 +164,20 @@
 
   let currentId = null;
   let runKeyHandler = null;
+  let runReturnState = null;
+
+  function setRunReturnState(state){
+    runReturnState = state || null;
+    if (btnBackToRunFromDetail){
+      btnBackToRunFromDetail.hidden = !runReturnState;
+      btnBackToRunFromDetail.title = runReturnState
+        ? 'Вернуться к упражнению на текущем вопросе'
+        : '';
+    }
+  }
 
   const KEY_UI = 'sh_tenses_ui_v1';
+  const KEY_GRAMMAR_HOME_TAB = 'sh_grammar_home_tab_v1';
   const KEY_LEVEL = 'sh_grammar_level_v1';
   const KEY_CATEGORY = 'sh_grammar_category_v1';
   const KEY_SUBGROUP = 'sh_grammar_subgroup_v1';
@@ -207,9 +226,16 @@
     'syntax'
   ];
 
+  const HOME_TAB_HINT = {
+    rules: 'раздел «правила»: только теория и темы по грамматике',
+    practice: 'раздел «упражнения»: смешанные, пользовательские, сравнение и daily',
+    all: 'раздел «всё»: показать все карточки'
+  };
+
   let activeCategory = loadCategory();
   let activeSubgroup = loadSubgroup();
   let ruleMode = loadRuleMode();
+  let grammarHomeTab = loadGrammarHomeTab();
   if (activeCategory === 'all') activeSubgroup = 'all';
 
   const GOALS = [
@@ -220,6 +246,11 @@
     { id:'mistakes', title:'ошибки (mistakes)' },
     { id:'compare', title:'сравнение (compare)' },
   ];
+
+  const PRACTICE_MODE_HINT = {
+    mixed: 'смешанные упражнения: автоматический микс тем по твоему уровню',
+    custom: 'пользовательские упражнения: сам выбираешь правила и времена в удобных группах'
+  };
 
   const CONSTRUCTOR_NODES = {
     root: {
@@ -521,6 +552,7 @@
     setVisible(practiceView, viewName === 'practice');
     setVisible(compareView, viewName === 'compare');
     setVisible(dailyView, viewName === 'daily');
+    if (viewName === 'home') applyGrammarHomeTab();
     if (viewName !== 'home' && searchResults) searchResults.hidden = true;
     window.scrollTo(0, 0);
   }
@@ -536,6 +568,70 @@
   function loadUIState(){
     try{ return JSON.parse(localStorage.getItem(KEY_UI) || '{}') || {}; }
     catch{ return {}; }
+  }
+
+  function normalizeGrammarHomeTab(tab){
+    const v = String(tab || '').trim().toLowerCase();
+    if (v === 'tools') return 'practice';
+    return (v === 'rules' || v === 'practice' || v === 'all') ? v : 'rules';
+  }
+
+  function loadGrammarHomeTab(){
+    try{
+      return normalizeGrammarHomeTab(localStorage.getItem(KEY_GRAMMAR_HOME_TAB) || 'rules');
+    } catch(_){
+      return 'rules';
+    }
+  }
+
+  function setGrammarHomeTab(tab){
+    grammarHomeTab = normalizeGrammarHomeTab(tab);
+    try{ localStorage.setItem(KEY_GRAMMAR_HOME_TAB, grammarHomeTab); } catch(_){ }
+    applyGrammarHomeTab();
+  }
+
+  function applyGrammarHomeTab(){
+    const selected = normalizeGrammarHomeTab(grammarHomeTab);
+
+    if (homeView){
+      homeView.setAttribute('data-grammar-home-tab', selected);
+    }
+
+    if (grammarHomeTabs){
+      const buttons = grammarHomeTabs.querySelectorAll('[data-grammar-home-tab]');
+      buttons.forEach((btn)=>{
+        const tab = normalizeGrammarHomeTab(btn.getAttribute('data-grammar-home-tab'));
+        const active = tab === selected;
+        btn.classList.toggle('is-active', active);
+        btn.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+    }
+
+    if (grammarHomeTabHint){
+      grammarHomeTabHint.textContent = HOME_TAB_HINT[selected] || HOME_TAB_HINT.rules;
+    }
+
+    if (grammarHomeTileGrid){
+      const tiles = grammarHomeTileGrid.querySelectorAll('.sh-tile[data-grammar-home-group]');
+      const showAll = selected === 'all';
+      grammarHomeTileGrid.hidden = false;
+      tiles.forEach((tile)=>{
+        if (showAll){
+          tile.hidden = false;
+          return;
+        }
+        const group = String(tile.getAttribute('data-grammar-home-group') || '').trim().toLowerCase();
+        tile.hidden = (group !== selected);
+      });
+    }
+
+    if (btnOpenConstructor){
+      const wrap = document.getElementById('grammarBuilderBox');
+      if (wrap) wrap.hidden = (selected === 'practice');
+    }
+
+    const searchWrap = document.getElementById('grammarSearchBox');
+    if (searchWrap) searchWrap.hidden = (selected === 'practice');
   }
 
   function normalizeLevel(level){
@@ -1659,17 +1755,17 @@
       badge.className = 'ik-badge';
       badge.textContent = `${masteryLabel(prog.mastery)} - ${prog.mastery}/5`;
 
-      const btn = document.createElement('button');
-      btn.className = 'ik-btn ik-btn--black';
-      btn.type = 'button';
-      btn.textContent = 'open';
-      btn.addEventListener('click', (e)=>{
+      const btnRule = document.createElement('button');
+      btnRule.className = 'ik-btn ik-btn--black';
+      btnRule.type = 'button';
+      btnRule.textContent = 'правило';
+      btnRule.addEventListener('click', (e)=>{
         e.stopPropagation();
         openTense(meta.id);
       });
 
       right.appendChild(badge);
-      right.appendChild(btn);
+      right.appendChild(btnRule);
 
       li.appendChild(left);
       li.appendChild(right);
@@ -1743,9 +1839,16 @@
     renderRuleBlocks(ruleBody, blocksForRuleMode(t.ruleBlocks || []));
   }
 
-  function openTense(id){
+  function openTense(id, opts){
     const t = REG.byId[id];
     if (!t) return;
+
+    const options = opts || {};
+    if (options.fromRun){
+      setRunReturnState(options.runContext || { sourceTenseId: id });
+    } else {
+      setRunReturnState(null);
+    }
 
     currentId = id;
 
@@ -1770,6 +1873,54 @@
   // -------------------------
   // Practice config
   // -------------------------
+  function normalizePracticeMode(mode){
+    return String(mode || '').toLowerCase() === 'custom' ? 'custom' : 'mixed';
+  }
+
+  function inferPracticeModeFromUi(ui){
+    const byMode = normalizePracticeMode(ui?.practiceMode || '');
+    if (byMode === 'custom') return 'custom';
+    const tenseId = String(ui?.tense || '').trim();
+    if (tenseId === CUSTOM_TENSE_ID) return 'custom';
+    return 'mixed';
+  }
+
+  function applyPracticeModeButtons(mode){
+    const m = normalizePracticeMode(mode);
+    if (modeMixedBtn){
+      modeMixedBtn.classList.toggle('ik-btn--black', m === 'mixed');
+    }
+    if (modeCustomBtn){
+      modeCustomBtn.classList.toggle('ik-btn--black', m === 'custom');
+    }
+    if (modeHintEl){
+      modeHintEl.textContent = PRACTICE_MODE_HINT[m] || PRACTICE_MODE_HINT.mixed;
+    }
+    if (btnStart){
+      btnStart.textContent = m === 'custom' ? 'start custom' : 'start mixed';
+    }
+  }
+
+  function setPracticeMode(mode, options){
+    const opts = Object.assign({ persist: true, rerender: true }, options || {});
+    const m = normalizePracticeMode(mode);
+
+    applyPracticeModeButtons(m);
+
+    if (tenseSelect){
+      tenseSelect.value = m === 'custom' ? CUSTOM_TENSE_ID : 'mixedAll';
+    }
+
+    if (m === 'custom') renderCustomPicker();
+    setCustomPickerVisible(m === 'custom');
+
+    if (opts.persist){
+      saveUIState({ practiceMode: m, tense: tenseSelect?.value || 'mixedAll' });
+    }
+
+    if (opts.rerender) renderPracticeInfo();
+  }
+
   function fillGoalOptions(){
     goalSelect.innerHTML = '';
     for (const g of GOALS){
@@ -1783,57 +1934,15 @@
   function fillTenseOptions(){
     tenseSelect.innerHTML = '';
 
-    const metas = sortMetasForDisplay(getFilteredMetas({ category: activeCategory, subgroup: activeSubgroup }));
-
     const optMixedAll = document.createElement('option');
     optMixedAll.value = 'mixedAll';
-    optMixedAll.textContent = 'Смешанное: все темы по уровню';
+    optMixedAll.textContent = 'Смешанные упражнения';
     tenseSelect.appendChild(optMixedAll);
 
     const optCustom = document.createElement('option');
     optCustom.value = CUSTOM_TENSE_ID;
-    optCustom.textContent = 'Пользовательское (Custom)';
+    optCustom.textContent = 'Пользовательские упражнения';
     tenseSelect.appendChild(optCustom);
-
-    for (let i = 0; i < metas.length; i++){
-      const meta = metas[i];
-      const opt = document.createElement('option');
-      opt.value = meta.id;
-      opt.textContent = meta.title;
-      tenseSelect.appendChild(opt);
-    }
-
-    // Special
-    const allowMixedPast = activeCategory === 'all' ||
-      (activeCategory === 'past' && (activeSubgroup === 'all' || activeSubgroup === 'simple' || activeSubgroup === 'continuous'));
-
-    if (REG.byId.mixed && allowMixedPast){
-      const optMixed = document.createElement('option');
-      optMixed.value = 'mixed';
-      optMixed.textContent = 'Mixed (Past Simple + Past Continuous)';
-      tenseSelect.appendChild(optMixed);
-    }
-
-    const allowMixedPresent = activeCategory === 'all' ||
-      (activeCategory === 'present' && (activeSubgroup === 'all' || activeSubgroup === 'simple' || activeSubgroup === 'continuous'));
-
-    if (REG.byId.mixedPresent && allowMixedPresent){
-      const optMixedP = document.createElement('option');
-      optMixedP.value = 'mixedPresent';
-      optMixedP.textContent = 'Mixed Present (Present Simple + Present Continuous)';
-      tenseSelect.appendChild(optMixedP);
-    }
-
-    const allowMixedPerfectPast = activeCategory === 'all' ||
-      (activeCategory === 'past' && (activeSubgroup === 'all' || activeSubgroup === 'simple' || activeSubgroup === 'perfect'));
-
-    if (REG.byId.mixedPerfectPast && allowMixedPerfectPast){
-      const optMixedPP = document.createElement('option');
-      optMixedPP.value = 'mixedPerfectPast';
-      optMixedPP.textContent = 'Mixed Perfect - Past (Present Perfect + Past Simple)';
-      tenseSelect.appendChild(optMixedPP);
-    }
-
   }
 
   function getCoreTenseIds(){
@@ -1847,7 +1956,7 @@
     const saved = Array.isArray(ui.customTenses) ? ui.customTenses : [];
     const valid = saved.filter(id => ids.includes(id));
     if (valid.length) return valid;
-    return [...ids];
+    return [];
   }
 
   function getCustomSelectedIds(){
@@ -1867,6 +1976,7 @@
   function saveCustomSelection(ids){
     saveUIState({ customTenses: ids });
     updateCustomHint(ids.length);
+    refreshCustomGroupCounts();
     if (tenseSelect?.value === CUSTOM_TENSE_ID) renderPracticeInfo();
   }
 
@@ -1878,54 +1988,161 @@
     saveCustomSelection(getCustomSelectedIds());
   }
 
+  function refreshCustomGroupCounts(){
+    if (!customGrid) return;
+    customGrid.querySelectorAll('.sh-custom-group').forEach((groupEl)=>{
+      const c = groupEl.querySelector('.sh-custom-group__count');
+      if (!c) return;
+      const boxes = Array.from(groupEl.querySelectorAll('input[type="checkbox"][data-tense-id]'));
+      const total = boxes.length;
+      const selected = boxes.filter((el)=> el.checked).length;
+      c.textContent = `${selected}/${total}`;
+    });
+  }
+
   function renderCustomPicker(){
     if (!customGrid) return;
     const selected = new Set(getSavedCustomIds());
-    const metas = getFilteredMetas({ category: 'all' });
+    const metas = sortMetasForDisplay(getFilteredMetas({ category: 'all' }));
     customGrid.innerHTML = '';
+    const catOrder = ['present', 'past', 'future', 'universal'];
+    const catMap = new Map();
 
     for (const meta of metas){
-      const label = document.createElement('label');
-      label.className = 'sh-custom-tense';
+      const cat = String(meta.group || 'universal').toLowerCase();
+      if (!catMap.has(cat)) catMap.set(cat, []);
+      catMap.get(cat).push(meta);
+    }
 
-      const cb = document.createElement('input');
-      cb.type = 'checkbox';
-      cb.className = 'sh-custom-tense__cb';
-      cb.setAttribute('data-tense-id', meta.id);
-      cb.checked = selected.has(meta.id);
+    const orderedCats = [...catOrder.filter((cat)=> catMap.has(cat)), ...Array.from(catMap.keys()).filter((cat)=> !catOrder.includes(cat))];
 
-      const textWrap = document.createElement('span');
-      textWrap.className = 'sh-custom-tense__text';
+    for (const cat of orderedCats){
+      const groupMetas = catMap.get(cat) || [];
+      if (!groupMetas.length) continue;
 
-      const t = document.createElement('span');
-      t.className = 'sh-custom-tense__title';
-      t.textContent = meta.title || meta.id;
+      const group = document.createElement('section');
+      group.className = 'sh-custom-group';
+      group.setAttribute('data-cat', cat);
 
-      const s = document.createElement('span');
-      s.className = 'sh-custom-tense__sub';
-      s.textContent = meta.subtitle || '';
+      const groupHead = document.createElement('div');
+      groupHead.className = 'sh-custom-group__head';
 
-      textWrap.appendChild(t);
-      textWrap.appendChild(s);
-      label.appendChild(cb);
-      label.appendChild(textWrap);
-      customGrid.appendChild(label);
+      const groupTitle = document.createElement('p');
+      groupTitle.className = 'sh-custom-group__title';
+      groupTitle.textContent = CATEGORY_LABEL[cat] || cat;
 
-      cb.addEventListener('change', ()=>{
+      const groupCount = document.createElement('span');
+      groupCount.className = 'ik-badge sh-custom-group__count';
+      groupCount.textContent = '0/0';
+
+      const groupActions = document.createElement('div');
+      groupActions.className = 'sh-custom-group__actions';
+
+      const btnPickGroup = document.createElement('button');
+      btnPickGroup.type = 'button';
+      btnPickGroup.className = 'ik-btn';
+      btnPickGroup.textContent = 'всё в разделе';
+      btnPickGroup.addEventListener('click', ()=>{
+        group.querySelectorAll('input[type="checkbox"][data-tense-id]').forEach((el)=>{ el.checked = true; });
         saveCustomSelection(getCustomSelectedIds());
       });
+
+      const btnClearGroup = document.createElement('button');
+      btnClearGroup.type = 'button';
+      btnClearGroup.className = 'ik-btn';
+      btnClearGroup.textContent = 'очистить раздел';
+      btnClearGroup.addEventListener('click', ()=>{
+        group.querySelectorAll('input[type="checkbox"][data-tense-id]').forEach((el)=>{ el.checked = false; });
+        saveCustomSelection(getCustomSelectedIds());
+      });
+
+      groupActions.appendChild(btnPickGroup);
+      groupActions.appendChild(btnClearGroup);
+
+      groupHead.appendChild(groupTitle);
+      groupHead.appendChild(groupCount);
+      groupHead.appendChild(groupActions);
+      group.appendChild(groupHead);
+
+      const subgroupMap = new Map();
+      for (const meta of groupMetas){
+        const sub = deriveSubgroup(meta) || 'all';
+        if (!subgroupMap.has(sub)) subgroupMap.set(sub, []);
+        subgroupMap.get(sub).push(meta);
+      }
+
+      const subgroupOrder = [...SUBGROUP_ORDER.filter((s)=> subgroupMap.has(s)), ...Array.from(subgroupMap.keys()).filter((s)=> !SUBGROUP_ORDER.includes(s))];
+
+      const subgroupWrap = document.createElement('div');
+      subgroupWrap.className = 'sh-custom-group__body';
+
+      for (const sub of subgroupOrder){
+        const subMetas = subgroupMap.get(sub) || [];
+        if (!subMetas.length) continue;
+
+        const subCard = document.createElement('div');
+        subCard.className = 'sh-custom-subgroup';
+
+        const subTitle = document.createElement('p');
+        subTitle.className = 'sh-custom-subgroup__title';
+        subTitle.textContent = subgroupLabel(sub);
+        subCard.appendChild(subTitle);
+
+        const subItems = document.createElement('div');
+        subItems.className = 'sh-custom-subgroup__items';
+
+        for (const meta of subMetas){
+          const label = document.createElement('label');
+          label.className = 'sh-custom-tense';
+
+          const cb = document.createElement('input');
+          cb.type = 'checkbox';
+          cb.className = 'sh-custom-tense__cb';
+          cb.setAttribute('data-tense-id', meta.id);
+          cb.checked = selected.has(meta.id);
+
+          const textWrap = document.createElement('span');
+          textWrap.className = 'sh-custom-tense__text';
+
+          const t = document.createElement('span');
+          t.className = 'sh-custom-tense__title';
+          t.textContent = meta.title || meta.id;
+
+          const s = document.createElement('span');
+          s.className = 'sh-custom-tense__sub';
+          s.textContent = meta.subtitle || meta.hint || '';
+
+          textWrap.appendChild(t);
+          textWrap.appendChild(s);
+          label.appendChild(cb);
+          label.appendChild(textWrap);
+          subItems.appendChild(label);
+
+          cb.addEventListener('change', ()=>{
+            saveCustomSelection(getCustomSelectedIds());
+          });
+        }
+
+        subCard.appendChild(subItems);
+        subgroupWrap.appendChild(subCard);
+      }
+
+      group.appendChild(subgroupWrap);
+      customGrid.appendChild(group);
     }
 
     updateCustomHint(selected.size);
+    refreshCustomGroupCounts();
   }
 
   function updateCustomHint(selectedCount){
     if (!customHint) return;
+    const total = getFilteredMetas({ category: 'all' }).length;
     if (!selectedCount){
-      customHint.textContent = 'выбери минимум одну тему, чтобы начать';
+      customHint.textContent = `выбрано: 0 из ${total}. Отметь темы, чтобы собрать свой набор.`;
       return;
     }
-    customHint.textContent = `выбрано: ${selectedCount} из ${getFilteredMetas({ category: 'all' }).length}`;
+    customHint.textContent = `выбрано: ${selectedCount} из ${total}`;
   }
 
   function buildMixedAllTense(){
@@ -1959,7 +2176,7 @@
     }
     return {
       id: 'mixedAll',
-      title: 'Смешанное: все темы',
+      title: 'Смешанные упражнения: все темы',
       subtitle: 'все темы выбранного фильтра и уровня',
       practice: {
         exercises: Array.from(grouped.values())
@@ -1999,7 +2216,7 @@
 
     return {
       id: CUSTOM_TENSE_ID,
-      title: `Пользовательское (${picked.length} тем.)`,
+      title: `Пользовательские упражнения (${picked.length} тем.)`,
       subtitle: 'набор по выбранным темам',
       practice: {
         exercises: Array.from(grouped.values())
@@ -2074,6 +2291,16 @@
     if (btnStart){
       btnStart.disabled = total === 0;
       btnStart.title = total ? '' : 'Нет заданий: выбери темы';
+    }
+
+    if (tenseId === CUSTOM_TENSE_ID && getCustomSelectedIds().length === 0){
+      const box = document.createElement('div');
+      box.className = 'sh-highlight';
+      box.innerHTML = '<p class="sh-highlight-title">Пользовательские упражнения</p><ul class="sh-highlight-list"><li>Сначала отметь хотя бы одну тему в блоке выбора выше.</li><li>Удобно начать с одной категории: present / past / future.</li></ul>';
+      practiceBody.innerHTML = '';
+      practiceBody.appendChild(box);
+      saveUIState({ goal: goalId, tense: tenseId, category: activeCategory, subgroup: activeSubgroup });
+      return;
     }
 
     // Summary card
@@ -2233,7 +2460,9 @@
 
       <div class="ik-row" style="margin-top:12px; gap:10px;">
         <button class="ik-btn ik-btn--black" id="shTRunCheckNext" type="button">check</button>
+        <button class="ik-btn" id="shTRunDontKnow" type="button">не знаю</button>
         <button class="ik-btn" id="shTRunExplainBtn" type="button" aria-disabled="true" title="перед объяснением дайте свой ответ">объяснение</button>
+        <button class="ik-btn" id="shTRunOpenRuleBtn" type="button" aria-disabled="true" title="сначала проверь ответ">к правилу</button>
       </div>
 
       <div id="shTRunExplainBox" class="sh-hint" hidden></div>
@@ -2251,7 +2480,9 @@
     const elLine = runWrap.querySelector('#shTRunLine');
     const btnExit = runWrap.querySelector('#shTRunExit');
     const btnCheckNext = runWrap.querySelector('#shTRunCheckNext');
+    const btnDontKnow = runWrap.querySelector('#shTRunDontKnow');
     const btnExplain = runWrap.querySelector('#shTRunExplainBtn');
+    const btnOpenRule = runWrap.querySelector('#shTRunOpenRuleBtn');
     const elExplain = runWrap.querySelector('#shTRunExplainBox');
     const cbShowAfterLocal = runWrap.querySelector('#shTRunShowAfter');
 
@@ -2288,13 +2519,21 @@
       lastCheck = null;
     }
 
-    function setExplainAvailability(isAnswered){
-      if (!btnExplain) return;
-      btnExplain.dataset.locked = isAnswered ? '0' : '1';
-      btnExplain.setAttribute('aria-disabled', isAnswered ? 'false' : 'true');
-      btnExplain.style.opacity = isAnswered ? '' : '0.55';
-      btnExplain.title = isAnswered ? 'показать объяснение' : 'перед объяснением дайте свой ответ';
-      btnExplain.textContent = 'объяснение';
+    function setActionAvailability(isAnswered){
+      if (btnExplain){
+        btnExplain.dataset.locked = isAnswered ? '0' : '1';
+        btnExplain.setAttribute('aria-disabled', isAnswered ? 'false' : 'true');
+        btnExplain.style.opacity = isAnswered ? '' : '0.55';
+        btnExplain.title = isAnswered ? 'показать объяснение' : 'перед объяснением дайте свой ответ';
+        btnExplain.textContent = 'объяснение';
+      }
+
+      if (btnOpenRule){
+        btnOpenRule.dataset.locked = isAnswered ? '0' : '1';
+        btnOpenRule.setAttribute('aria-disabled', isAnswered ? 'false' : 'true');
+        btnOpenRule.style.opacity = isAnswered ? '' : '0.55';
+        btnOpenRule.title = isAnswered ? 'открыть правило по этому заданию' : 'сначала проверь ответ';
+      }
     }
 
     const TENSE_TEXT_PATTERNS = [
@@ -2580,6 +2819,202 @@
       return null;
     }
 
+    const IRREGULAR_FORMS = {
+      be: { past: 'was', pp: 'been' },
+      have: { past: 'had', pp: 'had' },
+      do: { past: 'did', pp: 'done' },
+      go: { past: 'went', pp: 'gone' },
+      see: { past: 'saw', pp: 'seen' },
+      come: { past: 'came', pp: 'come' },
+      make: { past: 'made', pp: 'made' },
+      take: { past: 'took', pp: 'taken' },
+      write: { past: 'wrote', pp: 'written' },
+      read: { past: 'read', pp: 'read' },
+      eat: { past: 'ate', pp: 'eaten' },
+      drink: { past: 'drank', pp: 'drunk' },
+      ride: { past: 'rode', pp: 'ridden' },
+      speak: { past: 'spoke', pp: 'spoken' },
+      know: { past: 'knew', pp: 'known' },
+      find: { past: 'found', pp: 'found' },
+      think: { past: 'thought', pp: 'thought' },
+      tell: { past: 'told', pp: 'told' },
+      give: { past: 'gave', pp: 'given' },
+      put: { past: 'put', pp: 'put' },
+      win: { past: 'won', pp: 'won' },
+      fall: { past: 'fell', pp: 'fallen' },
+      leave: { past: 'left', pp: 'left' },
+      buy: { past: 'bought', pp: 'bought' },
+      get: { past: 'got', pp: 'gotten' },
+      begin: { past: 'began', pp: 'begun' },
+      choose: { past: 'chose', pp: 'chosen' },
+      learn: { past: 'learned', pp: 'learned' },
+      meet: { past: 'met', pp: 'met' }
+    };
+
+    function toThirdPerson(base){
+      const v = String(base || '').toLowerCase();
+      if (!v) return '';
+      if (v === 'be') return 'is';
+      if (v === 'have') return 'has';
+      if (v.endsWith('y') && !/[aeiou]y$/.test(v)) return `${v.slice(0, -1)}ies`;
+      if (/(s|x|z|ch|sh|o)$/.test(v)) return `${v}es`;
+      return `${v}s`;
+    }
+
+    function toIng(base){
+      const v = String(base || '').toLowerCase();
+      if (!v) return '';
+      if (v === 'be') return 'being';
+      if (v.endsWith('ie')) return `${v.slice(0, -2)}ying`;
+      if (v.endsWith('e') && !/(ee|ye|oe)$/.test(v)) return `${v.slice(0, -1)}ing`;
+      return `${v}ing`;
+    }
+
+    function toPast(base){
+      const v = String(base || '').toLowerCase();
+      if (!v) return '';
+      if (v === 'be') return 'was';
+      if (IRREGULAR_FORMS[v]?.past) return IRREGULAR_FORMS[v].past;
+      if (v.endsWith('y') && !/[aeiou]y$/.test(v)) return `${v.slice(0, -1)}ied`;
+      if (v.endsWith('e')) return `${v}d`;
+      return `${v}ed`;
+    }
+
+    function toParticiple(base){
+      const v = String(base || '').toLowerCase();
+      if (!v) return '';
+      if (IRREGULAR_FORMS[v]?.pp) return IRREGULAR_FORMS[v].pp;
+      return toPast(v);
+    }
+
+    function detectSubjectRole(prompt){
+      const raw = String(prompt || '');
+      const beforeBlank = raw.split(/_{2,}/)[0] || '';
+      const tokens = normalize(beforeBlank).split(' ').filter(Boolean);
+      if (tokens.includes('and')) return 'plural';
+      const last = tokens[tokens.length - 1] || '';
+      if (last === 'i') return 'i';
+      if (last === 'you' || last === 'we' || last === 'they') return 'plural';
+
+      const bracket = (raw.match(/\(([^)]+)\)/) || [])[1] || '';
+      const bNorm = normalize(bracket);
+      if (/\byou\b/.test(bNorm)) return 'plural';
+      if (/\bi\b/.test(bNorm)) return 'i';
+      if (/\bwe\b|\bthey\b/.test(bNorm)) return 'plural';
+      return 'singular';
+    }
+
+    function extractBaseVerb(prompt){
+      const m = String(prompt || '').match(/\(([^)]+)\)/);
+      if (!m) return '';
+      const inside = String(m[1] || '').toLowerCase().replace(/[^a-z\s/]/g, ' ');
+      const parts = inside.split(/[\/\s]+/).map(x => x.trim()).filter(Boolean);
+      for (let i = parts.length - 1; i >= 0; i -= 1){
+        const token = parts[i];
+        if (token === 'to' || token === 'not' || token === 'already' || token === 'just' || token === 'ever' || token === 'never') continue;
+        return token;
+      }
+      return '';
+    }
+
+    function buildFormByTense(baseVerb, tenseId, subjectRole){
+      const v = String(baseVerb || '').toLowerCase();
+      const id = String(tenseId || '');
+      if (!v || !id) return '';
+
+      const role = subjectRole || 'singular';
+      const haveAux = role === 'singular' ? 'has' : 'have';
+      const beAuxPresent = role === 'i' ? 'am' : (role === 'plural' ? 'are' : 'is');
+      const beAuxPast = role === 'plural' ? 'were' : 'was';
+
+      if (id === 'presentSimple'){
+        if (v === 'be') return beAuxPresent;
+        if (v === 'have') return haveAux;
+        return role === 'singular' ? toThirdPerson(v) : v;
+      }
+      if (id === 'presentContinuous') return `${beAuxPresent} ${toIng(v)}`;
+      if (id === 'presentPerfect') return `${haveAux} ${toParticiple(v)}`;
+      if (id === 'presentPerfectContinuous') return `${haveAux} been ${toIng(v)}`;
+
+      if (id === 'pastSimple'){
+        if (v === 'be') return beAuxPast;
+        return toPast(v);
+      }
+      if (id === 'pastContinuous') return `${beAuxPast} ${toIng(v)}`;
+      if (id === 'pastPerfect') return `had ${toParticiple(v)}`;
+      if (id === 'pastPerfectContinuous') return `had been ${toIng(v)}`;
+
+      if (id === 'futureSimple') return `will ${v}`;
+      if (id === 'futureContinuous') return `will be ${toIng(v)}`;
+      if (id === 'futurePerfect') return `will have ${toParticiple(v)}`;
+      if (id === 'futurePerfectContinuous') return `will have been ${toIng(v)}`;
+
+      return '';
+    }
+
+    function looksLikeTenseLabel(text){
+      return /\b(present|past|future)\b/i.test(String(text || ''));
+    }
+
+    function stripPromptHints(prompt){
+      return String(prompt || '')
+        .replace(/\s*\([^)]*\)/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function fillPromptBlanks(prompt, parts){
+      let out = stripPromptHints(prompt);
+      const forms = Array.isArray(parts) ? parts : [];
+      for (const part of forms){
+        out = out.replace(/_{2,}/, String(part || '').trim());
+      }
+      out = out.replace(/\s+/g, ' ').replace(/\s+([,.!?;:])/g, '$1').trim();
+      if (out && !/[.!?]$/.test(out)) out += '.';
+      return out;
+    }
+
+    function buildResolvedSentence(q, check, meta){
+      const item = q?.item || {};
+      const prompt = String(item.prompt || '').trim();
+      if (!prompt || !check) return '';
+
+      if (check.kind === 'input' || check.kind === 'correction'){
+        const correct = String(check.correctText || check.closestText || '').trim();
+        if (!correct) return '';
+        if (!/_{2,}/.test(prompt)){
+          if (/\s/.test(correct)) return correct;
+          return '';
+        }
+        const blankCount = (prompt.match(/_{2,}/g) || []).length;
+        if (blankCount !== 1 && /\s/.test(correct)) return correct;
+        return fillPromptBlanks(prompt, [correct]);
+      }
+
+      if (check.kind === 'multi_input'){
+        const parts = Array.isArray(check.correctParts) ? check.correctParts : [];
+        if (!parts.length || !/_{2,}/.test(prompt)) return '';
+        return fillPromptBlanks(prompt, parts);
+      }
+
+      if (check.kind === 'choice' && /_{2,}/.test(prompt)){
+        const correctText = String(check.correctText || '').trim();
+        let form = '';
+        if (correctText && !looksLikeTenseLabel(correctText)){
+          form = correctText;
+        } else {
+          const tenseId = meta?.id || detectTenseIdFromText(correctText);
+          const baseVerb = extractBaseVerb(prompt);
+          const role = detectSubjectRole(prompt);
+          form = buildFormByTense(baseVerb, tenseId, role);
+        }
+        if (!form) return '';
+        return fillPromptBlanks(prompt, [form]);
+      }
+
+      return '';
+    }
+
     function buildSmartExplanation(q, check){
       const item = q?.item || {};
       const lines = [];
@@ -2596,27 +3031,9 @@
 
       if (check){
         if (check.kind === 'choice'){
-          if (check.ok){
-            pushExplainLine(lines, `Твой выбор ${qText(check.selectedText)} — верно.`);
-          } else {
-            pushExplainLine(lines, `Твой выбор ${qText(check.selectedText)}. Правильно: ${qText(check.correctText)}.`);
-          }
+          pushExplainLine(lines, `Правильно: ${qText(check.correctText)}.`);
         } else if (check.kind === 'input' || check.kind === 'correction'){
-          if (check.state === 'correct'){
-            pushExplainLine(lines, `Твой ответ ${qText(check.rawInput)} — верно.`);
-          } else if (check.state === 'almost'){
-            pushExplainLine(lines, `Твой ответ ${qText(check.rawInput)} — почти верно (мелкая опечатка).`);
-            if (check.correctText) pushExplainLine(lines, `Эталонная форма: ${qText(check.correctText)}.`);
-          } else {
-            pushExplainLine(lines, `Твой ответ ${qText(check.rawInput)}. Правильно: ${qText(check.correctText || check.closestText)}.`);
-            const diff = tokenDiff(check.rawInput || '', check.correctText || check.closestText || '');
-            if (diff.missing.length) pushExplainLine(lines, `Добавь: ${joinReadable(diff.missing)}.`);
-            if (diff.extra.length) pushExplainLine(lines, `Убери/проверь: ${joinReadable(diff.extra)}.`);
-          }
-
-          if (check.kind === 'correction' && check.correctText){
-            pushExplainLine(lines, `Исправленный вариант целиком: ${qText(check.correctText)}.`);
-          }
+          pushExplainLine(lines, `Правильно: ${qText(check.correctText || check.closestText)}.`);
 
           const stativeIssue = detectStativeContinuousIssue(item.prompt || '', check.correctText || check.closestText || '');
           if (stativeIssue){
@@ -2631,9 +3048,6 @@
           if (check.ok){
             pushExplainLine(lines, `Верно: нужно выбрать ${joinReadable(check.correctLabels)}.`);
           } else {
-            pushExplainLine(lines, `Твой набор: ${joinReadable(check.selectedLabels)}.`);
-            if (check.missingLabels?.length) pushExplainLine(lines, `Нужно добавить: ${joinReadable(check.missingLabels)}.`);
-            if (check.extraLabels?.length) pushExplainLine(lines, `Лишние варианты: ${joinReadable(check.extraLabels)}.`);
             pushExplainLine(lines, `Правильный набор: ${joinReadable(check.correctLabels)}.`);
           }
         } else if (check.kind === 'match'){
@@ -2648,11 +3062,13 @@
             pushExplainLine(lines, `Верные формы: ${joinReadable(check.correctParts)}.`);
             if (check.anyAlmost) pushExplainLine(lines, 'Есть мелкие опечатки, но логика формы верная.');
           } else {
-            const wrong = (check.slots || []).filter(s => s.state === 'wrong').slice(0, 3);
-            const details = wrong.map(s=>`${s.index}) ${qText(s.raw)} -> ${qText(s.correct)}`);
-            if (details.length) pushExplainLine(lines, `Исправь поля: ${details.join(' | ')}.`);
             if (check.correctParts?.length) pushExplainLine(lines, `Правильные формы: ${joinReadable(check.correctParts)}.`);
           }
+        }
+
+        const resolved = buildResolvedSentence(q, check, meta);
+        if (resolved){
+          pushExplainLine(lines, `Полное предложение: ${qText(resolved)}.`);
         }
       }
 
@@ -2838,7 +3254,8 @@
     function renderCurrent(){
       checked = false;
       btnCheckNext.textContent = 'check';
-      setExplainAvailability(false);
+      setActionAvailability(false);
+      if (btnDontKnow) btnDontKnow.disabled = false;
       if (elExplain){ elExplain.hidden = true; elExplain.textContent = ''; }
       resetPerQuestionState();
       setFeedback('idle', 'ready', 'выбери ответ или введи ответ и нажми check');
@@ -3210,6 +3627,108 @@ try{
 
     btnExit.addEventListener('click', finish);
 
+    function dontKnowCurrent(){
+      const q = queue[idx];
+      if (!q) return;
+
+      countAttempt(q);
+      mistakesSet.add(q.item.id);
+
+      if (q.kind === 'choice'){
+        const correctText = q.item.options?.[q.item.correctIndex] || '';
+        markChoice(q.item.correctIndex, -1);
+        lastCheck = {
+          kind: 'choice',
+          ok: false,
+          selectedIndex: null,
+          correctIndex: q.item.correctIndex,
+          selectedText: '',
+          correctText,
+          forcedUnknown: true
+        };
+      } else if (q.kind === 'input' || q.kind === 'correction'){
+        const input = elCard.querySelector('#shTRunInput');
+        const accepted = q.item.accepted || [];
+        const correctText = accepted[0] || '';
+        if (input){
+          input.value = correctText;
+          input.classList.remove('is-bad');
+          input.classList.add('is-ok');
+        }
+        lastCheck = {
+          kind: q.kind,
+          ok: false,
+          state: 'wrong',
+          rawInput: '',
+          correctText,
+          closestText: correctText,
+          forcedUnknown: true
+        };
+      } else if (q.kind === 'multi'){
+        const correctSet = new Set((q.item.correctIndices || []).map(x => Number(x)));
+        const correctLabels = Array.from(correctSet).sort((a, b) => a - b).map(i => q.item.options?.[i]).filter(Boolean);
+        const btns = elCard.querySelectorAll('.sh-choice-list .sh-choice');
+        btns.forEach((b, i)=>{
+          b.classList.remove('is-correct', 'is-wrong');
+          if (correctSet.has(i)) b.classList.add('is-correct');
+        });
+        lastCheck = {
+          kind: 'multi',
+          ok: false,
+          selectedLabels: [],
+          correctLabels,
+          missingLabels: correctLabels,
+          extraLabels: [],
+          forcedUnknown: true
+        };
+      } else if (q.kind === 'match'){
+        const st = matchState;
+        if (st){
+          st.selects.forEach((sel, i)=>{
+            sel.value = st.pairs[i].right;
+            sel.classList.remove('is-bad');
+            sel.classList.add('is-ok');
+          });
+        }
+        lastCheck = {
+          kind: 'match',
+          ok: false,
+          mismatches: [],
+          forcedUnknown: true
+        };
+      } else if (q.kind === 'multi_input'){
+        const slots = [];
+        const specs = q.item.inputs || [];
+        for (let i = 0; i < specs.length; i += 1){
+          const correct = (specs[i].accepted && specs[i].accepted[0]) ? specs[i].accepted[0] : '';
+          const inputEl = multiInputs && multiInputs[i];
+          if (inputEl){
+            inputEl.value = correct;
+            inputEl.classList.remove('is-bad');
+            inputEl.classList.add('is-ok');
+          }
+          slots.push({ index: i + 1, raw: '', correct, state: 'wrong' });
+        }
+        lastCheck = {
+          kind: 'multi_input',
+          ok: false,
+          anyAlmost: false,
+          slots,
+          correctParts: slots.map(x => x.correct).filter(Boolean),
+          forcedUnknown: true
+        };
+      } else {
+        lastCheck = { kind: q.kind || 'unknown', ok: false, forcedUnknown: true };
+      }
+
+      saveMistakesSnapshot();
+      setFeedback('wrong', 'idk', 'показан правильный ответ');
+      checked = true;
+      setActionAvailability(true);
+      if (btnDontKnow) btnDontKnow.disabled = true;
+      btnCheckNext.textContent = (idx === queue.length - 1) ? 'finish' : 'next';
+    }
+
     if (btnExplain){
       btnExplain.addEventListener('click', ()=>{
         if (btnExplain.dataset.locked === '1') return;
@@ -3228,12 +3747,39 @@ try{
       });
     }
 
+    if (btnOpenRule){
+      btnOpenRule.addEventListener('click', ()=>{
+        if (btnOpenRule.dataset.locked === '1') return;
+        const q = queue[idx];
+        if (!q) return;
+        const meta = inferQuestionTenseMeta(q, lastCheck) || getTenseMetaById(tenseObj.id);
+        if (!meta || !meta.id) return;
+        openTense(meta.id, {
+          fromRun: true,
+          runContext: {
+            sourceTenseId: meta.id,
+            sourceExerciseTitle: q.exTitle,
+            sourceQuestionIndex: idx + 1
+          }
+        });
+        setStatus('rule');
+      });
+    }
+
+    if (btnDontKnow){
+      btnDontKnow.addEventListener('click', ()=>{
+        if (checked) return;
+        dontKnowCurrent();
+      });
+    }
+
     btnCheckNext.addEventListener('click', ()=>{
       if (!checked){
         const res = checkCurrent(); // null = ещё не готово
         if (res === null) return;
         checked = true;
-        setExplainAvailability(true);
+        setActionAvailability(true);
+        if (btnDontKnow) btnDontKnow.disabled = true;
         btnCheckNext.textContent = (idx === queue.length - 1) ? 'finish' : 'next';
         return;
       }
@@ -3384,14 +3930,11 @@ try{
   });
 
   btnGoPractice.addEventListener('click', ()=>{
-    if (!ensureLevelSelected()){
-      showOnly('home');
-      setStatus('выбери уровень');
-      return;
-    }
-    setCategory('all');
-    setSubgroup('all');
-    showPractice({ keepCurrentFilter: true });
+    openPracticeMode('custom', { autoStart: false });
+  });
+
+  btnGoMixed && btnGoMixed.addEventListener('click', ()=>{
+    openPracticeMode('mixed', { autoStart: true });
   });
 
   btnGoPresent && btnGoPresent.addEventListener('click', ()=> openCategory('present'));
@@ -3432,7 +3975,15 @@ try{
     setStatus('выбери уровень');
   });
 
-// Compare / Daily / Mixed Present quick start
+  if (grammarHomeTabs){
+    grammarHomeTabs.querySelectorAll('[data-grammar-home-tab]').forEach((btn)=>{
+      btn.addEventListener('click', ()=>{
+        setGrammarHomeTab(btn.getAttribute('data-grammar-home-tab'));
+      });
+    });
+  }
+
+// Compare / Daily quick start
 btnGoCompare && btnGoCompare.addEventListener('click', ()=>{
   if (!ensureLevelSelected()){
     showOnly('home');
@@ -3451,22 +4002,6 @@ btnGoDaily && btnGoDaily.addEventListener('click', ()=>{
   showDaily();
 });
 
-  btnGoMixedPresent && btnGoMixedPresent.addEventListener('click', ()=>{
-  if (!ensureLevelSelected()){
-    showOnly('home');
-    setStatus('выбери уровень');
-    return;
-  }
-  setCategory('present');
-  setSubgroup('all');
-  // open practice and start immediately
-  showPractice({ keepCurrentFilter: true });
-  try{
-    goalSelect.value = 'meaning';
-    tenseSelect.value = 'mixedPresent';
-  }catch(_){}
-  setTimeout(()=>{ btnStart && btnStart.click(); }, 0);
-});
 
 btnBackHomeFromCompare && btnBackHomeFromCompare.addEventListener('click', ()=>{
   showOnly('home');
@@ -3503,9 +4038,20 @@ btnResetProgress && btnResetProgress.addEventListener('click', ()=>{
   });
 
   btnBackToList && btnBackToList.addEventListener('click', ()=>{
+    setRunReturnState(null);
     renderList();
     showOnly('list');
     setStatus('list');
+  });
+
+  btnBackToRunFromDetail && btnBackToRunFromDetail.addEventListener('click', ()=>{
+    if (!runReturnState) return;
+    showOnly('practice');
+    setStatus('practice');
+    requestAnimationFrame(()=>{
+      const card = document.querySelector('#shTRunCard');
+      if (card) card.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    });
   });
 
   function showPractice(options){
@@ -3527,12 +4073,25 @@ btnResetProgress && btnResetProgress.addEventListener('click', ()=>{
     renderCustomPicker();
 
     if (ui.goal && GOALS.some(x=>x.id === ui.goal)) goalSelect.value = ui.goal;
-    if (ui.tense) tenseSelect.value = ui.tense;
-    setCustomPickerVisible((tenseSelect && tenseSelect.value) === CUSTOM_TENSE_ID);
+
+    const forcedMode = opts.forceMode ? normalizePracticeMode(opts.forceMode) : '';
+    const mode = forcedMode || inferPracticeModeFromUi(ui);
+    setPracticeMode(mode, { persist: !!forcedMode, rerender: false });
 
     showOnly('practice');
     renderPracticeInfo();
     setStatus('practice');
+    return true;
+  }
+
+  function openPracticeMode(mode, options){
+    const opts = Object.assign({ autoStart: false }, options || {});
+    setCategory('all');
+    setSubgroup('all');
+    if (!showPractice({ keepCurrentFilter: true, forceMode: mode })) return false;
+    if (opts.autoStart){
+      setTimeout(()=>{ btnStart && btnStart.click(); }, 0);
+    }
     return true;
   }
 
@@ -3542,25 +4101,16 @@ btnResetProgress && btnResetProgress.addEventListener('click', ()=>{
   });
 
   function goPracticeForTense(id){
+    if (!showPractice({ keepCurrentFilter: true, forceMode: 'custom' })) return;
+
     const meta = (REG.INDEX || []).find((m) => m.id === id);
-    if (meta && meta.group){
-      setCategory(String(meta.group).toLowerCase());
-      setSubgroup(deriveSubgroup(meta));
-    }
-
-    if (!showPractice({ keepCurrentFilter: true })) return;
-
-    const hasOption = Array.from(tenseSelect.options || []).some((opt) => opt.value === id);
-    if (hasOption){
-      tenseSelect.value = id;
+    if (meta && meta.id){
+      saveCustomSelection([meta.id]);
+      setPracticeMode('custom', { persist: true, rerender: false });
     } else {
-      setCategory('all');
-      setSubgroup('all');
-      fillTenseOptions();
-      if (Array.from(tenseSelect.options || []).some((opt) => opt.value === id)) tenseSelect.value = id;
+      setPracticeMode('mixed', { persist: true, rerender: false });
     }
 
-    saveUIState({ tense: id, category: activeCategory, subgroup: activeSubgroup });
     renderPracticeInfo();
   }
 
@@ -3572,10 +4122,13 @@ btnResetProgress && btnResetProgress.addEventListener('click', ()=>{
   });
 
   goalSelect && goalSelect.addEventListener('change', renderPracticeInfo);
+  modeMixedBtn && modeMixedBtn.addEventListener('click', ()=> setPracticeMode('mixed'));
+  modeCustomBtn && modeCustomBtn.addEventListener('click', ()=> setPracticeMode('custom'));
   tenseSelect && tenseSelect.addEventListener('change', ()=>{
-    const isCustom = (tenseSelect.value === CUSTOM_TENSE_ID);
-    setCustomPickerVisible(isCustom);
-    if (isCustom) updateCustomHint(getCustomSelectedIds().length);
+    const mode = tenseSelect.value === CUSTOM_TENSE_ID ? 'custom' : 'mixed';
+    applyPracticeModeButtons(mode);
+    setCustomPickerVisible(mode === 'custom');
+    if (mode === 'custom') updateCustomHint(getCustomSelectedIds().length);
     renderPracticeInfo();
   });
   btnCustomSelectAll && btnCustomSelectAll.addEventListener('click', ()=> setAllCustomSelection(true));
@@ -3913,6 +4466,7 @@ document.addEventListener('ik:languagechange', ()=>{
   updateRuleModeButtons();
   initSearchUI();
   if (countBadge) countBadge.textContent = `grammar: ${getFilteredMetas({ category: activeCategory, subgroup: activeSubgroup }).length}`;
+  setGrammarHomeTab('rules');
   showOnly('home');
 
   // -------------------------
