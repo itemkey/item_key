@@ -975,6 +975,16 @@ async function fetchJson(relPath){
 
   let checkMode = 'check'; // 'check' | 'next'
 
+  let textTasksActive = [];
+  let textCurrent = null;
+  let textRevealRu = false;
+  let textSessionTotal = 0;
+  let textSessionCorrect = 0;
+  let textHistory = [];
+  let textHistoryPos = -1;
+  let textSeqIndex = -1;
+  let textCheckMode = 'check';
+
   const elDbStatus = document.getElementById('dbStatus');
   const elTaskCount = document.getElementById('taskCountBadge');
   const elSeedBadge = document.getElementById('seedBadge');
@@ -982,8 +992,10 @@ async function fetchJson(relPath){
   const elWtPanel = document.getElementById('panel-wt');
   const elTransformType = document.getElementById('transformType');
   const elSubtabPractice = document.getElementById('subtab-practice');
+  const elSubtabText = document.getElementById('subtab-text');
   const elSubtabBuilder = document.getElementById('subtab-builder');
   const elPanelPractice = document.getElementById('panel-practice');
+  const elPanelText = document.getElementById('panel-text');
   const elPanelBuilder = document.getElementById('panel-builder');
 
   const elPromptEn = document.getElementById('promptEn');
@@ -1001,6 +1013,8 @@ async function fetchJson(relPath){
 
   const elRandom = document.getElementById('randomOrder');
   const elPracticeCategory = document.getElementById('practiceCategory');
+  const elTextRandom = document.getElementById('textRandomOrder');
+  const elTextCategory = document.getElementById('textCategory');
 
   const elViewCategory = document.getElementById('viewCategory');
   const elAddCategory = document.getElementById('addCategory');
@@ -1018,6 +1032,22 @@ async function fetchJson(relPath){
   const elInUnPrefixPicker = document.getElementById('inUnPrefixPicker');
   const btnPrefixIn = document.getElementById('btnPrefixIn');
   const btnPrefixUn = document.getElementById('btnPrefixUn');
+
+  const elTextPromptLabel = document.getElementById('textPromptLabel');
+  const elTextSentenceEn = document.getElementById('textSentenceEn');
+  const elTextSentenceRu = document.getElementById('textSentenceRu');
+  const elTextAnswer = document.getElementById('textAnswerInput');
+  const elTextQ = document.getElementById('textQBadge');
+  const elTextScore = document.getElementById('textSessionScore');
+  const elTextFeedbackBox = document.getElementById('textFeedbackBox');
+  const elTextFeedbackStamp = document.getElementById('textFeedbackStamp');
+  const elTextFeedbackLine = document.getElementById('textFeedbackLine');
+
+  const btnTextPrev = document.getElementById('btnTextPrev');
+  const btnTextNext = document.getElementById('btnTextNext');
+  const btnTextReveal = document.getElementById('btnTextReveal');
+  const btnTextCheckNext = document.getElementById('btnTextCheckNext');
+  const btnTextShowAnswer = document.getElementById('btnTextShowAnswer');
 
   const adminStatus = {};
   function setAdminText(el, text, label){
@@ -1040,8 +1070,18 @@ async function fetchJson(relPath){
     }
     if(!wtRuntime.isAdmin){
       if(elPanelBuilder) elPanelBuilder.hidden = true;
-      if(elPanelPractice) elPanelPractice.hidden = false;
-      if(elSubtabPractice) elSubtabPractice.setAttribute('aria-selected', 'true');
+      if(window.StudentHelperTabs && typeof window.StudentHelperTabs.setWTSubTab === 'function'){
+        const currentSubtab = (typeof window.StudentHelperTabs.getWTSubTab === 'function')
+          ? window.StudentHelperTabs.getWTSubTab()
+          : 'practice';
+        if(currentSubtab === 'builder') window.StudentHelperTabs.setWTSubTab('practice');
+      }else{
+        if(elPanelPractice) elPanelPractice.hidden = false;
+        if(elPanelText) elPanelText.hidden = true;
+        if(elSubtabPractice) elSubtabPractice.setAttribute('aria-selected', 'true');
+        if(elSubtabText) elSubtabText.setAttribute('aria-selected', 'false');
+        if(elSubtabBuilder) elSubtabBuilder.setAttribute('aria-selected', 'false');
+      }
     }
   }
 
@@ -1100,6 +1140,10 @@ async function fetchJson(relPath){
         { value: 'InUnPrefixes', label: wtText('приставки in- или un-', 'in- or un- prefixes') }
       ], elPracticeCategory && elPracticeCategory.value);
 
+      setSelectOptions(elTextCategory, [
+        { value: 'InUnPrefixes', label: wtText('приставки in- или un-', 'in- or un- prefixes') }
+      ], elTextCategory && elTextCategory.value);
+
       setSelectOptions(elViewCategory, [
         { value: 'All', label: wtText('все категории', 'All categories') },
         { value: 'InUnPrefixes', label: wtText('приставки in- или un-', 'in- or un- prefixes') }
@@ -1115,6 +1159,10 @@ async function fetchJson(relPath){
       setSelectOptions(elPracticeCategory, [
         { value: CATEGORY_N2V, label: wtText('существительное -> глагол', 'Noun -> Verb') }
       ], elPracticeCategory && elPracticeCategory.value);
+
+      setSelectOptions(elTextCategory, [
+        { value: CATEGORY_N2V, label: wtText('существительное -> глагол', 'Noun -> Verb') }
+      ], elTextCategory && elTextCategory.value);
 
       setSelectOptions(elViewCategory, [
         { value: 'All', label: wtText('все категории', 'All categories') },
@@ -1133,6 +1181,12 @@ async function fetchJson(relPath){
       { value: 'Prefixes', label: wtText('приставки', 'Prefixes') }
     ], elPracticeCategory && elPracticeCategory.value);
 
+    setSelectOptions(elTextCategory, [
+      { value: 'All', label: wtText('все категории', 'All categories') },
+      { value: 'Suffixes', label: wtText('суффиксы', 'Suffixes') },
+      { value: 'Prefixes', label: wtText('приставки', 'Prefixes') }
+    ], elTextCategory && elTextCategory.value);
+
     setSelectOptions(elViewCategory, [
       { value: 'All', label: wtText('все категории', 'All categories') },
       { value: 'Suffixes', label: wtText('суффиксы', 'Suffixes') },
@@ -1148,6 +1202,242 @@ async function fetchJson(relPath){
   function updateScore(){ elScore.textContent = `${sessionCorrect}/${sessionTotal}`; }
   function updateQ(){ elQ.textContent = `q: ${historyPos >= 0 ? (historyPos + 1) : 0}`; }
   function updateCountBadge(){ elTaskCount.textContent = `tasks: ${scopedTasks().length}`; }
+
+  function updateTextScore(){ if(elTextScore) elTextScore.textContent = `${textSessionCorrect}/${textSessionTotal}`; }
+  function updateTextQ(){ if(elTextQ) elTextQ.textContent = `q: ${textHistoryPos >= 0 ? (textHistoryPos + 1) : 0}`; }
+
+  function setTextFeedback(state, stamp, line){
+    if(!elTextFeedbackBox || !elTextFeedbackStamp || !elTextFeedbackLine) return;
+    elTextFeedbackBox.dataset.state = state || 'idle';
+    elTextFeedbackStamp.textContent = stamp || 'info';
+    elTextFeedbackLine.textContent = line || '';
+    pulse(elTextFeedbackBox, 'ik-pop');
+  }
+
+  function clearTextInputState(){
+    if(elTextAnswer) elTextAnswer.classList.remove('is-ok','is-bad');
+  }
+
+  function setTextCheckMode(mode){
+    textCheckMode = mode;
+    if(!btnTextCheckNext) return;
+    if(mode === 'next'){
+      btnTextCheckNext.textContent = wtText('далее', 'next');
+      btnTextCheckNext.title = wtText('Далее (Enter)', 'Next (Enter)');
+    }else{
+      btnTextCheckNext.textContent = wtText('проверить', 'check');
+      btnTextCheckNext.title = 'Check (Enter)';
+    }
+  }
+
+  function resetTextSession(){
+    textHistory = [];
+    textHistoryPos = -1;
+    textSeqIndex = -1;
+    updateTextQ();
+    setTextCheckMode('check');
+    clearTextInputState();
+  }
+
+  function textPromptForCurrentType(){
+    if(transformType === TRANSFORM_TYPE_INUN){
+      return wtText('Образуйте слово в скобках так, чтобы оно подходило по смыслу и грамматике.', 'Form the word in brackets so it fits the meaning and grammar.');
+    }
+    if(transformType === TRANSFORM_TYPE_N2V){
+      return wtText('Образуйте глагол от слова в скобках, чтобы завершить предложение.', 'Form a verb from the word in brackets to complete the sentence.');
+    }
+    return wtText('Образуйте однокоренное слово от основы в скобках.', 'Form a cognate word from the base in brackets.');
+  }
+
+  function updateTextPromptLabel(){
+    if(elTextPromptLabel) elTextPromptLabel.textContent = textPromptForCurrentType();
+  }
+
+  function updateTextActiveTasks(){
+    const cat = normCategory(elTextCategory && elTextCategory.value || 'All');
+    const scope = scopedTasks();
+    if(cat === 'All') textTasksActive = [...scope];
+    else textTasksActive = scope.filter((t) => normCategory(t.category) === cat);
+    textTasksActive.sort((a,b)=> (a.en_noun || '').localeCompare((b.en_noun || ''), 'en'));
+    updateTextPromptLabel();
+  }
+
+  function pickTextTemplate(baseWord, templates){
+    const list = Array.isArray(templates) ? templates : [];
+    if(!list.length) return { en: 'Write the correct form: ____', ru: 'Напиши правильную форму: ____' };
+    let sum = 0;
+    const src = String(baseWord || '');
+    for(let i = 0; i < src.length; i += 1) sum += src.charCodeAt(i);
+    return list[sum % list.length];
+  }
+
+  function buildTextExercise(task){
+    const t = task || {};
+    const base = String(t.en_noun || '').toUpperCase();
+    const ruBase = resolveRuNoun(t) || t.ru_noun || t.en_noun || '';
+
+    let templates = [
+      {
+        en: 'The situation became ____ after the latest update.',
+        ru: 'Ситуация стала ____ после последнего обновления.'
+      },
+      {
+        en: 'Her explanation was ____ enough for everyone to understand.',
+        ru: 'Ее объяснение было достаточно ____ для всех.'
+      },
+      {
+        en: 'The final decision looked ____ to the whole team.',
+        ru: 'Итоговое решение выглядело ____ для всей команды.'
+      }
+    ];
+
+    if(transformType === TRANSFORM_TYPE_INUN){
+      templates = [
+        {
+          en: 'Without enough data, his conclusion sounded ____.',
+          ru: 'Без достаточных данных его вывод звучал ____.'
+        },
+        {
+          en: 'After the review, the plan seemed ____ for this stage.',
+          ru: 'После проверки план казался ____ для этого этапа.'
+        },
+        {
+          en: 'In that context, the result looked completely ____.',
+          ru: 'В этом контексте результат выглядел полностью ____.'
+        }
+      ];
+    }else if(transformType === TRANSFORM_TYPE_N2V){
+      templates = [
+        {
+          en: 'Before the launch, we need to ____ the process.',
+          ru: 'Перед запуском нам нужно ____ процесс.'
+        },
+        {
+          en: 'The team will ____ the idea during the workshop.',
+          ru: 'Команда будет ____ идею во время воркшопа.'
+        },
+        {
+          en: 'Please ____ this concept so the clients can follow it.',
+          ru: 'Пожалуйста, ____ эту концепцию, чтобы клиенты могли ее понять.'
+        }
+      ];
+    }
+
+    const tpl = pickTextTemplate(t.en_noun, templates);
+    return {
+      en: `${tpl.en} (${base})`,
+      ru: `${tpl.ru} (${ruBase})`
+    };
+  }
+
+  function showTextTask(task){
+    textCurrent = task || null;
+    textRevealRu = false;
+    if(elTextSentenceRu) elTextSentenceRu.hidden = true;
+    setTextCheckMode('check');
+    clearTextInputState();
+
+    if(!textCurrent){
+      if(elTextSentenceEn) elTextSentenceEn.textContent = wtText('нет заданий', 'no tasks');
+      if(elTextSentenceRu) elTextSentenceRu.textContent = '';
+      if(elTextAnswer) elTextAnswer.value = '';
+      setTextFeedback('idle', wtText('пусто', 'empty'), wtText('добавь задания или load db', 'add tasks or load db'));
+      return;
+    }
+
+    const ex = buildTextExercise(textCurrent);
+    if(elTextSentenceEn) elTextSentenceEn.textContent = ex.en;
+    if(elTextSentenceRu) elTextSentenceRu.textContent = `${wtText('перевод', 'translation')}: ${ex.ru}`;
+    if(elTextAnswer){
+      elTextAnswer.value = '';
+      elTextAnswer.focus({ preventScroll:true });
+    }
+
+    setTextFeedback('idle', wtText('готово', 'ready'), wtText('введи ответ и нажми check', 'enter the answer and press check'));
+  }
+
+  function pickNewTextTask(){
+    if(!textTasksActive.length) return null;
+    const random = !!(elTextRandom && elTextRandom.checked);
+    if(random) return textTasksActive[Math.floor(Math.random() * textTasksActive.length)];
+    textSeqIndex = (textSeqIndex + 1) % textTasksActive.length;
+    return textTasksActive[textSeqIndex];
+  }
+
+  function goTextNext(){
+    if(!textTasksActive.length){ showTextTask(null); return; }
+
+    if(textHistoryPos < textHistory.length - 1){
+      textHistoryPos += 1;
+      updateTextQ();
+      showTextTask(textHistory[textHistoryPos]);
+      return;
+    }
+
+    const next = pickNewTextTask();
+    textHistory.push(next);
+    textHistoryPos = textHistory.length - 1;
+    updateTextQ();
+    showTextTask(next);
+  }
+
+  function goTextPrev(){
+    if(textHistoryPos <= 0) return;
+    textHistoryPos -= 1;
+    updateTextQ();
+    showTextTask(textHistory[textHistoryPos]);
+  }
+
+  function toggleTextTranslate(){
+    if(!textCurrent || !elTextSentenceRu) return;
+    textRevealRu = !textRevealRu;
+    elTextSentenceRu.hidden = !textRevealRu;
+  }
+
+  function checkTextOrNext(){
+    if(!textCurrent) return;
+
+    if(textCheckMode === 'next'){
+      goTextNext();
+      return;
+    }
+
+    const user = normalize(elTextAnswer && elTextAnswer.value || '');
+    const correct = normalize(textCurrent.en_adj);
+
+    if(!user){
+      setTextFeedback('idle', wtText('ввод', 'type'), wtText('введи ответ', 'enter the answer'));
+      if(elTextAnswer) pulse(elTextAnswer, 'ik-shake');
+      return;
+    }
+
+    textSessionTotal += 1;
+
+    if(user === correct){
+      textSessionCorrect += 1;
+      updateTextScore();
+      setTextFeedback('correct', 'ok', formatSolvedPair(textCurrent));
+      clearTextInputState();
+      if(elTextAnswer) elTextAnswer.classList.add('is-ok');
+      setTextCheckMode('next');
+      return;
+    }
+
+    updateTextScore();
+    setTextFeedback('wrong', wtText('нет', 'no'), wtText('неверно', 'incorrect'));
+    clearTextInputState();
+    if(elTextAnswer){
+      elTextAnswer.classList.add('is-bad');
+      elTextAnswer.focus({ preventScroll:true });
+      elTextAnswer.select();
+    }
+    setTextCheckMode('check');
+  }
+
+  function showTextAnswer(){
+    if(!textCurrent) return;
+    setTextFeedback('idle', wtText('ответ', 'answer'), formatSolvedPair(textCurrent));
+  }
 
   function clearInputState(){ elAnswer.classList.remove('is-ok','is-bad'); }
 
@@ -1229,6 +1519,7 @@ async function fetchJson(relPath){
     else if(transformType === TRANSFORM_TYPE_N2V) renderRule(CATEGORY_N2V);
     else renderRule(cat);
     applyInUnPrefixMode();
+    updateTextActiveTasks();
   }
 
   function refreshLocalizedUi(){
@@ -1237,6 +1528,7 @@ async function fetchJson(relPath){
     updateCountBadge();
     renderTaskList();
     updatePromptLabel();
+    updateTextPromptLabel();
 
     const cat = normCategory(elPracticeCategory && elPracticeCategory.value || 'All');
     if(transformType === TRANSFORM_TYPE_INUN) renderRule('InUnPrefixes');
@@ -1245,10 +1537,17 @@ async function fetchJson(relPath){
 
     applyInUnPrefixMode();
     setCheckMode(checkMode);
+    setTextCheckMode(textCheckMode);
 
     if(current && elPromptRu){
       const ruWord = resolveRuNoun(current);
       elPromptRu.textContent = `${wtText('перевод', 'translation')}: ${ruWord || current.ru_noun || current.en_noun}`;
+    }
+
+    if(textCurrent && elTextSentenceRu){
+      const ex = buildTextExercise(textCurrent);
+      elTextSentenceEn.textContent = ex.en;
+      elTextSentenceRu.textContent = `${wtText('перевод', 'translation')}: ${ex.ru}`;
     }
   }
 
@@ -1495,6 +1794,8 @@ async function fetchJson(relPath){
             updateActiveTasks();
             resetPracticeSession();
             goNext();
+            resetTextSession();
+            goTextNext();
           }catch(e){
             alert(`Ошибка удаления: ${e.message || e}`);
           }
@@ -1631,6 +1932,10 @@ async function fetchJson(relPath){
       updateQ();
       goNext();
 
+      updateTextScore();
+      updateTextQ();
+      goTextNext();
+
       if(window.IKLoading) window.IKLoading.done();
 
       if(wtRuntime.supa && wtRuntime.supa.auth && typeof wtRuntime.supa.auth.onAuthStateChange === 'function'){
@@ -1672,6 +1977,12 @@ async function fetchJson(relPath){
   btnPrefixIn && btnPrefixIn.addEventListener('click', ()=> choosePrefix('in'));
   btnPrefixUn && btnPrefixUn.addEventListener('click', ()=> choosePrefix('un'));
 
+  btnTextPrev && btnTextPrev.addEventListener('click', goTextPrev);
+  btnTextNext && btnTextNext.addEventListener('click', goTextNext);
+  btnTextReveal && btnTextReveal.addEventListener('click', toggleTextTranslate);
+  btnTextCheckNext && btnTextCheckNext.addEventListener('click', checkTextOrNext);
+  btnTextShowAnswer && btnTextShowAnswer.addEventListener('click', showTextAnswer);
+
   elAnswer.addEventListener('keydown', (e)=>{
     if(e.key === 'Enter'){
       e.preventDefault();
@@ -1679,10 +1990,25 @@ async function fetchJson(relPath){
     }
   });
 
+  elTextAnswer && elTextAnswer.addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter'){
+      e.preventDefault();
+      checkTextOrNext();
+    }
+  });
+
   document.addEventListener('keydown', (e)=>{
     const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
     const inText = tag === 'input' || tag === 'textarea';
-if(e.key.toLowerCase() === 't'){ if(inText) return; toggleTranslate(); return; }
+if(e.key.toLowerCase() === 't'){
+      if(inText) return;
+      const wtSubtab = (window.StudentHelperTabs && typeof window.StudentHelperTabs.getWTSubTab === 'function')
+        ? window.StudentHelperTabs.getWTSubTab()
+        : (elPanelText && !elPanelText.hidden ? 'text' : 'practice');
+      if(wtSubtab === 'text') toggleTextTranslate();
+      else toggleTranslate();
+      return;
+    }
     if(e.key.toLowerCase() === 'r'){ if(inText) return; toggleRule(); return; }
   });
 
@@ -1692,12 +2018,20 @@ if(e.key.toLowerCase() === 't'){ if(inText) return; toggleTranslate(); return; }
     goNext();
   });
 
+  elTextCategory && elTextCategory.addEventListener('change', ()=>{
+    updateTextActiveTasks();
+    resetTextSession();
+    goTextNext();
+  });
+
   elTransformType && elTransformType.addEventListener('change', ()=>{
     transformType = normTransformType(elTransformType.value);
     refreshLocalizedUi();
     updateActiveTasks();
     resetPracticeSession();
     goNext();
+    resetTextSession();
+    goTextNext();
   });
 
   elViewCategory.addEventListener('change', renderTaskList);
@@ -1738,6 +2072,8 @@ if(e.key.toLowerCase() === 't'){ if(inText) return; toggleTranslate(); return; }
       updateActiveTasks();
       resetPracticeSession();
       goNext();
+      resetTextSession();
+      goTextNext();
 
       setFeedback('idle', 'saved', cat);
     }catch(e){
@@ -1776,6 +2112,8 @@ if(e.key.toLowerCase() === 't'){ if(inText) return; toggleTranslate(); return; }
       updateActiveTasks();
       resetPracticeSession();
       goNext();
+      resetTextSession();
+      goTextNext();
 
       setAdminText(elSeedBadge, 'json: loaded');
       elSeedBadge.title = loadedFiles.join(', ');
@@ -1823,6 +2161,8 @@ if(e.key.toLowerCase() === 't'){ if(inText) return; toggleTranslate(); return; }
       updateActiveTasks();
       resetPracticeSession();
       goNext();
+      resetTextSession();
+      goTextNext();
       setFeedback('idle', 'import', 'ok');
     }catch(e){
       alert(`Ошибка импорта: ${e.message || e}`);

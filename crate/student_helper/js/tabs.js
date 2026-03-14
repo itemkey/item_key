@@ -69,28 +69,40 @@
 // WT subtabs (practice/builder)
 (function(){
   const a = document.getElementById('subtab-practice');
+  const t = document.getElementById('subtab-text');
   const b = document.getElementById('subtab-builder');
   const pa = document.getElementById('panel-practice');
+  const pt = document.getElementById('panel-text');
   const pb = document.getElementById('panel-builder');
 
-  if (!a || !b || !pa || !pb) return;
+  if (!a || !t || !b || !pa || !pt || !pb) return;
 
   function set(which){
-    const isA = which === 'practice';
-    a.setAttribute('aria-selected', String(isA));
-    b.setAttribute('aria-selected', String(!isA));
-    pa.hidden = !isA;
-    pb.hidden = isA;
+    const w = (which === 'builder') ? 'builder' : (which === 'text' ? 'text' : 'practice');
+    const isPractice = w === 'practice';
+    const isText = w === 'text';
+    const isBuilder = w === 'builder';
+
+    a.setAttribute('aria-selected', String(isPractice));
+    t.setAttribute('aria-selected', String(isText));
+    b.setAttribute('aria-selected', String(isBuilder));
+
+    pa.hidden = !isPractice;
+    pt.hidden = !isText;
+    pb.hidden = !isBuilder;
 
     try{
-      const route = isA ? 'wt-practice' : 'wt-builder';
-      document.dispatchEvent(new CustomEvent('sh:route', { detail: { route, main: 'wt', wtSubtab: isA ? 'practice' : 'builder' } }));
+      const route = isBuilder ? 'wt-builder' : (isText ? 'wt-text' : 'wt-practice');
+      document.dispatchEvent(new CustomEvent('sh:route', { detail: { route, main: 'wt', wtSubtab: w } }));
     }catch(_){ }
   }
 
   window.StudentHelperTabs = window.StudentHelperTabs || {};
   window.StudentHelperTabs.setWTSubTab = set;
-  window.StudentHelperTabs.getWTSubTab = ()=> (pa.hidden ? 'builder' : 'practice');
+  window.StudentHelperTabs.getWTSubTab = ()=> {
+    if(!pt.hidden) return 'text';
+    return pa.hidden ? 'builder' : 'practice';
+  };
 
   function goRouteOrFallback(route, fallback){
     if(window.StudentHelperRoute && typeof window.StudentHelperRoute.go === 'function'){
@@ -101,8 +113,11 @@
   }
 
   a.addEventListener('click', ()=> goRouteOrFallback('wt-practice', ()=> set('practice')));
+  t.addEventListener('click', ()=> goRouteOrFallback('wt-text', ()=> set('text')));
   b.addEventListener('click', ()=> goRouteOrFallback('wt-builder', ()=> set('builder')));
 
-  const initIsPractice = a.getAttribute('aria-selected') === 'true';
-  set(initIsPractice ? 'practice' : 'builder');
+  const initSubtab = (b.getAttribute('aria-selected') === 'true')
+    ? 'builder'
+    : (t.getAttribute('aria-selected') === 'true' ? 'text' : 'practice');
+  set(initSubtab);
 })();

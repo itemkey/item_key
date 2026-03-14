@@ -21,7 +21,7 @@
   <!-- Match main site look -->
   <link rel="stylesheet" href="../../assets/css/styles.css" />
 
-  <link rel="stylesheet" href="./student_helper.css?v=20260314-07" />
+  <link rel="stylesheet" href="./student_helper.css?v=20260314-08" />
 
 <style id="ik-site-nav-css">
 .ik-site-nav, .ik-site-nav *{ box-sizing: border-box; }
@@ -1033,6 +1033,7 @@
 
             <div class="ik-tabs" role="tablist" aria-label="Режимы word transformation">
               <button class="ik-tab" id="subtab-practice" role="tab" aria-selected="true" aria-controls="panel-practice" type="button">practice</button>
+              <button class="ik-tab" id="subtab-text" role="tab" aria-selected="false" aria-controls="panel-text" type="button">в тексте</button>
               <button class="ik-tab" id="subtab-builder" role="tab" aria-selected="false" aria-controls="panel-builder" type="button">constructor</button>
             </div>
 
@@ -1097,6 +1098,57 @@
                 <div class="ik-feedback" id="feedbackBox" data-state="idle" aria-live="polite">
                   <div class="ik-feedback__stamp" id="feedbackStamp">ready</div>
                   <p class="ik-feedback__line" id="feedbackLine">введи ответ и нажми check</p>
+                </div>
+              </section>
+            </div>
+
+            <!-- IN TEXT -->
+            <div id="panel-text" role="tabpanel" aria-labelledby="subtab-text" hidden>
+              <section class="ik-ex" aria-label="В тексте">
+                <p class="ik-title">в тексте</p>
+
+                <div class="ik-row">
+                  <button class="ik-btn" id="btnTextPrev" type="button" title="Предыдущий вопрос">назад</button>
+                  <button class="ik-btn ik-btn--black" id="btnTextNext" type="button" title="Следующий вопрос">далее</button>
+
+                  <label class="ik-label">
+                    <input type="checkbox" id="textRandomOrder" checked />
+                    случайно
+                  </label>
+
+                  <span class="ik-spacer" aria-hidden="true"></span>
+
+                  <label class="ik-label" for="textCategory">категория</label>
+                  <select class="ik-select" id="textCategory" style="min-width: 180px;">
+                    <option value="All">All</option>
+                    <option value="Suffixes">Suffixes</option>
+                    <option value="Prefixes">Prefixes</option>
+                  </select>
+
+                  <span class="ik-badge" id="textQBadge">q: 0</span>
+                  <span class="ik-badge" id="textSessionScore">0/0</span>
+                </div>
+
+                <div class="ik-divider"></div>
+
+                <p class="ik-prompt" id="textPromptLabel">вставь подходящую форму слова в текст</p>
+                <p class="ik-sentence" id="textSentenceEn">...</p>
+
+                <div class="ik-row" style="margin-top:8px;">
+                  <button class="ik-btn" id="btnTextReveal" type="button" title="Перевод предложения">перевод</button>
+                </div>
+
+                <p class="ik-ru" id="textSentenceRu" hidden>...</p>
+
+                <div class="ik-row" style="margin-top:12px;">
+                  <input class="ik-input" id="textAnswerInput" type="text" autocomplete="off" spellcheck="false" placeholder="Ответ (EN)" />
+                  <button class="ik-btn ik-btn--black" id="btnTextCheckNext" type="button" title="Check (Enter)">check</button>
+                  <button class="ik-btn" id="btnTextShowAnswer" type="button" title="Показать правильный ответ">ответ</button>
+                </div>
+
+                <div class="ik-feedback" id="textFeedbackBox" data-state="idle" aria-live="polite" style="margin-top:12px;">
+                  <div class="ik-feedback__stamp" id="textFeedbackStamp">ready</div>
+                  <p class="ik-feedback__line" id="textFeedbackLine">введи ответ и нажми check</p>
                 </div>
               </section>
             </div>
@@ -1210,7 +1262,7 @@
   <script src="./js/structure_data.js"></script>
   <script src="./js/structure.js"></script>
   <script src="./js/tenses.js?v=20260314-06"></script>
-  <script src="./js/word_transformation.js?v=20260314-06"></script>
+  <script src="./js/word_transformation.js?v=20260314-07"></script>
   <script src="./js/dictionary.js" onerror="window.IKAdminLog && window.IKAdminLog('error','student_helper','dictionary.js failed to load')"></script>
   <script>
     (function(){
@@ -1400,6 +1452,8 @@
     ['нажми start или выбери section', 'press start or choose a section'],
     ['выбери цель и режим (смешанные или пользовательские упражнения)', 'choose a goal and a mode (mixed or custom practice)'],
     ['восстановить из json', 'restore from JSON'],
+    ['в тексте', 'in text'],
+    ['вставь подходящую форму слова в текст', 'insert the correct word form into the text'],
     ['Не выбрано', 'Not selected'],
     ['случайно', 'random'],
     ['лицевая сторона', 'front'],
@@ -1592,7 +1646,7 @@
     '[contenteditable="true"]',
     '.ik-word',
     '#dictCardFront', '#dictCardBack', '#dictQuizFront', '#dictQuizBack', '#dictLearnFront', '#dictLearnBack',
-    '#promptEn', '#promptRu',
+    '#promptEn', '#promptRu', '#textSentenceEn', '#textSentenceRu',
     '#dictSectionCards', '#dictSectionQuiz', '#dictSectionLearn', '#dictBuilderSection',
     '#dictSectionList', '#dictWordList', '#dictFirstPickList', '#structList', '#tensesList',
     '#tensesCompareA', '#tensesCompareB', '#tensesTenseSelect', '#viewCategory', '#taskList'

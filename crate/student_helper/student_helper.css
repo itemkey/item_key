@@ -186,10 +186,20 @@ body {
       overflow-wrap:anywhere;
       word-break:break-word;
     }
-.ik-ru{
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  font-size:12px; opacity:.78; margin:6px 0 0;
-}
+
+    .ik-sentence{
+      margin:0;
+      font-family: ui-serif, "Times New Roman", Georgia, serif;
+      font-size:clamp(20px, 2.8vw, 30px);
+      line-height:1.35;
+      max-width:100%;
+      overflow-wrap:anywhere;
+      word-break:break-word;
+    }
+    .ik-ru{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size:12px; opacity:.78; margin:6px 0 0;
+    }
 
 /* WT: prefix picker is visible only in in/un transform type */
 #panel-wt #inUnPrefixPicker{

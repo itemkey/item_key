@@ -10,7 +10,7 @@
 
   const KEY_LAST = 'sh_last_module';
   const KEY_SEEN = 'sh_seen_lobby';
-  const VALID_ROUTES = new Set(['menu', 'dict', 'grammar', 'struct', 'tenses', 'wt', 'wt-practice', 'wt-builder']);
+  const VALID_ROUTES = new Set(['menu', 'dict', 'grammar', 'struct', 'tenses', 'wt', 'wt-practice', 'wt-text', 'wt-builder']);
 
   let ignoreNextHashChange = false;
 
@@ -25,6 +25,7 @@
     if(!raw) return '';
     if(VALID_ROUTES.has(raw)) return raw;
     if(raw === 'practice') return 'wt-practice';
+    if(raw === 'text') return 'wt-text';
     if(raw === 'builder') return 'wt-builder';
     return '';
   }
@@ -36,6 +37,7 @@
     if(normalized === 'menu') return { main: 'menu', wtSubtab: '' };
     if(normalized === 'struct' || normalized === 'tenses') return { main: 'grammar', wtSubtab: '' };
     if(normalized === 'wt-practice') return { main: 'wt', wtSubtab: 'practice' };
+    if(normalized === 'wt-text') return { main: 'wt', wtSubtab: 'text' };
     if(normalized === 'wt-builder') return { main: 'wt', wtSubtab: 'builder' };
     return { main: normalized, wtSubtab: '' };
   }
@@ -45,7 +47,9 @@
     if(!parsed) return '';
     if(parsed.main === 'menu') return 'menu';
     if(parsed.main !== 'wt') return parsed.main;
-    return parsed.wtSubtab === 'builder' ? 'wt-builder' : 'wt-practice';
+    if(parsed.wtSubtab === 'builder') return 'wt-builder';
+    if(parsed.wtSubtab === 'text') return 'wt-text';
+    return 'wt-practice';
   }
 
   function setHashRoute(route, replace){
@@ -105,7 +109,7 @@
     if(module === 'wt' && !wtSubtab && window.StudentHelperTabs && typeof window.StudentHelperTabs.getWTSubTab === 'function'){
       wtSubtab = window.StudentHelperTabs.getWTSubTab() || 'practice';
     }
-    if(module === 'wt' && wtSubtab !== 'builder') wtSubtab = 'practice';
+    if(module === 'wt' && wtSubtab !== 'builder' && wtSubtab !== 'text') wtSubtab = 'practice';
 
     localStorage.setItem(KEY_LAST, module);
 
@@ -123,14 +127,14 @@
 
     if(options.syncHash !== false){
       const routeValue = module === 'wt'
-        ? (wtSubtab === 'builder' ? 'wt-builder' : 'wt-practice')
+        ? (wtSubtab === 'builder' ? 'wt-builder' : (wtSubtab === 'text' ? 'wt-text' : 'wt-practice'))
         : (module === 'grammar' ? 'grammar' : module);
       setHashRoute(routeValue, !!options.replaceHash);
     }
 
     try{
       const route = module === 'wt'
-        ? (wtSubtab === 'builder' ? 'wt-builder' : 'wt-practice')
+        ? (wtSubtab === 'builder' ? 'wt-builder' : (wtSubtab === 'text' ? 'wt-text' : 'wt-practice'))
         : (module === 'grammar' ? 'grammar' : module);
       document.dispatchEvent(new CustomEvent('sh:route', { detail: { route, main: module, wtSubtab: wtSubtab || '' } }));
     }catch(_){ }
@@ -162,7 +166,10 @@
     if(main !== 'wt') return main;
 
     if(window.StudentHelperTabs && typeof window.StudentHelperTabs.getWTSubTab === 'function'){
-      return window.StudentHelperTabs.getWTSubTab() === 'builder' ? 'wt-builder' : 'wt-practice';
+      const wtSubtab = window.StudentHelperTabs.getWTSubTab();
+      if(wtSubtab === 'builder') return 'wt-builder';
+      if(wtSubtab === 'text') return 'wt-text';
+      return 'wt-practice';
     }
     return 'wt-practice';
   };
