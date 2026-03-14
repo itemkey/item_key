@@ -21,11 +21,86 @@
   const TRANSFORM_TYPE_INUN = 'in_un_prefix';
   const TRANSFORM_TYPE_N2V = 'noun_to_verb';
   const CATEGORY_N2V = 'NounToVerb';
+  const WT_MODE_MIXED = 'mixed';
+  const WT_MODE_CUSTOM = 'custom';
+  const WT_MODE_KEY = 'sh_wt_mode_v1';
+  const WT_CUSTOM_TYPES_KEY = 'sh_wt_custom_types_v1';
+
+  const WT_TYPES = [
+    {
+      id: TRANSFORM_TYPE_N2A,
+      titleRu: 'существительное -> прилагательное',
+      titleEn: 'Noun -> Adjective',
+      categories: ['Suffixes', 'Prefixes']
+    },
+    {
+      id: TRANSFORM_TYPE_INUN,
+      titleRu: 'приставки in- или un-',
+      titleEn: 'in- or un- prefixes',
+      categories: ['InUnPrefixes']
+    },
+    {
+      id: TRANSFORM_TYPE_N2V,
+      titleRu: 'существительное -> глагол',
+      titleEn: 'Noun -> Verb',
+      categories: [CATEGORY_N2V]
+    }
+  ];
 
   function normTransformType(type){
     const v = String(type || '').trim().toLowerCase();
     if(v === TRANSFORM_TYPE_INUN) return TRANSFORM_TYPE_INUN;
     if(v === TRANSFORM_TYPE_N2V) return TRANSFORM_TYPE_N2V;
+    return TRANSFORM_TYPE_N2A;
+  }
+
+  function normWtMode(mode){
+    return String(mode || '').trim().toLowerCase() === WT_MODE_CUSTOM
+      ? WT_MODE_CUSTOM
+      : WT_MODE_MIXED;
+  }
+
+  function loadWtMode(){
+    try{ return normWtMode(localStorage.getItem(WT_MODE_KEY)); }catch(_){ return WT_MODE_MIXED; }
+  }
+
+  function saveWtMode(mode){
+    try{ localStorage.setItem(WT_MODE_KEY, normWtMode(mode)); }catch(_){ }
+  }
+
+  function normalizeWtTypeIds(list){
+    const valid = new Set(WT_TYPES.map((x) => x.id));
+    if(!Array.isArray(list)) return [];
+    const out = [];
+    for(const raw of list){
+      const id = normTransformType(raw);
+      if(!valid.has(id)) continue;
+      if(out.includes(id)) continue;
+      out.push(id);
+    }
+    return out;
+  }
+
+  function loadWtCustomTypes(){
+    try{
+      const raw = localStorage.getItem(WT_CUSTOM_TYPES_KEY);
+      if(!raw) return [TRANSFORM_TYPE_N2A];
+      const parsed = JSON.parse(raw);
+      const ids = normalizeWtTypeIds(parsed);
+      return ids.length ? ids : [TRANSFORM_TYPE_N2A];
+    }catch(_){
+      return [TRANSFORM_TYPE_N2A];
+    }
+  }
+
+  function saveWtCustomTypes(ids){
+    try{ localStorage.setItem(WT_CUSTOM_TYPES_KEY, JSON.stringify(normalizeWtTypeIds(ids))); }catch(_){ }
+  }
+
+  function taskTypeId(task){
+    const c = normCategory(task && task.category || 'Suffixes');
+    if(c === 'InUnPrefixes') return TRANSFORM_TYPE_INUN;
+    if(c === CATEGORY_N2V) return TRANSFORM_TYPE_N2V;
     return TRANSFORM_TYPE_N2A;
   }
 
@@ -559,6 +634,7 @@ function buildAffixHintHTML(baseWord, kind){
   const ruleBody = document.getElementById('ruleBody');
 
   function renderRule(category){
+    if(!ruleBody || !ruleTitle) return;
     const c = normCategory(category);
     ruleBody.innerHTML = '';
 
@@ -671,9 +747,55 @@ function buildAffixHintHTML(baseWord, kind){
     addChips(def.chips);
   }
 
-  function toggleRule(){
-    const open = rulePanel.classList.toggle('is-open');
-    rulePanel.setAttribute('aria-hidden', String(!open));
+  function ruleCategoryForTypeId(typeId){
+    if(typeId === TRANSFORM_TYPE_INUN) return 'InUnPrefixes';
+    if(typeId === TRANSFORM_TYPE_N2V) return CATEGORY_N2V;
+    return 'All';
+  }
+
+  function renderRuleForCurrentScope(){
+    if(!ruleBody || !ruleTitle) return;
+    const typeIds = currentRuleTypeIds();
+    const normalized = normalizeWtTypeIds(typeIds);
+    if(!normalized.length){
+      ruleTitle.textContent = wtText('правило', 'rule');
+      ruleBody.innerHTML = `<p class="ik-sub">${escapeHTML(wtText('выбери минимум один тип в пользовательском режиме', 'choose at least one type in custom mode'))}</p>`;
+      return;
+    }
+
+    if(normalized.length === 1){
+      renderRule(ruleCategoryForTypeId(normalized[0]));
+      return;
+    }
+
+    const parts = [];
+    for(const typeId of normalized){
+      renderRule(ruleCategoryForTypeId(typeId));
+      parts.push({
+        title: wtTypeLabel(typeId),
+        html: ruleBody.innerHTML
+      });
+    }
+
+    ruleTitle.textContent = wtText('правила', 'rules');
+    ruleBody.innerHTML = '';
+
+    parts.forEach((part) => {
+      const section = document.createElement('section');
+      section.className = 'wt-rule-section';
+
+      const head = document.createElement('p');
+      head.className = 'wt-rule-section__head';
+      head.textContent = part.title;
+      section.appendChild(head);
+
+      const content = document.createElement('div');
+      content.className = 'wt-rule-section__body';
+      content.innerHTML = part.html;
+      section.appendChild(content);
+
+      ruleBody.appendChild(section);
+    });
   }
 
   // -----------------------------
@@ -964,6 +1086,8 @@ async function fetchJson(relPath){
   let tasksActive = [];
   let current = null;
   let transformType = TRANSFORM_TYPE_N2A;
+  let wtMode = loadWtMode();
+  let wtCustomTypeIds = loadWtCustomTypes();
 
   let revealRu = false;
   let sessionTotal = 0;
@@ -990,10 +1114,22 @@ async function fetchJson(relPath){
   const elSeedBadge = document.getElementById('seedBadge');
   const elDbNameLine = document.getElementById('dbNameLine');
   const elWtPanel = document.getElementById('panel-wt');
+  const elTransformTypeLabel = document.getElementById('transformTypeLabel');
   const elTransformType = document.getElementById('transformType');
+  const btnWtModeMixed = document.getElementById('wtModeMixedBtn');
+  const btnWtModeCustom = document.getElementById('wtModeCustomBtn');
+  const elWtModeHint = document.getElementById('wtModeHint');
+  const elWtCustomTypePicker = document.getElementById('wtCustomTypePicker');
+  const elWtCustomTypeTitle = document.getElementById('wtCustomTypeTitle');
+  const elWtCustomTypeHint = document.getElementById('wtCustomTypeHint');
+  const elWtCustomTypeGrid = document.getElementById('wtCustomTypeGrid');
+  const btnWtCustomTypeSelectAll = document.getElementById('wtCustomTypeSelectAllBtn');
+  const btnWtCustomTypeClearAll = document.getElementById('wtCustomTypeClearAllBtn');
+  const elSubtabRule = document.getElementById('subtab-rule');
   const elSubtabPractice = document.getElementById('subtab-practice');
   const elSubtabText = document.getElementById('subtab-text');
   const elSubtabBuilder = document.getElementById('subtab-builder');
+  const elPanelRule = document.getElementById('panel-rule');
   const elPanelPractice = document.getElementById('panel-practice');
   const elPanelText = document.getElementById('panel-text');
   const elPanelBuilder = document.getElementById('panel-builder');
@@ -1025,7 +1161,6 @@ async function fetchJson(relPath){
 
   const btnPrev = document.getElementById('btnPrev');
   const btnNext = document.getElementById('btnNext');
-  const btnRule = document.getElementById('btnRule');
   const btnReveal = document.getElementById('btnReveal');
   const btnCheckNext = document.getElementById('btnCheckNext');
   const btnShowAnswer = document.getElementById('btnShowAnswer');
@@ -1073,16 +1208,28 @@ async function fetchJson(relPath){
       if(window.StudentHelperTabs && typeof window.StudentHelperTabs.setWTSubTab === 'function'){
         const currentSubtab = (typeof window.StudentHelperTabs.getWTSubTab === 'function')
           ? window.StudentHelperTabs.getWTSubTab()
-          : 'practice';
-        if(currentSubtab === 'builder') window.StudentHelperTabs.setWTSubTab('practice');
+          : 'rule';
+        if(currentSubtab === 'builder') window.StudentHelperTabs.setWTSubTab('rule');
       }else{
-        if(elPanelPractice) elPanelPractice.hidden = false;
+        if(elPanelRule) elPanelRule.hidden = false;
+        if(elPanelPractice) elPanelPractice.hidden = true;
         if(elPanelText) elPanelText.hidden = true;
-        if(elSubtabPractice) elSubtabPractice.setAttribute('aria-selected', 'true');
+        if(elSubtabRule) elSubtabRule.setAttribute('aria-selected', 'true');
+        if(elSubtabPractice) elSubtabPractice.setAttribute('aria-selected', 'false');
         if(elSubtabText) elSubtabText.setAttribute('aria-selected', 'false');
         if(elSubtabBuilder) elSubtabBuilder.setAttribute('aria-selected', 'false');
       }
     }
+    syncBuilderTypeControlVisibility();
+  }
+
+  function syncBuilderTypeControlVisibility(){
+    const isBuilder = !!(window.StudentHelperTabs
+      && typeof window.StudentHelperTabs.getWTSubTab === 'function'
+      && window.StudentHelperTabs.getWTSubTab() === 'builder');
+    const show = !!(wtRuntime.isAdmin && isBuilder);
+    if(elTransformTypeLabel) elTransformTypeLabel.hidden = !show;
+    if(elTransformType) elTransformType.hidden = !show;
   }
 
   function pulse(el, cls){
@@ -1098,11 +1245,135 @@ async function fetchJson(relPath){
     pulse(elFeedbackBox, 'ik-pop');
   }
 
+  function allWtTypeIds(){ return WT_TYPES.map((x) => x.id); }
+
+  function getEffectiveTypeIds(){
+    if(normWtMode(wtMode) === WT_MODE_MIXED) return allWtTypeIds();
+    return normalizeWtTypeIds(wtCustomTypeIds);
+  }
+
+  function ensurePrimaryTransformType(){
+    const ids = getEffectiveTypeIds();
+    const current = normTransformType(transformType);
+    const next = ids.includes(current) ? current : (ids[0] || TRANSFORM_TYPE_N2A);
+    transformType = next || TRANSFORM_TYPE_N2A;
+    if(elTransformType) elTransformType.value = transformType;
+    return transformType;
+  }
+
+  function wtTypeLabel(typeId){
+    const info = WT_TYPES.find((x) => x.id === typeId) || WT_TYPES[0];
+    return wtText(info.titleRu, info.titleEn);
+  }
+
+  function categoriesForTypeIds(typeIds){
+    const ids = Array.isArray(typeIds) ? typeIds : [];
+    const out = [];
+    for(const id of ids){
+      const info = WT_TYPES.find((x) => x.id === id);
+      if(!info) continue;
+      for(const c of info.categories){
+        const cat = normCategory(c);
+        if(!out.includes(cat)) out.push(cat);
+      }
+    }
+    return out;
+  }
+
+  function wtModeHint(mode){
+    const m = normWtMode(mode);
+    if(m === WT_MODE_CUSTOM){
+      return wtText('пользовательский: выбери нужные типы словообразования', 'custom: choose needed word transformation types');
+    }
+    return wtText('смешанный: все типы словообразования', 'mixed: all word transformation types');
+  }
+
+  function renderWtCustomTypePicker(){
+    if(!elWtCustomTypeGrid) return;
+    const selected = normalizeWtTypeIds(wtCustomTypeIds);
+    elWtCustomTypeGrid.innerHTML = '';
+
+    const group = document.createElement('div');
+    group.className = 'sh-custom-group';
+
+    const head = document.createElement('div');
+    head.className = 'sh-custom-group__head';
+    head.innerHTML = `
+      <p class="sh-custom-group__title">${escapeHTML(wtText('типы', 'types'))}</p>
+      <span class="ik-badge">${selected.length}/${WT_TYPES.length}</span>
+      <div class="sh-custom-group__actions"></div>
+    `;
+    group.appendChild(head);
+
+    const body = document.createElement('div');
+    body.className = 'sh-custom-group__body';
+    for(const info of WT_TYPES){
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = `ik-btn ${selected.includes(info.id) ? 'ik-btn--black' : ''}`;
+      btn.textContent = wtText(info.titleRu, info.titleEn);
+      btn.dataset.typeId = info.id;
+      btn.addEventListener('click', ()=>{
+        const now = normalizeWtTypeIds(wtCustomTypeIds);
+        const has = now.includes(info.id);
+        const next = has ? now.filter((x) => x !== info.id) : [...now, info.id];
+        wtCustomTypeIds = normalizeWtTypeIds(next);
+        saveWtCustomTypes(wtCustomTypeIds);
+        applyWtModeUi();
+        refreshAfterScopeChange();
+      });
+      body.appendChild(btn);
+    }
+    group.appendChild(body);
+    elWtCustomTypeGrid.appendChild(group);
+  }
+
+  function applyWtModeUi(){
+    const mode = normWtMode(wtMode);
+    if(btnWtModeMixed) btnWtModeMixed.textContent = wtText('смешанный', 'mixed');
+    if(btnWtModeCustom) btnWtModeCustom.textContent = wtText('пользовательский', 'custom');
+    if(btnWtModeMixed){
+      btnWtModeMixed.classList.toggle('ik-btn--black', mode === WT_MODE_MIXED);
+      btnWtModeMixed.classList.toggle('is-active', mode === WT_MODE_MIXED);
+    }
+    if(btnWtModeCustom){
+      btnWtModeCustom.classList.toggle('ik-btn--black', mode === WT_MODE_CUSTOM);
+      btnWtModeCustom.classList.toggle('is-active', mode === WT_MODE_CUSTOM);
+    }
+    if(elWtModeHint) elWtModeHint.textContent = wtModeHint(mode);
+    if(elWtCustomTypeTitle) elWtCustomTypeTitle.textContent = wtText('пользовательский: выбери типы словообразования', 'custom: choose word transformation types');
+    if(elWtCustomTypeHint) elWtCustomTypeHint.textContent = wtText('собери свой набор типов: можно выбрать один или несколько', 'build your own set: choose one or multiple types');
+    if(btnWtCustomTypeSelectAll) btnWtCustomTypeSelectAll.textContent = wtText('выбрать все', 'select all');
+    if(btnWtCustomTypeClearAll) btnWtCustomTypeClearAll.textContent = wtText('снять все', 'clear all');
+    if(elWtCustomTypePicker) elWtCustomTypePicker.hidden = (mode !== WT_MODE_CUSTOM);
+    renderWtCustomTypePicker();
+    ensurePrimaryTransformType();
+  }
+
+  function setWtMode(mode, options){
+    const opts = options || {};
+    wtMode = normWtMode(mode);
+    if(opts.persist !== false) saveWtMode(wtMode);
+    applyWtModeUi();
+  }
+
+  function currentRuleTypeIds(){
+    return getEffectiveTypeIds();
+  }
+
+  function refreshAfterScopeChange(){
+    refreshLocalizedUi();
+    updateActiveTasks();
+    resetPracticeSession();
+    goNext();
+    resetTextSession();
+    goTextNext();
+  }
+
   function taskMatchesTransformType(task){
-    const cat = normCategory(task && task.category || 'Suffixes');
-    if(transformType === TRANSFORM_TYPE_INUN) return cat === 'InUnPrefixes';
-    if(transformType === TRANSFORM_TYPE_N2V) return cat === CATEGORY_N2V;
-    return cat !== 'InUnPrefixes' && cat !== CATEGORY_N2V;
+    const activeTypeIds = getEffectiveTypeIds();
+    const typeId = taskTypeId(task);
+    return activeTypeIds.includes(typeId);
   }
 
   function scopedTasks(){
@@ -1135,68 +1406,41 @@ async function fetchJson(relPath){
   }
 
   function syncTypeSelectors(){
-    if(transformType === TRANSFORM_TYPE_INUN){
-      setSelectOptions(elPracticeCategory, [
-        { value: 'InUnPrefixes', label: wtText('приставки in- или un-', 'in- or un- prefixes') }
-      ], elPracticeCategory && elPracticeCategory.value);
+    const activeTypeIds = getEffectiveTypeIds();
+    const activeCats = categoriesForTypeIds(activeTypeIds);
 
-      setSelectOptions(elTextCategory, [
-        { value: 'InUnPrefixes', label: wtText('приставки in- или un-', 'in- or un- prefixes') }
-      ], elTextCategory && elTextCategory.value);
+    const categoryLabel = (cat) => {
+      if(cat === 'Suffixes') return wtText('суффиксы', 'Suffixes');
+      if(cat === 'Prefixes') return wtText('приставки', 'Prefixes');
+      if(cat === 'InUnPrefixes') return wtText('приставки in- или un-', 'in- or un- prefixes');
+      if(cat === CATEGORY_N2V) return wtText('существительное -> глагол', 'Noun -> Verb');
+      return String(cat || '');
+    };
 
-      setSelectOptions(elViewCategory, [
-        { value: 'All', label: wtText('все категории', 'All categories') },
-        { value: 'InUnPrefixes', label: wtText('приставки in- или un-', 'in- or un- prefixes') }
-      ], elViewCategory && elViewCategory.value);
-
-      setSelectOptions(elAddCategory, [
-        { value: 'InUnPrefixes', label: wtText('приставки in- или un-', 'in- or un- prefixes') }
-      ], elAddCategory && elAddCategory.value);
-      return;
+    const opts = [{ value: 'All', label: wtText('все категории', 'All categories') }];
+    for(const cat of activeCats){
+      opts.push({ value: cat, label: categoryLabel(cat) });
     }
 
-    if(transformType === TRANSFORM_TYPE_N2V){
-      setSelectOptions(elPracticeCategory, [
-        { value: CATEGORY_N2V, label: wtText('существительное -> глагол', 'Noun -> Verb') }
-      ], elPracticeCategory && elPracticeCategory.value);
+    setSelectOptions(elPracticeCategory, opts, elPracticeCategory && elPracticeCategory.value);
+    setSelectOptions(elTextCategory, opts, elTextCategory && elTextCategory.value);
 
-      setSelectOptions(elTextCategory, [
-        { value: CATEGORY_N2V, label: wtText('существительное -> глагол', 'Noun -> Verb') }
-      ], elTextCategory && elTextCategory.value);
-
-      setSelectOptions(elViewCategory, [
-        { value: 'All', label: wtText('все категории', 'All categories') },
-        { value: CATEGORY_N2V, label: wtText('существительное -> глагол', 'Noun -> Verb') }
-      ], elViewCategory && elViewCategory.value);
-
-      setSelectOptions(elAddCategory, [
-        { value: CATEGORY_N2V, label: wtText('существительное -> глагол', 'Noun -> Verb') }
-      ], elAddCategory && elAddCategory.value);
-      return;
+    const builderType = normTransformType(transformType);
+    const builderCats = categoriesForTypeIds([builderType]);
+    const builderViewOpts = [{ value: 'All', label: wtText('все категории', 'All categories') }];
+    for(const cat of builderCats){
+      builderViewOpts.push({ value: cat, label: categoryLabel(cat) });
     }
+    setSelectOptions(elViewCategory, builderViewOpts, elViewCategory && elViewCategory.value);
 
-    setSelectOptions(elPracticeCategory, [
-      { value: 'All', label: wtText('все категории', 'All categories') },
-      { value: 'Suffixes', label: wtText('суффиксы', 'Suffixes') },
-      { value: 'Prefixes', label: wtText('приставки', 'Prefixes') }
-    ], elPracticeCategory && elPracticeCategory.value);
-
-    setSelectOptions(elTextCategory, [
-      { value: 'All', label: wtText('все категории', 'All categories') },
-      { value: 'Suffixes', label: wtText('суффиксы', 'Suffixes') },
-      { value: 'Prefixes', label: wtText('приставки', 'Prefixes') }
-    ], elTextCategory && elTextCategory.value);
-
-    setSelectOptions(elViewCategory, [
-      { value: 'All', label: wtText('все категории', 'All categories') },
-      { value: 'Suffixes', label: wtText('суффиксы', 'Suffixes') },
-      { value: 'Prefixes', label: wtText('приставки', 'Prefixes') }
-    ], elViewCategory && elViewCategory.value);
-
-    setSelectOptions(elAddCategory, [
-      { value: 'Suffixes', label: wtText('суффиксы', 'Suffixes') },
-      { value: 'Prefixes', label: wtText('приставки', 'Prefixes') }
-    ], elAddCategory && elAddCategory.value);
+    const builderAddOpts = [];
+    for(const cat of builderCats){
+      builderAddOpts.push({ value: cat, label: categoryLabel(cat) });
+    }
+    if(!builderAddOpts.length){
+      builderAddOpts.push({ value: 'Suffixes', label: wtText('суффиксы', 'Suffixes') });
+    }
+    setSelectOptions(elAddCategory, builderAddOpts, elAddCategory && elAddCategory.value);
   }
 
   function updateScore(){ elScore.textContent = `${sessionCorrect}/${sessionTotal}`; }
@@ -1240,10 +1484,14 @@ async function fetchJson(relPath){
   }
 
   function textPromptForCurrentType(){
-    if(transformType === TRANSFORM_TYPE_INUN){
+    const ids = getEffectiveTypeIds();
+    if(ids.length !== 1){
       return wtText('Образуйте слово в скобках так, чтобы оно подходило по смыслу и грамматике.', 'Form the word in brackets so it fits the meaning and grammar.');
     }
-    if(transformType === TRANSFORM_TYPE_N2V){
+    if(ids[0] === TRANSFORM_TYPE_INUN){
+      return wtText('Образуйте слово в скобках так, чтобы оно подходило по смыслу и грамматике.', 'Form the word in brackets so it fits the meaning and grammar.');
+    }
+    if(ids[0] === TRANSFORM_TYPE_N2V){
       return wtText('Образуйте глагол от слова в скобках, чтобы завершить предложение.', 'Form a verb from the word in brackets to complete the sentence.');
     }
     return wtText('Образуйте однокоренное слово от основы в скобках.', 'Form a cognate word from the base in brackets.');
@@ -1273,6 +1521,7 @@ async function fetchJson(relPath){
 
   function buildTextExercise(task){
     const t = task || {};
+    const typeId = taskTypeId(t);
     const base = String(t.en_noun || '').toUpperCase();
     const ruBase = resolveRuNoun(t) || t.ru_noun || t.en_noun || '';
 
@@ -1291,7 +1540,7 @@ async function fetchJson(relPath){
       }
     ];
 
-    if(transformType === TRANSFORM_TYPE_INUN){
+    if(typeId === TRANSFORM_TYPE_INUN){
       templates = [
         {
           en: 'Without enough data, his conclusion sounded ____.',
@@ -1306,7 +1555,7 @@ async function fetchJson(relPath){
           ru: 'В этом контексте результат выглядел полностью ____.'
         }
       ];
-    }else if(transformType === TRANSFORM_TYPE_N2V){
+    }else if(typeId === TRANSFORM_TYPE_N2V){
       templates = [
         {
           en: 'Before the launch, we need to ____ the process.',
@@ -1341,7 +1590,14 @@ async function fetchJson(relPath){
       if(elTextSentenceEn) elTextSentenceEn.textContent = wtText('нет заданий', 'no tasks');
       if(elTextSentenceRu) elTextSentenceRu.textContent = '';
       if(elTextAnswer) elTextAnswer.value = '';
-      setTextFeedback('idle', wtText('пусто', 'empty'), wtText('добавь задания или load db', 'add tasks or load db'));
+      const noTypesPicked = (normWtMode(wtMode) === WT_MODE_CUSTOM && getEffectiveTypeIds().length === 0);
+      setTextFeedback(
+        'idle',
+        wtText('пусто', 'empty'),
+        noTypesPicked
+          ? wtText('выбери минимум один тип в пользовательском режиме', 'choose at least one type in custom mode')
+          : wtText('добавь задания или load db', 'add tasks or load db')
+      );
       return;
     }
 
@@ -1462,15 +1718,15 @@ async function fetchJson(relPath){
   }
 
   function promptTextForCategory(cat){
-    if(transformType === TRANSFORM_TYPE_INUN) return wtText('Выбери нужную приставку: in- или un-', 'Choose the correct prefix: in- or un-');
-    if(transformType === TRANSFORM_TYPE_N2V) return wtText('Образуй глагол от данного слова', 'Build a verb from the base word');
     const c = normCategory(cat);
+    if(c === 'InUnPrefixes') return wtText('Выбери нужную приставку: in- или un-', 'Choose the correct prefix: in- or un-');
+    if(c === CATEGORY_N2V) return wtText('Образуй глагол от данного слова', 'Build a verb from the base word');
     if(c === 'Prefixes') return wtText('Образуй отрицательное прилагательное от данного слова', 'Build a negative adjective from the base word');
     return wtText('Образуй прилагательное из данного слова', 'Build an adjective from the base word');
   }
 
-  function isInUnPrefixesCategory(){
-    return transformType === TRANSFORM_TYPE_INUN;
+  function isInUnPrefixesCategory(category){
+    return normCategory(category) === 'InUnPrefixes';
   }
 
   function resetPrefixChoiceButtons(){
@@ -1479,7 +1735,10 @@ async function fetchJson(relPath){
   }
 
   function applyInUnPrefixMode(){
-    const enabled = isInUnPrefixesCategory();
+    const activeCategory = current
+      ? normCategory(current.category || 'Suffixes')
+      : normCategory(elPracticeCategory && elPracticeCategory.value || 'All');
+    const enabled = isInUnPrefixesCategory(activeCategory);
 
     if(elWtPanel) elWtPanel.classList.toggle('wt-inun-mode', enabled);
     if(elInUnPrefixPicker) elInUnPrefixPicker.hidden = !enabled;
@@ -1494,11 +1753,16 @@ async function fetchJson(relPath){
   function updatePromptLabel(){
     const selected = normCategory(elPracticeCategory && elPracticeCategory.value || 'All');
     if(selected === 'All'){
+      if(!current){
+        const cats = categoriesForTypeIds(getEffectiveTypeIds());
+        if(cats.length > 1){
+          elPromptLabel.textContent = wtText('Образуй нужную форму слова по типу задания', 'Build the needed word form based on task type');
+          return;
+        }
+      }
       const curCat = current
         ? normCategory(current.category || 'Suffixes')
-        : (transformType === TRANSFORM_TYPE_INUN
-          ? 'InUnPrefixes'
-          : (transformType === TRANSFORM_TYPE_N2V ? CATEGORY_N2V : 'Suffixes'));
+        : (categoriesForTypeIds(getEffectiveTypeIds())[0] || 'Suffixes');
       elPromptLabel.textContent = promptTextForCategory(curCat);
     }else{
       elPromptLabel.textContent = promptTextForCategory(selected);
@@ -1515,27 +1779,24 @@ async function fetchJson(relPath){
     tasksActive.sort((a,b)=> (a.en_noun || '').localeCompare((b.en_noun || ''), 'en'));
 
     updatePromptLabel();
-    if(transformType === TRANSFORM_TYPE_INUN) renderRule('InUnPrefixes');
-    else if(transformType === TRANSFORM_TYPE_N2V) renderRule(CATEGORY_N2V);
-    else renderRule(cat);
+    renderRuleForCurrentScope();
     applyInUnPrefixMode();
     updateTextActiveTasks();
   }
 
   function refreshLocalizedUi(){
     syncTransformTypeOptions();
+    applyWtModeUi();
     syncTypeSelectors();
     updateCountBadge();
     renderTaskList();
     updatePromptLabel();
     updateTextPromptLabel();
 
-    const cat = normCategory(elPracticeCategory && elPracticeCategory.value || 'All');
-    if(transformType === TRANSFORM_TYPE_INUN) renderRule('InUnPrefixes');
-    else if(transformType === TRANSFORM_TYPE_N2V) renderRule(CATEGORY_N2V);
-    else renderRule(cat);
+    renderRuleForCurrentScope();
 
     applyInUnPrefixMode();
+    syncBuilderTypeControlVisibility();
     setCheckMode(checkMode);
     setTextCheckMode(textCheckMode);
 
@@ -1554,7 +1815,7 @@ async function fetchJson(relPath){
   function resolveRuNoun(task){
     const t = task || {};
     let ru = String(t.ru_noun || '').trim();
-    if(!isInUnPrefixesCategory()) return ru;
+    if(!isInUnPrefixesCategory(t.category)) return ru;
 
     const key = normalize(t.en_noun);
     const fallback = INUN_RU_NOUN_FALLBACK[key] || '';
@@ -1566,7 +1827,7 @@ async function fetchJson(relPath){
   function resolveRuAdj(task){
     const t = task || {};
     let ru = String(t.ru_adj || '').trim();
-    if(!isInUnPrefixesCategory()) return ru;
+    if(!isInUnPrefixesCategory(t.category)) return ru;
 
     const key = normalize(t.en_adj);
     const fallback = INUN_RU_ADJ_FALLBACK[key] || '';
@@ -1596,7 +1857,14 @@ async function fetchJson(relPath){
       elPromptEn.textContent = wtText('нет заданий', 'no tasks');
       elAnswer.value = '';
       resetPrefixChoiceButtons();
-      setFeedback('idle', wtText('пусто', 'empty'), wtText('добавь задания или load db', 'add tasks or load db'));
+      const noTypesPicked = (normWtMode(wtMode) === WT_MODE_CUSTOM && getEffectiveTypeIds().length === 0);
+      setFeedback(
+        'idle',
+        wtText('пусто', 'empty'),
+        noTypesPicked
+          ? wtText('выбери минимум один тип в пользовательском режиме', 'choose at least one type in custom mode')
+          : wtText('добавь задания или load db', 'add tasks or load db')
+      );
       return;
     }
 
@@ -1608,7 +1876,7 @@ async function fetchJson(relPath){
     elAnswer.value = '';
     resetPrefixChoiceButtons();
     elAnswer.focus({ preventScroll:true });
-    setFeedback('idle', wtText('готово', 'ready'), isInUnPrefixesCategory()
+    setFeedback('idle', wtText('готово', 'ready'), isInUnPrefixesCategory(current && current.category)
       ? wtText('выбери приставку и нажми check', 'choose a prefix and press check')
       : wtText('введи ответ и нажми check', 'enter the answer and press check'));
   }
@@ -1665,7 +1933,7 @@ async function fetchJson(relPath){
     const correct = normalize(current.en_adj);
 
     if(!user){
-      setFeedback('idle', wtText('ввод', 'type'), isInUnPrefixesCategory()
+      setFeedback('idle', wtText('ввод', 'type'), isInUnPrefixesCategory(current && current.category)
         ? wtText('выбери приставку in- или un-', 'choose in- or un- prefix')
         : wtText('введи ответ', 'enter the answer'));
       pulse(elAnswer, 'ik-shake');
@@ -1955,7 +2223,7 @@ async function fetchJson(relPath){
   // Events
   // -----------------------------
   function choosePrefix(prefix){
-    if(!current || !isInUnPrefixesCategory()) return;
+    if(!current || !isInUnPrefixesCategory(current.category)) return;
     const p = normalize(prefix);
     if(p !== 'in' && p !== 'un') return;
 
@@ -1968,7 +2236,6 @@ async function fetchJson(relPath){
     elAnswer.focus({ preventScroll:true });
   }
 
-  btnRule.addEventListener('click', toggleRule);
   btnPrev.addEventListener('click', goPrev);
   btnNext.addEventListener('click', goNext);
   btnReveal.addEventListener('click', toggleTranslate);
@@ -1982,6 +2249,27 @@ async function fetchJson(relPath){
   btnTextReveal && btnTextReveal.addEventListener('click', toggleTextTranslate);
   btnTextCheckNext && btnTextCheckNext.addEventListener('click', checkTextOrNext);
   btnTextShowAnswer && btnTextShowAnswer.addEventListener('click', showTextAnswer);
+
+  btnWtModeMixed && btnWtModeMixed.addEventListener('click', ()=>{
+    setWtMode(WT_MODE_MIXED);
+    refreshAfterScopeChange();
+  });
+  btnWtModeCustom && btnWtModeCustom.addEventListener('click', ()=>{
+    setWtMode(WT_MODE_CUSTOM);
+    refreshAfterScopeChange();
+  });
+  btnWtCustomTypeSelectAll && btnWtCustomTypeSelectAll.addEventListener('click', ()=>{
+    wtCustomTypeIds = allWtTypeIds();
+    saveWtCustomTypes(wtCustomTypeIds);
+    applyWtModeUi();
+    refreshAfterScopeChange();
+  });
+  btnWtCustomTypeClearAll && btnWtCustomTypeClearAll.addEventListener('click', ()=>{
+    wtCustomTypeIds = [];
+    saveWtCustomTypes(wtCustomTypeIds);
+    applyWtModeUi();
+    refreshAfterScopeChange();
+  });
 
   elAnswer.addEventListener('keydown', (e)=>{
     if(e.key === 'Enter'){
@@ -2009,7 +2297,19 @@ if(e.key.toLowerCase() === 't'){
       else toggleTranslate();
       return;
     }
-    if(e.key.toLowerCase() === 'r'){ if(inText) return; toggleRule(); return; }
+    if(e.key.toLowerCase() === 'r'){
+      if(inText) return;
+      if(window.StudentHelperTabs && typeof window.StudentHelperTabs.setWTSubTab === 'function'){
+        window.StudentHelperTabs.setWTSubTab('rule');
+      }
+      return;
+    }
+  });
+
+  document.addEventListener('sh:route', (e)=>{
+    const detail = e && e.detail ? e.detail : {};
+    if(detail.main !== 'wt') return;
+    syncBuilderTypeControlVisibility();
   });
 
   elPracticeCategory.addEventListener('change', ()=>{
@@ -2026,12 +2326,7 @@ if(e.key.toLowerCase() === 't'){
 
   elTransformType && elTransformType.addEventListener('change', ()=>{
     transformType = normTransformType(elTransformType.value);
-    refreshLocalizedUi();
-    updateActiveTasks();
-    resetPracticeSession();
-    goNext();
-    resetTextSession();
-    goTextNext();
+    refreshAfterScopeChange();
   });
 
   elViewCategory.addEventListener('change', renderTaskList);

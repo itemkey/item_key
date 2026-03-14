@@ -21,7 +21,7 @@
   <!-- Match main site look -->
   <link rel="stylesheet" href="../../assets/css/styles.css" />
 
-  <link rel="stylesheet" href="./student_helper.css?v=20260314-08" />
+  <link rel="stylesheet" href="./student_helper.css?v=20260314-09" />
 
 <style id="ik-site-nav-css">
 .ik-site-nav, .ik-site-nav *{ box-sizing: border-box; }
@@ -1016,8 +1016,8 @@
 
 <div id="panel-wt" role="tabpanel" aria-labelledby="tab-wt">
             <div class="ik-row">
-              <label class="ik-label" for="transformType">тип</label>
-              <select class="ik-select" id="transformType" style="min-width: 260px;">
+              <label class="ik-label" for="transformType" id="transformTypeLabel" hidden>тип</label>
+              <select class="ik-select" id="transformType" style="min-width: 260px;" hidden>
                 <option value="noun_to_adj">существительное -> прилагательное</option>
                 <option value="in_un_prefix">приставки in- или un-</option>
                 <option value="noun_to_verb">существительное -> глагол</option>
@@ -1031,21 +1031,54 @@
 
             <div class="ik-divider"></div>
 
+            <p class="ik-title">словообразование</p>
+            <p class="ik-sub">два режима: смешанный или пользовательский</p>
+
+            <div class="sh-practice-mode" id="wtModeSwitch" role="group" aria-label="Режим word transformation">
+              <button class="ik-btn ik-btn--black" id="wtModeMixedBtn" type="button">смешанный</button>
+              <button class="ik-btn" id="wtModeCustomBtn" type="button">пользовательский</button>
+            </div>
+
+            <p class="ik-sub" id="wtModeHint">смешанный: все типы словообразования</p>
+
+            <div id="wtCustomTypePicker" class="sh-custom-picker" hidden>
+              <p class="sh-custom-picker__title" id="wtCustomTypeTitle">пользовательский: выбери типы словообразования</p>
+              <p class="sh-custom-picker__sub" id="wtCustomTypeHint">собери свой набор типов: можно выбрать один или несколько</p>
+              <div class="sh-custom-picker__actions">
+                <button class="ik-btn" id="wtCustomTypeSelectAllBtn" type="button">выбрать все</button>
+                <button class="ik-btn" id="wtCustomTypeClearAllBtn" type="button">снять все</button>
+              </div>
+              <div class="sh-custom-picker__grid" id="wtCustomTypeGrid" aria-label="Custom word transformation types"></div>
+            </div>
+
+            <div class="ik-divider"></div>
+
             <div class="ik-tabs" role="tablist" aria-label="Режимы word transformation">
-              <button class="ik-tab" id="subtab-practice" role="tab" aria-selected="true" aria-controls="panel-practice" type="button">practice</button>
+              <button class="ik-tab" id="subtab-rule" role="tab" aria-selected="true" aria-controls="panel-rule" type="button">правило</button>
+              <button class="ik-tab" id="subtab-practice" role="tab" aria-selected="false" aria-controls="panel-practice" type="button">practice</button>
               <button class="ik-tab" id="subtab-text" role="tab" aria-selected="false" aria-controls="panel-text" type="button">в тексте</button>
               <button class="ik-tab" id="subtab-builder" role="tab" aria-selected="false" aria-controls="panel-builder" type="button">constructor</button>
             </div>
 
+            <!-- RULE -->
+            <div id="panel-rule" role="tabpanel" aria-labelledby="subtab-rule">
+              <section class="ik-ex" aria-label="Правило">
+                <p class="ik-title">правило</p>
+                <div class="ik-rule is-open" id="rulePanel" aria-label="Rule" aria-hidden="false">
+                  <p class="ik-sub" id="ruleTitle">rule</p>
+                  <div id="ruleBody"></div>
+                </div>
+              </section>
+            </div>
+
             <!-- PRACTICE -->
-            <div id="panel-practice" role="tabpanel" aria-labelledby="subtab-practice">
+            <div id="panel-practice" role="tabpanel" aria-labelledby="subtab-practice" hidden>
               <section class="ik-ex" aria-label="Практика">
                 <p class="ik-title">практика</p>
 
                 <div class="ik-row">
                   <button class="ik-btn" id="btnPrev" type="button" title="Предыдущий вопрос">назад</button>
                   <button class="ik-btn ik-btn--black" id="btnNext" type="button" title="Следующий вопрос">далее</button>
-                  <button class="ik-btn" id="btnRule" type="button" title="Правило (r)">rule</button>
 
                   <label class="ik-label">
                     <input type="checkbox" id="randomOrder" checked />
@@ -1064,13 +1097,6 @@
                   <span class="ik-badge" id="qBadge">q: 0</span>
                   <span class="ik-badge" id="sessionScore">0/0</span>
                 </div>
-
-                <div class="ik-rule" id="rulePanel" aria-label="Rule" aria-hidden="true">
-                  <p class="ik-sub" id="ruleTitle">rule</p>
-                  <div id="ruleBody"></div>
-                </div>
-
-                <div class="ik-divider"></div>
 
                 <p class="ik-prompt" id="promptLabel">Сделай прилагательное из существительного</p>
 
@@ -1218,7 +1244,7 @@
   <script src="../../assets/js/theme.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../../assets/js/supabase-client.js"></script>
-  <script src="./js/tabs.js"></script>
+  <script src="./js/tabs.js?v=20260314-02"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function(){
       var backBtn = document.getElementById('ikBackBtn');
@@ -1258,11 +1284,11 @@
       }
     });
   </script>
-  <script src="./js/lobby.js"></script>
+  <script src="./js/lobby.js?v=20260314-02"></script>
   <script src="./js/structure_data.js"></script>
   <script src="./js/structure.js"></script>
   <script src="./js/tenses.js?v=20260314-06"></script>
-  <script src="./js/word_transformation.js?v=20260314-07"></script>
+  <script src="./js/word_transformation.js?v=20260314-09"></script>
   <script src="./js/dictionary.js" onerror="window.IKAdminLog && window.IKAdminLog('error','student_helper','dictionary.js failed to load')"></script>
   <script>
     (function(){
@@ -1454,6 +1480,13 @@
     ['восстановить из json', 'restore from JSON'],
     ['в тексте', 'in text'],
     ['вставь подходящую форму слова в текст', 'insert the correct word form into the text'],
+    ['два режима: смешанный или пользовательский', 'two modes: mixed or custom'],
+    ['смешанный', 'mixed'],
+    ['пользовательский', 'custom'],
+    ['смешанный: все типы словообразования', 'mixed: all word transformation types'],
+    ['пользовательский: выбери типы словообразования', 'custom: choose word transformation types'],
+    ['собери свой набор типов: можно выбрать один или несколько', 'build your own set: choose one or multiple types'],
+    ['выбери минимум один тип в пользовательском режиме', 'choose at least one type in custom mode'],
     ['Не выбрано', 'Not selected'],
     ['случайно', 'random'],
     ['лицевая сторона', 'front'],

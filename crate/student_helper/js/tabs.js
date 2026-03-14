@@ -66,33 +66,44 @@
   setMainTab(init);
 })();
 
-// WT subtabs (practice/builder)
+// WT subtabs (rule/practice/text/builder)
 (function(){
+  const r = document.getElementById('subtab-rule');
   const a = document.getElementById('subtab-practice');
   const t = document.getElementById('subtab-text');
   const b = document.getElementById('subtab-builder');
+  const pr = document.getElementById('panel-rule');
   const pa = document.getElementById('panel-practice');
   const pt = document.getElementById('panel-text');
   const pb = document.getElementById('panel-builder');
 
-  if (!a || !t || !b || !pa || !pt || !pb) return;
+  if (!r || !a || !t || !b || !pr || !pa || !pt || !pb) return;
 
   function set(which){
-    const w = (which === 'builder') ? 'builder' : (which === 'text' ? 'text' : 'practice');
+    const w = (which === 'builder')
+      ? 'builder'
+      : (which === 'text'
+        ? 'text'
+        : (which === 'practice' ? 'practice' : 'rule'));
+    const isRule = w === 'rule';
     const isPractice = w === 'practice';
     const isText = w === 'text';
     const isBuilder = w === 'builder';
 
+    r.setAttribute('aria-selected', String(isRule));
     a.setAttribute('aria-selected', String(isPractice));
     t.setAttribute('aria-selected', String(isText));
     b.setAttribute('aria-selected', String(isBuilder));
 
+    pr.hidden = !isRule;
     pa.hidden = !isPractice;
     pt.hidden = !isText;
     pb.hidden = !isBuilder;
 
     try{
-      const route = isBuilder ? 'wt-builder' : (isText ? 'wt-text' : 'wt-practice');
+      const route = isBuilder
+        ? 'wt-builder'
+        : (isText ? 'wt-text' : (isPractice ? 'wt-practice' : 'wt-rule'));
       document.dispatchEvent(new CustomEvent('sh:route', { detail: { route, main: 'wt', wtSubtab: w } }));
     }catch(_){ }
   }
@@ -100,6 +111,7 @@
   window.StudentHelperTabs = window.StudentHelperTabs || {};
   window.StudentHelperTabs.setWTSubTab = set;
   window.StudentHelperTabs.getWTSubTab = ()=> {
+    if(!pr.hidden) return 'rule';
     if(!pt.hidden) return 'text';
     return pa.hidden ? 'builder' : 'practice';
   };
@@ -112,12 +124,15 @@
     fallback();
   }
 
+  r.addEventListener('click', ()=> goRouteOrFallback('wt-rule', ()=> set('rule')));
   a.addEventListener('click', ()=> goRouteOrFallback('wt-practice', ()=> set('practice')));
   t.addEventListener('click', ()=> goRouteOrFallback('wt-text', ()=> set('text')));
   b.addEventListener('click', ()=> goRouteOrFallback('wt-builder', ()=> set('builder')));
 
   const initSubtab = (b.getAttribute('aria-selected') === 'true')
     ? 'builder'
-    : (t.getAttribute('aria-selected') === 'true' ? 'text' : 'practice');
+    : (t.getAttribute('aria-selected') === 'true'
+      ? 'text'
+      : (a.getAttribute('aria-selected') === 'true' ? 'practice' : 'rule'));
   set(initSubtab);
 })();

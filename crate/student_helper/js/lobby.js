@@ -10,7 +10,7 @@
 
   const KEY_LAST = 'sh_last_module';
   const KEY_SEEN = 'sh_seen_lobby';
-  const VALID_ROUTES = new Set(['menu', 'dict', 'grammar', 'struct', 'tenses', 'wt', 'wt-practice', 'wt-text', 'wt-builder']);
+  const VALID_ROUTES = new Set(['menu', 'dict', 'grammar', 'struct', 'tenses', 'wt', 'wt-rule', 'wt-practice', 'wt-text', 'wt-builder']);
 
   let ignoreNextHashChange = false;
 
@@ -24,6 +24,7 @@
     const raw = String(route || '').trim().toLowerCase();
     if(!raw) return '';
     if(VALID_ROUTES.has(raw)) return raw;
+    if(raw === 'rule') return 'wt-rule';
     if(raw === 'practice') return 'wt-practice';
     if(raw === 'text') return 'wt-text';
     if(raw === 'builder') return 'wt-builder';
@@ -36,6 +37,7 @@
 
     if(normalized === 'menu') return { main: 'menu', wtSubtab: '' };
     if(normalized === 'struct' || normalized === 'tenses') return { main: 'grammar', wtSubtab: '' };
+    if(normalized === 'wt-rule') return { main: 'wt', wtSubtab: 'rule' };
     if(normalized === 'wt-practice') return { main: 'wt', wtSubtab: 'practice' };
     if(normalized === 'wt-text') return { main: 'wt', wtSubtab: 'text' };
     if(normalized === 'wt-builder') return { main: 'wt', wtSubtab: 'builder' };
@@ -47,6 +49,7 @@
     if(!parsed) return '';
     if(parsed.main === 'menu') return 'menu';
     if(parsed.main !== 'wt') return parsed.main;
+    if(parsed.wtSubtab === 'rule') return 'wt-rule';
     if(parsed.wtSubtab === 'builder') return 'wt-builder';
     if(parsed.wtSubtab === 'text') return 'wt-text';
     return 'wt-practice';
@@ -107,9 +110,9 @@
 
     let wtSubtab = parsed.wtSubtab;
     if(module === 'wt' && !wtSubtab && window.StudentHelperTabs && typeof window.StudentHelperTabs.getWTSubTab === 'function'){
-      wtSubtab = window.StudentHelperTabs.getWTSubTab() || 'practice';
+      wtSubtab = window.StudentHelperTabs.getWTSubTab() || 'rule';
     }
-    if(module === 'wt' && wtSubtab !== 'builder' && wtSubtab !== 'text') wtSubtab = 'practice';
+    if(module === 'wt' && wtSubtab !== 'rule' && wtSubtab !== 'practice' && wtSubtab !== 'builder' && wtSubtab !== 'text') wtSubtab = 'rule';
 
     localStorage.setItem(KEY_LAST, module);
 
@@ -127,14 +130,14 @@
 
     if(options.syncHash !== false){
       const routeValue = module === 'wt'
-        ? (wtSubtab === 'builder' ? 'wt-builder' : (wtSubtab === 'text' ? 'wt-text' : 'wt-practice'))
+        ? (wtSubtab === 'builder' ? 'wt-builder' : (wtSubtab === 'text' ? 'wt-text' : (wtSubtab === 'practice' ? 'wt-practice' : 'wt-rule')))
         : (module === 'grammar' ? 'grammar' : module);
       setHashRoute(routeValue, !!options.replaceHash);
     }
 
     try{
       const route = module === 'wt'
-        ? (wtSubtab === 'builder' ? 'wt-builder' : (wtSubtab === 'text' ? 'wt-text' : 'wt-practice'))
+        ? (wtSubtab === 'builder' ? 'wt-builder' : (wtSubtab === 'text' ? 'wt-text' : (wtSubtab === 'practice' ? 'wt-practice' : 'wt-rule')))
         : (module === 'grammar' ? 'grammar' : module);
       document.dispatchEvent(new CustomEvent('sh:route', { detail: { route, main: module, wtSubtab: wtSubtab || '' } }));
     }catch(_){ }
@@ -167,11 +170,12 @@
 
     if(window.StudentHelperTabs && typeof window.StudentHelperTabs.getWTSubTab === 'function'){
       const wtSubtab = window.StudentHelperTabs.getWTSubTab();
+      if(wtSubtab === 'rule') return 'wt-rule';
       if(wtSubtab === 'builder') return 'wt-builder';
       if(wtSubtab === 'text') return 'wt-text';
       return 'wt-practice';
     }
-    return 'wt-practice';
+    return 'wt-rule';
   };
 
   btnDict.addEventListener('click', ()=> openModule('dict'));
