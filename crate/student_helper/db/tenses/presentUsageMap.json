@@ -148,6 +148,215 @@
             "explain": "know - стативный глагол, обычно используем Present Simple."
           }
         ]
+      },
+      {
+        "id": "photoPresentPastContrast",
+        "title": "Photo Set N: Present Perfect vs Past Simple in context",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "prm_photo_mix_1",
+            "instruction": "Выбери форму",
+            "prompt": "Tom Hanks ____ an Oscar several times already.",
+            "options": [
+              "won",
+              "has won",
+              "is winning"
+            ],
+            "correctIndex": 1,
+            "explain": "already + repeated achievement up to now -> Present Perfect."
+          },
+          {
+            "id": "prm_photo_mix_2",
+            "instruction": "Выбери форму",
+            "prompt": "Nick ____ football yesterday.",
+            "options": [
+              "has played",
+              "played",
+              "has been playing"
+            ],
+            "correctIndex": 1,
+            "explain": "yesterday = finished time -> Past Simple."
+          },
+          {
+            "id": "prm_photo_mix_3",
+            "instruction": "Выбери форму",
+            "prompt": "Mary already ____ from school. Now she is doing her homework.",
+            "options": [
+              "came",
+              "has come",
+              "is coming"
+            ],
+            "correctIndex": 1,
+            "explain": "Result now + already -> Present Perfect."
+          },
+          {
+            "id": "prm_photo_mix_4",
+            "instruction": "Выбери форму",
+            "prompt": "I ____ this book last year.",
+            "options": [
+              "have read",
+              "read",
+              "have been reading"
+            ],
+            "correctIndex": 1,
+            "explain": "last year -> Past Simple."
+          },
+          {
+            "id": "prm_photo_mix_5",
+            "instruction": "Выбери форму",
+            "prompt": "I'm sorry. I ____ my homework yet.",
+            "options": [
+              "didn't do",
+              "haven't done",
+              "am not doing"
+            ],
+            "correctIndex": 1,
+            "explain": "yet + not completed action -> Present Perfect."
+          },
+          {
+            "id": "prm_photo_mix_6",
+            "instruction": "Выбери форму",
+            "prompt": "He is not at school today, he ____ ill.",
+            "options": [
+              "fell",
+              "has fallen",
+              "is falling"
+            ],
+            "correctIndex": 1,
+            "explain": "Причина текущего состояния -> Present Perfect result."
+          },
+          {
+            "id": "prm_photo_mix_7",
+            "instruction": "Выбери форму",
+            "prompt": "When ____ he ____ ill?",
+            "options": [
+              "has / fallen",
+              "did / fall",
+              "does / fall"
+            ],
+            "correctIndex": 1,
+            "explain": "When спрашивает точный момент в прошлом -> Past Simple question."
+          },
+          {
+            "id": "prm_photo_mix_8",
+            "instruction": "Выбери форму",
+            "prompt": "He ____ ill yesterday.",
+            "options": [
+              "has fallen",
+              "fell",
+              "has fell"
+            ],
+            "correctIndex": 1,
+            "explain": "yesterday = Past Simple."
+          },
+          {
+            "id": "prm_photo_mix_9",
+            "instruction": "Выбери форму",
+            "prompt": "At last I ____ all my homework: now I'll go out.",
+            "options": [
+              "did",
+              "have done",
+              "am doing"
+            ],
+            "correctIndex": 1,
+            "explain": "Result now (now I'll go out) -> Present Perfect."
+          },
+          {
+            "id": "prm_photo_mix_10",
+            "instruction": "Выбери форму",
+            "prompt": "We ____ the problem already.",
+            "options": [
+              "solved",
+              "have solved",
+              "are solving"
+            ],
+            "correctIndex": 1,
+            "explain": "already + completed result -> Present Perfect."
+          }
+        ]
+      },
+      {
+        "id": "photoPresentPastDialogues",
+        "title": "Photo Set O: two-step dialogue contrasts",
+        "kind": "multi_input",
+        "items": [
+          {
+            "id": "prm_photo_dlg_1",
+            "instruction": "Заполни обе формы",
+            "prompt": "A: You ____ (book) tickets? B: Yes, I ____ (book) them five days ago.",
+            "inputs": [
+              {
+                "accepted": [
+                  "have booked",
+                  "Have you booked"
+                ]
+              },
+              {
+                "accepted": [
+                  "booked"
+                ]
+              }
+            ],
+            "explain": "В первом вопросе важен результат к now; во втором есть точное past time."
+          },
+          {
+            "id": "prm_photo_dlg_2",
+            "instruction": "Заполни обе формы",
+            "prompt": "A: Are you going to finish your work before bed? B: I ____ (finish) it already. I ____ (finish) it two hours ago.",
+            "inputs": [
+              {
+                "accepted": [
+                  "have finished",
+                  "I've finished"
+                ]
+              },
+              {
+                "accepted": [
+                  "finished"
+                ]
+              }
+            ],
+            "explain": "already без времени -> Present Perfect; two hours ago -> Past Simple."
+          },
+          {
+            "id": "prm_photo_dlg_3",
+            "instruction": "Заполни обе формы",
+            "prompt": "A: Do you want to go to the movie tonight? B: No, thanks. We ____ (see) it already. We ____ (see) it last week.",
+            "inputs": [
+              {
+                "accepted": [
+                  "have seen",
+                  "We've seen"
+                ]
+              },
+              {
+                "accepted": [
+                  "saw"
+                ]
+              }
+            ],
+            "explain": "already -> Present Perfect, last week -> Past Simple."
+          },
+          {
+            "id": "prm_photo_dlg_4",
+            "instruction": "Заполни обе формы",
+            "prompt": "Tom ____ (break) his leg five days ago. He ____ (be) in hospital since he ____ (break) his leg.",
+            "inputs": [
+              {
+                "accepted": [
+                  "broke"
+                ]
+              },
+              {
+                "accepted": [
+                  "has been"
+                ]
+              }
+            ],
+            "explain": "Первое - Past Simple (five days ago), второе - Present Perfect (since + point)."
+          }
+        ]
       }
     ]
   }

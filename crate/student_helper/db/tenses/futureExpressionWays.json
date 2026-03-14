@@ -1,47 +1,91 @@
 {
   "id": "futureExpressionWays",
   "title": "Future Expression Ways",
-  "subtitle": "все основные способы говорить о будущем",
+  "subtitle": "как выбирать форму будущего по смыслу, а не по слову-маркеру",
   "ruleBlocks": [
     {
       "type": "heading",
-      "text": "Способы выражения будущего"
+      "text": "Decision logic: как мыслить при выборе формы"
     },
     {
       "type": "text",
-      "text": "В английском нет одного универсального будущего времени. Мы выбираем форму по смыслу: will, be going to, Present Continuous, Present Simple, а также Present Simple в придаточных времени и условия (if/when/as soon as/unless)."
+      "text": "В английском нет одного будущего времени на все случаи. Сначала определяем смысл (решение сейчас, план, договоренность, расписание, придаточная if/when), потом выбираем форму."
     },
     {
       "type": "table",
-      "caption": "Быстрый выбор грамматики",
-      "columns": ["Способ", "Когда", "Формула", "Пример"],
+      "caption": "Быстрый выбор",
+      "columns": [
+        "Ситуация",
+        "Форма",
+        "Почему",
+        "Пример"
+      ],
       "rows": [
-        ["will", "решение в момент речи, обещание, мнение", "will + V1", "I'll help you."],
-        ["be going to", "план заранее, прогноз по признакам", "am/is/are going to + V1", "It's going to rain."],
-        ["Present Continuous", "личная договоренность", "am/is/are + V-ing", "I'm meeting Kate tonight."],
-        ["Present Simple", "расписание/график", "V1 / V-s", "The train leaves at 7."],
-        ["if/when-clause", "придаточные времени/условия", "Present Simple (без will)", "I'll call you when I arrive."]
+        [
+          "Решение в момент речи / обещание",
+          "will + V1",
+          "решение рождается сейчас",
+          "I will call her now."
+        ],
+        [
+          "План или прогноз по видимым признакам",
+          "am/is/are going to + V1",
+          "намерение уже есть или evidence налицо",
+          "Look at the sky. It is going to rain."
+        ],
+        [
+          "Личная договоренность",
+          "am/is/are + V-ing",
+          "встреча/договор уже зафиксирован",
+          "I am meeting the designer at 4."
+        ],
+        [
+          "Расписание/график",
+          "Present Simple",
+          "официальный таймтабл",
+          "The train leaves at 07:10."
+        ],
+        [
+          "После if/when/as soon as/unless",
+          "Present Simple",
+          "в придаточной future контекста не ставим will",
+          "I will text you when I get home."
+        ]
       ]
     },
     {
       "type": "highlight",
-      "title": "Алгоритм",
+      "title": "Типичные ошибки",
       "lines": [
-        "Решил прямо сейчас? -> will",
-        "План уже есть или видны признаки? -> be going to",
-        "Есть конкретная договоренность? -> Present Continuous",
-        "Официальное расписание? -> Present Simple",
-        "После if/when/as soon as/unless в будущем контексте -> Present Simple"
+        "when I will arrive -> when I arrive",
+        "I will to help -> I will help",
+        "The film will start at 8 (если это расписание) -> The film starts at 8",
+        "I think it is going to be fine (без evidence) -> чаще I think it will be fine"
       ]
     },
     {
       "type": "examples",
       "items": [
-        { "en": "I'll take your bag. It looks heavy.", "ru": "Я возьму твою сумку. Она выглядит тяжелой." },
-        { "en": "I'm going to start a new course next month.", "ru": "Я собираюсь начать новый курс в следующем месяце." },
-        { "en": "We're flying to Rome on Friday.", "ru": "Мы летим в Рим в пятницу." },
-        { "en": "The movie starts at 8:30.", "ru": "Фильм начинается в 8:30." },
-        { "en": "I'll text you as soon as I get home.", "ru": "Я напишу тебе, как только доберусь домой." }
+        {
+          "en": "A: The doorbell is ringing. B: I will get it.",
+          "ru": "A: В дверь звонят. B: Я открою."
+        },
+        {
+          "en": "We are going to move to a bigger flat in June.",
+          "ru": "Мы собираемся переехать в квартиру побольше в июне."
+        },
+        {
+          "en": "I am seeing my dentist on Thursday at 10.",
+          "ru": "Я иду к стоматологу в четверг в 10."
+        },
+        {
+          "en": "What time does the conference finish?",
+          "ru": "Во сколько заканчивается конференция?"
+        },
+        {
+          "en": "If you miss this train, you will have to wait an hour.",
+          "ru": "Если ты пропустишь этот поезд, придется ждать час."
+        }
       ]
     }
   ],
@@ -49,106 +93,856 @@
     "exercises": [
       {
         "id": "meaning",
-        "title": "Когда используем (Meaning)",
+        "title": "Recognition: что именно тренируем",
         "kind": "choice",
         "items": [
           {
             "id": "few_m_1",
-            "instruction": "Выбери лучший вариант",
-            "prompt": "A: The phone is ringing. B: I ____ answer it.",
-            "options": ["will", "am going to", "am answering"],
+            "instruction": "Выбери логику выбора",
+            "prompt": "A: The phone is ringing. B: I will answer it.",
+            "options": [
+              "решение в момент речи",
+              "заранее запланированная встреча",
+              "официальное расписание"
+            ],
             "correctIndex": 0,
-            "explain": "Решение принимается в момент речи -> will."
+            "explain": "Will здесь про решение, принятое прямо сейчас."
           },
           {
             "id": "few_m_2",
-            "instruction": "Выбери лучший вариант",
-            "prompt": "Look at those clouds! It ____ rain.",
-            "options": ["will", "is going to", "rains"],
-            "correctIndex": 1,
-            "explain": "Есть явные признаки -> be going to."
+            "instruction": "Выбери логику выбора",
+            "prompt": "Look at those clouds. It is going to rain.",
+            "options": [
+              "прогноз по признакам",
+              "расписание транспорта",
+              "привычка в настоящем"
+            ],
+            "correctIndex": 0,
+            "explain": "Be going to здесь не про календарный план, а про evidence now."
           },
           {
             "id": "few_m_3",
-            "instruction": "Выбери лучший вариант",
-            "prompt": "I have a ticket. I ____ my dentist at 6 pm.",
-            "options": ["see", "am seeing", "will seeing"],
-            "correctIndex": 1,
-            "explain": "Конкретная договоренность -> Present Continuous."
+            "instruction": "Выбери логику выбора",
+            "prompt": "I am meeting my team lead after lunch.",
+            "options": [
+              "личная договоренность",
+              "спонтанное обещание",
+              "гипотетическое условие"
+            ],
+            "correctIndex": 0,
+            "explain": "Present Continuous for future = уже согласованная встреча."
           },
           {
             "id": "few_m_4",
-            "instruction": "Выбери лучший вариант",
-            "prompt": "The train ____ at 07:10 tomorrow.",
-            "options": ["is leaving", "will leave", "leaves"],
-            "correctIndex": 2,
-            "explain": "Расписание/таймтабл -> Present Simple."
+            "instruction": "Выбери логику выбора",
+            "prompt": "The museum opens at 10 tomorrow.",
+            "options": [
+              "официальное расписание",
+              "мнение говорящего",
+              "решение прямо сейчас"
+            ],
+            "correctIndex": 0,
+            "explain": "Для timetable обычно Present Simple, даже если речь о будущем."
           },
           {
             "id": "few_m_5",
-            "instruction": "Выбери лучший вариант",
-            "prompt": "I'll call you when I ____ home.",
-            "options": ["will get", "get", "am getting"],
-            "correctIndex": 1,
-            "explain": "После when в future context ставим Present Simple."
+            "instruction": "Выбери логику выбора",
+            "prompt": "I will text you as soon as I get home.",
+            "options": [
+              "после as soon as ставим Present Simple",
+              "после as soon as обязательно will",
+              "после as soon as нужен Past Simple"
+            ],
+            "correctIndex": 0,
+            "explain": "В придаточной времени future-контекста ставим Present Simple: I get."
           },
           {
             "id": "few_m_6",
-            "instruction": "Выбери лучший вариант",
-            "prompt": "If she ____ late, we'll start without her.",
-            "options": ["is", "will be", "would be"],
+            "instruction": "Выбери логику выбора",
+            "prompt": "I think this update will help users.",
+            "options": [
+              "мнение/прогноз без видимого evidence",
+              "договоренность на конкретное время",
+              "фиксированный график"
+            ],
             "correctIndex": 0,
-            "explain": "После if (реальное условие будущего) -> Present Simple."
+            "explain": "I think чаще ведет к will как к прогнозу/оценке."
+          },
+          {
+            "id": "few_m_7",
+            "instruction": "Выбери логику выбора",
+            "prompt": "We are going to redesign the onboarding flow this quarter.",
+            "options": [
+              "заранее принятое намерение",
+              "действие прямо в момент речи",
+              "прошлый опыт"
+            ],
+            "correctIndex": 0,
+            "explain": "Be going to подчеркивает заранее сформированный план."
+          },
+          {
+            "id": "few_m_8",
+            "instruction": "Выбери логику выбора",
+            "prompt": "If she is late again, we will start without her.",
+            "options": [
+              "if-clause в Present Simple",
+              "if-clause в Future Simple",
+              "if-clause в Future Continuous"
+            ],
+            "correctIndex": 0,
+            "explain": "После if не ставим will в этом типе условий."
           }
         ]
       },
       {
         "id": "formula",
-        "title": "Формулы (Formula)",
+        "title": "Controlled practice: собери форму точно",
         "kind": "input",
         "items": [
           {
             "id": "few_f_1",
             "instruction": "Вставь форму",
-            "prompt": "I ____ (help) you with that box. (decision now)",
-            "accepted": ["will help"],
-            "explain": "Решение сейчас -> will help."
+            "prompt": "I ____ (carry) that for you. (offer now)",
+            "accepted": [
+              "will carry"
+            ],
+            "explain": "Спонтанное предложение помощи -> will + V1."
           },
           {
             "id": "few_f_2",
             "instruction": "Вставь форму",
-            "prompt": "They ____ (buy) a new car next month. (plan already made)",
-            "accepted": ["are going to buy"],
-            "explain": "План заранее -> are going to buy."
+            "prompt": "We ____ (launch) the beta in May. (plan already made)",
+            "accepted": [
+              "are going to launch"
+            ],
+            "explain": "План уже принят заранее -> be going to."
           },
           {
             "id": "few_f_3",
             "instruction": "Вставь форму",
-            "prompt": "We ____ (meet) our clients at 5 pm. (arrangement)",
-            "accepted": ["are meeting"],
-            "explain": "Договоренность -> Present Continuous."
+            "prompt": "I ____ (see) Nora at 7. We booked the table yesterday.",
+            "accepted": [
+              "am seeing"
+            ],
+            "explain": "Есть договоренность -> Present Continuous for future."
           },
           {
             "id": "few_f_4",
             "instruction": "Вставь форму",
-            "prompt": "The conference ____ (start) at 9 tomorrow.",
-            "accepted": ["starts"],
-            "explain": "Расписание -> Present Simple."
+            "prompt": "The workshop ____ (start) at 09:30.",
+            "accepted": [
+              "starts"
+            ],
+            "explain": "Таймтабл/официальное расписание -> Present Simple."
           },
           {
             "id": "few_f_5",
             "instruction": "Вставь форму",
-            "prompt": "I'll text you when I ____ (arrive).",
-            "accepted": ["arrive"],
-            "explain": "После when в таком контексте -> Present Simple."
+            "prompt": "I will call you when I ____ (finish) this task.",
+            "accepted": [
+              "finish"
+            ],
+            "explain": "После when в будущем контексте -> Present Simple."
           },
           {
             "id": "few_f_6",
             "instruction": "Исправь ошибку",
-            "prompt": "If I will see him, I'll tell him.",
-            "accepted": ["If I see him, I'll tell him.", "If I see him, I will tell him."],
-            "acceptedShort": ["see"],
-            "explain": "После if убираем will: If I see him..."
+            "prompt": "If I will see him, I will tell him.",
+            "accepted": [
+              "If I see him, I will tell him.",
+              "If I see him, I'll tell him."
+            ],
+            "acceptedShort": [
+              "see"
+            ],
+            "explain": "В if-clause убираем will: If I see him..."
+          },
+          {
+            "id": "few_f_7",
+            "instruction": "Вставь форму",
+            "prompt": "A: I forgot my charger. B: I ____ (lend) you mine.",
+            "accepted": [
+              "will lend"
+            ],
+            "explain": "Реакция в момент речи -> will."
+          },
+          {
+            "id": "few_f_8",
+            "instruction": "Вставь форму",
+            "prompt": "By the way, our flight ____ (leave) at 6:05 tomorrow morning.",
+            "accepted": [
+              "leaves"
+            ],
+            "explain": "Речь о расписании рейса -> Present Simple."
+          }
+        ]
+      },
+      {
+        "id": "markers",
+        "title": "Context clues: выбери все сильные сигналы",
+        "kind": "multi",
+        "items": [
+          {
+            "id": "few_mark_1",
+            "instruction": "Можно выбрать несколько",
+            "prompt": "Что чаще подсказывает форму will?",
+            "options": [
+              "I think",
+              "I promise",
+              "Look at those clouds",
+              "right now"
+            ],
+            "correctIndices": [
+              0,
+              1,
+              3
+            ],
+            "explain": "Will: мнение, обещание, решение/реакция в момент речи."
+          },
+          {
+            "id": "few_mark_2",
+            "instruction": "Можно выбрать несколько",
+            "prompt": "Что чаще подсказывает be going to?",
+            "options": [
+              "We already decided",
+              "Look at this mess",
+              "The train timetable says",
+              "I am sure"
+            ],
+            "correctIndices": [
+              0,
+              1
+            ],
+            "explain": "Be going to: заранее принятое намерение или прогноз по видимым признакам."
+          },
+          {
+            "id": "few_mark_3",
+            "instruction": "Можно выбрать несколько",
+            "prompt": "Что чаще подсказывает Present Continuous for future?",
+            "options": [
+              "We booked it yesterday",
+              "I am meeting her at 5",
+              "The museum opens at 10",
+              "See you on Friday"
+            ],
+            "correctIndices": [
+              0,
+              1,
+              3
+            ],
+            "explain": "Present Continuous for future связан с личной договоренностью."
+          },
+          {
+            "id": "few_mark_4",
+            "instruction": "Можно выбрать несколько",
+            "prompt": "Какие союзы обычно требуют Present Simple в future clause?",
+            "options": [
+              "when",
+              "if",
+              "as soon as",
+              "unless"
+            ],
+            "correctIndices": [
+              0,
+              1,
+              2,
+              3
+            ],
+            "explain": "Во всех этих придаточных в будущем контексте ставим Present Simple."
+          },
+          {
+            "id": "few_mark_5",
+            "instruction": "Можно выбрать несколько",
+            "prompt": "Что чаще подсказывает Present Simple для future?",
+            "options": [
+              "platform 4",
+              "departs",
+              "official schedule",
+              "I just decided"
+            ],
+            "correctIndices": [
+              0,
+              1,
+              2
+            ],
+            "explain": "Расписание/официальный график -> Present Simple."
+          }
+        ]
+      },
+      {
+        "id": "mistakes",
+        "title": "Error correction: поймай реалистичные ошибки",
+        "kind": "correction",
+        "items": [
+          {
+            "id": "few_c_1",
+            "instruction": "Исправь",
+            "prompt": "I will to help you with the slides.",
+            "accepted": [
+              "I will help you with the slides."
+            ],
+            "explain": "После will идет базовая форма без to."
+          },
+          {
+            "id": "few_c_2",
+            "instruction": "Исправь",
+            "prompt": "When I will finish, I'll send the file.",
+            "accepted": [
+              "When I finish, I'll send the file.",
+              "When I finish, I will send the file."
+            ],
+            "explain": "В when-clause будущего контекста ставим Present Simple."
+          },
+          {
+            "id": "few_c_3",
+            "instruction": "Исправь",
+            "prompt": "If she will call, tell her I'm in a meeting.",
+            "accepted": [
+              "If she calls, tell her I'm in a meeting.",
+              "If she calls, tell her I am in a meeting."
+            ],
+            "explain": "После if -> Present Simple, не will."
+          },
+          {
+            "id": "few_c_4",
+            "instruction": "Исправь",
+            "prompt": "The conference will start at 9, according to the official timetable.",
+            "accepted": [
+              "The conference starts at 9, according to the official timetable."
+            ],
+            "explain": "Если это официальный график, естественнее Present Simple."
+          },
+          {
+            "id": "few_c_5",
+            "instruction": "Исправь",
+            "prompt": "Look at him - he will fall.",
+            "accepted": [
+              "Look at him - he is going to fall."
+            ],
+            "explain": "Есть видимый признак сейчас -> be going to."
+          },
+          {
+            "id": "few_c_6",
+            "instruction": "Исправь",
+            "prompt": "I think we are going to win, but I have no real reason.",
+            "accepted": [
+              "I think we will win, but I have no real reason."
+            ],
+            "explain": "Без evidence и с I think обычно выбираем will."
+          },
+          {
+            "id": "few_c_7",
+            "instruction": "Исправь",
+            "prompt": "Are you go to the station later?",
+            "accepted": [
+              "Are you going to the station later?"
+            ],
+            "explain": "Для договоренности нужен Present Continuous: are you going..."
+          },
+          {
+            "id": "few_c_8",
+            "instruction": "Исправь",
+            "prompt": "We are meeting there every day from Monday to Friday forever.",
+            "accepted": [
+              "We meet there every day from Monday to Friday."
+            ],
+            "explain": "Рутина/регулярность -> Present Simple, не future arrangement."
+          }
+        ]
+      },
+      {
+        "id": "compare",
+        "title": "Contextual choice: выбери форму в живом контексте",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "few_cmp_1",
+            "instruction": "Выбери лучший вариант",
+            "prompt": "I think the meeting ____ longer than expected.",
+            "options": [
+              "will last",
+              "is lasting",
+              "is going to last"
+            ],
+            "correctIndex": 0,
+            "explain": "I think + нейтральный прогноз без evidence -> will."
+          },
+          {
+            "id": "few_cmp_2",
+            "instruction": "Выбери лучший вариант",
+            "prompt": "Careful! You ____ your coffee.",
+            "options": [
+              "will drop",
+              "are dropping",
+              "are going to drop"
+            ],
+            "correctIndex": 2,
+            "explain": "Видимый признак прямо сейчас -> be going to."
+          },
+          {
+            "id": "few_cmp_3",
+            "instruction": "Выбери лучший вариант",
+            "prompt": "I can't join at 6. I ____ my mentor then.",
+            "options": [
+              "see",
+              "am seeing",
+              "will see"
+            ],
+            "correctIndex": 1,
+            "explain": "Уже оговоренная встреча -> Present Continuous."
+          },
+          {
+            "id": "few_cmp_4",
+            "instruction": "Выбери лучший вариант",
+            "prompt": "What time ____ tomorrow?",
+            "options": [
+              "does the conference finish",
+              "will the conference finish",
+              "is the conference finishing"
+            ],
+            "correctIndex": 0,
+            "explain": "Вопрос о расписании -> Present Simple."
+          },
+          {
+            "id": "few_cmp_5",
+            "instruction": "Выбери лучший вариант",
+            "prompt": "As soon as you ____ Mrs. Minks, ask her to call me.",
+            "options": [
+              "will see",
+              "see",
+              "are seeing"
+            ],
+            "correctIndex": 1,
+            "explain": "После as soon as в будущем контексте -> Present Simple."
+          },
+          {
+            "id": "few_cmp_6",
+            "instruction": "Выбери лучший вариант",
+            "prompt": "A: The room is freezing. B: I ____ the window.",
+            "options": [
+              "am going to close",
+              "will close",
+              "am closing"
+            ],
+            "correctIndex": 1,
+            "explain": "Мгновенная реакция на ситуацию -> will."
+          },
+          {
+            "id": "few_cmp_7",
+            "instruction": "Выбери лучший вариант",
+            "prompt": "We bought the tickets yesterday, so we ____ to Berlin on Friday.",
+            "options": [
+              "will fly",
+              "fly",
+              "are flying"
+            ],
+            "correctIndex": 2,
+            "explain": "Есть конкретная договоренность и билеты -> Present Continuous."
+          },
+          {
+            "id": "few_cmp_8",
+            "instruction": "Выбери лучший вариант",
+            "prompt": "If you ____ late, the best seats will be gone.",
+            "options": [
+              "arrive",
+              "will arrive",
+              "are arriving"
+            ],
+            "correctIndex": 0,
+            "explain": "If-clause будущего реального условия -> Present Simple."
+          }
+        ]
+      },
+      {
+        "id": "application",
+        "goal": "compare",
+        "title": "Guided application: два шага в одном контексте",
+        "kind": "multi_input",
+        "items": [
+          {
+            "id": "few_app_1",
+            "instruction": "Заполни обе формы",
+            "prompt": "A: I forgot my wallet. B: I ____ (pay) now, and you ____ (transfer) me later.",
+            "inputs": [
+              {
+                "accepted": [
+                  "will pay"
+                ]
+              },
+              {
+                "accepted": [
+                  "can transfer",
+                  "will transfer"
+                ]
+              }
+            ],
+            "explain": "Первая форма - спонтанное решение. Вторая - последующее действие в том же контексте."
+          },
+          {
+            "id": "few_app_2",
+            "instruction": "Заполни обе формы",
+            "prompt": "We ____ (not start) until everyone ____ (arrive).",
+            "inputs": [
+              {
+                "accepted": [
+                  "will not start",
+                  "won't start"
+                ]
+              },
+              {
+                "accepted": [
+                  "arrives"
+                ]
+              }
+            ],
+            "explain": "Главная часть - will. После until - Present Simple."
+          },
+          {
+            "id": "few_app_3",
+            "instruction": "Заполни обе формы",
+            "prompt": "The webinar ____ (begin) at 8, and I ____ (join) from my phone.",
+            "inputs": [
+              {
+                "accepted": [
+                  "begins"
+                ]
+              },
+              {
+                "accepted": [
+                  "am joining",
+                  "will join"
+                ]
+              }
+            ],
+            "explain": "Первая часть про расписание; вторая может быть как arrangement, так и нейтральное решение."
+          },
+          {
+            "id": "few_app_4",
+            "instruction": "Заполни обе формы",
+            "prompt": "I ____ (not carry) this box. It looks too heavy - I ____ (ask) Mark for help.",
+            "inputs": [
+              {
+                "accepted": [
+                  "am not going to carry"
+                ]
+              },
+              {
+                "accepted": [
+                  "will ask"
+                ]
+              }
+            ],
+            "explain": "Первая форма - решение по текущим признакам/evidence; вторая - мгновенная реакция."
+          },
+          {
+            "id": "few_app_5",
+            "instruction": "Заполни обе формы",
+            "prompt": "PHOTO: departure board shows 21:00. The plane ____ (leave) at 9, so we ____ (take) a taxi now.",
+            "inputs": [
+              {
+                "accepted": [
+                  "leaves"
+                ]
+              },
+              {
+                "accepted": [
+                  "will take"
+                ]
+              }
+            ],
+            "explain": "Фото-сценарий: расписание -> Present Simple, реакция сейчас -> will."
+          }
+        ]
+      },
+      {
+        "id": "photoChoiceSet",
+        "title": "Photo Set A: revision multiple choice",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "photo_mc_1",
+            "instruction": "Выбери правильный вариант",
+            "prompt": "Don't forget to turn off the lights before you ____ .",
+            "options": [
+              "are leaving",
+              "leave",
+              "will leave",
+              "are going to leave"
+            ],
+            "correctIndex": 1,
+            "explain": "После before в будущем контексте ставим Present Simple."
+          },
+          {
+            "id": "photo_mc_2",
+            "instruction": "Выбери правильный вариант",
+            "prompt": "If you arrive late at the sale, the best things ____ .",
+            "options": [
+              "will be going",
+              "will go",
+              "will have been going",
+              "will have gone"
+            ],
+            "correctIndex": 3,
+            "explain": "Речь о результате к моменту в будущем -> Future Perfect."
+          },
+          {
+            "id": "photo_mc_3",
+            "instruction": "Выбери правильный вариант",
+            "prompt": "I ____ smoking after Christmas, I promise.",
+            "options": [
+              "am stopping",
+              "am going to stop",
+              "will stop",
+              "stop"
+            ],
+            "correctIndex": 2,
+            "explain": "Promise + решение/обещание -> will."
+          },
+          {
+            "id": "photo_mc_4",
+            "instruction": "Выбери правильный вариант",
+            "prompt": "As soon as you ____ Mrs. Minks tomorrow, could you ask her to ring me up?",
+            "options": [
+              "will see",
+              "see",
+              "saw",
+              "would see"
+            ],
+            "correctIndex": 1,
+            "explain": "После as soon as в будущем контексте -> Present Simple."
+          },
+          {
+            "id": "photo_mc_5",
+            "instruction": "Выбери правильный вариант",
+            "prompt": "The other mats can be stowed away until we ____ to a bigger house.",
+            "options": [
+              "move",
+              "will move",
+              "don't move",
+              "have moved"
+            ],
+            "correctIndex": 0,
+            "explain": "После until в будущем контексте чаще Present Simple."
+          },
+          {
+            "id": "photo_mc_6",
+            "instruction": "Выбери правильный вариант",
+            "prompt": "The staff didn't know if the timetable for the following week ____ changed.",
+            "options": [
+              "has been",
+              "will have been",
+              "would be",
+              "was being"
+            ],
+            "correctIndex": 2,
+            "explain": "Future-in-the-past в косвенной речи -> would be."
+          },
+          {
+            "id": "photo_mc_7",
+            "instruction": "Выбери правильный вариант",
+            "prompt": "I've planned my future for the next ten years. What ____ when you leave university?",
+            "options": [
+              "will you do",
+              "will you be doing",
+              "are you going to do",
+              "do you do"
+            ],
+            "correctIndex": 0,
+            "explain": "Нейтральный вопрос о будущем плане -> чаще will you do."
+          },
+          {
+            "id": "photo_mc_8",
+            "instruction": "Выбери правильный вариант",
+            "prompt": "Do you know what time ____ ?",
+            "options": [
+              "does the conference finish",
+              "the conference finishes",
+              "the conference will finish",
+              "is the conference finishing"
+            ],
+            "correctIndex": 1,
+            "explain": "Косвенный вопрос + расписание -> прямой порядок слов и Present Simple."
+          },
+          {
+            "id": "photo_mc_9",
+            "instruction": "Выбери правильный вариант",
+            "prompt": "I can see you ____ a baby. When is it due?",
+            "options": [
+              "will have",
+              "are having",
+              "are going to have",
+              "have"
+            ],
+            "correctIndex": 2,
+            "explain": "Есть наблюдаемые признаки -> be going to."
+          },
+          {
+            "id": "photo_mc_10",
+            "instruction": "Выбери правильный вариант",
+            "prompt": "Don't phone me tonight. I ____ for my English exam.",
+            "options": [
+              "will study",
+              "will be studying",
+              "study",
+              "will have studied"
+            ],
+            "correctIndex": 1,
+            "explain": "Процесс в определенный момент будущего -> Future Continuous."
+          },
+          {
+            "id": "photo_mc_11",
+            "instruction": "Выбери правильный вариант",
+            "prompt": "We're late. The film ____ by the time we get to the cinema.",
+            "options": [
+              "will already start",
+              "will be already started",
+              "will already have started",
+              "have already started"
+            ],
+            "correctIndex": 2,
+            "explain": "Действие завершится раньше будущего момента -> Future Perfect."
+          },
+          {
+            "id": "photo_mc_12",
+            "instruction": "Выбери правильный вариант",
+            "prompt": "____ to the stationer's later? If so, could you buy a bundle of A4 paper for me?",
+            "options": [
+              "Are you going",
+              "Have you gone",
+              "Will you go",
+              "Will you be going"
+            ],
+            "correctIndex": 0,
+            "explain": "Вопрос о ближайшем личном плане/маршруте -> Present Continuous."
+          },
+          {
+            "id": "photo_mc_13",
+            "instruction": "Выбери правильный вариант",
+            "prompt": "Remember to give her the letters when she ____ back.",
+            "options": [
+              "comes",
+              "will come",
+              "is coming",
+              "come"
+            ],
+            "correctIndex": 0,
+            "explain": "После when в будущем контексте -> Present Simple."
+          }
+        ]
+      },
+      {
+        "id": "photoFillSet",
+        "title": "Photo Set B: guided fill-in",
+        "kind": "input",
+        "items": [
+          {
+            "id": "photo_fill_1",
+            "instruction": "Вставь форму",
+            "prompt": "I (see) Nick tomorrow, so I can give him your message.",
+            "accepted": [
+              "am seeing"
+            ],
+            "explain": "Есть договоренность на завтра -> Present Continuous."
+          },
+          {
+            "id": "photo_fill_2",
+            "instruction": "Вставь форму",
+            "prompt": "If he continues like this, he (spend) all his money before the end of his holiday.",
+            "accepted": [
+              "will have spent"
+            ],
+            "explain": "Завершение к дедлайну в будущем -> Future Perfect."
+          },
+          {
+            "id": "photo_fill_3",
+            "instruction": "Вставь форму",
+            "prompt": "The ferry (get) into Rotterdam at six o'clock tomorrow morning.",
+            "accepted": [
+              "gets"
+            ],
+            "explain": "Официальное расписание -> Present Simple."
+          },
+          {
+            "id": "photo_fill_4",
+            "instruction": "Вставь форму",
+            "prompt": "If you need to contact me, I (stay) at the Hilton Hotel until Friday.",
+            "accepted": [
+              "will be staying"
+            ],
+            "explain": "Процесс/состояние в период будущего времени -> Future Continuous."
+          },
+          {
+            "id": "photo_fill_5",
+            "instruction": "Вставь форму",
+            "prompt": "Did you post that letter for me? - Oh, sorry. I completely forgot. I (do) it right now.",
+            "accepted": [
+              "will do"
+            ],
+            "explain": "Мгновенная реакция/решение в момент речи -> will."
+          },
+          {
+            "id": "photo_fill_6",
+            "instruction": "Вставь форму",
+            "prompt": "Can you tell me when Mr. Ellis (be) here next week?",
+            "accepted": [
+              "will be"
+            ],
+            "explain": "Косвенный вопрос о будущем факте -> will be."
+          },
+          {
+            "id": "photo_fill_7",
+            "instruction": "Вставь форму",
+            "prompt": "Do you think you still (do) the same job in ten years' time?",
+            "accepted": [
+              "will be doing",
+              "will do"
+            ],
+            "explain": "Оба варианта допустимы: процесс в момент (will be doing) или нейтральный факт (will do)."
+          },
+          {
+            "id": "photo_fill_8",
+            "instruction": "Вставь форму",
+            "prompt": "In the future videoconferences probably (replace) many international gatherings.",
+            "accepted": [
+              "will replace"
+            ],
+            "explain": "Прогноз о будущем -> Future Simple."
+          },
+          {
+            "id": "photo_fill_9",
+            "instruction": "Вставь форму",
+            "prompt": "I've got loads of work. I expect I (work) all night.",
+            "accepted": [
+              "will be working"
+            ],
+            "explain": "Ожидаемый длительный процесс в конкретный период -> Future Continuous."
+          },
+          {
+            "id": "photo_fill_10",
+            "instruction": "Вставь форму",
+            "prompt": "The international trade fair (open) on 9 April and (finish) on 1 May.",
+            "accepted": [
+              "opens"
+            ],
+            "explain": "Для расписания событий используем Present Simple (opens ... finishes)."
+          },
+          {
+            "id": "photo_fill_11",
+            "instruction": "Вставь форму",
+            "prompt": "If you (learn) another language, you (get) a better job.",
+            "accepted": [
+              "learn"
+            ],
+            "explain": "В if-clause используем Present Simple (learn)."
+          },
+          {
+            "id": "photo_fill_12",
+            "instruction": "Вставь форму",
+            "prompt": "If I (continue) with my diet, I (lose) 10 kilos by the end of the month.",
+            "accepted": [
+              "continue"
+            ],
+            "explain": "В if-clause -> Present Simple; результат в главной части будет future."
           }
         ]
       }

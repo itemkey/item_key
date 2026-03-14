@@ -1118,6 +1118,197 @@
             "explain": "Правильный ответ — «Present Perfect Continuous». Его выбираем по смыслу и маркерам в этом предложении. В подсказках контекста: маркер Perfect."
           }
         ]
+      },
+      {
+        "id": "photoPpPpcDecision",
+        "title": "Photo Set G: decision logic (PP vs PPC)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "ppc_photo_dec_1",
+            "instruction": "Выбери время",
+            "prompt": "Jack ____ his driving test three times because he doesn't know how to park.",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentPerfect",
+            "explain": "Подсчет количества (three times) -> Present Perfect."
+          },
+          {
+            "id": "ppc_photo_dec_2",
+            "instruction": "Выбери время",
+            "prompt": "I think he ____ a lot of improvement.",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentPerfect",
+            "explain": "Результат/достижение (improvement) -> Present Perfect."
+          },
+          {
+            "id": "ppc_photo_dec_3",
+            "instruction": "Выбери время",
+            "prompt": "Alice ____ her driving test yet because she doesn't know the rules well.",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentPerfect",
+            "explain": "yet + completed action/not completed -> Present Perfect."
+          },
+          {
+            "id": "ppc_photo_dec_4",
+            "instruction": "Выбери время",
+            "prompt": "She ____ about this for two months.",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "presentPerfectContinuous",
+            "explain": "Длительный процесс c for + period -> Present Perfect Continuous."
+          },
+          {
+            "id": "ppc_photo_dec_5",
+            "instruction": "Выбери время",
+            "prompt": "She ____ the driver's manual for hours.",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "presentPerfectContinuous",
+            "explain": "for hours подчеркивает длительность процесса."
+          },
+          {
+            "id": "ppc_photo_dec_6",
+            "instruction": "Выбери время",
+            "prompt": "She ____ another test yet.",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentPerfect",
+            "explain": "yet + test as countable event -> Present Perfect."
+          },
+          {
+            "id": "ppc_photo_dec_7",
+            "instruction": "Выбери время",
+            "prompt": "I ____ a headache since I got up.",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentPerfect",
+            "explain": "State verb have (состояние) -> обычно Present Perfect."
+          },
+          {
+            "id": "ppc_photo_dec_8",
+            "instruction": "Выбери время",
+            "prompt": "He is my friend. I ____ him for a long time.",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentPerfect",
+            "explain": "Stative verb know не используется в Continuous."
+          },
+          {
+            "id": "ppc_photo_dec_9",
+            "instruction": "Выбери время",
+            "prompt": "I ____ that song before.",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentPerfect",
+            "explain": "Опыт до текущего момента -> Present Perfect."
+          },
+          {
+            "id": "ppc_photo_dec_10",
+            "instruction": "Выбери время",
+            "prompt": "How long ____ for ten?",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "presentPerfectContinuous",
+            "explain": "How long обычно ведет к длительному процессу -> PPC."
+          }
+        ]
+      },
+      {
+        "id": "photoPpPpcBuild",
+        "title": "Photo Set H: build the exact form",
+        "kind": "input",
+        "items": [
+          {
+            "id": "ppc_photo_build_1",
+            "instruction": "Вставь форму",
+            "prompt": "Jack ____ (fail) his driving test three times.",
+            "accepted": [
+              "has failed"
+            ],
+            "explain": "Количество раз -> has failed (Present Perfect)."
+          },
+          {
+            "id": "ppc_photo_build_2",
+            "instruction": "Вставь форму",
+            "prompt": "She ____ (worry) about this for two months.",
+            "accepted": [
+              "has been worrying",
+              "has worried"
+            ],
+            "explain": "Для длительного процесса предпочтительно has been worrying; has worried допустимо как state-like usage."
+          },
+          {
+            "id": "ppc_photo_build_3",
+            "instruction": "Вставь форму",
+            "prompt": "She ____ (study) the driver's manual for hours.",
+            "accepted": [
+              "has been studying",
+              "has studied"
+            ],
+            "explain": "Процесс в фокусе -> has been studying (PPC)."
+          },
+          {
+            "id": "ppc_photo_build_4",
+            "instruction": "Вставь форму",
+            "prompt": "I ____ (have) a headache since I got up.",
+            "accepted": [
+              "have had"
+            ],
+            "explain": "have (state) обычно не ставим в Continuous -> have had."
+          },
+          {
+            "id": "ppc_photo_build_5",
+            "instruction": "Вставь форму",
+            "prompt": "I ____ (know) him for a long time.",
+            "accepted": [
+              "have known"
+            ],
+            "explain": "know = state verb -> Present Perfect, не Continuous."
+          },
+          {
+            "id": "ppc_photo_build_6",
+            "instruction": "Вставь форму",
+            "prompt": "I ____ (never/hear) that song before.",
+            "accepted": [
+              "have never heard",
+              "I've never heard"
+            ],
+            "explain": "Опыт до текущего момента -> Present Perfect."
+          }
+        ]
       }
     ]
   }

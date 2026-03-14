@@ -150,6 +150,228 @@
             "explain": "Нужен процесс в момент прихода, поэтому Past Continuous."
           }
         ]
+      },
+      {
+        "id": "photoDecision",
+        "title": "Photo Set I: choose the tense logic",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "pam_photo_dec_1",
+            "instruction": "Выбери лучший вариант",
+            "prompt": "When we came to the station, the train already ____ .",
+            "options": [
+              "left",
+              "had left",
+              "was leaving"
+            ],
+            "correctIndex": 1,
+            "explain": "Поезд ушел раньше нашего прибытия -> Past Perfect."
+          },
+          {
+            "id": "pam_photo_dec_2",
+            "instruction": "Выбери лучший вариант",
+            "prompt": "Yesterday I found the book which I ____ last week.",
+            "options": [
+              "lost",
+              "had lost",
+              "was losing"
+            ],
+            "correctIndex": 1,
+            "explain": "Потерял раньше, нашел позже -> had lost."
+          },
+          {
+            "id": "pam_photo_dec_3",
+            "instruction": "Выбери лучший вариант",
+            "prompt": "When I woke up, father already ____ to work.",
+            "options": [
+              "went",
+              "had gone",
+              "was going"
+            ],
+            "correctIndex": 1,
+            "explain": "Ушел до момента пробуждения -> Past Perfect."
+          },
+          {
+            "id": "pam_photo_dec_4",
+            "instruction": "Выбери лучший вариант",
+            "prompt": "Nick ____ the teacher the picture which he had drawn.",
+            "options": [
+              "showed",
+              "had shown",
+              "was showing"
+            ],
+            "correctIndex": 0,
+            "explain": "Главное (позднее) действие в повествовании -> Past Simple."
+          },
+          {
+            "id": "pam_photo_dec_5",
+            "instruction": "Выбери лучший вариант",
+            "prompt": "By 5 o'clock yesterday he ____ that work.",
+            "options": [
+              "completed",
+              "had completed",
+              "was completing"
+            ],
+            "correctIndex": 1,
+            "explain": "By + past time = к моменту в прошлом -> Past Perfect."
+          },
+          {
+            "id": "pam_photo_dec_6",
+            "instruction": "Выбери лучший вариант",
+            "prompt": "After John had washed his clothes, he ____ to study.",
+            "options": [
+              "had begun",
+              "began",
+              "was beginning"
+            ],
+            "correctIndex": 1,
+            "explain": "Позднейшее действие после after-clause обычно в Past Simple."
+          },
+          {
+            "id": "pam_photo_dec_7",
+            "instruction": "Выбери лучший вариант",
+            "prompt": "The car had flipped ten times before it ____ on its roof.",
+            "options": [
+              "had landed",
+              "landed",
+              "was landing"
+            ],
+            "correctIndex": 1,
+            "explain": "После серии предшествующих действий финальное событие чаще Past Simple."
+          },
+          {
+            "id": "pam_photo_dec_8",
+            "instruction": "Выбери лучший вариант",
+            "prompt": "John had lived in Miami for one year when his parents ____ to visit.",
+            "options": [
+              "came",
+              "had come",
+              "were coming"
+            ],
+            "correctIndex": 0,
+            "explain": "Визит родителей = более поздняя точка в прошлом -> came."
+          }
+        ]
+      },
+      {
+        "id": "photoSequenceBuild",
+        "title": "Photo Set J: build past sequence (2 slots)",
+        "kind": "multi_input",
+        "items": [
+          {
+            "id": "pam_photo_seq_1",
+            "instruction": "Заполни обе формы",
+            "prompt": "When I ____ (come) home, mother already ____ (cook) lunch.",
+            "inputs": [
+              {
+                "accepted": [
+                  "came"
+                ]
+              },
+              {
+                "accepted": [
+                  "had cooked",
+                  "had already cooked"
+                ]
+              }
+            ],
+            "explain": "Определи порядок: позднее came, ранее had cooked."
+          },
+          {
+            "id": "pam_photo_seq_2",
+            "instruction": "Заполни обе формы",
+            "prompt": "When the teacher ____ (enter), the pupils already ____ (open) their textbooks.",
+            "inputs": [
+              {
+                "accepted": [
+                  "entered"
+                ]
+              },
+              {
+                "accepted": [
+                  "had opened",
+                  "had already opened"
+                ]
+              }
+            ],
+            "explain": "То, что было раньше момента входа, ставим в Past Perfect."
+          },
+          {
+            "id": "pam_photo_seq_3",
+            "instruction": "Заполни обе формы",
+            "prompt": "When my brother ____ (return) from work, I already ____ (do) my homework.",
+            "inputs": [
+              {
+                "accepted": [
+                  "returned"
+                ]
+              },
+              {
+                "accepted": [
+                  "had done",
+                  "had already done"
+                ]
+              }
+            ],
+            "explain": "Домашняя работа завершилась до его возвращения."
+          },
+          {
+            "id": "pam_photo_seq_4",
+            "instruction": "Заполни обе формы",
+            "prompt": "When we ____ (come) to the station, the train already ____ (leave).",
+            "inputs": [
+              {
+                "accepted": [
+                  "came"
+                ]
+              },
+              {
+                "accepted": [
+                  "had left",
+                  "had already left"
+                ]
+              }
+            ],
+            "explain": "Поезд ушел до нашего прибытия."
+          },
+          {
+            "id": "pam_photo_seq_5",
+            "instruction": "Заполни обе формы",
+            "prompt": "After the stewardesses ____ (serve) lunch to the passengers, they ____ (start) eating.",
+            "inputs": [
+              {
+                "accepted": [
+                  "had served"
+                ]
+              },
+              {
+                "accepted": [
+                  "started"
+                ]
+              }
+            ],
+            "explain": "Сначала обслуживание, потом действие пассажиров."
+          },
+          {
+            "id": "pam_photo_seq_6",
+            "instruction": "Заполни обе формы",
+            "prompt": "The car ____ (flip) ten times before it ____ (land) on its roof.",
+            "inputs": [
+              {
+                "accepted": [
+                  "had flipped"
+                ]
+              },
+              {
+                "accepted": [
+                  "landed"
+                ]
+              }
+            ],
+            "explain": "Серия предшествующих действий + итоговое событие."
+          }
+        ]
       }
     ]
   }

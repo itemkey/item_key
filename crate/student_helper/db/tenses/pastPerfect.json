@@ -774,6 +774,315 @@
             "explain": "Без акцента на порядок - Past Simple возможен."
           }
         ]
+      },
+      {
+        "id": "photoPastSequence",
+        "title": "Photo Set E: Past Simple vs Past Perfect (sequence)",
+        "kind": "multi_input",
+        "items": [
+          {
+            "id": "pp_photo_seq_1",
+            "instruction": "Заполни обе формы",
+            "prompt": "When I ____ (come) home, mother already ____ (cook) lunch.",
+            "inputs": [
+              {
+                "accepted": [
+                  "came"
+                ]
+              },
+              {
+                "accepted": [
+                  "had cooked",
+                  "had already cooked"
+                ]
+              }
+            ],
+            "explain": "Позднее действие -> Past Simple, более раннее -> Past Perfect."
+          },
+          {
+            "id": "pp_photo_seq_2",
+            "instruction": "Заполни обе формы",
+            "prompt": "Nick ____ (show) the teacher the picture which he ____ (draw).",
+            "inputs": [
+              {
+                "accepted": [
+                  "showed"
+                ]
+              },
+              {
+                "accepted": [
+                  "had drawn"
+                ]
+              }
+            ],
+            "explain": "Сначала нарисовал, потом показал -> had drawn / showed."
+          },
+          {
+            "id": "pp_photo_seq_3",
+            "instruction": "Заполни обе формы",
+            "prompt": "When the teacher ____ (enter) the classroom, the pupils already ____ (open) their textbooks.",
+            "inputs": [
+              {
+                "accepted": [
+                  "entered"
+                ]
+              },
+              {
+                "accepted": [
+                  "had opened",
+                  "had already opened"
+                ]
+              }
+            ],
+            "explain": "Открыли раньше момента входа учителя."
+          },
+          {
+            "id": "pp_photo_seq_4",
+            "instruction": "Заполни обе формы",
+            "prompt": "Kate ____ (give) me the pen which she ____ (buy) before.",
+            "inputs": [
+              {
+                "accepted": [
+                  "gave"
+                ]
+              },
+              {
+                "accepted": [
+                  "had bought"
+                ]
+              }
+            ],
+            "explain": "Покупка произошла до передачи ручки."
+          },
+          {
+            "id": "pp_photo_seq_5",
+            "instruction": "Заполни обе формы",
+            "prompt": "Yesterday I ____ (find) the book which I ____ (lose) last week.",
+            "inputs": [
+              {
+                "accepted": [
+                  "found"
+                ]
+              },
+              {
+                "accepted": [
+                  "had lost"
+                ]
+              }
+            ],
+            "explain": "Сначала потерял (раньше), потом нашел (позже)."
+          },
+          {
+            "id": "pp_photo_seq_6",
+            "instruction": "Заполни обе формы",
+            "prompt": "When my brother ____ (return) from work, I already ____ (do) my homework.",
+            "inputs": [
+              {
+                "accepted": [
+                  "returned"
+                ]
+              },
+              {
+                "accepted": [
+                  "had done",
+                  "had already done"
+                ]
+              }
+            ],
+            "explain": "Домашка была сделана до его возвращения."
+          },
+          {
+            "id": "pp_photo_seq_7",
+            "instruction": "Заполни обе формы",
+            "prompt": "Mother ____ (see) that Nick ____ (not/wash) his hands.",
+            "inputs": [
+              {
+                "accepted": [
+                  "saw"
+                ]
+              },
+              {
+                "accepted": [
+                  "had not washed",
+                  "hadn't washed"
+                ]
+              }
+            ],
+            "explain": "Факт отсутствия действия предшествовал моменту, когда мама это заметила."
+          },
+          {
+            "id": "pp_photo_seq_8",
+            "instruction": "Заполни обе формы",
+            "prompt": "The teacher ____ (understand) that Lena ____ (not/do) her homework.",
+            "inputs": [
+              {
+                "accepted": [
+                  "understood"
+                ]
+              },
+              {
+                "accepted": [
+                  "had not done",
+                  "hadn't done"
+                ]
+              }
+            ],
+            "explain": "Невыполненная домашка раньше момента понимания."
+          },
+          {
+            "id": "pp_photo_seq_9",
+            "instruction": "Заполни обе формы",
+            "prompt": "When we ____ (come) to the station, the train already ____ (leave).",
+            "inputs": [
+              {
+                "accepted": [
+                  "came"
+                ]
+              },
+              {
+                "accepted": [
+                  "had left",
+                  "had already left"
+                ]
+              }
+            ],
+            "explain": "Поезд ушел до нашего прибытия."
+          },
+          {
+            "id": "pp_photo_seq_10",
+            "instruction": "Заполни обе формы",
+            "prompt": "Ann ____ (tell) me that she ____ (see) an interesting film.",
+            "inputs": [
+              {
+                "accepted": [
+                  "told"
+                ]
+              },
+              {
+                "accepted": [
+                  "had seen"
+                ]
+              }
+            ],
+            "explain": "Сначала посмотрела фильм, потом рассказала."
+          },
+          {
+            "id": "pp_photo_seq_11",
+            "instruction": "Заполни обе формы",
+            "prompt": "When I ____ (wake) up yesterday, father already ____ (go) to work.",
+            "inputs": [
+              {
+                "accepted": [
+                  "woke"
+                ]
+              },
+              {
+                "accepted": [
+                  "had gone",
+                  "had already gone"
+                ]
+              }
+            ],
+            "explain": "Отец ушел до момента пробуждения."
+          },
+          {
+            "id": "pp_photo_seq_12",
+            "instruction": "Заполни обе формы",
+            "prompt": "The car ____ (flip) ten times before it ____ (land) on its roof.",
+            "inputs": [
+              {
+                "accepted": [
+                  "had flipped"
+                ]
+              },
+              {
+                "accepted": [
+                  "landed"
+                ]
+              }
+            ],
+            "explain": "Серия переворотов завершилась до финального приземления."
+          },
+          {
+            "id": "pp_photo_seq_13",
+            "instruction": "Заполни обе формы",
+            "prompt": "We ____ (correct) our papers after we ____ (take) the quiz.",
+            "inputs": [
+              {
+                "accepted": [
+                  "corrected"
+                ]
+              },
+              {
+                "accepted": [
+                  "had taken"
+                ]
+              }
+            ],
+            "explain": "Сначала прошли квиз, потом проверяли работы."
+          },
+          {
+            "id": "pp_photo_seq_14",
+            "instruction": "Заполни обе формы",
+            "prompt": "John ____ (live) in Miami for one year when his parents ____ (come) to visit.",
+            "inputs": [
+              {
+                "accepted": [
+                  "had lived"
+                ]
+              },
+              {
+                "accepted": [
+                  "came"
+                ]
+              }
+            ],
+            "explain": "Длительный период к прошлому моменту -> had lived; визит позже -> came."
+          }
+        ]
+      },
+      {
+        "id": "photoPastSingle",
+        "title": "Photo Set F: single-slot control",
+        "kind": "input",
+        "items": [
+          {
+            "id": "pp_photo_single_1",
+            "instruction": "Вставь форму",
+            "prompt": "By that time they ____ (settle) the matter.",
+            "accepted": [
+              "had settled"
+            ],
+            "explain": "by that time -> Past Perfect."
+          },
+          {
+            "id": "pp_photo_single_2",
+            "instruction": "Вставь форму",
+            "prompt": "By 5 o'clock yesterday he ____ (complete) that work.",
+            "accepted": [
+              "had completed"
+            ],
+            "explain": "Завершение к моменту в прошлом -> Past Perfect."
+          },
+          {
+            "id": "pp_photo_single_3",
+            "instruction": "Вставь форму",
+            "prompt": "Jane ____ (send) a letter to her university after she had received her scholarship check.",
+            "accepted": [
+              "sent"
+            ],
+            "explain": "Главное более позднее действие обычно в Past Simple (sent)."
+          },
+          {
+            "id": "pp_photo_single_4",
+            "instruction": "Вставь форму",
+            "prompt": "After the stewardesses ____ (serve) lunch to the passengers, they started eating.",
+            "accepted": [
+              "had served"
+            ],
+            "explain": "В after-clause с акцентом на предшествование -> Past Perfect."
+          }
+        ]
       }
     ]
   }

@@ -1196,6 +1196,607 @@
             "explain": "Правильный вариант: Present Perfect Continuous."
           }
         ]
+      },
+      {
+        "id": "photoPpPpcChoice",
+        "title": "Photo Set C: Present Perfect vs Present Perfect Continuous",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "prp_photo_cmp_1",
+            "instruction": "Выбери время",
+            "prompt": "Nina ____ English for 2 years.",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "presentPerfectContinuous",
+            "explain": "Длительность активного процесса (for 2 years) -> чаще Present Perfect Continuous."
+          },
+          {
+            "id": "prp_photo_cmp_2",
+            "instruction": "Выбери время",
+            "prompt": "The birds ____ already ____ to the south.",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentPerfect",
+            "explain": "already + результат (улетели) -> Present Perfect."
+          },
+          {
+            "id": "prp_photo_cmp_3",
+            "instruction": "Выбери время",
+            "prompt": "They ____ him for many years.",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentPerfect",
+            "explain": "State verb know обычно не ставится в Continuous."
+          },
+          {
+            "id": "prp_photo_cmp_4",
+            "instruction": "Выбери время",
+            "prompt": "Mike ____ to learn the poem.",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentPerfect",
+            "explain": "Результат/факт ошибки -> Present Perfect."
+          },
+          {
+            "id": "prp_photo_cmp_5",
+            "instruction": "Выбери время",
+            "prompt": "The children ____ cartoons for 2 hours.",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "presentPerfectContinuous",
+            "explain": "Акцент на длительности процесса -> Present Perfect Continuous."
+          },
+          {
+            "id": "prp_photo_cmp_6",
+            "instruction": "Выбери время",
+            "prompt": "The train ____ just ____ .",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentPerfect",
+            "explain": "just + завершившееся событие/результат -> Present Perfect."
+          },
+          {
+            "id": "prp_photo_cmp_7",
+            "instruction": "Выбери время",
+            "prompt": "We ____ a holiday for five years.",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentPerfect",
+            "explain": "State verb have (в значении possess/experience) -> Present Perfect."
+          },
+          {
+            "id": "prp_photo_cmp_8",
+            "instruction": "Выбери время",
+            "prompt": "She ____ at this school for twenty years.",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "presentPerfectContinuous",
+            "explain": "Длительная деятельность (teach) -> чаще Present Perfect Continuous."
+          },
+          {
+            "id": "prp_photo_cmp_9",
+            "instruction": "Выбери время",
+            "prompt": "David ____ in his studio since 10 o'clock.",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "presentPerfectContinuous",
+            "explain": "since + процесс -> Present Perfect Continuous."
+          },
+          {
+            "id": "prp_photo_cmp_10",
+            "instruction": "Выбери время",
+            "prompt": "Mary and Sam ____ stamps for 3 years.",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "presentPerfectContinuous",
+            "explain": "Коллекционирование как длительный процесс -> Present Perfect Continuous."
+          },
+          {
+            "id": "prp_photo_cmp_11",
+            "instruction": "Выбери время",
+            "prompt": "Their parents ____ friends since childhood.",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentPerfect",
+            "explain": "State verb be + существительное -> Present Perfect."
+          },
+          {
+            "id": "prp_photo_cmp_12",
+            "instruction": "Выбери время",
+            "prompt": "Dave ____ a student for 2 years.",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentPerfect",
+            "explain": "State (be a student) -> Present Perfect."
+          },
+          {
+            "id": "prp_photo_cmp_13",
+            "instruction": "Выбери время",
+            "prompt": "Jack ____ his driving test three times.",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentPerfect",
+            "explain": "Подсчет количества раз -> Present Perfect."
+          },
+          {
+            "id": "prp_photo_cmp_14",
+            "instruction": "Выбери время",
+            "prompt": "Ivan has a stomachache. He ____ junk food all day.",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "presentPerfectContinuous",
+            "explain": "Есть следствие сейчас и длительный процесс -> Present Perfect Continuous."
+          }
+        ]
+      },
+      {
+        "id": "photoPpPpcQuestions",
+        "title": "Photo Set D: question builder (PP vs PPC)",
+        "kind": "input",
+        "items": [
+          {
+            "id": "prp_photo_q_1",
+            "instruction": "Построй вопрос",
+            "prompt": "Your shirt smells terrible! (you/smoke)?",
+            "accepted": [
+              "Have you been smoking?",
+              "Have you been smoking"
+            ],
+            "explain": "Видимый результат + недавний процесс -> Present Perfect Continuous question."
+          },
+          {
+            "id": "prp_photo_q_2",
+            "instruction": "Построй вопрос",
+            "prompt": "How long (you/wait) for them?",
+            "accepted": [
+              "How long have you been waiting for them?",
+              "How long have you been waiting for them"
+            ],
+            "explain": "How long + процесс -> Present Perfect Continuous."
+          },
+          {
+            "id": "prp_photo_q_3",
+            "instruction": "Построй вопрос",
+            "prompt": "How many glasses of beer (he/drink) today?",
+            "accepted": [
+              "How many glasses of beer has he drunk today?",
+              "How many glasses of beer has he drunk today"
+            ],
+            "explain": "How many + итоговое количество -> Present Perfect."
+          },
+          {
+            "id": "prp_photo_q_4",
+            "instruction": "Построй вопрос",
+            "prompt": "(you/ever/live) in a tent?",
+            "accepted": [
+              "Have you ever lived in a tent?",
+              "Have you ever lived in a tent"
+            ],
+            "explain": "ever + жизненный опыт -> Present Perfect."
+          },
+          {
+            "id": "prp_photo_q_5",
+            "instruction": "Построй вопрос",
+            "prompt": "Where (you/be)?",
+            "accepted": [
+              "Where have you been?",
+              "Where have you been"
+            ],
+            "explain": "Результат к моменту речи -> Present Perfect."
+          },
+          {
+            "id": "prp_photo_q_6",
+            "instruction": "Построй вопрос",
+            "prompt": "How much money (Kevin/spend) in the casino?",
+            "accepted": [
+              "How much money has Kevin spent in the casino?",
+              "How much money has Kevin spent in the casino"
+            ],
+            "explain": "Сумма/результат -> Present Perfect."
+          },
+          {
+            "id": "prp_photo_q_7",
+            "instruction": "Построй вопрос",
+            "prompt": "(those vegetables/boil) since 2 o'clock?",
+            "accepted": [
+              "Have those vegetables been boiling since 2 o'clock?",
+              "Have those vegetables been boiling since 2 o'clock"
+            ],
+            "explain": "since + процесс -> Present Perfect Continuous."
+          },
+          {
+            "id": "prp_photo_q_8",
+            "instruction": "Построй вопрос",
+            "prompt": "(you/defrost) the fridge yet?",
+            "accepted": [
+              "Have you defrosted the fridge yet?",
+              "Have you defrosted the fridge yet"
+            ],
+            "explain": "yet + completed action -> Present Perfect."
+          },
+          {
+            "id": "prp_photo_q_9",
+            "instruction": "Построй вопрос",
+            "prompt": "How many messages (she/send) today?",
+            "accepted": [
+              "How many messages has she sent today?",
+              "How many messages has she sent today"
+            ],
+            "explain": "How many + count -> Present Perfect."
+          },
+          {
+            "id": "prp_photo_q_10",
+            "instruction": "Построй вопрос",
+            "prompt": "How long (your sister/travel)?",
+            "accepted": [
+              "How long has your sister been traveling?",
+              "How long has your sister been travelling?",
+              "How long has your sister been traveling",
+              "How long has your sister been travelling"
+            ],
+            "explain": "How long + ongoing activity -> Present Perfect Continuous."
+          },
+          {
+            "id": "prp_photo_q_11",
+            "instruction": "Построй вопрос",
+            "prompt": "How many people (Angela/invite) to her party?",
+            "accepted": [
+              "How many people has Angela invited to her party?",
+              "How many people has Angela invited to her party"
+            ],
+            "explain": "Количество приглашенных -> Present Perfect."
+          },
+          {
+            "id": "prp_photo_q_12",
+            "instruction": "Построй вопрос",
+            "prompt": "(you/sit) here for a long time?",
+            "accepted": [
+              "Have you been sitting here for a long time?",
+              "Have you been sitting here for a long time"
+            ],
+            "explain": "for a long time + процесс -> Present Perfect Continuous."
+          }
+        ]
+      },
+      {
+        "id": "photoPresentPerfectForms",
+        "title": "Photo Set K: Present Perfect form builder",
+        "kind": "input",
+        "items": [
+          {
+            "id": "prp_photo_form_1",
+            "instruction": "Вставь форму",
+            "prompt": "I ____ (see) this film already.",
+            "accepted": [
+              "have seen",
+              "I've seen"
+            ],
+            "explain": "already + результат к настоящему -> Present Perfect."
+          },
+          {
+            "id": "prp_photo_form_2",
+            "instruction": "Вставь форму",
+            "prompt": "John and Julie ____ (have) their car for about a year.",
+            "accepted": [
+              "have had",
+              "John and Julie have had their car for about a year"
+            ],
+            "explain": "have в значении possession с for + period -> Present Perfect."
+          },
+          {
+            "id": "prp_photo_form_3",
+            "instruction": "Вставь форму",
+            "prompt": "She ____ (not/take) her driving test yet.",
+            "accepted": [
+              "hasn't taken",
+              "has not taken"
+            ],
+            "explain": "yet в отрицании -> Present Perfect negative."
+          },
+          {
+            "id": "prp_photo_form_4",
+            "instruction": "Вставь форму",
+            "prompt": "Sue ____ (be) a tour guide since she left university.",
+            "accepted": [
+              "has been"
+            ],
+            "explain": "State verb be + since -> Present Perfect."
+          },
+          {
+            "id": "prp_photo_form_5",
+            "instruction": "Построй вопрос",
+            "prompt": "(you/ride) into town on your new bike yet?",
+            "accepted": [
+              "Have you ridden into town on your new bike yet?",
+              "Have you ridden into town on your new bike yet"
+            ],
+            "explain": "yet в вопросе -> Present Perfect question."
+          },
+          {
+            "id": "prp_photo_form_6",
+            "instruction": "Вставь форму",
+            "prompt": "This new computer ____ (make) my life a lot easier.",
+            "accepted": [
+              "has made"
+            ],
+            "explain": "Текущий результат сейчас -> Present Perfect."
+          },
+          {
+            "id": "prp_photo_form_7",
+            "instruction": "Вставь форму",
+            "prompt": "We ____ (not/decide) what to get Mark for his birthday yet.",
+            "accepted": [
+              "haven't decided",
+              "have not decided"
+            ],
+            "explain": "yet + отсутствие результата -> Present Perfect negative."
+          },
+          {
+            "id": "prp_photo_form_8",
+            "instruction": "Построй вопрос",
+            "prompt": "(Paul/ever/meet) a famous person?",
+            "accepted": [
+              "Has Paul ever met a famous person?",
+              "Has Paul ever met a famous person"
+            ],
+            "explain": "ever + life experience -> Present Perfect."
+          }
+        ]
+      },
+      {
+        "id": "photoPpVsPsChoice",
+        "title": "Photo Set L: Present Perfect vs Past Simple",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "prp_photo_mix_1",
+            "instruction": "Выбери правильный вариант",
+            "prompt": "____ never played this game before.",
+            "options": [
+              "I've",
+              "I"
+            ],
+            "correctIndex": 0,
+            "explain": "before + опыт до настоящего момента -> Present Perfect."
+          },
+          {
+            "id": "prp_photo_mix_2",
+            "instruction": "Выбери правильный вариант",
+            "prompt": "Adam ____ his room last night.",
+            "options": [
+              "has tidied",
+              "tidied"
+            ],
+            "correctIndex": 1,
+            "explain": "last night = finished past time -> Past Simple."
+          },
+          {
+            "id": "prp_photo_mix_3",
+            "instruction": "Выбери правильный вариант",
+            "prompt": "____ here since 2005?",
+            "options": [
+              "Have you lived",
+              "Did you live"
+            ],
+            "correctIndex": 0,
+            "explain": "since + ongoing period -> Present Perfect."
+          },
+          {
+            "id": "prp_photo_mix_4",
+            "instruction": "Выбери правильный вариант",
+            "prompt": "Carol and I ____ to the cinema three nights ago.",
+            "options": [
+              "have been",
+              "went"
+            ],
+            "correctIndex": 1,
+            "explain": "three nights ago -> Past Simple."
+          },
+          {
+            "id": "prp_photo_mix_5",
+            "instruction": "Выбери правильный вариант",
+            "prompt": "It's the first time ____ our flat, isn't it?",
+            "options": [
+              "you've visited",
+              "you visited"
+            ],
+            "correctIndex": 0,
+            "explain": "It's the first time + Present Perfect."
+          },
+          {
+            "id": "prp_photo_mix_6",
+            "instruction": "Выбери правильный вариант",
+            "prompt": "They ____ the baby a name yet.",
+            "options": [
+              "haven't given",
+              "didn't give"
+            ],
+            "correctIndex": 0,
+            "explain": "yet + незавершенный результат -> Present Perfect."
+          },
+          {
+            "id": "prp_photo_mix_7",
+            "instruction": "Выбери правильный вариант",
+            "prompt": "____ to New York when you went to the States last summer?",
+            "options": [
+              "Have you been",
+              "Did you go"
+            ],
+            "correctIndex": 1,
+            "explain": "last summer = finished past time -> Past Simple."
+          },
+          {
+            "id": "prp_photo_mix_8",
+            "instruction": "Выбери правильный вариант",
+            "prompt": "____ an e-mail before?",
+            "options": [
+              "Have you ever sent",
+              "Did you ever send"
+            ],
+            "correctIndex": 0,
+            "explain": "ever + before (life experience) -> Present Perfect."
+          },
+          {
+            "id": "prp_photo_mix_9",
+            "instruction": "Выбери правильный вариант",
+            "prompt": "I already ____ my homework. Now I can go out.",
+            "options": [
+              "have done",
+              "did"
+            ],
+            "correctIndex": 0,
+            "explain": "already + current result -> Present Perfect."
+          },
+          {
+            "id": "prp_photo_mix_10",
+            "instruction": "Выбери правильный вариант",
+            "prompt": "I ____ my homework yesterday.",
+            "options": [
+              "have done",
+              "did"
+            ],
+            "correctIndex": 1,
+            "explain": "yesterday -> Past Simple."
+          },
+          {
+            "id": "prp_photo_mix_11",
+            "instruction": "Выбери правильный вариант",
+            "prompt": "He ____ just ____ home.",
+            "options": [
+              "has / come",
+              "did / come"
+            ],
+            "correctIndex": 0,
+            "explain": "just + recent result -> Present Perfect."
+          },
+          {
+            "id": "prp_photo_mix_12",
+            "instruction": "Выбери правильный вариант",
+            "prompt": "He was ill last week, but now he ____ .",
+            "options": [
+              "has recovered",
+              "recovered"
+            ],
+            "correctIndex": 0,
+            "explain": "Контраст with now -> важен результат в настоящем (has recovered)."
+          }
+        ]
+      },
+      {
+        "id": "photoClassroomProduction",
+        "title": "Photo Set M: classroom prompts -> full Present Perfect sentences",
+        "kind": "input",
+        "items": [
+          {
+            "id": "prp_photo_prod_1",
+            "instruction": "Собери предложение",
+            "prompt": "lesson / not / start / yet",
+            "accepted": [
+              "The lesson hasn't started yet.",
+              "The lesson has not started yet."
+            ],
+            "explain": "yet + negative result -> Present Perfect negative."
+          },
+          {
+            "id": "prp_photo_prod_2",
+            "instruction": "Собери предложение",
+            "prompt": "teacher / already / write / on the board",
+            "accepted": [
+              "The teacher has already written on the board."
+            ],
+            "explain": "already + done result -> Present Perfect."
+          },
+          {
+            "id": "prp_photo_prod_3",
+            "instruction": "Собери предложение",
+            "prompt": "Joe and Tim / just / come / into the classroom",
+            "accepted": [
+              "Joe and Tim have just come into the classroom."
+            ],
+            "explain": "just + recent action with present relevance -> Present Perfect."
+          },
+          {
+            "id": "prp_photo_prod_4",
+            "instruction": "Собери предложение",
+            "prompt": "Tony / not / finish / getting books ready",
+            "accepted": [
+              "Tony hasn't finished getting his books ready.",
+              "Tony has not finished getting his books ready."
+            ],
+            "explain": "Нет готового результата -> Present Perfect negative."
+          },
+          {
+            "id": "prp_photo_prod_5",
+            "instruction": "Собери предложение",
+            "prompt": "Christine / already / open / book",
+            "accepted": [
+              "Christine has already opened her book."
+            ],
+            "explain": "already подчеркивает завершенность к текущему моменту."
+          },
+          {
+            "id": "prp_photo_prod_6",
+            "instruction": "Собери предложение",
+            "prompt": "Dave / drop / pen / on the floor",
+            "accepted": [
+              "Dave has dropped his pen on the floor."
+            ],
+            "explain": "Результат виден сейчас в ситуации на картинке."
+          },
+          {
+            "id": "prp_photo_prod_7",
+            "instruction": "Собери предложение",
+            "prompt": "he / not / pick it up / yet",
+            "accepted": [
+              "He hasn't picked it up yet.",
+              "He has not picked it up yet."
+            ],
+            "explain": "yet в отрицании показывает, что действие до сих пор не завершено."
+          }
+        ]
       }
     ]
   }

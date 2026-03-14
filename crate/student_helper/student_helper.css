@@ -180,7 +180,11 @@ body {
       font-family: ui-serif, "Times New Roman", Georgia, serif;
       font-weight:900;
       font-size:clamp(30px, 5.2vw, 52px);
-      margin:0; line-height:1.05;
+      margin:0;
+      line-height:1.05;
+      max-width:100%;
+      overflow-wrap:anywhere;
+      word-break:break-word;
     }
     .ik-ru{
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
@@ -261,7 +265,15 @@ body {
     .ik-list li.is-clickable:hover{ background: rgba(0,0,0,0.04); }
     .ik-itemline{
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size:12px; line-height:1.35; margin:0;
+      font-size:12px;
+      line-height:1.35;
+      margin:0;
+      overflow-wrap:anywhere;
+      word-break:break-word;
+    }
+    .ik-list li > :first-child{
+      flex:1 1 auto;
+      min-width:0;
     }
     .ik-itemline b{ font-weight:900; }
     .ik-mini{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }

@@ -701,7 +701,7 @@ begin
       "ru": "память"
     },
     {
-      "en": "to memorise",
+      "en": "to memorize",
       "ru": "запоминать"
     },
     {

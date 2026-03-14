@@ -15,6 +15,7 @@ Order for fresh environment:
 11. Run `supabase/sql/stage15_planning_schedule.sql`
 12. Run `supabase/sql/stage16_planning_personal_schedule.sql`
 13. (Optional) Run `supabase/sql/stage12_seed_public_user_dictionaries.sql`
+14. (Optional, if stage12 was used) Run `supabase/sql/stage17_fix_memorize_spelling.sql`
 
 After SQL:
 

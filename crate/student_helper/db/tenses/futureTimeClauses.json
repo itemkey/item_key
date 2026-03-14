@@ -5,47 +5,67 @@
   "ruleBlocks": [
     {
       "type": "heading",
-      "text": "Главное правило future clauses"
+      "text": "Core rule"
     },
     {
       "type": "text",
-      "text": "В придаточных времени и условия после if/when/as soon as/unless/before/after/in case используем Present Simple, а не will."
+      "text": "В придаточных времени и условия (if, when, as soon as, before, after, until, unless) в future-контексте обычно ставим Present Simple, а не will."
     },
     {
       "type": "table",
-      "caption": "Схема",
-      "columns": ["Тип", "Форма", "Пример"],
+      "caption": "Decision pattern",
+      "columns": [
+        "Часть",
+        "Что ставим",
+        "Пример"
+      ],
       "rows": [
-        ["Main clause", "will + V1", "I'll call you"],
-        ["Time/condition clause", "Present Simple", "when I arrive"],
-        ["Итог", "will + V1 + when/if + Present Simple", "I'll call you when I arrive."]
+        [
+          "Главная часть",
+          "will + V1 / другой future-паттерн",
+          "I'll call you"
+        ],
+        [
+          "Придаточная времени/условия",
+          "Present Simple",
+          "when I arrive"
+        ],
+        [
+          "Итог",
+          "future + when/if + Present Simple",
+          "I'll call you when I arrive"
+        ]
       ]
     },
     {
       "type": "highlight",
-      "title": "Союзы",
+      "title": "High-frequency traps",
       "lines": [
-        "if (если), when (когда), as soon as (как только)",
-        "unless (если не), in case (в случае если)",
-        "before/after (до/после)"
+        "when I will finish -> when I finish",
+        "if she will call -> if she calls",
+        "as soon as you will see -> as soon as you see",
+        "until we will move -> until we move"
       ]
     },
     {
       "type": "examples",
       "items": [
-        { "en": "I'll text you as soon as I get home.", "ru": "Я напишу тебе, как только доберусь домой." },
-        { "en": "If it rains, we'll stay inside.", "ru": "Если пойдет дождь, мы останемся дома." },
-        { "en": "We'll leave when the meeting ends.", "ru": "Мы уйдем, когда встреча закончится." },
-        { "en": "I won't go out unless I finish my report.", "ru": "Я не пойду гулять, если не закончу отчет." }
-      ]
-    },
-    {
-      "type": "highlight",
-      "title": "Типичная ошибка",
-      "lines": [
-        "Неправильно: when I will arrive",
-        "Правильно: when I arrive",
-        "will в будущем стоит в главной части, не в придаточной"
+        {
+          "en": "Don't forget to turn off the lights before you leave.",
+          "ru": "Не забудь выключить свет перед тем, как уйдешь."
+        },
+        {
+          "en": "If you arrive late, the best things will have gone.",
+          "ru": "Если придешь поздно, лучшие вещи уже разберут."
+        },
+        {
+          "en": "As soon as you see Mrs. Minks, ask her to call me.",
+          "ru": "Как только увидишь миссис Минкс, попроси ее мне позвонить."
+        },
+        {
+          "en": "We'll keep these boxes until we move to a bigger place.",
+          "ru": "Мы сохраним эти коробки, пока не переедем в место побольше."
+        }
       ]
     }
   ],
@@ -53,105 +73,349 @@
     "exercises": [
       {
         "id": "meaning",
-        "title": "Когда используем (Meaning)",
+        "title": "Recognition: найди логику выбора",
         "kind": "choice",
         "items": [
           {
             "id": "ftc_m_1",
             "instruction": "Выбери правило",
             "prompt": "I'll call you when I arrive.",
-            "options": ["в придаточном времени Present Simple", "везде Future Simple", "прошлое время"],
+            "options": [
+              "после when -> Present Simple",
+              "после when -> will",
+              "после when -> Past Simple"
+            ],
             "correctIndex": 0,
-            "explain": "После when в future context ставим Present Simple."
+            "explain": "В future-контексте после when ставим Present Simple."
           },
           {
             "id": "ftc_m_2",
             "instruction": "Выбери правило",
             "prompt": "If she is late, we'll start without her.",
-            "options": ["if-clause в Present Simple", "if-clause с will", "Present Perfect"],
+            "options": [
+              "if-clause в Present Simple",
+              "if-clause в Future Simple",
+              "if-clause в Present Perfect"
+            ],
             "correctIndex": 0,
-            "explain": "После if в этом типе условий - Present Simple."
+            "explain": "Реальное условие будущего: if + Present Simple."
           },
           {
             "id": "ftc_m_3",
             "instruction": "Выбери правило",
             "prompt": "We'll leave as soon as the rain stops.",
-            "options": ["после as soon as - Present Simple", "после as soon as - will", "после as soon as - Past Simple"],
+            "options": [
+              "as soon as + Present Simple",
+              "as soon as + will",
+              "as soon as + would"
+            ],
             "correctIndex": 0,
-            "explain": "as soon as работает как союз времени."
+            "explain": "as soon as работает как союз времени, поэтому форма Present Simple."
           },
           {
             "id": "ftc_m_4",
             "instruction": "Выбери правило",
             "prompt": "I won't go unless he apologizes.",
-            "options": ["unless + Present Simple", "unless + will", "unless + was/were"],
+            "options": [
+              "unless + Present Simple",
+              "unless + will",
+              "unless + Past Continuous"
+            ],
             "correctIndex": 0,
-            "explain": "unless = if...not, используем Present Simple."
+            "explain": "unless = if ... not; здесь нужен Present Simple."
           },
           {
             "id": "ftc_m_5",
             "instruction": "Выбери правило",
-            "prompt": "We'll take a taxi if we miss the bus.",
-            "options": ["условие в Present Simple", "условие в Future Continuous", "условие в Past Perfect"],
+            "prompt": "Don't forget to lock the door before you leave.",
+            "options": [
+              "before + Present Simple",
+              "before + will",
+              "before + be going to"
+            ],
             "correctIndex": 0,
-            "explain": "If-clause содержит форму Present Simple (miss)."
+            "explain": "После before в таком контексте ставим Present Simple."
           },
           {
             "id": "ftc_m_6",
             "instruction": "Выбери правило",
-            "prompt": "In case she calls, tell her I'll be back at 6.",
-            "options": ["in case-clause в Present Simple", "in case-clause с will", "нельзя с in case"],
+            "prompt": "The mats can stay here until we move to a bigger house.",
+            "options": [
+              "until-clause в Present Simple",
+              "until-clause в will",
+              "until-clause в Future Continuous"
+            ],
             "correctIndex": 0,
-            "explain": "После in case в будущем контексте обычно Present Simple."
+            "explain": "После until в future-контексте обычно Present Simple."
           }
         ]
       },
       {
         "id": "formula",
-        "title": "Формулы (Formula)",
+        "title": "Controlled practice: поставь форму",
         "kind": "input",
         "items": [
           {
             "id": "ftc_f_1",
             "instruction": "Вставь форму",
             "prompt": "I'll text you when I ____ (arrive).",
-            "accepted": ["arrive"],
+            "accepted": [
+              "arrive"
+            ],
             "explain": "После when -> Present Simple."
           },
           {
             "id": "ftc_f_2",
             "instruction": "Вставь форму",
             "prompt": "If it ____ (rain), we'll stay home.",
-            "accepted": ["rains"],
-            "explain": "If-clause: Present Simple (rains)."
+            "accepted": [
+              "rains"
+            ],
+            "explain": "If-clause: Present Simple."
           },
           {
             "id": "ftc_f_3",
             "instruction": "Вставь форму",
             "prompt": "We'll leave as soon as he ____ (finish).",
-            "accepted": ["finishes"],
-            "explain": "as soon as + Present Simple."
+            "accepted": [
+              "finishes"
+            ],
+            "explain": "После as soon as ставим Present Simple."
           },
           {
             "id": "ftc_f_4",
-            "instruction": "Исправь ошибку",
+            "instruction": "Исправь",
             "prompt": "I'll call you when I will know the result.",
-            "accepted": ["I'll call you when I know the result", "I will call you when I know the result"],
-            "explain": "В придаточном после when убираем will."
+            "accepted": [
+              "I'll call you when I know the result.",
+              "I will call you when I know the result."
+            ],
+            "acceptedShort": [
+              "know"
+            ],
+            "explain": "В when-clause убираем will."
           },
           {
             "id": "ftc_f_5",
             "instruction": "Вставь форму",
             "prompt": "Unless she ____ (apologize), we won't continue.",
-            "accepted": ["apologizes"],
+            "accepted": [
+              "apologizes"
+            ],
             "explain": "unless + Present Simple."
           },
           {
             "id": "ftc_f_6",
             "instruction": "Вставь форму",
             "prompt": "We'll buy tickets before prices ____ (go) up.",
-            "accepted": ["go"],
-            "explain": "before-clause в Present Simple."
+            "accepted": [
+              "go"
+            ],
+            "explain": "В before-clause здесь нужна базовая форма Present Simple."
+          },
+          {
+            "id": "ftc_f_7",
+            "instruction": "Вставь форму",
+            "prompt": "As soon as you ____ (see) Mrs. Minks, ask her to ring me up.",
+            "accepted": [
+              "see"
+            ],
+            "explain": "После as soon as не используем will."
+          },
+          {
+            "id": "ftc_f_8",
+            "instruction": "Вставь форму",
+            "prompt": "The other mats can be stowed away until we ____ (move) to a bigger house.",
+            "accepted": [
+              "move"
+            ],
+            "explain": "until + Present Simple в будущем контексте."
+          }
+        ]
+      },
+      {
+        "id": "markers",
+        "title": "Context signals: выбери все корректные",
+        "kind": "multi",
+        "items": [
+          {
+            "id": "ftc_mark_1",
+            "instruction": "Можно выбрать несколько",
+            "prompt": "Какие союзы чаще запускают правило no will in clause?",
+            "options": [
+              "if",
+              "when",
+              "as soon as",
+              "unless"
+            ],
+            "correctIndices": [
+              0,
+              1,
+              2,
+              3
+            ],
+            "explain": "Все эти союзы типично требуют Present Simple в future-контексте."
+          },
+          {
+            "id": "ftc_mark_2",
+            "instruction": "Можно выбрать несколько",
+            "prompt": "Какие варианты естественны в придаточной части?",
+            "options": [
+              "when I arrive",
+              "if she calls",
+              "as soon as you see him",
+              "when I will arrive"
+            ],
+            "correctIndices": [
+              0,
+              1,
+              2
+            ],
+            "explain": "Вариант с will в придаточной - типичная ошибка."
+          }
+        ]
+      },
+      {
+        "id": "mistakes",
+        "title": "Error correction: исправь типичные ошибки",
+        "kind": "correction",
+        "items": [
+          {
+            "id": "ftc_c_1",
+            "instruction": "Исправь",
+            "prompt": "When I will get home, I'll call you.",
+            "accepted": [
+              "When I get home, I'll call you.",
+              "When I get home, I will call you."
+            ],
+            "explain": "После when -> Present Simple."
+          },
+          {
+            "id": "ftc_c_2",
+            "instruction": "Исправь",
+            "prompt": "If she will be late, we will start.",
+            "accepted": [
+              "If she is late, we will start.",
+              "If she is late, we'll start."
+            ],
+            "explain": "После if в таком условии не ставим will."
+          },
+          {
+            "id": "ftc_c_3",
+            "instruction": "Исправь",
+            "prompt": "As soon as you will see Mr. Black, ask him about the report.",
+            "accepted": [
+              "As soon as you see Mr. Black, ask him about the report."
+            ],
+            "explain": "После as soon as нужна форма Present Simple."
+          },
+          {
+            "id": "ftc_c_4",
+            "instruction": "Исправь",
+            "prompt": "We won't start until everyone will arrive.",
+            "accepted": [
+              "We won't start until everyone arrives.",
+              "We will not start until everyone arrives."
+            ],
+            "explain": "После until в future-контексте ставим Present Simple."
+          }
+        ]
+      },
+      {
+        "id": "compare",
+        "title": "Contextual choice",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "ftc_cmp_1",
+            "instruction": "Выбери лучший вариант",
+            "prompt": "Don't forget to turn off the lights before you ____ .",
+            "options": [
+              "leave",
+              "will leave",
+              "are leaving"
+            ],
+            "correctIndex": 0,
+            "explain": "before-clause с future meaning -> Present Simple."
+          },
+          {
+            "id": "ftc_cmp_2",
+            "instruction": "Выбери лучший вариант",
+            "prompt": "As soon as she ____ back, give her the letters.",
+            "options": [
+              "comes",
+              "will come",
+              "is coming"
+            ],
+            "correctIndex": 0,
+            "explain": "После as soon as в будущем контексте -> Present Simple."
+          },
+          {
+            "id": "ftc_cmp_3",
+            "instruction": "Выбери лучший вариант",
+            "prompt": "If you ____ late, the best things will have gone.",
+            "options": [
+              "arrive",
+              "will arrive",
+              "arrived"
+            ],
+            "correctIndex": 0,
+            "explain": "If-clause здесь требует Present Simple."
+          },
+          {
+            "id": "ftc_cmp_4",
+            "instruction": "Выбери лучший вариант",
+            "prompt": "We'll keep the old furniture until we ____ to a bigger flat.",
+            "options": [
+              "move",
+              "will move",
+              "have moved"
+            ],
+            "correctIndex": 0,
+            "explain": "until + Present Simple в future-контексте."
+          }
+        ]
+      },
+      {
+        "id": "photoBased",
+        "title": "Photo-based grammar prompts",
+        "kind": "multi_input",
+        "items": [
+          {
+            "id": "ftc_photo_1",
+            "instruction": "Заполни обе формы",
+            "prompt": "PHOTO: departure board and suitcase. We ____ (text) you when we ____ (get) to the station.",
+            "inputs": [
+              {
+                "accepted": [
+                  "will text"
+                ]
+              },
+              {
+                "accepted": [
+                  "get"
+                ]
+              }
+            ],
+            "explain": "Главная часть -> will; after when -> Present Simple."
+          },
+          {
+            "id": "ftc_photo_2",
+            "instruction": "Заполни обе формы",
+            "prompt": "PHOTO: office team near whiteboard. If she ____ (be) late, we ____ (start) without her.",
+            "inputs": [
+              {
+                "accepted": [
+                  "is"
+                ]
+              },
+              {
+                "accepted": [
+                  "will start"
+                ]
+              }
+            ],
+            "explain": "if-clause -> Present Simple; main clause -> will."
           }
         ]
       }
