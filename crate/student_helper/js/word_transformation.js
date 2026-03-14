@@ -8,6 +8,8 @@
 
   const N2A_SUFFIX_FILE = 'db/word_transformation/student_helper_db__noun_to_adj_Suffixes.json';
   const N2A_PREFIX_FILE = 'db/word_transformation/student_helper_db__noun_to_adj_Prefixes.json';
+  const N2A_INUN_FILE = 'db/word_transformation/student_helper_db__noun_to_adj_InUnPrefixes.json';
+  const N2V_FILE = 'db/word_transformation/student_helper_db__noun_to_verb.json';
 
   const wtRuntime = {
     isAdmin: false,
@@ -15,9 +17,32 @@
     source: 'local'
   };
 
+  const TRANSFORM_TYPE_N2A = 'noun_to_adj';
+  const TRANSFORM_TYPE_INUN = 'in_un_prefix';
+  const TRANSFORM_TYPE_N2V = 'noun_to_verb';
+  const CATEGORY_N2V = 'NounToVerb';
+
+  function normTransformType(type){
+    const v = String(type || '').trim().toLowerCase();
+    if(v === TRANSFORM_TYPE_INUN) return TRANSFORM_TYPE_INUN;
+    if(v === TRANSFORM_TYPE_N2V) return TRANSFORM_TYPE_N2V;
+    return TRANSFORM_TYPE_N2A;
+  }
+
   function idbSupported(){ return typeof indexedDB !== 'undefined'; }
   function dbNameFor(type){ return `${DB_PREFIX}${type}`; }
   function normalize(s){ return (s || '').trim().toLowerCase(); }
+  function siteLang(){
+    try{
+      if(window.IKSiteLang && typeof window.IKSiteLang.get === 'function'){
+        const fromApi = String(window.IKSiteLang.get() || '').trim().toLowerCase();
+        if(fromApi === 'en' || fromApi === 'ru') return fromApi;
+      }
+    }catch(_){ }
+    const attr = String(document.documentElement && document.documentElement.getAttribute('lang') || '').trim().toLowerCase();
+    return attr.startsWith('en') ? 'en' : 'ru';
+  }
+  function wtText(ru, en){ return siteLang() === 'en' ? en : ru; }
 function escapeHtml(s){
   return String(s || '')
     .replace(/&/g,'&amp;')
@@ -46,6 +71,7 @@ function detectAffixHintKind(baseWord, answerWord, category){
 
   const cat = normalize(normCategory(category));
   if(cat === 'prefixes') return 'prefix';
+  if(cat === 'inunprefixes') return 'prefix';
   if(cat === 'suffixes') return 'suffix';
   return 'suffix';
 }
@@ -64,6 +90,19 @@ function buildAffixHintHTML(baseWord, kind){
     const lc = c.toLowerCase();
     if(lc === 'suffixes') return 'Suffixes';
     if(lc === 'prefixes') return 'Prefixes';
+    if(
+      lc === 'inunprefixes' ||
+      lc === 'in-un-prefixes' ||
+      lc === 'in/un prefixes' ||
+      lc === 'in-/un- prefixes' ||
+      lc === 'in_un_prefixes'
+    ) return 'InUnPrefixes';
+    if(
+      lc === 'nountoverb' ||
+      lc === 'noun_to_verb' ||
+      lc === 'noun-to-verb' ||
+      lc === 'noun to verb'
+    ) return CATEGORY_N2V;
     if(lc === 'all') return 'All';
     return c;
   }
@@ -362,6 +401,8 @@ function buildAffixHintHTML(baseWord, kind){
 
     try{ push(await fetchJson(N2A_SUFFIX_FILE), 'Suffixes'); }catch(_){ }
     try{ push(await fetchJson(N2A_PREFIX_FILE), 'Prefixes'); }catch(_){ }
+    try{ push(await fetchJson(N2A_INUN_FILE), 'InUnPrefixes'); }catch(_){ }
+    try{ push(await fetchJson(N2V_FILE), CATEGORY_N2V); }catch(_){ }
 
     const uniq = new Map();
     for(const row of out) uniq.set(String(row.pairKey || ''), row);
@@ -371,15 +412,146 @@ function buildAffixHintHTML(baseWord, kind){
   // -----------------------------
   // Rules
   // -----------------------------
-  const RULES = {
-    Suffixes: {
-      title: 'Suffixes (added to the end)',
-      chips: ['-ful','-less','-ous','-ive','-able','-ible','-al','-ical','-y','-ic']
-    },
-    Prefixes: {
-      title: '- Negative Prefixes (added to the start)',
-      chips: ['in- (general)','il- (before l)','im- (before m, p)','ir- (before r)','mis-']
-    }
+  const INUN_RU_NOUN_FALLBACK = {
+    interesting: 'интересный',
+    thinkable: 'мыслимый',
+    safe: 'безопасный',
+    acceptable: 'приемлемый',
+    employed: 'трудоустроенный',
+    important: 'важный',
+    capable: 'способный',
+    comfortable: 'удобный',
+    friendly: 'дружелюбный',
+    experienced: 'опытный',
+    fair: 'справедливый',
+    competent: 'компетентный',
+    fortunate: 'удачливый',
+    effective: 'эффективный',
+    active: 'активный',
+    necessary: 'нужный',
+    available: 'доступный',
+    lucky: 'везучий',
+    certain: 'уверенный',
+    hospitable: 'гостеприимный',
+    successful: 'успешный',
+    expected: 'ожидаемый',
+    likely: 'вероятный',
+    willing: 'готовый',
+    accurate: 'точный',
+    known: 'известный',
+    believable: 'правдоподобный',
+    happy: 'счастливый',
+    secure: 'уверенный',
+    usual: 'обычный',
+    sure: 'уверенный',
+    significant: 'значительный',
+    real: 'реальный',
+    helpful: 'полезный',
+    reliable: 'надежный',
+    able: 'способный',
+    healthy: 'здоровый',
+    avoidable: 'предотвратимый',
+    reasonable: 'разумный',
+    valuable: 'ценный',
+    explored: 'исследованный',
+    common: 'обычный',
+    favourable: 'благоприятный',
+    predictable: 'предсказуемый',
+    popular: 'популярный',
+    like: 'похожий',
+    suitable: 'подходящий',
+    grateful: 'благодарный',
+    familiar: 'знакомый',
+    attentive: 'внимательный',
+    kind: 'добрый',
+    curable: 'излечимый',
+    tolerable: 'терпимый',
+    bearable: 'терпимый',
+    visible: 'видимый',
+    expensive: 'дорогой',
+    correct: 'правильный',
+    aware: 'осведомленный',
+    worthy: 'достойный',
+    clear: 'ясный',
+    attractive: 'привлекательный',
+    limited: 'ограниченный',
+    fit: 'пригодный',
+    forgettable: 'забываемый',
+    pleasant: 'приятный',
+    conscious: 'в сознании',
+    fashionable: 'модный',
+    sociable: 'общительный'
+  };
+
+  const INUN_RU_ADJ_FALLBACK = {
+    uninteresting: 'неинтересный',
+    unthinkable: 'немыслимый',
+    unsafe: 'небезопасный',
+    unacceptable: 'неприемлемый',
+    unemployed: 'безработный',
+    unimportant: 'неважный',
+    incapable: 'неспособный',
+    uncomfortable: 'неудобный',
+    unfriendly: 'недружелюбный',
+    inexperienced: 'неопытный',
+    unfair: 'несправедливый',
+    incompetent: 'некомпетентный',
+    unfortunate: 'неудачливый',
+    ineffective: 'неэффективный',
+    inactive: 'неактивный',
+    unnecessary: 'ненужный',
+    unavailable: 'недоступный',
+    unlucky: 'невезучий',
+    uncertain: 'неуверенный',
+    inhospitable: 'негостеприимный',
+    unsuccessful: 'неуспешный',
+    unexpected: 'неожиданный',
+    unlikely: 'маловероятный',
+    unwilling: 'неохотный',
+    inaccurate: 'неточный',
+    unknown: 'неизвестный',
+    unbelievable: 'невероятный',
+    unhappy: 'несчастный',
+    insecure: 'неуверенный',
+    unusual: 'необычный',
+    unsure: 'неуверенный',
+    insignificant: 'незначительный',
+    unreal: 'нереальный',
+    unhelpful: 'бесполезный',
+    unreliable: 'ненадежный',
+    unable: 'неспособный',
+    unhealthy: 'нездоровый',
+    unavoidable: 'неизбежный',
+    unreasonable: 'неразумный',
+    invaluable: 'бесценный',
+    unexplored: 'неисследованный',
+    uncommon: 'необычный',
+    unfavourable: 'неблагоприятный',
+    unpredictable: 'непредсказуемый',
+    unpopular: 'непопулярный',
+    unlike: 'непохожий',
+    unsuitable: 'неподходящий',
+    ungrateful: 'неблагодарный',
+    unfamiliar: 'незнакомый',
+    inattentive: 'невнимательный',
+    unkind: 'недобрый',
+    incurable: 'неизлечимый',
+    intolerable: 'невыносимый',
+    unbearable: 'невыносимый',
+    invisible: 'невидимый',
+    inexpensive: 'недорогой',
+    incorrect: 'неправильный',
+    unaware: 'неосведомленный',
+    unworthy: 'недостойный',
+    unclear: 'неясный',
+    unattractive: 'непривлекательный',
+    unlimited: 'неограниченный',
+    unfit: 'непригодный',
+    unforgettable: 'незабываемый',
+    unpleasant: 'неприятный',
+    unconscious: 'бессознательный',
+    unfashionable: 'немодный',
+    unsociable: 'необщительный'
   };
 
   const rulePanel = document.getElementById('rulePanel');
@@ -390,62 +562,113 @@ function buildAffixHintHTML(baseWord, kind){
     const c = normCategory(category);
     ruleBody.innerHTML = '';
 
-    if(c === 'All'){
-      ruleTitle.textContent = 'rules';
+    const addSub = (text) => {
+      const p = document.createElement('p');
+      p.className = 'ik-sub';
+      p.textContent = text;
+      ruleBody.appendChild(p);
+    };
 
-      const topT = document.createElement('p');
-      topT.className = 'ik-sub';
-      topT.textContent = RULES.Suffixes.title;
-      ruleBody.appendChild(topT);
-
-      const chips1 = document.createElement('div');
-      chips1.className = 'ik-chips';
-      for(const s of RULES.Suffixes.chips){
+    const addChips = (items) => {
+      const chips = document.createElement('div');
+      chips.className = 'ik-chips';
+      for(const item of items){
         const el = document.createElement('span');
         el.className = 'ik-chip';
-        el.textContent = s;
-        chips1.appendChild(el);
+        el.textContent = item;
+        chips.appendChild(el);
       }
-      ruleBody.appendChild(chips1);
+      ruleBody.appendChild(chips);
+    };
 
+    const addDivider = () => {
       const div = document.createElement('div');
       div.className = 'ik-divider';
       ruleBody.appendChild(div);
+    };
 
-      const botT = document.createElement('p');
-      botT.className = 'ik-sub';
-      botT.textContent = RULES.Prefixes.title;
-      ruleBody.appendChild(botT);
+    const addFoot = (text) => {
+      const p = document.createElement('p');
+      p.className = 'ik-footnote';
+      p.textContent = text;
+      ruleBody.appendChild(p);
+    };
 
-      const chips2 = document.createElement('div');
-      chips2.className = 'ik-chips';
-      for(const s of RULES.Prefixes.chips){
-        const el = document.createElement('span');
-        el.className = 'ik-chip';
-        el.textContent = s;
-        chips2.appendChild(el);
-      }
-      ruleBody.appendChild(chips2);
+    const suffixSpec = {
+      title: wtText('Суффиксы (добавляются в конец)', 'Suffixes (added to the end)'),
+      chips: ['-ful','-less','-ous','-ive','-able','-ible','-al','-ical','-y','-ic']
+    };
+
+    const prefixSpec = {
+      title: wtText('Отрицательные приставки (добавляются в начало)', 'Negative prefixes (added to the start)'),
+      chips: [
+        wtText('in- (общее правило)', 'in- (general)'),
+        wtText('il- (перед l)', 'il- (before l)'),
+        wtText('im- (перед m, p)', 'im- (before m, p)'),
+        wtText('ir- (перед r)', 'ir- (before r)'),
+        'mis-'
+      ]
+    };
+
+    const inUnSpec = {
+      title: wtText('Выбери приставку: in- или un-', 'Choose prefix: in- or un-'),
+      chips: ['in-','un-']
+    };
+
+    if(c === CATEGORY_N2V){
+      ruleTitle.textContent = wtText('правило', 'rule');
+
+      addSub(wtText('Существительное -> глагол: практическое правило', 'Noun -> Verb: practical rule'));
+      addFoot(wtText(
+        'Нет одного универсального суффикса. Выбирай модель и проверяй по словарной паре.',
+        'There is no single universal suffix. Choose a formation pattern and verify the lexical pair.'
+      ));
+
+      addDivider();
+      addSub(wtText('1) -en (часто от признака/состояния)', '1) -en (often from quality/state)'));
+      addChips(['bright -> brighten','broad -> broaden','dark -> darken','deaf -> deafen','fright -> frighten','length -> lengthen','light -> lighten']);
+
+      addDivider();
+      addSub(wtText('2) -fy (делать каким-то)', '2) -fy (to make / become)'));
+      addChips(['class -> classify','horror -> horrify','identity -> identify','just -> justify']);
+
+      addDivider();
+      addSub(wtText('3) -ize / -ise (оформить как процесс/действие)', '3) -ize / -ise (process/action verb)'));
+      addChips(['apology -> apologize','colony -> colonize','critic -> criticize','minimum -> minimize','real -> realize']);
+
+      addDivider();
+      addSub(wtText('4) en- + основа (дать/сделать ...)', '4) en- + base (to cause/put into state)'));
+      addChips(['able -> enable','courage -> encourage','danger -> endanger','large -> enlarge','rich -> enrich','sure -> ensure']);
+
+      addDivider();
+      addSub(wtText('5) Нулевая/словарная модель', '5) Zero-change / lexical model'));
+      addChips(['clear -> clear','cycle -> cycle','irritate -> irritate','reduce -> reduce','product -> produce','participant -> participate','motive -> motivate']);
+
+      addFoot(wtText(
+        'Важно: часть пар нерегулярны или зависят от смысла, их нужно запоминать как словарные.',
+        'Important: some pairs are lexical/irregular and should be memorized as fixed pairs.'
+      ));
       return;
     }
 
-    const def = RULES[c] || RULES.Suffixes;
-    ruleTitle.textContent = 'rule';
+    if(c === 'All'){
+      ruleTitle.textContent = wtText('правила', 'rules');
+      addSub(suffixSpec.title);
+      addChips(suffixSpec.chips);
+      addDivider();
+      addSub(prefixSpec.title);
+      addChips(prefixSpec.chips);
 
-    const t = document.createElement('p');
-    t.className = 'ik-sub';
-    t.textContent = def.title;
-    ruleBody.appendChild(t);
-
-    const chips = document.createElement('div');
-    chips.className = 'ik-chips';
-    for(const s of def.chips){
-      const el = document.createElement('span');
-      el.className = 'ik-chip';
-      el.textContent = s;
-      chips.appendChild(el);
+      return;
     }
-    ruleBody.appendChild(chips);
+
+    let def = suffixSpec;
+    if(c === 'Prefixes') def = prefixSpec;
+    else if(c === 'InUnPrefixes') def = inUnSpec;
+
+    ruleTitle.textContent = wtText('правило', 'rule');
+    addSub(def.title);
+    addChips(def.chips);
   }
 
   function toggleRule(){
@@ -558,7 +781,7 @@ async function fetchJson(relPath){
     const n = await countAllTasks(db);
     if(n > 0) return { loaded:false, reason:'not_empty', count:n };
 
-    // FIX: noun_to_adj loads BOTH files automatically
+    // FIX: noun_to_adj loads all seed files automatically
     if(type === 'noun_to_adj'){
       const okFiles = [];
       const failFiles = [];
@@ -588,6 +811,26 @@ async function fetchJson(relPath){
         failFiles.push(N2A_PREFIX_FILE);
       }
 
+      // in-/un- prefixes
+      try{
+        const data = await fetchJson(N2A_INUN_FILE);
+        const res = await importFromObject(data, { type, replace:false, silent:true, defaultCategory:'InUnPrefixes' });
+        okFiles.push(N2A_INUN_FILE);
+        added += res.added; skipped += res.skipped;
+      }catch(e){
+        failFiles.push(N2A_INUN_FILE);
+      }
+
+      // noun -> verb set
+      try{
+        const data = await fetchJson(N2V_FILE);
+        const res = await importFromObject(data, { type, replace:false, silent:true, defaultCategory:CATEGORY_N2V });
+        okFiles.push(N2V_FILE);
+        added += res.added; skipped += res.skipped;
+      }catch(e){
+        failFiles.push(N2V_FILE);
+      }
+
       const after = await countAllTasks(db);
       return {
         loaded: okFiles.length > 0,
@@ -614,9 +857,49 @@ async function fetchJson(relPath){
       const c = normCategory(category);
       if(c === 'Suffixes') return _basename(N2A_SUFFIX_FILE);
       if(c === 'Prefixes') return _basename(N2A_PREFIX_FILE);
+      if(c === 'InUnPrefixes') return _basename(N2A_INUN_FILE);
+      if(c === CATEGORY_N2V) return _basename(N2V_FILE);
       return 'student_helper_db__noun_to_adj_All.json';
     }
     return `${dbNameFor(type)}.json`;
+  }
+
+  async function mergeMissingSeedTasks(type){
+    if(type !== 'noun_to_adj' || !db) return { added: 0, skipped: 0 };
+
+    // Supabase read-only users cannot write seed rows.
+    if(db.kind === 'supabase' && !wtRuntime.isAdmin){
+      return { added: 0, skipped: 0, readonly: true };
+    }
+
+    const seedSets = [
+      { file: N2A_INUN_FILE, category: 'InUnPrefixes' },
+      { file: N2V_FILE, category: CATEGORY_N2V }
+    ];
+
+    let added = 0;
+    let skipped = 0;
+    let missing = 0;
+
+    for(const seed of seedSets){
+      try{
+        // eslint-disable-next-line no-await-in-loop
+        const data = await fetchJson(seed.file);
+        // eslint-disable-next-line no-await-in-loop
+        const res = await importFromObject(data, {
+          type,
+          replace: false,
+          silent: true,
+          defaultCategory: seed.category
+        });
+        added += Number(res && res.added || 0);
+        skipped += Number(res && res.skipped || 0);
+      }catch(_){
+        missing += 1;
+      }
+    }
+
+    return { added, skipped, missing };
   }
 
   async function exportDb(type, category, tasks){
@@ -653,6 +936,8 @@ async function fetchJson(relPath){
 
   function inferDefaultCategoryFromFilename(name){
     const n = String(name || '').toLowerCase();
+    if(n.includes('noun_to_verb')) return CATEGORY_N2V;
+    if(n.includes('_inunprefixes') || n.includes('_in_un') || n.includes('inun')) return 'InUnPrefixes';
     if(n.includes('_suffixes')) return 'Suffixes';
     if(n.includes('_prefixes')) return 'Prefixes';
     return 'Suffixes';
@@ -678,6 +963,7 @@ async function fetchJson(relPath){
   let tasksAll = [];
   let tasksActive = [];
   let current = null;
+  let transformType = TRANSFORM_TYPE_N2A;
 
   let revealRu = false;
   let sessionTotal = 0;
@@ -693,6 +979,8 @@ async function fetchJson(relPath){
   const elTaskCount = document.getElementById('taskCountBadge');
   const elSeedBadge = document.getElementById('seedBadge');
   const elDbNameLine = document.getElementById('dbNameLine');
+  const elWtPanel = document.getElementById('panel-wt');
+  const elTransformType = document.getElementById('transformType');
   const elSubtabPractice = document.getElementById('subtab-practice');
   const elSubtabBuilder = document.getElementById('subtab-builder');
   const elPanelPractice = document.getElementById('panel-practice');
@@ -703,6 +991,7 @@ async function fetchJson(relPath){
   const elPromptLabel = document.getElementById('promptLabel');
 
   const elAnswer = document.getElementById('answerInput');
+  const defaultAnswerPlaceholder = elAnswer ? (elAnswer.getAttribute('placeholder') || 'Ответ (EN)') : 'Ответ (EN)';
   const elScore = document.getElementById('sessionScore');
   const elQ = document.getElementById('qBadge');
 
@@ -726,6 +1015,9 @@ async function fetchJson(relPath){
   const btnReveal = document.getElementById('btnReveal');
   const btnCheckNext = document.getElementById('btnCheckNext');
   const btnShowAnswer = document.getElementById('btnShowAnswer');
+  const elInUnPrefixPicker = document.getElementById('inUnPrefixPicker');
+  const btnPrefixIn = document.getElementById('btnPrefixIn');
+  const btnPrefixUn = document.getElementById('btnPrefixUn');
 
   const adminStatus = {};
   function setAdminText(el, text, label){
@@ -765,19 +1057,107 @@ async function fetchJson(relPath){
     elFeedbackLine.textContent = line || '';
     pulse(elFeedbackBox, 'ik-pop');
   }
+
+  function taskMatchesTransformType(task){
+    const cat = normCategory(task && task.category || 'Suffixes');
+    if(transformType === TRANSFORM_TYPE_INUN) return cat === 'InUnPrefixes';
+    if(transformType === TRANSFORM_TYPE_N2V) return cat === CATEGORY_N2V;
+    return cat !== 'InUnPrefixes' && cat !== CATEGORY_N2V;
+  }
+
+  function scopedTasks(){
+    return tasksAll.filter(taskMatchesTransformType);
+  }
+
+  function setSelectOptions(selectEl, options, preferred){
+    if(!selectEl) return;
+    const prev = String(preferred || selectEl.value || '');
+    selectEl.innerHTML = '';
+    for(const opt of options){
+      const o = document.createElement('option');
+      o.value = String(opt.value);
+      o.textContent = String(opt.label);
+      selectEl.appendChild(o);
+    }
+    const allowed = new Set(options.map((x) => String(x.value)));
+    if(allowed.has(prev)) selectEl.value = prev;
+    else if(options[0]) selectEl.value = String(options[0].value);
+  }
+
+  function syncTransformTypeOptions(){
+    if(!elTransformType) return;
+    const prev = String(elTransformType.value || transformType || TRANSFORM_TYPE_N2A);
+    setSelectOptions(elTransformType, [
+      { value: TRANSFORM_TYPE_N2A, label: wtText('существительное -> прилагательное', 'Noun -> Adjective') },
+      { value: TRANSFORM_TYPE_INUN, label: wtText('приставки in- или un-', 'in- or un- prefixes') },
+      { value: TRANSFORM_TYPE_N2V, label: wtText('существительное -> глагол', 'Noun -> Verb') }
+    ], prev);
+  }
+
+  function syncTypeSelectors(){
+    if(transformType === TRANSFORM_TYPE_INUN){
+      setSelectOptions(elPracticeCategory, [
+        { value: 'InUnPrefixes', label: wtText('приставки in- или un-', 'in- or un- prefixes') }
+      ], elPracticeCategory && elPracticeCategory.value);
+
+      setSelectOptions(elViewCategory, [
+        { value: 'All', label: wtText('все категории', 'All categories') },
+        { value: 'InUnPrefixes', label: wtText('приставки in- или un-', 'in- or un- prefixes') }
+      ], elViewCategory && elViewCategory.value);
+
+      setSelectOptions(elAddCategory, [
+        { value: 'InUnPrefixes', label: wtText('приставки in- или un-', 'in- or un- prefixes') }
+      ], elAddCategory && elAddCategory.value);
+      return;
+    }
+
+    if(transformType === TRANSFORM_TYPE_N2V){
+      setSelectOptions(elPracticeCategory, [
+        { value: CATEGORY_N2V, label: wtText('существительное -> глагол', 'Noun -> Verb') }
+      ], elPracticeCategory && elPracticeCategory.value);
+
+      setSelectOptions(elViewCategory, [
+        { value: 'All', label: wtText('все категории', 'All categories') },
+        { value: CATEGORY_N2V, label: wtText('существительное -> глагол', 'Noun -> Verb') }
+      ], elViewCategory && elViewCategory.value);
+
+      setSelectOptions(elAddCategory, [
+        { value: CATEGORY_N2V, label: wtText('существительное -> глагол', 'Noun -> Verb') }
+      ], elAddCategory && elAddCategory.value);
+      return;
+    }
+
+    setSelectOptions(elPracticeCategory, [
+      { value: 'All', label: wtText('все категории', 'All categories') },
+      { value: 'Suffixes', label: wtText('суффиксы', 'Suffixes') },
+      { value: 'Prefixes', label: wtText('приставки', 'Prefixes') }
+    ], elPracticeCategory && elPracticeCategory.value);
+
+    setSelectOptions(elViewCategory, [
+      { value: 'All', label: wtText('все категории', 'All categories') },
+      { value: 'Suffixes', label: wtText('суффиксы', 'Suffixes') },
+      { value: 'Prefixes', label: wtText('приставки', 'Prefixes') }
+    ], elViewCategory && elViewCategory.value);
+
+    setSelectOptions(elAddCategory, [
+      { value: 'Suffixes', label: wtText('суффиксы', 'Suffixes') },
+      { value: 'Prefixes', label: wtText('приставки', 'Prefixes') }
+    ], elAddCategory && elAddCategory.value);
+  }
+
   function updateScore(){ elScore.textContent = `${sessionCorrect}/${sessionTotal}`; }
   function updateQ(){ elQ.textContent = `q: ${historyPos >= 0 ? (historyPos + 1) : 0}`; }
-  function updateCountBadge(){ elTaskCount.textContent = `tasks: ${tasksAll.length}`; }
+  function updateCountBadge(){ elTaskCount.textContent = `tasks: ${scopedTasks().length}`; }
 
   function clearInputState(){ elAnswer.classList.remove('is-ok','is-bad'); }
 
   function setCheckMode(mode){
     checkMode = mode;
     if(mode === 'next'){
-      btnCheckNext.textContent = 'далее';
-      btnCheckNext.title = 'Далее (Enter)';
+      btnCheckNext.textContent = wtText('далее', 'next');
+      btnCheckNext.title = wtText('Далее (Enter)', 'Next (Enter)');
     }else{
-      btnCheckNext.textContent = 'check';
+      btnCheckNext.textContent = wtText('проверить', 'check');
       btnCheckNext.title = 'Check (Enter)';
     }
   }
@@ -792,15 +1172,43 @@ async function fetchJson(relPath){
   }
 
   function promptTextForCategory(cat){
+    if(transformType === TRANSFORM_TYPE_INUN) return wtText('Выбери нужную приставку: in- или un-', 'Choose the correct prefix: in- or un-');
+    if(transformType === TRANSFORM_TYPE_N2V) return wtText('Образуй глагол от данного слова', 'Build a verb from the base word');
     const c = normCategory(cat);
-    if(c === 'Prefixes') return 'Образуй отрицательное прилагательное от данного слова';
-    return 'Образуй прилагательное из данного слова';
+    if(c === 'Prefixes') return wtText('Образуй отрицательное прилагательное от данного слова', 'Build a negative adjective from the base word');
+    return wtText('Образуй прилагательное из данного слова', 'Build an adjective from the base word');
+  }
+
+  function isInUnPrefixesCategory(){
+    return transformType === TRANSFORM_TYPE_INUN;
+  }
+
+  function resetPrefixChoiceButtons(){
+    if(btnPrefixIn) btnPrefixIn.classList.remove('ik-btn--black');
+    if(btnPrefixUn) btnPrefixUn.classList.remove('ik-btn--black');
+  }
+
+  function applyInUnPrefixMode(){
+    const enabled = isInUnPrefixesCategory();
+
+    if(elWtPanel) elWtPanel.classList.toggle('wt-inun-mode', enabled);
+    if(elInUnPrefixPicker) elInUnPrefixPicker.hidden = !enabled;
+    if(elAnswer){
+      elAnswer.readOnly = enabled;
+      elAnswer.placeholder = enabled ? wtText('выбери in- или un-', 'choose in- or un-') : defaultAnswerPlaceholder;
+    }
+
+    if(!enabled) resetPrefixChoiceButtons();
   }
 
   function updatePromptLabel(){
-    const selected = normCategory(elPracticeCategory.value || 'All');
+    const selected = normCategory(elPracticeCategory && elPracticeCategory.value || 'All');
     if(selected === 'All'){
-      const curCat = current ? normCategory(current.category || 'Suffixes') : 'Suffixes';
+      const curCat = current
+        ? normCategory(current.category || 'Suffixes')
+        : (transformType === TRANSFORM_TYPE_INUN
+          ? 'InUnPrefixes'
+          : (transformType === TRANSFORM_TYPE_N2V ? CATEGORY_N2V : 'Suffixes'));
       elPromptLabel.textContent = promptTextForCategory(curCat);
     }else{
       elPromptLabel.textContent = promptTextForCategory(selected);
@@ -808,19 +1216,77 @@ async function fetchJson(relPath){
   }
 
   function updateActiveTasks(){
-    const cat = normCategory(elPracticeCategory.value || 'All');
-    if(cat === 'All') tasksActive = [...tasksAll];
-    else tasksActive = tasksAll.filter(t => normCategory(t.category) === cat);
+    const cat = normCategory(elPracticeCategory && elPracticeCategory.value || 'All');
+    const scope = scopedTasks();
+
+    if(cat === 'All') tasksActive = [...scope];
+    else tasksActive = scope.filter(t => normCategory(t.category) === cat);
 
     tasksActive.sort((a,b)=> (a.en_noun || '').localeCompare((b.en_noun || ''), 'en'));
 
     updatePromptLabel();
-    renderRule(cat);
+    if(transformType === TRANSFORM_TYPE_INUN) renderRule('InUnPrefixes');
+    else if(transformType === TRANSFORM_TYPE_N2V) renderRule(CATEGORY_N2V);
+    else renderRule(cat);
+    applyInUnPrefixMode();
+  }
+
+  function refreshLocalizedUi(){
+    syncTransformTypeOptions();
+    syncTypeSelectors();
+    updateCountBadge();
+    renderTaskList();
+    updatePromptLabel();
+
+    const cat = normCategory(elPracticeCategory && elPracticeCategory.value || 'All');
+    if(transformType === TRANSFORM_TYPE_INUN) renderRule('InUnPrefixes');
+    else if(transformType === TRANSFORM_TYPE_N2V) renderRule(CATEGORY_N2V);
+    else renderRule(cat);
+
+    applyInUnPrefixMode();
+    setCheckMode(checkMode);
+
+    if(current && elPromptRu){
+      const ruWord = resolveRuNoun(current);
+      elPromptRu.textContent = `${wtText('перевод', 'translation')}: ${ruWord || current.ru_noun || current.en_noun}`;
+    }
+  }
+
+  function resolveRuNoun(task){
+    const t = task || {};
+    let ru = String(t.ru_noun || '').trim();
+    if(!isInUnPrefixesCategory()) return ru;
+
+    const key = normalize(t.en_noun);
+    const fallback = INUN_RU_NOUN_FALLBACK[key] || '';
+    const looksAscii = /^[a-z\s-]+$/i.test(ru);
+    if(!ru || looksAscii) ru = fallback || ru;
+    return ru;
+  }
+
+  function resolveRuAdj(task){
+    const t = task || {};
+    let ru = String(t.ru_adj || '').trim();
+    if(!isInUnPrefixesCategory()) return ru;
+
+    const key = normalize(t.en_adj);
+    const fallback = INUN_RU_ADJ_FALLBACK[key] || '';
+    const looksAscii = /^[a-z\s-]+$/i.test(ru);
+    if(!ru || looksAscii) ru = fallback || ru;
+    return ru;
+  }
+
+  function formatSolvedPair(task){
+    if(!task) return '';
+    const ruNoun = resolveRuNoun(task) || task.ru_noun || task.en_noun;
+    const ruAdj = resolveRuAdj(task) || task.ru_adj || task.en_adj;
+    return `${task.en_noun}(${ruNoun}) -> ${task.en_adj}(${ruAdj})`;
   }
 
   function showTask(t){
     current = t || null;
     updatePromptLabel();
+    applyInUnPrefixMode();
     revealRu = false;
     if(elPromptRu) elPromptRu.hidden = true;
 
@@ -828,19 +1294,24 @@ async function fetchJson(relPath){
     setCheckMode('check');
 
     if(!current){
-      elPromptEn.textContent = 'нет заданий';
+      elPromptEn.textContent = wtText('нет заданий', 'no tasks');
       elAnswer.value = '';
-      setFeedback('idle', 'empty', 'добавь задания или load db');
+      resetPrefixChoiceButtons();
+      setFeedback('idle', wtText('пусто', 'empty'), wtText('добавь задания или load db', 'add tasks or load db'));
       return;
     }
 
     elPromptEn.innerHTML = buildAffixHintHTML(current.en_noun, detectAffixHintKind(current.en_noun, current.en_adj, current.category));
-    elPromptRu.textContent = `перевод: ${current.ru_noun}`;
+    const ruWord = resolveRuNoun(current);
+    elPromptRu.textContent = `${wtText('перевод', 'translation')}: ${ruWord || current.ru_noun || current.en_noun}`;
     elPromptRu.hidden = true;
 
     elAnswer.value = '';
+    resetPrefixChoiceButtons();
     elAnswer.focus({ preventScroll:true });
-    setFeedback('idle', 'ready', 'введи ответ и нажми check');
+    setFeedback('idle', wtText('готово', 'ready'), isInUnPrefixesCategory()
+      ? wtText('выбери приставку и нажми check', 'choose a prefix and press check')
+      : wtText('введи ответ и нажми check', 'enter the answer and press check'));
   }
 
   function pickNewTask(){
@@ -895,7 +1366,9 @@ async function fetchJson(relPath){
     const correct = normalize(current.en_adj);
 
     if(!user){
-      setFeedback('idle', 'type', 'введи ответ');
+      setFeedback('idle', wtText('ввод', 'type'), isInUnPrefixesCategory()
+        ? wtText('выбери приставку in- или un-', 'choose in- or un- prefix')
+        : wtText('введи ответ', 'enter the answer'));
       pulse(elAnswer, 'ik-shake');
       return;
     }
@@ -905,13 +1378,13 @@ async function fetchJson(relPath){
     if(user === correct){
       sessionCorrect += 1;
       updateScore();
-      setFeedback('correct', 'ok', `${current.en_noun} -> ${current.en_adj}`);
+      setFeedback('correct', 'ok', formatSolvedPair(current));
       clearInputState();
       elAnswer.classList.add('is-ok');
       setCheckMode('next');
     }else{
       updateScore();
-      setFeedback('wrong', 'no', 'неверно');
+      setFeedback('wrong', wtText('нет', 'no'), wtText('неверно', 'incorrect'));
       clearInputState();
       elAnswer.classList.add('is-bad');
       elAnswer.focus({ preventScroll:true });
@@ -922,7 +1395,7 @@ async function fetchJson(relPath){
 
   function showAnswer(){
     if(!current) return;
-    setFeedback('idle', 'answer', `${current.en_adj} | ${current.ru_adj}`);
+    setFeedback('idle', 'answer', formatSolvedPair(current));
   }
 
   async function refreshTasks(){
@@ -985,7 +1458,8 @@ async function fetchJson(relPath){
 
   function renderTaskList(){
     const view = normCategory(elViewCategory.value || 'All');
-    const list = (view === 'All') ? tasksAll : tasksAll.filter(t => normCategory(t.category) === view);
+    const scope = scopedTasks();
+    const list = (view === 'All') ? scope : scope.filter(t => normCategory(t.category) === view);
 
     elTaskList.innerHTML = '';
     if(!list.length){
@@ -1140,6 +1614,18 @@ async function fetchJson(relPath){
         }
       }
 
+      try{
+        const merged = await mergeMissingSeedTasks('noun_to_adj');
+        if(merged && merged.added) await refreshTasks();
+      }catch(seedMergeError){
+        console.warn('WT in/un seed merge skipped:', seedMergeError);
+      }
+
+      syncTransformTypeOptions();
+      transformType = normTransformType(elTransformType && elTransformType.value);
+      if(elTransformType) elTransformType.value = transformType;
+      refreshLocalizedUi();
+
       updateActiveTasks();
       updateScore();
       updateQ();
@@ -1163,12 +1649,28 @@ async function fetchJson(relPath){
   // -----------------------------
   // Events
   // -----------------------------
+  function choosePrefix(prefix){
+    if(!current || !isInUnPrefixesCategory()) return;
+    const p = normalize(prefix);
+    if(p !== 'in' && p !== 'un') return;
+
+    elAnswer.value = `${p}${normalize(current.en_noun)}`;
+    clearInputState();
+
+    if(btnPrefixIn) btnPrefixIn.classList.toggle('ik-btn--black', p === 'in');
+    if(btnPrefixUn) btnPrefixUn.classList.toggle('ik-btn--black', p === 'un');
+
+    elAnswer.focus({ preventScroll:true });
+  }
+
   btnRule.addEventListener('click', toggleRule);
   btnPrev.addEventListener('click', goPrev);
   btnNext.addEventListener('click', goNext);
   btnReveal.addEventListener('click', toggleTranslate);
   btnCheckNext.addEventListener('click', checkOrNext);
   btnShowAnswer.addEventListener('click', showAnswer);
+  btnPrefixIn && btnPrefixIn.addEventListener('click', ()=> choosePrefix('in'));
+  btnPrefixUn && btnPrefixUn.addEventListener('click', ()=> choosePrefix('un'));
 
   elAnswer.addEventListener('keydown', (e)=>{
     if(e.key === 'Enter'){
@@ -1190,6 +1692,14 @@ if(e.key.toLowerCase() === 't'){ if(inText) return; toggleTranslate(); return; }
     goNext();
   });
 
+  elTransformType && elTransformType.addEventListener('change', ()=>{
+    transformType = normTransformType(elTransformType.value);
+    refreshLocalizedUi();
+    updateActiveTasks();
+    resetPracticeSession();
+    goNext();
+  });
+
   elViewCategory.addEventListener('change', renderTaskList);
 
   document.getElementById('btnAddTask').addEventListener('click', async ()=>{
@@ -1197,7 +1707,10 @@ if(e.key.toLowerCase() === 't'){ if(inText) return; toggleTranslate(); return; }
       setFeedback('idle', 'read-only', 'конструктор доступен только администратору');
       return;
     }
-    const cat = normCategory(elAddCategory.value || 'Suffixes');
+    let cat;
+    if(transformType === TRANSFORM_TYPE_INUN) cat = 'InUnPrefixes';
+    else if(transformType === TRANSFORM_TYPE_N2V) cat = CATEGORY_N2V;
+    else cat = normCategory(elAddCategory.value || 'Suffixes');
 
     const enWord = normalize(document.getElementById('inEnWord').value);
     const enAns  = normalize(document.getElementById('inEnAnswer').value);
@@ -1239,12 +1752,25 @@ if(e.key.toLowerCase() === 't'){ if(inText) return; toggleTranslate(); return; }
     }
     try{
       await clearAll(db);
+      const loadedFiles = [];
 
-      const s = await fetchJson(N2A_SUFFIX_FILE);
-      await importFromObject(s, { type:'noun_to_adj', replace:false, silent:true, defaultCategory:'Suffixes' });
+      if(transformType === TRANSFORM_TYPE_INUN){
+        const iu = await fetchJson(N2A_INUN_FILE);
+        await importFromObject(iu, { type:'noun_to_adj', replace:false, silent:true, defaultCategory:'InUnPrefixes' });
+        loadedFiles.push(N2A_INUN_FILE);
+      }else if(transformType === TRANSFORM_TYPE_N2V){
+        const n2v = await fetchJson(N2V_FILE);
+        await importFromObject(n2v, { type:'noun_to_adj', replace:false, silent:true, defaultCategory:CATEGORY_N2V });
+        loadedFiles.push(N2V_FILE);
+      }else{
+        const s = await fetchJson(N2A_SUFFIX_FILE);
+        await importFromObject(s, { type:'noun_to_adj', replace:false, silent:true, defaultCategory:'Suffixes' });
+        loadedFiles.push(N2A_SUFFIX_FILE);
 
-      const p = await fetchJson(N2A_PREFIX_FILE);
-      await importFromObject(p, { type:'noun_to_adj', replace:false, silent:true, defaultCategory:'Prefixes' });
+        const p = await fetchJson(N2A_PREFIX_FILE);
+        await importFromObject(p, { type:'noun_to_adj', replace:false, silent:true, defaultCategory:'Prefixes' });
+        loadedFiles.push(N2A_PREFIX_FILE);
+      }
 
       await refreshTasks();
       updateActiveTasks();
@@ -1252,7 +1778,7 @@ if(e.key.toLowerCase() === 't'){ if(inText) return; toggleTranslate(); return; }
       goNext();
 
       setAdminText(elSeedBadge, 'json: loaded');
-      elSeedBadge.title = `${N2A_SUFFIX_FILE}, ${N2A_PREFIX_FILE}`;
+      elSeedBadge.title = loadedFiles.join(', ');
       setFeedback('idle', 'reset', 'ok');
     }catch(e){
       alert('Не удалось загрузить json рядом с HTML. Если открываешь как file://, браузер может блокировать fetch. Тогда нажми load db и выбери файлы вручную.');
@@ -1265,8 +1791,14 @@ if(e.key.toLowerCase() === 't'){ if(inText) return; toggleTranslate(); return; }
       return;
     }
     const view = normCategory(elViewCategory.value || 'All');
-    const list = (view === 'All') ? tasksAll : tasksAll.filter(t => normCategory(t.category) === view);
-    await exportDb('noun_to_adj', view, list);
+    const scope = scopedTasks();
+    const list = (view === 'All') ? scope : scope.filter(t => normCategory(t.category) === view);
+    const exportCategory = (view === 'All')
+      ? (transformType === TRANSFORM_TYPE_INUN
+        ? 'InUnPrefixes'
+        : (transformType === TRANSFORM_TYPE_N2V ? CATEGORY_N2V : view))
+      : view;
+    await exportDb('noun_to_adj', exportCategory, list);
   });
 
   document.getElementById('btnImportDb').addEventListener('click', ()=>{
@@ -1295,6 +1827,18 @@ if(e.key.toLowerCase() === 't'){ if(inText) return; toggleTranslate(); return; }
     }catch(e){
       alert(`Ошибка импорта: ${e.message || e}`);
     }
+  });
+
+  document.addEventListener('ik:languagechange', ()=>{
+    transformType = normTransformType(elTransformType && elTransformType.value);
+    refreshLocalizedUi();
+    updateActiveTasks();
+  });
+
+  window.addEventListener('load', ()=>{
+    transformType = normTransformType(elTransformType && elTransformType.value);
+    refreshLocalizedUi();
+    updateActiveTasks();
   });
 
   // -----------------------------

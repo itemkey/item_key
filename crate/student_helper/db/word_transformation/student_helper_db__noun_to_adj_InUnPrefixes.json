@@ -1,0 +1,554 @@
+{
+  "schema": "student_helper_db_export",
+  "schemaVersion": 1,
+  "type": "noun_to_adj",
+  "category": "InUnPrefixes",
+  "exportedAt": "2026-03-14T00:00:00Z",
+  "dbName": "student_helper_db__noun_to_adj",
+  "tasks": [
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "interesting",
+      "en_adj": "uninteresting",
+      "ru_noun": "интересный",
+      "ru_adj": "неинтересный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "thinkable",
+      "en_adj": "unthinkable",
+      "ru_noun": "мыслимый",
+      "ru_adj": "немыслимый"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "safe",
+      "en_adj": "unsafe",
+      "ru_noun": "безопасный",
+      "ru_adj": "небезопасный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "acceptable",
+      "en_adj": "unacceptable",
+      "ru_noun": "приемлемый",
+      "ru_adj": "неприемлемый"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "employed",
+      "en_adj": "unemployed",
+      "ru_noun": "трудоустроенный",
+      "ru_adj": "безработный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "important",
+      "en_adj": "unimportant",
+      "ru_noun": "важный",
+      "ru_adj": "неважный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "capable",
+      "en_adj": "incapable",
+      "ru_noun": "способный",
+      "ru_adj": "неспособный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "comfortable",
+      "en_adj": "uncomfortable",
+      "ru_noun": "удобный",
+      "ru_adj": "неудобный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "friendly",
+      "en_adj": "unfriendly",
+      "ru_noun": "дружелюбный",
+      "ru_adj": "недружелюбный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "experienced",
+      "en_adj": "inexperienced",
+      "ru_noun": "опытный",
+      "ru_adj": "неопытный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "fair",
+      "en_adj": "unfair",
+      "ru_noun": "справедливый",
+      "ru_adj": "несправедливый"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "competent",
+      "en_adj": "incompetent",
+      "ru_noun": "компетентный",
+      "ru_adj": "некомпетентный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "fortunate",
+      "en_adj": "unfortunate",
+      "ru_noun": "удачливый",
+      "ru_adj": "неудачливый"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "effective",
+      "en_adj": "ineffective",
+      "ru_noun": "эффективный",
+      "ru_adj": "неэффективный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "active",
+      "en_adj": "inactive",
+      "ru_noun": "активный",
+      "ru_adj": "неактивный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "necessary",
+      "en_adj": "unnecessary",
+      "ru_noun": "нужный",
+      "ru_adj": "ненужный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "available",
+      "en_adj": "unavailable",
+      "ru_noun": "доступный",
+      "ru_adj": "недоступный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "lucky",
+      "en_adj": "unlucky",
+      "ru_noun": "везучий",
+      "ru_adj": "невезучий"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "certain",
+      "en_adj": "uncertain",
+      "ru_noun": "уверенный",
+      "ru_adj": "неуверенный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "hospitable",
+      "en_adj": "inhospitable",
+      "ru_noun": "гостеприимный",
+      "ru_adj": "негостеприимный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "successful",
+      "en_adj": "unsuccessful",
+      "ru_noun": "успешный",
+      "ru_adj": "неуспешный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "expected",
+      "en_adj": "unexpected",
+      "ru_noun": "ожидаемый",
+      "ru_adj": "неожиданный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "likely",
+      "en_adj": "unlikely",
+      "ru_noun": "вероятный",
+      "ru_adj": "маловероятный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "willing",
+      "en_adj": "unwilling",
+      "ru_noun": "готовый",
+      "ru_adj": "неохотный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "accurate",
+      "en_adj": "inaccurate",
+      "ru_noun": "точный",
+      "ru_adj": "неточный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "known",
+      "en_adj": "unknown",
+      "ru_noun": "известный",
+      "ru_adj": "неизвестный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "believable",
+      "en_adj": "unbelievable",
+      "ru_noun": "правдоподобный",
+      "ru_adj": "невероятный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "happy",
+      "en_adj": "unhappy",
+      "ru_noun": "счастливый",
+      "ru_adj": "несчастный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "secure",
+      "en_adj": "insecure",
+      "ru_noun": "уверенный",
+      "ru_adj": "неуверенный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "usual",
+      "en_adj": "unusual",
+      "ru_noun": "обычный",
+      "ru_adj": "необычный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "sure",
+      "en_adj": "unsure",
+      "ru_noun": "уверенный",
+      "ru_adj": "неуверенный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "significant",
+      "en_adj": "insignificant",
+      "ru_noun": "значительный",
+      "ru_adj": "незначительный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "real",
+      "en_adj": "unreal",
+      "ru_noun": "реальный",
+      "ru_adj": "нереальный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "helpful",
+      "en_adj": "unhelpful",
+      "ru_noun": "полезный",
+      "ru_adj": "бесполезный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "reliable",
+      "en_adj": "unreliable",
+      "ru_noun": "надежный",
+      "ru_adj": "ненадежный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "able",
+      "en_adj": "unable",
+      "ru_noun": "способный",
+      "ru_adj": "неспособный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "healthy",
+      "en_adj": "unhealthy",
+      "ru_noun": "здоровый",
+      "ru_adj": "нездоровый"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "avoidable",
+      "en_adj": "unavoidable",
+      "ru_noun": "предотвратимый",
+      "ru_adj": "неизбежный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "reasonable",
+      "en_adj": "unreasonable",
+      "ru_noun": "разумный",
+      "ru_adj": "неразумный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "valuable",
+      "en_adj": "invaluable",
+      "ru_noun": "ценный",
+      "ru_adj": "бесценный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "explored",
+      "en_adj": "unexplored",
+      "ru_noun": "исследованный",
+      "ru_adj": "неисследованный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "common",
+      "en_adj": "uncommon",
+      "ru_noun": "обычный",
+      "ru_adj": "необычный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "favourable",
+      "en_adj": "unfavourable",
+      "ru_noun": "благоприятный",
+      "ru_adj": "неблагоприятный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "predictable",
+      "en_adj": "unpredictable",
+      "ru_noun": "предсказуемый",
+      "ru_adj": "непредсказуемый"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "popular",
+      "en_adj": "unpopular",
+      "ru_noun": "популярный",
+      "ru_adj": "непопулярный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "like",
+      "en_adj": "unlike",
+      "ru_noun": "похожий",
+      "ru_adj": "непохожий"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "suitable",
+      "en_adj": "unsuitable",
+      "ru_noun": "подходящий",
+      "ru_adj": "неподходящий"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "grateful",
+      "en_adj": "ungrateful",
+      "ru_noun": "благодарный",
+      "ru_adj": "неблагодарный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "familiar",
+      "en_adj": "unfamiliar",
+      "ru_noun": "знакомый",
+      "ru_adj": "незнакомый"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "attentive",
+      "en_adj": "inattentive",
+      "ru_noun": "внимательный",
+      "ru_adj": "невнимательный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "kind",
+      "en_adj": "unkind",
+      "ru_noun": "добрый",
+      "ru_adj": "недобрый"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "curable",
+      "en_adj": "incurable",
+      "ru_noun": "излечимый",
+      "ru_adj": "неизлечимый"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "tolerable",
+      "en_adj": "intolerable",
+      "ru_noun": "терпимый",
+      "ru_adj": "невыносимый"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "bearable",
+      "en_adj": "unbearable",
+      "ru_noun": "терпимый",
+      "ru_adj": "невыносимый"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "visible",
+      "en_adj": "invisible",
+      "ru_noun": "видимый",
+      "ru_adj": "невидимый"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "expensive",
+      "en_adj": "inexpensive",
+      "ru_noun": "дорогой",
+      "ru_adj": "недорогой"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "correct",
+      "en_adj": "incorrect",
+      "ru_noun": "правильный",
+      "ru_adj": "неправильный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "aware",
+      "en_adj": "unaware",
+      "ru_noun": "осведомленный",
+      "ru_adj": "неосведомленный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "worthy",
+      "en_adj": "unworthy",
+      "ru_noun": "достойный",
+      "ru_adj": "недостойный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "clear",
+      "en_adj": "unclear",
+      "ru_noun": "ясный",
+      "ru_adj": "неясный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "attractive",
+      "en_adj": "unattractive",
+      "ru_noun": "привлекательный",
+      "ru_adj": "непривлекательный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "limited",
+      "en_adj": "unlimited",
+      "ru_noun": "ограниченный",
+      "ru_adj": "неограниченный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "fit",
+      "en_adj": "unfit",
+      "ru_noun": "пригодный",
+      "ru_adj": "непригодный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "forgettable",
+      "en_adj": "unforgettable",
+      "ru_noun": "забываемый",
+      "ru_adj": "незабываемый"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "pleasant",
+      "en_adj": "unpleasant",
+      "ru_noun": "приятный",
+      "ru_adj": "неприятный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "conscious",
+      "en_adj": "unconscious",
+      "ru_noun": "в сознании",
+      "ru_adj": "бессознательный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "fashionable",
+      "en_adj": "unfashionable",
+      "ru_noun": "модный",
+      "ru_adj": "немодный"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "InUnPrefixes",
+      "en_noun": "sociable",
+      "en_adj": "unsociable",
+      "ru_noun": "общительный",
+      "ru_adj": "необщительный"
+    }
+  ]
+}

@@ -21,7 +21,7 @@
   <!-- Match main site look -->
   <link rel="stylesheet" href="../../assets/css/styles.css" />
 
-  <link rel="stylesheet" href="./student_helper.css?v=20260314-06" />
+  <link rel="stylesheet" href="./student_helper.css?v=20260314-07" />
 
 <style id="ik-site-nav-css">
 .ik-site-nav, .ik-site-nav *{ box-sizing: border-box; }
@@ -1018,7 +1018,9 @@
             <div class="ik-row">
               <label class="ik-label" for="transformType">тип</label>
               <select class="ik-select" id="transformType" style="min-width: 260px;">
-                <option value="noun_to_adj">Noun -> Adjective</option>
+                <option value="noun_to_adj">существительное -> прилагательное</option>
+                <option value="in_un_prefix">приставки in- или un-</option>
+                <option value="noun_to_verb">существительное -> глагол</option>
               </select>
 
               <span class="ik-badge" id="taskCountBadge">tasks: 0</span>
@@ -1084,6 +1086,12 @@
                   <button class="ik-btn" id="btnShowAnswer" type="button" title="Показать правильный ответ">ответ</button>
                 </div>
 
+                <div class="ik-row" id="inUnPrefixPicker" style="margin-top:8px;" hidden>
+                  <span class="ik-label">выбери приставку</span>
+                  <button class="ik-btn" id="btnPrefixIn" type="button">in-</button>
+                  <button class="ik-btn" id="btnPrefixUn" type="button">un-</button>
+                </div>
+
                 <div class="ik-divider"></div>
 
                 <div class="ik-feedback" id="feedbackBox" data-state="idle" aria-live="polite">
@@ -1124,7 +1132,7 @@
 
                 <div class="ik-row" style="margin-top:10px;">
                   <button class="ik-btn ik-btn--black" id="btnAddTask" type="button">сохранить</button>
-                  <button class="ik-btn" id="btnResetFromJson" type="button" title="Загрузит suffixes + prefixes из json рядом с этим html">восстановить из json</button>
+                  <button class="ik-btn" id="btnResetFromJson" type="button" title="Загрузит наборы из json для текущего типа">восстановить из json</button>
                 </div>
 
                 <div class="ik-divider"></div>
@@ -1202,7 +1210,7 @@
   <script src="./js/structure_data.js"></script>
   <script src="./js/structure.js"></script>
   <script src="./js/tenses.js?v=20260314-06"></script>
-  <script src="./js/word_transformation.js"></script>
+  <script src="./js/word_transformation.js?v=20260314-06"></script>
   <script src="./js/dictionary.js" onerror="window.IKAdminLog && window.IKAdminLog('error','student_helper','dictionary.js failed to load')"></script>
   <script>
     (function(){
@@ -1435,6 +1443,9 @@
     ['показывать ответы после каждого', 'show answers after each'],
     ['Enter - проверить/далее • Esc - выйти в меню', 'Enter - check/next • Esc - go to menu'],
     ['тип', 'type'],
+    ['существительное -> прилагательное', 'Noun -> Adjective'],
+    ['приставки in- или un-', 'in- or un- prefixes'],
+    ['существительное -> глагол', 'Noun -> Verb'],
     ['прилагательное', 'Adjective'],
     ['категория', 'category'],
     ['все категории', 'All'],

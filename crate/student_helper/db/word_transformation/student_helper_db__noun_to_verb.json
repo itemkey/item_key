@@ -1,0 +1,250 @@
+{
+  "schema": "student_helper_db_export",
+  "schemaVersion": 1,
+  "type": "noun_to_adj",
+  "category": "NounToVerb",
+  "exportedAt": "2026-03-14T00:00:00Z",
+  "dbName": "student_helper_db__noun_to_adj",
+  "tasks": [
+    {
+      "type": "noun_to_adj",
+      "category": "NounToVerb",
+      "en_noun": "apology",
+      "en_adj": "apologize",
+      "ru_noun": "извинение",
+      "ru_adj": "извиняться"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "NounToVerb",
+      "en_noun": "bright",
+      "en_adj": "brighten",
+      "ru_noun": "яркий",
+      "ru_adj": "делать ярче"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "NounToVerb",
+      "en_noun": "broad",
+      "en_adj": "broaden",
+      "ru_noun": "широкий",
+      "ru_adj": "расширять"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "NounToVerb",
+      "en_noun": "clear",
+      "en_adj": "clear",
+      "ru_noun": "ясный",
+      "ru_adj": "прояснять"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "NounToVerb",
+      "en_noun": "class",
+      "en_adj": "classify",
+      "ru_noun": "класс",
+      "ru_adj": "классифицировать"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "NounToVerb",
+      "en_noun": "colony",
+      "en_adj": "colonize",
+      "ru_noun": "колония",
+      "ru_adj": "колонизировать"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "NounToVerb",
+      "en_noun": "critic",
+      "en_adj": "criticize",
+      "ru_noun": "критик",
+      "ru_adj": "критиковать"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "NounToVerb",
+      "en_noun": "dark",
+      "en_adj": "darken",
+      "ru_noun": "темный",
+      "ru_adj": "затемнять"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "NounToVerb",
+      "en_noun": "deaf",
+      "en_adj": "deafen",
+      "ru_noun": "глухой",
+      "ru_adj": "оглушать"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "NounToVerb",
+      "en_noun": "able",
+      "en_adj": "enable",
+      "ru_noun": "способный",
+      "ru_adj": "давать возможность"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "NounToVerb",
+      "en_noun": "courage",
+      "en_adj": "encourage",
+      "ru_noun": "смелость",
+      "ru_adj": "ободрять"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "NounToVerb",
+      "en_noun": "danger",
+      "en_adj": "endanger",
+      "ru_noun": "опасность",
+      "ru_adj": "подвергать опасности"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "NounToVerb",
+      "en_noun": "large",
+      "en_adj": "enlarge",
+      "ru_noun": "большой",
+      "ru_adj": "увеличивать"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "NounToVerb",
+      "en_noun": "rich",
+      "en_adj": "enrich",
+      "ru_noun": "богатый",
+      "ru_adj": "обогащать"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "NounToVerb",
+      "en_noun": "sure",
+      "en_adj": "ensure",
+      "ru_noun": "уверенный",
+      "ru_adj": "обеспечивать"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "NounToVerb",
+      "en_noun": "fright",
+      "en_adj": "frighten",
+      "ru_noun": "страх",
+      "ru_adj": "пугать"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "NounToVerb",
+      "en_noun": "horror",
+      "en_adj": "horrify",
+      "ru_noun": "ужас",
+      "ru_adj": "ужасать"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "NounToVerb",
+      "en_noun": "identity",
+      "en_adj": "identify",
+      "ru_noun": "личность",
+      "ru_adj": "идентифицировать"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "NounToVerb",
+      "en_noun": "irritate",
+      "en_adj": "irritate",
+      "ru_noun": "раздражать",
+      "ru_adj": "раздражать"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "NounToVerb",
+      "en_noun": "just",
+      "en_adj": "justify",
+      "ru_noun": "справедливый",
+      "ru_adj": "оправдывать"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "NounToVerb",
+      "en_noun": "length",
+      "en_adj": "lengthen",
+      "ru_noun": "длина",
+      "ru_adj": "удлинять"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "NounToVerb",
+      "en_noun": "light",
+      "en_adj": "lighten",
+      "ru_noun": "светлый",
+      "ru_adj": "осветлять"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "NounToVerb",
+      "en_noun": "minimum",
+      "en_adj": "minimize",
+      "ru_noun": "минимум",
+      "ru_adj": "минимизировать"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "NounToVerb",
+      "en_noun": "motive",
+      "en_adj": "motivate",
+      "ru_noun": "мотив",
+      "ru_adj": "мотивировать"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "NounToVerb",
+      "en_noun": "participant",
+      "en_adj": "participate",
+      "ru_noun": "участник",
+      "ru_adj": "участвовать"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "NounToVerb",
+      "en_noun": "product",
+      "en_adj": "produce",
+      "ru_noun": "продукт",
+      "ru_adj": "производить"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "NounToVerb",
+      "en_noun": "real",
+      "en_adj": "realize",
+      "ru_noun": "реальный",
+      "ru_adj": "осознавать"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "NounToVerb",
+      "en_noun": "recognise",
+      "en_adj": "recognize",
+      "ru_noun": "узнавать",
+      "ru_adj": "узнавать"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "NounToVerb",
+      "en_noun": "cycle",
+      "en_adj": "cycle",
+      "ru_noun": "цикл",
+      "ru_adj": "циклировать"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "NounToVerb",
+      "en_noun": "reduce",
+      "en_adj": "reduce",
+      "ru_noun": "сокращение",
+      "ru_adj": "сокращать"
+    }
+  ]
+}

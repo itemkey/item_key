@@ -186,10 +186,19 @@ body {
       overflow-wrap:anywhere;
       word-break:break-word;
     }
-    .ik-ru{
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size:12px; opacity:.78; margin:6px 0 0;
-    }
+.ik-ru{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size:12px; opacity:.78; margin:6px 0 0;
+}
+
+/* WT: prefix picker is visible only in in/un transform type */
+#panel-wt #inUnPrefixPicker{
+  display: none !important;
+}
+
+#panel-wt.wt-inun-mode #inUnPrefixPicker{
+  display: flex !important;
+}
 
     .ik-badge{
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
