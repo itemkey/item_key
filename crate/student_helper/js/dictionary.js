@@ -4006,13 +4006,19 @@ li.appendChild(left);
     cardsQueue = next;
   }
 
-  function cardsSyncDoneState(){
+  function cardsSetDoneVisible(visible){
     if(!elCardsDoneRow) return;
+    const show = !!visible;
+    elCardsDoneRow.hidden = !show;
+    elCardsDoneRow.style.display = show ? 'flex' : 'none';
+  }
+
+  function cardsSyncDoneState(){
     const done = !!cardsDeck.length
       && cardsQueue.length === 0
       && cardsPos >= 0
       && cardsPos >= (cardsHistory.length - 1);
-    elCardsDoneRow.hidden = !done;
+    cardsSetDoneVisible(done);
   }
 
   function cardsShow(item, frontLang){
@@ -4030,7 +4036,7 @@ li.appendChild(left);
       elCardFrontLang.textContent = '';
       elCardBackLang.textContent = '';
       elCardsMeta.textContent = '';
-      if(elCardsDoneRow) elCardsDoneRow.hidden = true;
+      cardsSetDoneVisible(false);
       return;
     }
 
@@ -4102,7 +4108,7 @@ li.appendChild(left);
     cardsLastId = '';
     cardsSeen = new Set();
     if(cardsDeck.length) cardsBuildQueue();
-    if(elCardsDoneRow) elCardsDoneRow.hidden = true;
+    cardsSetDoneVisible(false);
     cardsGoNext();
   }
 
