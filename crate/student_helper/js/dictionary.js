@@ -642,11 +642,11 @@ function dictFilenameForSection(sectionName){
 
   // Cards state
   let cardsDeck = [];
+  let cardsQueue = [];
   let cardsHistory = [];
   let cardsPos = -1;
-  let cardsSeq = -1;
+  let cardsLastId = '';
 
-  
   let cardsSeen = new Set();
 // Quiz state
   let quizDeck = [];
@@ -1844,6 +1844,8 @@ if(btnLearnCheckNext){ btnLearnCheckNext.textContent = 'далее'; btnLearnChe
   const elCardFrontLang = document.getElementById('dictCardFrontLang');
   const elCardBackLang = document.getElementById('dictCardBackLang');
   const elCardsMeta = document.getElementById('dictCardsMeta');
+  const elCardsDoneRow = document.getElementById('dictCardsDoneRow');
+  const btnCardsRestart = document.getElementById('dictCardsRestart');
 
   const elQuizMode = document.getElementById('dictQuizMode');
   const elQuizScore = document.getElementById('dictQuizScore');
@@ -2849,8 +2851,7 @@ function quizMcqSelect(idx){
     mcqBumpConfusion(quizCurrent, quizAskLang, chosenOpt && chosenOpt.norm, correctOpt && correctOpt.norm);
 
     // return later
-    const insertAt = Math.min(quizQueue.length, DICT_REASK_GAP);
-    quizQueue.splice(insertAt, 0, quizCurrent);
+    quizScheduleReask(quizCurrent);
 
     // in mix: after wrong MCQ, force next attempt as input
     const k = practiceKey(quizCurrent);
@@ -2885,8 +2886,7 @@ function quizMcqGiveUp(){
   practiceBump(quizCurrent, quizAskLang, 'wrong');
   if(Math.random() < 0.45) coachSignal('giveup');
 
-  const insertAt = Math.min(quizQueue.length, DICT_REASK_GAP);
-  quizQueue.splice(insertAt, 0, quizCurrent);
+  quizScheduleReask(quizCurrent);
 
   const k = practiceKey(quizCurrent);
   if(k && String(cfg.taskMode || 'mix') === 'mix') quizModeOverrides[k] = 'input';
@@ -3988,6 +3988,33 @@ li.appendChild(left);
     }
   }
 
+  function cardsItemKey(item){
+    if(!item) return '';
+    if(item.id != null) return String(item.id);
+    return `${String(item.sectionId || '')}|${normEnCmp(item.en)}|${normRuCmp(item.ru)}`;
+  }
+
+  function cardsBuildQueue(){
+    let next = cardsDeck.slice();
+    if(elCardsRandom && elCardsRandom.checked){
+      next = shuffle(next);
+      if(cardsLastId && next.length > 1 && cardsItemKey(next[0]) === cardsLastId){
+        const swapIdx = 1 + Math.floor(Math.random() * (next.length - 1));
+        [next[0], next[swapIdx]] = [next[swapIdx], next[0]];
+      }
+    }
+    cardsQueue = next;
+  }
+
+  function cardsSyncDoneState(){
+    if(!elCardsDoneRow) return;
+    const done = !!cardsDeck.length
+      && cardsQueue.length === 0
+      && cardsPos >= 0
+      && cardsPos >= (cardsHistory.length - 1);
+    elCardsDoneRow.hidden = !done;
+  }
+
   function cardsShow(item, frontLang){
     cardsSetFlipped(false);
 
@@ -4003,6 +4030,7 @@ li.appendChild(left);
       elCardFrontLang.textContent = '';
       elCardBackLang.textContent = '';
       elCardsMeta.textContent = '';
+      if(elCardsDoneRow) elCardsDoneRow.hidden = true;
       return;
     }
 
@@ -4013,20 +4041,20 @@ li.appendChild(left);
     elCardBackLang.textContent = frontIsEn ? 'RU' : 'EN';
 
     const secName = getSectionNameById(item.sectionId);
-    // progress: unique seen / total in current deck
-    if(item && item.id != null) cardsSeen.add(String(item.id));
+    const key = cardsItemKey(item);
+    if(key) cardsSeen.add(key);
     const denom = cardsDeck.length || 0;
     const prog = denom ? cardsSeen.size : 0;
     elCardsMeta.textContent = `section: ${secName} | ${prog}/${denom}`;
-}
+    cardsSyncDoneState();
+  }
 
   function cardsPick(){
     if(!cardsDeck.length) return null;
-    if(elCardsRandom.checked){
-      return cardsDeck[Math.floor(Math.random() * cardsDeck.length)];
-    }
-    cardsSeq = (cardsSeq + 1) % cardsDeck.length;
-    return cardsDeck[cardsSeq];
+    if(!cardsQueue.length) return null;
+    const next = cardsQueue.shift() || null;
+    cardsLastId = cardsItemKey(next);
+    return next;
   }
 
   function cardsGoNext(){
@@ -4040,6 +4068,11 @@ li.appendChild(left);
     }
 
     const item = cardsPick();
+    if(!item){
+      cardsSyncDoneState();
+      return;
+    }
+
     const pref = String(elCardsFront.value || 'en');
     const frontLang = pref === 'mix' ? (Math.random() < 0.5 ? 'en' : 'ru') : pref;
 
@@ -4063,10 +4096,13 @@ li.appendChild(left);
 
   function dictResetCards(){
     cardsDeck = wordsForSelection(elSectionCards.value);
+    cardsQueue = [];
     cardsHistory = [];
     cardsPos = -1;
-    cardsSeq = -1;
+    cardsLastId = '';
     cardsSeen = new Set();
+    if(cardsDeck.length) cardsBuildQueue();
+    if(elCardsDoneRow) elCardsDoneRow.hidden = true;
     cardsGoNext();
   }
 
@@ -4206,6 +4242,27 @@ li.appendChild(left);
     }
     const item = quizQueue.shift();
     quizShow(item);
+  }
+
+  function quizItemKey(item){
+    if(!item) return '';
+    if(item.id != null) return String(item.id);
+    return practiceKey(item);
+  }
+
+  function quizScheduleReask(item){
+    if(!item) return;
+    const unseenLeft = Math.max(0, (quizDeck.length || 0) - quizSeen.size);
+    let insertAt = unseenLeft > 0
+      ? quizQueue.length
+      : Math.min(quizQueue.length, DICT_REASK_GAP);
+
+    const key = quizItemKey(item);
+    while(insertAt < quizQueue.length && key && quizItemKey(quizQueue[insertAt]) === key){
+      insertAt += 1;
+    }
+
+    quizQueue.splice(insertAt, 0, item);
   }
 
   function weightedPickNoReplace(items, n, weightFn){
@@ -4365,8 +4422,7 @@ li.appendChild(left);
 
   practiceBump(p.item, p.askLang, 'wrong');
   if(Math.random() < 0.35) coachSignal('wrong');
-    const insertAt = Math.min(quizQueue.length, DICT_REASK_GAP);
-    quizQueue.splice(insertAt, 0, p.item);
+    quizScheduleReask(p.item);
     quizSetFeedback('wrong', 'no', 'не засчитано - слово вернется позже');
   }
 
@@ -4432,8 +4488,7 @@ li.appendChild(left);
     practiceBump(quizCurrent, quizAskLang, 'wrong');
     if(Math.random() < 0.38) coachSignal('wrong');
 
-    const insertAt = Math.min(quizQueue.length, DICT_REASK_GAP);
-    quizQueue.splice(insertAt, 0, quizCurrent);
+    quizScheduleReask(quizCurrent);
 
     quizSetFeedback('wrong', 'no', 'неверно - смотри ответ и жми далее');
     quizLockAfterCheck(false);
@@ -4459,8 +4514,7 @@ li.appendChild(left);
   practiceBump(quizCurrent, quizAskLang, 'wrong');
   if(Math.random() < 0.45) coachSignal('giveup');
 
-    const insertAt = Math.min(quizQueue.length, DICT_REASK_GAP);
-    quizQueue.splice(insertAt, 0, quizCurrent);
+    quizScheduleReask(quizCurrent);
 
     quizSetFeedback('wrong', 'giveup', 'ответ показан - слово вернется позже');
     quizLockAfterCheck(false);
@@ -4855,6 +4909,7 @@ async function dictSyncFromFolder(opts){
 
   btnCardsPrev.addEventListener('click', cardsGoPrev);
   btnCardsNext.addEventListener('click', cardsGoNext);
+  if(btnCardsRestart) btnCardsRestart.addEventListener('click', dictResetCards);
   elCardsFront.addEventListener('change', dictResetCards);
   elCardsRandom.addEventListener('change', dictResetCards);
   elSectionCards.addEventListener('change', ()=>{

@@ -107,6 +107,28 @@
   function idbSupported(){ return typeof indexedDB !== 'undefined'; }
   function dbNameFor(type){ return `${DB_PREFIX}${type}`; }
   function normalize(s){ return (s || '').trim().toLowerCase(); }
+  function shuffleList(arr){
+    const out = Array.isArray(arr) ? arr.slice() : [];
+    for(let i = out.length - 1; i > 0; i -= 1){
+      const j = Math.floor(Math.random() * (i + 1));
+      [out[i], out[j]] = [out[j], out[i]];
+    }
+    return out;
+  }
+  function taskCycleKey(task){
+    const t = task || {};
+    if(t.id != null) return String(t.id);
+    return `${normalize(t.en_noun)}|${normalize(t.en_adj)}|${normalize(normCategory(t.category))}`;
+  }
+  function buildCyclePool(list, random, lastKey){
+    let pool = Array.isArray(list) ? list.slice() : [];
+    if(random) pool = shuffleList(pool);
+    if(lastKey && pool.length > 1 && taskCycleKey(pool[0]) === lastKey){
+      const swapIdx = 1 + Math.floor(Math.random() * (pool.length - 1));
+      [pool[0], pool[swapIdx]] = [pool[swapIdx], pool[0]];
+    }
+    return pool;
+  }
   function siteLang(){
     try{
       if(window.IKSiteLang && typeof window.IKSiteLang.get === 'function'){
@@ -1095,7 +1117,8 @@ async function fetchJson(relPath){
 
   let history = [];
   let historyPos = -1;
-  let seqIndex = -1;
+  let practicePool = [];
+  let practiceLastKey = '';
 
   let checkMode = 'check'; // 'check' | 'next'
 
@@ -1106,7 +1129,8 @@ async function fetchJson(relPath){
   let textSessionCorrect = 0;
   let textHistory = [];
   let textHistoryPos = -1;
-  let textSeqIndex = -1;
+  let textPool = [];
+  let textLastKey = '';
   let textCheckMode = 'check';
 
   const elDbStatus = document.getElementById('dbStatus');
@@ -1477,7 +1501,8 @@ async function fetchJson(relPath){
   function resetTextSession(){
     textHistory = [];
     textHistoryPos = -1;
-    textSeqIndex = -1;
+    textPool = [];
+    textLastKey = '';
     updateTextQ();
     setTextCheckMode('check');
     clearTextInputState();
@@ -1507,6 +1532,8 @@ async function fetchJson(relPath){
     if(cat === 'All') textTasksActive = [...scope];
     else textTasksActive = scope.filter((t) => normCategory(t.category) === cat);
     textTasksActive.sort((a,b)=> (a.en_noun || '').localeCompare((b.en_noun || ''), 'en'));
+    textPool = [];
+    textLastKey = '';
     updateTextPromptLabel();
   }
 
@@ -1614,10 +1641,13 @@ async function fetchJson(relPath){
 
   function pickNewTextTask(){
     if(!textTasksActive.length) return null;
-    const random = !!(elTextRandom && elTextRandom.checked);
-    if(random) return textTasksActive[Math.floor(Math.random() * textTasksActive.length)];
-    textSeqIndex = (textSeqIndex + 1) % textTasksActive.length;
-    return textTasksActive[textSeqIndex];
+    if(!textPool.length){
+      const random = !!(elTextRandom && elTextRandom.checked);
+      textPool = buildCyclePool(textTasksActive, random, textLastKey);
+    }
+    const next = textPool.shift() || null;
+    if(next) textLastKey = taskCycleKey(next);
+    return next;
   }
 
   function goTextNext(){
@@ -1711,7 +1741,8 @@ async function fetchJson(relPath){
   function resetPracticeSession(){
     history = [];
     historyPos = -1;
-    seqIndex = -1;
+    practicePool = [];
+    practiceLastKey = '';
     updateQ();
     setCheckMode('check');
     clearInputState();
@@ -1777,6 +1808,8 @@ async function fetchJson(relPath){
     else tasksActive = scope.filter(t => normCategory(t.category) === cat);
 
     tasksActive.sort((a,b)=> (a.en_noun || '').localeCompare((b.en_noun || ''), 'en'));
+    practicePool = [];
+    practiceLastKey = '';
 
     updatePromptLabel();
     renderRuleForCurrentScope();
@@ -1883,12 +1916,13 @@ async function fetchJson(relPath){
 
   function pickNewTask(){
     if(!tasksActive.length) return null;
-    const random = !!elRandom.checked;
-    if(random){
-      return tasksActive[Math.floor(Math.random() * tasksActive.length)];
+    if(!practicePool.length){
+      const random = !!(elRandom && elRandom.checked);
+      practicePool = buildCyclePool(tasksActive, random, practiceLastKey);
     }
-    seqIndex = (seqIndex + 1) % tasksActive.length;
-    return tasksActive[seqIndex];
+    const next = practicePool.shift() || null;
+    if(next) practiceLastKey = taskCycleKey(next);
+    return next;
   }
 
   function goNext(){
@@ -2318,8 +2352,18 @@ if(e.key.toLowerCase() === 't'){
     goNext();
   });
 
+  elRandom && elRandom.addEventListener('change', ()=>{
+    resetPracticeSession();
+    goNext();
+  });
+
   elTextCategory && elTextCategory.addEventListener('change', ()=>{
     updateTextActiveTasks();
+    resetTextSession();
+    goTextNext();
+  });
+
+  elTextRandom && elTextRandom.addEventListener('change', ()=>{
     resetTextSession();
     goTextNext();
   });

@@ -346,6 +346,10 @@
                 </div>
 
                 <p class="ik-footnote" id="dictCardsMeta">...</p>
+                <div class="ik-row" id="dictCardsDoneRow" style="justify-content:center; gap:10px; margin-top:8px;" hidden>
+                  <span class="ik-footnote">вы просмотрели все слова</span>
+                  <button class="ik-btn ik-btn--black" id="dictCardsRestart" type="button">еще раз</button>
+                </div>
               </section>
             </div>
 
@@ -433,7 +437,7 @@
 <p class="ik-feedback__line" id="dictQuizLine">введи перевод и нажми check</p>
                 </div>
 
-                <p class="ik-footnote">правило: после проверки переписать нельзя - только далее. неверные слова вернутся через пару заданий.</p>
+                <p class="ik-footnote">правило: после проверки переписать нельзя - только далее. неверные слова вернутся позже.</p>
               </section>
             </div>
 
@@ -1440,6 +1444,8 @@
     ['разделы', 'sections'],
     ['назад', 'back'],
     ['далее', 'next'],
+    ['вы просмотрели все слова', 'you viewed all words'],
+    ['еще раз', 'again'],
     ['англ', 'EN'],
     ['рус', 'RU'],
     ['сдаюсь', 'give up'],
@@ -1499,7 +1505,7 @@
     ['"to" не обязателен', '"to" optional'],
     ['артикли не обязательны', 'articles optional'],
     ['готово', 'ready'],
-    ['правило: после проверки переписать нельзя - только далее. неверные слова вернутся через пару заданий.', 'rule: after checking, you cannot edit the answer - only move on. wrong words will return after a couple of tasks.'],
+    ['правило: после проверки переписать нельзя - только далее. неверные слова вернутся позже.', 'rule: after checking, you cannot edit the answer - only move on. wrong words will return later.'],
     ['умные повторы', 'smart review'],
     ['слово считается выученным в сессии, если 2 раза подряд ответил верно без подсказок и между ответами было хотя бы 10 заданий.', 'a word is counted as learned in the session if you answer it correctly twice in a row without hints, with at least 10 tasks between the answers.'],
     ['сохранить JSON', 'save JSON'],
