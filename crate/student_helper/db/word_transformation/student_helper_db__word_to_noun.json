@@ -1,0 +1,433 @@
+{
+  "schema": "student_helper_db_export",
+  "schemaVersion": 1,
+  "type": "noun_to_adj",
+  "category": "WordToNoun",
+  "exportedAt": "2026-03-17T00:00:00Z",
+  "dbName": "student_helper_db__noun_to_adj",
+  "tasks": [
+    {
+      "type": "noun_to_adj",
+      "category": "WordToNoun",
+      "en_noun": "able",
+      "en_adj": "ability",
+      "ru_noun": "able",
+      "ru_adj": "ability",
+      "text_en": "His ability to save money is a real problem."
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "WordToNoun",
+      "en_noun": "accommodate",
+      "en_adj": "accommodation",
+      "ru_noun": "accommodate",
+      "ru_adj": "accommodation",
+      "text_en": "We need to find accommodation for the weekend trip."
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "WordToNoun",
+      "en_noun": "achieve",
+      "en_adj": "achievement",
+      "ru_noun": "achieve",
+      "ru_adj": "achievement",
+      "text_en": "Finishing the game was a big achievement for him."
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "WordToNoun",
+      "en_noun": "act",
+      "en_adj": "action",
+      "ru_noun": "act",
+      "ru_adj": "action",
+      "text_en": "Quick action is important in an emergency."
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "WordToNoun",
+      "en_noun": "active",
+      "en_adj": "activist",
+      "ru_noun": "active",
+      "ru_adj": "activist",
+      "text_en": "The activist gave a speech about protecting nature."
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "WordToNoun",
+      "en_noun": "active",
+      "en_adj": "activity",
+      "ru_noun": "active",
+      "ru_adj": "activity",
+      "text_en": "There's a lot of activity in our school club."
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "WordToNoun",
+      "en_noun": "act",
+      "en_adj": "actor",
+      "ru_noun": "act",
+      "ru_adj": "actor",
+      "text_en": "My favorite actor is in the new superhero movie."
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "WordToNoun",
+      "en_noun": "addict",
+      "en_adj": "addiction",
+      "ru_noun": "addict",
+      "ru_adj": "addiction",
+      "text_en": "Her addiction to her phone is total."
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "WordToNoun",
+      "en_noun": "add",
+      "en_adj": "addition",
+      "ru_noun": "add",
+      "ru_adj": "addition",
+      "text_en": "The addition of a new level made the game cooler."
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "WordToNoun",
+      "en_noun": "advertise",
+      "en_adj": "advertisement",
+      "ru_noun": "advertise",
+      "ru_adj": "advertisement",
+      "text_en": "I saw an advertisement for the sale online."
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "WordToNoun",
+      "en_noun": "amaze",
+      "en_adj": "amazement",
+      "ru_noun": "amaze",
+      "ru_adj": "amazement",
+      "text_en": "To my amazement, I got the highest score."
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "WordToNoun",
+      "en_noun": "amuse",
+      "en_adj": "amusement",
+      "ru_noun": "amuse",
+      "ru_adj": "amusement",
+      "text_en": "The movie was pure amusement."
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "WordToNoun",
+      "en_noun": "announce",
+      "en_adj": "announcement",
+      "ru_noun": "announce",
+      "ru_adj": "announcement",
+      "text_en": "The announcement about the concert made everyone happy."
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "WordToNoun",
+      "en_noun": "anxious",
+      "en_adj": "anxiety",
+      "ru_noun": "anxious",
+      "ru_adj": "anxiety",
+      "text_en": "I feel anxiety before a big test."
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "WordToNoun",
+      "en_noun": "apply",
+      "en_adj": "application",
+      "ru_noun": "apply",
+      "ru_adj": "application",
+      "text_en": "Please send your application by email."
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "WordToNoun",
+      "en_noun": "appoint",
+      "en_adj": "appointment",
+      "ru_noun": "appoint",
+      "ru_adj": "appointment",
+      "text_en": "I have an appointment at the cafe after school."
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "WordToNoun",
+      "en_noun": "argue",
+      "en_adj": "argument",
+      "ru_noun": "argue",
+      "ru_adj": "argument",
+      "text_en": "We had an argument about which game is better."
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "WordToNoun",
+      "en_noun": "arrange",
+      "en_adj": "arrangement",
+      "ru_noun": "arrange",
+      "ru_adj": "arrangement",
+      "text_en": "The arrangement for the party is almost done."
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "WordToNoun",
+      "en_noun": "art",
+      "en_adj": "artist",
+      "ru_noun": "art",
+      "ru_adj": "artist",
+      "text_en": "The young artist drew a fantastic comic."
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "WordToNoun",
+      "en_noun": "attract",
+      "en_adj": "attraction",
+      "ru_noun": "attract",
+      "ru_adj": "attraction",
+      "text_en": "The main attraction here is the ice cream shop."
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "WordToNoun",
+      "en_noun": "aware",
+      "en_adj": "awareness",
+      "ru_noun": "aware",
+      "ru_adj": "awareness",
+      "text_en": "We need more awareness about this problem."
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "WordToNoun",
+      "en_noun": "calculate",
+      "en_adj": "calculation",
+      "ru_noun": "calculate",
+      "ru_adj": "calculation",
+      "text_en": "My calculation shows I have enough money for a ticket."
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "WordToNoun",
+      "en_noun": "carry",
+      "en_adj": "carrier",
+      "ru_noun": "carry",
+      "ru_adj": "carrier",
+      "text_en": "The carrier brought a big package to our door."
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "WordToNoun",
+      "en_noun": "cautious",
+      "en_adj": "caution",
+      "ru_noun": "cautious",
+      "ru_adj": "caution",
+      "text_en": "Cross the street with caution."
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "WordToNoun",
+      "en_noun": "certain",
+      "en_adj": "certainty",
+      "ru_noun": "certain",
+      "ru_adj": "certainty",
+      "text_en": "I can't say with certainty if he will come."
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "WordToNoun",
+      "en_noun": "characterise",
+      "en_adj": "characteristic",
+      "ru_noun": "characterise",
+      "ru_adj": "characteristic",
+      "text_en": "Honesty is a good characteristic in a friend."
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "WordToNoun",
+      "en_noun": "combine",
+      "en_adj": "combination",
+      "ru_noun": "combine",
+      "ru_adj": "combination",
+      "text_en": "The sauce is a combination of three ingredients."
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "WordToNoun",
+      "en_noun": "commit",
+      "en_adj": "commitment",
+      "ru_noun": "commit",
+      "ru_adj": "commitment",
+      "text_en": "She shows great commitment to her football team."
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "WordToNoun",
+      "en_noun": "communicate",
+      "en_adj": "communication",
+      "ru_noun": "communicate",
+      "ru_adj": "communication",
+      "text_en": "Good communication solves many problems."
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "WordToNoun",
+      "en_noun": "common",
+      "en_adj": "community",
+      "ru_noun": "common",
+      "ru_adj": "community",
+      "text_en": "Our school community is very friendly."
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "WordToNoun",
+      "en_noun": "compete",
+      "en_adj": "competition",
+      "ru_noun": "compete",
+      "ru_adj": "competition",
+      "text_en": "The competition in the race was tough."
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "WordToNoun",
+      "en_noun": "compete",
+      "en_adj": "competitor",
+      "ru_noun": "compete",
+      "ru_adj": "competitor",
+      "text_en": "Every competitor got a medal."
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "WordToNoun",
+      "en_noun": "compose",
+      "en_adj": "composer",
+      "ru_noun": "compose",
+      "ru_adj": "composer",
+      "text_en": "He is the composer of this song."
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "WordToNoun",
+      "en_noun": "conclude",
+      "en_adj": "conclusion",
+      "ru_noun": "conclude",
+      "ru_adj": "conclusion",
+      "text_en": "What is your conclusion after reading the book?"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "WordToNoun",
+      "en_noun": "connect",
+      "en_adj": "connection",
+      "ru_noun": "connect",
+      "ru_adj": "connection",
+      "text_en": "I lost my internet connection."
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "WordToNoun",
+      "en_noun": "conscious",
+      "en_adj": "consciousness",
+      "ru_noun": "conscious",
+      "ru_adj": "consciousness",
+      "text_en": "He lost consciousness after he fell."
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "WordToNoun",
+      "en_noun": "consult",
+      "en_adj": "consultation",
+      "ru_noun": "consult",
+      "ru_adj": "consultation",
+      "text_en": "I had a consultation with the teacher about my project."
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "WordToNoun",
+      "en_noun": "consume",
+      "en_adj": "consumer",
+      "ru_noun": "consume",
+      "ru_adj": "consumer",
+      "text_en": "The consumer bought a new phone."
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "WordToNoun",
+      "en_noun": "consume",
+      "en_adj": "consumption",
+      "ru_noun": "consume",
+      "ru_adj": "consumption",
+      "text_en": "High consumption of sugar is unhealthy."
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "WordToNoun",
+      "en_noun": "contain",
+      "en_adj": "container",
+      "ru_noun": "contain",
+      "ru_adj": "container",
+      "text_en": "The container for juice is empty."
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "WordToNoun",
+      "en_noun": "contribute",
+      "en_adj": "contribution",
+      "ru_noun": "contribute",
+      "ru_adj": "contribution",
+      "text_en": "Your help was a big contribution to our success."
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "WordToNoun",
+      "en_noun": "create",
+      "en_adj": "creation",
+      "ru_noun": "create",
+      "ru_adj": "creation",
+      "text_en": "The creation of this app changed everything."
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "WordToNoun",
+      "en_noun": "creative",
+      "en_adj": "creativity",
+      "ru_noun": "creative",
+      "ru_adj": "creativity",
+      "text_en": "Her creativity is amazing; she makes her own clothes."
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "WordToNoun",
+      "en_noun": "create",
+      "en_adj": "creator",
+      "ru_noun": "create",
+      "ru_adj": "creator",
+      "text_en": "Who was the creator of this game?"
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "WordToNoun",
+      "en_noun": "cruel",
+      "en_adj": "cruelty",
+      "ru_noun": "cruel",
+      "ru_adj": "cruelty",
+      "text_en": "His cruelty made everyone sad."
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "WordToNoun",
+      "en_noun": "curious",
+      "en_adj": "curiosity",
+      "ru_noun": "curious",
+      "ru_adj": "curiosity",
+      "text_en": "Her curiosity led her to learn new things."
+    },
+    {
+      "type": "noun_to_adj",
+      "category": "WordToNoun",
+      "en_noun": "cycle",
+      "en_adj": "cyclist",
+      "ru_noun": "cycle",
+      "ru_adj": "cyclist",
+      "text_en": "The cyclist fixed his bike."
+    }
+  ]
+}

@@ -64,24 +64,20 @@
       ],
       "rows": [
         [
-          "опыт",
-          "ever, never, before, once/twice, the first time"
+          "результат/новость",
+          "already, just, yet, still, by now"
         ],
         [
-          "результат/новость",
-          "already, just, yet, recently, lately"
+          "опыт",
+          "ever, never (experience), before, twice (in my life), always (I've always wanted)"
         ],
         [
           "период не закончен",
-          "today, this week/month/year, so far, up to now"
+          "today (unfinished), lately, recently, in recent years, so far, up to now, in the last 2 weeks, over the last decade"
         ],
         [
           "длительность",
-          "for, since, since when, how long, all day/week"
-        ],
-        [
-          "сколько раз",
-          "three times, several times, a few times"
+          "for 2 years, since, how long (+ stative verbs)"
         ]
       ]
     },

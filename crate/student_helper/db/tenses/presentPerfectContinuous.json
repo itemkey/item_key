@@ -65,19 +65,19 @@
       "rows": [
         [
           "длительность",
-          "for, since, how long, all day/week, for ages"
+          "for a long time, for 2 hours now, since, how long"
         ],
         [
-          "в последнее время",
-          "lately, recently, these days"
+          "незаконченный период",
+          "all morning (не закончилось), whole day, over the last 3 days"
         ],
         [
           "контекст/результат",
           "look at you!, your hands are dirty, I'm tired"
         ],
         [
-          "период не закончен",
-          "today, this week (когда акцент на процессе)"
+          "в последнее время",
+          "lately, recently, these days"
         ]
       ]
     },

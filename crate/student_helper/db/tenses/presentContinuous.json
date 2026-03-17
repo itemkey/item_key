@@ -71,19 +71,23 @@
       "rows": [
         [
           "прямо сейчас",
-          "now, right now, at the moment"
+          "now, at the moment, currently"
         ],
         [
-          "временно",
-          "this week/month, these days, today"
+          "временный период",
+          "these days, nowadays, today (контраст с usually), still"
         ],
         [
           "развитие",
-          "more and more, getting..."
+          "getting better/harder, gradually"
+        ],
+        [
+          "раздражающая повторяемость",
+          "always, continually, constantly"
         ],
         [
           "контекст",
-          "Look!, Listen!"
+          "Look!, Listen!, tomorrow (план), next Friday"
         ]
       ]
     },

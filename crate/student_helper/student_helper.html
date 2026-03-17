@@ -1022,9 +1022,10 @@
             <div class="ik-row">
               <label class="ik-label" for="transformType" id="transformTypeLabel" hidden>тип</label>
               <select class="ik-select" id="transformType" style="min-width: 260px;" hidden>
-                <option value="noun_to_adj">существительное -> прилагательное</option>
+                <option value="noun_to_adj">образование прилагательного</option>
                 <option value="in_un_prefix">приставки in- или un-</option>
-                <option value="noun_to_verb">существительное -> глагол</option>
+                <option value="noun_to_verb">образование глагола</option>
+                <option value="word_to_noun">образование существительного</option>
               </select>
 
               <span class="ik-badge" id="taskCountBadge">tasks: 0</span>
@@ -1102,7 +1103,7 @@
                   <span class="ik-badge" id="sessionScore">0/0</span>
                 </div>
 
-                <p class="ik-prompt" id="promptLabel">Сделай прилагательное из существительного</p>
+                <p class="ik-prompt" id="promptLabel">Образуй нужную форму слова</p>
 
                 <div class="ik-wordbar">
                   <p class="ik-word" id="promptEn">...</p>
@@ -1292,7 +1293,7 @@
   <script src="./js/structure_data.js"></script>
   <script src="./js/structure.js"></script>
   <script src="./js/tenses.js?v=20260314-06"></script>
-  <script src="./js/word_transformation.js?v=20260314-09"></script>
+  <script src="./js/word_transformation.js?v=20260317-01"></script>
   <script src="./js/dictionary.js" onerror="window.IKAdminLog && window.IKAdminLog('error','student_helper','dictionary.js failed to load')"></script>
   <script>
     (function(){
@@ -1536,16 +1537,17 @@
     ['показывать ответы после каждого', 'show answers after each'],
     ['Enter - проверить/далее • Esc - выйти в меню', 'Enter - check/next • Esc - go to menu'],
     ['тип', 'type'],
-    ['существительное -> прилагательное', 'Noun -> Adjective'],
+    ['образование прилагательного', 'Adjective Formation'],
     ['приставки in- или un-', 'in- or un- prefixes'],
-    ['существительное -> глагол', 'Noun -> Verb'],
+    ['образование глагола', 'Verb Formation'],
+    ['образование существительного', 'Noun Formation'],
     ['прилагательное', 'Adjective'],
     ['категория', 'category'],
     ['все категории', 'All'],
     ['суффиксы', 'Suffixes'],
     ['приставки', 'Prefixes'],
     ['вопрос', 'q'],
-    ['Сделай прилагательное из существительного', 'Make an adjective from the noun'],
+    ['Образуй нужную форму слова', 'Build the needed word form'],
     ['перевод', 'translation'],
     ['ответ', 'answer'],
     ['просмотр', 'view'],

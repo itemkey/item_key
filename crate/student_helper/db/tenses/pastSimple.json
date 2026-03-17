@@ -120,18 +120,26 @@
       "type": "highlight",
       "title": "Точное время",
       "lines": [
+        "in the past",
         "yesterday",
-        "last week/month/year",
-        "in 2010"
+        "last week",
+        "ago",
+        "in 1998",
+        "in the 16th century",
+        "in the Middle Ages",
+        "when I was 6"
       ]
     },
     {
       "type": "highlight",
-      "title": "Период времени (контекст прошлого)",
+      "title": "Сюжетные маркеры",
       "lines": [
-        "when I was a child",
-        "during the war",
-        "for two hours (если воспринимаем как завершенную длительность)"
+        "once / one day (in the past)",
+        "suddenly",
+        "finally",
+        "the other day",
+        "originally",
+        "and then"
       ]
     },
     {

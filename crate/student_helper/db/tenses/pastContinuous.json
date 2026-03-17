@@ -88,11 +88,12 @@
       "type": "highlight",
       "title": "Подсказки",
       "lines": [
-        "while",
-        "when (решает смысл: процесс или факт)",
-        "at 7 o’clock yesterday",
-        "all night",
-        "as"
+        "at 3 pm yesterday",
+        "at that time yesterday",
+        "from 2 till 4 yesterday",
+        "the whole day yesterday",
+        "when + V2",
+        "while / as"
       ]
     },
     {

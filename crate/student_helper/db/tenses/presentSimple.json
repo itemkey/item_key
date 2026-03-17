@@ -64,20 +64,20 @@
       ],
       "rows": [
         [
-          "частота",
-          "always, usually, often, sometimes, never"
+          "частота/обычность",
+          "every day, every other day, every year (annually), always, usually, sometimes, seldom, rarely, never"
         ],
         [
           "регулярность",
-          "every day/week/year, on Mondays, at weekends"
+          "regularly (on a regular basis), once a week, in the evenings, on Mondays"
         ],
         [
-          "расписание",
-          "at 7:30, tomorrow (в расписании), next week (в расписании)"
+          "нейтральный стиль",
+          "normally, generally, traditionally, typically, as a rule"
         ],
         [
-          "общие факты",
-          "generally, in general, normally"
+          "условные придаточные (Conditionals)",
+          "if, unless, when, until, in case (обычно в придаточной части Conditionals)"
         ]
       ]
     },

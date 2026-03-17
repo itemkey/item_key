@@ -11,7 +11,10 @@
   "word_transformation": {
     "noun_to_adj": {
       "prefixes": "student_helper_db__noun_to_adj_Prefixes.json",
-      "suffixes": "student_helper_db__noun_to_adj_Suffixes.json"
+      "suffixes": "student_helper_db__noun_to_adj_Suffixes.json",
+      "inUnPrefixes": "student_helper_db__noun_to_adj_InUnPrefixes.json",
+      "nounToVerb": "student_helper_db__noun_to_verb.json",
+      "wordToNoun": "student_helper_db__word_to_noun.json"
     }
   }
 }

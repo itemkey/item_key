@@ -10,6 +10,7 @@
   const N2A_PREFIX_FILE = 'db/word_transformation/student_helper_db__noun_to_adj_Prefixes.json';
   const N2A_INUN_FILE = 'db/word_transformation/student_helper_db__noun_to_adj_InUnPrefixes.json';
   const N2V_FILE = 'db/word_transformation/student_helper_db__noun_to_verb.json';
+  const W2N_FILE = 'db/word_transformation/student_helper_db__word_to_noun.json';
 
   const wtRuntime = {
     isAdmin: false,
@@ -20,17 +21,20 @@
   const TRANSFORM_TYPE_N2A = 'noun_to_adj';
   const TRANSFORM_TYPE_INUN = 'in_un_prefix';
   const TRANSFORM_TYPE_N2V = 'noun_to_verb';
+  const TRANSFORM_TYPE_W2N = 'word_to_noun';
   const CATEGORY_N2V = 'NounToVerb';
+  const CATEGORY_W2N = 'WordToNoun';
   const WT_MODE_MIXED = 'mixed';
   const WT_MODE_CUSTOM = 'custom';
   const WT_MODE_KEY = 'sh_wt_mode_v1';
   const WT_CUSTOM_TYPES_KEY = 'sh_wt_custom_types_v1';
+  const WT_TEXT_TEMPLATES = new Map();
 
   const WT_TYPES = [
     {
       id: TRANSFORM_TYPE_N2A,
-      titleRu: 'существительное -> прилагательное',
-      titleEn: 'Noun -> Adjective',
+      titleRu: 'образование прилагательного',
+      titleEn: 'Adjective Formation',
       categories: ['Suffixes', 'Prefixes']
     },
     {
@@ -41,9 +45,15 @@
     },
     {
       id: TRANSFORM_TYPE_N2V,
-      titleRu: 'существительное -> глагол',
-      titleEn: 'Noun -> Verb',
+      titleRu: 'образование глагола',
+      titleEn: 'Verb Formation',
       categories: [CATEGORY_N2V]
+    },
+    {
+      id: TRANSFORM_TYPE_W2N,
+      titleRu: 'образование существительного',
+      titleEn: 'Noun Formation',
+      categories: [CATEGORY_W2N]
     }
   ];
 
@@ -51,6 +61,7 @@
     const v = String(type || '').trim().toLowerCase();
     if(v === TRANSFORM_TYPE_INUN) return TRANSFORM_TYPE_INUN;
     if(v === TRANSFORM_TYPE_N2V) return TRANSFORM_TYPE_N2V;
+    if(v === TRANSFORM_TYPE_W2N) return TRANSFORM_TYPE_W2N;
     return TRANSFORM_TYPE_N2A;
   }
 
@@ -101,6 +112,7 @@
     const c = normCategory(task && task.category || 'Suffixes');
     if(c === 'InUnPrefixes') return TRANSFORM_TYPE_INUN;
     if(c === CATEGORY_N2V) return TRANSFORM_TYPE_N2V;
+    if(c === CATEGORY_W2N) return TRANSFORM_TYPE_W2N;
     return TRANSFORM_TYPE_N2A;
   }
 
@@ -200,11 +212,85 @@ function buildAffixHintHTML(baseWord, kind){
       lc === 'noun-to-verb' ||
       lc === 'noun to verb'
     ) return CATEGORY_N2V;
+    if(
+      lc === 'wordtonoun' ||
+      lc === 'word_to_noun' ||
+      lc === 'word-to-noun' ||
+      lc === 'word to noun' ||
+      lc === 'nounformation' ||
+      lc === 'noun_formation' ||
+      lc === 'noun-formation' ||
+      lc === 'noun formation'
+    ) return CATEGORY_W2N;
     if(lc === 'all') return 'All';
     return c;
   }
   function makePairKey(t){
     return `${normalize(t.en_noun)}|${normalize(t.en_adj)}|${normalize(t.type)}|${normalize(normCategory(t.category))}`;
+  }
+
+  function templatePairKey(baseWord, answerWord, category){
+    return `${normalize(baseWord)}|${normalize(answerWord)}|${normalize(TRANSFORM_TYPE_N2A)}|${normalize(normCategory(category))}`;
+  }
+
+  function registerTextTemplate(task, fallbackCategory){
+    const t = task || {};
+    const enNoun = normalize(t.en_noun);
+    const enAdj = normalize(t.en_adj);
+    if(!enNoun || !enAdj) return;
+
+    const textEn = String(t.text_en || t.sentence_en || '').trim();
+    const textRu = String(t.text_ru || t.sentence_ru || '').trim();
+    if(!textEn && !textRu) return;
+
+    const category = normCategory(t.category || fallbackCategory || 'Suffixes');
+    const key = templatePairKey(enNoun, enAdj, category);
+    WT_TEXT_TEMPLATES.set(key, {
+      en: textEn,
+      ru: textRu
+    });
+  }
+
+  function registerTextTemplatesFromJson(data, fallbackCategory){
+    const list = Array.isArray(data && data.tasks) ? data.tasks : [];
+    for(const task of list){
+      registerTextTemplate(task, fallbackCategory);
+    }
+  }
+
+  function sentenceWithGap(sentence, answer){
+    const src = String(sentence || '').trim();
+    const ans = String(answer || '').trim();
+    if(!src) return '';
+    if(!ans) return src;
+
+    const escaped = ans.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const asWord = new RegExp(`\\b${escaped}\\b`, 'i');
+    if(asWord.test(src)) return src.replace(asWord, '____');
+
+    const asRaw = new RegExp(escaped, 'i');
+    if(asRaw.test(src)) return src.replace(asRaw, '____');
+
+    return src;
+  }
+
+  function getCustomTextTemplate(task){
+    const t = task || {};
+    const category = normCategory(t.category || 'Suffixes');
+    const key = templatePairKey(t.en_noun, t.en_adj, category);
+    const raw = WT_TEXT_TEMPLATES.get(key);
+    if(!raw) return null;
+    return {
+      en: String(raw.en || '').trim(),
+      ru: String(raw.ru || '').trim()
+    };
+  }
+
+  async function preloadSeedTextTemplates(){
+    try{
+      const data = await fetchJson(W2N_FILE);
+      registerTextTemplatesFromJson(data, CATEGORY_W2N);
+    }catch(_){ }
   }
 
   function openDBForType(type){
@@ -482,6 +568,7 @@ function buildAffixHintHTML(baseWord, kind){
     if(type !== 'noun_to_adj') return [];
     const out = [];
     const push = (data, fallbackCategory) => {
+      registerTextTemplatesFromJson(data, fallbackCategory);
       const list = Array.isArray(data && data.tasks) ? data.tasks : [];
       for(const t of list){
         const en_noun = normalize(t && t.en_noun);
@@ -500,6 +587,7 @@ function buildAffixHintHTML(baseWord, kind){
     try{ push(await fetchJson(N2A_PREFIX_FILE), 'Prefixes'); }catch(_){ }
     try{ push(await fetchJson(N2A_INUN_FILE), 'InUnPrefixes'); }catch(_){ }
     try{ push(await fetchJson(N2V_FILE), CATEGORY_N2V); }catch(_){ }
+    try{ push(await fetchJson(W2N_FILE), CATEGORY_W2N); }catch(_){ }
 
     const uniq = new Map();
     for(const row of out) uniq.set(String(row.pairKey || ''), row);
@@ -716,7 +804,7 @@ function buildAffixHintHTML(baseWord, kind){
     if(c === CATEGORY_N2V){
       ruleTitle.textContent = wtText('правило', 'rule');
 
-      addSub(wtText('Существительное -> глагол: практическое правило', 'Noun -> Verb: practical rule'));
+      addSub(wtText('Образование глагола: практическое правило', 'Verb formation: practical rule'));
       addFoot(wtText(
         'Нет одного универсального суффикса. Выбирай модель и проверяй по словарной паре.',
         'There is no single universal suffix. Choose a formation pattern and verify the lexical pair.'
@@ -749,6 +837,38 @@ function buildAffixHintHTML(baseWord, kind){
       return;
     }
 
+    if(c === CATEGORY_W2N){
+      ruleTitle.textContent = wtText('правило', 'rule');
+
+      addSub(wtText('Правила образования существительных', 'Noun formation rules'));
+
+      addDivider();
+      addSub(wtText('Глагол + суффикс', 'Verb + suffix'));
+      addChips(['-ion, -tion, -sion -> attraction, decision','-ment -> achievement, argument']);
+
+      addDivider();
+      addSub(wtText('Прилагательное + суффикс', 'Adjective + suffix'));
+      addChips(['-ness -> happiness, weakness','-ty, -ity -> ability, creativity']);
+
+      addDivider();
+      addSub(wtText('Профессии (глагол +)', 'Professions (verb +)'));
+      addChips(['-or, -er -> actor, programmer']);
+
+      addDivider();
+      addSub(wtText('Профессии (сущ./прил. +)', 'Professions (noun/adj +)'));
+      addChips(['-ist -> scientist, cyclist','-ship -> friendship, membership']);
+
+      addDivider();
+      addChips(['-ion','-tion','-sion','-ment','-ness','-ty','-ity','-or','-er','-ist','-ship']);
+
+      addFoot(wtText(
+        'Подбирай суффикс по части речи исходного слова и проверяй написание в контексте.',
+        'Choose suffixes by the base word part of speech and verify spelling in context.'
+      ));
+
+      return;
+    }
+
     if(c === 'All'){
       ruleTitle.textContent = wtText('правила', 'rules');
       addSub(suffixSpec.title);
@@ -772,6 +892,7 @@ function buildAffixHintHTML(baseWord, kind){
   function ruleCategoryForTypeId(typeId){
     if(typeId === TRANSFORM_TYPE_INUN) return 'InUnPrefixes';
     if(typeId === TRANSFORM_TYPE_N2V) return CATEGORY_N2V;
+    if(typeId === TRANSFORM_TYPE_W2N) return CATEGORY_W2N;
     return 'All';
   }
 
@@ -848,6 +969,7 @@ function buildAffixHintHTML(baseWord, kind){
       const ruNoun = String(t.ru_noun || '').trim();
       const ruAdj  = String(t.ru_adj || '').trim();
       const cat = normCategory(t.category || defaultCategory);
+      registerTextTemplate(t, cat);
 
       if(!enNoun || !enAdj || !ruNoun || !ruAdj) continue;
 
@@ -938,6 +1060,7 @@ async function fetchJson(relPath){
       // suffixes
       try{
         const data = await fetchJson(N2A_SUFFIX_FILE);
+        registerTextTemplatesFromJson(data, 'Suffixes');
         const res = await importFromObject(data, { type, replace:false, silent:true, defaultCategory:'Suffixes' });
         okFiles.push(N2A_SUFFIX_FILE);
         added += res.added; skipped += res.skipped;
@@ -948,6 +1071,7 @@ async function fetchJson(relPath){
       // prefixes
       try{
         const data = await fetchJson(N2A_PREFIX_FILE);
+        registerTextTemplatesFromJson(data, 'Prefixes');
         const res = await importFromObject(data, { type, replace:false, silent:true, defaultCategory:'Prefixes' });
         okFiles.push(N2A_PREFIX_FILE);
         added += res.added; skipped += res.skipped;
@@ -958,6 +1082,7 @@ async function fetchJson(relPath){
       // in-/un- prefixes
       try{
         const data = await fetchJson(N2A_INUN_FILE);
+        registerTextTemplatesFromJson(data, 'InUnPrefixes');
         const res = await importFromObject(data, { type, replace:false, silent:true, defaultCategory:'InUnPrefixes' });
         okFiles.push(N2A_INUN_FILE);
         added += res.added; skipped += res.skipped;
@@ -968,11 +1093,23 @@ async function fetchJson(relPath){
       // noun -> verb set
       try{
         const data = await fetchJson(N2V_FILE);
+        registerTextTemplatesFromJson(data, CATEGORY_N2V);
         const res = await importFromObject(data, { type, replace:false, silent:true, defaultCategory:CATEGORY_N2V });
         okFiles.push(N2V_FILE);
         added += res.added; skipped += res.skipped;
       }catch(e){
         failFiles.push(N2V_FILE);
+      }
+
+      // word -> noun set
+      try{
+        const data = await fetchJson(W2N_FILE);
+        registerTextTemplatesFromJson(data, CATEGORY_W2N);
+        const res = await importFromObject(data, { type, replace:false, silent:true, defaultCategory:CATEGORY_W2N });
+        okFiles.push(W2N_FILE);
+        added += res.added; skipped += res.skipped;
+      }catch(e){
+        failFiles.push(W2N_FILE);
       }
 
       const after = await countAllTasks(db);
@@ -1003,6 +1140,7 @@ async function fetchJson(relPath){
       if(c === 'Prefixes') return _basename(N2A_PREFIX_FILE);
       if(c === 'InUnPrefixes') return _basename(N2A_INUN_FILE);
       if(c === CATEGORY_N2V) return _basename(N2V_FILE);
+      if(c === CATEGORY_W2N) return _basename(W2N_FILE);
       return 'student_helper_db__noun_to_adj_All.json';
     }
     return `${dbNameFor(type)}.json`;
@@ -1018,7 +1156,8 @@ async function fetchJson(relPath){
 
     const seedSets = [
       { file: N2A_INUN_FILE, category: 'InUnPrefixes' },
-      { file: N2V_FILE, category: CATEGORY_N2V }
+      { file: N2V_FILE, category: CATEGORY_N2V },
+      { file: W2N_FILE, category: CATEGORY_W2N }
     ];
 
     let added = 0;
@@ -1029,6 +1168,7 @@ async function fetchJson(relPath){
       try{
         // eslint-disable-next-line no-await-in-loop
         const data = await fetchJson(seed.file);
+        registerTextTemplatesFromJson(data, seed.category);
         // eslint-disable-next-line no-await-in-loop
         const res = await importFromObject(data, {
           type,
@@ -1054,14 +1194,20 @@ async function fetchJson(relPath){
       category: normCategory(category),
       exportedAt: new Date().toISOString(),
       dbName: dbNameFor(type),
-      tasks: tasks.map(t => ({
-        type: t.type,
-        category: normCategory(t.category),
-        en_noun: t.en_noun,
-        en_adj: t.en_adj,
-        ru_noun: t.ru_noun,
-        ru_adj: t.ru_adj
-      }))
+      tasks: tasks.map(t => {
+        const row = {
+          type: t.type,
+          category: normCategory(t.category),
+          en_noun: t.en_noun,
+          en_adj: t.en_adj,
+          ru_noun: t.ru_noun,
+          ru_adj: t.ru_adj
+        };
+        const tpl = getCustomTextTemplate(t);
+        if(tpl && tpl.en) row.text_en = tpl.en;
+        if(tpl && tpl.ru) row.text_ru = tpl.ru;
+        return row;
+      })
     };
 
     const filename = exportFilenameFor(type, category);
@@ -1081,6 +1227,7 @@ async function fetchJson(relPath){
   function inferDefaultCategoryFromFilename(name){
     const n = String(name || '').toLowerCase();
     if(n.includes('noun_to_verb')) return CATEGORY_N2V;
+    if(n.includes('word_to_noun') || n.includes('noun_formation')) return CATEGORY_W2N;
     if(n.includes('_inunprefixes') || n.includes('_in_un') || n.includes('inun')) return 'InUnPrefixes';
     if(n.includes('_suffixes')) return 'Suffixes';
     if(n.includes('_prefixes')) return 'Prefixes';
@@ -1423,9 +1570,10 @@ async function fetchJson(relPath){
     if(!elTransformType) return;
     const prev = String(elTransformType.value || transformType || TRANSFORM_TYPE_N2A);
     setSelectOptions(elTransformType, [
-      { value: TRANSFORM_TYPE_N2A, label: wtText('существительное -> прилагательное', 'Noun -> Adjective') },
+      { value: TRANSFORM_TYPE_N2A, label: wtText('образование прилагательного', 'Adjective Formation') },
       { value: TRANSFORM_TYPE_INUN, label: wtText('приставки in- или un-', 'in- or un- prefixes') },
-      { value: TRANSFORM_TYPE_N2V, label: wtText('существительное -> глагол', 'Noun -> Verb') }
+      { value: TRANSFORM_TYPE_N2V, label: wtText('образование глагола', 'Verb Formation') },
+      { value: TRANSFORM_TYPE_W2N, label: wtText('образование существительного', 'Noun Formation') }
     ], prev);
   }
 
@@ -1437,7 +1585,8 @@ async function fetchJson(relPath){
       if(cat === 'Suffixes') return wtText('суффиксы', 'Suffixes');
       if(cat === 'Prefixes') return wtText('приставки', 'Prefixes');
       if(cat === 'InUnPrefixes') return wtText('приставки in- или un-', 'in- or un- prefixes');
-      if(cat === CATEGORY_N2V) return wtText('существительное -> глагол', 'Noun -> Verb');
+      if(cat === CATEGORY_N2V) return wtText('образование глагола', 'Verb Formation');
+      if(cat === CATEGORY_W2N) return wtText('образование существительного', 'Noun Formation');
       return String(cat || '');
     };
 
@@ -1519,6 +1668,9 @@ async function fetchJson(relPath){
     if(ids[0] === TRANSFORM_TYPE_N2V){
       return wtText('Образуйте глагол от слова в скобках, чтобы завершить предложение.', 'Form a verb from the word in brackets to complete the sentence.');
     }
+    if(ids[0] === TRANSFORM_TYPE_W2N){
+      return wtText('Образуйте существительное от слова в скобках, чтобы завершить предложение.', 'Form a noun from the word in brackets to complete the sentence.');
+    }
     return wtText('Образуйте однокоренное слово от основы в скобках.', 'Form a cognate word from the base in brackets.');
   }
 
@@ -1551,6 +1703,18 @@ async function fetchJson(relPath){
     const typeId = taskTypeId(t);
     const base = String(t.en_noun || '').toUpperCase();
     const ruBase = resolveRuNoun(t) || t.ru_noun || t.en_noun || '';
+    const ruAnswer = resolveRuAdj(t) || t.ru_adj || t.en_adj || '';
+
+    const customTpl = getCustomTextTemplate(t);
+    if(customTpl && customTpl.en){
+      const enSentence = sentenceWithGap(customTpl.en, t.en_adj);
+      const ruSource = customTpl.ru || customTpl.en;
+      const ruSentence = sentenceWithGap(ruSource, ruAnswer);
+      return {
+        en: `${enSentence} (${base})`,
+        ru: `${ruSentence} (${ruBase})`
+      };
+    }
 
     let templates = [
       {
@@ -1595,6 +1759,21 @@ async function fetchJson(relPath){
         {
           en: 'Please ____ this concept so the clients can follow it.',
           ru: 'Пожалуйста, ____ эту концепцию, чтобы клиенты могли ее понять.'
+        }
+      ];
+    }else if(typeId === TRANSFORM_TYPE_W2N){
+      templates = [
+        {
+          en: 'His ____ helped the team finish the task on time.',
+          ru: 'Его ____ помогла команде закончить задачу вовремя.'
+        },
+        {
+          en: 'The teacher praised her ____ in class.',
+          ru: 'Учитель похвалил ее ____ на занятии.'
+        },
+        {
+          en: 'We discussed this ____ at the meeting yesterday.',
+          ru: 'Мы обсудили это ____ на встрече вчера.'
         }
       ];
     }
@@ -1751,7 +1930,8 @@ async function fetchJson(relPath){
   function promptTextForCategory(cat){
     const c = normCategory(cat);
     if(c === 'InUnPrefixes') return wtText('Выбери нужную приставку: in- или un-', 'Choose the correct prefix: in- or un-');
-    if(c === CATEGORY_N2V) return wtText('Образуй глагол от данного слова', 'Build a verb from the base word');
+    if(c === CATEGORY_N2V) return wtText('Образуй глагол от данного слова', 'Form a verb from the base word');
+    if(c === CATEGORY_W2N) return wtText('Образуй существительное от данного слова', 'Form a noun from the base word');
     if(c === 'Prefixes') return wtText('Образуй отрицательное прилагательное от данного слова', 'Build a negative adjective from the base word');
     return wtText('Образуй прилагательное из данного слова', 'Build an adjective from the base word');
   }
@@ -2113,6 +2293,7 @@ async function fetchJson(relPath){
   async function boot(){
     try{
       await initWtAccess();
+      await preloadSeedTextTemplates();
       enforceBuilderAccess();
 
       setAdminText(elDbStatus, 'opening...');
@@ -2383,6 +2564,7 @@ if(e.key.toLowerCase() === 't'){
     let cat;
     if(transformType === TRANSFORM_TYPE_INUN) cat = 'InUnPrefixes';
     else if(transformType === TRANSFORM_TYPE_N2V) cat = CATEGORY_N2V;
+    else if(transformType === TRANSFORM_TYPE_W2N) cat = CATEGORY_W2N;
     else cat = normCategory(elAddCategory.value || 'Suffixes');
 
     const enWord = normalize(document.getElementById('inEnWord').value);
@@ -2437,6 +2619,10 @@ if(e.key.toLowerCase() === 't'){
         const n2v = await fetchJson(N2V_FILE);
         await importFromObject(n2v, { type:'noun_to_adj', replace:false, silent:true, defaultCategory:CATEGORY_N2V });
         loadedFiles.push(N2V_FILE);
+      }else if(transformType === TRANSFORM_TYPE_W2N){
+        const w2n = await fetchJson(W2N_FILE);
+        await importFromObject(w2n, { type:'noun_to_adj', replace:false, silent:true, defaultCategory:CATEGORY_W2N });
+        loadedFiles.push(W2N_FILE);
       }else{
         const s = await fetchJson(N2A_SUFFIX_FILE);
         await importFromObject(s, { type:'noun_to_adj', replace:false, silent:true, defaultCategory:'Suffixes' });
@@ -2473,7 +2659,9 @@ if(e.key.toLowerCase() === 't'){
     const exportCategory = (view === 'All')
       ? (transformType === TRANSFORM_TYPE_INUN
         ? 'InUnPrefixes'
-        : (transformType === TRANSFORM_TYPE_N2V ? CATEGORY_N2V : view))
+        : (transformType === TRANSFORM_TYPE_N2V
+          ? CATEGORY_N2V
+          : (transformType === TRANSFORM_TYPE_W2N ? CATEGORY_W2N : view)))
       : view;
     await exportDb('noun_to_adj', exportCategory, list);
   });
