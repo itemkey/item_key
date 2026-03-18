@@ -1951,5 +1951,153 @@ begin
     set current_version_id = v_ver_id, updated_at = now()
     where id = v_dict_id;
   end if;
+
+  -- ==========================================
+  -- destination B1 unit 24 vocabulary
+  -- ==========================================
+  v_title := 'destination B1 unit 24 vocabulary';
+  v_title_key := public.ik_title_key(v_title);
+
+  insert into public.ik_public_dicts(dict_type, title, title_key, owner_id, rating_enabled)
+  values ('user', v_title, v_title_key, v_owner, true)
+  on conflict (dict_type, title_key)
+  do update set title = excluded.title, owner_id = excluded.owner_id, rating_enabled = true, updated_at = now();
+
+  select d.id, d.current_version_id
+  into v_dict_id, v_current_ver
+  from public.ik_public_dicts d
+  where d.dict_type = 'user' and d.title_key = v_title_key
+  limit 1;
+
+  if v_current_ver is null then
+    insert into public.ik_public_dict_versions(dict_id, version, status, created_by)
+    values (v_dict_id, 1, 'published', v_owner)
+    returning id into v_ver_id;
+
+    v_payload := $json$
+{
+  "schema": "student_helper_dictionary_section",
+  "schemaVersion": 1,
+  "exportedAt": "2026-03-18T00:00:00Z",
+  "section": "destination B1 unit 24 vocabulary",
+  "words": [
+    {"en": "admit", "ru": "признавать, сознаваться"},
+    {"en": "arrest", "ru": "арестовывать"},
+    {"en": "charity", "ru": "благотворительность, благотворительная организация"},
+    {"en": "commit", "ru": "совершать"},
+    {"en": "community", "ru": "сообщество, община"},
+    {"en": "court", "ru": "суд"},
+    {"en": "criminal", "ru": "преступник; преступный, уголовный"},
+    {"en": "culture", "ru": "культура"},
+    {"en": "familiar", "ru": "знакомый"},
+    {"en": "government", "ru": "правительство"},
+
+    {"en": "habit", "ru": "привычка"},
+    {"en": "identity card", "ru": "удостоверение личности"},
+    {"en": "illegal", "ru": "незаконный"},
+    {"en": "politics", "ru": "политика"},
+    {"en": "population", "ru": "население"},
+    {"en": "prison", "ru": "тюрьма"},
+    {"en": "protest", "ru": "протест"},
+    {"en": "resident", "ru": "житель"},
+    {"en": "responsible", "ru": "ответственный"},
+    {"en": "rob", "ru": "грабить"},
+
+    {"en": "routine", "ru": "рутина, обычный порядок; обычный, рутинный"},
+    {"en": "schedule", "ru": "расписание, график"},
+    {"en": "situation", "ru": "ситуация"},
+    {"en": "social", "ru": "социальный, общественный"},
+    {"en": "society", "ru": "общество"},
+    {"en": "steal", "ru": "красть"},
+    {"en": "tradition", "ru": "традиция"},
+    {"en": "typical", "ru": "типичный"},
+    {"en": "vote", "ru": "голосовать; голос"},
+    {"en": "youth club", "ru": "молодёжный клуб"},
+
+    {"en": "break in(to)", "ru": "вломиться, незаконно проникнуть"},
+    {"en": "catch up (with)", "ru": "догнать, сравняться"},
+    {"en": "get away with", "ru": "избежать наказания за что-либо"},
+    {"en": "get up", "ru": "вставать"},
+    {"en": "move in", "ru": "въезжать, поселяться"},
+    {"en": "put away", "ru": "убирать на место"},
+    {"en": "wake up", "ru": "просыпаться"},
+    {"en": "wash up", "ru": "мыть посуду"},
+
+    {"en": "against the law", "ru": "противозаконно, против закона"},
+    {"en": "at the age of", "ru": "в возрасте"},
+    {"en": "in public", "ru": "на публике, при всех"},
+    {"en": "in response to", "ru": "в ответ на"},
+    {"en": "in touch (with)", "ru": "на связи, в контакте"},
+    {"en": "in your teens/twenties/etc", "ru": "в подростковом возрасте / в двадцать с чем-то лет"},
+
+    {"en": "agree", "ru": "соглашаться"},
+    {"en": "agreement", "ru": "соглашение"},
+    {"en": "disagree", "ru": "не соглашаться"},
+
+    {"en": "belief", "ru": "вера, убеждение"},
+    {"en": "believe", "ru": "верить"},
+    {"en": "unbelievable", "ru": "невероятный"},
+
+    {"en": "courage", "ru": "смелость, мужество"},
+    {"en": "courageous", "ru": "смелый, мужественный"},
+
+    {"en": "elect", "ru": "избирать"},
+    {"en": "election", "ru": "выборы"},
+
+    {"en": "equal", "ru": "равный"},
+    {"en": "equality", "ru": "равенство"},
+    {"en": "unequal", "ru": "неравный"},
+
+    {"en": "life", "ru": "жизнь"},
+    {"en": "live", "ru": "жить"},
+    {"en": "alive", "ru": "живой"},
+
+    {"en": "nation", "ru": "нация"},
+    {"en": "nationality", "ru": "национальность"},
+    {"en": "international", "ru": "международный"},
+
+    {"en": "peace", "ru": "мир"},
+    {"en": "peaceful", "ru": "мирный"},
+    {"en": "peacefully", "ru": "мирно"},
+
+    {"en": "prisoner", "ru": "заключённый"},
+
+    {"en": "shoot", "ru": "стрелять"},
+    {"en": "shot", "ru": "выстрел"},
+    {"en": "shooting", "ru": "стрельба"},
+
+    {"en": "angry (with sb) about", "ru": "злой на кого-то из-за чего-то"},
+    {"en": "guilty of", "ru": "виновный в чём-то"},
+
+    {"en": "accuse sb of", "ru": "обвинять кого-то в чём-то"},
+    {"en": "blame sb for", "ru": "винить кого-то за что-то"},
+    {"en": "blame sth on", "ru": "сваливать что-то на кого-то/что-то"},
+    {"en": "criticise sb for", "ru": "критиковать кого-то за что-то"},
+
+    {"en": "forget about", "ru": "забывать о"},
+    {"en": "forgive sb for", "ru": "прощать кого-то за что-то"},
+    {"en": "invite sb to", "ru": "приглашать кого-то куда-то"},
+    {"en": "punish sb for", "ru": "наказывать кого-то за что-то"},
+    {"en": "share sth with", "ru": "делиться чем-то с кем-то"},
+    {"en": "smile at", "ru": "улыбаться кому-то"}
+  ]
+}
+    $json$::jsonb;
+
+    insert into public.ik_public_dict_words(dict_version_id, en, ru, en_key, ru_key, pair_key)
+    select
+      v_ver_id,
+      btrim(coalesce(w->>'en','')),
+      btrim(coalesce(w->>'ru','')),
+      public.ik_norm_space_lower(coalesce(w->>'en','')),
+      public.ik_norm_space_lower(coalesce(w->>'ru','')),
+      public.ik_norm_space_lower(coalesce(w->>'en','')) || '|' || public.ik_norm_space_lower(coalesce(w->>'ru',''))
+    from jsonb_array_elements(coalesce(v_payload->'words','[]'::jsonb)) w
+    where btrim(coalesce(w->>'en','')) <> '' and btrim(coalesce(w->>'ru','')) <> '';
+
+    update public.ik_public_dicts
+    set current_version_id = v_ver_id, updated_at = now()
+    where id = v_dict_id;
+  end if;
 end;
 $stage12$;
