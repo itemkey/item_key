@@ -1,0 +1,606 @@
+{
+  "id": "tensesBasicOverview",
+  "title": "Базовый экскурс по временам",
+  "subtitle": "единая карта времен: 3 времени + 4 идеи + быстрый выбор",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "1. Самая главная идея"
+    },
+    {
+      "type": "text",
+      "text": "В английском есть только 3 времени: Present, Past, Future. Все остальное - это не еще 20 отдельных времен, а 4 способа посмотреть на действие: факт, процесс, результат или длительность."
+    },
+    {
+      "type": "highlight",
+      "title": "3 времени",
+      "lines": [
+        "Present - настоящее",
+        "Past - прошедшее",
+        "Future - будущее"
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "4 смысловые идеи",
+      "lines": [
+        "Simple - факт, регулярность, отдельные точки",
+        "Continuous - процесс, внутри которого мы находимся",
+        "Perfect - уже сделано к определенной точке, важен результат/опыт/факт",
+        "Perfect Continuous - процесс длился до определенной точки"
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Главная точка отсчета",
+      "columns": ["Ветка", "Точка отсчета", "Как смотрим"],
+      "rows": [
+        ["Present", "now", "Смотрим прямо от now"],
+        ["Past", "точка в прошлом", "Берем момент тогда"],
+        ["Future", "точка в будущем", "Берем момент потом"]
+      ]
+    },
+    {
+      "type": "topicLinks",
+      "title": "Быстрый переход к картам выбора",
+      "note": "Если нужно быстро сориентироваться, открой одну из карт ниже.",
+      "items": [
+        { "id": "presentUsageMap", "label": "Present Usage Map", "note": "как выбрать present по смыслу" },
+        { "id": "pastUsageMap", "label": "Past Usage Map", "note": "как выбрать past по смыслу" },
+        { "id": "futureExpressionWays", "label": "Future Expression Ways", "note": "как выбрать future-форму" }
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "2. Времена по смыслу"
+    },
+    {
+      "type": "table",
+      "caption": "Один смысловой скелет",
+      "columns": ["Идея", "Что это значит", "Образ"],
+      "rows": [
+        ["Simple", "Не процесс, а факт: обычно, по расписанию, как привычка, как отдельное завершенное действие", "Много отдельных точек: началось - закончилось"],
+        ["Continuous", "Одно действие в процессе", "Одна длинная линия"],
+        ["Perfect", "Уже сделано к точке", "Пазл собран: важен результат/опыт, когда неважно"],
+        ["Perfect Continuous", "Делалось какое-то время до точки", "Не бахнуло, а бахало- бахало- бахало"]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Короткая логика",
+      "lines": [
+        "Simple = факт",
+        "Continuous = процесс",
+        "Perfect = уже совершилось",
+        "Perfect Continuous = длилось до точки"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "3. Времена подробнее"
+    },
+    {
+      "type": "heading",
+      "text": "Present Simple"
+    },
+    {
+      "type": "text",
+      "text": "Смысл: действие как факт. Это не про прямо сейчас, а про вообще, обычно, как правило."
+    },
+    {
+      "type": "highlight",
+      "title": "Когда используем",
+      "lines": [
+        "привычка",
+        "регулярность",
+        "расписание",
+        "общий факт",
+        "то, что обычно верно"
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Формула Present Simple",
+      "columns": ["Лицо", "Формула"],
+      "rows": [
+        ["I / You / We / They", "V1"],
+        ["He / She / It", "V-s / V-es"]
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        { "en": "I eat soup.", "ru": "Я ем суп. / Обычно ем суп." },
+        { "en": "I eat soup three times a week.", "ru": "Я ем суп 3 раза в неделю." },
+        { "en": "The train leaves at 6.", "ru": "Поезд отправляется в 6. Расписание - Present Simple." }
+      ]
+    },
+    {
+      "type": "topicLinks",
+      "title": "Точечное правило",
+      "items": [
+        { "id": "presentSimple", "label": "Present Simple", "note": "подробная тема с формулами и практикой" }
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Present Continuous"
+    },
+    {
+      "type": "text",
+      "text": "Смысл: действие идет сейчас или это один временный процесс, внутри которого мы находимся."
+    },
+    {
+      "type": "table",
+      "caption": "Формула Present Continuous",
+      "columns": ["Формула", "Подсказка"],
+      "rows": [
+        ["am / is / are + V-ing", "Крылышки бабочки: am/is/are и -ing. Без одного крыла форма не летит."]
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        { "en": "I am eating soup now.", "ru": "Я сейчас ем суп." },
+        { "en": "We are talking now.", "ru": "Мы сейчас разговариваем." },
+        { "en": "I am learning to swim now.", "ru": "Я сейчас учусь плавать." }
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Present Simple vs Present Continuous",
+      "columns": ["Привычка/факт", "Процесс сейчас"],
+      "rows": [
+        ["We talk every week.", "We are talking now."],
+        ["I go to the pool every Tuesday and Friday.", "I am learning to swim now."]
+      ]
+    },
+    {
+      "type": "topicLinks",
+      "title": "Точечные правила",
+      "items": [
+        { "id": "presentContinuous", "label": "Present Continuous", "note": "процесс сейчас/временно" },
+        { "id": "presentSimple", "label": "Present Simple", "note": "чтобы закрепить контраст привычка vs процесс" }
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Present Perfect"
+    },
+    {
+      "type": "text",
+      "text": "Смысл: действие уже совершилось, и это важно сейчас. Главное - не когда именно, а результат, опыт или сам факт. Present Perfect связан с now и не отрезан от настоящего."
+    },
+    {
+      "type": "table",
+      "caption": "Формула Present Perfect",
+      "columns": ["Формула", "Смысл"],
+      "rows": [
+        ["have / has + V3", "уже сделал к настоящему моменту"]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Что означает",
+      "lines": [
+        "Результат сейчас: You have eaten soup.",
+        "Жизненный опыт: I have been to Paris.",
+        "Было / не было: Have you ever been to Japan?"
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Когда нельзя Present Perfect",
+      "lines": [
+        "Если время названо точно или период уже закончен: yesterday, last year, in 2020, on Monday, at 5",
+        "Если есть четкое когда, обычно нужен Past Simple"
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        { "en": "I have been to Paris.", "ru": "Я была в Париже. Когда? Не важно." },
+        { "en": "I went to Paris in my second year.", "ru": "Я была в Париже на втором курсе. Есть когда -> Past Simple." },
+        { "en": "I have never been to Japan.", "ru": "Я никогда не была в Японии." }
+      ]
+    },
+    {
+      "type": "topicLinks",
+      "title": "Точечные правила",
+      "items": [
+        { "id": "presentPerfect", "label": "Present Perfect", "note": "результат, опыт, факт" },
+        { "id": "pastSimple", "label": "Past Simple", "note": "для случаев с точным временем" }
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Past Simple"
+    },
+    {
+      "type": "text",
+      "text": "Смысл: действие произошло в прошлом и там осталось. Это как кирпичная стена между прошлым и now."
+    },
+    {
+      "type": "table",
+      "caption": "Формула Past Simple",
+      "columns": ["Формула", "Когда используем"],
+      "rows": [
+        ["V2 / V-ed", "время указано, период закончен, нам важно когда"]
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        { "en": "I went to Paris in my second year.", "ru": "Я была в Париже на втором курсе." },
+        { "en": "I ate soup yesterday.", "ru": "Я ел суп вчера." },
+        { "en": "He never went to Japan.", "ru": "Он никогда не был в Японии." }
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Unfinished vs finished period",
+      "lines": [
+        "I have never been to Japan. -> незаконченный период жизни",
+        "Freddie Mercury never went to Japan. -> период закрыт, Past Simple"
+      ]
+    },
+    {
+      "type": "topicLinks",
+      "title": "Точечное правило",
+      "items": [
+        { "id": "pastSimple", "label": "Past Simple", "note": "детально: маркеры и типовые ошибки" }
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Present Perfect vs Past Simple"
+    },
+    {
+      "type": "table",
+      "caption": "Самая частая путаница",
+      "columns": ["Present Perfect", "Past Simple"],
+      "rows": [
+        ["Важно, что действие было", "Важно, когда это было"],
+        ["Не важно, когда", "Период завершен"],
+        ["Есть связь с настоящим", "Действие осталось в прошлом"],
+        ["Опыт, результат, было/не было", "Кирпичная стена между прошлым и now"]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Мини-проверка",
+      "lines": [
+        "Есть конкретное когда? -> да: Past Simple",
+        "Нет конкретного когда? -> часто Present Perfect"
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        { "en": "I have lived in America.", "ru": "Просто факт опыта." },
+        { "en": "I lived in America when I was 20.", "ru": "Есть когда -> Past Simple." }
+      ]
+    },
+    {
+      "type": "topicLinks",
+      "title": "Куда перейти глубже",
+      "items": [
+        { "id": "presentPerfect", "label": "Present Perfect", "note": "результат и опыт" },
+        { "id": "pastSimple", "label": "Past Simple", "note": "завершенное прошлое" }
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Present Perfect Continuous"
+    },
+    {
+      "type": "text",
+      "text": "Смысл: действие началось в прошлом, длилось какое-то время и либо продолжается сейчас, либо только что закончилось. Здесь важна длительность процесса."
+    },
+    {
+      "type": "table",
+      "caption": "Формула Present Perfect Continuous",
+      "columns": ["Формула", "Маркеры"],
+      "rows": [
+        ["have / has been + V-ing", "for (в течение), since (с момента)"]
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        { "en": "I have been waiting for 10 minutes.", "ru": "Я жду уже 10 минут." },
+        { "en": "I have been studying since 9 o'clock.", "ru": "Я учусь с 9 часов." },
+        { "en": "I have been talking to you for 15 minutes.", "ru": "Я говорю с вами уже 15 минут." }
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Образ",
+      "lines": [
+        "Present Perfect - уже сделал",
+        "Present Perfect Continuous - делал-делал-делал до текущего момента"
+      ]
+    },
+    {
+      "type": "topicLinks",
+      "title": "Точечные правила",
+      "items": [
+        { "id": "presentPerfectContinuous", "label": "Present Perfect Continuous", "note": "длительность до now" },
+        { "id": "presentPerfect", "label": "Present Perfect", "note": "чтобы закрепить контраст результат vs длительность" }
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Past Continuous"
+    },
+    {
+      "type": "text",
+      "text": "Смысл: действие было в процессе в определенный момент в прошлом. Это ответ на вопрос: что делал?"
+    },
+    {
+      "type": "table",
+      "caption": "Формула Past Continuous",
+      "columns": ["Формула", "Подсказка"],
+      "rows": [
+        ["was / were + V-ing", "Та же бабочка: was/were и -ing"]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Когда используем",
+      "lines": [
+        "Процесс в конкретный момент в прошлом: At 6 yesterday I was eating soup.",
+        "Одно действие шло, и его прервало другое: When you called me, I was eating soup.",
+        "Два процесса одновременно: While you were eating, I was sleeping."
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Маркеры",
+      "lines": [
+        "while - в то время как",
+        "when - когда",
+        "Past Simple - что сделал; Past Continuous - что делал"
+      ]
+    },
+    {
+      "type": "topicLinks",
+      "title": "Точечное правило",
+      "items": [
+        { "id": "pastContinuous", "label": "Past Continuous", "note": "процесс в прошлом моменте" },
+        { "id": "pastSimple", "label": "Past Simple", "note": "для контраста сделал vs делал" }
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Past Perfect"
+    },
+    {
+      "type": "text",
+      "text": "Смысл: одно действие произошло раньше другого в прошлом. Было прошлое и еще более раннее прошлое."
+    },
+    {
+      "type": "table",
+      "caption": "Формула Past Perfect",
+      "columns": ["Формула", "Ключевая мысль"],
+      "rows": [
+        ["had + V3", "к тому моменту уже сделал"]
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        { "en": "Before I ate the soup, I had heated it.", "ru": "Сначала разогрел, потом съел." },
+        { "en": "I had heated the soup before I ate it.", "ru": "Тот же смысл, другой порядок слов." }
+      ]
+    },
+    {
+      "type": "topicLinks",
+      "title": "Точечные правила",
+      "items": [
+        { "id": "pastPerfect", "label": "Past Perfect", "note": "действие до другого действия в прошлом" },
+        { "id": "pastSimple", "label": "Past Simple", "note": "чтобы закрепить связку Past Perfect + Past Simple" }
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Future Simple"
+    },
+    {
+      "type": "text",
+      "text": "Смысл: обычное будущее - обещание, решение, прогноз, факт о будущем."
+    },
+    {
+      "type": "table",
+      "caption": "Формула Future Simple",
+      "columns": ["Формула", "Примеры"],
+      "rows": [
+        ["will + V1", "I will eat soup after school. / I will call you later. / It will rain tomorrow."]
+      ]
+    },
+    {
+      "type": "topicLinks",
+      "title": "Точечные правила",
+      "items": [
+        { "id": "futureSimple", "label": "Future Simple", "note": "решение, прогноз, обещание" },
+        { "id": "futureExpressionWays", "label": "Future Expression Ways", "note": "все способы говорить о будущем" }
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "4. First Conditional"
+    },
+    {
+      "type": "table",
+      "caption": "Формула",
+      "columns": ["Правильно", "Неправильно"],
+      "rows": [
+        ["If + Present Simple, will + V1", "If + will ..."],
+        ["If I eat, I will...", "If I will eat..."]
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        { "en": "If I don't eat soup, I will die.", "ru": "If и will не стоят вместе в одной части предложения." }
+      ]
+    },
+    {
+      "type": "topicLinks",
+      "title": "Точечные правила",
+      "items": [
+        { "id": "conditionalsZeroFirst", "label": "Zero and First Conditionals", "note": "основа для First Conditional" },
+        { "id": "futureTimeClauses", "label": "Future Time Clauses", "note": "та же логика: no will в if/when-clause" }
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "5. Stative verbs - глаголы состояния"
+    },
+    {
+      "type": "text",
+      "text": "Stative verbs обычно не используют в Continuous, потому что это состояния, а не процессы."
+    },
+    {
+      "type": "highlight",
+      "title": "Частые stative verbs",
+      "lines": [
+        "know, believe, love, like, want",
+        "need, understand, hear, see, remember"
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        { "en": "I love pasta.", "ru": "Обычно не I am loving pasta (кроме разговорного эффекта/рекламы)." },
+        { "en": "I know the answer.", "ru": "Состояние, не процесс." },
+        { "en": "I hear you.", "ru": "Состояние восприятия." }
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Глаголы-хамелеоны",
+      "columns": ["Глагол", "Состояние", "Процесс"],
+      "rows": [
+        ["think", "I think he is right. (мнение)", "I am thinking about your question. (процесс)"],
+        ["taste", "The soup tastes good. (состояние)", "I am tasting the soup. (действие)" ]
+      ]
+    },
+    {
+      "type": "topicLinks",
+      "title": "Точечные правила",
+      "items": [
+        { "id": "presentSimple", "label": "Present Simple", "note": "state verbs чаще живут здесь" },
+        { "id": "presentContinuous", "label": "Present Continuous", "note": "чтобы увидеть, когда Continuous возможен" }
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "6. Короткая схема распознавания времени"
+    },
+    {
+      "type": "table",
+      "caption": "Шаг 1: выбери время",
+      "columns": ["Сигнал", "Ветка"],
+      "rows": [
+        ["сейчас / вообще", "Present"],
+        ["тогда, в прошлом", "Past"],
+        ["потом, впереди", "Future"]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Шаг 2: выбери идею",
+      "lines": [
+        "Факт, привычка, расписание, регулярность? -> Simple",
+        "Один процесс, внутри которого я нахожусь? -> Continuous",
+        "Уже сделано к точке, важен результат/опыт? -> Perfect",
+        "Длилось какое-то время до точки? -> Perfect Continuous"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "7. Самые важные пары для различения"
+    },
+    {
+      "type": "table",
+      "caption": "Мини-контрасты",
+      "columns": ["Пара", "Контраст"],
+      "rows": [
+        ["Present Simple vs Present Continuous", "I read every day. / I am reading now."],
+        ["Present Perfect vs Past Simple", "I have seen this film. / I saw this film last year."],
+        ["Present Perfect vs Present Perfect Continuous", "I have written 3 emails. / I have been writing emails for 2 hours."],
+        ["Past Simple vs Past Continuous", "I ate soup. / I was eating soup."],
+        ["Past Simple vs Past Perfect", "I ate the soup. / I had heated it before I ate it."]
+      ]
+    },
+    {
+      "type": "topicLinks",
+      "title": "Куда перейти по контрастам",
+      "items": [
+        { "id": "presentUsageMap", "label": "Present Usage Map", "note": "контрасты внутри Present" },
+        { "id": "pastUsageMap", "label": "Past Usage Map", "note": "контрасты внутри Past" },
+        { "id": "futureExpressionWays", "label": "Future Expression Ways", "note": "контрасты future-форм" }
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "8. Одна фраза на каждое время - шпаргалка"
+    },
+    {
+      "type": "highlight",
+      "title": "Шпаргалка",
+      "lines": [
+        "Present Simple - факт / обычно / по расписанию",
+        "Present Continuous - процесс сейчас",
+        "Present Perfect - уже сделал, когда не важно",
+        "Present Perfect Continuous - делаю уже какое-то время",
+        "Past Simple - сделал тогда, в прошлом, и точка",
+        "Past Continuous - делал в тот момент",
+        "Past Perfect - к тому моменту уже сделал",
+        "Future Simple - сделаю потом",
+        "First Conditional - если это случится, то будет вот это"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "9. Итог"
+    },
+    {
+      "type": "text",
+      "text": "Если совсем сжать все в одну систему: сначала выбираем точку отсчета (now / тогда / потом), потом выбираем идею (факт / процесс / результат / длительность). Вопрос всегда один: где точка и что именно мы хотим показать про действие?"
+    },
+    {
+      "type": "highlight",
+      "title": "Итоговая формула",
+      "lines": [
+        "Simple - факт",
+        "Continuous - процесс",
+        "Perfect - уже совершилось",
+        "Perfect Continuous - длилось до точки",
+        "now -> Present",
+        "тогда -> Past",
+        "потом -> Future"
+      ]
+    },
+    {
+      "type": "topicLinks",
+      "title": "Открыть нужное точечное правило",
+      "note": "Нажми на карточку и перейди в полное правило с примерами и упражнениями.",
+      "items": [
+        { "id": "presentSimple", "label": "Present Simple", "note": "факт, привычка, расписание" },
+        { "id": "presentContinuous", "label": "Present Continuous", "note": "процесс сейчас" },
+        { "id": "presentPerfect", "label": "Present Perfect", "note": "результат / опыт" },
+        { "id": "presentPerfectContinuous", "label": "Present Perfect Continuous", "note": "длительность до now" },
+        { "id": "pastSimple", "label": "Past Simple", "note": "завершенное прошлое" },
+        { "id": "pastContinuous", "label": "Past Continuous", "note": "процесс в прошлом моменте" },
+        { "id": "pastPerfect", "label": "Past Perfect", "note": "раньше другого прошлого действия" },
+        { "id": "futureSimple", "label": "Future Simple", "note": "обычное будущее" },
+        { "id": "conditionalsZeroFirst", "label": "First Conditional (в теме conditionals)", "note": "if + Present, will + V1" }
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": []
+  }
+}

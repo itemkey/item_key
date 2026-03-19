@@ -1,5 +1,16 @@
 [
   {
+    "id": "tensesBasicOverview",
+    "title": "Базовый экскурс по временам",
+    "subtitle": "единая карта: 3 времени + 4 идеи + быстрые переходы",
+    "hint": "база по временам + ссылки на точечные правила",
+    "file": "tensesBasicOverview.json",
+    "group": "universal",
+    "kind": "structure",
+    "compare": false,
+    "levels": ["A2-B1", "B1-B2", "B2-C1"]
+  },
+  {
     "id": "pastSimple",
     "title": "Past Simple",
     "subtitle": "факт - действие завершено",

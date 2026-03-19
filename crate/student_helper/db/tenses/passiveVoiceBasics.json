@@ -1,7 +1,7 @@
 {
   "id": "passiveVoiceBasics",
   "title": "Passive Voice Basics",
-  "subtitle": "действие важнее исполнителя",
+  "subtitle": "действие важнее исполнителя: be + V3",
   "ruleBlocks": [
     {
       "type": "heading",
@@ -9,43 +9,144 @@
     },
     {
       "type": "text",
-      "text": "Passive Voice используем, когда важнее само действие или результат, а не тот, кто выполняет действие. Формула: be + V3."
+      "text": "В пассиве фокус на объекте/результате, а не на деятеле. Схема из картинки: Active = Mouse ate cheese, Passive = Cheese was eaten (by mouse)."
+    },
+    {
+      "type": "highlight",
+      "title": "Главная формула",
+      "lines": [
+        "Passive = be + V3 (past participle)",
+        "Объект из Active становится подлежащим в Passive",
+        "Исполнитель добавляется через by только если он реально важен"
+      ]
     },
     {
       "type": "table",
-      "caption": "Базовые формулы",
-      "columns": ["Время", "Формула", "Пример"],
+      "caption": "Базовые формы (как на шпаргалке)",
+      "columns": ["Время / группа", "Формула", "Пример"],
       "rows": [
-        ["Present Simple", "am/is/are + V3", "English is spoken here."],
+        ["Present Simple", "am/is/are + V3", "The room is cleaned every day."],
         ["Past Simple", "was/were + V3", "The bridge was built in 1998."],
-        ["Future Simple", "will be + V3", "The project will be finished soon."]
+        ["Future Simple", "will be + V3", "The project will be finished soon."],
+        ["Modal verbs", "can/must/should + be + V3", "The task must be done today."],
+        ["Present Perfect", "have/has been + V3", "The app has been downloaded a lot."],
+        ["Past Perfect", "had been + V3", "By 2010 the plan had been approved."],
+        ["Present Continuous", "am/is/are being + V3", "The house is being painted."],
+        ["Past Continuous", "was/were being + V3", "The road was being repaired."],
+        ["Future Perfect", "will have been + V3", "The work will have been completed by Friday."]
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Markers: by и with"
+    },
+    {
+      "type": "table",
+      "caption": "Разница предлогов",
+      "columns": ["Маркер", "Зачем", "Пример"],
+      "rows": [
+        ["by", "кем/чем выполнено действие (агент)", "The book was written by J.K. Rowling."],
+        ["with", "с помощью какого инструмента/средства", "The letter was written with a pen."]
       ]
     },
     {
       "type": "highlight",
-      "title": "Когда удобно использовать",
+      "title": "Когда by обычно не нужен",
       "lines": [
-        "неизвестно, кто сделал действие",
-        "исполнитель не важен",
-        "официальный/научный/новостной стиль"
+        "исполнитель неизвестен: My bike was stolen.",
+        "исполнитель очевиден и неважен: The road was closed at night.",
+        "официальный стиль/инструкции/новости: The report will be sent tomorrow."
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Active -> Passive: алгоритм"
+    },
+    {
+      "type": "table",
+      "caption": "4 шага преобразования",
+      "columns": ["Шаг", "Что делаем", "Пример"],
+      "rows": [
+        ["1", "Берем объект из Active", "People clean the office every day."],
+        ["2", "Ставим его на место подлежащего", "The office ..."],
+        ["3", "Выбираем форму be по времени", "... is ..."],
+        ["4", "Добавляем V3 и при необходимости by-agent", "The office is cleaned every day (by staff)."]
       ]
     },
     {
       "type": "examples",
       "items": [
-        { "en": "The documents are checked every morning.", "ru": "Документы проверяются каждое утро." },
-        { "en": "My phone was stolen yesterday.", "ru": "Мой телефон украли вчера." },
-        { "en": "The report will be sent tonight.", "ru": "Отчет будет отправлен сегодня вечером." },
-        { "en": "The room was cleaned by Anna.", "ru": "Комната была убрана Анной." }
+        { "en": "Active: They will deliver our furniture on Thursday.", "ru": "Passive: Our new furniture will be delivered on Thursday." },
+        { "en": "Active: People use the internet worldwide.", "ru": "Passive: The internet is used worldwide." },
+        { "en": "Active: They inspired the book with childhood memories.", "ru": "Passive: The book was inspired by childhood memories." },
+        { "en": "Active: Someone has stolen my phone.", "ru": "Passive: My phone has been stolen." }
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Опасные ловушки (по твоим заданиям)"
+    },
+    {
+      "type": "highlight",
+      "title": "Ловушка 1: не все глаголы делают пассив",
+      "lines": [
+        "intransitive (без прямого объекта) обычно не пассивятся: happen, appear, rain",
+        "Правильно: Small cracks appeared. (не were appeared)",
+        "Правильно: It rains a lot in spring. (не is rained)",
+        "Правильно: The best thing that has ever happened to me. (не was happened)"
       ]
     },
     {
       "type": "highlight",
-      "title": "Актив -> Пассив (логика)",
+      "title": "Ловушка 2: смотри на смысл, а не на by в предложении",
       "lines": [
-        "Active: People clean the office every day.",
-        "Passive: The office is cleaned every day.",
-        "Объект активного предложения становится подлежащим в пассиве"
+        "Some influencers make thousands of pounds... -> active, потому что есть субъект-деятель",
+        "By the age of 13, Fred had joined a troupe. -> active (сам присоединился)",
+        "In the 1990s, Sean started a company. -> active",
+        "The internet is used by billions... -> passive (над интернетом совершают действие)"
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Ловушка 3: participle как состояние (похоже на passive)",
+      "lines": [
+        "be involved in, be interested in, be born, be located, be called",
+        "Molly is involved with a charity.",
+        "I was born in Belarus.",
+        "The book is called 'The Invisible Man'."
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Частые пассивные/пассивоподобные паттерны",
+      "columns": ["Паттерн", "Смысл", "Пример"],
+      "rows": [
+        ["be born", "родиться", "I was born in 2005."],
+        ["be called", "называться", "The film is called 'Stand By Me'."],
+        ["be canceled", "быть отмененным", "The meeting was canceled."],
+        ["be delayed", "задерживаться", "I am delayed by traffic."],
+        ["be destroyed / damaged", "быть разрушенным / поврежденным", "The building was destroyed."],
+        ["be dismissed", "быть уволенным", "He was dismissed."],
+        ["be employed", "быть нанятым", "Ten people are employed here."],
+        ["be filled with", "быть наполненным", "Her eyes were filled with tears."],
+        ["be given", "получить (букв. быть данным)", "He was given permission."],
+        ["be held", "проводиться", "The meeting will be held at 5."],
+        ["be injured", "быть раненым", "A man was injured in the accident."],
+        ["be interested in", "интересоваться", "I am interested in music."],
+        ["be involved in", "быть вовлеченным", "Two cars were involved in the crash."],
+        ["be left", "быть оставленным", "The door was left open."],
+        ["be told to", "получить указание", "He was told to leave."],
+        ["be trapped", "оказаться в ловушке", "I was trapped in the lift."]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Короткий чек перед ответом",
+      "lines": [
+        "1) Кто в фокусе: исполнитель или объект?",
+        "2) Есть ли у глагола прямой объект (можно ли вообще сделать passive)?",
+        "3) Какое время по маркерам: now/usually, yesterday, by..., since..., next...?",
+        "4) Для passive выбери правильную форму be и обязательно V3"
       ]
     }
   ],
@@ -70,7 +171,7 @@
             "prompt": "The report will be checked tomorrow.",
             "options": ["официальный стиль и фокус на действии", "прошлая привычка", "личная договоренность"],
             "correctIndex": 0,
-            "explain": "Часто в деловой речи используют passive для фокуса на процессе."
+            "explain": "Деловой/официальный стиль часто использует passive."
           },
           {
             "id": "pvb_m_3",
@@ -152,6 +253,162 @@
             "prompt": "The task will finished tomorrow.",
             "accepted": ["The task will be finished tomorrow", "The task will be finished tomorrow."],
             "explain": "В Future Passive нужен вспомогательный be: will be finished."
+          },
+          {
+            "id": "pvb_f_7",
+            "instruction": "Вставь форму",
+            "prompt": "The old building ____ (pull down).",
+            "accepted": ["should be pulled down"],
+            "explain": "Modal passive: should + be + V3."
+          },
+          {
+            "id": "pvb_f_8",
+            "instruction": "Вставь форму",
+            "prompt": "The internet ____ (use) by billions of people.",
+            "accepted": ["is used"],
+            "explain": "Present Simple Passive: is used."
+          }
+        ]
+      },
+      {
+        "id": "mistakes",
+        "title": "Ловушки (Mistakes)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "pvb_ms_1",
+            "instruction": "Выбери правильный вариант",
+            "prompt": "I tried the door and ... it unlocked.",
+            "options": ["found", "have found", "was finding", "was found"],
+            "correctIndex": 0,
+            "explain": "Нужно активное found: I found it unlocked."
+          },
+          {
+            "id": "pvb_ms_2",
+            "instruction": "Выбери правильный вариант",
+            "prompt": "Our new furniture ... on Thursday.",
+            "options": ["delivers", "will deliver", "is delivered", "will be delivered"],
+            "correctIndex": 3,
+            "explain": "Будущее + объект в фокусе -> will be delivered."
+          },
+          {
+            "id": "pvb_ms_3",
+            "instruction": "Выбери правильный вариант",
+            "prompt": "Instagram is a platform that ... digital marketing.",
+            "options": ["is revolutionised", "was revolutionised", "has revolutionised", "revolutionise"],
+            "correctIndex": 2,
+            "explain": "Здесь актив: платформа сама изменила сферу -> has revolutionised."
+          },
+          {
+            "id": "pvb_ms_4",
+            "instruction": "Выбери правильный вариант",
+            "prompt": "Molly ... with a charity that helps animals.",
+            "options": ["is involving", "involves", "has involved", "is involved"],
+            "correctIndex": 3,
+            "explain": "Устойчивый паттерн состояния: be involved with/in."
+          },
+          {
+            "id": "pvb_ms_5",
+            "instruction": "Выбери правильный вариант",
+            "prompt": "That's the best thing that ... to me.",
+            "options": ["was ever happened", "ever happen", "has ever happened", "is ever happened"],
+            "correctIndex": 2,
+            "explain": "happen не пассивится; нужен актив Present Perfect: has happened."
+          },
+          {
+            "id": "pvb_ms_6",
+            "instruction": "Выбери правильный вариант",
+            "prompt": "It ... that the old building should be pulled down.",
+            "options": ["was decided", "decided", "was deciding", "is decide"],
+            "correctIndex": 0,
+            "explain": "Безличная конструкция в пассиве: It was decided that..."
+          },
+          {
+            "id": "pvb_ms_7",
+            "instruction": "Выбери правильный вариант",
+            "prompt": "Small cracks ... in the wall after the earthquake.",
+            "options": ["were appeared", "are appeared", "appeared", "appears"],
+            "correctIndex": 2,
+            "explain": "appear - непереходный глагол, пассив невозможен."
+          },
+          {
+            "id": "pvb_ms_8",
+            "instruction": "Выбери правильный вариант",
+            "prompt": "In spring it ... a lot, but rainfall is light.",
+            "options": ["was raining", "rains", "is rained", "raining"],
+            "correctIndex": 1,
+            "explain": "Общий факт -> Present Simple active: rains."
+          },
+          {
+            "id": "pvb_ms_9",
+            "instruction": "Выбери правильный вариант",
+            "prompt": "The internet is a global system that ... by billions of people worldwide.",
+            "options": ["is using", "is used", "used", "has used"],
+            "correctIndex": 1,
+            "explain": "Над интернетом выполняют действие -> is used."
+          },
+          {
+            "id": "pvb_ms_10",
+            "instruction": "Выбери правильный вариант",
+            "prompt": "Before the invention of the wheel, humans ... in how much they could transport over land.",
+            "options": ["limited", "were limiting", "are limited", "were limited"],
+            "correctIndex": 3,
+            "explain": "Состояние в прошлом, вызванное внешним фактором -> were limited."
+          }
+        ]
+      },
+      {
+        "id": "compare",
+        "title": "Active vs Passive mix",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "pvb_cmp_1",
+            "instruction": "Выбери форму",
+            "prompt": "By the age of 13, Fred ... a travelling dance-theatre troupe.",
+            "options": ["had joined", "was joining", "was joined", "will be joined"],
+            "correctIndex": 0,
+            "explain": "Fred сам выполнил действие -> active Past Perfect."
+          },
+          {
+            "id": "pvb_cmp_2",
+            "instruction": "Выбери форму",
+            "prompt": "In the 1990s, Sean ... a company to produce themed clothing.",
+            "options": ["was started", "started", "start", "has started"],
+            "correctIndex": 1,
+            "explain": "Есть деятель Sean -> active Past Simple."
+          },
+          {
+            "id": "pvb_cmp_3",
+            "instruction": "Выбери форму",
+            "prompt": "It ... that about 40 percent of the world's population use social media.",
+            "options": ["is estimated", "estimates", "was estimating", "has estimate"],
+            "correctIndex": 0,
+            "explain": "Типичная безличная научная конструкция: It is estimated that..."
+          },
+          {
+            "id": "pvb_cmp_4",
+            "instruction": "Выбери форму",
+            "prompt": "The Facebook website ... in 2004 and now it ... by billions per month.",
+            "options": ["was launched / is used", "launched / uses", "has launched / is using", "was launching / used"],
+            "correctIndex": 0,
+            "explain": "1) запуск - объект в фокусе (past passive), 2) использование сейчас (present passive)."
+          },
+          {
+            "id": "pvb_cmp_5",
+            "instruction": "Выбери форму",
+            "prompt": "Ancient mariners ... the stars for navigation, but this method ... on cloudy nights.",
+            "options": ["used / did not work", "were used / was not worked", "use / is not worked", "had used / was not working"],
+            "correctIndex": 0,
+            "explain": "Обе части активные: used, did not work."
+          },
+          {
+            "id": "pvb_cmp_6",
+            "instruction": "Выбери форму",
+            "prompt": "Canva ... a free-to-use design tool. It can ... to create posters.",
+            "options": ["is / be used", "was / used", "is being / use", "has been / be using"],
+            "correctIndex": 0,
+            "explain": "1) is - факт, 2) can be used - modal passive."
           }
         ]
       }

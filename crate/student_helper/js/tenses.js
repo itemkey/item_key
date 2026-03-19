@@ -75,6 +75,7 @@
   const btnGoCompare = document.getElementById('tensesGoCompare');
   const btnGoDaily = document.getElementById('tensesGoDaily');
   const btnGoMixed = document.getElementById('tensesGoMixed');
+  const btnGoBasics = document.getElementById('tensesGoBasics');
   const btnGoPresent = document.getElementById('grammarGoPresent');
   const btnGoPast = document.getElementById('grammarGoPast');
   const btnGoFuture = document.getElementById('grammarGoFuture');
@@ -183,6 +184,7 @@
   const KEY_SUBGROUP = 'sh_grammar_subgroup_v1';
   const KEY_LIST_COMPACT = 'sh_grammar_list_compact_v1';
   const KEY_RULE_MODE = 'sh_grammar_rule_mode_v1';
+  const BASIC_OVERVIEW_ID = 'tensesBasicOverview';
   const CUSTOM_TENSE_ID = 'custom';
   const LEVELS = ['A2-B1', 'B1-B2', 'B2-C1'];
   const CATEGORY_LABEL = {
@@ -745,6 +747,7 @@
     const id = String(meta?.id || '').toLowerCase();
     const group = String(meta?.group || '').toLowerCase();
 
+    if (id === BASIC_OVERVIEW_ID.toLowerCase()) return 'usage_map';
     if (id.includes('usagemap') || id.includes('expressionways')) return 'usage_map';
 
     if (group === 'present' || group === 'past' || group === 'future'){
@@ -804,6 +807,10 @@
   function sortMetasForDisplay(metas){
     const arr = Array.isArray(metas) ? [...metas] : [];
     arr.sort((a, b)=>{
+      const ap = String(a?.id || '') === BASIC_OVERVIEW_ID ? 0 : 1;
+      const bp = String(b?.id || '') === BASIC_OVERVIEW_ID ? 0 : 1;
+      if (ap !== bp) return ap - bp;
+
       const am = deriveSubgroup(a) === 'usage_map' ? 0 : 1;
       const bm = deriveSubgroup(b) === 'usage_map' ? 0 : 1;
       if (am !== bm) return am - bm;
@@ -1637,6 +1644,58 @@
         p.className = 'sh-rule-p';
         p.textContent = b.text || '';
         container.appendChild(p);
+      } else if (b.type === 'topicLinks'){
+        const links = Array.isArray(b.items) ? b.items : [];
+        const valid = links.filter((item)=>{
+          const topicId = String(item?.id || '').trim();
+          return !!(topicId && REG.byId && REG.byId[topicId]);
+        });
+        if (!valid.length) continue;
+
+        const box = document.createElement('div');
+        box.className = 'sh-topic-links';
+
+        if (b.title){
+          const title = document.createElement('p');
+          title.className = 'sh-topic-links__title';
+          title.textContent = b.title;
+          box.appendChild(title);
+        }
+
+        if (b.note){
+          const note = document.createElement('p');
+          note.className = 'sh-topic-links__note';
+          note.textContent = b.note;
+          box.appendChild(note);
+        }
+
+        const list = document.createElement('div');
+        list.className = 'sh-topic-links__list';
+
+        for (const item of valid){
+          const topicId = String(item.id || '').trim();
+          const topic = REG.byId[topicId] || {};
+
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'sh-topic-link';
+
+          const title = document.createElement('span');
+          title.className = 'sh-topic-link__title';
+          title.textContent = item.label || topic.title || topicId;
+          btn.appendChild(title);
+
+          const sub = document.createElement('span');
+          sub.className = 'sh-topic-link__sub';
+          sub.textContent = item.note || topic.subtitle || '';
+          btn.appendChild(sub);
+
+          btn.addEventListener('click', ()=> openTense(topicId));
+          list.appendChild(btn);
+        }
+
+        box.appendChild(list);
+        container.appendChild(box);
       } else if (b.type === 'table'){
         const wrap = document.createElement('div');
         wrap.className = 'sh-table-wrap';
@@ -1778,11 +1837,12 @@
   // -------------------------
   function blocksForRuleMode(blocks){
     const source = Array.isArray(blocks) ? blocks : [];
-    if (ruleMode === 'full') return source;
+    if (ruleMode === 'full' || currentId === BASIC_OVERVIEW_ID) return source;
 
     const out = [];
     let heading = 0;
     let text = 0;
+    let topicLinks = 0;
     let table = 0;
     let highlight = 0;
     let examples = 0;
@@ -1799,6 +1859,13 @@
       if (block.type === 'text' && text < 1){
         out.push(block);
         text += 1;
+        continue;
+      }
+
+      if (block.type === 'topicLinks' && topicLinks < 2){
+        const items = Array.isArray(block.items) ? block.items.slice(0, 8) : [];
+        out.push(Object.assign({}, block, { items }));
+        topicLinks += 1;
         continue;
       }
 
@@ -3916,6 +3983,26 @@ try{
   // -------------------------
   // Events
   // -------------------------
+  btnGoBasics && btnGoBasics.addEventListener('click', ()=>{
+    if (!ensureLevelSelected()){
+      showOnly('home');
+      setStatus('выбери уровень');
+      return;
+    }
+
+    setCategory('all');
+    setSubgroup('all');
+
+    if (REG.byId && REG.byId[BASIC_OVERVIEW_ID]){
+      openTense(BASIC_OVERVIEW_ID);
+      return;
+    }
+
+    renderList();
+    showOnly('list');
+    setStatus('list');
+  });
+
   btnGoTheory.addEventListener('click', ()=>{
     if (!ensureLevelSelected()){
       showOnly('home');
