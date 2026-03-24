@@ -234,25 +234,17 @@
         "items": [
           {
             "id": "mpr_f_1",
-            "instruction": "Заполни 2 пропуска",
-            "prompt": "She ____ ____ in a bank. (work)",
+            "instruction": "Заполни пропуск",
+            "prompt": "She ____ in a bank. (work)",
             "inputs": [
               {
                 "placeholder": "",
                 "accepted": [
-                  "works",
-                  "is"
-                ]
-              },
-              {
-                "placeholder": "",
-                "accepted": [
-                  "",
-                  "working"
+                  "works"
                 ]
               }
             ],
-            "explain": "Это составная форма Mixed Present: заполняем оба элемента по формуле времени. Нужные части: «works», «»."
+            "explain": "Постоянный факт о работе -> Present Simple: works."
           },
           {
             "id": "mpr_f_2",
@@ -325,15 +317,9 @@
                 "accepted": [
                   "leaves"
                 ]
-              },
-              {
-                "placeholder": "",
-                "accepted": [
-                  ""
-                ]
               }
             ],
-            "explain": "Это составная форма Mixed Present: заполняем оба элемента по формуле времени. Нужные части: «leaves», «»."
+            "explain": "Расписание -> Present Simple: leaves."
           },
           {
             "id": "mpr_f_6",

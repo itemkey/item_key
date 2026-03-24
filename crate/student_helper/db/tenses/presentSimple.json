@@ -527,22 +527,16 @@
           {
             "id": "prs_mi_5",
             "instruction": "Заполни пропуски",
-            "prompt": "The movie ____ ____ at 8. (start)",
+            "prompt": "The movie ____ at 8. (start)",
             "inputs": [
               {
                 "placeholder": "",
                 "accepted": [
                   "starts"
                 ]
-              },
-              {
-                "placeholder": "",
-                "accepted": [
-                  ""
-                ]
               }
             ],
-            "explain": "Это составная форма Present Simple: заполняем оба элемента по формуле времени. Нужные части: «starts», «»."
+            "explain": "В расписании/графике используем Present Simple: starts."
           },
           {
             "id": "prs_mi_6",

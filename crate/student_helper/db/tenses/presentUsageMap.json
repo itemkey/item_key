@@ -340,7 +340,7 @@
           },
           {
             "id": "prm_photo_dlg_4",
-            "instruction": "Заполни обе формы",
+            "instruction": "Заполни три формы",
             "prompt": "Tom ____ (break) his leg five days ago. He ____ (be) in hospital since he ____ (break) his leg.",
             "inputs": [
               {
@@ -352,9 +352,14 @@
                 "accepted": [
                   "has been"
                 ]
+              },
+              {
+                "accepted": [
+                  "broke"
+                ]
               }
             ],
-            "explain": "Первое - Past Simple (five days ago), второе - Present Perfect (since + point)."
+            "explain": "Первое и третье - Past Simple (break -> broke), второе - Present Perfect (since + point)."
           }
         ]
       },

@@ -2891,10 +2891,25 @@
       const key = String(id || '').trim();
       if (!key) return null;
       const meta = (REG.INDEX || []).find(x => x.id === key);
-      if (meta) return { id: meta.id, title: meta.title || meta.id, hint: meta.hint || '', subtitle: meta.subtitle || '' };
+      if (meta) return {
+        id: meta.id,
+        title: meta.title || meta.id,
+        hint: meta.hint || '',
+        subtitle: meta.subtitle || '',
+        kind: meta.kind || '',
+        group: meta.group || ''
+      };
       const obj = REG.byId && REG.byId[key];
       if (obj && obj.title){
-        return { id: obj.id || key, title: obj.title || key, hint: obj.hint || '', subtitle: obj.subtitle || '' };
+        const idxMeta = (REG.INDEX || []).find(x => x.id === key) || null;
+        return {
+          id: obj.id || key,
+          title: obj.title || key,
+          hint: obj.hint || '',
+          subtitle: obj.subtitle || '',
+          kind: idxMeta?.kind || '',
+          group: idxMeta?.group || ''
+        };
       }
       return null;
     }
@@ -2924,20 +2939,34 @@
       if (!src) return '';
 
       const ids = new Set();
-      if (/\bwill have been\b/.test(src) && /\bing\b/.test(src)) ids.add('futurePerfectContinuous');
-      if (/\bhad been\b/.test(src) && /\bing\b/.test(src)) ids.add('pastPerfectContinuous');
-      if (/\b(?:have|has) been\b/.test(src) && /\bing\b/.test(src)) ids.add('presentPerfectContinuous');
+      const hasIng = /\b[a-z]+ing\b/.test(src);
+      const hasEd = /\b[a-z]+ed\b/.test(src);
+      const hasPastParticiple = /\b(?:been|gone|done|seen|made|taken|written|drunk|eaten|left|bought|told|given|found|known|thought|read|built|sent|paid|won|lost|met|held|kept|led|grown|shown|spoken|broken|chosen|driven|forgotten|rung|run|begun|felt|cut|put|sat|stood|understood)\b/.test(src);
+      const hasPastIrregular = /\b(?:went|saw|came|got|took|made|wrote|ate|drank|spoke|thought|found|knew|said|left|arrived|started|stopped|rang|called|built|sent|paid|won|lost|met|held|kept|led|grew|showed|broke|chose|drove|forgot|ran|began|felt|cut|put|sat|stood|understood)\b/.test(src);
 
-      if (/\bwill have\b/.test(src) && /\b(?:done|gone|been|seen|had|made|taken|written|drunk|eaten|finished|worked|studied|arrived|left|bought|told|given|found|known|thought|read)\b/.test(src)) ids.add('futurePerfect');
-      if (/\bhad\b/.test(src) && /\b(?:done|gone|been|seen|had|made|taken|written|drunk|eaten|finished|worked|studied|arrived|left|bought|told|given|found|known|thought|read)\b/.test(src)) ids.add('pastPerfect');
-      if (/\b(?:have|has)\b/.test(src) && /\b(?:done|gone|been|seen|had|made|taken|written|drunk|eaten|finished|worked|studied|arrived|left|bought|told|given|found|known|thought|read)\b/.test(src)) ids.add('presentPerfect');
+      const hasFuturePerfectCont = /\bwill have been\b/.test(src) && hasIng;
+      const hasPastPerfectCont = /\bhad been\b/.test(src) && hasIng;
+      const hasPresentPerfectCont = /\b(?:have|has) been\b/.test(src) && hasIng;
 
-      if (/\bwill be\b/.test(src) && /\bing\b/.test(src)) ids.add('futureContinuous');
-      if (/\b(?:was|were)\b/.test(src) && /\bing\b/.test(src)) ids.add('pastContinuous');
-      if (/\b(?:am|is|are)\b/.test(src) && /\bing\b/.test(src)) ids.add('presentContinuous');
+      if (hasFuturePerfectCont) ids.add('futurePerfectContinuous');
+      if (hasPastPerfectCont) ids.add('pastPerfectContinuous');
+      if (hasPresentPerfectCont) ids.add('presentPerfectContinuous');
+
+      if (/\bwill have\b/.test(src) && (hasEd || hasPastParticiple) && !hasFuturePerfectCont) ids.add('futurePerfect');
+      if (/\bhad\b/.test(src) && (hasEd || hasPastParticiple) && !hasPastPerfectCont) ids.add('pastPerfect');
+      if (/\b(?:have|has)\b/.test(src) && (hasEd || hasPastParticiple) && !hasPresentPerfectCont) ids.add('presentPerfect');
+
+      if (/\bwill be\b/.test(src) && hasIng && !/\bwill have been\b/.test(src)) ids.add('futureContinuous');
+      if (/\b(?:was|were)\b/.test(src) && hasIng && !/\bhad been\b/.test(src)) ids.add('pastContinuous');
+      if (/\b(?:am|is|are)\b/.test(src) && hasIng && !/\b(?:have|has) been\b/.test(src)) ids.add('presentContinuous');
+
+      if (/\bwill be\b/.test(src) && (hasEd || hasPastParticiple) && !hasIng && !/\bwill have\b/.test(src)) ids.add('futureSimple');
+      if (/\b(?:was|were)\b/.test(src) && (hasEd || hasPastParticiple) && !hasIng && !/\bhad\b/.test(src)) ids.add('pastSimple');
+      if (/\b(?:am|is|are)\b/.test(src) && (hasEd || hasPastParticiple) && !hasIng && !/\b(?:have|has)\b/.test(src)) ids.add('presentSimple');
 
       if (/\bwill\b/.test(src) && !/\bwill (?:be|have)\b/.test(src)) ids.add('futureSimple');
-      if (/\bdid\b/.test(src) || /\b(?:went|saw|came|got|took|made|wrote|ate|drank|spoke|thought|found|knew|said|left|arrived|started|stopped|rang|called)\b/.test(src)) ids.add('pastSimple');
+      if (/\bdid\b/.test(src) || hasPastIrregular) ids.add('pastSimple');
+      if (!ids.size && hasEd && !/\b(?:have|has|had|am|is|are|was|were|will)\b/.test(src)) ids.add('pastSimple');
       if ((/\b(?:do|does)\b/.test(src) || /\b(?:always|usually|often|sometimes|never|every)\b/.test(src)) && !ids.size) ids.add('presentSimple');
 
       if (ids.size === 1) return Array.from(ids)[0];
@@ -2998,7 +3027,7 @@
       add(/\b(yesterday|last\s+\w+|\d+\s+ago|in\s+\d{4}|then)\b/, 'есть точка в прошлом');
       add(/\bwhile\b/, 'есть while (обычно фон/процесс)');
       add(/\b(already|just|yet|ever|so far|recently|lately)\b/, 'есть perfect-маркер');
-      add(/\b(for|since|how long)\b/, 'есть маркер длительности');
+      add(/\bsince\b|\bhow long\b|\bfor\s+(?:(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|a|an|several|many|few|couple|half)\s+)?(?:second|seconds|minute|minutes|hour|hours|day|days|week|weeks|month|months|year|years)\b|\bfor\s+a\s+long\s+time\b|\bfor\s+a\s+while\b/, 'есть маркер длительности');
       add(/\b(by the time|before)\b|\bby\s+(tomorrow|then|next|\d)/, 'есть дедлайн/граница во времени');
       add(/\b(tomorrow|next\s+\w+|soon|this time tomorrow)\b/, 'есть ориентир на будущее');
 
@@ -3340,7 +3369,8 @@
       const meta = inferQuestionTenseMeta(q, check);
 
       if (meta?.title){
-        pushExplainLine(lines, `Время: ${meta.title}.`);
+        const label = meta.kind === 'tense' ? 'Время' : 'Тема';
+        pushExplainLine(lines, `${label}: ${meta.title}.`);
       }
 
       const signals = detectPromptSignals(item.prompt || '');
