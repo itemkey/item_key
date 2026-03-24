@@ -411,6 +411,247 @@
             "explain": "1) is - факт, 2) can be used - modal passive."
           }
         ]
+      },
+      {
+        "id": "story_cloze",
+        "title": "Контекстные тексты (Dropdown)",
+        "kind": "inline_select",
+        "items": [
+          {
+            "id": "pvb_sc_1",
+            "instruction": "Прочитай текст. Выбери правильный вариант ответа.",
+            "storyTitle": "Social media trends",
+            "segments": [
+              "Teens always look for new ways to express themselves creatively. While Instagram and Snapchat are still popular, new platforms like BeReal ",
+              " more frequently. Although initially BeReal ",
+              " in 2020, it first ",
+              " widespread popularity in early 2022. BeReal ",
+              " to encourage more authentic sharing among users. This app has been downloaded by millions of teens who ",
+              " to show their real lives without filters. As these platforms continue to develop, more features ",
+              " to attract creative users. It is clear that the way teens use social media ",
+              " day by day."
+            ],
+            "blanks": [
+              { "options": ["are used", "used", "is used", "use"], "correctIndex": 0 },
+              { "options": ["was launched", "launched", "is launched", "has launched"], "correctIndex": 0 },
+              { "options": ["gained", "was gained", "has gained", "gain"], "correctIndex": 0 },
+              { "options": ["was designed", "designed", "is design", "has designed"], "correctIndex": 0 },
+              { "options": ["want", "are wanted", "wanted", "are wanting"], "correctIndex": 0 },
+              { "options": ["are added", "add", "is adding", "added"], "correctIndex": 0 },
+              { "options": ["is changing", "has changed", "changed", "will changed"], "correctIndex": 0 }
+            ],
+            "explain": "Текст тренирует переключение между активом и пассивом по контексту времени и смыслу предложения."
+          },
+          {
+            "id": "pvb_sc_2",
+            "instruction": "Прочитай текст. Выбери правильный вариант ответа.",
+            "storyTitle": "The rise of social media",
+            "segments": [
+              "Those who ",
+              " the film The Social Network may be under the impression that social media ",
+              " when Mark Zuckerberg and his friends ",
+              " together on Harvard's campus to create 'TheFaceBook'. Although Facebook did play an important role in making social media popular, it was hardly the first site. In fact, social media officially ",
+              " in 1997, but the roots of social media trace back even further to the birth of the blogosphere. In the early 1990s, blogs ",
+              " in people's heads the idea that you could log onto the internet and post whatever you ",
+              " and receive feedback about it without having to go through a third party. It was truly revolutionary, and it ",
+              " the door for the social media revolution that was about to occur."
+            ],
+            "blanks": [
+              { "options": ["have seen", "saw", "had seen", "are seen"], "correctIndex": 0 },
+              { "options": ["started", "was started", "has started", "is started"], "correctIndex": 0 },
+              { "options": ["worked", "were worked", "have worked", "are worked"], "correctIndex": 0 },
+              { "options": ["began", "was begun", "has begun", "is beginning"], "correctIndex": 0 },
+              { "options": ["planted", "were planted", "have planted", "are planting"], "correctIndex": 0 },
+              { "options": ["wanted", "was wanted", "have wanted", "wanting"], "correctIndex": 0 },
+              { "options": ["opened", "was opened", "had opened", "has opened"], "correctIndex": 0 }
+            ],
+            "explain": "В связном тексте важно отслеживать, где нужен актив (действующий субъект), а где passive невозможен или неуместен."
+          }
+        ]
+      },
+      {
+        "id": "photo_brackets_1",
+        "title": "Раскрой скобки: active/passive mix (part 1)",
+        "kind": "multi_input",
+        "items": [
+          {
+            "id": "pvb_pb1_1",
+            "instruction": "Раскрой скобки",
+            "prompt": "These days, special effects ____ (use) in movies to create images that ____ (exist).",
+            "inputs": [
+              { "accepted": ["are used"] },
+              { "accepted": ["do not exist", "don't exist"] }
+            ],
+            "explain": "Present Simple Passive + Present Simple Active (neg)."
+          },
+          {
+            "id": "pvb_pb1_2",
+            "instruction": "Раскрой скобки",
+            "prompt": "It ____ (recommend) that you CHANGE your passwords every few months.",
+            "inputs": [
+              { "accepted": ["is recommended"] }
+            ],
+            "explain": "Безличная рекомендация в пассиве: It is recommended that..."
+          },
+          {
+            "id": "pvb_pb1_3",
+            "instruction": "Раскрой скобки",
+            "prompt": "I ____ (tell) by the doctor that the vaccine was safe - but what ____ (happen) later was life-changing for me.",
+            "inputs": [
+              { "accepted": ["was told"] },
+              { "accepted": ["happened"] }
+            ],
+            "explain": "Первое - passive (was told), второе - active past (happened)."
+          },
+          {
+            "id": "pvb_pb1_4",
+            "instruction": "Раскрой скобки",
+            "prompt": "Mr. Beast (Jimmy Donaldson) IS (be) now the highest-paid YouTuber in the world who ____ (earn) about $50 million yearly.",
+            "inputs": [
+              { "accepted": ["earns"] }
+            ],
+            "explain": "Относительное предложение о факте: who earns..."
+          },
+          {
+            "id": "pvb_pb1_5",
+            "instruction": "Раскрой скобки",
+            "prompt": "This scientific conference ____ (take) place in Indonesia last week and ____ (attend) by a number of young scientists.",
+            "inputs": [
+              { "accepted": ["took"] },
+              { "accepted": ["was attended"] }
+            ],
+            "explain": "Сначала active past (took place), потом passive past (was attended)."
+          },
+          {
+            "id": "pvb_pb1_7",
+            "instruction": "Раскрой скобки",
+            "prompt": "From 18 to 45 litres of water ____ (waste) every extra minute that you ____ (spend) in the shower.",
+            "inputs": [
+              { "accepted": ["are wasted"] },
+              { "accepted": ["spend"] }
+            ],
+            "explain": "Общий факт: are wasted / you spend."
+          },
+          {
+            "id": "pvb_pb1_10",
+            "instruction": "Раскрой скобки",
+            "prompt": "When Thomas Edison ____ (demonstrate) the first light bulb on New Year's Eve 1879, it ____ (mark) the dawn of the electric age.",
+            "inputs": [
+              { "accepted": ["demonstrated"] },
+              { "accepted": ["marked"] }
+            ],
+            "explain": "Оба действия завершенные в прошлом: demonstrated / marked."
+          },
+          {
+            "id": "pvb_pb1_12",
+            "instruction": "Раскрой скобки",
+            "prompt": "The development of the WWW ____ (open up) the world of the Internet to everybody and connected the world in a way that it ____ (never be) before.",
+            "inputs": [
+              { "accepted": ["opened up", "opened"] },
+              { "accepted": ["had never been"] }
+            ],
+            "explain": "Прошлое событие + состояние до этого события: had never been."
+          },
+          {
+            "id": "pvb_pb1_13",
+            "instruction": "Раскрой скобки",
+            "prompt": "Although digital books ____ (become) more popular in recent years, it is unlikely that they ____ (fully replace) printed books.",
+            "inputs": [
+              { "accepted": ["have become"] },
+              { "accepted": ["will fully replace", "will replace fully"] }
+            ],
+            "explain": "recent years -> Present Perfect; прогноз в будущем -> will."
+          },
+          {
+            "id": "pvb_pb1_14",
+            "instruction": "Раскрой скобки",
+            "prompt": "The discovery of fire ____ (occur) during the Paleolithic era, when early hominids first ____ (learn) to control and utilise it for various purposes.",
+            "inputs": [
+              { "accepted": ["occurred"] },
+              { "accepted": ["learned", "learnt"] }
+            ],
+            "explain": "Исторический нарратив в Past Simple."
+          },
+          {
+            "id": "pvb_pb1_15",
+            "instruction": "Раскрой скобки",
+            "prompt": "The first compass ____ (invent) in China between the 2nd Century B.C. and 1st Century A.D. However, it ____ (use) for navigation for the first time between the 11th and 12th centuries.",
+            "inputs": [
+              { "accepted": ["was invented"] },
+              { "accepted": ["was used"] }
+            ],
+            "explain": "Оба события в прошлом и в пассиве: was invented / was used."
+          }
+        ]
+      },
+      {
+        "id": "photo_brackets_2",
+        "title": "Раскрой скобки: active/passive mix (part 2)",
+        "kind": "multi_input",
+        "items": [
+          {
+            "id": "pvb_pb2_1",
+            "instruction": "Раскрой скобки",
+            "prompt": "The first battery dates back to 1800, when Italian physicist Alessandro Volta ____ (wrap) stacked discs of copper and zinc in a cloth, submerged it in salty water and ____ (find out) that it conducted energy.",
+            "inputs": [
+              { "accepted": ["wrapped"] },
+              { "accepted": ["found out"] }
+            ],
+            "explain": "Историческое повествование: Past Simple active."
+          },
+          {
+            "id": "pvb_pb2_2",
+            "instruction": "Раскрой скобки",
+            "prompt": "G.O.A.T. is an acronym that ____ (currently use) to call someone or something the 'greatest of all time', according to Dictionary.com. It ____ (pronounce) 'goat' like the animal.",
+            "inputs": [
+              { "accepted": ["is currently used", "is used currently"] },
+              { "accepted": ["is pronounced"] }
+            ],
+            "explain": "Определение и произношение - общие факты в Present Simple Passive."
+          },
+          {
+            "id": "pvb_pb2_3",
+            "instruction": "Раскрой скобки",
+            "prompt": "In the 1970s, scientists Robert Kahn and Vinton Cerf ____ (develop) the communication protocols for the Internet, the Transmission Control Protocol (TCP) and the Internet Protocol (IP). For this, Kahn and Cerf ____ (often consider) inventors of the Internet.",
+            "inputs": [
+              { "accepted": ["developed"] },
+              { "accepted": ["are often considered", "are considered"] }
+            ],
+            "explain": "Сначала past факт, затем общий статус в present passive."
+          },
+          {
+            "id": "pvb_pb2_4",
+            "instruction": "Раскрой скобки",
+            "prompt": "As of June 2024, Steven Spielberg ____ (remain) the highest-grossing film director in history, amassing over 10.7 billion U.S. dollars at the global box office throughout his career. James Cameron ____ (follow) with 8.7 billion dollars thanks to the success of 'Avatar: The Way of Water'.",
+            "inputs": [
+              { "accepted": ["remains"] },
+              { "accepted": ["follows"] }
+            ],
+            "explain": "Текущий факт по рейтингу: remains / follows."
+          },
+          {
+            "id": "pvb_pb2_5",
+            "instruction": "Раскрой скобки",
+            "prompt": "In 1928, at St. Mary's Hospital in London, Alexander Fleming DISCOVERED (discover) penicillin. This discovery ____ (lead) to the introduction of antibiotics and the number of deaths from infection ____ (reduce) greatly.",
+            "inputs": [
+              { "accepted": ["led"] },
+              { "accepted": ["were reduced"] }
+            ],
+            "explain": "Результат прошлого открытия: led + were reduced."
+          },
+          {
+            "id": "pvb_pb2_6",
+            "instruction": "Раскрой скобки",
+            "prompt": "In 1966, an MIT (Massachusetts Institute of Technology) professor named Joseph Weizenbaum ____ (create) the first chatbot. He cast it in the role of a psychotherapist. A user ____ (type) a message on an electric typewriter that ____ (connect) to a mainframe. After a moment, the 'psychotherapist' ____ (reply).",
+            "inputs": [
+              { "accepted": ["created"] },
+              { "accepted": ["typed"] },
+              { "accepted": ["was connected"] },
+              { "accepted": ["replied"] }
+            ],
+            "explain": "Смешение активного narative и одного пассива по объекту (typewriter was connected)."
+          }
+        ]
       }
     ]
   }

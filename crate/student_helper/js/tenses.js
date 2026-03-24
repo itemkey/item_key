@@ -76,9 +76,7 @@
   const btnGoDaily = document.getElementById('tensesGoDaily');
   const btnGoMixed = document.getElementById('tensesGoMixed');
   const btnGoBasics = document.getElementById('tensesGoBasics');
-  const btnGoPresent = document.getElementById('grammarGoPresent');
-  const btnGoPast = document.getElementById('grammarGoPast');
-  const btnGoFuture = document.getElementById('grammarGoFuture');
+  const btnGoActiveTenses = document.getElementById('grammarGoActiveTenses');
   const btnGoUniversal = document.getElementById('grammarGoUniversal');
 
   const searchInput = document.getElementById('grammarSearchInput');
@@ -152,6 +150,9 @@
   const customPicker = document.getElementById('tensesCustomPicker');
   const customGrid = document.getElementById('tensesCustomGrid');
   const customHint = document.getElementById('tensesCustomHint');
+  const customSearchInput = document.getElementById('tensesCustomSearchInput');
+  const customSearchClearBtn = document.getElementById('tensesCustomSearchClearBtn');
+  const customSearchEmpty = document.getElementById('tensesCustomSearchEmpty');
   const btnCustomSelectAll = document.getElementById('tensesCustomSelectAllBtn');
   const btnCustomClearAll = document.getElementById('tensesCustomClearAllBtn');
 
@@ -166,6 +167,9 @@
   let currentId = null;
   let runKeyHandler = null;
   let runReturnState = null;
+  let customSearchQuery = '';
+  let detailBackStack = [];
+  let overviewFloatingSyncBound = false;
 
   function setRunReturnState(state){
     runReturnState = state || null;
@@ -189,6 +193,7 @@
   const LEVELS = ['A2-B1', 'B1-B2', 'B2-C1'];
   const CATEGORY_LABEL = {
     all: 'все темы по уровню',
+    active_tenses: 'active tenses - времена',
     present: 'present - настоящее',
     past: 'past - прошлое',
     future: 'future - будущее',
@@ -244,6 +249,7 @@
     { id:'all', title:'общее (all goals)' },
     { id:'meaning', title:'когда используем (meaning)' },
     { id:'formula', title:'формула (formula)' },
+    { id:'story_cloze', title:'контекст (dropdown story)' },
     { id:'markers', title:'маркеры (markers)' },
     { id:'mistakes', title:'ошибки (mistakes)' },
     { id:'compare', title:'сравнение (compare)' },
@@ -554,9 +560,147 @@
     setVisible(practiceView, viewName === 'practice');
     setVisible(compareView, viewName === 'compare');
     setVisible(dailyView, viewName === 'daily');
+    syncFarmHubForTensesView(viewName);
+    if (viewName !== 'detail'){
+      const nav = document.getElementById('tensesOverviewFloatingNav');
+      if (nav) nav.hidden = true;
+      if (detailView){
+        detailView.classList.remove('has-overview-floating-nav');
+      }
+    }
     if (viewName === 'home') applyGrammarHomeTab();
     if (viewName !== 'home' && searchResults) searchResults.hidden = true;
     window.scrollTo(0, 0);
+  }
+
+  function syncFarmHubForTensesView(viewName){
+    const coach = window.IKFarmCoach;
+    if (!coach || typeof coach.update !== 'function') return;
+
+    if (viewName === 'practice'){
+      coach.update({
+        active: true,
+        owner: 'tenses_practice',
+        title: isEnLang() ? 'Farm HUB · Practice' : 'Farm HUB · Практика',
+        line: isEnLang() ? 'Practice mode is active.' : 'Режим упражнений активен.',
+        sub: isEnLang() ? 'Pick goal, start run, keep momentum.' : 'Выбери цель, запускай раунд и держи темп.',
+        chips: isEnLang() ? ['practice', 'focus', 'progress'] : ['упражнения', 'фокус', 'прогресс'],
+        progress: 0,
+        hideLabel: isEnLang() ? 'hide' : 'скрыть',
+        stripLabel: 'Farm HUB ▾'
+      });
+      return;
+    }
+
+    if (typeof coach.hide === 'function') coach.hide();
+    else coach.update({ active: false });
+  }
+
+  function normalizeHeadingKey(text){
+    return String(text || '')
+      .toLowerCase()
+      .replace(/^\d+\.\s*/,'')
+      .replace(/[^a-zа-яё0-9]+/gi,'-')
+      .replace(/^-+|-+$/g,'');
+  }
+
+  function scrollRuleHeadingTo(key){
+    if (!ruleBody) return;
+    const k = String(key || '').trim();
+    if (!k) return;
+    const target = ruleBody.querySelector(`[data-basic-heading-key="${k}"]`);
+    if (!target) return;
+    const nav = document.getElementById('tensesOverviewFloatingNav');
+    const navShift = (nav && !nav.hidden) ? (nav.getBoundingClientRect().bottom + 10) : 88;
+    const top = target.getBoundingClientRect().top + window.scrollY - navShift;
+    window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+  }
+
+  function getOverviewFloatingNav(){
+    let el = document.getElementById('tensesOverviewFloatingNav');
+    if (el) return el;
+    el = document.createElement('div');
+    el.id = 'tensesOverviewFloatingNav';
+    el.className = 'sh-overview-floating-nav';
+    el.hidden = true;
+    document.body.appendChild(el);
+    return el;
+  }
+
+  function syncOverviewFloatingNavPosition(){
+    const box = document.getElementById('tensesOverviewFloatingNav');
+    if (!box || box.hidden) return;
+
+    const siteNav = document.getElementById('ikSiteNav') || document.querySelector('.ik-site-nav');
+
+    const navRect = siteNav ? siteNav.getBoundingClientRect() : { bottom: 0 };
+    const laneRect = siteNav ? siteNav.getBoundingClientRect() : { left: 0, right: window.innerWidth };
+
+    const top = Math.max(0, Math.round(navRect.bottom + 2));
+    const left = Math.max(0, Math.round(laneRect.left));
+    const right = Math.max(0, Math.round(window.innerWidth - laneRect.right));
+
+    box.style.top = `${top}px`;
+    box.style.left = `${left}px`;
+    box.style.right = `${right}px`;
+
+  }
+
+  function bindOverviewFloatingNavSync(){
+    if (overviewFloatingSyncBound) return;
+    overviewFloatingSyncBound = true;
+    const run = ()=> syncOverviewFloatingNavPosition();
+    window.addEventListener('scroll', run, { passive: true });
+    window.addEventListener('resize', run);
+  }
+
+  function renderBasicOverviewQuickNav(){
+    if (!ruleBody || !detailView) return;
+    const box = getOverviewFloatingNav();
+    box.innerHTML = '';
+
+    const shouldShow = currentId === BASIC_OVERVIEW_ID && !detailView.hidden;
+    if (!shouldShow){
+      box.hidden = true;
+      detailView.classList.remove('has-overview-floating-nav');
+      return;
+    }
+
+    const links = [
+      { label: 'Present Simple', key: normalizeHeadingKey('Present Simple') },
+      { label: 'Present Continuous', key: normalizeHeadingKey('Present Continuous') },
+      { label: 'Present Perfect', key: normalizeHeadingKey('Present Perfect') },
+      { label: 'Present Perfect Continuous', key: normalizeHeadingKey('Present Perfect Continuous') },
+      { label: 'Past Simple', key: normalizeHeadingKey('Past Simple') },
+      { label: 'Past Continuous', key: normalizeHeadingKey('Past Continuous') },
+      { label: 'Past Perfect', key: normalizeHeadingKey('Past Perfect') },
+      { label: 'Future Simple', key: normalizeHeadingKey('Future Simple') },
+      { label: 'First Conditional', key: normalizeHeadingKey('First Conditional') }
+    ];
+
+    const available = links.filter((x)=> ruleBody.querySelector(`[data-basic-heading-key="${x.key}"]`));
+    if (!available.length) return;
+
+    const title = document.createElement('p');
+    title.className = 'sh-overview-floating-nav__title';
+    title.textContent = isEnLang() ? 'Quick navigation' : 'Быстрая навигация';
+    box.appendChild(title);
+
+    const bar = document.createElement('div');
+    bar.className = 'sh-overview-floating-nav__bar';
+    available.forEach((x)=>{
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'ik-btn sh-overview-floating-nav__btn';
+      btn.textContent = x.label;
+      btn.addEventListener('click', ()=> scrollRuleHeadingTo(x.key));
+      bar.appendChild(btn);
+    });
+    box.appendChild(bar);
+    box.hidden = false;
+    detailView.classList.add('has-overview-floating-nav');
+    bindOverviewFloatingNavSync();
+    syncOverviewFloatingNavPosition();
   }
 
   function saveUIState(patch){
@@ -835,7 +979,14 @@
     metas = metas.filter((meta) => matchesLevel(meta, level));
 
     if (category !== 'all'){
-      metas = metas.filter((meta) => String(meta.group || '').toLowerCase() === category);
+      if (category === 'active_tenses'){
+        metas = metas.filter((meta) => {
+          const group = String(meta.group || '').toLowerCase();
+          return group === 'present' || group === 'past' || group === 'future';
+        });
+      } else {
+        metas = metas.filter((meta) => String(meta.group || '').toLowerCase() === category);
+      }
     }
 
     if (subgroup !== 'all'){
@@ -1638,6 +1789,9 @@
         const h = document.createElement('h3');
         h.className = 'sh-rule-h';
         h.textContent = b.text || '';
+        if (currentId === BASIC_OVERVIEW_ID){
+          h.setAttribute('data-basic-heading-key', normalizeHeadingKey(b.text || ''));
+        }
         container.appendChild(h);
       } else if (b.type === 'text'){
         const p = document.createElement('p');
@@ -1690,7 +1844,26 @@
           sub.textContent = item.note || topic.subtitle || '';
           btn.appendChild(sub);
 
-          btn.addEventListener('click', ()=> openTense(topicId));
+          btn.addEventListener('click', ()=>{
+            const isBasicQuickMaps =
+              currentId === BASIC_OVERVIEW_ID &&
+              String(b.title || '').trim().toLowerCase() === 'быстрый переход к картам выбора';
+
+            if (isBasicQuickMaps){
+              const mapTargets = {
+                presentUsageMap: normalizeHeadingKey('Present Simple'),
+                pastUsageMap: normalizeHeadingKey('Past Simple'),
+                futureExpressionWays: normalizeHeadingKey('Future Simple')
+              };
+              const targetKey = mapTargets[topicId];
+              if (targetKey){
+                scrollRuleHeadingTo(targetKey);
+                return;
+              }
+            }
+
+            openTense(topicId, { fromTopicLink: true, returnScrollY: window.scrollY });
+          });
           list.appendChild(btn);
         }
 
@@ -1904,6 +2077,7 @@
     const t = REG.byId[currentId];
     if (!t) return;
     renderRuleBlocks(ruleBody, blocksForRuleMode(t.ruleBlocks || []));
+    renderBasicOverviewQuickNav();
   }
 
   function openTense(id, opts){
@@ -1917,16 +2091,45 @@
       setRunReturnState(null);
     }
 
+    if (options.fromTopicLink && currentId && currentId !== id){
+      detailBackStack.push({
+        id: currentId,
+        scrollY: Number.isFinite(options.returnScrollY) ? options.returnScrollY : window.scrollY
+      });
+    } else if (!options.preserveBackStack){
+      detailBackStack = [];
+    }
+
     currentId = id;
 
     tenseTitleEl.textContent = t.title || id;
     tenseSubtitleEl.textContent = t.subtitle || '';
     renderCurrentRule();
+    updateDetailPracticeButtons(t);
 
     updateMasteryUI(id);
     updateRuleModeButtons();
     showOnly('detail');
+    renderBasicOverviewQuickNav();
     setStatus('open');
+    if (Number.isFinite(options.restoreScrollY)){
+      requestAnimationFrame(()=>{
+        window.scrollTo({ top: Math.max(0, Number(options.restoreScrollY) || 0), behavior: 'auto' });
+      });
+    }
+  }
+
+  function hasPracticeForTopic(topic){
+    const exercises = (topic && topic.practice && Array.isArray(topic.practice.exercises))
+      ? topic.practice.exercises
+      : [];
+    return exercises.some((ex)=> Array.isArray(ex.items) && ex.items.length > 0);
+  }
+
+  function updateDetailPracticeButtons(topic){
+    const canOpen = hasPracticeForTopic(topic);
+    if (btnGoPracticeFromDetail) btnGoPracticeFromDetail.hidden = !canOpen;
+    if (btnGoPracticeBottom) btnGoPracticeBottom.hidden = !canOpen;
   }
 
   function updateMasteryUI(id){
@@ -2038,6 +2241,33 @@
   function setCustomPickerVisible(visible){
     if (!customPicker) return;
     customPicker.hidden = !visible;
+    if (visible) applyCustomSearchFilter();
+  }
+
+  function applyCustomSearchFilter(){
+    if (!customGrid) return;
+    const query = normalize(customSearchQuery || '');
+    const hasQuery = !!query;
+    let anyVisible = false;
+
+    customGrid.querySelectorAll('.sh-custom-group').forEach((groupEl)=>{
+      let groupVisible = false;
+      groupEl.querySelectorAll('.sh-custom-subgroup').forEach((subEl)=>{
+        let subVisible = false;
+        subEl.querySelectorAll('.sh-custom-tense').forEach((itemEl)=>{
+          const hay = String(itemEl.getAttribute('data-search') || '');
+          const match = !hasQuery || hay.includes(query);
+          itemEl.hidden = !match;
+          if (match) subVisible = true;
+        });
+        subEl.hidden = !subVisible;
+        if (subVisible) groupVisible = true;
+      });
+      groupEl.hidden = !groupVisible;
+      if (groupVisible) anyVisible = true;
+    });
+
+    if (customSearchEmpty) customSearchEmpty.hidden = !hasQuery || anyVisible;
   }
 
   function saveCustomSelection(ids){
@@ -2161,6 +2391,14 @@
         for (const meta of subMetas){
           const label = document.createElement('label');
           label.className = 'sh-custom-tense';
+          label.setAttribute('data-search', normalize([
+            meta.title || meta.id || '',
+            meta.subtitle || '',
+            meta.hint || '',
+            meta.id || '',
+            subgroupLabel(sub),
+            CATEGORY_LABEL[cat] || cat
+          ].join(' ')));
 
           const cb = document.createElement('input');
           cb.type = 'checkbox';
@@ -2200,6 +2438,7 @@
 
     updateCustomHint(selected.size);
     refreshCustomGroupCounts();
+    applyCustomSearchFilter();
   }
 
   function updateCustomHint(selectedCount){
@@ -2405,7 +2644,7 @@
   }
 
   // -------------------------
-  // Practice run (choice/input/multi/match/multi_input)
+  // Practice run (choice/input/multi/match/multi_input/inline_select)
   // -------------------------
   function startRun(tenseObj, exerciseIds, opts, mountEl){
     const practiceBody = mountEl || document.getElementById('tensesPracticeBody');
@@ -2441,6 +2680,13 @@
       if (Array.isArray(item.options)) it.options = [...item.options];
       if (Array.isArray(item.correctIndices)) it.correctIndices = [...item.correctIndices];
       if (Array.isArray(item.pairs)) it.pairs = item.pairs.map(p => ({ left: p.left, right: p.right }));
+      if (Array.isArray(item.segments)) it.segments = [...item.segments];
+      if (Array.isArray(item.blanks)){
+        it.blanks = item.blanks.map((b)=>({
+          options: Array.isArray(b?.options) ? [...b.options] : [],
+          correctIndex: Number(b?.correctIndex)
+        }));
+      }
 
       // Shuffle options to avoid fixed patterns
       if ((kind === 'choice' || kind === 'multi') && Array.isArray(it.options) && it.options.length > 1){
@@ -2567,6 +2813,7 @@
     let selectedSet = new Set(); // for multi
     let matchState = null; // { rights:[], selects:[] }
     let multiInputs = null; // [inputEl,...]
+    let inlineSelectState = null; // { slots:[{mount,select,options,correctIndex}], segments:[] }
 
     // scoring per exercise
     const exTotals = {};
@@ -2583,6 +2830,7 @@
       selectedSet = new Set();
       matchState = null;
       multiInputs = null;
+      inlineSelectState = null;
       lastCheck = null;
     }
 
@@ -3079,6 +3327,10 @@
         return fillPromptBlanks(prompt, [form]);
       }
 
+      if (check.kind === 'inline_select'){
+        return String(check.correctSentence || '').trim();
+      }
+
       return '';
     }
 
@@ -3131,6 +3383,9 @@
           } else {
             if (check.correctParts?.length) pushExplainLine(lines, `Правильные формы: ${joinReadable(check.correctParts)}.`);
           }
+        } else if (check.kind === 'inline_select'){
+          if (check.ok) pushExplainLine(lines, `Верно: ${check.correctCount}/${check.total}.`);
+          else pushExplainLine(lines, `Результат: ${check.correctCount}/${check.total}.`);
         }
 
         const resolved = buildResolvedSentence(q, check, meta);
@@ -3318,6 +3573,71 @@
       inputs[0] && inputs[0].focus?.();
     }
 
+    function renderInlineSelect(q){
+      const item = q.item || {};
+      const title = String(item.storyTitle || '').trim();
+      if (title){
+        const h = document.createElement('p');
+        h.className = 'sh-inline-story-title';
+        h.textContent = title;
+        elCard.appendChild(h);
+      }
+
+      const box = document.createElement('div');
+      box.className = 'sh-inline-story';
+
+      const segments = Array.isArray(item.segments) ? item.segments : [];
+      const blanks = Array.isArray(item.blanks) ? item.blanks : [];
+      const slots = [];
+
+      const textLine = document.createElement('p');
+      textLine.className = 'sh-inline-story__line';
+
+      for (let i = 0; i < blanks.length; i += 1){
+        const seg = String(segments[i] || '');
+        if (seg) textLine.appendChild(document.createTextNode(seg));
+
+        const mount = document.createElement('span');
+        mount.className = 'sh-inline-slot';
+
+        const sel = document.createElement('select');
+        sel.className = 'ik-select sh-inline-select';
+        sel.setAttribute('data-idx', String(i));
+
+        const blank = blanks[i] || {};
+        const opts = Array.isArray(blank.options) ? blank.options : [];
+        const ph = document.createElement('option');
+        ph.value = '';
+        ph.textContent = '...';
+        sel.appendChild(ph);
+        opts.forEach((opt, j)=>{
+          const o = document.createElement('option');
+          o.value = String(j);
+          o.textContent = String(opt || '');
+          sel.appendChild(o);
+        });
+
+        mount.appendChild(sel);
+        textLine.appendChild(mount);
+
+        slots.push({
+          mount,
+          select: sel,
+          options: opts,
+          correctIndex: Number(blank.correctIndex)
+        });
+      }
+
+      const tail = String(segments[blanks.length] || '');
+      if (tail) textLine.appendChild(document.createTextNode(tail));
+
+      box.appendChild(textLine);
+      elCard.appendChild(box);
+
+      inlineSelectState = { slots, segments: [...segments] };
+      slots[0]?.select?.focus?.();
+    }
+
     function renderCurrent(){
       checked = false;
       btnCheckNext.textContent = 'check';
@@ -3360,6 +3680,8 @@ try{
         renderMatch(q);
       } else if (q.kind === 'multi_input'){
         renderMultiInput(q);
+      } else if (q.kind === 'inline_select'){
+        renderInlineSelect(q);
       } else {
         // fallback
         renderInput(q);
@@ -3623,6 +3945,85 @@ try{
         return allOk;
       }
 
+      if (q.kind === 'inline_select'){
+        const st = inlineSelectState;
+        if (!st || !Array.isArray(st.slots) || !st.slots.length){
+          setFeedback('idle', 'pick', 'не удалось создать поля');
+          lastCheck = null;
+          return null;
+        }
+
+        for (const slot of st.slots){
+          const val = String(slot.select?.value || '');
+          if (!val){
+            setFeedback('idle', 'pick', 'заполни все поля');
+            lastCheck = null;
+            return null;
+          }
+        }
+
+        countAttempt(q);
+
+        let okCount = 0;
+        const parts = [];
+        const detail = [];
+
+        for (let i = 0; i < st.slots.length; i += 1){
+          const slot = st.slots[i];
+          const pickedIndex = Number(slot.select.value);
+          const correctIndex = Number(slot.correctIndex);
+          const correctText = String(slot.options[correctIndex] || '');
+          const pickedText = String(slot.options[pickedIndex] || '');
+          const isOk = pickedIndex === correctIndex;
+          if (isOk) okCount += 1;
+          parts.push(correctText);
+
+          const badge = document.createElement('span');
+          badge.className = `sh-inline-result ${isOk ? 'is-ok' : 'is-wrong'}`;
+          if (isOk){
+            badge.textContent = correctText;
+          } else {
+            badge.innerHTML = `<s>${escapeHtml(pickedText)}</s> ${escapeHtml(correctText)} <span aria-hidden="true">×</span>`;
+          }
+
+          slot.mount.innerHTML = '';
+          slot.mount.appendChild(badge);
+
+          detail.push({ pickedText, correctText, ok: isOk });
+        }
+
+        const total = st.slots.length;
+        const ok = okCount === total;
+        if (ok){
+          exCorrect[q.exId] = (exCorrect[q.exId] || 0) + 1;
+          mistakesSet.delete(q.item.id);
+          setFeedback('correct', 'ok', `верно (${okCount}/${total})`);
+        } else {
+          mistakesSet.add(q.item.id);
+          setFeedback('wrong', 'no', `неверно (${okCount}/${total})`);
+        }
+
+        const sentenceParts = [];
+        for (let i = 0; i < total; i += 1){
+          sentenceParts.push(String(st.segments[i] || ''));
+          sentenceParts.push(parts[i] || '');
+        }
+        sentenceParts.push(String(st.segments[total] || ''));
+        const correctSentence = sentenceParts.join('').replace(/\s+/g, ' ').replace(/\s+([,.!?;:])/g, '$1').trim();
+
+        lastCheck = {
+          kind: 'inline_select',
+          ok,
+          correctCount: okCount,
+          total,
+          slots: detail,
+          correctSentence
+        };
+
+        saveMistakesSnapshot();
+        return ok;
+      }
+
       // fallback
       setFeedback('wrong', 'no', 'unknown task type');
       lastCheck = { kind: q.kind || 'unknown', ok: false };
@@ -3782,6 +4183,42 @@ try{
           anyAlmost: false,
           slots,
           correctParts: slots.map(x => x.correct).filter(Boolean),
+          forcedUnknown: true
+        };
+      } else if (q.kind === 'inline_select'){
+        const st = inlineSelectState;
+        const detail = [];
+        if (st && Array.isArray(st.slots)){
+          for (let i = 0; i < st.slots.length; i += 1){
+            const slot = st.slots[i];
+            const correctIndex = Number(slot.correctIndex);
+            const correctText = String(slot.options?.[correctIndex] || '');
+            const badge = document.createElement('span');
+            badge.className = 'sh-inline-result is-ok';
+            badge.textContent = correctText;
+            slot.mount.innerHTML = '';
+            slot.mount.appendChild(badge);
+            detail.push({ pickedText: '', correctText, ok: false });
+          }
+        }
+
+        const total = detail.length;
+        const sentenceParts = [];
+        if (st && Array.isArray(st.segments)){
+          for (let i = 0; i < total; i += 1){
+            sentenceParts.push(String(st.segments[i] || ''));
+            sentenceParts.push(detail[i]?.correctText || '');
+          }
+          sentenceParts.push(String(st.segments[total] || ''));
+        }
+
+        lastCheck = {
+          kind: 'inline_select',
+          ok: false,
+          correctCount: 0,
+          total,
+          slots: detail,
+          correctSentence: sentenceParts.join('').replace(/\s+/g, ' ').replace(/\s+([,.!?;:])/g, '$1').trim(),
           forcedUnknown: true
         };
       } else {
@@ -4024,9 +4461,7 @@ try{
     openPracticeMode('mixed', { autoStart: true });
   });
 
-  btnGoPresent && btnGoPresent.addEventListener('click', ()=> openCategory('present'));
-  btnGoPast && btnGoPast.addEventListener('click', ()=> openCategory('past'));
-  btnGoFuture && btnGoFuture.addEventListener('click', ()=> openCategory('future'));
+  btnGoActiveTenses && btnGoActiveTenses.addEventListener('click', ()=> openCategory('active_tenses'));
   btnGoUniversal && btnGoUniversal.addEventListener('click', ()=> openCategory('universal'));
   btnOpenConstructor && btnOpenConstructor.addEventListener('click', ()=> showConstructor());
   btnBackHomeFromConstructor && btnBackHomeFromConstructor.addEventListener('click', ()=>{
@@ -4125,6 +4560,15 @@ btnResetProgress && btnResetProgress.addEventListener('click', ()=>{
   });
 
   btnBackToList && btnBackToList.addEventListener('click', ()=>{
+    if (detailBackStack.length){
+      const prev = detailBackStack.pop();
+      const prevId = String(prev?.id || '');
+      if (prevId && REG.byId[prevId]){
+        openTense(prevId, { preserveBackStack: true, restoreScrollY: Number(prev?.scrollY || 0) });
+        setStatus('open');
+        return;
+      }
+    }
     setRunReturnState(null);
     renderList();
     showOnly('list');
@@ -4220,6 +4664,16 @@ btnResetProgress && btnResetProgress.addEventListener('click', ()=>{
   });
   btnCustomSelectAll && btnCustomSelectAll.addEventListener('click', ()=> setAllCustomSelection(true));
   btnCustomClearAll && btnCustomClearAll.addEventListener('click', ()=> setAllCustomSelection(false));
+  customSearchInput && customSearchInput.addEventListener('input', ()=>{
+    customSearchQuery = String(customSearchInput.value || '');
+    applyCustomSearchFilter();
+  });
+  customSearchClearBtn && customSearchClearBtn.addEventListener('click', ()=>{
+    customSearchQuery = '';
+    if (customSearchInput) customSearchInput.value = '';
+    applyCustomSearchFilter();
+    customSearchInput?.focus?.();
+  });
 
   btnStart && btnStart.addEventListener('click', ()=>{
     const tenseId = tenseSelect.value || tenseSelect.options?.[0]?.value || (REG.INDEX[0] && REG.INDEX[0].id);
@@ -4229,6 +4683,11 @@ btnResetProgress && btnResetProgress.addEventListener('click', ()=>{
 
     const showAfter = !!cbShowAfter?.checked;
     startRun(tenseObj, exIds, { showAfterEach: showAfter, onlyMistakes: false });
+    if (tenseId === CUSTOM_TENSE_ID){
+      requestAnimationFrame(()=>{
+        practiceBody?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+      });
+    }
   });
 
   btnRetry && btnRetry.addEventListener('click', ()=>{

@@ -74,7 +74,7 @@
   const coachState = {
     ready: false,
     visible: false,
-    collapsed: false,
+    collapsed: true,
     payload: null,
     hideTimer: null,
     typeTimer: null,
@@ -1162,6 +1162,11 @@
   function updateCoachForRoute(route) {
     const next = String(route || "menu");
     coachState.route = next;
+    if (coachState.owner && coachState.owner !== "route") return;
+    if (next !== "wt-practice") {
+      coachUpdate({ owner: "route", active: false });
+      return;
+    }
     const line = routeTalkLine(next, coachState.routeTalkStep);
     coachUpdate({
       owner: "route",
@@ -1181,7 +1186,7 @@
   function scheduleRouteCoachTalk() {
     if (coachState.routeTalkTimer) window.clearTimeout(coachState.routeTalkTimer);
     coachState.routeTalkTimer = window.setTimeout(() => {
-      if (coachState.owner === "dictionary") {
+      if (coachState.owner !== "route") {
         scheduleRouteCoachTalk();
         return;
       }

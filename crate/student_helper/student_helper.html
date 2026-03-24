@@ -771,21 +771,9 @@
                   <div class="sh-tile__foot">открыть</div>
                 </button>
 
-                <button class="sh-tile" id="grammarGoPresent" type="button" role="listitem" aria-label="Открыть Present grammar" data-grammar-home-group="rules">
-                  <div class="sh-tile__head">present</div>
-                  <div class="sh-tile__body">настоящее: привычки, процессы, perfect</div>
-                  <div class="sh-tile__foot">открыть</div>
-                </button>
-
-                <button class="sh-tile" id="grammarGoPast" type="button" role="listitem" aria-label="Открыть Past grammar" data-grammar-home-group="rules">
-                  <div class="sh-tile__head">past</div>
-                  <div class="sh-tile__body">прошлое: факты, процессы, опыт, привычки</div>
-                  <div class="sh-tile__foot">открыть</div>
-                </button>
-
-                <button class="sh-tile" id="grammarGoFuture" type="button" role="listitem" aria-label="Открыть Future grammar" data-grammar-home-group="rules">
-                  <div class="sh-tile__head">future</div>
-                  <div class="sh-tile__body">способы выражения будущего: will, going to, расписания, планы</div>
+                <button class="sh-tile" id="grammarGoActiveTenses" type="button" role="listitem" aria-label="Открыть раздел Active Tenses" data-grammar-home-group="rules">
+                  <div class="sh-tile__head">active tenses</div>
+                  <div class="sh-tile__body">все времена в одном разделе: present, past, future</div>
                   <div class="sh-tile__foot">открыть</div>
                 </button>
 
@@ -1009,10 +997,15 @@
               <div id="tensesCustomPicker" class="sh-custom-picker" hidden>
                 <p class="sh-custom-picker__title">пользовательские упражнения: выбери правила и времена</p>
                 <p class="sh-custom-picker__sub" id="tensesCustomHint">собери свой набор по категориям — без длинного сплошного списка</p>
+                <div class="sh-custom-picker__search">
+                  <input class="ik-input" id="tensesCustomSearchInput" type="search" autocomplete="off" spellcheck="false" placeholder="найти правило: passive, perfect, conditionals..." />
+                  <button class="ik-btn" id="tensesCustomSearchClearBtn" type="button">очистить поиск</button>
+                </div>
                 <div class="sh-custom-picker__actions">
                   <button class="ik-btn" id="tensesCustomSelectAllBtn" type="button">выбрать все</button>
                   <button class="ik-btn" id="tensesCustomClearAllBtn" type="button">снять все</button>
                 </div>
+                <p class="ik-footnote" id="tensesCustomSearchEmpty" hidden>ничего не найдено, уточни запрос</p>
                 <div class="sh-custom-picker__grid" id="tensesCustomGrid" aria-label="Custom tenses list"></div>
               </div>
 
@@ -1404,6 +1397,7 @@
     ['уровень сохранен', 'level saved'],
     ['выбери уровень', 'choose a level'],
     ['грамматика: времена + структуры + практика', 'grammar: tenses + structures + practice'],
+    ['active tenses - времена', 'active tenses'],
     ['present - настоящее', 'present'],
     ['past - прошлое', 'past'],
     ['future - будущее', 'future'],

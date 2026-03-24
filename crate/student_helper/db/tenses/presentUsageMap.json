@@ -357,6 +357,183 @@
             "explain": "Первое - Past Simple (five days ago), второе - Present Perfect (since + point)."
           }
         ]
+      },
+      {
+        "id": "story_cloze",
+        "title": "Photo Set P: story dropdown",
+        "kind": "inline_select",
+        "items": [
+          {
+            "id": "prm_story_1",
+            "instruction": "Выбери формы в тексте",
+            "storyTitle": "Food Adventures",
+            "segments": [
+              "I have a great tradition. At the weekends, I ",
+              " new restaurants in my city. Last Saturday, I ",
+              " a vibrant food festival that showcased cuisines from around the world. While I ",
+              " different dishes, I ",
+              " an amazing vegan taco that I absolutely loved. I am sure, I ",
+              " to the festival to taste more food and maybe even meet some of the chefs!"
+            ],
+            "blanks": [
+              { "options": ["explore", "explored", "am exploring", "have explored"], "correctIndex": 0 },
+              { "options": ["visited", "have visited", "visit", "was visiting"], "correctIndex": 0 },
+              { "options": ["was trying", "tried", "have tried", "try"], "correctIndex": 0 },
+              { "options": ["discovered", "have discovered", "discover", "was discovering"], "correctIndex": 0 },
+              { "options": ["will return", "return", "returned", "have returned"], "correctIndex": 0 }
+            ],
+            "explain": "В одном тексте сочетаются Present Simple, Past Simple, Past Continuous и Future Simple по контексту." 
+          },
+          {
+            "id": "prm_story_2",
+            "instruction": "Выбери формы в тексте",
+            "storyTitle": "Cultural Festivals",
+            "segments": [
+              "My friends and I ",
+              " the famous music festival in the park soon. Currently, we ",
+              " our outfits and mapping out the bands we want to see. When we were a bit younger, we ",
+              " to the same festival and had a fantastic time, and we ",
+              " our favorite band perform live since that time. This year, we ",
+              " our best to catch them on stage!"
+            ],
+            "blanks": [
+              { "options": ["will attend", "attend", "attended", "have attended"], "correctIndex": 0 },
+              { "options": ["were planning", "are planning", "plan", "have planned"], "correctIndex": 1 },
+              { "options": ["have gone", "went", "go", "were going"], "correctIndex": 1 },
+              { "options": ["hadn't seen", "haven't seen", "didn't see", "don't see"], "correctIndex": 1 },
+              { "options": ["will do", "do", "are doing", "have done"], "correctIndex": 0 }
+            ],
+            "explain": "Маркеры soon/currently/when/since помогают выбрать нужные времена в одном связном абзаце."
+          },
+          {
+            "id": "prm_story_3",
+            "instruction": "Выбери формы в тексте",
+            "storyTitle": "Culinary Experiences",
+            "segments": [
+              "I ",
+              " cooking new recipes. Over the past few months, I ",
+              " various international dishes, including sushi and paella. I hope one day I ",
+              " a dinner party to share my culinary adventures with friends. Italian cuisine is something that I am particularly good at, so if I ",
+              " a delicious homemade pizza everyone will enjoy it!"
+            ],
+            "blanks": [
+              { "options": ["love", "am loving", "loved", "have loved"], "correctIndex": 0 },
+              { "options": ["have tried", "tried", "am trying", "had tried"], "correctIndex": 0 },
+              { "options": ["will host", "host", "have hosted", "hosted"], "correctIndex": 0 },
+              { "options": ["made", "make", "will make", "am making"], "correctIndex": 1 }
+            ],
+            "explain": "Стативные формы, опыт за период и условная связка if помогают выбрать правильные формы."
+          },
+          {
+            "id": "prm_story_4",
+            "instruction": "Выбери формы в тексте",
+            "storyTitle": "Travel Memories",
+            "segments": [
+              "When we ",
+              " to Italy once, I ",
+              " the streets of Florence when I realized I ",
+              " my camera at the hotel. I ",
+              " many beautiful moments before that, but I missed taking pictures of the stunning sunset. Since then, I ",
+              " it a habit to double-check my bag before leaving."
+            ],
+            "blanks": [
+              { "options": ["traveled", "have traveled", "travel", "were traveling"], "correctIndex": 0 },
+              { "options": ["had explored", "was exploring", "explored", "have explored"], "correctIndex": 1 },
+              { "options": ["forgot", "had forgotten", "have forgotten", "was forgetting"], "correctIndex": 1 },
+              { "options": ["have captured", "had captured", "captured", "was capturing"], "correctIndex": 1 },
+              { "options": ["have made", "made", "am making", "had made"], "correctIndex": 0 }
+            ],
+            "explain": "Порядок событий в прошлом (past before past) и период since then задают правильные формы."
+          },
+          {
+            "id": "prm_story_5",
+            "instruction": "Выбери формы в тексте",
+            "storyTitle": "Communication in the Digital Age",
+            "segments": [
+              "As I ",
+              " through my social media feed the other day, I ",
+              " a lot of posts about mental health awareness. Many people ",
+              " their experiences online to help others. Before I ",
+              " those posts, I ",
+              " how important it is to talk about mental health. Now, I ",
+              " an effort to support my friends whenever they need someone to talk to."
+            ],
+            "blanks": [
+              { "options": ["had scrolled", "was scrolling", "scrolled", "have been scrolling"], "correctIndex": 1 },
+              { "options": ["noticed", "was noticing", "have noticed", "notice"], "correctIndex": 0 },
+              { "options": ["share", "are sharing", "shared", "have shared"], "correctIndex": 0 },
+              { "options": ["saw", "have seen", "was seeing", "had seen"], "correctIndex": 0 },
+              { "options": ["hadn't realized", "didn't realize", "haven't realized", "don't realize"], "correctIndex": 0 },
+              { "options": ["am making", "make", "have made", "made"], "correctIndex": 0 }
+            ],
+            "explain": "Фон/событие в прошлом, причинный past perfect и текущее действие now связываются в один контекст."
+          },
+          {
+            "id": "prm_story_6",
+            "instruction": "Выбери формы в тексте",
+            "storyTitle": "Food Sustainability",
+            "segments": [
+              "Today, I ",
+              " about sustainable food practices. Over the past year, I ",
+              " how to grow my own vegetables at home. Some time ago, I ",
+              " my first garden, and it was a rewarding experience. I think I ",
+              " to focus on sustainable eating to contribute positively to our environment in the future."
+            ],
+            "blanks": [
+              { "options": ["learned", "am learning", "have learned", "learn"], "correctIndex": 1 },
+              { "options": ["have been researching", "researched", "am researching", "had researched"], "correctIndex": 0 },
+              { "options": ["started", "have started", "start", "was starting"], "correctIndex": 0 },
+              { "options": ["will continue", "continue", "am continuing", "continued"], "correctIndex": 0 }
+            ],
+            "explain": "Today/over the past year/some time ago/in the future задают разные временные опоры."
+          },
+          {
+            "id": "prm_story_7",
+            "instruction": "Выбери формы в тексте",
+            "storyTitle": "A journey to the Amazon rainforest.",
+            "segments": [
+              "Last summer, a group of researchers ",
+              " a journey to the Amazon rainforest to study its biodiversity. They ",
+              " samples of plants and animals, which would be used in their research. One of the researchers, Dr. Harris, ",
+              " so excited about the trip that he ",
+              " the night before. They all agreed that the rainforest ",
+              " a breathtaking place, full of life and mystery. Since they returned to their lab, they ",
+              " important insights into the issue of climate change."
+            ],
+            "blanks": [
+              { "options": ["took", "have taken", "were taking", "take"], "correctIndex": 0 },
+              { "options": ["collect", "collected", "have collected", "were collecting"], "correctIndex": 1 },
+              { "options": ["was", "were", "is", "has been"], "correctIndex": 0 },
+              { "options": ["was barely slept", "had barely slept", "barely slept", "has barely slept"], "correctIndex": 1 },
+              { "options": ["is", "was", "has been", "had been"], "correctIndex": 1 },
+              { "options": ["have had", "had", "were having", "have"], "correctIndex": 0 }
+            ],
+            "explain": "В одном рассказе сочетаются past narration, past perfect и результат к настоящему."
+          },
+          {
+            "id": "prm_story_8",
+            "instruction": "Выбери формы в тексте",
+            "storyTitle": "Achieving goals.",
+            "segments": [
+              "Many people believe that achieving personal goals is the key to happiness. Experts ",
+              " that setting small, realistic goals can improve motivation and reduce stress. For example, you ",
+              " better results with time, if you feel that the process itself is rewarding. It is important to remember that success ",
+              " overnight. Patience and dedication are crucial when it comes to achieving long-term goals. Recently, a study ",
+              " that people who set realistic goals and work steadily towards them ",
+              " more satisfied with their lives. Currently more and more people ",
+              " their best to become more productive."
+            ],
+            "blanks": [
+              { "options": ["say", "are saying", "have said", "said"], "correctIndex": 1 },
+              { "options": ["will achieve", "achieve", "are achieving", "have achieved"], "correctIndex": 0 },
+              { "options": ["doesn't come", "isn't coming", "didn't come", "hasn't come"], "correctIndex": 0 },
+              { "options": ["has shown", "showed", "shows", "is showing"], "correctIndex": 0 },
+              { "options": ["are", "were", "have been", "be"], "correctIndex": 0 },
+              { "options": ["will do", "are done", "have been doing", "are doing", "do"], "correctIndex": 3 }
+            ],
+            "explain": "Текст с general truths, prediction, recent evidence и current trend в одном абзаце."
+          }
+        ]
       }
     ]
   }
