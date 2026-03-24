@@ -2866,6 +2866,80 @@
       ['futurePerfect', /\bfuture perfect\b/i],
     ];
 
+    function normalizeInstructionText(q){
+      const kind = String(q?.kind || '').trim().toLowerCase();
+      const raw = String(q?.item?.instruction || '').trim();
+      const generic = /^(выбери|choose|select)\.?$/i.test(raw);
+
+      if (kind === 'choice'){
+        if (!raw || generic) return 'Выбери один правильный вариант';
+        return raw;
+      }
+
+      if (kind === 'multi'){
+        if (!raw || generic) return 'Выбери все подходящие варианты';
+        if (!/(несколько|все|all)/i.test(raw)) return `${raw} (можно несколько)`;
+        return raw;
+      }
+
+      if (kind === 'match'){
+        if (!raw || generic) return 'Сопоставь пары';
+        return raw;
+      }
+
+      if (kind === 'correction'){
+        if (!raw) return 'Исправь ошибку';
+        return raw;
+      }
+
+      if (kind === 'multi_input'){
+        if (!raw) return 'Заполни все поля';
+        return raw;
+      }
+
+      if (kind === 'inline_select'){
+        if (!raw || generic) return 'Выбери вариант в каждом поле';
+        return raw;
+      }
+
+      return raw || 'Ответь на вопрос';
+    }
+
+    function buildQuestionHintText(q){
+      const kind = String(q?.kind || '').trim().toLowerCase();
+      const prompt = String(q?.item?.prompt || '').trim();
+      const plainPrompt = stripPromptHints(prompt);
+      const shortPrompt = plainPrompt && plainPrompt.split(/\s+/).length <= 4 && !/[?.:]/.test(plainPrompt);
+
+      if (kind === 'choice') return 'Формат: один ответ. Выбери лучший вариант и нажми «проверить».';
+      if (kind === 'multi'){
+        if (shortPrompt) return `Критерий: «${plainPrompt}». Выбери все варианты, которые к нему подходят.`;
+        return 'Формат: мультивыбор. Можно выбрать несколько вариантов; проверь, чтобы отметить все правильные.';
+      }
+      if (kind === 'match') return 'Сопоставь пары во всех строках, затем нажми «проверить».';
+      if (kind === 'multi_input') return 'Заполни каждое поле по порядку: одно поле = одна часть правильной формы.';
+      if (kind === 'inline_select') return 'Выбери вариант в каждом выпадающем поле, затем нажми «проверить».';
+      if (kind === 'correction') return 'Можно ввести либо всё исправленное предложение, либо только исправленный фрагмент.';
+
+      if (kind === 'input'){
+        if (/_{2,}/.test(prompt)) return 'Вводи только пропущенную форму в пустое место (не нужно переписывать все предложение).';
+        return 'Введи правильную форму по контексту предложения.';
+      }
+
+      return '';
+    }
+
+    function readyLineForQuestion(q){
+      const kind = String(q?.kind || '').trim().toLowerCase();
+      if (kind === 'choice') return 'выбери один вариант и нажми check';
+      if (kind === 'multi') return 'выбери все подходящие варианты и нажми проверить';
+      if (kind === 'match') return 'заполни пары и нажми проверить';
+      if (kind === 'multi_input') return 'заполни все поля и нажми check';
+      if (kind === 'inline_select') return 'выбери варианты во всех полях и нажми check';
+      if (kind === 'correction') return 'исправь ошибку и нажми check';
+      return 'введи ответ и нажми check';
+    }
+
     function qText(v){
       const t = String(v || '').trim();
       return t ? `«${t}»` : '—';
@@ -3018,29 +3092,64 @@
     }
 
     function detectPromptSignals(prompt){
-      const t = String(prompt || '').toLowerCase();
+      const src = String(prompt || '').toLowerCase();
       const out = [];
-      const add = (re, text)=>{ if (re.test(t)) out.push(text); };
-
-      add(/\b(now|right now|at the moment|currently)\b|\blook\b|\blisten\b/, 'есть маркер текущего момента');
-      add(/\b(always|usually|often|sometimes|never|generally|normally)\b|\bevery\s+(day|week|month|year)\b|\bon\s+\w+s\b|\bat weekends?\b/, 'есть маркер регулярности/привычки');
-      add(/\b(yesterday|last\s+\w+|\d+\s+ago|in\s+\d{4}|then)\b/, 'есть точка в прошлом');
-      add(/\bwhile\b/, 'есть while (обычно фон/процесс)');
-      add(/\b(already|just|yet|ever|so far|recently|lately)\b/, 'есть perfect-маркер');
-      add(/\bsince\b|\bhow long\b|\bfor\s+(?:(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|a|an|several|many|few|couple|half)\s+)?(?:second|seconds|minute|minutes|hour|hours|day|days|week|weeks|month|months|year|years)\b|\bfor\s+a\s+long\s+time\b|\bfor\s+a\s+while\b/, 'есть маркер длительности');
-      add(/\b(by the time|before)\b|\bby\s+(tomorrow|then|next|\d)/, 'есть дедлайн/граница во времени');
-      add(/\b(tomorrow|next\s+\w+|soon|this time tomorrow)\b/, 'есть ориентир на будущее');
-
-      const uniqOut = [];
       const seen = new Set();
-      for (const v of out){
-        const key = normalize(v);
-        if (!seen.has(key)){
-          seen.add(key);
-          uniqOut.push(v);
-        }
+
+      function add(re, key, reason){
+        const m = src.match(re);
+        if (!m) return;
+        if (seen.has(key)) return;
+        seen.add(key);
+        out.push({ key, hit: String(m[0] || '').trim(), reason });
       }
-      return uniqOut;
+
+      add(/\b(now|right now|at the moment|currently|look|listen)\b/, 'now', 'маркер момента речи -> обычно Continuous');
+      add(/\b(always|usually|often|sometimes|never|generally|normally)\b|\bevery\s+(day|week|month|year)\b|\bon\s+\w+s\b|\bat weekends?\b/, 'habit', 'маркер регулярности -> чаще Simple');
+      add(/\b(yesterday|last\s+\w+|\d+\s+ago|in\s+\d{4}|then|during\s+the\s+[a-z-]+\s+era)\b/, 'past_point', 'конкретный период/точка в прошлом -> чаще Past Simple');
+      add(/\bwhile\b/, 'while', 'while часто задает фон/процесс -> Continuous');
+      add(/\b(already|just|yet|ever|never|so far|recently|lately)\b/, 'perfect', 'связь с текущим моментом -> чаще Perfect');
+      add(/\bsince\b|\bhow long\b|\bfor\s+(?:(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|a|an|several|many|few|couple|half)\s+)?(?:second|seconds|minute|minutes|hour|hours|day|days|week|weeks|month|months|year|years)\b|\bfor\s+a\s+long\s+time\b|\bfor\s+a\s+while\b/, 'duration', 'длительность -> обычно Perfect / Perfect Continuous');
+      add(/\b(by the time|before)\b|\bby\s+(tomorrow|then|next|\d)/, 'deadline', 'граница к сроку -> часто форма Perfect');
+      add(/\b(tomorrow|next\s+\w+|soon|this time tomorrow)\b/, 'future', 'ориентир на будущее -> выбираем future-форму по смыслу');
+
+      return out;
+    }
+
+    function formatSignalsForExplain(signals){
+      if (!Array.isArray(signals) || !signals.length) return '';
+      return signals
+        .slice(0, 3)
+        .map((sig)=>{
+          const hit = String(sig?.hit || '').trim();
+          const reason = String(sig?.reason || '').trim();
+          if (hit && reason) return `«${hit}» -> ${reason}`;
+          return reason || '';
+        })
+        .filter(Boolean)
+        .join(' | ');
+    }
+
+    function hasDurationLikeSignal(prompt){
+      const t = String(prompt || '').toLowerCase();
+      if (!t) return false;
+      return /\bsince\b|\bhow long\b|\bfor\s+(?:(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|a|an|several|many|few|couple|half)\s+)?(?:second|seconds|minute|minutes|hour|hours|day|days|week|weeks|month|months|year|years)\b|\bfor\s+a\s+long\s+time\b|\bfor\s+a\s+while\b|\ball\s+(?:day|morning|afternoon|evening|night)\b|\b(?:lately|recently|these days)\b/.test(t);
+    }
+
+    function filterAcceptedByPromptHeuristics(q, acceptedList){
+      const list = Array.isArray(acceptedList) ? acceptedList.filter(Boolean) : [];
+      if (!list.length) return list;
+      if (!q || q.kind !== 'input') return list;
+
+      const meta = inferQuestionTenseMeta(q, null);
+      if (!meta || meta.id !== 'presentPerfectContinuous') return list;
+      if (!hasDurationLikeSignal(q.item?.prompt || '')) return list;
+
+      const base = extractBaseVerb(q.item?.prompt || '');
+      if (base && STATIVE_FORMS[base]) return list;
+
+      const strict = list.filter((ans)=> /\b(?:have|has) been [a-z]+ing\b/.test(normalize(ans)));
+      return strict.length ? strict : list;
     }
 
     function nearestAccepted(raw, accepted){
@@ -3087,6 +3196,10 @@
       t = t.replace(/\s+/g, ' ');
       t = t.replace(/^В этом предложении важно значение ситуации, а не только форма\.\s*/i, '');
       t = t.replace(/^В исходной фразе нарушена форма времени или порядок слов\.\s*/i, '');
+      t = t.replace(/^Здесь нужно различить близкие времена по смыслу\.\s*/i, '');
+      t = t.replace(/^Верный вариант\s*[—-]\s*«[^»]+»,\s*потому что смысл фразы именно такой\.\s*/i, '');
+      t = t.replace(/^Исправленный вариант:\s*«[^»]+»\.\s*/i, '');
+      t = t.replace(/^Проверь вспомогательный глагол, базовую\/ing\/V3-форму и позицию подлежащего\.\s*/i, '');
       return t.trim();
     }
 
@@ -3363,26 +3476,111 @@
       return '';
     }
 
+    function getQuickMeta(meta){
+      if (!meta || typeof QUICK !== 'object' || !QUICK) return null;
+      return QUICK[meta.id] || null;
+    }
+
+    function buildMetaFocusLine(meta, quickMeta){
+      if (quickMeta?.when) return `Логика выбора: ${quickMeta.when}.`;
+      if (meta?.subtitle) return `Логика темы: ${meta.subtitle}.`;
+      if (meta?.hint) return `Опора по теме: ${meta.hint}.`;
+      return '';
+    }
+
+    function buildContrastGuidance(item, meta){
+      const ids = Array.isArray(item?.candidateTenseIds) ? item.candidateTenseIds.filter(Boolean) : [];
+      if (ids.length !== 2 || !meta?.id) return '';
+
+      const altId = ids.find((id)=> id !== meta.id);
+      if (!altId) return '';
+
+      const altMeta = getTenseMetaById(altId);
+      const currentQuick = getQuickMeta(meta);
+      const altQuick = getQuickMeta(altMeta);
+      if (!currentQuick?.when && !altQuick?.when) return '';
+
+      const currentTitle = meta.title || meta.id;
+      const altTitle = altMeta?.title || altId;
+      const currentWhen = currentQuick?.when ? currentQuick.when : 'смотри на контекст предложения';
+      const altWhen = altQuick?.when ? altQuick.when : 'смотри на контекст предложения';
+
+      return `Как отличать варианты: ${currentTitle} -> ${currentWhen}; ${altTitle} -> ${altWhen}.`;
+    }
+
+    function buildInputTokenHint(check){
+      const raw = String(check?.rawInput || '').trim();
+      const correct = String(check?.correctText || check?.closestText || '').trim();
+      if (!raw || !correct) return '';
+
+      const diff = tokenDiff(raw, correct);
+      const parts = [];
+      if (diff.missing.length) parts.push(`не хватает ${joinReadable(diff.missing)}`);
+      if (diff.extra.length) parts.push(`лишнее ${joinReadable(diff.extra)}`);
+      if (!parts.length) return '';
+      return `По словам: ${parts.join('; ')}.`;
+    }
+
+    function buildMultiInputSlotHint(check){
+      if (!check || !Array.isArray(check.slots)) return '';
+      const wrong = check.slots.filter((slot)=> slot && slot.state === 'wrong');
+      if (!wrong.length) return '';
+      return wrong
+        .slice(0, 4)
+        .map((slot)=>`${slot.index}) нужно ${qText(slot.correct)}${slot.raw ? `, у тебя ${qText(slot.raw)}` : ''}`)
+        .join(' | ');
+    }
+
+    function buildInlineSelectSlotHint(check){
+      if (!check || !Array.isArray(check.slots)) return '';
+      const wrong = check.slots
+        .map((slot, i)=>({ index: i + 1, slot }))
+        .filter((x)=> x.slot && !x.slot.ok);
+      if (!wrong.length) return '';
+
+      return wrong
+        .slice(0, 4)
+        .map((x)=>`${x.index}) нужно ${qText(x.slot.correctText)}${x.slot.pickedText ? `, у тебя ${qText(x.slot.pickedText)}` : ''}`)
+        .join(' | ');
+    }
+
     function buildSmartExplanation(q, check){
       const item = q?.item || {};
       const lines = [];
       const meta = inferQuestionTenseMeta(q, check);
+      const quickMeta = getQuickMeta(meta);
 
       if (meta?.title){
         const label = meta.kind === 'tense' ? 'Время' : 'Тема';
         pushExplainLine(lines, `${label}: ${meta.title}.`);
       }
 
+      const focusLine = buildMetaFocusLine(meta, quickMeta);
+      if (focusLine) pushExplainLine(lines, focusLine);
+
       const signals = detectPromptSignals(item.prompt || '');
-      if (signals.length){
-        pushExplainLine(lines, `Сигналы в предложении: ${signals.slice(0, 3).join('; ')}.`);
-      }
+      const signalsLine = formatSignalsForExplain(signals);
+      if (signalsLine) pushExplainLine(lines, `Опоры в предложении: ${signalsLine}.`);
+
+      const contrastLine = buildContrastGuidance(item, meta);
+      if (contrastLine) pushExplainLine(lines, contrastLine);
 
       if (check){
         if (check.kind === 'choice'){
-          pushExplainLine(lines, `Правильно: ${qText(check.correctText)}.`);
+          const letter = Number.isInteger(check.correctIndex)
+            ? `${String.fromCharCode(97 + check.correctIndex)}) `
+            : '';
+          const correctAnswer = `${letter}${String(check.correctText || '').trim()}`.trim();
+          if (correctAnswer) pushExplainLine(lines, `Правильный вариант: ${qText(correctAnswer)}.`);
+          if (!check.ok && check.selectedText) pushExplainLine(lines, `Твой выбор: ${qText(check.selectedText)}.`);
         } else if (check.kind === 'input' || check.kind === 'correction'){
-          pushExplainLine(lines, `Правильно: ${qText(check.correctText || check.closestText)}.`);
+          const right = String(check.correctText || check.closestText || '').trim();
+          if (right) pushExplainLine(lines, `Правильно: ${qText(right)}.`);
+          if (check.state === 'almost') pushExplainLine(lines, 'Есть мелкая опечатка, но грамматическая форма выбрана верно.');
+          if (!check.ok && check.rawInput) pushExplainLine(lines, `Твой ответ: ${qText(check.rawInput)}.`);
+
+          const tokenHint = buildInputTokenHint(check);
+          if (tokenHint) pushExplainLine(lines, tokenHint);
 
           const stativeIssue = detectStativeContinuousIssue(item.prompt || '', check.correctText || check.closestText || '');
           if (stativeIssue){
@@ -3397,7 +3595,10 @@
           if (check.ok){
             pushExplainLine(lines, `Верно: нужно выбрать ${joinReadable(check.correctLabels)}.`);
           } else {
+            if (check.selectedLabels?.length) pushExplainLine(lines, `Ты выбрал: ${joinReadable(check.selectedLabels)}.`);
             pushExplainLine(lines, `Правильный набор: ${joinReadable(check.correctLabels)}.`);
+            if (check.missingLabels?.length) pushExplainLine(lines, `Не хватает: ${joinReadable(check.missingLabels)}.`);
+            if (check.extraLabels?.length) pushExplainLine(lines, `Лишние варианты: ${joinReadable(check.extraLabels)}.`);
           }
         } else if (check.kind === 'match'){
           if (check.ok){
@@ -3412,10 +3613,17 @@
             if (check.anyAlmost) pushExplainLine(lines, 'Есть мелкие опечатки, но логика формы верная.');
           } else {
             if (check.correctParts?.length) pushExplainLine(lines, `Правильные формы: ${joinReadable(check.correctParts)}.`);
+            const slotHint = buildMultiInputSlotHint(check);
+            if (slotHint) pushExplainLine(lines, `По частям: ${slotHint}.`);
           }
         } else if (check.kind === 'inline_select'){
-          if (check.ok) pushExplainLine(lines, `Верно: ${check.correctCount}/${check.total}.`);
-          else pushExplainLine(lines, `Результат: ${check.correctCount}/${check.total}.`);
+          if (check.ok){
+            pushExplainLine(lines, `Верно: ${check.correctCount}/${check.total}.`);
+          } else {
+            pushExplainLine(lines, `Результат: ${check.correctCount}/${check.total}.`);
+            const slotHint = buildInlineSelectSlotHint(check);
+            if (slotHint) pushExplainLine(lines, `Где ошибка: ${slotHint}.`);
+          }
         }
 
         const resolved = buildResolvedSentence(q, check, meta);
@@ -3424,13 +3632,14 @@
         }
       }
 
-      const quickMeta = (meta && typeof QUICK === 'object' && QUICK && QUICK[meta.id]) ? QUICK[meta.id] : null;
       if (quickMeta?.formula){
         pushExplainLine(lines, `Формула: ${quickMeta.formula}.`);
+      } else if (meta?.hint && lines.length < 7){
+        pushExplainLine(lines, `Подсказка по теме: ${meta.hint}.`);
       }
 
       const base = cleanLegacyExplain(item.explain || '');
-      if (lines.length < 3 && base){
+      if (base && lines.length < 8){
         pushExplainLine(lines, base);
       }
 
@@ -3441,7 +3650,7 @@
     function renderChoice(q){
       const p = document.createElement('div');
       p.className = 'sh-run-prompt';
-      p.textContent = q.item.prompt;
+      p.textContent = String(q.item.prompt || '').trim() || 'Выбери правильный вариант.';
       elCard.appendChild(p);
 
       const list = document.createElement('div');
@@ -3467,7 +3676,7 @@
     function renderInput(q){
       const p = document.createElement('div');
       p.className = 'sh-run-prompt';
-      p.textContent = q.item.prompt;
+      p.textContent = String(q.item.prompt || '').trim() || 'Введи правильный ответ.';
       elCard.appendChild(p);
 
       const row = document.createElement('div');
@@ -3480,7 +3689,14 @@
       input.type = 'text';
       input.autocomplete = 'off';
       input.spellcheck = false;
-      input.placeholder = 'Answer...';
+      const hasBlank = /_{2,}/.test(String(q?.item?.prompt || ''));
+      if (q.kind === 'correction'){
+        input.placeholder = 'исправь: фрагмент или всё предложение';
+      } else if (hasBlank){
+        input.placeholder = 'введи пропущенную форму';
+      } else {
+        input.placeholder = 'введи ответ';
+      }
 
       row.appendChild(input);
       elCard.appendChild(row);
@@ -3490,7 +3706,7 @@
     function renderMulti(q){
       const p = document.createElement('div');
       p.className = 'sh-run-prompt';
-      p.textContent = q.item.prompt;
+      p.textContent = String(q.item.prompt || '').trim() || 'Выбери все подходящие варианты.';
       elCard.appendChild(p);
 
       const list = document.createElement('div');
@@ -3530,7 +3746,7 @@
     function renderMatch(q){
       const p = document.createElement('div');
       p.className = 'sh-run-prompt';
-      p.textContent = q.item.prompt;
+      p.textContent = String(q.item.prompt || '').trim() || 'Соедини элементы из левого столбца с подходящими вариантами справа.';
       elCard.appendChild(p);
 
       const pairs = q.item.pairs || [];
@@ -3576,7 +3792,7 @@
     function renderMultiInput(q){
       const p = document.createElement('div');
       p.className = 'sh-run-prompt';
-      p.textContent = q.item.prompt;
+      p.textContent = String(q.item.prompt || '').trim() || 'Заполни все поля правильными формами.';
       elCard.appendChild(p);
 
       const row = document.createElement('div');
@@ -3591,7 +3807,7 @@
         input.type = 'text';
         input.autocomplete = 'off';
         input.spellcheck = false;
-        input.placeholder = '';
+        input.placeholder = String(spec?.placeholder || '').trim() || `часть ${i + 1}`;
         input.style.minWidth = '220px';
         input.setAttribute('data-idx', String(i));
         row.appendChild(input);
@@ -3675,29 +3891,31 @@
       if (btnDontKnow) btnDontKnow.disabled = false;
       if (elExplain){ elExplain.hidden = true; elExplain.textContent = ''; }
       resetPerQuestionState();
-      setFeedback('idle', 'ready', 'выбери ответ или введи ответ и нажми check');
+      const q = queue[idx];
+      setFeedback('idle', 'ready', readyLineForQuestion(q));
 
+      // progress
+      try{
+        const bar = runWrap.querySelector('#shTRunProgress > div');
+        if (bar){
+          const pct = Math.round(((idx) / Math.max(1, queue.length)) * 100);
+          bar.style.width = pct + '%';
+        }
+      } catch(_){ }
 
-const q = queue[idx];
+      try{
+        const hintEl = runWrap.querySelector('#shTRunHint');
+        if (hintEl){
+          const hintText = buildQuestionHintText(q);
+          hintEl.hidden = !hintText;
+          hintEl.textContent = hintText || '';
+        }
+      } catch(_){ }
 
-// progress
-try{
-  const bar = runWrap.querySelector('#shTRunProgress > div');
-  if (bar){
-    const pct = Math.round(((idx) / Math.max(1, queue.length)) * 100);
-    bar.style.width = pct + '%';
-  }
-} catch(_){}
-try{
-  const hintEl = runWrap.querySelector('#shTRunHint');
-  if (hintEl){
-    hintEl.hidden = true;
-    hintEl.textContent = '';
-  }
-} catch(_){}      elEx.textContent = `exercise: ${q.exTitle}`;
+      elEx.textContent = `exercise: ${q.exTitle}`;
       elQ.textContent  = `question: ${idx+1}/${queue.length}`;
 
-      elInstr.textContent = q.item.instruction || '';
+      elInstr.textContent = normalizeInstructionText(q);
       elCard.innerHTML = '';
 
       if (q.kind === 'choice'){
@@ -3756,7 +3974,9 @@ try{
         } else {
           mistakesSet.add(q.item.id);
           const corr = String.fromCharCode(97 + q.item.correctIndex);
-          setFeedback('wrong', 'no', cbShowAfterLocal.checked ? `неверно (правильно: ${corr})` : 'неверно');
+          const corrText = q.item.options?.[q.item.correctIndex] || '';
+          const corrLabel = corrText ? `${corr}) ${corrText}` : corr;
+          setFeedback('wrong', 'no', cbShowAfterLocal.checked ? `неверно (правильно: ${corrLabel})` : 'неверно');
         }
         lastCheck = {
           kind: 'choice',
@@ -3786,10 +4006,16 @@ try{
           acceptedList = [...accepted, ...extra].filter(Boolean);
         }
 
+        if (q.kind === 'input'){
+          acceptedList = filterAcceptedByPromptHeuristics(q, acceptedList);
+        }
+
+        const candidateAnswers = acceptedList.length ? acceptedList : accepted;
+
         countAttempt(q);
-        const res = checkInput(raw, acceptedList);
-        const nearest = nearestAccepted(raw, acceptedList.length ? acceptedList : accepted);
-        const primaryCorrect = (accepted && accepted[0]) ? accepted[0] : (nearest?.text || '');
+        const res = checkInput(raw, candidateAnswers);
+        const nearest = nearestAccepted(raw, candidateAnswers);
+        const primaryCorrect = candidateAnswers[0] || (nearest?.text || '');
         if (res.state === 'correct'){
           exCorrect[q.exId] = (exCorrect[q.exId] || 0) + 1;
           mistakesSet.delete(q.item.id);
@@ -3807,7 +4033,8 @@ try{
           input.classList.remove('is-ok');
           input.classList.add('is-bad');
           if (cbShowAfterLocal.checked){
-            setFeedback('wrong', 'no', `неверно (правильно: ${accepted[0] || ''})`);
+            const variants = (candidateAnswers || []).slice(0, 3).filter(Boolean).join(' / ');
+            setFeedback('wrong', 'no', `неверно (правильно: ${variants || ''})`);
           } else {
             setFeedback('wrong', 'no', 'неверно');
           }
@@ -3960,8 +4187,13 @@ try{
           setFeedback('correct', 'ok', anyAlmost ? 'верно (опечатка)' : 'верно');
         } else {
           mistakesSet.add(q.item.id);
-          const firstAccepted = (specs[0] && specs[0].accepted && specs[0].accepted[0]) ? specs[0].accepted[0] : '';
-          setFeedback('wrong', 'no', cbShowAfterLocal.checked ? `неверно (пример: ${firstAccepted} ...)` : 'неверно');
+          if (cbShowAfterLocal.checked){
+            const corrParts = slots.map((slot)=> slot.correct).filter(Boolean);
+            const corrText = corrParts.join(' ; ');
+            setFeedback('wrong', 'no', `неверно (правильные формы: ${corrText})`);
+          } else {
+            setFeedback('wrong', 'no', 'неверно');
+          }
         }
 
         lastCheck = {
@@ -4390,26 +4622,51 @@ try{
   function deriveCorrectionKeywords(wrongRaw, correctRaw){
     const wrong = tokensNormalized(wrongRaw);
     const correct = tokensNormalized(correctRaw);
+    const out = [];
 
+    if (!correct.length) return out;
+
+    // Bag-diff: tokens that should appear in the corrected answer.
     const counts = Object.create(null);
-    for (const w of wrong){
-      counts[w] = (counts[w] || 0) + 1;
-    }
-
-    const extra = [];
+    for (const w of wrong) counts[w] = (counts[w] || 0) + 1;
+    const extraTokens = [];
     for (const c of correct){
       if (counts[c] > 0) counts[c] -= 1;
-      else extra.push(c);
+      else extraTokens.push(c);
+    }
+    if (extraTokens.length) out.push(extraTokens.join(' '));
+
+    // Span-diff: changed chunk + nearest context on both sides.
+    let left = 0;
+    while (left < wrong.length && left < correct.length && wrong[left] === correct[left]) left += 1;
+
+    let rightWrong = wrong.length - 1;
+    let rightCorrect = correct.length - 1;
+    while (rightWrong >= left && rightCorrect >= left && wrong[rightWrong] === correct[rightCorrect]){
+      rightWrong -= 1;
+      rightCorrect -= 1;
     }
 
-    // If no token differences (often just word order), accept the start of the correct sentence/question.
-    if (extra.length === 0 && correct.length){
-      extra.push(correct[0]);
-      if (correct.length >= 2) extra.push(correct[0] + ' ' + correct[1]);
-      if (correct.length >= 3) extra.push(correct[0] + ' ' + correct[1] + ' ' + correct[2]);
+    const changed = correct.slice(left, rightCorrect + 1);
+    if (changed.length){
+      const changedText = changed.join(' ');
+      out.push(changedText);
+
+      const prev = left > 0 ? correct[left - 1] : '';
+      const next = rightCorrect + 1 < correct.length ? correct[rightCorrect + 1] : '';
+      if (prev) out.push(`${prev} ${changedText}`);
+      if (next) out.push(`${changedText} ${next}`);
+      if (prev && next) out.push(`${prev} ${changedText} ${next}`);
     }
 
-    return uniq(extra);
+    // Fallback for reorder-only or tiny fixes: accept beginning chunks.
+    if (out.length === 0 && correct.length){
+      out.push(correct[0]);
+      if (correct.length >= 2) out.push(`${correct[0]} ${correct[1]}`);
+      if (correct.length >= 3) out.push(`${correct[0]} ${correct[1]} ${correct[2]}`);
+    }
+
+    return uniq(out);
   }
 
   function levenshtein(a, b){

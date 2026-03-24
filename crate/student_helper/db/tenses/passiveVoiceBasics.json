@@ -257,9 +257,9 @@
           {
             "id": "pvb_f_7",
             "instruction": "Вставь форму",
-            "prompt": "The old building ____ (pull down).",
+            "prompt": "It was decided that the old building ____ (pull down).",
             "accepted": ["should be pulled down"],
-            "explain": "Modal passive: should + be + V3."
+            "explain": "После конструкции It was decided that... естественно: should be + V3."
           },
           {
             "id": "pvb_f_8",

@@ -1265,18 +1265,16 @@
             "instruction": "Вставь форму",
             "prompt": "She ____ (worry) about this for two months.",
             "accepted": [
-              "has been worrying",
-              "has worried"
+              "has been worrying"
             ],
-            "explain": "Для длительного процесса предпочтительно has been worrying; has worried допустимо как state-like usage."
+            "explain": "Длительность процесса (for two months) -> has been worrying."
           },
           {
             "id": "ppc_photo_build_3",
             "instruction": "Вставь форму",
             "prompt": "She ____ (study) the driver's manual for hours.",
             "accepted": [
-              "has been studying",
-              "has studied"
+              "has been studying"
             ],
             "explain": "Процесс в фокусе -> has been studying (PPC)."
           },
