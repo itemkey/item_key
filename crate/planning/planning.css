@@ -2058,3 +2058,105 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* =============================
+   Planning minimal board refresh
+   ============================= */
+
+.page-planning .planning-shell{
+  width: min(1240px, 95vw);
+  gap: 12px;
+}
+
+.page-planning .planning-head{
+  align-items: flex-end;
+  border-bottom: 1px solid rgba(0,0,0,.10);
+  padding-bottom: 10px;
+}
+
+.page-planning .planning-title .kicker{
+  letter-spacing: 3px;
+  color: rgba(0,0,0,.44);
+}
+
+.page-planning .planning-title h1{
+  font-size: 13px;
+  letter-spacing: 3.4px;
+}
+
+.page-planning .planning-actions{
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  width: min(760px, 100%);
+  gap: 7px;
+}
+
+.page-planning .planning-actions .btn,
+.page-planning .planning-toolbar .btn,
+.page-planning .planning-toolbar .ctl,
+.page-planning .scope-switch__btn{
+  min-height: 38px;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.page-planning .planning-toolbar{
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.page-planning .planning-toolbar > #projectScope{
+  grid-column: 1 / -1;
+}
+
+.page-planning .planning-content{
+  min-height: 60vh;
+}
+
+.page-planning .column{
+  background: #ffffff;
+  border-color: rgba(0,0,0,.11);
+}
+
+.page-planning .card{
+  box-shadow: none;
+  border-color: rgba(0,0,0,.12);
+  background: #ffffff;
+}
+
+.page-planning .card:hover{
+  transform: none;
+  box-shadow: none;
+  border-color: rgba(0,0,0,.24);
+}
+
+.page-planning .card__name{
+  letter-spacing: .8px;
+}
+
+.page-planning .card__actions .btn{
+  min-height: 32px;
+  padding: 0 10px;
+}
+
+.page-planning #viewSelect{
+  display: none !important;
+}
+
+@media (max-width: 980px){
+  .page-planning .planning-actions{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .page-planning .planning-toolbar{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px){
+  .page-planning .planning-actions,
+  .page-planning .planning-toolbar{
+    grid-template-columns: 1fr;
+  }
+}

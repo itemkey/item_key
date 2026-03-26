@@ -387,7 +387,13 @@
         <a class="crate-card" href="crate/planning/planning.html">
           <div class="crate-card__kicker" data-i18n="module">module</div>
           <h2 class="crate-card__name" id="cardPlanningTitle">планирование</h2>
-          <p class="crate-card__meta" id="cardPlanningMeta">пока пусто. здесь будет план / трекер / расписание.</p>
+          <p class="crate-card__meta" id="cardPlanningMeta">чистая доска проектов и задач без расписания.</p>
+        </a>
+
+        <a class="crate-card" href="crate/schedule/schedule.html">
+          <div class="crate-card__kicker" data-i18n="module">module</div>
+          <h2 class="crate-card__name" id="cardScheduleTitle">расписание</h2>
+          <p class="crate-card__meta" id="cardScheduleMeta">сегодня, общее расписание и умный помощник с дедлайнами.</p>
         </a>
 
         <a class="crate-card" href="crate/student_helper/student_helper.html">
@@ -428,7 +434,9 @@
           notesTitle: 'заметки',
           notesMeta: 'удобный менеджер заметок: категории/подкатегории, форматирование, картинки, авто-сохранение и “Прошептать” в whisperer.',
           planningTitle: 'планирование',
-          planningMeta: 'пока пусто. здесь будет план / трекер / расписание.',
+          planningMeta: 'чистая доска проектов и задач без расписания.',
+          scheduleTitle: 'расписание',
+          scheduleMeta: 'сегодня, общее расписание и умный помощник с дедлайнами.',
           studyTitle: 'Учебный центр',
           studyMeta: 'модуль активен. тренажер / база / поиск.',
           whispererTitle: 'прошептать',
@@ -453,7 +461,9 @@
           notesTitle: 'notes',
           notesMeta: 'convenient notes manager: categories/subcategories, formatting, images, auto-save, and “Whisper it” to whisperer.',
           planningTitle: 'planning',
-          planningMeta: 'empty for now. planning / tracker / schedule will appear here.',
+          planningMeta: 'clean board for projects and tasks without scheduling.',
+          scheduleTitle: 'schedule',
+          scheduleMeta: 'today focus, full calendar, and smart assistant built around deadlines.',
           studyTitle: 'Study Center',
           studyMeta: 'module is active. trainer / knowledge base / search.',
           whispererTitle: 'whisperer',
@@ -502,6 +512,8 @@
         byId('cardNotesMeta').textContent = t.notesMeta;
         byId('cardPlanningTitle').textContent = t.planningTitle;
         byId('cardPlanningMeta').textContent = t.planningMeta;
+        byId('cardScheduleTitle').textContent = t.scheduleTitle;
+        byId('cardScheduleMeta').textContent = t.scheduleMeta;
         byId('cardStudyTitle').textContent = t.studyTitle;
         byId('cardStudyMeta').textContent = t.studyMeta;
         byId('cardWhispererTitle').textContent = t.whispererTitle;

@@ -9,7 +9,7 @@
     },
     {
       "type": "text",
-      "text": "Present Simple — время фактов и регулярности. Это «точка» на линии времени: привычка, расписание, истина, правило."
+      "text": "Present Simple — время фактов и регулярности. Это «точка» на линии времени: привычка, расписание, истина, правило, стабильное состояние."
     },
     {
       "type": "highlight",
@@ -47,12 +47,162 @@
     },
     {
       "type": "highlight",
-      "title": "Правило -s/-es (3-е лицо ед.ч.)",
+      "title": "Короткие ответы",
       "lines": [
-        "work → works, live → lives, play → plays",
-        "watch / go / do → watches / goes / does (-es)",
-        "study → studies (y → ies после согласной)",
-        "have → has (исключение)"
+        "Do you live here? → Yes, I do. / No, I don't.",
+        "Does she work on Sundays? → Yes, she does. / No, she doesn't.",
+        "Is he at home? → Yes, he is. / No, he isn't.",
+        "Помни: в вопросах с do/does смысловой глагол всегда в V1 (Does she work?, не works)."
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "3 ключевые зоны использования",
+      "columns": [
+        "Сфера",
+        "Когда",
+        "Примеры"
+      ],
+      "rows": [
+        [
+          "повторяющиеся действия",
+          "рутина, привычки, регулярность",
+          "I get up at 7. / She drinks coffee every morning."
+        ],
+        [
+          "общеизвестные факты",
+          "истины, правила, научные факты",
+          "The Earth revolves around the Sun. / Water boils at 100°C."
+        ],
+        [
+          "расписания",
+          "транспорт, уроки, официальные графики",
+          "The bus departs at 9 o'clock. / The lesson starts at 9."
+        ]
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Правила написания окончания -(E)S"
+    },
+    {
+      "type": "text",
+      "text": "Окончание добавляется только в 3-м лице ед. числа (he/she/it). Для I/you/we/they всегда базовая форма: work, play, go."
+    },
+    {
+      "type": "table",
+      "caption": "Как выбрать -s / -es / -ies",
+      "columns": [
+        "Случай",
+        "Что добавляем",
+        "Примеры"
+      ],
+      "rows": [
+        [
+          "обычное окончание",
+          "-s",
+          "look → looks, call → calls, play → plays"
+        ],
+        [
+          "-ss, -x, -z, -sh, -ch, -tch",
+          "-es",
+          "miss → misses, fix → fixes, buzz → buzzes, wash → washes, watch → watches"
+        ],
+        [
+          "глаголы на -o",
+          "-es",
+          "go → goes, do → does"
+        ],
+        [
+          "согласная + y",
+          "y → ies",
+          "try → tries, study → studies, hurry → hurries, cry → cries"
+        ],
+        [
+          "гласная + y",
+          "только -s",
+          "buy → buys, enjoy → enjoys, play → plays"
+        ],
+        [
+          "have",
+          "исключение: has",
+          "have → has"
+        ]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Алгоритм за 5 секунд",
+      "lines": [
+        "1) Сначала проверь подлежащее: he/she/it или нет.",
+        "2) Если НЕ he/she/it → оставляй V1: I/you/we/they work.",
+        "3) Если he/she/it → добавляй -s/-es/-ies по таблице.",
+        "4) В отрицании и вопросе с does форма снова V1: She doesn't work. Does she work?"
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        {
+          "en": "She plays tennis every Sunday.",
+          "ru": "play → plays (обычное -s)."
+        },
+        {
+          "en": "Lucy washes her hair every day.",
+          "ru": "wash → washes (-es после -sh)."
+        },
+        {
+          "en": "John never cries.",
+          "ru": "cry → cries (согласная + y)."
+        },
+        {
+          "en": "My mother always says that love is more important than money.",
+          "ru": "say → says (обычное -s)."
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Отрицание и вопросы: do/does и be"
+    },
+    {
+      "type": "table",
+      "caption": "Две разные модели",
+      "columns": [
+        "Тип",
+        "Утверждение",
+        "Отрицание",
+        "Вопрос"
+      ],
+      "rows": [
+        [
+          "обычный глагол",
+          "She works.",
+          "She doesn't work.",
+          "Does she work?"
+        ],
+        [
+          "be (am/is/are)",
+          "He is a student.",
+          "He isn't a student.",
+          "Is he a student?"
+        ],
+        [
+          "have (обладание)",
+          "He has a car.",
+          "He doesn't have a car.",
+          "Does he have a car?"
+        ]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Позиция наречий частоты",
+      "lines": [
+        "always / usually / often / never ставим перед смысловым глаголом: She always comes early.",
+        "С глаголом be наречие идет после be: She is always polite.",
+        "Маркер every day/week/year чаще стоит в конце: We train every day.",
+        "never уже содержит отрицание, не добавляй don't/doesn't: He never drinks coffee."
       ]
     },
     {
@@ -87,7 +237,7 @@
     },
     {
       "type": "text",
-      "text": "1) забывают -s/-es в he/she/it. 2) ставят do/does в утверждении. 3) используют Present Continuous для фактов/привычек."
+      "text": "1) забывают -s/-es в he/she/it. 2) оставляют -s после does (Does she works? -> Does she work?). 3) путают do/does с be (She doesn't happy -> She isn't happy). 4) используют Present Continuous для фактов/привычек."
     },
     {
       "type": "examples",
@@ -107,6 +257,14 @@
         {
           "en": "He doesn't like coffee.",
           "ru": "Ему не нравится кофе (состояние)."
+        },
+        {
+          "en": "She isn't a doctor.",
+          "ru": "Она не врач (с be не используем do/does)."
+        },
+        {
+          "en": "Does he speak English?",
+          "ru": "Он говорит по-английски? (после does только V1)."
         }
       ]
     },
@@ -959,6 +1117,888 @@
             "correctIndex": 1,
             "correctTenseId": "presentContinuous",
             "explain": "Здесь нужно различить близкие времена по смыслу. Правильный выбор — «Present Continuous»: именно это время лучше совпадает с контекстом фразы. В подсказках контекста: маркер Perfect."
+          }
+        ]
+      },
+      {
+        "id": "photo_endings_selector",
+        "goal": "formula",
+        "title": "Фото-дрилл: окончания -s/-es/-ies",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "prs_ph_end_1",
+            "instruction": "Выбери окончание для he/she/it",
+            "prompt": "brush -> ?",
+            "options": [
+              "-s",
+              "-ies",
+              "-es"
+            ],
+            "correctIndex": 2,
+            "explain": "После -sh добавляем -es: brush -> brushes."
+          },
+          {
+            "id": "prs_ph_end_2",
+            "instruction": "Выбери окончание",
+            "prompt": "play -> ?",
+            "options": [
+              "-s",
+              "-es",
+              "-ies"
+            ],
+            "correctIndex": 0,
+            "explain": "Обычный случай: play -> plays."
+          },
+          {
+            "id": "prs_ph_end_3",
+            "instruction": "Выбери окончание",
+            "prompt": "watch -> ?",
+            "options": [
+              "-s",
+              "-es",
+              "-ies"
+            ],
+            "correctIndex": 1,
+            "explain": "После -ch добавляем -es: watch -> watches."
+          },
+          {
+            "id": "prs_ph_end_4",
+            "instruction": "Выбери окончание",
+            "prompt": "study -> ?",
+            "options": [
+              "-s",
+              "-es",
+              "-ies"
+            ],
+            "correctIndex": 2,
+            "explain": "Согласная + y: y меняется на ies -> study -> studies."
+          },
+          {
+            "id": "prs_ph_end_5",
+            "instruction": "Выбери окончание",
+            "prompt": "buy -> ?",
+            "options": [
+              "-s",
+              "-es",
+              "-ies"
+            ],
+            "correctIndex": 0,
+            "explain": "Гласная + y: только -s -> buy -> buys."
+          },
+          {
+            "id": "prs_ph_end_6",
+            "instruction": "Выбери окончание",
+            "prompt": "go -> ?",
+            "options": [
+              "-s",
+              "-es",
+              "-ies"
+            ],
+            "correctIndex": 1,
+            "explain": "Глаголы на -o обычно получают -es: go -> goes."
+          },
+          {
+            "id": "prs_ph_end_7",
+            "instruction": "Выбери окончание",
+            "prompt": "pass -> ?",
+            "options": [
+              "-s",
+              "-es",
+              "-ies"
+            ],
+            "correctIndex": 1,
+            "explain": "После -ss добавляем -es: pass -> passes."
+          },
+          {
+            "id": "prs_ph_end_8",
+            "instruction": "Выбери окончание",
+            "prompt": "fly -> ?",
+            "options": [
+              "-s",
+              "-es",
+              "-ies"
+            ],
+            "correctIndex": 2,
+            "explain": "Согласная + y: fly -> flies."
+          },
+          {
+            "id": "prs_ph_end_9",
+            "instruction": "Выбери окончание",
+            "prompt": "enjoy -> ?",
+            "options": [
+              "-s",
+              "-es",
+              "-ies"
+            ],
+            "correctIndex": 0,
+            "explain": "После гласной перед y ставим только -s: enjoy -> enjoys."
+          },
+          {
+            "id": "prs_ph_end_10",
+            "instruction": "Выбери правильную форму",
+            "prompt": "have (he/she/it) -> ?",
+            "options": [
+              "has",
+              "haves",
+              "hases"
+            ],
+            "correctIndex": 0,
+            "explain": "Это исключение: have -> has."
+          }
+        ]
+      },
+      {
+        "id": "photo_third_person_gapfill",
+        "goal": "formula",
+        "title": "Фото-дрилл: вставь форму глагола",
+        "kind": "input",
+        "items": [
+          {
+            "id": "prs_ph_fill_1",
+            "instruction": "Вставь форму глагола",
+            "prompt": "She ____ (play) tennis every Sunday.",
+            "accepted": [
+              "plays"
+            ],
+            "explain": "She -> 3-е лицо ед. числа, поэтому plays."
+          },
+          {
+            "id": "prs_ph_fill_2",
+            "instruction": "Вставь форму глагола",
+            "prompt": "He ____ (buy) a cup of coffee every morning.",
+            "accepted": [
+              "buys"
+            ],
+            "explain": "buy -> buys (гласная + y, только -s)."
+          },
+          {
+            "id": "prs_ph_fill_3",
+            "instruction": "Вставь форму глагола",
+            "prompt": "Julie ____ (study) French at school.",
+            "accepted": [
+              "studies"
+            ],
+            "explain": "study -> studies (согласная + y -> ies)."
+          },
+          {
+            "id": "prs_ph_fill_4",
+            "instruction": "Вставь форму глагола",
+            "prompt": "Luke ____ (try) hard to be polite.",
+            "accepted": [
+              "tries"
+            ],
+            "explain": "try -> tries (согласная + y -> ies)."
+          },
+          {
+            "id": "prs_ph_fill_5",
+            "instruction": "Вставь форму глагола",
+            "prompt": "She ____ (enjoy) going swimming.",
+            "accepted": [
+              "enjoys"
+            ],
+            "explain": "enjoy -> enjoys (гласная + y, только -s)."
+          },
+          {
+            "id": "prs_ph_fill_6",
+            "instruction": "Вставь форму глагола",
+            "prompt": "Lucy ____ (wash) her hair every day.",
+            "accepted": [
+              "washes"
+            ],
+            "explain": "После -sh ставим -es: washes."
+          },
+          {
+            "id": "prs_ph_fill_7",
+            "instruction": "Вставь форму глагола",
+            "prompt": "John never ____ (cry).",
+            "accepted": [
+              "cries"
+            ],
+            "explain": "cry -> cries (согласная + y)."
+          },
+          {
+            "id": "prs_ph_fill_8",
+            "instruction": "Вставь форму глагола",
+            "prompt": "My mother always ____ (say) that love is more important than money.",
+            "accepted": [
+              "says"
+            ],
+            "explain": "Обычное -s: say -> says."
+          },
+          {
+            "id": "prs_ph_fill_9",
+            "instruction": "Вставь форму глагола",
+            "prompt": "I hope Julie ____ (pass) the exam.",
+            "accepted": [
+              "passes"
+            ],
+            "explain": "После -ss добавляем -es: pass -> passes."
+          },
+          {
+            "id": "prs_ph_fill_10",
+            "instruction": "Вставь форму глагола",
+            "prompt": "The plane ____ (fly) low over the airport.",
+            "accepted": [
+              "flies"
+            ],
+            "explain": "fly -> flies (согласная + y)."
+          }
+        ]
+      },
+      {
+        "id": "photo_do_does_choice",
+        "goal": "formula",
+        "title": "Фото-дрилл: do/does и форма глагола",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "prs_ph_aux_1",
+            "instruction": "Выбери лучший вариант",
+            "prompt": "I ____ tea.",
+            "options": [
+              "like",
+              "likes",
+              "am liking"
+            ],
+            "correctIndex": 0,
+            "explain": "С подлежащим I используем базовую форму: I like tea."
+          },
+          {
+            "id": "prs_ph_aux_2",
+            "instruction": "Выбери лучший вариант",
+            "prompt": "She ____ two brothers.",
+            "options": [
+              "have",
+              "has",
+              "does have"
+            ],
+            "correctIndex": 1,
+            "explain": "В утвердительном предложении с she: has."
+          },
+          {
+            "id": "prs_ph_aux_3",
+            "instruction": "Выбери лучший вариант",
+            "prompt": "Tom ____ work until 10 today.",
+            "options": [
+              "don't",
+              "doesn't",
+              "isn't"
+            ],
+            "correctIndex": 1,
+            "explain": "С he/she/it в отрицании используем doesn't + V1."
+          },
+          {
+            "id": "prs_ph_aux_4",
+            "instruction": "Выбери лучший вариант",
+            "prompt": "____ you play an instrument?",
+            "options": [
+              "Do",
+              "Does",
+              "Are"
+            ],
+            "correctIndex": 0,
+            "explain": "С you в вопросе нужен вспомогательный do."
+          },
+          {
+            "id": "prs_ph_aux_5",
+            "instruction": "Выбери лучший вариант",
+            "prompt": "The museum ____ at 10 o'clock.",
+            "options": [
+              "open",
+              "opens",
+              "is opening"
+            ],
+            "correctIndex": 1,
+            "explain": "Расписание и 3-е лицо ед. числа: opens."
+          },
+          {
+            "id": "prs_ph_aux_6",
+            "instruction": "Выбери лучший вариант",
+            "prompt": "Peter and Megan often ____ to the cinema.",
+            "options": [
+              "go",
+              "goes",
+              "are going"
+            ],
+            "correctIndex": 0,
+            "explain": "С they-подобным подлежащим используем V1: go."
+          },
+          {
+            "id": "prs_ph_aux_7",
+            "instruction": "Выбери лучший вариант",
+            "prompt": "John ____ to bed very late.",
+            "options": [
+              "go",
+              "goes",
+              "is going"
+            ],
+            "correctIndex": 1,
+            "explain": "John = he, поэтому goes."
+          },
+          {
+            "id": "prs_ph_aux_8",
+            "instruction": "Выбери лучший вариант",
+            "prompt": "What time ____ you get home in the morning?",
+            "options": [
+              "do",
+              "does",
+              "are"
+            ],
+            "correctIndex": 0,
+            "explain": "С you в вопросе используем do."
+          },
+          {
+            "id": "prs_ph_aux_9",
+            "instruction": "Выбери лучший вариант",
+            "prompt": "What language ____ she speak?",
+            "options": [
+              "do",
+              "does",
+              "is"
+            ],
+            "correctIndex": 1,
+            "explain": "С she в вопросе нужен does + V1."
+          },
+          {
+            "id": "prs_ph_aux_10",
+            "instruction": "Выбери лучший вариант",
+            "prompt": "My son never ____ cartoons.",
+            "options": [
+              "watch",
+              "watches",
+              "is watching"
+            ],
+            "correctIndex": 1,
+            "explain": "My son = he, в Present Simple: watches."
+          }
+        ]
+      },
+      {
+        "id": "photo_negative_transform",
+        "goal": "formula",
+        "title": "Фото-дрилл: сделай отрицание",
+        "kind": "input",
+        "items": [
+          {
+            "id": "prs_ph_neg_1",
+            "instruction": "Переделай в отрицание",
+            "prompt": "He is a student. -> (negative)",
+            "accepted": [
+              "He isn't a student.",
+              "He is not a student."
+            ],
+            "explain": "С глаголом be используем isn't / is not."
+          },
+          {
+            "id": "prs_ph_neg_2",
+            "instruction": "Переделай в отрицание",
+            "prompt": "Peter works in an office. -> (negative)",
+            "accepted": [
+              "Peter doesn't work in an office.",
+              "Peter does not work in an office."
+            ],
+            "explain": "С he/she/it в отрицании используем doesn't + V1."
+          },
+          {
+            "id": "prs_ph_neg_3",
+            "instruction": "Переделай в отрицание",
+            "prompt": "My parents live in Arizona. -> (negative)",
+            "accepted": [
+              "My parents don't live in Arizona.",
+              "My parents do not live in Arizona."
+            ],
+            "explain": "С they/my parents используем don't + V1."
+          },
+          {
+            "id": "prs_ph_neg_4",
+            "instruction": "Переделай в отрицание",
+            "prompt": "Suzan likes cats. -> (negative)",
+            "accepted": [
+              "Suzan doesn't like cats.",
+              "Suzan does not like cats."
+            ],
+            "explain": "После doesn't глагол возвращается в V1: like."
+          },
+          {
+            "id": "prs_ph_neg_5",
+            "instruction": "Переделай в отрицание",
+            "prompt": "He has brothers and sisters. -> (negative)",
+            "accepted": [
+              "He doesn't have any brothers or sisters.",
+              "He does not have any brothers or sisters."
+            ],
+            "explain": "Современная базовая модель: doesn't have."
+          },
+          {
+            "id": "prs_ph_neg_6",
+            "instruction": "Переделай в отрицание",
+            "prompt": "She speaks three languages. -> (negative)",
+            "accepted": [
+              "She doesn't speak three languages.",
+              "She does not speak three languages."
+            ],
+            "explain": "doesn't + speak (без -s)."
+          },
+          {
+            "id": "prs_ph_neg_7",
+            "instruction": "Переделай в отрицание",
+            "prompt": "John and I want to be musicians. -> (negative)",
+            "accepted": [
+              "John and I don't want to be musicians.",
+              "John and I do not want to be musicians."
+            ],
+            "explain": "С составным подлежащим John and I -> don't."
+          },
+          {
+            "id": "prs_ph_neg_8",
+            "instruction": "Переделай в отрицание",
+            "prompt": "They play tennis. -> (negative)",
+            "accepted": [
+              "They don't play tennis.",
+              "They do not play tennis."
+            ],
+            "explain": "С they используем don't + V1."
+          },
+          {
+            "id": "prs_ph_neg_9",
+            "instruction": "Переделай в отрицание",
+            "prompt": "She gets home late. -> (negative)",
+            "accepted": [
+              "She doesn't get home late.",
+              "She does not get home late."
+            ],
+            "explain": "После doesn't -> get, не gets."
+          },
+          {
+            "id": "prs_ph_neg_10",
+            "instruction": "Переделай в отрицание",
+            "prompt": "Anna and Paul live in the center. -> (negative)",
+            "accepted": [
+              "Anna and Paul don't live in the center.",
+              "Anna and Paul do not live in the center."
+            ],
+            "explain": "Anna and Paul = they, поэтому don't live."
+          }
+        ]
+      },
+      {
+        "id": "photo_question_transform",
+        "goal": "formula",
+        "title": "Фото-дрилл: построй вопрос",
+        "kind": "input",
+        "items": [
+          {
+            "id": "prs_ph_q_1",
+            "instruction": "Сделай вопрос",
+            "prompt": "Laura / play / tennis -> ?",
+            "accepted": [
+              "Does Laura play tennis?"
+            ],
+            "explain": "С Laura (she) используем does + V1."
+          },
+          {
+            "id": "prs_ph_q_2",
+            "instruction": "Сделай вопрос",
+            "prompt": "you / speak / English -> ?",
+            "accepted": [
+              "Do you speak English?"
+            ],
+            "explain": "С you ставим Do."
+          },
+          {
+            "id": "prs_ph_q_3",
+            "instruction": "Сделай вопрос",
+            "prompt": "you / want / some coffee -> ?",
+            "accepted": [
+              "Do you want some coffee?"
+            ],
+            "explain": "Do + you + V1."
+          },
+          {
+            "id": "prs_ph_q_4",
+            "instruction": "Сделай вопрос",
+            "prompt": "Where / he / live -> ?",
+            "accepted": [
+              "Where does he live?"
+            ],
+            "explain": "Wh-word + does + he + V1."
+          },
+          {
+            "id": "prs_ph_q_5",
+            "instruction": "Сделай вопрос",
+            "prompt": "How often / they / go to the cinema -> ?",
+            "accepted": [
+              "How often do they go to the cinema?"
+            ],
+            "explain": "С they используем do."
+          },
+          {
+            "id": "prs_ph_q_6",
+            "instruction": "Сделай вопрос",
+            "prompt": "What time / Suzan / start work -> ?",
+            "accepted": [
+              "What time does Suzan start work?",
+              "What time does Susan start work?"
+            ],
+            "explain": "С Suzan/Susan (she) нужен does + start."
+          },
+          {
+            "id": "prs_ph_q_7",
+            "instruction": "Сделай вопрос",
+            "prompt": "Where / she / work -> ?",
+            "accepted": [
+              "Where does she work?"
+            ],
+            "explain": "С she используем does + V1."
+          },
+          {
+            "id": "prs_ph_q_8",
+            "instruction": "Сделай вопрос",
+            "prompt": "you / listen to music -> ?",
+            "accepted": [
+              "Do you listen to music?"
+            ],
+            "explain": "Do + you + listen."
+          },
+          {
+            "id": "prs_ph_q_9",
+            "instruction": "Сделай вопрос",
+            "prompt": "he / watch / series -> ?",
+            "accepted": [
+              "Does he watch series?"
+            ],
+            "explain": "Does + he + watch (без -es после does)."
+          },
+          {
+            "id": "prs_ph_q_10",
+            "instruction": "Сделай вопрос",
+            "prompt": "How often / they / travel -> ?",
+            "accepted": [
+              "How often do they travel?"
+            ],
+            "explain": "How often + do + they + travel."
+          }
+        ]
+      },
+      {
+        "id": "photo_story_inline",
+        "goal": "story_cloze",
+        "title": "Фото-дрилл: мини-текст с выбором формы",
+        "kind": "inline_select",
+        "items": [
+          {
+            "id": "prs_ph_story_1",
+            "instruction": "Выбери правильную форму в каждом пропуске",
+            "storyTitle": "Sara's Week",
+            "segments": [
+              "Sara is my daughter. She has two daughters; they are my granddaughters. Sara ",
+              " much free time because she ",
+              " in a shop. In the week, she ",
+              " very early and she ",
+              " to bed quite late every day. She ",
+              " Sundays because she ",
+              " and she ",
+              " the day with her family. On Sundays, they ",
+              " very late because they always ",
+              ". My granddaughters ",
+              " always sad on Sunday evenings because it's the end of the weekend."
+            ],
+            "blanks": [
+              {
+                "options": [
+                  "doesn't have",
+                  "don't have",
+                  "isn't having",
+                  "not have"
+                ],
+                "correctIndex": 0
+              },
+              {
+                "options": [
+                  "works",
+                  "work",
+                  "is working",
+                  "does work"
+                ],
+                "correctIndex": 0
+              },
+              {
+                "options": [
+                  "gets up",
+                  "get up",
+                  "is getting up",
+                  "doesn't get up"
+                ],
+                "correctIndex": 0
+              },
+              {
+                "options": [
+                  "goes",
+                  "go",
+                  "is going",
+                  "going"
+                ],
+                "correctIndex": 0
+              },
+              {
+                "options": [
+                  "loves",
+                  "love",
+                  "is loving",
+                  "loving"
+                ],
+                "correctIndex": 0
+              },
+              {
+                "options": [
+                  "doesn't work",
+                  "don't work",
+                  "isn't working",
+                  "not work"
+                ],
+                "correctIndex": 0
+              },
+              {
+                "options": [
+                  "spends",
+                  "spend",
+                  "is spending",
+                  "spended"
+                ],
+                "correctIndex": 0
+              },
+              {
+                "options": [
+                  "don't get up",
+                  "doesn't get up",
+                  "aren't getting up",
+                  "not get up"
+                ],
+                "correctIndex": 0
+              },
+              {
+                "options": [
+                  "go out",
+                  "goes out",
+                  "are going out",
+                  "went out"
+                ],
+                "correctIndex": 0
+              },
+              {
+                "options": [
+                  "are",
+                  "is",
+                  "be",
+                  "am"
+                ],
+                "correctIndex": 0
+              }
+            ],
+            "explain": "Это смешанный текст на Present Simple: следи за подлежащим (she/they) и за формулами do/does + V1."
+          }
+        ]
+      },
+      {
+        "id": "photo_sentence_builder_a",
+        "goal": "formula",
+        "title": "Фото-дрилл: собери предложение (1-10)",
+        "kind": "input",
+        "items": [
+          {
+            "id": "prs_ph_sb_a_1",
+            "instruction": "Собери предложение",
+            "prompt": "(we / not / go out much)",
+            "accepted": [
+              "We don't go out much.",
+              "We do not go out much."
+            ],
+            "explain": "С we в отрицании используем don't + V1."
+          },
+          {
+            "id": "prs_ph_sb_a_2",
+            "instruction": "Собери предложение",
+            "prompt": "(they / think it's a good idea)",
+            "accepted": [
+              "They think it's a good idea."
+            ],
+            "explain": "С they используем базовую форму think."
+          },
+          {
+            "id": "prs_ph_sb_a_3",
+            "instruction": "Собери предложение",
+            "prompt": "(he / know how to play the violin?)",
+            "accepted": [
+              "Does he know how to play the violin?"
+            ],
+            "explain": "Вопрос с he: Does + he + know."
+          },
+          {
+            "id": "prs_ph_sb_a_4",
+            "instruction": "Собери предложение",
+            "prompt": "(why / I / have to clean up?)",
+            "accepted": [
+              "Why do I have to clean up?"
+            ],
+            "explain": "Wh-вопрос с I строится через do."
+          },
+          {
+            "id": "prs_ph_sb_a_5",
+            "instruction": "Собери предложение",
+            "prompt": "(she / not / sleep late at the weekends)",
+            "accepted": [
+              "She doesn't sleep late at the weekends.",
+              "She does not sleep late at the weekends."
+            ],
+            "explain": "She -> doesn't + V1."
+          },
+          {
+            "id": "prs_ph_sb_a_6",
+            "instruction": "Собери предложение",
+            "prompt": "(I / love studying languages?)",
+            "accepted": [
+              "Do I love studying languages?"
+            ],
+            "explain": "Общий вопрос с I: Do I ...?"
+          },
+          {
+            "id": "prs_ph_sb_a_7",
+            "instruction": "Собери предложение",
+            "prompt": "(we / not / believe the Prime Minister)",
+            "accepted": [
+              "We don't believe the Prime Minister.",
+              "We do not believe the Prime Minister."
+            ],
+            "explain": "С we в отрицании: don't believe."
+          },
+          {
+            "id": "prs_ph_sb_a_8",
+            "instruction": "Собери предложение",
+            "prompt": "(you / understand the question?)",
+            "accepted": [
+              "Do you understand the question?"
+            ],
+            "explain": "С you вопрос строится через do."
+          },
+          {
+            "id": "prs_ph_sb_a_9",
+            "instruction": "Собери предложение",
+            "prompt": "(she / not / want to go to the cinema)",
+            "accepted": [
+              "She doesn't want to go to the cinema.",
+              "She does not want to go to the cinema."
+            ],
+            "explain": "She -> doesn't want."
+          },
+          {
+            "id": "prs_ph_sb_a_10",
+            "instruction": "Собери предложение",
+            "prompt": "(I / like trying new kinds of food)",
+            "accepted": [
+              "I like trying new kinds of food."
+            ],
+            "explain": "С I — обычная форма like."
+          }
+        ]
+      },
+      {
+        "id": "photo_sentence_builder_b",
+        "goal": "formula",
+        "title": "Фото-дрилл: собери предложение (11-20)",
+        "kind": "input",
+        "items": [
+          {
+            "id": "prs_ph_sb_b_11",
+            "instruction": "Собери предложение",
+            "prompt": "(David / want some coffee?)",
+            "accepted": [
+              "Does David want some coffee?"
+            ],
+            "explain": "David = he, поэтому Does + David + want."
+          },
+          {
+            "id": "prs_ph_sb_b_12",
+            "instruction": "Собери предложение",
+            "prompt": "(what / Lucy / do at the weekends?)",
+            "accepted": [
+              "What does Lucy do at the weekends?"
+            ],
+            "explain": "Wh-вопрос с Lucy: what does Lucy do..."
+          },
+          {
+            "id": "prs_ph_sb_b_13",
+            "instruction": "Собери предложение",
+            "prompt": "(they / not / work late on Fridays)",
+            "accepted": [
+              "They don't work late on Fridays.",
+              "They do not work late on Fridays."
+            ],
+            "explain": "С they используем don't work."
+          },
+          {
+            "id": "prs_ph_sb_b_14",
+            "instruction": "Собери предложение",
+            "prompt": "(she / have three daughters)",
+            "accepted": [
+              "She has three daughters."
+            ],
+            "explain": "Исключение have -> has в 3-м лице."
+          },
+          {
+            "id": "prs_ph_sb_b_15",
+            "instruction": "Собери предложение",
+            "prompt": "(you / own a car?)",
+            "accepted": [
+              "Do you own a car?"
+            ],
+            "explain": "Вопрос с you: Do you own...?"
+          },
+          {
+            "id": "prs_ph_sb_b_16",
+            "instruction": "Собери предложение",
+            "prompt": "(where / Alicia / work?)",
+            "accepted": [
+              "Where does Alicia work?"
+            ],
+            "explain": "Alicia = she, поэтому does + work."
+          },
+          {
+            "id": "prs_ph_sb_b_17",
+            "instruction": "Собери предложение",
+            "prompt": "(when / she / go to her Chinese class?)",
+            "accepted": [
+              "When does she go to her Chinese class?"
+            ],
+            "explain": "Wh-вопрос: when does she go..."
+          },
+          {
+            "id": "prs_ph_sb_b_18",
+            "instruction": "Собери предложение",
+            "prompt": "(I / not / believe you)",
+            "accepted": [
+              "I don't believe you.",
+              "I do not believe you."
+            ],
+            "explain": "С I используем don't believe."
+          },
+          {
+            "id": "prs_ph_sb_b_19",
+            "instruction": "Собери предложение",
+            "prompt": "(she / think about her holidays often)",
+            "accepted": [
+              "She thinks about her holidays often."
+            ],
+            "explain": "She -> thinks (добавляем -s)."
+          },
+          {
+            "id": "prs_ph_sb_b_20",
+            "instruction": "Собери предложение",
+            "prompt": "(you / like going to restaurants?)",
+            "accepted": [
+              "Do you like going to restaurants?"
+            ],
+            "explain": "Общий вопрос с you через do."
           }
         ]
       }

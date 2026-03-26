@@ -168,7 +168,6 @@
           <button class="btn" id="btnNewTask" type="button">+ задача</button>
           <button class="btn" id="btnInviteFriend" type="button">+ друг</button>
           <button class="btn" id="btnInvitesInbox" type="button">входящие</button>
-          <button class="btn" id="btnNewEvent" type="button">+ расписание</button>
         </div>
       </header>
 
@@ -214,7 +213,6 @@
         <button class="btn btn--thin" id="clearFilters" type="button">очистить</button>
         <select id="viewSelect" class="ctl" aria-label="Вид">
           <option value="board">доска</option>
-          <option value="schedule">расписание</option>
         </select>
       </div>
 
@@ -224,7 +222,6 @@
 
       <section class="planning-content" data-ik-stage="content">
         <div id="boardView" class="board" hidden></div>
-        <div id="scheduleView" class="schedule" hidden></div>
       </section>
     </section>
   </main>
@@ -306,7 +303,7 @@
 
       function readViewFromHash(){
         var raw = String(window.location.hash || '').replace('#', '').trim().toLowerCase();
-        if(raw === 'board' || raw === 'schedule') return raw;
+        if(raw === 'board') return raw;
         return '';
       }
 
@@ -405,7 +402,6 @@
     ['+ задача', '+ task'],
     ['+ друг', '+ friend'],
     ['входящие', 'inbox'],
-    ['+ расписание', '+ schedule'],
     ['Личные', 'Personal'],
     ['Общие', 'Shared'],
     ['Все', 'All'],
@@ -413,7 +409,6 @@
     ['проекты', 'projects'],
     ['задача', 'task'],
     ['задачи', 'tasks'],
-    ['расписание', 'schedule'],
     ['доска', 'board'],
     ['очистить', 'clear'],
     ['пре-альфа', 'pre-alpha'],
@@ -449,19 +444,14 @@
     ['сортировка: сначала новые', 'sort: newest'],
     ['проектов пока нет', 'No projects yet'],
     ['задач пока нет', 'No tasks yet'],
-    ['событий пока нет', 'No events yet'],
     ['создать проект', 'Create project'],
     ['создать задачу', 'Create task'],
-    ['создать событие', 'Create event'],
     ['новый проект', 'New project'],
     ['новая задача', 'New task'],
-    ['новое событие', 'New event'],
     ['редактировать проект', 'Edit project'],
     ['редактировать задачу', 'Edit task'],
-    ['редактировать событие', 'Edit event'],
     ['удалить проект', 'Delete project'],
     ['удалить задачу', 'Delete task'],
-    ['удалить событие', 'Delete event'],
     ['сохранить', 'Save'],
     ['отмена', 'Cancel'],
     ['название', 'Title'],
@@ -493,10 +483,8 @@
     ['по умолчанию', 'Default'],
     ['сначала новые', 'Newest first'],
     ['выполнено', 'Completed'],
-    ['календарь', 'Calendar'],
     ['добавить задачу', 'Add task'],
     ['добавить проект', 'Add project'],
-    ['добавить событие', 'Add event'],
     ['сначала выберите проект', 'select project first'],
     ['добавить друга', 'invite friend'],
     ['тип проекта', 'project scope'],
@@ -585,7 +573,6 @@
     'planning': 'planning',
     'clear': 'clear',
     'board': 'board',
-    'schedule': 'schedule',
     'pre-alpha': 'pre-alpha',
     'Main menu': 'Main menu',
     'Close': 'Close'
@@ -596,7 +583,6 @@
     'planning': 'планирование',
     'clear': 'очистить',
     'board': 'доска',
-    'schedule': 'расписание',
     'pre-alpha': 'пре-альфа',
     'Main menu': 'Главное меню',
     'Close': 'Закрыть',
@@ -631,19 +617,14 @@
     'planning center': 'центр планирования',
     'No projects yet': 'проектов пока нет',
     'No tasks yet': 'задач пока нет',
-    'No events yet': 'событий пока нет',
     'Create project': 'создать проект',
     'Create task': 'создать задачу',
-    'Create event': 'создать событие',
     'New project': 'новый проект',
     'New task': 'новая задача',
-    'New event': 'новое событие',
     'Edit project': 'редактировать проект',
     'Edit task': 'редактировать задачу',
-    'Edit event': 'редактировать событие',
     'Delete project': 'удалить проект',
     'Delete task': 'удалить задачу',
-    'Delete event': 'удалить событие',
     'Save': 'сохранить',
     'Cancel': 'отмена',
     'Title': 'название',
@@ -673,10 +654,8 @@
     'Default': 'по умолчанию',
     'Newest first': 'сначала новые',
     'Completed': 'выполнено',
-    'Calendar': 'календарь',
     'Add task': 'добавить задачу',
-    'Add project': 'добавить проект',
-    'Add event': 'добавить событие'
+    'Add project': 'добавить проект'
   };
 
   const SELECTOR_RULES = {
@@ -687,7 +666,6 @@
       { selector: '#btnNewTask', text: { ru: '+ задача', en: '+ task' } },
       { selector: '#btnInviteFriend', text: { ru: '+ друг', en: '+ friend' } },
       { selector: '#btnInvitesInbox', text: { ru: 'входящие', en: 'inbox' } },
-      { selector: '#btnNewEvent', text: { ru: '+ расписание', en: '+ schedule' } },
       { selector: '#scopePersonal', text: { ru: 'Личные', en: 'Personal' } },
       { selector: '#scopeShared', text: { ru: 'Общие', en: 'Shared' } },
       { selector: '#scopeAll', text: { ru: 'Все', en: 'All' } },
@@ -736,12 +714,6 @@
         en: /^tasks:\s*(\d+)$/i,
         toRu: (m) => `задач: ${m[1]}`,
         toEn: (m) => `tasks: ${m[1]}`
-      },
-      {
-        ru: /^событий:\s*(\d+)$/i,
-        en: /^events:\s*(\d+)$/i,
-        toRu: (m) => `событий: ${m[1]}`,
-        toEn: (m) => `events: ${m[1]}`
       },
       {
         ru: /^дедлайн:\s*(.+)$/i,

@@ -14,8 +14,9 @@ Order for fresh environment:
 10. Run `supabase/sql/stage11_economy_roles_public_dictionary.sql`
 11. Run `supabase/sql/stage15_planning_schedule.sql`
 12. Run `supabase/sql/stage16_planning_personal_schedule.sql`
-13. (Optional) Run `supabase/sql/stage12_seed_public_user_dictionaries.sql`
-14. (Optional, if stage12 was used) Run `supabase/sql/stage17_fix_memorize_spelling.sql`
+13. Run `supabase/sql/stage18_schedule_v2.sql` (**resets schedule domain data**)
+14. (Optional) Run `supabase/sql/stage12_seed_public_user_dictionaries.sql`
+15. (Optional, if stage12 was used) Run `supabase/sql/stage17_fix_memorize_spelling.sql`
 
 After SQL:
 
@@ -27,9 +28,10 @@ After SQL:
   - `dictionary` cloud status not failing
   - `progress cloud: ok` after login
   - `planning cloud: live` after opening planning board
-  - schedule view opens and can create/edit weekly events
-  - `+ расписание` creates personal schedule chip with tabs today/lists/calendar
-  - in personal schedule plan modal, repeat options work (daily/weekly/monthly/yearly/weekdays/weekends)
+  - `planning` shows board-only UI (no schedule tab/button)
+  - `crate/schedule/schedule.html` opens and can create/edit plans + slots
+  - assistant can generate suggestions and apply them to real blocks
+  - settings save in `ik_sched_prefs`
 
 Operational model:
 

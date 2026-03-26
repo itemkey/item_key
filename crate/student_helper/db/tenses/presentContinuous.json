@@ -53,12 +53,148 @@
     },
     {
       "type": "highlight",
-      "title": "Правописание -ing",
+      "title": "Короткие ответы",
       "lines": [
-        "make → making (e убираем)",
-        "run → running (удваиваем согласную: CVC)",
-        "lie → lying (ie → y)",
-        "play → playing (без изменений)"
+        "Are you listening? → Yes, I am. / No, I'm not.",
+        "Is he studying? → Yes, he is. / No, he isn't.",
+        "Are they trying? → Yes, they are. / No, they aren't.",
+        "В вопросе меняем порядок: Am/Is/Are + subject + V-ing."
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Ситуации, где нужен Present Continuous",
+      "columns": [
+        "Ситуация",
+        "Когда используем",
+        "Пример"
+      ],
+      "rows": [
+        [
+          "действие в момент речи",
+          "происходит прямо сейчас, пока мы говорим",
+          "We are all waiting for you."
+        ],
+        [
+          "действие в процессе",
+          "действие началось и еще не завершилось",
+          "I am learning to swim."
+        ],
+        [
+          "временное действие",
+          "временная, не постоянная ситуация",
+          "He is staying at the hotel."
+        ],
+        [
+          "изменяющаяся ситуация",
+          "видим развитие/изменение сейчас",
+          "It is getting colder."
+        ],
+        [
+          "растущий тренд",
+          "изменение в обществе/мире на текущем этапе",
+          "More and more people are using social media."
+        ],
+        [
+          "раздражающая повторяемость",
+          "always/constantly/forever + V-ing",
+          "She is always complaining!"
+        ],
+        [
+          "запланированное ближайшее будущее",
+          "есть договоренность/четкий план",
+          "I am meeting Mila on Friday."
+        ]
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        {
+          "en": "Are you listening to me?",
+          "ru": "Ты меня слушаешь? (действие в момент речи)"
+        },
+        {
+          "en": "When I get home, the kids are doing their homework.",
+          "ru": "Когда я прихожу домой, дети делают уроки (действие в процессе)."
+        },
+        {
+          "en": "They are working hard these days.",
+          "ru": "Они много работают в эти дни (временный период)."
+        },
+        {
+          "en": "We are leaving for Turkiye early in the morning.",
+          "ru": "Мы уезжаем в Турцию рано утром (запланированное будущее)."
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Правила написания -ing"
+    },
+    {
+      "type": "text",
+      "text": "Для Present Continuous нужно правильно образовать V-ing. Ниже — рабочие правила с самыми частыми исключениями."
+    },
+    {
+      "type": "table",
+      "caption": "Орфография V-ing (подробно)",
+      "columns": [
+        "Правило",
+        "Что происходит",
+        "Примеры"
+      ],
+      "rows": [
+        [
+          "базовый случай",
+          "добавляем -ing к основе",
+          "go -> going, read -> reading, wash -> washing"
+        ],
+        [
+          "немая -e на конце",
+          "убираем -e + ing",
+          "live -> living, make -> making, argue -> arguing"
+        ],
+        [
+          "-ee / -ye / -oe",
+          "сохраняем e",
+          "see -> seeing, be -> being, tiptoe -> tiptoeing"
+        ],
+        [
+          "глагол на -y",
+          "добавляем -ing без изменений",
+          "play -> playing, study -> studying"
+        ],
+        [
+          "lie / die / tie",
+          "ie меняется на y + ing",
+          "lie -> lying, die -> dying, tie -> tying"
+        ],
+        [
+          "одна краткая гласная + одна согласная (CVC)",
+          "удваиваем конечную согласную",
+          "plan -> planning, stop -> stopping, run -> running"
+        ],
+        [
+          "слова на -l",
+          "BrE: часто удваиваем l (travelling), AmE: чаще traveling",
+          "travel -> travelling/traveling, quarrel -> quarrelling/quarreling"
+        ],
+        [
+          "слова на -ic",
+          "добавляем k перед -ing",
+          "panic -> panicking, picnic -> picnicking"
+        ]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Сравнения и исключения",
+      "lines": [
+        "start -> starting (не CVC: в конце две согласные), fix -> fixing (x не удваиваем), snow -> snowing, rain -> raining.",
+        "open -> opening (ударение не на последний слог, поэтому без удвоения n).",
+        "BrE чаще: controlling, travelling; AmE чаще: controlling, traveling.",
+        "feel -> feeling, steal -> stealing (долгий гласный перед l, удвоение не нужно)."
       ]
     },
     {
@@ -89,6 +225,27 @@
           "контекст",
           "Look!, Listen!, tomorrow (план), next Friday"
         ]
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Present Continuous для ближайшего будущего"
+    },
+    {
+      "type": "text",
+      "text": "Используем для договоренностей и четких планов, которые уже согласованы (часто есть конкретное время/место)."
+    },
+    {
+      "type": "examples",
+      "items": [
+        {
+          "en": "I am meeting Mila on Friday.",
+          "ru": "Я встречаюсь с Милой в пятницу (договоренность)."
+        },
+        {
+          "en": "We are leaving for Turkiye early in the morning.",
+          "ru": "Мы уезжаем в Турцию рано утром (запланированное действие)."
+        }
       ]
     },
     {
@@ -971,6 +1128,666 @@
             "correctIndex": 0,
             "correctTenseId": "presentSimple",
             "explain": "Здесь нужно различить близкие времена по смыслу. Правильный выбор — «Present Simple»: именно это время лучше совпадает с контекстом фразы. В подсказках контекста: контекст привычки/регулярности, есть будущая точка отсчета."
+          }
+        ]
+      },
+      {
+        "id": "photo_usage_cases",
+        "goal": "meaning",
+        "title": "Фото-дрилл: ситуации использования",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "prc_ph_use_1",
+            "instruction": "Выбери значение",
+            "prompt": "We are all waiting for you.",
+            "options": [
+              "действие в момент речи",
+              "постоянный факт",
+              "расписание"
+            ],
+            "correctIndex": 0,
+            "explain": "Действие идет прямо сейчас, в момент речи."
+          },
+          {
+            "id": "prc_ph_use_2",
+            "instruction": "Выбери значение",
+            "prompt": "I am learning to swim.",
+            "options": [
+              "действие в процессе",
+              "общеизвестный факт",
+              "привычка"
+            ],
+            "correctIndex": 0,
+            "explain": "Процесс начался и еще не завершился."
+          },
+          {
+            "id": "prc_ph_use_3",
+            "instruction": "Выбери значение",
+            "prompt": "He is staying at the hotel this week.",
+            "options": [
+              "временное действие",
+              "постоянная ситуация",
+              "разовое прошлое"
+            ],
+            "correctIndex": 0,
+            "explain": "Ситуация временная, а не постоянная."
+          },
+          {
+            "id": "prc_ph_use_4",
+            "instruction": "Выбери значение",
+            "prompt": "It is getting colder.",
+            "options": [
+              "изменяющаяся ситуация",
+              "стабильный факт",
+              "расписание"
+            ],
+            "correctIndex": 0,
+            "explain": "Мы показываем развитие/изменение."
+          },
+          {
+            "id": "prc_ph_use_5",
+            "instruction": "Выбери значение",
+            "prompt": "More and more people are using social media.",
+            "options": [
+              "растущий тренд",
+              "привычка every day",
+              "past action"
+            ],
+            "correctIndex": 0,
+            "explain": "Фраза описывает текущую тенденцию."
+          },
+          {
+            "id": "prc_ph_use_6",
+            "instruction": "Выбери значение",
+            "prompt": "She is always complaining!",
+            "options": [
+              "раздражающая повторяемость",
+              "нейтральная привычка",
+              "future schedule"
+            ],
+            "correctIndex": 0,
+            "explain": "always + V-ing часто передает раздражение."
+          },
+          {
+            "id": "prc_ph_use_7",
+            "instruction": "Выбери значение",
+            "prompt": "I am meeting Mila on Friday.",
+            "options": [
+              "договоренность на ближайшее будущее",
+              "факт навсегда",
+              "привычка"
+            ],
+            "correctIndex": 0,
+            "explain": "Есть согласованный план на ближайшее будущее."
+          },
+          {
+            "id": "prc_ph_use_8",
+            "instruction": "Выбери значение",
+            "prompt": "They are working hard these days.",
+            "options": [
+              "временный период",
+              "регулярность по расписанию",
+              "общеизвестный факт"
+            ],
+            "correctIndex": 0,
+            "explain": "these days указывает на временную ситуацию."
+          }
+        ]
+      },
+      {
+        "id": "photo_ing_spelling_choice",
+        "goal": "formula",
+        "title": "Фото-дрилл: правописание -ing",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "prc_ph_spell_1",
+            "instruction": "Выбери правильную форму",
+            "prompt": "swim -> ?",
+            "options": [
+              "swiming",
+              "swimming",
+              "swims"
+            ],
+            "correctIndex": 1,
+            "explain": "Короткая гласная + одна согласная: удваиваем m -> swimming."
+          },
+          {
+            "id": "prc_ph_spell_2",
+            "instruction": "Выбери правильную форму",
+            "prompt": "live -> ?",
+            "options": [
+              "liveing",
+              "living",
+              "livesing"
+            ],
+            "correctIndex": 1,
+            "explain": "Немую -e убираем: live -> living."
+          },
+          {
+            "id": "prc_ph_spell_3",
+            "instruction": "Выбери правильную форму",
+            "prompt": "see -> ?",
+            "options": [
+              "seeing",
+              "seing",
+              "seeeing"
+            ],
+            "correctIndex": 0,
+            "explain": "В глаголах на -ee букву e сохраняем: see -> seeing."
+          },
+          {
+            "id": "prc_ph_spell_4",
+            "instruction": "Выбери правильную форму",
+            "prompt": "die -> ?",
+            "options": [
+              "dieing",
+              "dying",
+              "diing"
+            ],
+            "correctIndex": 1,
+            "explain": "ie меняется на y: die -> dying."
+          },
+          {
+            "id": "prc_ph_spell_5",
+            "instruction": "Выбери правильную форму",
+            "prompt": "plan -> ?",
+            "options": [
+              "planing",
+              "planning",
+              "plansing"
+            ],
+            "correctIndex": 1,
+            "explain": "CVC-модель: удваиваем конечную согласную n."
+          },
+          {
+            "id": "prc_ph_spell_6",
+            "instruction": "Выбери правильную форму",
+            "prompt": "open -> ?",
+            "options": [
+              "oppening",
+              "openning",
+              "opening"
+            ],
+            "correctIndex": 2,
+            "explain": "Ударение не на последний слог, поэтому без удвоения."
+          },
+          {
+            "id": "prc_ph_spell_7",
+            "instruction": "Выбери правильную форму",
+            "prompt": "panic -> ?",
+            "options": [
+              "panicing",
+              "panicking",
+              "panicingg"
+            ],
+            "correctIndex": 1,
+            "explain": "После -ic добавляем k: panic -> panicking."
+          },
+          {
+            "id": "prc_ph_spell_8",
+            "instruction": "Выбери правильную форму",
+            "prompt": "travel (BrE) -> ?",
+            "options": [
+              "traveling",
+              "travelling",
+              "travveling"
+            ],
+            "correctIndex": 1,
+            "explain": "В британском варианте обычно travelling."
+          },
+          {
+            "id": "prc_ph_spell_9",
+            "instruction": "Выбери правильную форму",
+            "prompt": "fix -> ?",
+            "options": [
+              "fixing",
+              "fixxing",
+              "fixingg"
+            ],
+            "correctIndex": 0,
+            "explain": "x не удваиваем: fix -> fixing."
+          },
+          {
+            "id": "prc_ph_spell_10",
+            "instruction": "Выбери правильную форму",
+            "prompt": "tie -> ?",
+            "options": [
+              "tieing",
+              "tiing",
+              "tying"
+            ],
+            "correctIndex": 2,
+            "explain": "ie -> y: tie -> tying."
+          }
+        ]
+      },
+      {
+        "id": "photo_continuous_gapfill",
+        "goal": "formula",
+        "title": "Фото-дрилл: вставь форму Present Continuous",
+        "kind": "input",
+        "items": [
+          {
+            "id": "prc_ph_fill_1",
+            "instruction": "Вставь форму",
+            "prompt": "He ____ (save) money because he wants to buy a car.",
+            "accepted": [
+              "is saving"
+            ],
+            "explain": "He -> is + saving."
+          },
+          {
+            "id": "prc_ph_fill_2",
+            "instruction": "Вставь форму",
+            "prompt": "You ____ (not listen) to me.",
+            "accepted": [
+              "aren't listening",
+              "are not listening"
+            ],
+            "explain": "You -> are not + listening."
+          },
+          {
+            "id": "prc_ph_fill_3",
+            "instruction": "Вставь форму",
+            "prompt": "My parents ____ (look) for a new apartment.",
+            "accepted": [
+              "are looking"
+            ],
+            "explain": "My parents -> are looking."
+          },
+          {
+            "id": "prc_ph_fill_4",
+            "instruction": "Вставь форму",
+            "prompt": "The victim ____ (not cooperate) with the police.",
+            "accepted": [
+              "isn't cooperating",
+              "is not cooperating"
+            ],
+            "explain": "The victim -> is not cooperating."
+          },
+          {
+            "id": "prc_ph_fill_5",
+            "instruction": "Вставь форму",
+            "prompt": "We ____ (plan) a trip to Japan.",
+            "accepted": [
+              "are planning"
+            ],
+            "explain": "plan -> planning (удвоение n)."
+          },
+          {
+            "id": "prc_ph_fill_6",
+            "instruction": "Вставь форму",
+            "prompt": "I ____ (cook) fish for dinner.",
+            "accepted": [
+              "am cooking",
+              "I'm cooking"
+            ],
+            "explain": "I -> am cooking."
+          },
+          {
+            "id": "prc_ph_fill_7",
+            "instruction": "Вставь форму",
+            "prompt": "The water ____ (boil). You can put the pasta now.",
+            "accepted": [
+              "is boiling"
+            ],
+            "explain": "Сигнал now в соседнем предложении: is boiling."
+          },
+          {
+            "id": "prc_ph_fill_8",
+            "instruction": "Вставь форму",
+            "prompt": "He ____ (not train) because he has health problems.",
+            "accepted": [
+              "isn't training",
+              "is not training"
+            ],
+            "explain": "He -> isn't training."
+          },
+          {
+            "id": "prc_ph_fill_9",
+            "instruction": "Вставь форму",
+            "prompt": "I ____ (not work) at present. I'm unemployed.",
+            "accepted": [
+              "am not working",
+              "I'm not working"
+            ],
+            "explain": "at present указывает на текущий период: am not working."
+          },
+          {
+            "id": "prc_ph_fill_10",
+            "instruction": "Вставь форму",
+            "prompt": "It ____ (not rain) now. We can go to the park.",
+            "accepted": [
+              "isn't raining",
+              "is not raining"
+            ],
+            "explain": "now + отрицание: isn't raining."
+          }
+        ]
+      },
+      {
+        "id": "photo_qa_short_answers",
+        "goal": "formula",
+        "title": "Фото-дрилл: вопросы и короткие ответы",
+        "kind": "multi_input",
+        "items": [
+          {
+            "id": "prc_ph_qa_1",
+            "instruction": "Заполни 2 части",
+            "prompt": "A: ____ (you/cry)?  B: No, I ____.",
+            "inputs": [
+              {
+                "accepted": [
+                  "Are you crying?",
+                  "Are you crying"
+                ]
+              },
+              {
+                "accepted": [
+                  "am not",
+                  "I'm not",
+                  "I am not"
+                ]
+              }
+            ],
+            "explain": "Вопрос: Are you crying? Короткий ответ: No, I am not."
+          },
+          {
+            "id": "prc_ph_qa_2",
+            "instruction": "Заполни 2 части",
+            "prompt": "A: ____ (your father/recover) well after the operation?  B: Yes, he ____.",
+            "inputs": [
+              {
+                "accepted": [
+                  "Is your father recovering well after the operation?",
+                  "Is your father recovering well after the operation"
+                ]
+              },
+              {
+                "accepted": [
+                  "is"
+                ]
+              }
+            ],
+            "explain": "Is your father recovering ...? -> Yes, he is."
+          },
+          {
+            "id": "prc_ph_qa_3",
+            "instruction": "Заполни 2 части",
+            "prompt": "A: ____ (they/try) to find a solution?  B: Yes, they ____.",
+            "inputs": [
+              {
+                "accepted": [
+                  "Are they trying to find a solution?",
+                  "Are they trying to find a solution"
+                ]
+              },
+              {
+                "accepted": [
+                  "are"
+                ]
+              }
+            ],
+            "explain": "Are they trying ...? -> Yes, they are."
+          },
+          {
+            "id": "prc_ph_qa_4",
+            "instruction": "Заполни 2 части",
+            "prompt": "A: ____ (the baby/sleep)?  B: No, she ____.",
+            "inputs": [
+              {
+                "accepted": [
+                  "Is the baby sleeping?",
+                  "Is the baby sleeping"
+                ]
+              },
+              {
+                "accepted": [
+                  "isn't",
+                  "is not"
+                ]
+              }
+            ],
+            "explain": "Is the baby sleeping? -> No, she isn't."
+          },
+          {
+            "id": "prc_ph_qa_5",
+            "instruction": "Заполни 2 части",
+            "prompt": "A: ____ (we/do) the right thing?  B: Yes, we ____.",
+            "inputs": [
+              {
+                "accepted": [
+                  "Are we doing the right thing?",
+                  "Are we doing the right thing"
+                ]
+              },
+              {
+                "accepted": [
+                  "are"
+                ]
+              }
+            ],
+            "explain": "Are we doing ...? -> Yes, we are."
+          },
+          {
+            "id": "prc_ph_qa_6",
+            "instruction": "Заполни 2 части",
+            "prompt": "A: ____ (he/study) for his exams?  B: No, he ____.",
+            "inputs": [
+              {
+                "accepted": [
+                  "Is he studying for his exams?",
+                  "Is he studying for his exams"
+                ]
+              },
+              {
+                "accepted": [
+                  "isn't",
+                  "is not"
+                ]
+              }
+            ],
+            "explain": "Is he studying ...? -> No, he isn't."
+          },
+          {
+            "id": "prc_ph_qa_7",
+            "instruction": "Заполни 2 части",
+            "prompt": "A: ____ (you/eat) my pizza?  B: Yes, I ____.",
+            "inputs": [
+              {
+                "accepted": [
+                  "Are you eating my pizza?",
+                  "Are you eating my pizza"
+                ]
+              },
+              {
+                "accepted": [
+                  "am"
+                ]
+              }
+            ],
+            "explain": "Are you eating ...? -> Yes, I am."
+          },
+          {
+            "id": "prc_ph_qa_8",
+            "instruction": "Заполни 2 части",
+            "prompt": "A: ____ (you/pay) by credit card?  B: No, I ____.",
+            "inputs": [
+              {
+                "accepted": [
+                  "Are you paying by credit card?",
+                  "Are you paying by credit card"
+                ]
+              },
+              {
+                "accepted": [
+                  "am not",
+                  "I'm not",
+                  "I am not"
+                ]
+              }
+            ],
+            "explain": "Are you paying ...? -> No, I am not."
+          },
+          {
+            "id": "prc_ph_qa_9",
+            "instruction": "Заполни 2 части",
+            "prompt": "A: ____ (they/win) the match?  B: Yes, they ____.",
+            "inputs": [
+              {
+                "accepted": [
+                  "Are they winning the match?",
+                  "Are they winning the match"
+                ]
+              },
+              {
+                "accepted": [
+                  "are"
+                ]
+              }
+            ],
+            "explain": "Are they winning ...? -> Yes, they are."
+          },
+          {
+            "id": "prc_ph_qa_10",
+            "instruction": "Заполни 2 части",
+            "prompt": "A: ____ (Tom/run) in the race?  B: No, he ____.",
+            "inputs": [
+              {
+                "accepted": [
+                  "Is Tom running in the race?",
+                  "Is Tom running in the race"
+                ]
+              },
+              {
+                "accepted": [
+                  "isn't",
+                  "is not"
+                ]
+              }
+            ],
+            "explain": "Is Tom running ...? -> No, he isn't."
+          }
+        ]
+      },
+      {
+        "id": "photo_live_dialogue",
+        "goal": "story_cloze",
+        "title": "Фото-дрилл: диалог в момент речи",
+        "kind": "inline_select",
+        "items": [
+          {
+            "id": "prc_ph_story_1",
+            "instruction": "Выбери форму в каждом пропуске",
+            "storyTitle": "Suzan and Mark",
+            "segments": [
+              "Suzan: Hi Mark. What ",
+              "? Mark: I ",
+              " TV. Suzan: What ",
+              "? Mark: A football match. Liverpool ",
+              " against Manchester United. Suzan: ",
+              " it? Mark: Yes, I ",
+              ". It's a great match. Suzan: ",
+              "? Mark: Yes! But what about you? What ",
+              "? Suzan: I'm with Alice. We ",
+              " for our maths exam. Mark: Well, I'm sure you ",
+              " maths."
+            ],
+            "blanks": [
+              {
+                "options": [
+                  "are you doing",
+                  "do you do",
+                  "you are doing",
+                  "are you do"
+                ],
+                "correctIndex": 0
+              },
+              {
+                "options": [
+                  "am watching",
+                  "watch",
+                  "am watch",
+                  "watching"
+                ],
+                "correctIndex": 0
+              },
+              {
+                "options": [
+                  "are you watching",
+                  "do you watch",
+                  "you are watching",
+                  "are you watch"
+                ],
+                "correctIndex": 0
+              },
+              {
+                "options": [
+                  "are playing",
+                  "is playing",
+                  "play",
+                  "playing"
+                ],
+                "correctIndex": 0
+              },
+              {
+                "options": [
+                  "are you enjoying",
+                  "do you enjoy",
+                  "you are enjoying",
+                  "are you enjoy"
+                ],
+                "correctIndex": 0
+              },
+              {
+                "options": [
+                  "am",
+                  "is",
+                  "are",
+                  "do"
+                ],
+                "correctIndex": 0
+              },
+              {
+                "options": [
+                  "is your team winning",
+                  "does your team win",
+                  "your team is winning",
+                  "is your team win"
+                ],
+                "correctIndex": 0
+              },
+              {
+                "options": [
+                  "are you doing",
+                  "do you do",
+                  "are you do",
+                  "you do"
+                ],
+                "correctIndex": 0
+              },
+              {
+                "options": [
+                  "are studying",
+                  "study",
+                  "studying",
+                  "are study"
+                ],
+                "correctIndex": 0
+              },
+              {
+                "options": [
+                  "aren't enjoying",
+                  "don't enjoy",
+                  "are not enjoy",
+                  "not enjoy"
+                ],
+                "correctIndex": 0
+              }
+            ],
+            "explain": "Диалог строится на Present Continuous: вопрос Am/Is/Are + subject + V-ing, ответ с am/is/are (+ not)."
           }
         ]
       }

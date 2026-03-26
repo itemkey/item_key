@@ -222,6 +222,7 @@ export class PlanningCollabApp {
   constructor(ui, els) {
     this.ui = ui;
     this.els = els;
+    this.boardOnly = !!(els && els.boardOnly);
 
     const todayIso = formatLocalISO(new Date());
 
@@ -299,6 +300,10 @@ export class PlanningCollabApp {
     this.bindHandlers();
     this.applyPrefsToControls();
     this.renderProjectScopeToggle();
+    if (this.boardOnly) {
+      this.uiPrefs.view = 'board';
+      this.persistUIPrefs();
+    }
     this.setView(this.uiPrefs.view);
 
     if (!(window.IKSupabase && typeof window.IKSupabase.getClient === 'function')) {
@@ -488,8 +493,11 @@ export class PlanningCollabApp {
 
   getScopeFilteredProjects() {
     const mode = this.normalizeScopeValue(this.uiPrefs.projectScope);
-    if (mode === 'all') return this.state.projects.slice();
-    return this.state.projects.filter((p) => this.normalizeProjectScope(p) === mode);
+    const rows = this.boardOnly
+      ? this.state.projects.filter((p) => this.normalizeProjectKind(p && p.kind) !== 'schedule')
+      : this.state.projects.slice();
+    if (mode === 'all') return rows;
+    return rows.filter((p) => this.normalizeProjectScope(p) === mode);
   }
 
   rememberScopeReturnProject(projectId) {
@@ -768,7 +776,7 @@ export class PlanningCollabApp {
       });
     }
 
-    if (this.els.btnNewEvent) {
+    if (this.els.btnNewEvent && !this.boardOnly) {
       this.els.btnNewEvent.addEventListener('click', () => {
         void this.openCreateScheduleProjectModal().catch((error) => this.onMutationError(error));
       });
@@ -1082,6 +1090,48 @@ export class PlanningCollabApp {
       return;
     }
 
+    if (this.boardOnly) {
+      if (body) body.classList.remove('planning-mode-schedule');
+      if (titleEl) titleEl.textContent = this.t('планирование', 'planning');
+      if (this.els.searchInput) {
+        this.els.searchInput.placeholder = this.t('поиск задач…', 'search tasks…');
+      }
+
+      if (this.els.btnNewEvent) {
+        this.els.btnNewEvent.hidden = true;
+        this.els.btnNewEvent.disabled = true;
+      }
+
+      if (this.els.viewSelect) {
+        this.els.viewSelect.value = 'board';
+        this.els.viewSelect.disabled = true;
+        this.els.viewSelect.hidden = true;
+      }
+
+      const controls = [
+        this.els.projectScope,
+        this.els.assigneeFilter,
+        this.els.tagsFilter,
+        this.els.priorityFilter,
+        this.els.deadlineFilter,
+        this.els.sortSelect,
+        this.els.clearFilters,
+        this.els.planningPresence,
+        this.els.btnNewTask,
+        this.els.btnInviteFriend,
+        this.els.btnInvitesInbox
+      ];
+      for (const el of controls) {
+        if (!el) continue;
+        el.hidden = false;
+      }
+
+      const hasProject = !!this.state.activeProjectId;
+      if (this.els.btnNewTask) this.els.btnNewTask.disabled = !hasProject;
+      if (this.els.btnInviteFriend) this.els.btnInviteFriend.disabled = !hasProject;
+      return;
+    }
+
     const hasProject = !!this.state.activeProjectId;
     const scheduleMode = hasProject && this.isScheduleProject();
 
@@ -1336,6 +1386,12 @@ export class PlanningCollabApp {
     const target = this.state.projects.find((p) => String(p.id) === id);
     if (!target) return;
 
+    const kind = this.normalizeProjectKind(target.kind);
+    if (this.boardOnly && kind === 'schedule') {
+      this.ui.toast(this.t('расписание вынесено в отдельный раздел item-crate', 'schedule moved to a separate item-crate section'));
+      return;
+    }
+
     const visible = this.getScopeFilteredProjects().some((p) => String(p.id) === id);
     if (!visible) {
       this.uiPrefs.projectScope = 'all';
@@ -1350,8 +1406,6 @@ export class PlanningCollabApp {
 
     this.renderProjectSelect();
     this.renderProjectBar();
-
-    const kind = this.normalizeProjectKind(target.kind);
 
     if (kind === 'schedule') {
       await this.unsubscribeProject();
@@ -1692,8 +1746,10 @@ export class PlanningCollabApp {
   }
 
   setView(view) {
-    const forcedSchedule = this.isScheduleProject();
-    const safeView = forcedSchedule ? 'schedule' : (view === 'schedule' ? 'schedule' : 'board');
+    const forcedSchedule = !this.boardOnly && this.isScheduleProject();
+    const safeView = this.boardOnly
+      ? 'board'
+      : (forcedSchedule ? 'schedule' : (view === 'schedule' ? 'schedule' : 'board'));
     this.uiPrefs.view = safeView;
     this.persistUIPrefs();
 
@@ -1705,6 +1761,11 @@ export class PlanningCollabApp {
     if (this.els.scheduleView) this.els.scheduleView.hidden = safeView !== 'schedule';
 
     if (safeView === 'board') {
+      this.renderBoard();
+      return;
+    }
+
+    if (this.boardOnly) {
       this.renderBoard();
       return;
     }
@@ -5154,7 +5215,50 @@ export class PlanningCollabApp {
     return count;
   }
 
+  openCreateBoardProjectModal() {
+    this.ui.openModal({
+      title: this.t('новый проект', 'new project'),
+      bodyHtml: `
+        <form class="form">
+          <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+            ${this.t('название', 'name')}
+            <input class="ctl" name="name" required maxlength="120" />
+          </label>
+
+          <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+            ${this.t('описание', 'description')}
+            <textarea class="ctl" name="description" rows="3" maxlength="500"></textarea>
+          </label>
+
+          <label style="display:grid; gap:6px; font-size:11px; letter-spacing:2px; text-transform:uppercase;">
+            ${this.t('шаблон доски', 'board preset')}
+            <select class="ctl" name="board_preset">
+              <option value="classic">${this.t('классический', 'classic')}</option>
+              <option value="study">${this.t('учебный', 'study')}</option>
+              <option value="lean">${this.t('компактный', 'lean')}</option>
+            </select>
+          </label>
+
+          <div class="planning-modal-note">${escapeHtml(this.t('можно изменить потом через управление колонками', 'you can change later in columns settings'))}</div>
+
+          <div class="form__actions">
+            <button class="btn" type="button" data-close>${this.t('отмена', 'cancel')}</button>
+            <button class="btn" type="submit">${this.t('создать', 'create')}</button>
+          </div>
+        </form>
+      `,
+      onSubmit: (data) => {
+        void this.createProjectSubmit(data).catch((error) => this.onMutationError(error));
+      }
+    });
+  }
+
   openCreateProjectModal() {
+    if (this.boardOnly) {
+      this.openCreateBoardProjectModal();
+      return;
+    }
+
     this.ui.openModal({
       title: this.t('новый проект', 'new project'),
       bodyHtml: `

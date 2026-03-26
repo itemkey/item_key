@@ -17,12 +17,11 @@ const app = new PlanningCollabApp(ui, {
   clearFilters: document.getElementById('clearFilters'),
   viewSelect: document.getElementById('viewSelect'),
   boardView: document.getElementById('boardView'),
-  scheduleView: document.getElementById('scheduleView'),
   btnNewProject: document.getElementById('btnNewProject'),
   btnNewTask: document.getElementById('btnNewTask'),
   btnInviteFriend: document.getElementById('btnInviteFriend'),
   btnInvitesInbox: document.getElementById('btnInvitesInbox'),
-  btnNewEvent: document.getElementById('btnNewEvent')
+  boardOnly: true
 });
 
 try {
