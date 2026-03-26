@@ -1,0 +1,898 @@
+{
+  "id": "specialNounsNumber",
+  "title": "Special Nouns: Singular/Plural",
+  "subtitle": "особенные существительные и согласование с is/are",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Как работает правило"
+    },
+    {
+      "type": "text",
+      "text": "Некоторые английские существительные не подчиняются простому правилу «если есть -s, значит множественное». Поэтому для них важно запоминать категорию: всегда singular (is), всегда plural (are), одинаковая форма (is/are по контексту), или особая форма множественного числа."
+    },
+    {
+      "type": "highlight",
+      "title": "База",
+      "lines": [
+        "is: singular-only nouns и существительные на -s, которые грамматически singular",
+        "are: plural-only nouns и обычные формы множественного числа",
+        "is / are: слова с одинаковой формой в singular и plural (series, sheep, means и т.д.)",
+        "irregular plural: man -> men, child -> children, tooth -> teeth и т.д."
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "1) Только singular (обычно is)"
+    },
+    {
+      "type": "table",
+      "caption": "Singular-only и похожие случаи",
+      "columns": [
+        "Группа",
+        "Слова",
+        "Пример"
+      ],
+      "rows": [
+        [
+          "Только singular",
+          "advice, chess, clothing, furniture, gossip, hair, homework, jewellery, knowledge, money, moustache, news, trouble, information, progress, weather",
+          "The news is important. / Her hair is wet."
+        ],
+        [
+          "Слова из тренировки",
+          "meat, water, space, speech, work",
+          "Work is hard today."
+        ],
+        [
+          "На -s, но singular",
+          "mathematics, physics, phonetics, politics, economics, gymnastics, athletics, measles, rickets, mumps",
+          "Physics is difficult for me."
+        ],
+        [
+          "Согласование как singular",
+          "everyone, everybody",
+          "Everybody is ready."
+        ]
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "2) Только plural (обычно are)"
+    },
+    {
+      "type": "table",
+      "caption": "Plural-only nouns",
+      "columns": [
+        "Группа",
+        "Слова",
+        "Пример"
+      ],
+      "rows": [
+        [
+          "Только plural",
+          "binoculars, clothes, glasses, goods, headphones, outskirts, police, pyjamas, scales, scissors, stairs, thanks, tights, traffic lights, trousers, jeans, shorts",
+          "My trousers are new. / The police are here."
+        ],
+        [
+          "Формы множественного числа",
+          "people, men, gentlemen, mice, cakes",
+          "People are friendly."
+        ]
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "3) Одинаковая форма: singular и plural"
+    },
+    {
+      "type": "table",
+      "caption": "Смотри на контекст (this/these, one/many)",
+      "columns": [
+        "Слово",
+        "Singular (is)",
+        "Plural (are)"
+      ],
+      "rows": [
+        [
+          "series",
+          "This series is short.",
+          "These series are short."
+        ],
+        [
+          "means",
+          "A means is needed.",
+          "Different means are possible."
+        ],
+        [
+          "sheep",
+          "This sheep is calm.",
+          "Those sheep are calm."
+        ],
+        [
+          "species",
+          "This species is rare.",
+          "These species are rare."
+        ],
+        [
+          "deer",
+          "A deer is in the garden.",
+          "Deer are in the garden."
+        ],
+        [
+          "fish",
+          "This fish is fresh.",
+          "Fish are expensive today."
+        ],
+        [
+          "bison",
+          "A bison is huge.",
+          "Bison are huge."
+        ],
+        [
+          "crossroads",
+          "The crossroads is empty at night.",
+          "The crossroads are busy in the morning."
+        ]
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "4) Irregular plural"
+    },
+    {
+      "type": "table",
+      "caption": "Особые формы множественного числа",
+      "columns": [
+        "Singular",
+        "Plural",
+        "Пример"
+      ],
+      "rows": [
+        [
+          "man",
+          "men",
+          "Two men are waiting."
+        ],
+        [
+          "woman",
+          "women",
+          "Women are welcome."
+        ],
+        [
+          "child",
+          "children",
+          "The children are outside."
+        ],
+        [
+          "person",
+          "people",
+          "People are tired."
+        ],
+        [
+          "goose",
+          "geese",
+          "Geese are noisy."
+        ],
+        [
+          "tooth",
+          "teeth",
+          "Your teeth are white."
+        ],
+        [
+          "foot",
+          "feet",
+          "My feet are cold."
+        ],
+        [
+          "mouse",
+          "mice",
+          "Mice are small."
+        ]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Короткий алгоритм",
+      "lines": [
+        "Шаг 1: проверь, не из списка ли это singular-only (money, news, advice...) -> is",
+        "Шаг 2: проверь, не из списка ли это plural-only (trousers, scissors, police...) -> are",
+        "Шаг 3: если форма одинаковая (series, means, sheep, species...), смотри на контекст: this/one -> is, these/many -> are",
+        "Шаг 4: отдельно учи irregular plural: men, women, children, people, geese, teeth, feet, mice"
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        {
+          "en": "The news is bad today.",
+          "ru": "Новости сегодня плохие."
+        },
+        {
+          "en": "My jeans are too tight.",
+          "ru": "Мои джинсы слишком тесные."
+        },
+        {
+          "en": "This series is interesting, but these series are too long.",
+          "ru": "Этот сериал интересный, но эти сериалы слишком длинные."
+        },
+        {
+          "en": "Her advice is always useful.",
+          "ru": "Ее совет всегда полезен."
+        },
+        {
+          "en": "The police are looking for witnesses.",
+          "ru": "Полиция ищет свидетелей."
+        }
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": [
+      {
+        "id": "meaning",
+        "title": "Категория слова (Meaning)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "snn_m_1",
+            "instruction": "Выбери категорию",
+            "prompt": "money",
+            "options": [
+              "is",
+              "are",
+              "is / are"
+            ],
+            "correctIndex": 0,
+            "explain": "money употребляется как singular noun -> is"
+          },
+          {
+            "id": "snn_m_2",
+            "instruction": "Выбери категорию",
+            "prompt": "trousers",
+            "options": [
+              "is",
+              "are",
+              "is / are"
+            ],
+            "correctIndex": 1,
+            "explain": "trousers - plural-only noun -> are"
+          },
+          {
+            "id": "snn_m_3",
+            "instruction": "Выбери категорию",
+            "prompt": "series",
+            "options": [
+              "is",
+              "are",
+              "is / are"
+            ],
+            "correctIndex": 2,
+            "explain": "series имеет одинаковую форму в singular и plural"
+          },
+          {
+            "id": "snn_m_4",
+            "instruction": "Выбери категорию",
+            "prompt": "physics",
+            "options": [
+              "is",
+              "are",
+              "is / are"
+            ],
+            "correctIndex": 0,
+            "explain": "physics заканчивается на -s, но грамматически singular"
+          },
+          {
+            "id": "snn_m_5",
+            "instruction": "Выбери категорию",
+            "prompt": "people",
+            "options": [
+              "is",
+              "are",
+              "is / are"
+            ],
+            "correctIndex": 1,
+            "explain": "people - plural form (person -> people)"
+          },
+          {
+            "id": "snn_m_6",
+            "instruction": "Выбери категорию",
+            "prompt": "news",
+            "options": [
+              "is",
+              "are",
+              "is / are"
+            ],
+            "correctIndex": 0,
+            "explain": "news употребляется как singular"
+          },
+          {
+            "id": "snn_m_7",
+            "instruction": "Выбери категорию",
+            "prompt": "sheep",
+            "options": [
+              "is",
+              "are",
+              "is / are"
+            ],
+            "correctIndex": 2,
+            "explain": "sheep: одна и та же форма в singular и plural"
+          },
+          {
+            "id": "snn_m_8",
+            "instruction": "Выбери категорию",
+            "prompt": "means",
+            "options": [
+              "is",
+              "are",
+              "is / are"
+            ],
+            "correctIndex": 2,
+            "explain": "means: форма одинаковая, глагол выбираем по контексту"
+          },
+          {
+            "id": "snn_m_9",
+            "instruction": "Выбери категорию",
+            "prompt": "scissors",
+            "options": [
+              "is",
+              "are",
+              "is / are"
+            ],
+            "correctIndex": 1,
+            "explain": "scissors - plural-only noun"
+          },
+          {
+            "id": "snn_m_10",
+            "instruction": "Выбери категорию",
+            "prompt": "athletics",
+            "options": [
+              "is",
+              "are",
+              "is / are"
+            ],
+            "correctIndex": 0,
+            "explain": "athletics на -s, но употребляется как singular"
+          },
+          {
+            "id": "snn_m_11",
+            "instruction": "Выбери категорию",
+            "prompt": "knowledge",
+            "options": [
+              "is",
+              "are",
+              "is / are"
+            ],
+            "correctIndex": 0,
+            "explain": "knowledge - singular-only noun"
+          },
+          {
+            "id": "snn_m_12",
+            "instruction": "Выбери категорию",
+            "prompt": "mice",
+            "options": [
+              "is",
+              "are",
+              "is / are"
+            ],
+            "correctIndex": 1,
+            "explain": "mice - plural form (mouse -> mice)"
+          }
+        ]
+      },
+      {
+        "id": "formula",
+        "title": "Вставь форму (Formula)",
+        "kind": "input",
+        "items": [
+          {
+            "id": "snn_f_1",
+            "instruction": "Вставь слово",
+            "prompt": "The news ____ very important today.",
+            "accepted": [
+              "is"
+            ],
+            "explain": "news -> singular"
+          },
+          {
+            "id": "snn_f_2",
+            "instruction": "Вставь слово",
+            "prompt": "My pyjamas ____ clean.",
+            "accepted": [
+              "are"
+            ],
+            "explain": "pyjamas -> plural-only"
+          },
+          {
+            "id": "snn_f_3",
+            "instruction": "Вставь слово",
+            "prompt": "This series ____ very short.",
+            "accepted": [
+              "is"
+            ],
+            "explain": "this series -> singular"
+          },
+          {
+            "id": "snn_f_4",
+            "instruction": "Вставь слово",
+            "prompt": "These series ____ very short.",
+            "accepted": [
+              "are"
+            ],
+            "explain": "these series -> plural"
+          },
+          {
+            "id": "snn_f_5",
+            "instruction": "Вставь слово",
+            "prompt": "The police ____ near the station.",
+            "accepted": [
+              "are"
+            ],
+            "explain": "police -> plural agreement"
+          },
+          {
+            "id": "snn_f_6",
+            "instruction": "Вставь слово",
+            "prompt": "Mathematics ____ my favorite subject.",
+            "accepted": [
+              "is"
+            ],
+            "explain": "mathematics -> singular"
+          },
+          {
+            "id": "snn_f_7",
+            "instruction": "Вставь слово",
+            "prompt": "Her hair ____ wet.",
+            "accepted": [
+              "is"
+            ],
+            "explain": "hair в этом значении -> singular"
+          },
+          {
+            "id": "snn_f_8",
+            "instruction": "Заполни форму",
+            "prompt": "One man, two ____.",
+            "accepted": [
+              "men"
+            ],
+            "explain": "irregular plural: man -> men"
+          },
+          {
+            "id": "snn_f_9",
+            "instruction": "Заполни форму",
+            "prompt": "One woman, two ____.",
+            "accepted": [
+              "women"
+            ],
+            "explain": "irregular plural: woman -> women"
+          },
+          {
+            "id": "snn_f_10",
+            "instruction": "Заполни форму",
+            "prompt": "One child, two ____.",
+            "accepted": [
+              "children"
+            ],
+            "explain": "irregular plural: child -> children"
+          },
+          {
+            "id": "snn_f_11",
+            "instruction": "Заполни форму",
+            "prompt": "One tooth, two ____.",
+            "accepted": [
+              "teeth"
+            ],
+            "explain": "irregular plural: tooth -> teeth"
+          },
+          {
+            "id": "snn_f_12",
+            "instruction": "Заполни форму",
+            "prompt": "One mouse, two ____.",
+            "accepted": [
+              "mice"
+            ],
+            "explain": "irregular plural: mouse -> mice"
+          },
+          {
+            "id": "snn_f_13",
+            "instruction": "Вставь слово",
+            "prompt": "Everybody ____ ready.",
+            "accepted": [
+              "is"
+            ],
+            "explain": "everybody согласуется как singular"
+          },
+          {
+            "id": "snn_f_14",
+            "instruction": "Вставь слово",
+            "prompt": "The traffic lights ____ red.",
+            "accepted": [
+              "are"
+            ],
+            "explain": "traffic lights - plural-only noun"
+          }
+        ]
+      },
+      {
+        "id": "markers",
+        "title": "Собери группы (Markers)",
+        "kind": "multi",
+        "items": [
+          {
+            "id": "snn_mark_1",
+            "instruction": "Выбери слова для is",
+            "prompt": "Категория is",
+            "options": [
+              "meat",
+              "weather",
+              "water",
+              "space",
+              "advice",
+              "mathematics",
+              "clothing",
+              "work",
+              "hair",
+              "phonetics",
+              "physics",
+              "progress",
+              "chess",
+              "homework",
+              "news",
+              "athletics",
+              "information",
+              "economics",
+              "knowledge",
+              "money",
+              "trousers",
+              "people",
+              "scissors"
+            ],
+            "correctIndices": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19
+            ],
+            "explain": "Это singular-колонка из тренировки: uncountable nouns + существительные на -s, которые употребляются как singular"
+          },
+          {
+            "id": "snn_mark_2",
+            "instruction": "Выбери слова для are",
+            "prompt": "Категория are",
+            "options": [
+              "gentlemen",
+              "trousers",
+              "stairs",
+              "clothes",
+              "tights",
+              "mice",
+              "cakes",
+              "people",
+              "scissors",
+              "goods",
+              "jeans",
+              "pyjamas",
+              "men",
+              "glasses",
+              "police",
+              "news",
+              "knowledge"
+            ],
+            "correctIndices": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14
+            ],
+            "explain": "Это plural-колонка: plural-only nouns и обычные формы множественного числа"
+          },
+          {
+            "id": "snn_mark_3",
+            "instruction": "Выбери слова для is / are",
+            "prompt": "Одинаковая форма в singular и plural",
+            "options": [
+              "series",
+              "means",
+              "sheep",
+              "species",
+              "crossroads",
+              "fish",
+              "bison",
+              "deer",
+              "homework",
+              "weather"
+            ],
+            "correctIndices": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7
+            ],
+            "explain": "Для этих слов форма не меняется. Согласование зависит от контекста: this/one -> is, these/many -> are"
+          }
+        ]
+      },
+      {
+        "id": "markers_2",
+        "goal": "markers",
+        "title": "Распредели существительные (Match)",
+        "kind": "match",
+        "items": [
+          {
+            "id": "snn_match_1",
+            "instruction": "Соедини",
+            "prompt": "Слово -> категория",
+            "pairs": [
+              {
+                "left": "money",
+                "right": "is"
+              },
+              {
+                "left": "trousers",
+                "right": "are"
+              },
+              {
+                "left": "series",
+                "right": "is / are"
+              },
+              {
+                "left": "means",
+                "right": "is / are"
+              },
+              {
+                "left": "police",
+                "right": "are"
+              },
+              {
+                "left": "news",
+                "right": "is"
+              },
+              {
+                "left": "sheep",
+                "right": "is / are"
+              },
+              {
+                "left": "physics",
+                "right": "is"
+              }
+            ],
+            "explain": "Ключ: запомни 3 колонки - is, are, is / are"
+          },
+          {
+            "id": "snn_match_2",
+            "instruction": "Соедини",
+            "prompt": "Слова из набора тренировки",
+            "pairs": [
+              {
+                "left": "homework",
+                "right": "is"
+              },
+              {
+                "left": "glasses",
+                "right": "are"
+              },
+              {
+                "left": "athletics",
+                "right": "is"
+              },
+              {
+                "left": "people",
+                "right": "are"
+              },
+              {
+                "left": "knowledge",
+                "right": "is"
+              },
+              {
+                "left": "mice",
+                "right": "are"
+              },
+              {
+                "left": "economics",
+                "right": "is"
+              },
+              {
+                "left": "goods",
+                "right": "are"
+              }
+            ],
+            "explain": "Согласование зависит от категории слова, а не только от окончания"
+          }
+        ]
+      },
+      {
+        "id": "story_cloze",
+        "goal": "story_cloze",
+        "title": "Контекст: is / are (Dropdown)",
+        "kind": "inline_select",
+        "items": [
+          {
+            "id": "snn_story_1",
+            "instruction": "Прочитай текст и выбери is/are",
+            "storyTitle": "Nouns in context",
+            "segments": [
+              "The news ",
+              " serious today, and the police ",
+              " already here. This series ",
+              " very popular, but these series ",
+              " too expensive for me. Her hair ",
+              " wet, and her glasses ",
+              " on the table. Those sheep ",
+              " in the yard, and this sheep ",
+              " very calm."
+            ],
+            "blanks": [
+              {
+                "options": [
+                  "is",
+                  "are"
+                ],
+                "correctIndex": 0
+              },
+              {
+                "options": [
+                  "is",
+                  "are"
+                ],
+                "correctIndex": 1
+              },
+              {
+                "options": [
+                  "is",
+                  "are"
+                ],
+                "correctIndex": 0
+              },
+              {
+                "options": [
+                  "is",
+                  "are"
+                ],
+                "correctIndex": 1
+              },
+              {
+                "options": [
+                  "is",
+                  "are"
+                ],
+                "correctIndex": 0
+              },
+              {
+                "options": [
+                  "is",
+                  "are"
+                ],
+                "correctIndex": 1
+              },
+              {
+                "options": [
+                  "is",
+                  "are"
+                ],
+                "correctIndex": 1
+              },
+              {
+                "options": [
+                  "is",
+                  "are"
+                ],
+                "correctIndex": 0
+              }
+            ],
+            "explain": "В этом тексте встречаются все три группы: singular-only, plural-only и одинаковая форма (series, sheep)."
+          }
+        ]
+      },
+      {
+        "id": "mistakes",
+        "title": "Исправь ошибки (Mistakes)",
+        "kind": "correction",
+        "items": [
+          {
+            "id": "snn_c_1",
+            "instruction": "Исправь предложение",
+            "prompt": "The news are shocking.",
+            "accepted": [
+              "The news is shocking."
+            ],
+            "explain": "news согласуется как singular"
+          },
+          {
+            "id": "snn_c_2",
+            "instruction": "Исправь предложение",
+            "prompt": "My trousers is too long.",
+            "accepted": [
+              "My trousers are too long."
+            ],
+            "explain": "trousers -> plural-only"
+          },
+          {
+            "id": "snn_c_3",
+            "instruction": "Исправь предложение",
+            "prompt": "This species are rare.",
+            "accepted": [
+              "This species is rare."
+            ],
+            "explain": "this species - singular контекст"
+          },
+          {
+            "id": "snn_c_4",
+            "instruction": "Исправь предложение",
+            "prompt": "These species is rare.",
+            "accepted": [
+              "These species are rare."
+            ],
+            "explain": "these species - plural контекст"
+          },
+          {
+            "id": "snn_c_5",
+            "instruction": "Исправь предложение",
+            "prompt": "The police is looking for the car.",
+            "accepted": [
+              "The police are looking for the car."
+            ],
+            "explain": "police согласуется с are"
+          },
+          {
+            "id": "snn_c_6",
+            "instruction": "Исправь предложение",
+            "prompt": "Her advice are useful.",
+            "accepted": [
+              "Her advice is useful."
+            ],
+            "explain": "advice - singular-only noun"
+          },
+          {
+            "id": "snn_c_7",
+            "instruction": "Исправь предложение",
+            "prompt": "Two child are playing outside.",
+            "accepted": [
+              "Two children are playing outside."
+            ],
+            "explain": "child -> children"
+          },
+          {
+            "id": "snn_c_8",
+            "instruction": "Исправь предложение",
+            "prompt": "Mathematics are difficult for me.",
+            "accepted": [
+              "Mathematics is difficult for me."
+            ],
+            "explain": "mathematics на -s, но грамматически singular"
+          }
+        ]
+      }
+    ]
+  }
+}

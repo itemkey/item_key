@@ -329,6 +329,17 @@
     "levels": ["A2-B1", "B1-B2"]
   },
   {
+    "id": "specialNounsNumber",
+    "title": "Special Nouns: Singular/Plural",
+    "subtitle": "особенные существительные и согласование is/are",
+    "hint": "singular-only, plural-only, same form, irregular plurals",
+    "file": "specialNounsNumber.json",
+    "group": "universal",
+    "kind": "structure",
+    "compare": false,
+    "levels": ["A2-B1", "B1-B2", "B2-C1"]
+  },
+  {
     "id": "modalsPossibilityDeduction",
     "title": "Modals: Possibility and Deduction",
     "subtitle": "might/may/could, must, can't",
