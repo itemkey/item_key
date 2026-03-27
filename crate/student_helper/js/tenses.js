@@ -2010,7 +2010,7 @@
   // -------------------------
   function blocksForRuleMode(blocks){
     const source = Array.isArray(blocks) ? blocks : [];
-    if (ruleMode === 'full' || currentId === BASIC_OVERVIEW_ID || currentId === 'presentPerfect' || currentId === 'presentPerfectContinuous') return source;
+    if (ruleMode === 'full' || currentId === BASIC_OVERVIEW_ID || currentId === 'presentPerfect' || currentId === 'presentPerfectContinuous' || currentId === 'presentPerfectVsPresentPerfectContinuous') return source;
 
     const out = [];
     let heading = 0;

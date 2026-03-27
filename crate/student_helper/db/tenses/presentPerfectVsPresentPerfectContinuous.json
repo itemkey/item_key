@@ -1,0 +1,1295 @@
+{
+  "id": "presentPerfectVsPresentPerfectContinuous",
+  "title": "Present Perfect vs Present Perfect Continuous",
+  "subtitle": "результат (WHAT?) vs процесс/длительность (HOW LONG?)",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Ключевая разница: Result vs Process"
+    },
+    {
+      "type": "text",
+      "text": "Оба времени связывают прошлое с настоящим, но акцент разный. Present Perfect показывает результат/факт к текущему моменту. Present Perfect Continuous показывает процесс и длительность: как долго действие шло или идет."
+    },
+    {
+      "type": "highlight",
+      "title": "Супер-формула выбора",
+      "lines": [
+        "Present Perfect = WHAT? Что сделано? Какой результат? Сколько раз?",
+        "Present Perfect Continuous = HOW LONG? Как долго? Чем занимались?",
+        "Если важен итог -> чаще Present Perfect",
+        "Если важен процесс/длительность/видимые следы процесса -> чаще Present Perfect Continuous"
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Формы двух времен",
+      "columns": [
+        "",
+        "Present Perfect",
+        "Present Perfect Continuous"
+      ],
+      "rows": [
+        [
+          "Утверждение",
+          "have/has + V3",
+          "have/has been + V-ing"
+        ],
+        [
+          "Отрицание",
+          "have/has not + V3",
+          "have/has not been + V-ing"
+        ],
+        [
+          "Вопрос",
+          "Have/Has + subject + V3?",
+          "Have/Has + subject + been + V-ing?"
+        ],
+        [
+          "Главный вопрос",
+          "What has happened / been done?",
+          "How long has it been happening?"
+        ]
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "1) Present Perfect: результат и факт"
+    },
+    {
+      "type": "highlight",
+      "title": "Когда выбираем Present Perfect",
+      "lines": [
+        "Когда важен результат в настоящем: действие завершено, итог есть сейчас",
+        "Когда говорим об опыте в жизни: ever / never",
+        "Когда считаем, сколько раз что-то произошло: how many times, once/twice",
+        "Частые маркеры: already, just, yet, ever, never"
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        {
+          "en": "I have finished my homework.",
+          "ru": "Я закончил домашнее задание. (результат: всё готово)"
+        },
+        {
+          "en": "She has passed the exam.",
+          "ru": "Она сдала экзамен. (важна новость/итог)"
+        },
+        {
+          "en": "We have watched this series already.",
+          "ru": "Мы уже посмотрели этот сериал."
+        },
+        {
+          "en": "I have never tried Korean food.",
+          "ru": "Я никогда не пробовал корейскую еду. (опыт)"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "2) Present Perfect Continuous: процесс и длительность"
+    },
+    {
+      "type": "highlight",
+      "title": "Когда выбираем Present Perfect Continuous",
+      "lines": [
+        "Когда важен сам процесс, а не только результат",
+        "Когда нужно подчеркнуть длительность: for/since/how long",
+        "Когда действие началось в прошлом и продолжается сейчас",
+        "Когда действие только что закончилось, но есть видимые следы: tired, wet, dirty"
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        {
+          "en": "I have been studying English for three years.",
+          "ru": "Я учу английский уже три года. (процесс длится)"
+        },
+        {
+          "en": "She has been preparing for the exam all night.",
+          "ru": "Она готовится к экзамену всю ночь."
+        },
+        {
+          "en": "They have been waiting for the bus for 20 minutes.",
+          "ru": "Они ждут автобус уже 20 минут."
+        },
+        {
+          "en": "You look tired. You have been working too much.",
+          "ru": "Ты выглядишь уставшим. Ты слишком много работал. (есть следствие процесса)"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Сравнение в одинаковых ситуациях"
+    },
+    {
+      "type": "highlight",
+      "title": "Игровой пример",
+      "lines": [
+        "He has played this game before. -> есть опыт, факт важнее времени",
+        "He has been playing this game all evening. -> подчеркиваем длительный процесс"
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Телефон / screen time",
+      "lines": [
+        "I have checked my phone. -> действие завершено, есть результат",
+        "I have been checking my phone all morning. -> подчеркивается длительность процесса"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Важное исключение: stative verbs"
+    },
+    {
+      "type": "text",
+      "text": "Глаголы состояния (know, like, believe, own, want, have в значении обладания) обычно не используются в Continuous-формах. Поэтому в таких случаях выбираем Present Perfect, а не Present Perfect Continuous."
+    },
+    {
+      "type": "table",
+      "caption": "Stative verbs: неправильно -> правильно",
+      "columns": [
+        "Неправильно",
+        "Правильно"
+      ],
+      "rows": [
+        [
+          "I have been knowing her for years.",
+          "I have known her for years."
+        ],
+        [
+          "I have been liking this song since childhood.",
+          "I have liked this song since childhood."
+        ],
+        [
+          "They have been owning this house since 2012.",
+          "They have owned this house since 2012."
+        ],
+        [
+          "How long have you been having this car?",
+          "How long have you had this car?"
+        ]
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Keyword clues: маркеры-подсказки"
+    },
+    {
+      "type": "table",
+      "caption": "Какие сигналы тянут к какому времени",
+      "columns": [
+        "Present Perfect (result)",
+        "Present Perfect Continuous (process)"
+      ],
+      "rows": [
+        [
+          "already, just, yet",
+          "for, since, all day"
+        ],
+        [
+          "ever / never",
+          "how long"
+        ],
+        [
+          "how many times",
+          "lately, recently"
+        ],
+        [
+          "finished/done/made + результат",
+          "tired/dirty/wet + следы процесса"
+        ]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Алгоритм за 5 секунд",
+      "lines": [
+        "Шаг 1: Нужен ответ «что сделано / сколько раз»? -> Present Perfect",
+        "Шаг 2: Нужен ответ «как долго / чем занимался»? -> Present Perfect Continuous",
+        "Шаг 3: Если это stative verb (know, like, believe, own, want, have) -> не Continuous",
+        "Шаг 4: Если видишь следствие процесса (устал, грязные руки, запах дыма) -> чаще Continuous"
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Финальная мысль",
+      "lines": [
+        "Выбирай не по форме, а по смыслу: результат или процесс.",
+        "Present Perfect = WHAT?",
+        "Present Perfect Continuous = HOW LONG?"
+      ]
+    },
+    {
+      "type": "topicLinks",
+      "title": "Связанные темы",
+      "note": "Если хочешь углубиться в каждую форму отдельно, открой эти правила.",
+      "items": [
+        {
+          "id": "presentPerfect",
+          "label": "Present Perfect",
+          "note": "результат, опыт, незаконченный период"
+        },
+        {
+          "id": "presentPerfectContinuous",
+          "label": "Present Perfect Continuous",
+          "note": "процесс, длительность, видимые следы"
+        },
+        {
+          "id": "stativeVerbs",
+          "label": "Stative Verbs",
+          "note": "когда нельзя использовать Continuous"
+        },
+        {
+          "id": "presentUsageMap",
+          "label": "Present Usage Map",
+          "note": "быстрый выбор формы по задаче"
+        }
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": [
+      {
+        "id": "meaning",
+        "title": "Result vs Process: выбери время",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "ppvppc_m_1",
+            "instruction": "Выбери время",
+            "prompt": "I have finished my homework.",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentPerfect",
+            "explain": "Есть завершенный результат сейчас -> Present Perfect."
+          },
+          {
+            "id": "ppvppc_m_2",
+            "instruction": "Выбери время",
+            "prompt": "She has been preparing for the exam all night.",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "presentPerfectContinuous",
+            "explain": "all night подчеркивает длительность процесса -> Present Perfect Continuous."
+          },
+          {
+            "id": "ppvppc_m_3",
+            "instruction": "Выбери время",
+            "prompt": "How many times have you watched this film?",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentPerfect",
+            "explain": "how many times = считаем результат/количество -> Present Perfect."
+          },
+          {
+            "id": "ppvppc_m_4",
+            "instruction": "Выбери время",
+            "prompt": "How long have you been waiting for me?",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "presentPerfectContinuous",
+            "explain": "how long = длительность процесса -> Present Perfect Continuous."
+          },
+          {
+            "id": "ppvppc_m_5",
+            "instruction": "Выбери время",
+            "prompt": "Look at your hands! You have been painting.",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "presentPerfectContinuous",
+            "explain": "Есть видимые следы процесса (грязные руки) -> Present Perfect Continuous."
+          },
+          {
+            "id": "ppvppc_m_6",
+            "instruction": "Выбери время",
+            "prompt": "We have watched this series already.",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentPerfect",
+            "explain": "already + результат (посмотрели) -> Present Perfect."
+          },
+          {
+            "id": "ppvppc_m_7",
+            "instruction": "Выбери время",
+            "prompt": "I have known her for years.",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentPerfect",
+            "explain": "know — stative verb, поэтому не Continuous."
+          },
+          {
+            "id": "ppvppc_m_8",
+            "instruction": "Выбери время",
+            "prompt": "They have been playing this game all evening.",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "presentPerfectContinuous",
+            "explain": "all evening подчеркивает длительный процесс."
+          },
+          {
+            "id": "ppvppc_m_9",
+            "instruction": "Выбери время",
+            "prompt": "Have you ever tried Korean food?",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentPerfect",
+            "explain": "ever = жизненный опыт -> Present Perfect."
+          },
+          {
+            "id": "ppvppc_m_10",
+            "instruction": "Выбери время",
+            "prompt": "I've been checking my phone all morning.",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "presentPerfectContinuous",
+            "explain": "all morning = длительность и процесс."
+          },
+          {
+            "id": "ppvppc_m_11",
+            "instruction": "Выбери время",
+            "prompt": "He has passed the exam.",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentPerfect",
+            "explain": "Итог (сдал экзамен) важнее процесса подготовки."
+          },
+          {
+            "id": "ppvppc_m_12",
+            "instruction": "Выбери время",
+            "prompt": "Why are you out of breath? Have you been running?",
+            "options": [
+              "Present Perfect",
+              "Present Perfect Continuous"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "presentPerfectContinuous",
+            "explain": "Есть следствие процесса (запыхался) -> Present Perfect Continuous."
+          }
+        ]
+      },
+      {
+        "id": "photo_gap_set_1",
+        "goal": "formula",
+        "title": "Поставь глагол в верную форму (Set 1)",
+        "kind": "input",
+        "items": [
+          {
+            "id": "ppvppc_g1_1",
+            "instruction": "Впиши только форму в пропуск",
+            "prompt": "____ (they / arrive) already?",
+            "accepted": [
+              "have they arrived",
+              "have they arrived already"
+            ],
+            "explain": "already + вопрос о результате -> Present Perfect."
+          },
+          {
+            "id": "ppvppc_g1_2",
+            "instruction": "Впиши форму",
+            "prompt": "Lucy ____ (run) 2000 metres today.",
+            "accepted": [
+              "has run"
+            ],
+            "explain": "Количество/результат (2000 metres) -> Present Perfect."
+          },
+          {
+            "id": "ppvppc_g1_3",
+            "instruction": "Впиши форму",
+            "prompt": "I ____ (clean) all morning - I'm fed up!",
+            "accepted": [
+              "have been cleaning"
+            ],
+            "explain": "all morning + устал/раздражен -> Present Perfect Continuous."
+          },
+          {
+            "id": "ppvppc_g1_4",
+            "instruction": "Впиши форму",
+            "prompt": "How long ____ (you / know) Simon?",
+            "accepted": [
+              "have you known"
+            ],
+            "explain": "know — stative verb, поэтому Present Perfect (не Continuous)."
+          },
+          {
+            "id": "ppvppc_g1_5",
+            "instruction": "Впиши форму",
+            "prompt": "I ____ (drink) more water lately, that's why now I feel better.",
+            "accepted": [
+              "have been drinking"
+            ],
+            "explain": "lately + процесс, который влияет на состояние сейчас -> Continuous."
+          },
+          {
+            "id": "ppvppc_g1_6",
+            "instruction": "Впиши форму",
+            "prompt": "Sorry about the mess! I ____ (bake).",
+            "accepted": [
+              "have been baking"
+            ],
+            "explain": "По контексту важны следы процесса (mess) -> Continuous."
+          },
+          {
+            "id": "ppvppc_g1_7",
+            "instruction": "Впиши форму",
+            "prompt": "How many times ____ (you / take) this exam?",
+            "accepted": [
+              "have you taken"
+            ],
+            "explain": "how many times -> считаем количество раз -> Present Perfect."
+          },
+          {
+            "id": "ppvppc_g1_8",
+            "instruction": "Впиши форму",
+            "prompt": "He ____ (eat) six bars of chocolate today!",
+            "accepted": [
+              "has eaten"
+            ],
+            "explain": "Конкретный результат/количество -> Present Perfect."
+          },
+          {
+            "id": "ppvppc_g1_9",
+            "instruction": "Впиши форму",
+            "prompt": "Julie ____ (cook) dinner. Let's go and eat!",
+            "accepted": [
+              "has cooked"
+            ],
+            "explain": "Действие завершено, результат готов -> Present Perfect."
+          },
+          {
+            "id": "ppvppc_g1_10",
+            "instruction": "Впиши форму",
+            "prompt": "The students ____ (finish) their exams. They're very happy.",
+            "accepted": [
+              "have finished"
+            ],
+            "explain": "Есть итог (экзамены закончены) -> Present Perfect."
+          },
+          {
+            "id": "ppvppc_g1_11",
+            "instruction": "Впиши форму",
+            "prompt": "The baby's face is really dirty! What ____ (he / eat)?",
+            "accepted": [
+              "has he been eating"
+            ],
+            "explain": "Видимые следы процесса -> Present Perfect Continuous."
+          },
+          {
+            "id": "ppvppc_g1_12",
+            "instruction": "Впиши форму",
+            "prompt": "Iona is exhausted these days. She ____ (work) too hard recently.",
+            "accepted": [
+              "has been working"
+            ],
+            "explain": "recently + усталость как результат процесса -> Continuous."
+          },
+          {
+            "id": "ppvppc_g1_13",
+            "instruction": "Впиши форму",
+            "prompt": "Luke ____ (never / be) abroad.",
+            "accepted": [
+              "has never been"
+            ],
+            "explain": "never + опыт -> Present Perfect."
+          },
+          {
+            "id": "ppvppc_g1_14",
+            "instruction": "Впиши форму",
+            "prompt": "I ____ (wait) for three hours already!",
+            "accepted": [
+              "have been waiting"
+            ],
+            "explain": "for three hours + эмоциональный оттенок -> Continuous."
+          },
+          {
+            "id": "ppvppc_g1_15",
+            "instruction": "Впиши форму",
+            "prompt": "____ (you / finish) your homework yet?",
+            "accepted": [
+              "have you finished"
+            ],
+            "explain": "yet в вопросе о результате -> Present Perfect."
+          },
+          {
+            "id": "ppvppc_g1_16",
+            "instruction": "Впиши форму",
+            "prompt": "How long ____ (you / be) a lawyer?",
+            "accepted": [
+              "have you been"
+            ],
+            "explain": "be в значении состояния/статуса -> Present Perfect."
+          },
+          {
+            "id": "ppvppc_g1_17",
+            "instruction": "Впиши форму",
+            "prompt": "I ____ (read) your book all day. It's very interesting, but I'm only on chapter 2.",
+            "accepted": [
+              "have been reading"
+            ],
+            "explain": "all day + процесс еще идет (только chapter 2) -> Continuous."
+          },
+          {
+            "id": "ppvppc_g1_18",
+            "instruction": "Впиши форму",
+            "prompt": "She ____ (drink) ten glasses of water!",
+            "accepted": [
+              "has drunk"
+            ],
+            "explain": "Количество (ten glasses) -> результат, Present Perfect."
+          },
+          {
+            "id": "ppvppc_g1_19",
+            "instruction": "Впиши форму",
+            "prompt": "I ____ (have) my dog for sixteen years.",
+            "accepted": [
+              "have had"
+            ],
+            "explain": "have (обладание) — stative, используем Present Perfect."
+          },
+          {
+            "id": "ppvppc_g1_20",
+            "instruction": "Впиши форму",
+            "prompt": "Help! I ____ (lose) my wallet! How can I get home?",
+            "accepted": [
+              "have lost"
+            ],
+            "explain": "Срочный результат сейчас (кошелек потерян) -> Present Perfect."
+          }
+        ]
+      },
+      {
+        "id": "photo_gap_set_2",
+        "goal": "formula",
+        "title": "Поставь глагол в верную форму (Set 2)",
+        "kind": "input",
+        "items": [
+          {
+            "id": "ppvppc_g2_1",
+            "instruction": "Впиши только форму",
+            "prompt": "____ (you / buy) your train ticket yet?",
+            "accepted": [
+              "have you bought"
+            ],
+            "explain": "yet в вопросе о результате -> Present Perfect."
+          },
+          {
+            "id": "ppvppc_g2_2",
+            "instruction": "Впиши форму",
+            "prompt": "The kitchen is a complete mess! What ____ (the children / do)?",
+            "accepted": [
+              "have the children been doing"
+            ],
+            "explain": "Есть видимый беспорядок как следствие процесса -> Continuous."
+          },
+          {
+            "id": "ppvppc_g2_3",
+            "instruction": "Впиши форму",
+            "prompt": "Julie ____ (learn) to drive for six years!",
+            "accepted": [
+              "has been learning"
+            ],
+            "explain": "for six years -> длительность процесса -> Continuous."
+          },
+          {
+            "id": "ppvppc_g2_4",
+            "instruction": "Впиши форму",
+            "prompt": "Amanda ____ (already / have) lunch, so she'll meet us later.",
+            "accepted": [
+              "has already had"
+            ],
+            "explain": "already + завершенный результат (поела) -> Present Perfect."
+          },
+          {
+            "id": "ppvppc_g2_5",
+            "instruction": "Впиши форму",
+            "prompt": "How much coffee ____ (she / drink) this morning?",
+            "accepted": [
+              "has she drunk"
+            ],
+            "explain": "how much = количество результата -> Present Perfect."
+          },
+          {
+            "id": "ppvppc_g2_6",
+            "instruction": "Впиши форму",
+            "prompt": "Simon ____ (write) three books.",
+            "accepted": [
+              "has written"
+            ],
+            "explain": "Три книги = итог/количество -> Present Perfect."
+          },
+          {
+            "id": "ppvppc_g2_7",
+            "instruction": "Впиши форму",
+            "prompt": "I ____ (do) everything I needed to do today! Hurray!",
+            "accepted": [
+              "have done"
+            ],
+            "explain": "Все завершено -> результат, Present Perfect."
+          },
+          {
+            "id": "ppvppc_g2_8",
+            "instruction": "Впиши форму",
+            "prompt": "It ____ (not / rain) all summer, so the garden is dead.",
+            "accepted": [
+              "has not rained",
+              "hasn't rained"
+            ],
+            "explain": "Нет дождя за период -> важен итог (сад высох) -> Present Perfect."
+          },
+          {
+            "id": "ppvppc_g2_9",
+            "instruction": "Впиши форму",
+            "prompt": "I ____ (read) your book. Here it is, thank you.",
+            "accepted": [
+              "have read"
+            ],
+            "explain": "Книга уже прочитана (готовый результат) -> Present Perfect."
+          },
+          {
+            "id": "ppvppc_g2_10",
+            "instruction": "Впиши форму",
+            "prompt": "She ____ (forget) how to get to my house.",
+            "accepted": [
+              "has forgotten"
+            ],
+            "explain": "Текущее состояние-результат (забыла) -> Present Perfect."
+          },
+          {
+            "id": "ppvppc_g2_11",
+            "instruction": "Впиши форму",
+            "prompt": "I ____ (work) in the garden all day and I need a rest.",
+            "accepted": [
+              "have been working"
+            ],
+            "explain": "all day + усталость -> процесс и следствие, Continuous."
+          },
+          {
+            "id": "ppvppc_g2_12",
+            "instruction": "Впиши форму",
+            "prompt": "She ____ (make) three cakes. They look delicious!",
+            "accepted": [
+              "has made"
+            ],
+            "explain": "Есть готовый результат (три торта) -> Present Perfect."
+          },
+          {
+            "id": "ppvppc_g2_13",
+            "instruction": "Впиши форму",
+            "prompt": "David feels great these days. He ____ (get) up early lately.",
+            "accepted": [
+              "has been getting"
+            ],
+            "explain": "lately + повторяющийся процесс в периоде -> Continuous."
+          },
+          {
+            "id": "ppvppc_g2_14",
+            "instruction": "Впиши форму",
+            "prompt": "We ____ (always / hate) rush hour traffic.",
+            "accepted": [
+              "have always hated"
+            ],
+            "explain": "hate — stative verb, используем Present Perfect."
+          },
+          {
+            "id": "ppvppc_g2_15",
+            "instruction": "Впиши форму",
+            "prompt": "Recently, I ____ (study) a lot. My exams are in a few weeks.",
+            "accepted": [
+              "have been studying"
+            ],
+            "explain": "recently + активный процесс -> Present Perfect Continuous."
+          },
+          {
+            "id": "ppvppc_g2_16",
+            "instruction": "Впиши форму",
+            "prompt": "We ____ (write) this book for months and months.",
+            "accepted": [
+              "have been writing"
+            ],
+            "explain": "for months and months = длительность процесса -> Continuous."
+          },
+          {
+            "id": "ppvppc_g2_17",
+            "instruction": "Впиши форму",
+            "prompt": "I ____ (always / love) chocolate.",
+            "accepted": [
+              "have always loved"
+            ],
+            "explain": "love — stative verb -> Present Perfect, не Continuous."
+          },
+          {
+            "id": "ppvppc_g2_18",
+            "instruction": "Впиши форму",
+            "prompt": "I ____ (want) to go back to university for a long time.",
+            "accepted": [
+              "have wanted"
+            ],
+            "explain": "want — stative verb, выбираем Present Perfect."
+          },
+          {
+            "id": "ppvppc_g2_19",
+            "instruction": "Впиши форму",
+            "prompt": "What's that delicious smell? ____ (you / cook)?",
+            "accepted": [
+              "have you been cooking"
+            ],
+            "explain": "Запах = следствие процесса -> Present Perfect Continuous."
+          },
+          {
+            "id": "ppvppc_g2_20",
+            "instruction": "Впиши форму",
+            "prompt": "I ____ (watch) seven films this week!",
+            "accepted": [
+              "have watched"
+            ],
+            "explain": "seven films = количественный результат -> Present Perfect."
+          }
+        ]
+      },
+      {
+        "id": "photo_gap_set_3",
+        "goal": "formula",
+        "title": "Photo Drill: simple or continuous (Set 3)",
+        "kind": "multi_input",
+        "items": [
+          {
+            "id": "ppvppc_g3_1",
+            "instruction": "Заполни пропуск",
+            "prompt": "Where have you been? ____ (you / play) tennis?",
+            "inputs": [
+              {
+                "placeholder": "have you been playing",
+                "accepted": [
+                  "have you been playing"
+                ]
+              }
+            ],
+            "explain": "Вопрос о недавнем процессе -> Present Perfect Continuous."
+          },
+          {
+            "id": "ppvppc_g3_2",
+            "instruction": "Заполни пропуск",
+            "prompt": "Look! Somebody ____ (break) that window.",
+            "inputs": [
+              {
+                "placeholder": "has broken",
+                "accepted": [
+                  "has broken"
+                ]
+              }
+            ],
+            "explain": "Видим результат сейчас (разбитое окно) -> Present Perfect."
+          },
+          {
+            "id": "ppvppc_g3_3",
+            "instruction": "Заполни пропуск",
+            "prompt": "You look tired. ____ (you / work) hard?",
+            "inputs": [
+              {
+                "placeholder": "have you been working",
+                "accepted": [
+                  "have you been working"
+                ]
+              }
+            ],
+            "explain": "Есть следствие процесса (усталость) -> Present Perfect Continuous."
+          },
+          {
+            "id": "ppvppc_g3_4",
+            "instruction": "Заполни пропуск",
+            "prompt": "____ (you / ever / work) in a factory? 'No, never.'",
+            "inputs": [
+              {
+                "placeholder": "have you ever worked",
+                "accepted": [
+                  "have you ever worked"
+                ]
+              }
+            ],
+            "explain": "ever + опыт в жизни -> Present Perfect."
+          },
+          {
+            "id": "ppvppc_g3_5",
+            "instruction": "Заполни пропуск",
+            "prompt": "Where's Lisa? Where ____ (she / go)?",
+            "inputs": [
+              {
+                "placeholder": "has she gone",
+                "accepted": [
+                  "has she gone"
+                ]
+              }
+            ],
+            "explain": "Важен результат сейчас: она ушла и ее нет здесь."
+          },
+          {
+            "id": "ppvppc_g3_6",
+            "instruction": "Заполни пропуск",
+            "prompt": "This is a very old book. I ____ (have) it since I was a child.",
+            "inputs": [
+              {
+                "placeholder": "have had",
+                "accepted": [
+                  "have had"
+                ]
+              }
+            ],
+            "explain": "have (обладание) — stative verb, поэтому Present Perfect."
+          },
+          {
+            "id": "ppvppc_g3_7",
+            "instruction": "Заполни пропуск",
+            "prompt": "'Have you been busy?' 'No, I ____ (watch) TV.'",
+            "inputs": [
+              {
+                "placeholder": "have been watching",
+                "accepted": [
+                  "have been watching"
+                ]
+              }
+            ],
+            "explain": "Подчеркиваем процесс занятия в периоде -> Present Perfect Continuous."
+          },
+          {
+            "id": "ppvppc_g3_8",
+            "instruction": "Заполни пропуск",
+            "prompt": "My brother is an actor. He ____ (appear) in several films.",
+            "inputs": [
+              {
+                "placeholder": "has appeared",
+                "accepted": [
+                  "has appeared"
+                ]
+              }
+            ],
+            "explain": "several films = количество/достижение -> Present Perfect."
+          },
+          {
+            "id": "ppvppc_g3_9",
+            "instruction": "Заполни пропуск",
+            "prompt": "'Sorry I'm late.' 'That's all right. I ____ (not / wait) long.'",
+            "inputs": [
+              {
+                "placeholder": "haven't been waiting",
+                "accepted": [
+                  "haven't been waiting",
+                  "have not been waiting",
+                  "haven't waited",
+                  "have not waited"
+                ]
+              }
+            ],
+            "explain": "long чаще тянет к длительности; допустимы обе формы в живой речи."
+          },
+          {
+            "id": "ppvppc_g3_10",
+            "instruction": "Заполни пропуск",
+            "prompt": "Are you OK? You look as if you ____ (cry).",
+            "inputs": [
+              {
+                "placeholder": "have been crying",
+                "accepted": [
+                  "have been crying"
+                ]
+              }
+            ],
+            "explain": "По внешнему виду видим следствие процесса -> Present Perfect Continuous."
+          },
+          {
+            "id": "ppvppc_g3_11",
+            "instruction": "Заполни пропуск",
+            "prompt": "'Is it still raining?' 'No, it ____ (stop).'",
+            "inputs": [
+              {
+                "placeholder": "has stopped",
+                "accepted": [
+                  "has stopped"
+                ]
+              }
+            ],
+            "explain": "Важен результат: дождь уже прекратился -> Present Perfect."
+          },
+          {
+            "id": "ppvppc_g3_12",
+            "instruction": "Заполни пропуск",
+            "prompt": "The children are tired now. They ____ (play) in the garden.",
+            "inputs": [
+              {
+                "placeholder": "have been playing",
+                "accepted": [
+                  "have been playing"
+                ]
+              }
+            ],
+            "explain": "Усталость показывает следствие длительного процесса."
+          },
+          {
+            "id": "ppvppc_g3_13",
+            "instruction": "Заполни оба пропуска",
+            "prompt": "I ____ (lose) my phone. ____ (you / see) it?",
+            "inputs": [
+              {
+                "placeholder": "have lost",
+                "accepted": [
+                  "have lost"
+                ]
+              },
+              {
+                "placeholder": "have you seen",
+                "accepted": [
+                  "have you seen"
+                ]
+              }
+            ],
+            "explain": "Потеря и поиск результата к настоящему моменту -> Present Perfect."
+          },
+          {
+            "id": "ppvppc_g3_14",
+            "instruction": "Заполни оба пропуска",
+            "prompt": "I ____ (read) the book you lent me, but I ____ (not/finish) it yet. It's really interesting.",
+            "inputs": [
+              {
+                "placeholder": "have been reading",
+                "accepted": [
+                  "have been reading"
+                ]
+              },
+              {
+                "placeholder": "haven't finished",
+                "accepted": [
+                  "haven't finished",
+                  "have not finished"
+                ]
+              }
+            ],
+            "explain": "Чтение как процесс + результат еще не достигнут (yet)."
+          },
+          {
+            "id": "ppvppc_g3_15",
+            "instruction": "Заполни пропуск",
+            "prompt": "I ____ (read) the book you lent me, so you can have it back now.",
+            "inputs": [
+              {
+                "placeholder": "have read",
+                "accepted": [
+                  "have read"
+                ]
+              }
+            ],
+            "explain": "Книга уже прочитана, итог готов -> Present Perfect."
+          }
+        ]
+      },
+      {
+        "id": "markers",
+        "goal": "markers",
+        "title": "Keyword clues: выбери маркеры",
+        "kind": "multi",
+        "items": [
+          {
+            "id": "ppvppc_mark_1",
+            "instruction": "Отметь маркеры Present Perfect (result)",
+            "prompt": "Какие маркеры чаще ведут к Present Perfect?",
+            "options": [
+              "already",
+              "just",
+              "yet",
+              "how long",
+              "all day"
+            ],
+            "correctIndices": [
+              0,
+              1,
+              2
+            ],
+            "explain": "already/just/yet обычно сигналят результат и завершенность."
+          },
+          {
+            "id": "ppvppc_mark_2",
+            "instruction": "Отметь маркеры Present Perfect Continuous (process)",
+            "prompt": "Какие маркеры чаще ведут к Present Perfect Continuous?",
+            "options": [
+              "for",
+              "since",
+              "all day",
+              "how long",
+              "ever"
+            ],
+            "correctIndices": [
+              0,
+              1,
+              2,
+              3
+            ],
+            "explain": "for/since/all day/how long подчеркивают длительность процесса."
+          },
+          {
+            "id": "ppvppc_mark_3",
+            "instruction": "Отметь сигналы количества/опыта",
+            "prompt": "Что обычно тянет к Present Perfect?",
+            "options": [
+              "ever/never",
+              "how many times",
+              "once/twice",
+              "for 3 hours",
+              "all evening"
+            ],
+            "correctIndices": [
+              0,
+              1,
+              2
+            ],
+            "explain": "Опыт и количество раз обычно оформляются через Present Perfect."
+          },
+          {
+            "id": "ppvppc_mark_4",
+            "instruction": "Отметь сигналы видимого процесса",
+            "prompt": "Что чаще указывает на Present Perfect Continuous?",
+            "options": [
+              "I'm tired",
+              "your hands are dirty",
+              "you smell of smoke",
+              "in 2010",
+              "last week"
+            ],
+            "correctIndices": [
+              0,
+              1,
+              2
+            ],
+            "explain": "Следы процесса (усталость, грязные руки, запах) -> Continuous."
+          }
+        ]
+      },
+      {
+        "id": "stative_mistakes",
+        "goal": "mistakes",
+        "title": "Stative verbs: исправь ошибку",
+        "kind": "correction",
+        "items": [
+          {
+            "id": "ppvppc_st_1",
+            "instruction": "Исправь",
+            "prompt": "I have been knowing her for years.",
+            "accepted": [
+              "I have known her for years.",
+              "I've known her for years."
+            ],
+            "explain": "know — stative verb, не используем Continuous."
+          },
+          {
+            "id": "ppvppc_st_2",
+            "instruction": "Исправь",
+            "prompt": "I have been liking this song since childhood.",
+            "accepted": [
+              "I have liked this song since childhood.",
+              "I've liked this song since childhood."
+            ],
+            "explain": "like — stative verb, нужна форма Present Perfect."
+          },
+          {
+            "id": "ppvppc_st_3",
+            "instruction": "Исправь",
+            "prompt": "They have been owning this house since 2012.",
+            "accepted": [
+              "They have owned this house since 2012.",
+              "They've owned this house since 2012."
+            ],
+            "explain": "own обычно не ставим в Continuous."
+          },
+          {
+            "id": "ppvppc_st_4",
+            "instruction": "Исправь",
+            "prompt": "How long have you been having this car?",
+            "accepted": [
+              "How long have you had this car?"
+            ],
+            "explain": "have (обладание) -> Present Perfect: have had."
+          },
+          {
+            "id": "ppvppc_st_5",
+            "instruction": "Исправь",
+            "prompt": "She has been wanting to move abroad for years.",
+            "accepted": [
+              "She has wanted to move abroad for years.",
+              "She's wanted to move abroad for years."
+            ],
+            "explain": "want — stative verb."
+          },
+          {
+            "id": "ppvppc_st_6",
+            "instruction": "Исправь",
+            "prompt": "He has been believing that story for months.",
+            "accepted": [
+              "He has believed that story for months.",
+              "He's believed that story for months."
+            ],
+            "explain": "believe обычно не употребляется в Continuous-форме."
+          },
+          {
+            "id": "ppvppc_st_7",
+            "instruction": "Исправь",
+            "prompt": "We have been needing more time lately.",
+            "accepted": [
+              "We have needed more time lately.",
+              "We've needed more time lately."
+            ],
+            "explain": "need в этом значении — stative verb."
+          },
+          {
+            "id": "ppvppc_st_8",
+            "instruction": "Исправь",
+            "prompt": "I have been loving chocolate since childhood.",
+            "accepted": [
+              "I have loved chocolate since childhood.",
+              "I've loved chocolate since childhood."
+            ],
+            "explain": "love — stative verb, используем Present Perfect."
+          }
+        ]
+      },
+      {
+        "id": "compare",
+        "goal": "compare",
+        "title": "Выбери лучший вариант по контексту",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "ppvppc_cmp_1",
+            "instruction": "Выбери",
+            "prompt": "Контекст: у человека грязные руки и запах краски. Как лучше сказать?",
+            "options": [
+              "You have painted the wall.",
+              "You have been painting the wall."
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "presentPerfectContinuous",
+            "explain": "По следам процесса лучше форма Continuous."
+          },
+          {
+            "id": "ppvppc_cmp_2",
+            "instruction": "Выбери",
+            "prompt": "Контекст: комната уже готова и чистая. Как лучше сказать?",
+            "options": [
+              "I have cleaned the room.",
+              "I have been cleaning the room."
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentPerfect",
+            "explain": "Нужен итог: комната убрана -> Present Perfect."
+          },
+          {
+            "id": "ppvppc_cmp_3",
+            "instruction": "Выбери",
+            "prompt": "Контекст: ты спрашиваешь про количество попыток. Как лучше сказать?",
+            "options": [
+              "How many times have you tried this task?",
+              "How long have you been trying this task?"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentPerfect",
+            "explain": "Количество раз = Present Perfect."
+          },
+          {
+            "id": "ppvppc_cmp_4",
+            "instruction": "Выбери",
+            "prompt": "Контекст: тебе важно, как долго человек ждет. Выбери лучший вопрос.",
+            "options": [
+              "How long have you waited?",
+              "How long have you been waiting?"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "presentPerfectContinuous",
+            "explain": "Длительность текущего процесса -> Present Perfect Continuous."
+          },
+          {
+            "id": "ppvppc_cmp_5",
+            "instruction": "Выбери",
+            "prompt": "Контекст: «Я уже проверил телефон, все сообщения видел».",
+            "options": [
+              "I have checked my phone.",
+              "I have been checking my phone."
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentPerfect",
+            "explain": "Здесь важен завершенный результат."
+          },
+          {
+            "id": "ppvppc_cmp_6",
+            "instruction": "Выбери",
+            "prompt": "Контекст: «Я все утро сижу в телефоне».",
+            "options": [
+              "I have checked my phone all morning.",
+              "I have been checking my phone all morning."
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "presentPerfectContinuous",
+            "explain": "all morning + процесс -> Continuous."
+          },
+          {
+            "id": "ppvppc_cmp_7",
+            "instruction": "Выбери",
+            "prompt": "Контекст: «Он раньше играл в эту игру, у него есть опыт».",
+            "options": [
+              "He has played this game before.",
+              "He has been playing this game before."
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentPerfect",
+            "explain": "before + опыт до настоящего = Present Perfect."
+          },
+          {
+            "id": "ppvppc_cmp_8",
+            "instruction": "Выбери",
+            "prompt": "Контекст: «Он весь вечер играет».",
+            "options": [
+              "He has played this game all evening.",
+              "He has been playing this game all evening."
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "presentPerfectContinuous",
+            "explain": "all evening подчеркивает длительный процесс -> Continuous."
+          }
+        ]
+      }
+    ]
+  }
+}

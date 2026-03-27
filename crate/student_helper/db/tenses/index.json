@@ -113,6 +113,17 @@
     "levels": ["B1-B2", "B2-C1"]
   },
   {
+    "id": "presentPerfectVsPresentPerfectContinuous",
+    "title": "Present Perfect vs Present Perfect Continuous",
+    "subtitle": "результат vs процесс/длительность",
+    "hint": "WHAT? vs HOW LONG? • markers • stative verbs",
+    "file": "presentPerfectVsPresentPerfectContinuous.json",
+    "group": "present",
+    "kind": "structure",
+    "compare": false,
+    "levels": ["B1-B2", "B2-C1"]
+  },
+  {
     "id": "presentUsageMap",
     "title": "Present Usage Map",
     "subtitle": "как выбрать настоящее время по задаче",
