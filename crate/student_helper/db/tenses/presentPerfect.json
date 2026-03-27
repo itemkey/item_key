@@ -1,15 +1,25 @@
 {
   "id": "presentPerfect",
   "title": "Present Perfect",
-  "subtitle": "опыт • результат • период не закончен",
+  "subtitle": "что сделано к настоящему моменту • результат • опыт",
   "ruleBlocks": [
     {
       "type": "heading",
-      "text": "Когда используем Present Perfect"
+      "text": "Present Perfect: что сделано к настоящему моменту"
     },
     {
       "type": "text",
-      "text": "Present Perfect связывает прошлое с настоящим: действие произошло раньше, но важно сейчас (есть результат/опыт, или период времени ещё не закончился)."
+      "text": "Present Perfect описывает действие, завершенное к настоящему моменту, когда важен результат сейчас. Это время отвечает на вопрос «Что сделано?», а не «Когда именно это произошло?»"
+    },
+    {
+      "type": "highlight",
+      "title": "Главный вопрос времени",
+      "lines": [
+        "Present Perfect отвечает на вопрос: «Что уже произошло к настоящему моменту?»",
+        "Обычно НЕ отвечаем на вопрос «когда именно?» — это зона Past Simple",
+        "Сначала сообщаем результат/новость в Present Perfect, детали времени даём в Past Simple",
+        "Сигнал-пара: Have you ever been abroad? (опыт до сейчас) и When did you go there? (конкретный момент)"
+      ]
     },
     {
       "type": "highlight",
@@ -21,6 +31,10 @@
         "recent news → только что/уже/ещё нет (just/already/yet)",
         "for/since → как долго (период + точка)"
       ]
+    },
+    {
+      "type": "heading",
+      "text": "Формы Present Perfect"
     },
     {
       "type": "table",
@@ -48,6 +62,15 @@
     },
     {
       "type": "highlight",
+      "title": "Форма на примерах",
+      "lines": [
+        "I have lost my key.",
+        "She has not washed the dishes.",
+        "Have you learned the poem yet?"
+      ]
+    },
+    {
+      "type": "highlight",
       "title": "V3 (Past Participle) — третья форма",
       "lines": [
         "regular: work → worked, play → played",
@@ -65,20 +88,45 @@
       "rows": [
         [
           "результат/новость",
-          "already, just, yet, still, by now"
+          "already, just, yet, still (отрицания), by now"
         ],
         [
-          "опыт",
-          "ever, never (experience), before, twice (in my life), always (I've always wanted)"
+          "опыт и количество раз",
+          "ever, never, before, once/twice/three times, all my life"
+        ],
+        [
+          "первый/второй/лучший раз",
+          "It is the first time he has cooked breakfast himself; this is the best film I have ever seen"
         ],
         [
           "период не закончен",
-          "today (unfinished), lately, recently, in recent years, so far, up to now, in the last 2 weeks, over the last decade"
+          "today, this week, this month, this year, so far, up to now, lately, recently, in recent years"
         ],
         [
-          "длительность",
-          "for 2 years, since, how long (+ stative verbs)"
+          "длительность (часто со stative verbs)",
+          "for 2 hours, since morning, how long, since when"
         ]
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Действие с результатом в настоящем"
+    },
+    {
+      "type": "text",
+      "text": "Present Perfect используется для действия, которое уже завершилось, но его результат виден или ощущается сейчас. Точное время совершения действия не указывается."
+    },
+    {
+      "type": "examples",
+      "items": [
+        {
+          "en": "He has already cleaned his room.",
+          "ru": "Он уже убрал свою комнату, и теперь она чистая."
+        },
+        {
+          "en": "I am afraid I have forgotten my password.",
+          "ru": "Боюсь, я забыл пароль, и сейчас не могу войти."
+        }
       ]
     },
     {
@@ -87,10 +135,11 @@
     },
     {
       "type": "highlight",
-      "title": "5 основных случаев",
+      "title": "6 основных случаев",
       "lines": [
         "Результат в настоящем: I’ve lost my keys. (сейчас не могу найти)",
         "Жизненный опыт: Have you ever been abroad? (когда именно — не важно)",
+        "Сколько раз / первый раз: She’s been to Rome three times. / It’s the first time I’ve tried diving.",
         "Недавнее действие/новость: They’ve just arrived. / I’ve already done it.",
         "Действие началось в прошлом и продолжается (часто state verbs): I’ve lived here for 10 years.",
         "Незаконченный период времени: I’ve read three books this month. (месяц ещё идёт)"
@@ -151,6 +200,170 @@
     },
     {
       "type": "heading",
+      "text": "Указание на количество раз"
+    },
+    {
+      "type": "highlight",
+      "title": "Что важно",
+      "lines": [
+        "Повторяющиеся действия: указываем, сколько раз действие произошло к настоящему моменту",
+        "Опыт: They have been to London three times",
+        "Первый раз: It is the first time he has cooked breakfast himself",
+        "Действия за период: I have drunk two cups of tea today (день еще не закончился)"
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        {
+          "en": "They have been to London three times.",
+          "ru": "Они были в Лондоне три раза (опыт до текущего момента)."
+        },
+        {
+          "en": "It is the first time he has cooked breakfast himself.",
+          "ru": "Он впервые сам приготовил завтрак."
+        },
+        {
+          "en": "I have drunk two cups of tea today.",
+          "ru": "Я выпил две чашки чая сегодня (день ещё не закончился)."
+        },
+        {
+          "en": "How many countries have they visited in Europe?",
+          "ru": "Сколько стран в Европе они посетили?"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Связь с Past Simple: since (+ Stative Verb)"
+    },
+    {
+      "type": "text",
+      "text": "Часто используем Present Perfect + since, а после since — Past Simple, чтобы показать точку старта действия в прошлом и его связь с настоящим."
+    },
+    {
+      "type": "highlight",
+      "title": "Как работает since",
+      "lines": [
+        "since + точка времени: since 2019, since Monday",
+        "since + Past Simple: since they finished school, since I moved here",
+        "Со stative verbs (be, know, have, love) обычно Present Perfect, не Continuous",
+        "Если важен длительный процесс/активность, чаще используем Present Perfect Continuous"
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        {
+          "en": "They have been friends since they finished school.",
+          "ru": "Они дружат с тех пор, как закончили школу."
+        },
+        {
+          "en": "That was ten years ago, and things have changed since then.",
+          "ru": "Это было десять лет назад, и с тех пор многое изменилось."
+        },
+        {
+          "en": "I have known her since we met at university.",
+          "ru": "Я знаю её с тех пор, как мы познакомились в университете."
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Новая информация и детали"
+    },
+    {
+      "type": "highlight",
+      "title": "Логика в диалоге",
+      "lines": [
+        "Сначала даём новость/результат в Present Perfect",
+        "Потом уточняем, кто/когда/где — уже в Past Simple",
+        "Это помогает естественно строить разговор: факт сейчас -> детали в прошлом"
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        {
+          "en": "Somebody has spilt water on the floor.",
+          "ru": "Кто-то разлил воду на пол."
+        },
+        {
+          "en": "It wasn't me. I didn't do it.",
+          "ru": "Это не я. Я этого не делал."
+        },
+        {
+          "en": "The manager has resigned. She announced it yesterday.",
+          "ru": "Менеджер уволилась. Она объявила об этом вчера."
+        },
+        {
+          "en": "I've lost my wallet. I left it on the bus this morning.",
+          "ru": "Я потерял кошелёк. Я оставил его в автобусе сегодня утром."
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Длительность действия и наречия"
+    },
+    {
+      "type": "highlight",
+      "title": "Длительность",
+      "lines": [
+        "Present Perfect используем для действий/состояний, которые начались в прошлом и продолжаются до настоящего момента",
+        "Частые маркеры: for, since, all day, lately, recently, up to now",
+        "Особенно это важно со stative verbs, которые обычно не употребляются в Continuous"
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        {
+          "en": "I have wanted to try this for ages.",
+          "ru": "Я давно хотел это попробовать."
+        },
+        {
+          "en": "The weather has been fantastic all day long.",
+          "ru": "Погода была прекрасной весь день."
+        }
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Наречия времени для Present Perfect",
+      "columns": [
+        "Маркеры",
+        "Период/длительность"
+      ],
+      "rows": [
+        [
+          "ever, never",
+          "up to now, so far"
+        ],
+        [
+          "just, already, yet",
+          "still (обычно в отрицаниях)"
+        ],
+        [
+          "lately, recently",
+          "by now, this week"
+        ],
+        [
+          "in recent years, before",
+          "once, twice"
+        ],
+        [
+          "today, always",
+          "for 2 hours, since morning"
+        ],
+        [
+          "all my life",
+          "Since when? / How long?"
+        ]
+      ]
+    },
+    {
+      "type": "heading",
       "text": "Short answers, сокращения и нюансы"
     },
     {
@@ -172,9 +385,10 @@
       "type": "highlight",
       "title": "Ошибки → исправление",
       "lines": [
-        "Did you ever been...? → Have you ever been...?",
+        "Did you ever been abroad? -> Have you ever been abroad?",
         "I have went → I have gone (V3!)",
         "I have seen him yesterday → I saw him yesterday (есть точное прошлое время)",
+        "What have you done? (результат до сейчас) vs When did you do it? (точный момент)",
         "He has finished? → Has he finished?",
         "since/for: since 2015 (точка), for 10 years (период)"
       ]
@@ -200,8 +414,8 @@
           "часто есть точное время (yesterday, last week, in 2010)"
         ],
         [
-          "Have you ever...? / Have you seen...? (до сейчас)",
-          "When did you...? / Did you see...? (в конкретный момент)"
+          "Have you ever been abroad? / Have you seen Anna? (до сейчас)",
+          "When did you go abroad? / Did you see Anna yesterday? (в конкретный момент)"
         ]
       ]
     },
@@ -584,7 +798,7 @@
                 ]
               }
             ],
-            "explain": "before, for ⇒ Present Perfect; have + V3; be → V3."
+            "explain": "before ⇒ Present Perfect; have + V3; be → V3."
           },
           {
             "id": "prp_mi_3",
@@ -667,6 +881,188 @@
               }
             ],
             "explain": "yet ⇒ Present Perfect; have + V3; arrive → V3."
+          }
+        ]
+      },
+      {
+        "id": "photoWorkbookGapFill",
+        "title": "Photo Set: gap fill (have/has + V3)",
+        "kind": "input",
+        "items": [
+          {
+            "id": "prp_photo_gap_1",
+            "instruction": "Вставь форму",
+            "prompt": "You ____ a pet for three years. (KEEP)",
+            "accepted": [
+              "have kept",
+              "have kept a pet for three years"
+            ],
+            "explain": "You -> have + V3 (kept)."
+          },
+          {
+            "id": "prp_photo_gap_2",
+            "instruction": "Построй вопрос",
+            "prompt": "____ here before? (YOU COME)",
+            "accepted": [
+              "Have you come",
+              "Have you come here before?",
+              "Have you come here before"
+            ],
+            "explain": "Вопрос в Present Perfect: Have + subject + V3."
+          },
+          {
+            "id": "prp_photo_gap_3",
+            "instruction": "Построй вопрос",
+            "prompt": "____ all day? (IT RAIN)",
+            "accepted": [
+              "Has it rained",
+              "Has it rained all day?",
+              "Has it rained all day"
+            ],
+            "explain": "It -> has + V3 (rained)."
+          },
+          {
+            "id": "prp_photo_gap_4",
+            "instruction": "Вставь форму",
+            "prompt": "Who ____ to invite? (WE FORGET)",
+            "accepted": [
+              "have we forgotten",
+              "Who have we forgotten to invite?",
+              "Who have we forgotten to invite"
+            ],
+            "explain": "Question word + have + subject + V3."
+          },
+          {
+            "id": "prp_photo_gap_5",
+            "instruction": "Сделай отрицание",
+            "prompt": "We ____ that song already. (NOT HEAR)",
+            "accepted": [
+              "haven't heard",
+              "have not heard"
+            ],
+            "explain": "Отрицание Present Perfect: have not + V3."
+          },
+          {
+            "id": "prp_photo_gap_6",
+            "instruction": "Сделай отрицание",
+            "prompt": "He ____ his books. (NOT FORGET)",
+            "accepted": [
+              "hasn't forgotten",
+              "has not forgotten"
+            ],
+            "explain": "He -> has not + V3."
+          },
+          {
+            "id": "prp_photo_gap_7",
+            "instruction": "Вставь форму",
+            "prompt": "She ____ all the chocolate! (STEAL)",
+            "accepted": [
+              "has stolen"
+            ],
+            "explain": "She -> has + V3 (stolen)."
+          },
+          {
+            "id": "prp_photo_gap_8",
+            "instruction": "Построй вопрос",
+            "prompt": "____ it well? (I EXPLAIN)",
+            "accepted": [
+              "Have I explained",
+              "Have I explained it well?",
+              "Have I explained it well"
+            ],
+            "explain": "I -> have + V3; порядок слов вопроса обязателен."
+          },
+          {
+            "id": "prp_photo_gap_9",
+            "instruction": "Вставь форму",
+            "prompt": "Who ____ recently? (HE MEET)",
+            "accepted": [
+              "has he met",
+              "Who has he met recently?",
+              "Who has he met recently"
+            ],
+            "explain": "He -> has + V3 (met)."
+          },
+          {
+            "id": "prp_photo_gap_10",
+            "instruction": "Построй вопрос",
+            "prompt": "____ already? (WE FINISH)",
+            "accepted": [
+              "Have we finished",
+              "Have we finished already?",
+              "Have we finished already"
+            ],
+            "explain": "We -> have + V3 (finished)."
+          },
+          {
+            "id": "prp_photo_gap_11",
+            "instruction": "Вставь форму",
+            "prompt": "What countries ____ in Europe? (THEY VISIT)",
+            "accepted": [
+              "have they visited",
+              "What countries have they visited in Europe?",
+              "What countries have they visited in Europe"
+            ],
+            "explain": "They -> have + V3 (visited)."
+          },
+          {
+            "id": "prp_photo_gap_12",
+            "instruction": "Вставь форму",
+            "prompt": "He ____ his leg. (HURT)",
+            "accepted": [
+              "has hurt"
+            ],
+            "explain": "He -> has + V3 (hurt)."
+          },
+          {
+            "id": "prp_photo_gap_13",
+            "instruction": "Вставь форму",
+            "prompt": "She ____ her phone in a taxi. (LEAVE)",
+            "accepted": [
+              "has left"
+            ],
+            "explain": "She -> has + V3 (left)."
+          },
+          {
+            "id": "prp_photo_gap_14",
+            "instruction": "Сделай отрицание",
+            "prompt": "We ____ our tickets. (NOT LOSE)",
+            "accepted": [
+              "haven't lost",
+              "have not lost"
+            ],
+            "explain": "We -> have not + V3."
+          },
+          {
+            "id": "prp_photo_gap_15",
+            "instruction": "Построй вопрос",
+            "prompt": "____ her mother? (SHE CALL)",
+            "accepted": [
+              "Has she called",
+              "Has she called her mother?",
+              "Has she called her mother"
+            ],
+            "explain": "She -> has + V3; вопрос начинается с Has."
+          },
+          {
+            "id": "prp_photo_gap_16",
+            "instruction": "Построй вопрос",
+            "prompt": "____ a taxi? (HE TAKE)",
+            "accepted": [
+              "Has he taken",
+              "Has he taken a taxi?",
+              "Has he taken a taxi"
+            ],
+            "explain": "He -> has + V3 (taken)."
+          },
+          {
+            "id": "prp_photo_gap_17",
+            "instruction": "Вставь форму",
+            "prompt": "She ____ to the library. (GO)",
+            "accepted": [
+              "has gone"
+            ],
+            "explain": "go -> gone (V3), поэтому has gone."
           }
         ]
       },
@@ -811,6 +1207,221 @@
         ]
       },
       {
+        "id": "sincePastSimpleBridge",
+        "title": "Since + Past Simple (bridge)",
+        "kind": "multi_input",
+        "items": [
+          {
+            "id": "prp_since_1",
+            "instruction": "Заполни оба пропуска",
+            "prompt": "They ____ friends since they ____ school. (be / finish)",
+            "inputs": [
+              {
+                "placeholder": "have been",
+                "accepted": [
+                  "have been",
+                  "'ve been"
+                ]
+              },
+              {
+                "placeholder": "finished",
+                "accepted": [
+                  "finished"
+                ]
+              }
+            ],
+            "explain": "В главной части — Present Perfect, после since — Past Simple."
+          },
+          {
+            "id": "prp_since_2",
+            "instruction": "Заполни оба пропуска",
+            "prompt": "I ____ here since I ____ to this city. (live / move)",
+            "inputs": [
+              {
+                "placeholder": "have lived",
+                "accepted": [
+                  "have lived",
+                  "'ve lived"
+                ]
+              },
+              {
+                "placeholder": "moved",
+                "accepted": [
+                  "moved"
+                ]
+              }
+            ],
+            "explain": "Точка старта после since оформляется Past Simple."
+          },
+          {
+            "id": "prp_since_3",
+            "instruction": "Заполни оба пропуска",
+            "prompt": "We ____ each other since we ____ at university. (know / meet)",
+            "inputs": [
+              {
+                "placeholder": "have known",
+                "accepted": [
+                  "have known",
+                  "'ve known"
+                ]
+              },
+              {
+                "placeholder": "met",
+                "accepted": [
+                  "met"
+                ]
+              }
+            ],
+            "explain": "know — stative verb, поэтому используем Present Perfect (have known)."
+          },
+          {
+            "id": "prp_since_4",
+            "instruction": "Заполни оба пропуска",
+            "prompt": "Things ____ a lot since that incident ____. (change / happen)",
+            "inputs": [
+              {
+                "placeholder": "have changed",
+                "accepted": [
+                  "have changed",
+                  "'ve changed"
+                ]
+              },
+              {
+                "placeholder": "happened",
+                "accepted": [
+                  "happened"
+                ]
+              }
+            ],
+            "explain": "Изменение до настоящего -> have changed; момент в прошлом -> happened."
+          },
+          {
+            "id": "prp_since_5",
+            "instruction": "Заполни оба пропуска",
+            "prompt": "She ____ much happier since she ____ jobs. (be / change)",
+            "inputs": [
+              {
+                "placeholder": "has been",
+                "accepted": [
+                  "has been",
+                  "'s been"
+                ]
+              },
+              {
+                "placeholder": "changed",
+                "accepted": [
+                  "changed"
+                ]
+              }
+            ],
+            "explain": "Состояние к настоящему моменту -> has been; событие-старт -> changed."
+          }
+        ]
+      },
+      {
+        "id": "newsThenDetails",
+        "title": "Новая информация -> детали (PP + Past Simple)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "prp_news_1",
+            "instruction": "Выбери форму",
+            "prompt": "Somebody ____ water on the floor!",
+            "options": [
+              "has spilt",
+              "spilt"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentPerfect",
+            "explain": "Это новая новость с результатом сейчас -> Present Perfect."
+          },
+          {
+            "id": "prp_news_2",
+            "instruction": "Выбери форму",
+            "prompt": "It ____ five minutes ago.",
+            "options": [
+              "has happened",
+              "happened"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "pastSimple",
+            "explain": "five minutes ago задаёт точный момент в прошлом -> Past Simple."
+          },
+          {
+            "id": "prp_news_3",
+            "instruction": "Выбери форму",
+            "prompt": "The manager ____ . She announced it yesterday.",
+            "options": [
+              "has resigned",
+              "resigned"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentPerfect",
+            "explain": "Сначала сообщаем факт-результат к текущему моменту -> has resigned."
+          },
+          {
+            "id": "prp_news_4",
+            "instruction": "Выбери форму",
+            "prompt": "She ____ it yesterday.",
+            "options": [
+              "has announced",
+              "announced"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "pastSimple",
+            "explain": "yesterday = конкретное прошлое время -> Past Simple."
+          },
+          {
+            "id": "prp_news_5",
+            "instruction": "Выбери форму",
+            "prompt": "I ____ my wallet. I can't find it.",
+            "options": [
+              "have lost",
+              "lost"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentPerfect",
+            "explain": "Есть текущий результат (не могу найти) -> Present Perfect."
+          },
+          {
+            "id": "prp_news_6",
+            "instruction": "Выбери форму",
+            "prompt": "I ____ it on the bus this morning.",
+            "options": [
+              "have left",
+              "left"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "pastSimple",
+            "explain": "this morning (период уже завершён) -> Past Simple."
+          },
+          {
+            "id": "prp_news_7",
+            "instruction": "Выбери форму",
+            "prompt": "They ____ friends since they left school.",
+            "options": [
+              "have been",
+              "were"
+            ],
+            "correctIndex": 0,
+            "correctTenseId": "presentPerfect",
+            "explain": "Состояние, начавшееся в прошлом и актуальное сейчас -> Present Perfect."
+          },
+          {
+            "id": "prp_news_8",
+            "instruction": "Выбери форму",
+            "prompt": "They ____ school in 2012.",
+            "options": [
+              "have left",
+              "left"
+            ],
+            "correctIndex": 1,
+            "correctTenseId": "pastSimple",
+            "explain": "in 2012 = точная дата в прошлом -> Past Simple."
+          }
+        ]
+      },
+      {
         "id": "mistakes",
         "title": "Исправь ошибки (Mistakes)",
         "kind": "correction",
@@ -891,7 +1502,7 @@
               "We have lived here for 10 years.",
               "We've lived here for 10 years."
             ],
-            "explain": "since ⇒ Present Perfect."
+            "explain": "for + период; since + точка отсчёта."
           },
           {
             "id": "prp_c_9",
@@ -901,7 +1512,7 @@
               "She hasn't called yet.",
               "She has not called yet."
             ],
-            "explain": "already ⇒ Present Perfect."
+            "explain": "В отрицании обычно используем yet, а не already."
           },
           {
             "id": "prp_c_10",

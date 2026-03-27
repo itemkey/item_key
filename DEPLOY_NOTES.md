@@ -15,8 +15,9 @@ Order for fresh environment:
 11. Run `supabase/sql/stage15_planning_schedule.sql`
 12. Run `supabase/sql/stage16_planning_personal_schedule.sql`
 13. Run `supabase/sql/stage18_schedule_v2.sql` (**resets schedule domain data**)
-14. (Optional) Run `supabase/sql/stage12_seed_public_user_dictionaries.sql`
-15. (Optional, if stage12 was used) Run `supabase/sql/stage17_fix_memorize_spelling.sql`
+14. Run `supabase/sql/stage19_schedule_series_compact.sql`
+15. (Optional) Run `supabase/sql/stage12_seed_public_user_dictionaries.sql`
+16. (Optional, if stage12 was used) Run `supabase/sql/stage17_fix_memorize_spelling.sql`
 
 After SQL:
 
@@ -30,6 +31,7 @@ After SQL:
   - `planning cloud: live` after opening planning board
   - `planning` shows board-only UI (no schedule tab/button)
   - `crate/schedule/schedule.html` opens and can create/edit plans + slots
+  - assistant `Занятости` tab creates `ik_sched_busy_series` rows
   - assistant can generate suggestions and apply them to real blocks
   - settings save in `ik_sched_prefs`
 

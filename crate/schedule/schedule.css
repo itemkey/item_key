@@ -517,6 +517,59 @@ button.calendar-cell {
   overflow-wrap: anywhere;
 }
 
+.assistant-subtabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.assistant-subtabs .mode-btn {
+  min-width: 170px;
+}
+
+.assistant-collapsible {
+  border: 1px solid var(--sched-line);
+  background: #fbfbfb;
+  padding: 8px;
+  display: grid;
+  gap: 8px;
+}
+
+.assistant-collapsible > summary {
+  cursor: pointer;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.compact-list {
+  max-height: 340px;
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.series-card {
+  border-left: 2px solid var(--sched-line);
+}
+
+.series-card .item-card__actions,
+.suggest-card--group .suggest-card__actions,
+.suggest-card--mini .suggest-card__actions {
+  justify-content: flex-start;
+}
+
+.item-card--compact {
+  gap: 4px;
+}
+
+.suggest-card--group {
+  gap: 6px;
+}
+
+.suggest-card--mini {
+  background: #fafafa;
+}
+
 .item-list,
 .suggest-list {
   display: grid;
@@ -845,5 +898,13 @@ button.calendar-cell {
     font-size: 16px;
     letter-spacing: 0;
     text-transform: none;
+  }
+
+  .assistant-subtabs .mode-btn {
+    width: 100%;
+  }
+
+  .compact-list {
+    max-height: 260px;
   }
 }
