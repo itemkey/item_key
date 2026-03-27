@@ -33,13 +33,15 @@
   padding-bottom: 110px;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  overflow-x: auto !important;
 }
 
 .page.page-schedule .center-stage {
   min-height: 0;
   display: block;
-  padding-top: 6px;
-  padding-bottom: 80px;
+  width: 100%;
+  max-width: 100%;
+  padding: 6px clamp(8px, 1.8vw, 22px) 80px !important;
 }
 
 .ik-site-nav,
@@ -95,7 +97,8 @@
 }
 
 .schedule-shell {
-  width: min(1200px, calc(100vw - 20px));
+  width: 100%;
+  max-width: 1200px;
   margin: 0 auto;
   display: grid;
   gap: 12px;
@@ -148,10 +151,12 @@
   flex-wrap: wrap;
   justify-content: flex-end;
   flex: 1 1 280px;
+  min-width: 0;
 }
 
 .schedule-head__actions .btn {
   white-space: nowrap;
+  max-width: 100%;
 }
 
 .schedule-tabs {
@@ -169,6 +174,7 @@
   text-transform: uppercase;
   line-height: 1.2;
   cursor: pointer;
+  overflow-wrap: anywhere;
 }
 
 .schedule-tab.is-active {
@@ -181,6 +187,7 @@
   background: rgba(255, 255, 255, 0.96);
   min-height: 62vh;
   padding: 12px;
+  overflow-x: auto;
 }
 
 .btn {
@@ -562,6 +569,30 @@ button.calendar-cell {
   gap: 8px;
 }
 
+.weekday-pick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.weekday-pick .field-inline {
+  border: 1px solid var(--sched-line);
+  background: #fff;
+  padding: 6px 8px;
+}
+
+[data-mode-only].is-unavailable {
+  opacity: 0.38;
+}
+
+[data-mode-only].is-unavailable .ctl,
+[data-mode-only].is-unavailable input,
+[data-mode-only].is-unavailable select,
+[data-mode-only].is-unavailable textarea {
+  background: #f4f4f4;
+  color: #8c8c8c;
+}
+
 .badge {
   display: inline-flex;
   align-items: center;
@@ -761,7 +792,8 @@ button.calendar-cell {
   }
 
   .schedule-shell {
-    width: min(100%, calc(100vw - 12px));
+    width: 100%;
+    max-width: 100%;
   }
 
   .schedule-tabs {

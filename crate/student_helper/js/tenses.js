@@ -458,7 +458,7 @@
     global_map: { reason: 'Начнем с быстрой навигации по грамматике: так проще сразу выбрать нужную форму.', picks: ['futureExpressionWays', 'presentUsageMap', 'pastUsageMap'] },
 
     present_habit: { reason: 'Ты описываешь регулярность или факт в настоящем.', picks: ['presentSimple', 'presentUsageMap', 'presentContinuous'] },
-    present_state: { reason: 'Это состояние/желание/мнение, обычно нужна форма Present Simple (например: I want...).', picks: ['presentSimple', 'presentUsageMap', 'presentContinuous'] },
+    present_state: { reason: 'Это состояние/желание/мнение, обычно нужна форма Present Simple (например: I want...).', picks: ['stativeVerbs', 'presentSimple', 'presentUsageMap'] },
     present_process: { reason: 'Ты говоришь о процессе прямо сейчас.', picks: ['presentContinuous', 'presentUsageMap', 'presentSimple'] },
     present_result: { reason: 'Тебе важен результат к текущему моменту.', picks: ['presentPerfect', 'presentUsageMap', 'presentPerfectContinuous'] },
     present_duration: { reason: 'Тебе нужна длительность процесса до сейчас.', picks: ['presentPerfectContinuous', 'presentUsageMap', 'presentPerfect'] },

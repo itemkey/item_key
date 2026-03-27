@@ -6,6 +6,14 @@ const FLEXIBILITY_VALUES = ['fixed', 'flexible', 'very_flexible'];
 const REPEAT_VALUES = ['none', 'daily', 'weekly', 'monthly', 'yearly', 'weekdays', 'weekends'];
 const PERIOD_VALUES = ['any', 'morning', 'afternoon', 'evening', 'night'];
 const ASSISTANT_MODES = ['auto', 'deadline_focus', 'balanced', 'light'];
+const ASSISTANT_PLAN_MODES = ['deadline', 'day_flexible', 'weekly_flexible'];
+const PRESERVED_FORM_SELECTORS = [
+  '[data-assistant-item-form]',
+  '[data-recurring-busy-form]',
+  '[data-assistant-run-form]',
+  '[data-settings-form]'
+];
+const WEEKDAY_SHORT_RU = ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'];
 
 function escapeHtml(str) {
   return String(str ?? '')
@@ -109,6 +117,16 @@ function startOfWeek(date) {
   return d;
 }
 
+function firstWeekdayOnOrAfter(baseDate, weekday) {
+  const d = startOfDay(baseDate);
+  const target = Number(weekday);
+  if (!Number.isInteger(target) || target < 0 || target > 6) return d;
+  const cur = d.getDay();
+  const delta = (target - cur + 7) % 7;
+  d.setDate(d.getDate() + delta);
+  return d;
+}
+
 function shortText(value, max = 120) {
   const txt = String(value || '').replace(/\s+/g, ' ').trim();
   if (!txt) return '';
@@ -157,6 +175,11 @@ function normalizePeriod(v) {
 function normalizeMode(v) {
   const s = String(v || '').toLowerCase();
   return ASSISTANT_MODES.includes(s) ? s : 'auto';
+}
+
+function normalizeAssistantPlanMode(v) {
+  const s = String(v || '').toLowerCase();
+  return ASSISTANT_PLAN_MODES.includes(s) ? s : 'deadline';
 }
 
 function parseOffsets(raw) {
@@ -376,7 +399,7 @@ class ScheduleApp {
     try {
       await this.ensureDefaultSpace();
       await this.loadPrefs();
-      await this.reloadAll();
+      await this.reloadAll({ showLoading: true });
       this.render();
     } catch (error) {
       this.onError(error);
@@ -403,6 +426,10 @@ class ScheduleApp {
     this.els.content?.addEventListener('submit', (event) => {
       void this.handleContentSubmit(event).catch((error) => this.onError(error));
     });
+
+    this.els.content?.addEventListener('change', (event) => {
+      void this.handleContentChange(event).catch((error) => this.onError(error));
+    });
   }
 
   async handleContentSubmit(event) {
@@ -413,6 +440,13 @@ class ScheduleApp {
       event.preventDefault();
       const data = Object.fromEntries(new FormData(form).entries());
       await this.createAssistantInboxItem(data);
+      return;
+    }
+
+    if (form.matches('[data-recurring-busy-form]')) {
+      event.preventDefault();
+      const data = Object.fromEntries(new FormData(form).entries());
+      await this.createRecurringBusyBlocks(data);
       return;
     }
 
@@ -427,6 +461,14 @@ class ScheduleApp {
       event.preventDefault();
       const data = Object.fromEntries(new FormData(form).entries());
       await this.saveSettings(data);
+    }
+  }
+
+  async handleContentChange(event) {
+    const modeSelect = event.target.closest('[data-assistant-plan-mode]');
+    if (modeSelect) {
+      const form = modeSelect.closest('form');
+      if (form) this.syncAssistantInboxMode(form);
     }
   }
 
@@ -459,6 +501,13 @@ class ScheduleApp {
         }
         this.render();
       }
+      return;
+    }
+
+    const openBusyDayBtn = event.target.closest('[data-open-busy-day]');
+    if (openBusyDayBtn) {
+      const day = parseISODate(openBusyDayBtn.getAttribute('data-open-busy-day'));
+      if (day) this.openCalendarAt(day);
       return;
     }
 
@@ -604,53 +653,59 @@ class ScheduleApp {
     if (CALENDAR_MODES.includes(mode)) this.state.calendarMode = mode;
   }
 
-  async reloadAll() {
+  async reloadAll(options = null) {
     if (!this.state.space) return;
-    this.state.loading = true;
-    this.render();
+
+    const showLoading = !!(options && options.showLoading);
+    if (showLoading) {
+      this.state.loading = true;
+      this.render();
+    }
 
     const spaceId = this.state.space.id;
     const fromIso = addDays(new Date(), -90).toISOString();
     const toIso = addDays(new Date(), 370).toISOString();
 
-    const [itemsRes, blocksRes, suggestionsRes, runsRes] = await Promise.all([
-      this.client
-        .from('ik_sched_items')
-        .select('*')
-        .eq('space_id', spaceId)
-        .order('created_at', { ascending: false }),
-      this.client
-        .from('ik_sched_blocks')
-        .select('*')
-        .eq('space_id', spaceId)
-        .gte('starts_at', fromIso)
-        .lte('starts_at', toIso)
-        .order('starts_at', { ascending: true }),
-      this.client
-        .from('ik_sched_assistant_suggestions')
-        .select('*')
-        .eq('space_id', spaceId)
-        .order('created_at', { ascending: false })
-        .limit(500),
-      this.client
-        .from('ik_sched_assistant_runs')
-        .select('*')
-        .eq('space_id', spaceId)
-        .order('started_at', { ascending: false })
-        .limit(20)
-    ]);
+    try {
+      const [itemsRes, blocksRes, suggestionsRes, runsRes] = await Promise.all([
+        this.client
+          .from('ik_sched_items')
+          .select('*')
+          .eq('space_id', spaceId)
+          .order('created_at', { ascending: false }),
+        this.client
+          .from('ik_sched_blocks')
+          .select('*')
+          .eq('space_id', spaceId)
+          .gte('starts_at', fromIso)
+          .lte('starts_at', toIso)
+          .order('starts_at', { ascending: true }),
+        this.client
+          .from('ik_sched_assistant_suggestions')
+          .select('*')
+          .eq('space_id', spaceId)
+          .order('created_at', { ascending: false })
+          .limit(500),
+        this.client
+          .from('ik_sched_assistant_runs')
+          .select('*')
+          .eq('space_id', spaceId)
+          .order('started_at', { ascending: false })
+          .limit(20)
+      ]);
 
-    if (itemsRes.error) throw itemsRes.error;
-    if (blocksRes.error) throw blocksRes.error;
-    if (suggestionsRes.error) throw suggestionsRes.error;
-    if (runsRes.error) throw runsRes.error;
+      if (itemsRes.error) throw itemsRes.error;
+      if (blocksRes.error) throw blocksRes.error;
+      if (suggestionsRes.error) throw suggestionsRes.error;
+      if (runsRes.error) throw runsRes.error;
 
-    this.state.items = asArray(itemsRes.data);
-    this.state.blocks = asArray(blocksRes.data);
-    this.state.suggestions = asArray(suggestionsRes.data);
-    this.state.runs = asArray(runsRes.data);
-
-    this.state.loading = false;
+      this.state.items = asArray(itemsRes.data);
+      this.state.blocks = asArray(blocksRes.data);
+      this.state.suggestions = asArray(suggestionsRes.data);
+      this.state.runs = asArray(runsRes.data);
+    } finally {
+      this.state.loading = false;
+    }
   }
 
   renderLoading(text) {
@@ -690,6 +745,32 @@ class ScheduleApp {
     this.render();
   }
 
+  openCalendarAt(date) {
+    const day = startOfDay(date || new Date());
+    this.state.activeTab = 'calendar';
+    this.state.anchorDate = day;
+    this.state.selectedDate = day;
+    this.render();
+  }
+
+  syncAssistantInboxMode(form) {
+    if (!(form instanceof HTMLFormElement)) return;
+    const select = form.querySelector('[data-assistant-plan-mode]');
+    const mode = normalizeAssistantPlanMode(select ? select.value : 'deadline');
+
+    form.querySelectorAll('[data-mode-only]').forEach((node) => {
+      const raw = String(node.getAttribute('data-mode-only') || '');
+      const allowed = raw.split(/[\s,]+/).filter(Boolean).map((x) => String(x).toLowerCase());
+      const visible = allowed.includes(mode);
+      node.hidden = false;
+      node.classList.toggle('is-unavailable', !visible);
+
+      node.querySelectorAll('input, select, textarea').forEach((control) => {
+        control.disabled = !visible;
+      });
+    });
+  }
+
   renderTabs() {
     this.els.tabsRoot?.querySelectorAll('[data-tab]').forEach((node) => {
       const active = String(node.getAttribute('data-tab')) === this.state.activeTab;
@@ -697,14 +778,80 @@ class ScheduleApp {
     });
   }
 
+  captureFormState(form) {
+    const out = {};
+    if (!(form instanceof HTMLFormElement)) return out;
+
+    Array.from(form.elements).forEach((el) => {
+      if (!(el instanceof HTMLElement)) return;
+      const name = el.getAttribute('name');
+      if (!name) return;
+      const type = String(el.getAttribute('type') || '').toLowerCase();
+
+      if (el instanceof HTMLInputElement && type === 'checkbox') {
+        out[name] = { kind: 'checkbox', value: el.checked };
+        return;
+      }
+
+      if (el instanceof HTMLInputElement && type === 'radio') {
+        if (el.checked) out[name] = { kind: 'radio', value: el.value };
+        return;
+      }
+
+      if (el instanceof HTMLInputElement || el instanceof HTMLSelectElement || el instanceof HTMLTextAreaElement) {
+        out[name] = { kind: 'value', value: el.value };
+      }
+    });
+
+    return out;
+  }
+
+  restoreFormState(form, state) {
+    if (!(form instanceof HTMLFormElement) || !state || typeof state !== 'object') return;
+
+    Array.from(form.elements).forEach((el) => {
+      if (!(el instanceof HTMLElement)) return;
+      const name = el.getAttribute('name');
+      if (!name || !(name in state)) return;
+
+      const saved = state[name];
+      if (!saved || typeof saved !== 'object') return;
+
+      const type = String(el.getAttribute('type') || '').toLowerCase();
+
+      if (el instanceof HTMLInputElement && type === 'checkbox') {
+        el.checked = !!saved.value;
+        return;
+      }
+
+      if (el instanceof HTMLInputElement && type === 'radio') {
+        el.checked = String(el.value) === String(saved.value || '');
+        return;
+      }
+
+      if (el instanceof HTMLInputElement || el instanceof HTMLSelectElement || el instanceof HTMLTextAreaElement) {
+        el.value = saved.value == null ? '' : String(saved.value);
+      }
+    });
+  }
+
   captureViewState() {
     const state = {
       scrollX: window.scrollX,
       scrollY: window.scrollY,
-      focusSelector: ''
+      focusSelector: '',
+      forms: {}
     };
 
     if (!this.els.content) return state;
+
+    PRESERVED_FORM_SELECTORS.forEach((selector) => {
+      const form = this.els.content.querySelector(selector);
+      if (form instanceof HTMLFormElement) {
+        state.forms[selector] = this.captureFormState(form);
+      }
+    });
+
     const active = document.activeElement;
     if (!(active instanceof HTMLElement) || !this.els.content.contains(active)) return state;
 
@@ -715,6 +862,8 @@ class ScheduleApp {
     const escapedName = String(fieldName).replaceAll('"', '\\"');
     if (form.matches('[data-assistant-item-form]')) {
       state.focusSelector = `[data-assistant-item-form] [name="${escapedName}"]`;
+    } else if (form.matches('[data-recurring-busy-form]')) {
+      state.focusSelector = `[data-recurring-busy-form] [name="${escapedName}"]`;
     } else if (form.matches('[data-assistant-run-form]')) {
       state.focusSelector = `[data-assistant-run-form] [name="${escapedName}"]`;
     } else if (form.matches('[data-settings-form]')) {
@@ -726,6 +875,15 @@ class ScheduleApp {
 
   restoreViewState(state) {
     if (!state) return;
+
+    if (this.els.content && state.forms && typeof state.forms === 'object') {
+      PRESERVED_FORM_SELECTORS.forEach((selector) => {
+        const form = this.els.content.querySelector(selector);
+        if (form instanceof HTMLFormElement && state.forms[selector]) {
+          this.restoreFormState(form, state.forms[selector]);
+        }
+      });
+    }
 
     if (Number.isFinite(state.scrollX) && Number.isFinite(state.scrollY)) {
       window.scrollTo(state.scrollX, state.scrollY);
@@ -772,6 +930,11 @@ class ScheduleApp {
 
     this.els.content.innerHTML = html;
     if (preserveView) this.restoreViewState(viewState);
+
+    if (this.state.activeTab === 'assistant') {
+      const form = this.els.content.querySelector('[data-assistant-item-form]');
+      if (form) this.syncAssistantInboxMode(form);
+    }
   }
 
   findItem(id) {
@@ -791,6 +954,7 @@ class ScheduleApp {
     parts.push(categoryLabel(item.category));
     parts.push(priorityLabel(item.priority));
     if (item.estimated_minutes) parts.push(`${item.estimated_minutes} мин`);
+    if (item.desired_day) parts.push(`день ${item.desired_day}`);
     if (item.deadline_at) {
       const d = new Date(item.deadline_at);
       parts.push(`дедлайн ${toISODate(d)} ${toTimeText(d)}`);
@@ -1259,6 +1423,40 @@ class ScheduleApp {
       .sort((a, b) => toEpoch(a.suggested_start_at) - toEpoch(b.suggested_start_at));
   }
 
+  allUpcomingBusyBlocks() {
+    const now = Date.now();
+    return this.state.blocks
+      .filter((block) => {
+        if (block.item_id) return false;
+        if (!block.is_locked) return false;
+        if (String(block.status || '') === 'cancelled') return false;
+        return toEpoch(block.ends_at) >= now;
+      })
+      .slice()
+      .sort((a, b) => toEpoch(a.starts_at) - toEpoch(b.starts_at));
+  }
+
+  upcomingBusyBlocks(limit = 8) {
+    return this
+      .allUpcomingBusyBlocks()
+      .slice(0, Math.max(1, Number(limit) || 8));
+  }
+
+  renderBusyPreviewCard(block) {
+    const start = new Date(block.starts_at);
+    const end = new Date(block.ends_at);
+    const dayKey = toISODate(start);
+    return `
+      <article class="item-card">
+        <div class="item-card__title">${escapeHtml(String(block.title || 'Занятость'))}</div>
+        <div class="item-card__meta">${escapeHtml(`${dayKey} ${toTimeText(start)} - ${toTimeText(end)}`)}</div>
+        <div class="item-card__actions">
+          <button class="btn btn--thin" type="button" data-open-busy-day="${escapeAttr(dayKey)}">Открыть в календаре</button>
+        </div>
+      </article>
+    `;
+  }
+
   renderSuggestionCard(s) {
     const item = this.findItem(s.item_id);
     const start = new Date(s.suggested_start_at);
@@ -1288,6 +1486,8 @@ class ScheduleApp {
     const defaults = parseJsonMaybe(this.state.prefs && this.state.prefs.assistant_defaults, {});
     const horizonDefault = clamp(Number(defaults.horizon_days || 30), 3, 180);
     const modeDefault = normalizeMode(defaults.mode || 'deadline_focus');
+    const busyPreview = this.upcomingBusyBlocks(8);
+    const busyTotal = this.allUpcomingBusyBlocks().length;
 
     return `
       <div class="sched-pane">
@@ -1296,7 +1496,70 @@ class ScheduleApp {
             <div class="sched-block__title">Помощник по составлению расписания</div>
             <button class="btn" type="button" data-run-assistant>Сформировать предложения</button>
           </div>
-          <div class="assistant-note">Сначала выгрузи все планы в inbox. Помощник учитывает дедлайн, объем, оценку времени, обязательность, приоритет и свободные окна. Большие задачи автоматически делятся на части.</div>
+          <div class="assistant-note">Сначала добавь постоянные занятости (уроки, работа, тренировки), потом выгрузи планы в inbox. Помощник учитывает дедлайн, объем, обязательность, приоритет и свободные окна.</div>
+        </section>
+
+        <section class="sched-block">
+          <header class="sched-block__head">
+            <div class="sched-block__title">Регулярная занятость</div>
+          </header>
+          <div class="assistant-note">Пример: школа каждый понедельник с 08:30 до 14:45.</div>
+          <form class="form" data-recurring-busy-form>
+            <div class="form__grid2">
+              <label class="field">Название
+                <input class="ctl" name="title" maxlength="220" />
+              </label>
+              <label class="field">Категория
+                <select class="ctl" name="category">
+                  <option value="mandatory" selected>Обязательное</option>
+                  <option value="personal">Личное</option>
+                  <option value="temporary">Временное</option>
+                </select>
+              </label>
+            </div>
+
+            <div class="form__grid2">
+              <label class="field">День недели
+                <select class="ctl" name="weekday">
+                  <option value="1" selected>Понедельник</option>
+                  <option value="2">Вторник</option>
+                  <option value="3">Среда</option>
+                  <option value="4">Четверг</option>
+                  <option value="5">Пятница</option>
+                  <option value="6">Суббота</option>
+                  <option value="0">Воскресенье</option>
+                </select>
+              </label>
+              <label class="field">Начиная с даты
+                <input class="ctl" type="date" name="from_date" />
+              </label>
+            </div>
+
+            <div class="form__grid2">
+              <label class="field">Начало
+                <input class="ctl" type="time" name="start_time" required />
+              </label>
+              <label class="field">Конец
+                <input class="ctl" type="time" name="end_time" required />
+              </label>
+            </div>
+
+            <div class="form__grid2">
+              <label class="field">Повторять до (необязательно)
+                <input class="ctl" type="date" name="until_date" />
+              </label>
+              <div class="assistant-note">Если оставить пусто, создается только ближайшая дата. Чтобы получить серию, укажи дату окончания.</div>
+            </div>
+
+            <div class="form__actions">
+              <button class="btn" type="submit">Добавить регулярную занятость</button>
+            </div>
+          </form>
+
+          <div class="sched-block__title">Ближайшие занятости${busyTotal ? ` · показано ${busyPreview.length} из ${busyTotal}` : ''}</div>
+          ${busyPreview.length
+            ? `<div class="item-list">${busyPreview.map((block) => this.renderBusyPreviewCard(block)).join('')}</div>`
+            : '<div class="empty-note">Пока нет регулярных занятостей</div>'}
         </section>
 
         <div class="assistant-grid">
@@ -1320,6 +1583,44 @@ class ScheduleApp {
               </div>
 
               <div class="form__grid2">
+                <label class="field">Формат плана
+                  <select class="ctl" name="plan_mode" data-assistant-plan-mode>
+                    <option value="deadline" selected>По дедлайну</option>
+                    <option value="day_flexible">На конкретный день (время подберет помощник)</option>
+                    <option value="weekly_flexible">Регулярно по дням недели (время подберет помощник)</option>
+                  </select>
+                </label>
+                <label class="field" data-mode-only="day_flexible">Нужный день
+                  <input class="ctl" name="desired_day" type="date" />
+                </label>
+              </div>
+
+              <div class="form__grid2" data-mode-only="weekly_flexible">
+                <label class="field">Начиная с даты
+                  <input class="ctl" name="from_date" type="date" />
+                </label>
+                <label class="field">Повторять до (необязательно)
+                  <input class="ctl" name="until_date" type="date" />
+                </label>
+              </div>
+
+              <div class="field" data-mode-only="weekly_flexible">
+                <span>Дни недели</span>
+                <div class="weekday-pick">
+                  <label class="field-inline"><input type="checkbox" name="weekday_1" checked />Пн</label>
+                  <label class="field-inline"><input type="checkbox" name="weekday_2" />Вт</label>
+                  <label class="field-inline"><input type="checkbox" name="weekday_3" />Ср</label>
+                  <label class="field-inline"><input type="checkbox" name="weekday_4" />Чт</label>
+                  <label class="field-inline"><input type="checkbox" name="weekday_5" />Пт</label>
+                  <label class="field-inline"><input type="checkbox" name="weekday_6" />Сб</label>
+                  <label class="field-inline"><input type="checkbox" name="weekday_0" />Вс</label>
+                </div>
+              </div>
+
+              <div class="assistant-note" data-mode-only="day_flexible">Дедлайн можно не указывать. Помощник сам поставит точное время в выбранный день.</div>
+              <div class="assistant-note" data-mode-only="weekly_flexible">Помощник создаст отдельный inbox-план на каждую выбранную дату и сам подберет точное время внутри дня. Если дата окончания не указана, берется 8 недель вперед.</div>
+
+              <div class="form__grid2">
                 <label class="field">Приоритет
                   <select class="ctl" name="priority">
                     <option value="low">LOW</option>
@@ -1333,7 +1634,7 @@ class ScheduleApp {
                 </label>
               </div>
 
-              <div class="form__grid2">
+              <div class="form__grid2" data-mode-only="deadline">
                 <label class="field">Дедлайн (дата, необязательно)
                   <input class="ctl" name="deadline_date" type="date" />
                 </label>
@@ -1341,7 +1642,7 @@ class ScheduleApp {
                   <input class="ctl" name="deadline_time" type="time" />
                 </label>
               </div>
-              <div class="assistant-note">Если время дедлайна не указано, используется конец дня.</div>
+              <div class="assistant-note" data-mode-only="deadline">Если время дедлайна не указано, используется конец дня.</div>
 
               <div class="form__grid2">
                 <label class="field">Предпочтительное время
@@ -1881,6 +2182,23 @@ class ScheduleApp {
             </label>
           </div>
 
+          ${isEdit ? '' : `
+            <div class="form__grid2">
+              <label class="field">Повтор слота
+                <select class="ctl" name="repeat_rule">
+                  <option value="none" selected>Без повтора</option>
+                  <option value="weekly">Еженедельно</option>
+                  <option value="weekdays">По будням</option>
+                  <option value="daily">Ежедневно</option>
+                </select>
+              </label>
+              <label class="field">Повторять до
+                <input class="ctl" type="date" name="repeat_until" />
+              </label>
+            </div>
+            <div class="assistant-note">Если повтор включен и дата не задана, серия создается на 12 недель вперед.</div>
+          `}
+
           <div class="field-inline">
             <input type="checkbox" name="is_locked" id="blockLocked" ${block && block.is_locked ? 'checked' : ''} />
             <label for="blockLocked">Зафиксированный слот</label>
@@ -1931,36 +2249,99 @@ class ScheduleApp {
     };
   }
 
+  buildRecurringBlockRows(payload, data) {
+    const repeatRule = String(data.repeat_rule || 'none').toLowerCase();
+    if (!['none', 'weekly', 'weekdays', 'daily'].includes(repeatRule)) return [payload];
+    if (repeatRule === 'none') return [payload];
+
+    const baseStart = new Date(payload.starts_at);
+    const baseEnd = new Date(payload.ends_at);
+    if (!Number.isFinite(baseStart.getTime()) || !Number.isFinite(baseEnd.getTime()) || baseEnd <= baseStart) {
+      return [payload];
+    }
+
+    const baseDay = startOfDay(baseStart);
+    const untilDate = parseISODate(data.repeat_until) || addDays(baseDay, 84);
+    if (startOfDay(untilDate) < baseDay) {
+      this.ui.toast('Дата повтора раньше даты слота');
+      return null;
+    }
+
+    const durationMs = baseEnd.getTime() - baseStart.getTime();
+    const startHour = baseStart.getHours();
+    const startMinute = baseStart.getMinutes();
+
+    const rows = [];
+    const maxRows = 260;
+    const pushRow = (day) => {
+      if (rows.length >= maxRows) return;
+      const start = new Date(day.getFullYear(), day.getMonth(), day.getDate(), startHour, startMinute, 0, 0);
+      const end = new Date(start.getTime() + durationMs);
+      rows.push({
+        ...payload,
+        starts_at: start.toISOString(),
+        ends_at: end.toISOString()
+      });
+    };
+
+    if (repeatRule === 'weekly') {
+      for (let cursor = new Date(baseDay); cursor <= untilDate && rows.length < maxRows; cursor = addDays(cursor, 7)) {
+        pushRow(cursor);
+      }
+    } else {
+      for (let cursor = new Date(baseDay); cursor <= untilDate && rows.length < maxRows; cursor = addDays(cursor, 1)) {
+        if (repeatRule === 'weekdays' && (cursor.getDay() === 0 || cursor.getDay() === 6)) continue;
+        pushRow(cursor);
+      }
+    }
+
+    if (!rows.length) rows.push(payload);
+    return rows;
+  }
+
   async createBlock(data) {
     if (!this.state.space) return;
     const payload = this.buildBlockPayload(data);
     if (!payload) return;
 
+    const seriesRows = this.buildRecurringBlockRows(payload, data);
+    if (!seriesRows || !seriesRows.length) return;
+
+    const insertPayload = seriesRows.map((row) => ({
+      ...row,
+      space_id: this.state.space.id,
+      source: 'manual',
+      created_by: this.user.id,
+      updated_by: this.user.id
+    }));
+
     const { data: insertRows, error } = await this.client
       .from('ik_sched_blocks')
-      .insert({
-        ...payload,
-        space_id: this.state.space.id,
-        source: 'manual',
-        created_by: this.user.id,
-        updated_by: this.user.id
-      })
-      .select('id,item_id')
-      .limit(1);
+      .insert(insertPayload)
+      .select('id,item_id');
     if (error) throw error;
 
-    const inserted = asArray(insertRows)[0] || null;
-    if (inserted && inserted.item_id) {
+    const linkedIds = Array.from(new Set(
+      asArray(insertRows)
+        .map((row) => String(row.item_id || '').trim())
+        .filter(Boolean)
+    ));
+    if (linkedIds.length) {
       await this.client
         .from('ik_sched_items')
         .update({ status: 'scheduled', updated_by: this.user.id })
-        .eq('id', inserted.item_id)
+        .in('id', linkedIds)
         .eq('space_id', this.state.space.id)
         .in('status', ['pending', 'in_progress']);
     }
 
     this.ui.closeModal();
     await this.reloadAll();
+    if (insertPayload.length > 1) {
+      this.render({ preserveView: true });
+      this.ui.toast(`Слотов создано: ${insertPayload.length}`);
+      return;
+    }
     this.render({ preserveView: true });
     this.ui.toast('Слот создан');
   }
@@ -1995,24 +2376,104 @@ class ScheduleApp {
     this.ui.toast('Слот сохранен');
   }
 
+  findMatchingRecurringBusySeriesIds(block, futureOnly = true) {
+    if (!block) return [];
+
+    const baseStart = new Date(block.starts_at);
+    const baseEnd = new Date(block.ends_at);
+    if (!Number.isFinite(baseStart.getTime()) || !Number.isFinite(baseEnd.getTime()) || baseEnd <= baseStart) {
+      return [];
+    }
+
+    if (block.item_id || !block.is_locked) return [];
+
+    const baseTitle = String(block.title || '').trim().toLowerCase();
+    const baseCategory = normalizeCategory(block.category);
+    const baseSource = String(block.source || 'manual');
+    const baseStartClock = toTimeText(baseStart);
+    const baseEndClock = toTimeText(baseEnd);
+    const fromEpoch = startOfDay(baseStart).getTime();
+
+    return this.state.blocks
+      .filter((candidate) => {
+        if (!candidate || candidate.item_id || !candidate.is_locked) return false;
+        if (!!candidate.is_locked !== !!block.is_locked) return false;
+        if (normalizeCategory(candidate.category) !== baseCategory) return false;
+        if (String(candidate.source || 'manual') !== baseSource) return false;
+        if (String(candidate.title || '').trim().toLowerCase() !== baseTitle) return false;
+
+        const s = new Date(candidate.starts_at);
+        const e = new Date(candidate.ends_at);
+        if (!Number.isFinite(s.getTime()) || !Number.isFinite(e.getTime()) || e <= s) return false;
+        if (futureOnly && s.getTime() < fromEpoch) return false;
+        if (toTimeText(s) !== baseStartClock || toTimeText(e) !== baseEndClock) return false;
+        return true;
+      })
+      .map((candidate) => String(candidate.id));
+  }
+
   openDeleteBlockModal(blockId) {
     const block = this.findBlock(blockId);
     if (!block) return;
+
+    const seriesIds = this.findMatchingRecurringBusySeriesIds(block, true);
+    const canDeleteSeries = seriesIds.length > 1;
+
     this.ui.openModal({
       title: 'Удалить слот',
       bodyHtml: `
         <form class="form">
           <div class="assistant-note">Удалить слот "${escapeHtml(String(block.title || ''))}"?</div>
+          ${canDeleteSeries ? `<div class="assistant-note">Найдено повторов в серии: ${seriesIds.length}. Можно удалить только этот слот или всю серию.</div>` : ''}
           <div class="form__actions">
             <button class="btn" type="button" data-close>Отмена</button>
-            <button class="btn btn--danger" type="submit">Удалить</button>
+            ${canDeleteSeries ? `<button class="btn" type="button" data-delete-block-single="${escapeAttr(block.id)}">Удалить только этот</button>` : ''}
+            <button class="btn btn--danger" type="submit">${canDeleteSeries ? `Удалить серию (${seriesIds.length})` : 'Удалить'}</button>
           </div>
         </form>
       `,
+      onMount: (root) => {
+        const singleBtn = root.querySelector('[data-delete-block-single]');
+        if (singleBtn) {
+          singleBtn.addEventListener('click', () => {
+            this.ui.closeModal();
+            void this.deleteBlock(block.id).catch((error) => this.onError(error));
+          });
+        }
+      },
       onSubmit: () => {
+        if (canDeleteSeries) {
+          void this.deleteBlockSeries(block.id).catch((error) => this.onError(error));
+          return;
+        }
         void this.deleteBlock(block.id).catch((error) => this.onError(error));
       }
     });
+  }
+
+  async deleteBlockSeries(blockId) {
+    const block = this.findBlock(blockId);
+    if (!block || !this.state.space) return;
+
+    const ids = this.findMatchingRecurringBusySeriesIds(block, true);
+    if (!ids.length) return;
+    if (ids.length === 1) {
+      await this.deleteBlock(ids[0]);
+      return;
+    }
+
+    const { error } = await this.client
+      .from('ik_sched_blocks')
+      .delete()
+      .eq('space_id', this.state.space.id)
+      .in('id', ids);
+
+    if (error) throw error;
+
+    this.ui.closeModal();
+    await this.reloadAll();
+    this.render({ preserveView: true });
+    this.ui.toast(`Удалена серия слотов: ${ids.length}`);
   }
 
   async deleteBlock(blockId) {
@@ -2077,18 +2538,208 @@ class ScheduleApp {
     this.ui.toast(nextStatus === 'done' ? 'Слот отмечен как выполненный' : 'Слот вернулся в план');
   }
 
-  async createAssistantInboxItem(data) {
-    await this.createItem({
+  assistantWeekdaysFromData(data) {
+    const out = [];
+    for (let i = 0; i < 7; i += 1) {
+      const v = data[`weekday_${i}`];
+      if (v === 'on' || v === true || v === 'true' || v === '1' || v === 1) out.push(i);
+    }
+    return out;
+  }
+
+  buildAssistantInboxItemPayload(data, overrides = null) {
+    const cfg = overrides || {};
+    const notePrefix = String(cfg.note_prefix || '').trim();
+    const baseNote = String(data.note || '').trim();
+    const note = [notePrefix, baseNote].filter(Boolean).join(baseNote && notePrefix ? ' | ' : '');
+
+    return this.buildItemPayload({
       ...data,
       item_type: 'task',
-      desired_day: '',
+      desired_day: cfg.desired_day == null ? String(data.desired_day || '') : String(cfg.desired_day || ''),
+      deadline_date: cfg.deadline_date == null ? String(data.deadline_date || '') : String(cfg.deadline_date || ''),
+      deadline_time: cfg.deadline_time == null ? String(data.deadline_time || '') : String(cfg.deadline_time || ''),
       preferred_from: '',
       preferred_to: '',
       repeat_rule: 'none',
       repeat_until: '',
       notify_enabled: 'on',
-      notify_offsets: '60, 15'
+      notify_offsets: '60, 15',
+      flexibility: cfg.flexibility || data.flexibility || 'flexible',
+      note
     });
+  }
+
+  async createAssistantInboxItem(data) {
+    if (!this.state.space) return;
+
+    const mode = normalizeAssistantPlanMode(data.plan_mode);
+    const payloads = [];
+
+    if (mode === 'deadline') {
+      const payload = this.buildAssistantInboxItemPayload(data);
+      if (!payload) return;
+      payloads.push(payload);
+    } else if (mode === 'day_flexible') {
+      const desired = parseISODate(data.desired_day);
+      if (!desired) {
+        this.ui.toast('Укажи день для режима "на конкретный день"');
+        return;
+      }
+
+      const dayKey = toISODate(desired);
+      const payload = this.buildAssistantInboxItemPayload(data, {
+        desired_day: dayKey,
+        deadline_date: '',
+        deadline_time: '',
+        flexibility: 'fixed',
+        note_prefix: `[плавающий график · день ${dayKey}]`
+      });
+      if (!payload) return;
+      payloads.push(payload);
+    } else {
+      const weekdays = this.assistantWeekdaysFromData(data);
+      if (!weekdays.length) {
+        this.ui.toast('Выбери хотя бы один день недели');
+        return;
+      }
+
+      const fromDate = parseISODate(data.from_date) || startOfDay(new Date());
+      const untilDate = parseISODate(data.until_date) || addDays(fromDate, 56);
+      if (startOfDay(untilDate) < startOfDay(fromDate)) {
+        this.ui.toast('Дата окончания серии раньше даты старта');
+        return;
+      }
+
+      const maxRows = 180;
+      for (let day = new Date(fromDate); day <= untilDate && payloads.length < maxRows; day = addDays(day, 1)) {
+        if (!weekdays.includes(day.getDay())) continue;
+
+        const dayKey = toISODate(day);
+        const weekday = WEEKDAY_SHORT_RU[day.getDay()] || '';
+        const payload = this.buildAssistantInboxItemPayload(data, {
+          desired_day: dayKey,
+          deadline_date: '',
+          deadline_time: '',
+          flexibility: 'fixed',
+          note_prefix: `[плавающий график · ${weekday} ${dayKey}]`
+        });
+
+        if (!payload) return;
+        payloads.push(payload);
+      }
+
+      if (!payloads.length) {
+        this.ui.toast('Нет дат для выбранных дней недели в указанном диапазоне');
+        return;
+      }
+    }
+
+    const rows = payloads.map((payload) => ({
+      ...payload,
+      space_id: this.state.space.id,
+      status: 'pending',
+      created_by: this.user.id,
+      updated_by: this.user.id
+    }));
+
+    const { error } = await this.client.from('ik_sched_items').insert(rows);
+    if (error) throw error;
+
+    await this.reloadAll();
+    this.render({ preserveView: true });
+
+    if (mode === 'weekly_flexible') {
+      if (rows.length >= 180) {
+        this.ui.toast(`В inbox добавлено ${rows.length} планов (ограничение серии)`);
+        return;
+      }
+      this.ui.toast(`В inbox добавлено ${rows.length} регулярных планов`);
+      return;
+    }
+
+    if (mode === 'day_flexible') {
+      this.ui.toast('План на выбранный день добавлен в inbox');
+      return;
+    }
+
+    this.ui.toast('План добавлен в inbox');
+  }
+
+  async createRecurringBusyBlocks(data) {
+    if (!this.state.space) return;
+
+    const title = String(data.title || '').trim() || 'Занятость';
+    const weekdayNum = Number.parseInt(String(data.weekday || '1'), 10);
+    const weekday = Number.isInteger(weekdayNum) && weekdayNum >= 0 && weekdayNum <= 6 ? weekdayNum : 1;
+
+    const fromDate = parseISODate(data.from_date) || startOfDay(new Date());
+    const firstDate = firstWeekdayOnOrAfter(fromDate, weekday);
+    const untilDate = parseISODate(data.until_date) || firstDate;
+
+    if (startOfDay(untilDate) < startOfDay(firstDate)) {
+      this.ui.toast('Дата окончания серии раньше даты старта');
+      return;
+    }
+
+    const startTime = parseTimeText(data.start_time);
+    const endTime = parseTimeText(data.end_time);
+    if (!startTime || !endTime) {
+      this.ui.toast('Укажи корректное время начала и конца');
+      return;
+    }
+
+    const firstStart = composeDateTime(toISODate(firstDate), data.start_time, startTime.hh, startTime.mm);
+    const firstEnd = composeDateTime(toISODate(firstDate), data.end_time, endTime.hh, endTime.mm);
+    if (!firstStart || !firstEnd || firstEnd <= firstStart) {
+      this.ui.toast('Проверь время: конец должен быть позже начала');
+      return;
+    }
+
+    const durationMs = firstEnd.getTime() - firstStart.getTime();
+    const category = normalizeCategory(data.category);
+
+    const rows = [];
+    const maxRows = 260;
+    for (let cursor = new Date(firstDate); cursor <= untilDate && rows.length < maxRows; cursor = addDays(cursor, 7)) {
+      const start = composeDateTime(toISODate(cursor), data.start_time, startTime.hh, startTime.mm);
+      if (!start) continue;
+      const end = new Date(start.getTime() + durationMs);
+      rows.push({
+        space_id: this.state.space.id,
+        item_id: null,
+        suggestion_id: null,
+        title,
+        category,
+        starts_at: start.toISOString(),
+        ends_at: end.toISOString(),
+        status: 'planned',
+        is_locked: true,
+        source: 'manual',
+        created_by: this.user.id,
+        updated_by: this.user.id
+      });
+    }
+
+    if (!rows.length) {
+      this.ui.toast('Не удалось построить серию');
+      return;
+    }
+
+    const { error } = await this.client.from('ik_sched_blocks').insert(rows);
+    if (error) throw error;
+
+    await this.reloadAll();
+    this.render({ preserveView: true });
+    if (rows.length === 1) {
+      this.ui.toast('Добавлен 1 слот регулярной занятости');
+      return;
+    }
+    if (rows.length === maxRows) {
+      this.ui.toast(`Добавлено ${rows.length} слотов (ограничение серии)`);
+      return;
+    }
+    this.ui.toast(`Добавлено регулярных слотов: ${rows.length} (до ${toISODate(untilDate)}). Они видны ниже в "Ближайшие занятости".`);
   }
 
   workingWindowFromPrefs() {
@@ -2190,6 +2841,9 @@ class ScheduleApp {
 
   reasonForSuggestion(item, chunkIndex, chunkTotal, deadlineDate) {
     const lines = [];
+    if (item.desired_day) {
+      lines.push(`привязка к дню ${item.desired_day}: подобрано точное время в пределах дня`);
+    }
     if (deadlineDate) {
       const days = dayDiff(new Date(), deadlineDate);
       if (days <= 2) lines.push('очень близкий дедлайн: вынесено в ближайшие свободные слоты');
@@ -2256,11 +2910,17 @@ class ScheduleApp {
       for (let chunkIdx = 0; chunkIdx < totalChunks; chunkIdx += 1) {
         let placed = null;
 
-        if (normalizeFlexibility(item.flexibility) === 'fixed' && item.desired_day && chunkIdx === 0) {
-          const desired = parseISODate(item.desired_day);
-          if (desired) {
-            const windows = this.periodWindowsForDay(desired, item.preferred_period, windowPrefs.start, windowPrefs.end);
-            placed = this.freeSlotInWindows(desired, windows, occupancy, chunkSize);
+        const desiredDay = item.desired_day ? parseISODate(item.desired_day) : null;
+        const strictDesiredDay = !!desiredDay && normalizeFlexibility(item.flexibility) === 'fixed';
+
+        if (desiredDay) {
+          const windows = this.periodWindowsForDay(desiredDay, item.preferred_period, windowPrefs.start, windowPrefs.end);
+          placed = this.freeSlotInWindows(desiredDay, windows, occupancy, chunkSize);
+
+          if (!placed && strictDesiredDay) {
+            failed = true;
+            warnings.push(`Нет окна в выбранный день ${item.desired_day}: ${item.title}`);
+            break;
           }
         }
 

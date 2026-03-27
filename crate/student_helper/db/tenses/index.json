@@ -82,6 +82,17 @@
     "levels": ["A2-B1", "B1-B2", "B2-C1"]
   },
   {
+    "id": "stativeVerbs",
+    "title": "Stative Verbs",
+    "subtitle": "глаголы состояния и ловушки с Continuous",
+    "hint": "state verbs • see/look/watch • hear/listen • meaning",
+    "file": "stativeVerbs.json",
+    "group": "present",
+    "kind": "structure",
+    "compare": false,
+    "levels": ["A2-B1", "B1-B2", "B2-C1"]
+  },
+  {
     "id": "presentPerfect",
     "title": "Present Perfect",
     "subtitle": "опыт - результат - период не закончен",

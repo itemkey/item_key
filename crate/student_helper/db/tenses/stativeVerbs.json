@@ -1,0 +1,1423 @@
+{
+  "id": "stativeVerbs",
+  "title": "Stative Verbs",
+  "subtitle": "состояние, восприятие и мнение -> обычно Simple",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Что такое Stative Verbs"
+    },
+    {
+      "type": "text",
+      "text": "Некоторые глаголы выражают состояние, восприятие или мнение, а не действие. Такие глаголы называются stative (non-continuous) verbs."
+    },
+    {
+      "type": "highlight",
+      "title": "Главное правило",
+      "lines": [
+        "Stative-глаголы обычно не используются в Continuous-временах.",
+        "Для факта, мнения, отношения или состояния выбираем Simple-форму.",
+        "Если значение глагола меняется на действие/процесс, Continuous становится возможным.",
+        "Смысл важнее формы: один и тот же глагол может быть и stative, и dynamic."
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        {
+          "en": "I believe you're right, but I don't agree with your methods.",
+          "ru": "believe и agree выражают мнение/состояние, поэтому здесь Present Simple."
+        },
+        {
+          "en": "I know the answer.",
+          "ru": "know = состояние знания, не процесс."
+        },
+        {
+          "en": "She is looking at the stars.",
+          "ru": "look = активное действие, поэтому Continuous."
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Как быстро распознать stative-глагол"
+    },
+    {
+      "type": "table",
+      "caption": "Частые группы",
+      "columns": [
+        "Группа",
+        "Типичные глаголы",
+        "Подсказка"
+      ],
+      "rows": [
+        [
+          "восприятие",
+          "see, hear, notice, smell, taste",
+          "просто воспринимаем без усилия"
+        ],
+        [
+          "умственная деятельность",
+          "know, remember, understand, believe, realise, mean",
+          "знание, мнение, вывод"
+        ],
+        [
+          "эмоции и чувства",
+          "love, like, hate, dislike, prefer, regret",
+          "отношение и эмоция"
+        ],
+        [
+          "желание и необходимость",
+          "want, wish, need, mind",
+          "внутреннее состояние, не физическое действие"
+        ],
+        [
+          "состояние и принадлежность",
+          "be, have (possession), belong, own, possess, include, contain, consist",
+          "статичный факт о человеке, предмете или системе"
+        ]
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Список, который стоит выучить (ядро)",
+      "columns": [
+        "Состояние/мнение",
+        "Восприятие",
+        "Обладание и связи"
+      ],
+      "rows": [
+        [
+          "agree, appear, be, believe, consider, doubt, exist, forget, forgive, hate",
+          "hear, notice, recognise, see, seem",
+          "belong, contain, consist, depend, fit"
+        ],
+        [
+          "know, love, matter, mean, mind, need, prefer, realise, remember, regret",
+          "smell*, sound, taste*",
+          "have*, include, involve, own, possess, suit, weigh*"
+        ],
+        [
+          "suppose, think*, understand, want, wish, wonder",
+          "feel*, look*",
+          "resemble"
+        ]
+      ]
+    },
+    {
+      "type": "text",
+      "text": "Глаголы со звездочкой (*) могут использоваться и в Simple, и в Continuous. Все решает значение в конкретном предложении."
+    },
+    {
+      "type": "heading",
+      "text": "Ловушка 1: see / look / watch"
+    },
+    {
+      "type": "table",
+      "caption": "Чувствуем разницу",
+      "columns": [
+        "Глагол",
+        "Значение",
+        "Continuous",
+        "Пример"
+      ],
+      "rows": [
+        [
+          "see",
+          "просто видеть (восприятие без усилий)",
+          "обычно не употребляется",
+          "I see a cat on the roof."
+        ],
+        [
+          "look (at)",
+          "смотреть специально, направлять взгляд",
+          "употребляется",
+          "She is looking at the stars."
+        ],
+        [
+          "watch",
+          "наблюдать движение или процесс",
+          "употребляется",
+          "We are watching a movie."
+        ]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Проверочная фраза",
+      "lines": [
+        "Скажи мысленно: «Я собираюсь немного по...».",
+        "«...поувидеть» звучит неестественно -> see чаще остается в Simple.",
+        "«...посмотреть / понаблюдать» естественно -> look/watch легко идут в Continuous."
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Ловушка 2: hear / listen"
+    },
+    {
+      "type": "table",
+      "caption": "Пассивное vs активное восприятие",
+      "columns": [
+        "Глагол",
+        "Значение",
+        "Continuous",
+        "Пример"
+      ],
+      "rows": [
+        [
+          "hear",
+          "просто слышать (без усилия)",
+          "обычно не употребляется",
+          "I hear birds outside my window."
+        ],
+        [
+          "listen (to)",
+          "слушать осознанно, направлять внимание",
+          "употребляется",
+          "She is listening to her favorite playlist."
+        ]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Вывод",
+      "lines": [
+        "hear = пассивное восприятие -> чаще Simple.",
+        "listen = активное действие -> Continuous возможен и часто нужен.",
+        "Смысл «действие или состояние?» всегда проверяем в контексте."
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Глаголы со *: значение решает форму"
+    },
+    {
+      "type": "table",
+      "caption": "Когда Continuous возможен, а когда нет",
+      "columns": [
+        "Глагол",
+        "Continuous (действие/процесс)",
+        "Simple (состояние/восприятие)"
+      ],
+      "rows": [
+        [
+          "smell",
+          "She is smelling the candle to choose a scent.",
+          "The air smells like fresh rain."
+        ],
+        [
+          "taste",
+          "He is tasting the sauce to check it.",
+          "This cake tastes wonderful."
+        ],
+        [
+          "feel",
+          "The doctor is feeling my pulse. / I'm feeling much better today.",
+          "This fabric feels soft. / I feel he's right."
+        ],
+        [
+          "weigh",
+          "The vet is weighing the puppy.",
+          "The table weighs 20 kilos."
+        ],
+        [
+          "look",
+          "She is looking through old photos.",
+          "He looks exhausted after the trip."
+        ],
+        [
+          "see",
+          "I'm seeing a dentist tomorrow. / She is seeing her colleague.",
+          "I see your point now. / Do you see those clouds?"
+        ],
+        [
+          "hear",
+          "The court is hearing a complicated case now.",
+          "I can't hear you clearly."
+        ],
+        [
+          "have",
+          "We're having dinner with our neighbours tonight.",
+          "I have a new laptop for work."
+        ],
+        [
+          "think",
+          "I'm thinking about taking a gap year.",
+          "I think this plan will work."
+        ]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Алгоритм за 5 секунд",
+      "lines": [
+        "1) Это состояние/мнение/восприятие? -> обычно Simple.",
+        "2) Это действие-процесс в моменте? -> возможен Continuous.",
+        "3) Сравни значение: I think (мнение) vs I'm thinking (процесс).",
+        "4) Если сомневаешься, начни с Simple и проверь, не скрывается ли активное действие."
+      ]
+    },
+    {
+      "type": "topicLinks",
+      "title": "Связанные темы",
+      "note": "После этого блока полезно закрепить контраст между Simple и Continuous.",
+      "items": [
+        {
+          "id": "presentSimple",
+          "label": "Present Simple",
+          "note": "факты, привычки, состояния"
+        },
+        {
+          "id": "presentContinuous",
+          "label": "Present Continuous",
+          "note": "процесс сейчас, временные действия"
+        },
+        {
+          "id": "presentUsageMap",
+          "label": "Present Usage Map",
+          "note": "быстрый выбор формы по смыслу"
+        }
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": [
+      {
+        "id": "meaning",
+        "title": "Когда используем (Meaning)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "stv_m_1",
+            "instruction": "Выбери объяснение",
+            "prompt": "I believe you're right, but I don't agree with this method.",
+            "options": [
+              "мнение/состояние -> Present Simple",
+              "процесс прямо сейчас -> Present Continuous",
+              "договоренность на будущее"
+            ],
+            "correctIndex": 0,
+            "explain": "believe и agree здесь выражают мнение, поэтому выбираем Simple."
+          },
+          {
+            "id": "stv_m_2",
+            "instruction": "Выбери объяснение",
+            "prompt": "Look! The children are watching the horses.",
+            "options": [
+              "постоянный факт",
+              "действие в процессе сейчас",
+              "завершенное действие"
+            ],
+            "correctIndex": 1,
+            "explain": "watch = активное наблюдение, контекст Look! -> процесс в момент речи."
+          },
+          {
+            "id": "stv_m_3",
+            "instruction": "Выбери объяснение",
+            "prompt": "I hear birds outside my window.",
+            "options": [
+              "пассивное восприятие -> Simple",
+              "активное действие -> Continuous",
+              "план на будущее"
+            ],
+            "correctIndex": 0,
+            "explain": "hear = просто слышать, обычно не требует Continuous."
+          },
+          {
+            "id": "stv_m_4",
+            "instruction": "Выбери объяснение",
+            "prompt": "She is listening to her favorite playlist.",
+            "options": [
+              "пассивное восприятие",
+              "активное действие в процессе",
+              "стабильный факт"
+            ],
+            "correctIndex": 1,
+            "explain": "listen = активное действие, поэтому Continuous естественен."
+          },
+          {
+            "id": "stv_m_5",
+            "instruction": "Выбери объяснение",
+            "prompt": "This soup tastes amazing.",
+            "options": [
+              "вкус как характеристика -> Simple",
+              "дегустация как действие -> Continuous",
+              "будущий план"
+            ],
+            "correctIndex": 0,
+            "explain": "taste здесь означает характеристику блюда (стативное значение)."
+          },
+          {
+            "id": "stv_m_6",
+            "instruction": "Выбери объяснение",
+            "prompt": "The chef is tasting the soup right now.",
+            "options": [
+              "состояние",
+              "активная проверка вкуса",
+              "обычная привычка"
+            ],
+            "correctIndex": 1,
+            "explain": "is tasting = процесс: человек пробует еду прямо сейчас."
+          },
+          {
+            "id": "stv_m_7",
+            "instruction": "Выбери объяснение",
+            "prompt": "I think your idea is brilliant.",
+            "options": [
+              "мнение -> Simple",
+              "процесс размышления -> Continuous",
+              "действие в прошлом"
+            ],
+            "correctIndex": 0,
+            "explain": "think в значении «считаю» обычно используется в Simple."
+          },
+          {
+            "id": "stv_m_8",
+            "instruction": "Выбери объяснение",
+            "prompt": "I'm thinking about moving abroad.",
+            "options": [
+              "готовое мнение",
+              "процесс обдумывания",
+              "постоянная характеристика"
+            ],
+            "correctIndex": 1,
+            "explain": "I'm thinking = «обдумываю сейчас», это процесс."
+          },
+          {
+            "id": "stv_m_9",
+            "instruction": "Выбери объяснение",
+            "prompt": "We have two dogs.",
+            "options": [
+              "обладание -> Simple",
+              "временное действие",
+              "раздражающая повторяемость"
+            ],
+            "correctIndex": 0,
+            "explain": "have в значении possession обычно не употребляется в Continuous."
+          },
+          {
+            "id": "stv_m_10",
+            "instruction": "Выбери объяснение",
+            "prompt": "We're having dinner with our neighbours tonight.",
+            "options": [
+              "обладание",
+              "договоренность/событие",
+              "общий факт"
+            ],
+            "correctIndex": 1,
+            "explain": "have dinner = действие, поэтому форма Continuous допустима."
+          },
+          {
+            "id": "stv_m_11",
+            "instruction": "Выбери объяснение",
+            "prompt": "The package weighs two kilos.",
+            "options": [
+              "характеристика предмета -> Simple",
+              "процесс взвешивания -> Continuous",
+              "план"
+            ],
+            "correctIndex": 0,
+            "explain": "weigh в значении веса предмета = stative."
+          },
+          {
+            "id": "stv_m_12",
+            "instruction": "Выбери объяснение",
+            "prompt": "The assistant is weighing the package now.",
+            "options": [
+              "факт",
+              "процесс измерения веса",
+              "расписание"
+            ],
+            "correctIndex": 1,
+            "explain": "is weighing = выполняется действие «взвешивает»."
+          },
+          {
+            "id": "stv_m_13",
+            "instruction": "Выбери объяснение",
+            "prompt": "You look tired after the trip.",
+            "options": [
+              "внешний вид/состояние -> Simple",
+              "активное действие -> Continuous",
+              "привычка"
+            ],
+            "correctIndex": 0,
+            "explain": "look в значении «выглядеть» обычно берется в Simple."
+          },
+          {
+            "id": "stv_m_14",
+            "instruction": "Выбери объяснение",
+            "prompt": "She is looking for her keys.",
+            "options": [
+              "внешний вид",
+              "поиск как действие в процессе",
+              "обладание"
+            ],
+            "correctIndex": 1,
+            "explain": "look for = действие поиска, поэтому Continuous уместен."
+          },
+          {
+            "id": "stv_m_15",
+            "instruction": "Выбери объяснение",
+            "prompt": "I'm seeing my dentist tomorrow morning.",
+            "options": [
+              "see = видеть глазами",
+              "договоренная встреча",
+              "пассивное восприятие"
+            ],
+            "correctIndex": 1,
+            "explain": "see в значении «встречаться/посещать» может использоваться в Continuous."
+          }
+        ]
+      },
+      {
+        "id": "formula",
+        "title": "Формы глагола (Present Simple vs Present Continuous)",
+        "kind": "multi_input",
+        "items": [
+          {
+            "id": "stv_f_1",
+            "instruction": "Заполни пропуск",
+            "prompt": "This coffee has a strong, bitter flavour; I ____ it a little sweeter. (prefer)",
+            "inputs": [
+              {
+                "accepted": [
+                  "prefer"
+                ]
+              }
+            ],
+            "explain": "prefer = отношение/мнение, поэтому Simple."
+          },
+          {
+            "id": "stv_f_2",
+            "instruction": "Заполни пропуск",
+            "prompt": "There are several reasons why people ____ everything they read or see on the internet. (believe)",
+            "inputs": [
+              {
+                "accepted": [
+                  "believe"
+                ]
+              }
+            ],
+            "explain": "believe обычно статичен -> Present Simple."
+          },
+          {
+            "id": "stv_f_3",
+            "instruction": "Заполни пропуск",
+            "prompt": "Why ____ your time on TikTok instead of doing homework? (you still waste)",
+            "inputs": [
+              {
+                "accepted": [
+                  "are you still wasting"
+                ]
+              }
+            ],
+            "explain": "Вопрос о действии в процессе сейчас -> Present Continuous."
+          },
+          {
+            "id": "stv_f_4",
+            "instruction": "Заполни оба пропуска",
+            "prompt": "I ____ to hurt your feelings. I ____ around. (not mean / just joke)",
+            "inputs": [
+              {
+                "accepted": [
+                  "don't mean",
+                  "do not mean"
+                ]
+              },
+              {
+                "accepted": [
+                  "am just joking",
+                  "am joking"
+                ]
+              }
+            ],
+            "explain": "mean (намереваться в этом контексте) и joke around как процесс."
+          },
+          {
+            "id": "stv_f_5",
+            "instruction": "Заполни оба пропуска",
+            "prompt": "My answer to this question ____ the same - I ____. (remain / not know)",
+            "inputs": [
+              {
+                "accepted": [
+                  "remains"
+                ]
+              },
+              {
+                "accepted": [
+                  "don't know",
+                  "do not know"
+                ]
+              }
+            ],
+            "explain": "Оба глагола статичны в этом контексте -> Present Simple."
+          },
+          {
+            "id": "stv_f_6",
+            "instruction": "Заполни оба пропуска",
+            "prompt": "I ____ your point of view, but I still ____ with you. (see / disagree)",
+            "inputs": [
+              {
+                "accepted": [
+                  "see"
+                ]
+              },
+              {
+                "accepted": [
+                  "disagree"
+                ]
+              }
+            ],
+            "explain": "see (понимать) и disagree (мнение) -> обычно Simple."
+          },
+          {
+            "id": "stv_f_7",
+            "instruction": "Заполни оба пропуска",
+            "prompt": "A weekend trip to the lake ____ me perfectly right now. I ____ a break from studying. (suit / need)",
+            "inputs": [
+              {
+                "accepted": [
+                  "suits"
+                ]
+              },
+              {
+                "accepted": [
+                  "need"
+                ]
+              }
+            ],
+            "explain": "suit и need здесь описывают состояние/потребность."
+          },
+          {
+            "id": "stv_f_8",
+            "instruction": "Заполни оба пропуска",
+            "prompt": "We'd better head home now, as it ____ late and I ____ extremely tired. (get / feel)",
+            "inputs": [
+              {
+                "accepted": [
+                  "is getting"
+                ]
+              },
+              {
+                "accepted": [
+                  "feel",
+                  "am feeling"
+                ]
+              }
+            ],
+            "explain": "get late = процесс изменения; feel может быть Simple или Continuous в значении текущего самочувствия."
+          },
+          {
+            "id": "stv_f_9",
+            "instruction": "Заполни оба пропуска",
+            "prompt": "I ____ with Mum's opinion on social media, but I ____ her right to express it. (not agree / respect)",
+            "inputs": [
+              {
+                "accepted": [
+                  "don't agree",
+                  "do not agree"
+                ]
+              },
+              {
+                "accepted": [
+                  "respect"
+                ]
+              }
+            ],
+            "explain": "agree/respect = отношение, поэтому Simple."
+          },
+          {
+            "id": "stv_f_10",
+            "instruction": "Заполни оба пропуска",
+            "prompt": "I ____ my laptop to finish this project because my tablet ____ at the moment. (use / charge)",
+            "inputs": [
+              {
+                "accepted": [
+                  "am using"
+                ]
+              },
+              {
+                "accepted": [
+                  "is charging"
+                ]
+              }
+            ],
+            "explain": "Оба действия происходят сейчас -> Continuous."
+          },
+          {
+            "id": "stv_f_11",
+            "instruction": "Заполни оба пропуска",
+            "prompt": "When you ____ nothing is lacking, the whole world ____ to you. (realise / belong)",
+            "inputs": [
+              {
+                "accepted": [
+                  "realise",
+                  "realize"
+                ]
+              },
+              {
+                "accepted": [
+                  "belongs"
+                ]
+              }
+            ],
+            "explain": "Обобщенная мысль/истина -> Present Simple."
+          },
+          {
+            "id": "stv_f_12",
+            "instruction": "Заполни оба пропуска",
+            "prompt": "The aroma of the soup ____ absolutely mouthwatering, and it ____ my stomach rumble. (be / make)",
+            "inputs": [
+              {
+                "accepted": [
+                  "is"
+                ]
+              },
+              {
+                "accepted": [
+                  "makes"
+                ]
+              }
+            ],
+            "explain": "Описание состояния и факта реакции -> Present Simple."
+          },
+          {
+            "id": "stv_f_13",
+            "instruction": "Заполни оба пропуска",
+            "prompt": "I usually ____ breakfast at 7 a.m., but today I ____ a leisurely breakfast at 8 o'clock. (have / enjoy)",
+            "inputs": [
+              {
+                "accepted": [
+                  "have"
+                ]
+              },
+              {
+                "accepted": [
+                  "am enjoying"
+                ]
+              }
+            ],
+            "explain": "usually -> Present Simple, today (сейчас/временная ситуация) -> Present Continuous."
+          },
+          {
+            "id": "stv_f_14",
+            "instruction": "Заполни оба пропуска",
+            "prompt": "Can you give me a minute? I ____ to my classmate how to solve this tricky math problem, but he still ____ anything. (explain / not understand)",
+            "inputs": [
+              {
+                "accepted": [
+                  "am explaining"
+                ]
+              },
+              {
+                "accepted": [
+                  "doesn't understand",
+                  "does not understand"
+                ]
+              }
+            ],
+            "explain": "explain = текущий процесс, understand = stative (обычно Simple)."
+          },
+          {
+            "id": "stv_f_15",
+            "instruction": "Заполни оба пропуска",
+            "prompt": "There ____ 95 million Instagram posts daily. This ____ photo uploads, stories, and reels shared on the platform. (be / include)",
+            "inputs": [
+              {
+                "accepted": [
+                  "are"
+                ]
+              },
+              {
+                "accepted": [
+                  "includes"
+                ]
+              }
+            ],
+            "explain": "Статистика и общий факт -> Present Simple."
+          }
+        ]
+      },
+      {
+        "id": "formula_2",
+        "goal": "formula",
+        "title": "Диалоги: значение глагола в контексте",
+        "kind": "multi_input",
+        "items": [
+          {
+            "id": "stv_f2_1",
+            "instruction": "Заполни все пропуски",
+            "prompt": "A: I see you ____ a new laptop! How ____ you ____ it? B: It ____ a lot of useful features. I'm really enjoying it!",
+            "inputs": [
+              {
+                "accepted": [
+                  "have"
+                ]
+              },
+              {
+                "accepted": [
+                  "do"
+                ]
+              },
+              {
+                "accepted": [
+                  "like"
+                ]
+              },
+              {
+                "accepted": [
+                  "has"
+                ]
+              }
+            ],
+            "explain": "have как possession -> has/have; like в вопросе с do."
+          },
+          {
+            "id": "stv_f2_2",
+            "instruction": "Заполни все пропуски",
+            "prompt": "A: You ____ a bit stressed. What's happened? B: I ____ for my wallet. I can't find it anywhere.",
+            "inputs": [
+              {
+                "accepted": [
+                  "look"
+                ]
+              },
+              {
+                "accepted": [
+                  "am looking"
+                ]
+              }
+            ],
+            "explain": "look (выглядеть) -> Simple, look for (искать) -> Continuous."
+          },
+          {
+            "id": "stv_f2_3",
+            "instruction": "Заполни все пропуски",
+            "prompt": "A: I ____ this book will be a great read. Have you read the first chapter? B: Yes! I ____ of reading more this evening.",
+            "inputs": [
+              {
+                "accepted": [
+                  "think"
+                ]
+              },
+              {
+                "accepted": [
+                  "am thinking"
+                ]
+              }
+            ],
+            "explain": "think (мнение) vs am thinking (процесс обдумывания)."
+          },
+          {
+            "id": "stv_f2_4",
+            "instruction": "Заполни все пропуски",
+            "prompt": "A: I need your advice. I ____ different candles to choose a new one. B: This one ____ fantastic! I like it the most.",
+            "inputs": [
+              {
+                "accepted": [
+                  "am smelling"
+                ]
+              },
+              {
+                "accepted": [
+                  "smells"
+                ]
+              }
+            ],
+            "explain": "am smelling = действие, smells = характеристика запаха."
+          },
+          {
+            "id": "stv_f2_5",
+            "instruction": "Заполни все пропуски",
+            "prompt": "A: This cake ____ amazing! Who baked it? B: I ____ it for the first time. I think it's chocolate and raspberry.",
+            "inputs": [
+              {
+                "accepted": [
+                  "tastes"
+                ]
+              },
+              {
+                "accepted": [
+                  "am tasting"
+                ]
+              }
+            ],
+            "explain": "taste как характеристика -> Simple, как действие «пробовать» -> Continuous."
+          },
+          {
+            "id": "stv_f2_6",
+            "instruction": "Заполни все пропуски",
+            "prompt": "A: I ____ you are really into painting lately. Are you taking lessons? B: Yes, I ____ it.",
+            "inputs": [
+              {
+                "accepted": [
+                  "see"
+                ]
+              },
+              {
+                "accepted": [
+                  "love"
+                ]
+              }
+            ],
+            "explain": "see (понимать/замечать) и love обычно берутся в Simple."
+          },
+          {
+            "id": "stv_f2_7",
+            "instruction": "Заполни все пропуски",
+            "prompt": "A: ____ you ____ any weekend plans? B: Actually, I do. I ____ a small barbecue with friends.",
+            "inputs": [
+              {
+                "accepted": [
+                  "do"
+                ]
+              },
+              {
+                "accepted": [
+                  "have"
+                ]
+              },
+              {
+                "accepted": [
+                  "am having"
+                ]
+              }
+            ],
+            "explain": "Do you have = possession/наличие, am having = запланированное событие."
+          }
+        ]
+      },
+      {
+        "id": "formula_3",
+        "goal": "formula",
+        "title": "Смешанные диалоги: stative и dynamic",
+        "kind": "multi_input",
+        "items": [
+          {
+            "id": "stv_f3_1",
+            "instruction": "Заполни все пропуски",
+            "prompt": "A: Did you hear about the new cafe downtown? ____ to check it out this weekend? B: Definitely! I ____ to go there because everyone ____ about it. It ____ really cozy! A: I read it ____ amazing desserts. B: Yeah, and the menu ____ delicious too.",
+            "inputs": [
+              {
+                "accepted": [
+                  "do you want"
+                ]
+              },
+              {
+                "accepted": [
+                  "am planning"
+                ]
+              },
+              {
+                "accepted": [
+                  "is talking"
+                ]
+              },
+              {
+                "accepted": [
+                  "looks"
+                ]
+              },
+              {
+                "accepted": [
+                  "has"
+                ]
+              },
+              {
+                "accepted": [
+                  "sounds"
+                ]
+              }
+            ],
+            "explain": "want/look/sound/have в статичных значениях и talking/planning как процессы."
+          },
+          {
+            "id": "stv_f3_2",
+            "instruction": "Заполни все пропуски",
+            "prompt": "A: ____ the latest documentary on space exploration now? B: Not really. It ____ very interesting to me. A: Really? It ____ that science show we saw last year. B: I ____ it. I ____ it's the same.",
+            "inputs": [
+              {
+                "accepted": [
+                  "are you watching"
+                ]
+              },
+              {
+                "accepted": [
+                  "doesn't seem",
+                  "does not seem"
+                ]
+              },
+              {
+                "accepted": [
+                  "resembles"
+                ]
+              },
+              {
+                "accepted": [
+                  "doubt"
+                ]
+              },
+              {
+                "accepted": [
+                  "don't believe",
+                  "do not believe"
+                ]
+              }
+            ],
+            "explain": "watching = процесс, а seem/resemble/doubt/believe обычно stative."
+          },
+          {
+            "id": "stv_f3_3",
+            "instruction": "Заполни все пропуски",
+            "prompt": "A: ____ Anna is serious about joining the yoga class? B: I ____ it! She ____ that committed. B: I ____. It ____ her anyway. She ____ running.",
+            "inputs": [
+              {
+                "accepted": [
+                  "do you think"
+                ]
+              },
+              {
+                "accepted": [
+                  "doubt"
+                ]
+              },
+              {
+                "accepted": [
+                  "doesn't seem",
+                  "does not seem"
+                ]
+              },
+              {
+                "accepted": [
+                  "agree"
+                ]
+              },
+              {
+                "accepted": [
+                  "doesn't suit",
+                  "does not suit"
+                ]
+              },
+              {
+                "accepted": [
+                  "prefers"
+                ]
+              }
+            ],
+            "explain": "В этом диалоге почти все глаголы статичны: think, doubt, seem, agree, suit, prefer."
+          },
+          {
+            "id": "stv_f3_4",
+            "instruction": "Заполни все пропуски",
+            "prompt": "A: Hey, ____ when the outdoor movie night starts? B: I ____ it begins at 8 p.m. A: Great! I really ____ to watch my favorite film. A: Everyone ____ about it! It's going to be fun.",
+            "inputs": [
+              {
+                "accepted": [
+                  "do you know"
+                ]
+              },
+              {
+                "accepted": [
+                  "know"
+                ]
+              },
+              {
+                "accepted": [
+                  "want"
+                ]
+              },
+              {
+                "accepted": [
+                  "is now talking"
+                ]
+              }
+            ],
+            "explain": "know/want -> stative; is now talking -> текущий процесс в сообществе."
+          },
+          {
+            "id": "stv_f3_5",
+            "instruction": "Заполни все пропуски",
+            "prompt": "A: Did you hear that Leo changed schools? A: He says he's bored and ____ to try something different. B: But that's risky! ____ that it might be hard to adjust? B: I ____ he stays safe. A: Anyway, let's grab a snack. I ____.",
+            "inputs": [
+              {
+                "accepted": [
+                  "wants"
+                ]
+              },
+              {
+                "accepted": [
+                  "does he now understand"
+                ]
+              },
+              {
+                "accepted": [
+                  "hope"
+                ]
+              },
+              {
+                "accepted": [
+                  "am starving"
+                ]
+              }
+            ],
+            "explain": "want/understand/hope -> состояния, am starving -> текущее ощущение как процесс/состояние момента."
+          }
+        ]
+      },
+      {
+        "id": "compare",
+        "title": "Choose the correct forms (Set A)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "stv_cmp_1",
+            "instruction": "Выбери форму",
+            "prompt": "They ____ a party at the pool right now.",
+            "options": [
+              "has",
+              "are having",
+              "have"
+            ],
+            "correctIndex": 1,
+            "explain": "right now -> процесс в момент речи."
+          },
+          {
+            "id": "stv_cmp_2",
+            "instruction": "Выбери форму",
+            "prompt": "I ____ it is going to rain.",
+            "options": [
+              "think",
+              "thinks",
+              "am thinking"
+            ],
+            "correctIndex": 0,
+            "explain": "think в значении мнения обычно берется в Simple."
+          },
+          {
+            "id": "stv_cmp_3",
+            "instruction": "Выбери форму",
+            "prompt": "____ my new dress?",
+            "options": [
+              "Do you like",
+              "Are you like",
+              "Are you liking"
+            ],
+            "correctIndex": 0,
+            "explain": "like в значении отношения -> Simple вопрос с do."
+          },
+          {
+            "id": "stv_cmp_4",
+            "instruction": "Выбери форму",
+            "prompt": "Kim ____ dinner at the moment.",
+            "options": [
+              "eats",
+              "does eat",
+              "is eating"
+            ],
+            "correctIndex": 2,
+            "explain": "at the moment -> процесс сейчас."
+          },
+          {
+            "id": "stv_cmp_5",
+            "instruction": "Выбери форму",
+            "prompt": "The girls ____ very helpful today.",
+            "options": [
+              "is being",
+              "are being",
+              "are"
+            ],
+            "correctIndex": 1,
+            "explain": "temporary behaviour today -> are being."
+          },
+          {
+            "id": "stv_cmp_6",
+            "instruction": "Выбери форму",
+            "prompt": "Lemons ____ sour.",
+            "options": [
+              "taste",
+              "is tasting",
+              "are tasting"
+            ],
+            "correctIndex": 0,
+            "explain": "taste как характеристика продукта -> Simple."
+          },
+          {
+            "id": "stv_cmp_7",
+            "instruction": "Выбери форму",
+            "prompt": "What ____ at?",
+            "options": [
+              "do you look",
+              "is you looking",
+              "are you looking"
+            ],
+            "correctIndex": 2,
+            "explain": "look at как действие в момент речи -> Continuous question."
+          },
+          {
+            "id": "stv_cmp_8",
+            "instruction": "Выбери форму",
+            "prompt": "The children ____ in Father Christmas.",
+            "options": [
+              "believe",
+              "believes",
+              "are believing"
+            ],
+            "correctIndex": 0,
+            "explain": "believe = мнение/убеждение, обычно Simple."
+          },
+          {
+            "id": "stv_cmp_9",
+            "instruction": "Выбери форму",
+            "prompt": "Sam ____ a yellow T-shirt today.",
+            "options": [
+              "wears",
+              "is wearing",
+              "is wear"
+            ],
+            "correctIndex": 1,
+            "explain": "today указывает на ситуацию текущего дня -> is wearing."
+          },
+          {
+            "id": "stv_cmp_10",
+            "instruction": "Выбери форму",
+            "prompt": "We ____ visiting our grandparents.",
+            "options": [
+              "love",
+              "loves",
+              "are loving"
+            ],
+            "correctIndex": 0,
+            "explain": "love обычно stative, поэтому без Continuous."
+          }
+        ]
+      },
+      {
+        "id": "compare_2",
+        "goal": "compare",
+        "title": "Choose the correct forms (Set B)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "stv_cmp2_1",
+            "instruction": "Выбери форму",
+            "prompt": "The car ____ to Mark.",
+            "options": [
+              "is belonging",
+              "belongs",
+              "is belong"
+            ],
+            "correctIndex": 1,
+            "explain": "belong = состояние принадлежности -> Simple."
+          },
+          {
+            "id": "stv_cmp2_2",
+            "instruction": "Выбери форму",
+            "prompt": "The boys ____ lunch right now.",
+            "options": [
+              "has",
+              "are having",
+              "have"
+            ],
+            "correctIndex": 1,
+            "explain": "have lunch = действие в процессе, right now."
+          },
+          {
+            "id": "stv_cmp2_3",
+            "instruction": "Выбери форму",
+            "prompt": "I ____ what the answer is.",
+            "options": [
+              "know",
+              "am knowing",
+              "knows"
+            ],
+            "correctIndex": 0,
+            "explain": "know почти всегда stative -> Present Simple."
+          },
+          {
+            "id": "stv_cmp2_4",
+            "instruction": "Выбери форму",
+            "prompt": "The children ____ at the horses.",
+            "options": [
+              "look",
+              "are looking",
+              "is looking"
+            ],
+            "correctIndex": 1,
+            "explain": "look at = целенаправленное действие, поэтому Continuous."
+          },
+          {
+            "id": "stv_cmp2_5",
+            "instruction": "Выбери форму",
+            "prompt": "____ another cup of tea?",
+            "options": [
+              "Do you like",
+              "Would you like",
+              "Are you liking"
+            ],
+            "correctIndex": 1,
+            "explain": "В вежливом предложении используем шаблон Would you like..."
+          },
+          {
+            "id": "stv_cmp2_6",
+            "instruction": "Выбери форму",
+            "prompt": "It ____ like there is someone at the door.",
+            "options": [
+              "sounds",
+              "is sounding",
+              "sound"
+            ],
+            "correctIndex": 0,
+            "explain": "sound в значении впечатления/восприятия обычно в Simple."
+          },
+          {
+            "id": "stv_cmp2_7",
+            "instruction": "Выбери форму",
+            "prompt": "Mum ____ pasta for dinner tonight.",
+            "options": [
+              "has",
+              "is having",
+              "have"
+            ],
+            "correctIndex": 1,
+            "explain": "have dinner/meal tonight = запланированное действие."
+          },
+          {
+            "id": "stv_cmp2_8",
+            "instruction": "Выбери форму",
+            "prompt": "The chef ____ the sauce to see if it needs more salt.",
+            "options": [
+              "tastes",
+              "is tasting",
+              "taste"
+            ],
+            "correctIndex": 1,
+            "explain": "to see if it needs more salt -> действие дегустации сейчас."
+          },
+          {
+            "id": "stv_cmp2_9",
+            "instruction": "Выбери форму",
+            "prompt": "Nicky ____ very silly today.",
+            "options": [
+              "is",
+              "is being",
+              "are being"
+            ],
+            "correctIndex": 1,
+            "explain": "temporary behaviour today -> is being."
+          },
+          {
+            "id": "stv_cmp2_10",
+            "instruction": "Выбери форму",
+            "prompt": "Daniel ____ brown hair and blue eyes.",
+            "options": [
+              "is having",
+              "are having",
+              "has"
+            ],
+            "correctIndex": 2,
+            "explain": "have в значении внешней характеристики/обладания -> has."
+          }
+        ]
+      },
+      {
+        "id": "formula_4",
+        "goal": "formula",
+        "title": "Заполни пропуски: stative vs dynamic",
+        "kind": "input",
+        "items": [
+          {
+            "id": "stv_f4_1",
+            "instruction": "Вставь форму",
+            "prompt": "John ____ (think) about his future.",
+            "accepted": [
+              "is thinking"
+            ],
+            "explain": "Здесь think = процесс обдумывания."
+          },
+          {
+            "id": "stv_f4_2",
+            "instruction": "Вставь форму",
+            "prompt": "Ali ____ (have) three sisters.",
+            "accepted": [
+              "has"
+            ],
+            "explain": "have = possession -> Present Simple."
+          },
+          {
+            "id": "stv_f4_3",
+            "instruction": "Вставь форму",
+            "prompt": "It ____ (smell) like something is burning.",
+            "accepted": [
+              "smells"
+            ],
+            "explain": "smell здесь = характеристика запаха, не действие."
+          },
+          {
+            "id": "stv_f4_4",
+            "instruction": "Вставь форму",
+            "prompt": "The boys ____ (play) with their new toys.",
+            "accepted": [
+              "are playing"
+            ],
+            "explain": "play как текущее действие -> Continuous."
+          },
+          {
+            "id": "stv_f4_5",
+            "instruction": "Вставь форму",
+            "prompt": "Sara ____ (look) like she's been crying.",
+            "accepted": [
+              "looks"
+            ],
+            "explain": "look в значении внешнего вида -> Simple."
+          },
+          {
+            "id": "stv_f4_6",
+            "instruction": "Вставь форму",
+            "prompt": "I ____ (want) another coffee.",
+            "accepted": [
+              "want"
+            ],
+            "explain": "want обычно stative -> Present Simple."
+          },
+          {
+            "id": "stv_f4_7",
+            "instruction": "Вставь форму",
+            "prompt": "We ____ (have) a really good time.",
+            "accepted": [
+              "are having"
+            ],
+            "explain": "have a good time = действие/событие, возможен Continuous."
+          },
+          {
+            "id": "stv_f4_8",
+            "instruction": "Вставь форму",
+            "prompt": "Alice and Peter ____ (need) to go to the shop.",
+            "accepted": [
+              "need"
+            ],
+            "explain": "need в значении необходимости -> Simple."
+          },
+          {
+            "id": "stv_f4_9",
+            "instruction": "Вставь форму",
+            "prompt": "The shop ____ usually very busy. (be)",
+            "accepted": [
+              "is"
+            ],
+            "explain": "usually + be -> Present Simple."
+          },
+          {
+            "id": "stv_f4_10",
+            "instruction": "Вставь форму",
+            "prompt": "The baby ____ (sleep) on the sofa.",
+            "accepted": [
+              "is sleeping"
+            ],
+            "explain": "Текущее действие -> Present Continuous."
+          }
+        ]
+      }
+    ]
+  }
+}
