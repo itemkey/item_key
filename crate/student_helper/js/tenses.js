@@ -78,12 +78,32 @@
   const btnGoBasics = document.getElementById('tensesGoBasics');
   const btnGoActiveTenses = document.getElementById('grammarGoActiveTenses');
   const btnGoUniversal = document.getElementById('grammarGoUniversal');
+  const btnGoPresent = document.getElementById('grammarGoPresent');
+  const btnGoPast = document.getElementById('grammarGoPast');
+  const btnGoFuture = document.getElementById('grammarGoFuture');
+  const btnGoConditionals = document.getElementById('grammarGoConditionals');
+  const btnGoModals = document.getElementById('grammarGoModals');
+  const btnGoPassive = document.getElementById('grammarGoPassive');
+  const btnGoReportedClauses = document.getElementById('grammarGoReportedClauses');
+  const btnGoVerbPatterns = document.getElementById('grammarGoVerbPatterns');
+  const btnGoArticles = document.getElementById('grammarGoArticles');
+  const btnGoSyntax = document.getElementById('grammarGoSyntax');
+  const btnGoWritingPack = document.getElementById('grammarGoWritingPack');
+  const btnGoExamRoute = document.getElementById('grammarGoExamRoute');
 
   const searchInput = document.getElementById('grammarSearchInput');
   const searchClearBtn = document.getElementById('grammarSearchClearBtn');
   const searchHint = document.getElementById('grammarSearchHint');
   const searchResults = document.getElementById('grammarSearchResults');
   const btnOpenConstructor = document.getElementById('grammarOpenConstructorBtn');
+  const homeFinderWrap = document.getElementById('grammarHomeFinderWrap');
+  const homeFinderTitleEl = document.getElementById('grammarHomeFinderTitle');
+  const homeFinderModesEl = document.getElementById('grammarHomeFinderModes');
+  const homeFinderChipsEl = document.getElementById('grammarHomeFinderChips');
+  const homeFinderSummaryEl = document.getElementById('grammarHomeFinderSummary');
+  const homeFinderOpenBtn = document.getElementById('grammarHomeFinderOpenBtn');
+  const homeFinderResetBtn = document.getElementById('grammarHomeFinderResetBtn');
+  const homeFinderConstructorBtn = document.getElementById('grammarHomeFinderConstructorBtn');
   const grammarHomeTabs = document.getElementById('grammarHomeTabs');
   const grammarHomeTabHint = document.getElementById('grammarHomeTabHint');
   const grammarHomeTileGrid = document.getElementById('grammarHomeTileGrid');
@@ -120,6 +140,16 @@
   const btnBackHomeFromList = document.getElementById('tensesBackToHomeFromList');
   const listEl = document.getElementById('tensesList');
   const listSubtitleEl = document.getElementById('tensesListSubtitle');
+  const categoryWrap = document.getElementById('grammarCategoryWrap');
+  const categoryBar = document.getElementById('grammarCategoryBar');
+  const finderWrap = document.getElementById('grammarFinderWrap');
+  const finderTitleEl = document.getElementById('grammarFinderTitle');
+  const finderModesEl = document.getElementById('grammarFinderModes');
+  const finderChipsEl = document.getElementById('grammarFinderChips');
+  const finderSummaryEl = document.getElementById('grammarFinderSummary');
+  const finderResetBtn = document.getElementById('grammarFinderResetBtn');
+  const listSearchInput = document.getElementById('grammarListSearchInput');
+  const listSearchClearBtn = document.getElementById('grammarListSearchClearBtn');
   const compactListToggle = document.getElementById('grammarCompactListToggle');
   const subgroupWrap = document.getElementById('grammarSubgroupWrap');
   const subgroupBar = document.getElementById('grammarSubgroupBar');
@@ -168,6 +198,7 @@
   let runKeyHandler = null;
   let runReturnState = null;
   let customSearchQuery = '';
+  const RULE_PROFILE_CACHE = new Map();
   let detailBackStack = [];
   let overviewFloatingSyncBound = false;
 
@@ -188,9 +219,13 @@
   const KEY_SUBGROUP = 'sh_grammar_subgroup_v1';
   const KEY_LIST_COMPACT = 'sh_grammar_list_compact_v1';
   const KEY_RULE_MODE = 'sh_grammar_rule_mode_v1';
+  const KEY_FINDER_MODE = 'sh_grammar_finder_mode_v1';
+  const KEY_FINDER_VALUE = 'sh_grammar_finder_value_v1';
+  const KEY_LIST_SEARCH = 'sh_grammar_list_search_v1';
   const BASIC_OVERVIEW_ID = 'tensesBasicOverview';
   const CUSTOM_TENSE_ID = 'custom';
   const LEVELS = ['A2-B1', 'B1-B2', 'B2-C1'];
+  const CATEGORY_ORDER = ['all', 'active_tenses', 'present', 'past', 'future', 'universal'];
   const CATEGORY_LABEL = {
     all: 'все темы по уровню',
     active_tenses: 'active tenses - времена',
@@ -198,6 +233,15 @@
     past: 'past - прошлое',
     future: 'future - будущее',
     universal: 'universal - общие структуры'
+  };
+
+  const CATEGORY_LABEL_EN = {
+    all: 'all topics by level',
+    active_tenses: 'active tenses',
+    present: 'present',
+    past: 'past',
+    future: 'future',
+    universal: 'universal grammar'
   };
 
   const SUBGROUP_LABEL = {
@@ -208,6 +252,23 @@
     perfect_continuous: 'perfect continuous / длительность',
     future_forms: 'future forms / способы',
     usage_map: 'быстрый выбор грамматики',
+    conditionals: 'conditionals',
+    modals: 'modals',
+    voice: 'passive voice',
+    clauses: 'clauses',
+    verb_patterns: 'verb patterns',
+    articles: 'articles',
+    syntax: 'syntax'
+  };
+
+  const SUBGROUP_LABEL_EN = {
+    all: 'all subgroups',
+    simple: 'simple / facts',
+    continuous: 'continuous / process',
+    perfect: 'perfect / result',
+    perfect_continuous: 'perfect continuous / duration',
+    future_forms: 'future forms / options',
+    usage_map: 'quick grammar maps',
     conditionals: 'conditionals',
     modals: 'modals',
     voice: 'passive voice',
@@ -233,8 +294,78 @@
     'syntax'
   ];
 
+  const FINDER_MODE_ORDER = ['all', 'intent', 'pattern', 'mistake', 'route'];
+
+  const FINDER_MODE_LABEL = {
+    all: { ru: 'всё', en: 'all' },
+    intent: { ru: 'по смыслу', en: 'by meaning' },
+    pattern: { ru: 'по формуле', en: 'by pattern' },
+    mistake: { ru: 'по ошибке', en: 'by mistake' },
+    route: { ru: 'маршруты', en: 'routes' }
+  };
+
+  const FINDER_OPTIONS = {
+    intent: [
+      { id: 'plan', ru: 'план / намерение', en: 'plan / intention' },
+      { id: 'prediction', ru: 'прогноз', en: 'prediction' },
+      { id: 'promise', ru: 'обещание / решение', en: 'promise / instant decision' },
+      { id: 'condition', ru: 'условие / if-логика', en: 'condition / if-logic' },
+      { id: 'process', ru: 'процесс в моменте', en: 'process at a point' },
+      { id: 'result', ru: 'результат к моменту', en: 'result by a point' },
+      { id: 'duration', ru: 'длительность', en: 'duration' },
+      { id: 'comparison', ru: 'сравнение времен', en: 'tense contrast' },
+      { id: 'reporting', ru: 'косвенная речь', en: 'reported speech' },
+      { id: 'passive', ru: 'пассивный залог', en: 'passive voice' },
+      { id: 'modal_obligation', ru: 'обязанность / совет', en: 'obligation / advice' },
+      { id: 'modal_deduction', ru: 'вероятность / вывод', en: 'possibility / deduction' },
+      { id: 'adverb_choice', ru: 'прилагательное / наречие', en: 'adjective / adverb' },
+      { id: 'noun_number', ru: 'число существительных', en: 'noun number agreement' }
+    ],
+    pattern: [
+      { id: 'will_v1', ru: 'will + V1', en: 'will + V1' },
+      { id: 'be_going_to', ru: 'be going to + V1', en: 'be going to + V1' },
+      { id: 'be_ving', ru: 'be + V-ing', en: 'be + V-ing' },
+      { id: 'have_v3', ru: 'have/has + V3', en: 'have/has + V3' },
+      { id: 'had_v3', ru: 'had + V3', en: 'had + V3' },
+      { id: 'be_v3', ru: 'be + V3', en: 'be + V3' },
+      { id: 'if_present', ru: 'if/when + Present', en: 'if/when + Present' },
+      { id: 'if_past', ru: 'if + Past / had V3', en: 'if + Past / had V3' },
+      { id: 'modal_base', ru: 'modal + V1', en: 'modal + V1' }
+    ],
+    mistake: [
+      { id: 'if_will', ru: 'ошибка if + will', en: 'if + will error' },
+      { id: 'good_well', ru: 'good vs well', en: 'good vs well' },
+      { id: 'hard_hardly', ru: 'hard vs hardly', en: 'hard vs hardly' },
+      { id: 'do_does', ru: 'do/does и -s', en: 'do/does and -s' },
+      { id: 'have_v3_error', ru: 'have/has + V3', en: 'have/has + V3' },
+      { id: 'passive_active', ru: 'active vs passive', en: 'active vs passive' },
+      { id: 'by_deadline', ru: 'by / к сроку', en: 'by / deadline marker' }
+    ],
+    route: [
+      { id: 'quick_a2b1', ru: 'быстрый старт A2-B1', en: 'quick start A2-B1' },
+      { id: 'exam_b1b2', ru: 'экзамен B1-B2', en: 'exam B1-B2' },
+      { id: 'advanced_b2c1', ru: 'прокачка B2-C1', en: 'advanced B2-C1' },
+      { id: 'active_tenses_route', ru: 'только active tenses', en: 'active tenses only' },
+      { id: 'universal_route', ru: 'universal grammar', en: 'universal grammar' },
+      { id: 'future_pack', ru: 'весь future блок', en: 'full future pack' },
+      { id: 'writing_pack', ru: 'точность в письме', en: 'writing accuracy pack' }
+    ]
+  };
+
+  const FAMILY_LABEL = {
+    tense: { ru: 'времена', en: 'tenses' },
+    usage_map: { ru: 'карты выбора', en: 'usage maps' },
+    conditionals: { ru: 'conditionals', en: 'conditionals' },
+    modals: { ru: 'modals', en: 'modals' },
+    voice: { ru: 'passive voice', en: 'passive voice' },
+    clauses: { ru: 'clauses', en: 'clauses' },
+    verb_patterns: { ru: 'verb patterns', en: 'verb patterns' },
+    articles: { ru: 'articles', en: 'articles' },
+    syntax: { ru: 'syntax', en: 'syntax' }
+  };
+
   const HOME_TAB_HINT = {
-    rules: 'раздел «правила»: только теория и темы по грамматике',
+    rules: 'раздел «правила»: крупные разделы + быстрый старт + точечные фильтры',
     practice: 'раздел «упражнения»: смешанные, пользовательские, сравнение и daily',
     all: 'раздел «всё»: показать все карточки'
   };
@@ -243,6 +374,9 @@
   let activeSubgroup = loadSubgroup();
   let ruleMode = loadRuleMode();
   let grammarHomeTab = loadGrammarHomeTab();
+  let finderMode = loadFinderMode();
+  let finderValue = loadFinderValue();
+  let listSearchQuery = loadListSearchQuery();
   if (activeCategory === 'all') activeSubgroup = 'all';
 
   const GOALS = [
@@ -778,6 +912,11 @@
 
     const searchWrap = document.getElementById('grammarSearchBox');
     if (searchWrap) searchWrap.hidden = (selected === 'practice');
+
+    if (homeFinderWrap){
+      homeFinderWrap.hidden = (selected === 'practice');
+      if (selected !== 'practice') syncHomeFinderUi();
+    }
   }
 
   function normalizeLevel(level){
@@ -798,6 +937,7 @@
     if (!next) return;
     try{ localStorage.setItem(KEY_LEVEL, next); }catch(_){ }
     refreshLevelUI();
+    syncHomeFinderUi();
     renderList();
     fillTenseOptions();
     renderCustomPicker();
@@ -807,6 +947,7 @@
   function clearLevel(){
     try{ localStorage.removeItem(KEY_LEVEL); }catch(_){ }
     refreshLevelUI();
+    syncHomeFinderUi();
     if (countBadge) countBadge.textContent = 'grammar: 0';
   }
 
@@ -832,6 +973,118 @@
     }catch(_){
       return 'all';
     }
+  }
+
+  function normalizeFinderMode(mode){
+    const key = String(mode || '').trim().toLowerCase();
+    return FINDER_MODE_ORDER.includes(key) ? key : 'all';
+  }
+
+  function finderModeLabel(mode){
+    const key = normalizeFinderMode(mode);
+    const dict = FINDER_MODE_LABEL[key] || FINDER_MODE_LABEL.all;
+    return isEnLang() ? (dict.en || dict.ru) : (dict.ru || dict.en);
+  }
+
+  function finderOptionLabel(option){
+    if (!option || typeof option !== 'object') return '';
+    return isEnLang() ? (option.en || option.ru || option.id || '') : (option.ru || option.en || option.id || '');
+  }
+
+  function getFinderOptions(mode){
+    const key = normalizeFinderMode(mode);
+    return Array.isArray(FINDER_OPTIONS[key]) ? FINDER_OPTIONS[key] : [];
+  }
+
+  function normalizeFinderValue(mode, value){
+    const key = normalizeFinderMode(mode);
+    if (key === 'all') return '';
+    const v = String(value || '').trim().toLowerCase();
+    if (!v) return '';
+    const options = getFinderOptions(key);
+    return options.some((it)=> it.id === v) ? v : '';
+  }
+
+  function loadFinderMode(){
+    try{
+      return normalizeFinderMode(localStorage.getItem(KEY_FINDER_MODE) || 'all');
+    }catch(_){
+      return 'all';
+    }
+  }
+
+  function loadFinderValue(){
+    const mode = loadFinderMode();
+    try{
+      return normalizeFinderValue(mode, localStorage.getItem(KEY_FINDER_VALUE) || '');
+    }catch(_){
+      return '';
+    }
+  }
+
+  function loadListSearchQuery(){
+    try{
+      return String(localStorage.getItem(KEY_LIST_SEARCH) || '').trim();
+    }catch(_){
+      return '';
+    }
+  }
+
+  function setFinderMode(mode, options){
+    const opts = Object.assign({ keepValue: false, rerender: true }, options || {});
+    const next = normalizeFinderMode(mode);
+    finderMode = next;
+    if (!opts.keepValue){
+      finderValue = '';
+    } else {
+      finderValue = normalizeFinderValue(next, finderValue);
+    }
+    try{ localStorage.setItem(KEY_FINDER_MODE, finderMode); }catch(_){ }
+    try{
+      if (finderValue) localStorage.setItem(KEY_FINDER_VALUE, finderValue);
+      else localStorage.removeItem(KEY_FINDER_VALUE);
+    }catch(_){ }
+    syncHomeFinderUi();
+    if (opts.rerender) renderList();
+  }
+
+  function setFinderValue(value, options){
+    const opts = Object.assign({ rerender: true }, options || {});
+    finderValue = normalizeFinderValue(finderMode, value);
+    try{
+      if (finderValue) localStorage.setItem(KEY_FINDER_VALUE, finderValue);
+      else localStorage.removeItem(KEY_FINDER_VALUE);
+    }catch(_){ }
+    syncHomeFinderUi();
+    if (opts.rerender) renderList();
+  }
+
+  function setListSearchQuery(value, options){
+    const opts = Object.assign({ rerender: true, syncInput: true }, options || {});
+    listSearchQuery = String(value || '').trim();
+    try{
+      if (listSearchQuery) localStorage.setItem(KEY_LIST_SEARCH, listSearchQuery);
+      else localStorage.removeItem(KEY_LIST_SEARCH);
+    }catch(_){ }
+    if (opts.syncInput && listSearchInput){
+      const raw = String(value || '').trim();
+      if (listSearchInput.value !== raw) listSearchInput.value = raw;
+    }
+    syncHomeFinderUi();
+    if (opts.rerender) renderList();
+  }
+
+  function clearFinderFilters(options){
+    const opts = Object.assign({ rerender: true }, options || {});
+    finderMode = 'all';
+    finderValue = '';
+    listSearchQuery = '';
+    try{ localStorage.setItem(KEY_FINDER_MODE, finderMode); }catch(_){ }
+    try{ localStorage.removeItem(KEY_FINDER_VALUE); }catch(_){ }
+    try{ localStorage.removeItem(KEY_LIST_SEARCH); }catch(_){ }
+    if (listSearchInput) listSearchInput.value = '';
+    syncHomeFinderUi();
+    if (opts.rerender) renderList();
   }
 
   function isCompactList(){
@@ -918,7 +1171,18 @@
 
   function subgroupLabel(subgroup){
     const key = normalizeSubgroup(subgroup);
-    return SUBGROUP_LABEL[key] || key.replace(/_/g, ' ');
+    const ru = SUBGROUP_LABEL[key] || '';
+    const en = SUBGROUP_LABEL_EN[key] || '';
+    return isEnLang()
+      ? (en || ru || key.replace(/_/g, ' '))
+      : (ru || en || key.replace(/_/g, ' '));
+  }
+
+  function categoryLabel(category){
+    const key = String(category || '').trim().toLowerCase();
+    const ru = CATEGORY_LABEL[key] || '';
+    const en = CATEGORY_LABEL_EN[key] || '';
+    return isEnLang() ? (en || ru || key) : (ru || en || key);
   }
 
   function getAvailableSubgroups(category){
@@ -1001,6 +1265,510 @@
     return metas;
   }
 
+  function normalizeTagArray(value){
+    const arr = Array.isArray(value) ? value : (value ? [value] : []);
+    const out = [];
+    const seen = new Set();
+    for (const item of arr){
+      const key = String(item || '').trim().toLowerCase().replace(/[^a-z0-9_\-]+/g, '_');
+      if (!key || seen.has(key)) continue;
+      seen.add(key);
+      out.push(key);
+    }
+    return out;
+  }
+
+  function mergeTags(){
+    const seen = new Set();
+    const out = [];
+    for (const list of arguments){
+      const tags = normalizeTagArray(list);
+      for (const tag of tags){
+        if (seen.has(tag)) continue;
+        seen.add(tag);
+        out.push(tag);
+      }
+    }
+    return out;
+  }
+
+  function familyLabel(family){
+    const key = String(family || '').trim().toLowerCase();
+    const dict = FAMILY_LABEL[key] || null;
+    if (!dict) return key;
+    return isEnLang() ? (dict.en || dict.ru || key) : (dict.ru || dict.en || key);
+  }
+
+  function inferRuleFamily(meta){
+    const id = String(meta?.id || '').toLowerCase();
+    const group = String(meta?.group || '').toLowerCase();
+    const kind = String(meta?.kind || '').toLowerCase();
+
+    if (id.includes('usagemap') || id.includes('expressionways') || id === BASIC_OVERVIEW_ID.toLowerCase()) return 'usage_map';
+    if (id.includes('conditional')) return 'conditionals';
+    if (id.includes('modal') || id.includes('wouldideas')) return 'modals';
+    if (id.includes('passive') || id.includes('voice')) return 'voice';
+    if (id.includes('clause') || id.includes('reported')) return 'clauses';
+    if (id.includes('article')) return 'articles';
+    if (id.includes('adverb') || id.includes('questiontags') || id.includes('inversion') || id.includes('cleft') || id.includes('specialnounsnumber')) return 'syntax';
+    if (id.includes('gerund') || id.includes('wish') || id.includes('causative') || id.includes('stative')) return 'verb_patterns';
+    if (kind === 'tense' || group === 'present' || group === 'past' || group === 'future') return 'tense';
+    return 'verb_patterns';
+  }
+
+  function inferRuleIntents(meta){
+    const id = String(meta?.id || '').toLowerCase();
+    const family = inferRuleFamily(meta);
+    const out = [];
+
+    if (id.includes('goingto') || id.includes('presentcontinuous') || id.includes('futureexpressionways')) out.push('plan');
+    if (id.includes('futuresimple') || id.includes('futureexpressionways')) out.push('prediction', 'promise');
+    if (id.includes('condition') || id.includes('timeclauses')) out.push('condition');
+    if (id.includes('continuous')) out.push('process');
+    if (id.includes('perfect') && !id.includes('continuous')) out.push('result');
+    if (id.includes('perfectcontinuous')) out.push('duration');
+    if (id.includes('compare') || id.includes('vs') || id.includes('usagemap') || id.includes('expressionways')) out.push('comparison');
+    if (id.includes('reported')) out.push('reporting');
+    if (id.includes('passive')) out.push('passive');
+    if (id.includes('modalsobligation') || id.includes('wouldideas')) out.push('modal_obligation');
+    if (id.includes('modalspossibility')) out.push('modal_deduction');
+    if (id.includes('adverb')) out.push('adverb_choice');
+    if (id.includes('specialnounsnumber')) out.push('noun_number');
+
+    if (!out.length){
+      if (family === 'voice') out.push('passive');
+      else if (family === 'conditionals') out.push('condition');
+      else if (family === 'modals') out.push('modal_obligation');
+      else if (family === 'clauses') out.push('reporting');
+    }
+
+    return out;
+  }
+
+  function inferRulePatterns(meta){
+    const id = String(meta?.id || '').toLowerCase();
+    const out = [];
+
+    if (id.includes('futuresimple')) out.push('will_v1');
+    if (id.includes('goingto')) out.push('be_going_to');
+    if (id.includes('continuous')) out.push('be_ving');
+    if (id.includes('presentperfect') || id.includes('futureperfect') || id.includes('presentperfectvspresentperfectcontinuous')) out.push('have_v3');
+    if (id.includes('pastperfect')) out.push('had_v3');
+    if (id.includes('passive')) out.push('be_v3');
+    if (id.includes('timeclauses') || id.includes('conditionalszerofirst')) out.push('if_present');
+    if (id.includes('conditionalssecondthird') || id.includes('mixedconditionals')) out.push('if_past');
+    if (id.includes('modal') || id.includes('wouldideas') || id.includes('wishifonly')) out.push('modal_base');
+
+    return out;
+  }
+
+  function inferRuleMistakes(meta){
+    const id = String(meta?.id || '').toLowerCase();
+    const out = [];
+
+    if (id.includes('timeclauses') || id.includes('futuresimple') || id.includes('futureexpressionways')) out.push('if_will');
+    if (id.includes('adverb')) out.push('good_well', 'hard_hardly');
+    if (id.includes('presentsimple')) out.push('do_does');
+    if (id.includes('presentperfect') || id.includes('futureperfect') || id.includes('pastperfect')) out.push('have_v3_error', 'by_deadline');
+    if (id.includes('passive')) out.push('passive_active');
+
+    return out;
+  }
+
+  function inferRuleRoutes(meta){
+    const id = String(meta?.id || '').toLowerCase();
+    const group = String(meta?.group || '').toLowerCase();
+    const levels = Array.isArray(meta?.levels) ? meta.levels : [];
+    const out = [];
+
+    if (levels.includes('A2-B1')) out.push('quick_a2b1');
+    if (levels.includes('B1-B2')) out.push('exam_b1b2');
+    if (levels.includes('B2-C1')) out.push('advanced_b2c1');
+    if (group === 'present' || group === 'past' || group === 'future') out.push('active_tenses_route');
+    if (group === 'universal') out.push('universal_route');
+    if (group === 'future') out.push('future_pack');
+    if (id.includes('reported') || id.includes('passive') || id.includes('condition') || id.includes('adverb') || id.includes('article') || id.includes('specialnounsnumber') || id.includes('questiontags')) out.push('writing_pack');
+
+    return out;
+  }
+
+  function inferRuleAliases(meta){
+    const id = String(meta?.id || '').toLowerCase();
+    const out = [
+      meta?.title || '',
+      meta?.subtitle || '',
+      meta?.hint || ''
+    ];
+
+    if (id.includes('futuresimple')) out.push('will', 'future simple', 'будущее simple');
+    if (id.includes('futurecontinuous')) out.push('will be doing', 'future continuous');
+    if (id.includes('futureperfect') && !id.includes('continuous')) out.push('will have done', 'future perfect');
+    if (id.includes('futureperfectcontinuous')) out.push('will have been doing', 'future perfect continuous');
+    if (id.includes('goingto')) out.push('be going to', 'собираюсь');
+    if (id.includes('futurepresentsimple')) out.push('timetable', 'расписание в будущем');
+    if (id.includes('futurepresentcontinuous')) out.push('arrangement', 'договоренность на будущее');
+    if (id.includes('futuretimeclauses')) out.push('if + will', 'when + will', 'future clauses');
+    if (id.includes('passive')) out.push('passive voice', 'be + v3', 'страдательный залог');
+    if (id.includes('reported')) out.push('reported speech', 'согласование времен', 'future in the past');
+    if (id.includes('adverb')) out.push('good well', 'hard hardly', 'adjective adverb', 'so such enough too');
+    if (id.includes('specialnounsnumber')) out.push('is are nouns', 'singular plural', 'news money scissors');
+
+    return out;
+  }
+
+  function getRuleProfile(meta){
+    if (!meta || !meta.id) return null;
+    const key = String(meta.id);
+    const cached = RULE_PROFILE_CACHE.get(key);
+    if (cached) return cached;
+
+    const group = String(meta.group || '').toLowerCase() || 'universal';
+    const subgroup = deriveSubgroup(meta);
+    const family = normalizeTagArray(meta.family)[0] || inferRuleFamily(meta);
+
+    const intents = mergeTags(meta.intents, inferRuleIntents(meta));
+    const patterns = mergeTags(meta.patterns, inferRulePatterns(meta));
+    const mistakes = mergeTags(meta.mistakes, inferRuleMistakes(meta));
+    const routes = mergeTags(meta.routes, inferRuleRoutes(meta));
+    const aliases = mergeTags(meta.aliases, inferRuleAliases(meta));
+
+    const searchText = normalizeSearchText([
+      meta.id,
+      meta.title,
+      meta.subtitle,
+      meta.hint,
+      group,
+      subgroup,
+      family,
+      intents.join(' '),
+      patterns.join(' '),
+      mistakes.join(' '),
+      routes.join(' '),
+      aliases.join(' ')
+    ].filter(Boolean).join(' '));
+
+    const profile = {
+      id: key,
+      group,
+      subgroup,
+      family,
+      intents,
+      patterns,
+      mistakes,
+      routes,
+      aliases,
+      searchText,
+      searchTokens: splitWords(searchText)
+    };
+
+    RULE_PROFILE_CACHE.set(key, profile);
+    return profile;
+  }
+
+  function getFinderField(mode){
+    const key = normalizeFinderMode(mode);
+    if (key === 'intent') return 'intents';
+    if (key === 'pattern') return 'patterns';
+    if (key === 'mistake') return 'mistakes';
+    if (key === 'route') return 'routes';
+    return '';
+  }
+
+  function matchesFinderProfile(profile){
+    if (!profile) return false;
+    const mode = normalizeFinderMode(finderMode);
+    if (mode === 'all' || !finderValue) return true;
+    const field = getFinderField(mode);
+    if (!field) return true;
+    const list = Array.isArray(profile[field]) ? profile[field] : [];
+    return list.includes(finderValue);
+  }
+
+  function matchesListQuery(meta, profile, query){
+    const q = normalizeSearchText(query || '');
+    if (!q) return true;
+
+    const terms = splitWords(q);
+    if (!terms.length) return true;
+
+    const haystack = [
+      normalizeSearchText(meta?.title || ''),
+      normalizeSearchText(meta?.subtitle || ''),
+      normalizeSearchText(meta?.hint || ''),
+      profile?.searchText || ''
+    ].join(' ');
+
+    return terms.every((term) => {
+      if (!term) return true;
+      if (haystack.includes(term)) return true;
+      if (term.length >= 4){
+        return profile?.searchTokens?.some((tk)=> tk.startsWith(term));
+      }
+      return false;
+    });
+  }
+
+  function getListFilteredMetas(){
+    const base = sortMetasForDisplay(getFilteredMetas({ category: activeCategory, subgroup: activeSubgroup }));
+    return base.filter((meta) => {
+      const profile = getRuleProfile(meta);
+      if (!matchesFinderProfile(profile)) return false;
+      if (!matchesListQuery(meta, profile, listSearchQuery)) return false;
+      return true;
+    });
+  }
+
+  function countFinderOption(baseMetas, mode, optionId){
+    const field = getFinderField(mode);
+    if (!field) return 0;
+    let count = 0;
+    for (const meta of (baseMetas || [])){
+      const profile = getRuleProfile(meta);
+      if (!profile) continue;
+      const list = Array.isArray(profile[field]) ? profile[field] : [];
+      if (list.includes(optionId)) count += 1;
+    }
+    return count;
+  }
+
+  function renderCategoryBar(){
+    if (!categoryWrap || !categoryBar) return;
+    categoryBar.innerHTML = '';
+
+    for (const key of CATEGORY_ORDER){
+      if (!CATEGORY_LABEL[key]) continue;
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'ik-btn';
+      if (key === activeCategory) btn.classList.add('is-active');
+      btn.textContent = categoryLabel(key);
+      btn.addEventListener('click', ()=>{
+        setCategory(key);
+        setSubgroup('all');
+        renderList();
+      });
+      categoryBar.appendChild(btn);
+    }
+
+    categoryWrap.hidden = false;
+  }
+
+  function renderFinderModes(){
+    if (!finderModesEl) return;
+    finderModesEl.innerHTML = '';
+    for (const mode of FINDER_MODE_ORDER){
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'ik-btn';
+      btn.textContent = finderModeLabel(mode);
+      btn.setAttribute('data-finder-mode', mode);
+      if (mode === finderMode) btn.classList.add('is-active');
+      btn.addEventListener('click', ()=>{
+        setFinderMode(mode);
+      });
+      finderModesEl.appendChild(btn);
+    }
+  }
+
+  function renderFinderChips(baseMetas){
+    if (!finderChipsEl) return;
+    finderChipsEl.innerHTML = '';
+
+    const mode = normalizeFinderMode(finderMode);
+    if (mode === 'all'){
+      const note = document.createElement('p');
+      note.className = 'ik-footnote';
+      note.textContent = isEnLang()
+        ? 'Select mode to filter by meaning, pattern, mistakes, or learning route.'
+        : 'Выбери режим, чтобы фильтровать темы по смыслу, формуле, ошибке или маршруту.';
+      finderChipsEl.appendChild(note);
+      return;
+    }
+
+    const options = getFinderOptions(mode);
+    if (!options.length) return;
+
+    for (const option of options){
+      const count = countFinderOption(baseMetas, mode, option.id);
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'sh-finder__chip';
+      btn.classList.toggle('is-active', finderValue === option.id);
+      btn.disabled = count === 0;
+      btn.innerHTML = `${escapeHtml(finderOptionLabel(option))}<span class="sh-finder__chip-count">(${count})</span>`;
+      btn.addEventListener('click', ()=>{
+        if (finderValue === option.id) setFinderValue('');
+        else setFinderValue(option.id);
+      });
+      finderChipsEl.appendChild(btn);
+    }
+  }
+
+  function renderFinderSummary(total){
+    if (!finderSummaryEl) return;
+    const mode = normalizeFinderMode(finderMode);
+    const modeText = finderModeLabel(mode);
+    const options = getFinderOptions(mode);
+    const option = options.find((it)=> it.id === finderValue);
+    const filterText = finderValue
+      ? finderOptionLabel(option || { id: finderValue, ru: finderValue, en: finderValue })
+      : (isEnLang() ? 'none' : 'нет');
+    const queryText = listSearchQuery ? listSearchQuery : (isEnLang() ? 'none' : 'нет');
+
+    finderSummaryEl.textContent = isEnLang()
+      ? `mode: ${modeText} • quick filter: ${filterText} • text: ${queryText} • topics: ${total}`
+      : `режим: ${modeText} • быстрый фильтр: ${filterText} • текст: ${queryText} • тем: ${total}`;
+  }
+
+  function syncFinderUi(baseMetas, total){
+    if (!finderWrap) return;
+    finderWrap.hidden = false;
+    if (finderTitleEl){
+      finderTitleEl.textContent = isEnLang()
+        ? 'Section system: find any rule fast'
+        : 'система разделов: найди правило за секунды';
+    }
+    if (finderResetBtn){
+      finderResetBtn.textContent = isEnLang() ? 'reset filters' : 'сбросить фильтры';
+    }
+    if (listSearchInput){
+      listSearchInput.placeholder = isEnLang()
+        ? 'filter by topic, formula, error...'
+        : 'фильтр по теме, формуле, ошибке...';
+      if (listSearchInput.value !== (listSearchQuery || '')) listSearchInput.value = listSearchQuery || '';
+    }
+    if (listSearchClearBtn){
+      listSearchClearBtn.textContent = isEnLang() ? 'clear' : 'очистить';
+    }
+    renderFinderModes();
+    renderFinderChips(baseMetas);
+    renderFinderSummary(total);
+  }
+
+  function getFinderVisibleCount(baseMetas){
+    let count = 0;
+    for (const meta of (baseMetas || [])){
+      const profile = getRuleProfile(meta);
+      if (!matchesFinderProfile(profile)) continue;
+      count += 1;
+    }
+    return count;
+  }
+
+  function renderHomeFinderModes(){
+    if (!homeFinderModesEl) return;
+    homeFinderModesEl.innerHTML = '';
+    for (const mode of FINDER_MODE_ORDER){
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'ik-btn';
+      btn.textContent = finderModeLabel(mode);
+      btn.setAttribute('data-finder-mode', mode);
+      if (mode === finderMode) btn.classList.add('is-active');
+      btn.addEventListener('click', ()=>{
+        setFinderMode(mode, { rerender: false });
+      });
+      homeFinderModesEl.appendChild(btn);
+    }
+  }
+
+  function renderHomeFinderChips(baseMetas){
+    if (!homeFinderChipsEl) return;
+    homeFinderChipsEl.innerHTML = '';
+
+    const mode = normalizeFinderMode(finderMode);
+    if (mode === 'all'){
+      const note = document.createElement('p');
+      note.className = 'ik-footnote';
+      note.textContent = isEnLang()
+        ? 'Pick one mode, then choose a quick filter. The list opens already focused.'
+        : 'Выбери режим, потом быстрый фильтр. Список откроется уже сфокусированным.';
+      homeFinderChipsEl.appendChild(note);
+      return;
+    }
+
+    const options = getFinderOptions(mode);
+    if (!options.length) return;
+
+    for (const option of options){
+      const count = countFinderOption(baseMetas, mode, option.id);
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'sh-finder__chip';
+      btn.classList.toggle('is-active', finderValue === option.id);
+      btn.disabled = count === 0;
+      btn.innerHTML = `${escapeHtml(finderOptionLabel(option))}<span class="sh-finder__chip-count">(${count})</span>`;
+      btn.addEventListener('click', ()=>{
+        if (finderValue === option.id) setFinderValue('', { rerender: false });
+        else setFinderValue(option.id, { rerender: false });
+      });
+      homeFinderChipsEl.appendChild(btn);
+    }
+  }
+
+  function renderHomeFinderSummary(baseMetas){
+    if (!homeFinderSummaryEl) return;
+    const mode = normalizeFinderMode(finderMode);
+    const modeText = finderModeLabel(mode);
+    const options = getFinderOptions(mode);
+    const option = options.find((it)=> it.id === finderValue);
+    const filterText = finderValue
+      ? finderOptionLabel(option || { id: finderValue, ru: finderValue, en: finderValue })
+      : (isEnLang() ? 'none' : 'нет');
+    const total = Array.isArray(baseMetas) ? baseMetas.length : 0;
+    const visible = getFinderVisibleCount(baseMetas);
+
+    homeFinderSummaryEl.textContent = isEnLang()
+      ? `mode: ${modeText} • quick filter: ${filterText} • topics: ${visible}/${total}`
+      : `режим: ${modeText} • быстрый фильтр: ${filterText} • тем: ${visible}/${total}`;
+  }
+
+  function syncHomeFinderUi(){
+    if (!homeFinderWrap) return;
+    const selected = normalizeGrammarHomeTab(grammarHomeTab);
+    homeFinderWrap.hidden = (selected === 'practice');
+    if (homeFinderWrap.hidden) return;
+    const hasLevel = ensureLevelSelected();
+
+    if (homeFinderTitleEl){
+      homeFinderTitleEl.textContent = isEnLang()
+        ? 'Quick start: choose logic and open a focused list'
+        : 'быстрый старт: выбери логику и сразу открой список';
+    }
+    if (homeFinderResetBtn){
+      homeFinderResetBtn.textContent = isEnLang() ? 'reset' : 'сбросить';
+    }
+    if (homeFinderConstructorBtn){
+      homeFinderConstructorBtn.textContent = isEnLang() ? 'not sure -> constructor' : 'не уверен -> конструктор';
+    }
+    if (homeFinderOpenBtn){
+      homeFinderOpenBtn.textContent = isEnLang() ? 'open list' : 'открыть список';
+      homeFinderOpenBtn.disabled = !hasLevel;
+    }
+
+    const baseMetas = sortMetasForDisplay(getFilteredMetas({ category: 'all', subgroup: 'all' }));
+    renderHomeFinderModes();
+    renderHomeFinderChips(baseMetas);
+    renderHomeFinderSummary(baseMetas);
+    if (!hasLevel && homeFinderSummaryEl){
+      homeFinderSummaryEl.textContent += isEnLang() ? ' • choose level first' : ' • сначала выбери уровень';
+    }
+  }
+
+  function openListWithCurrentFinder(){
+    if (!ensureLevelSelected()){
+      showOnly('home');
+      setStatus('выбери уровень');
+      return;
+    }
+    setCategory('all');
+    setSubgroup('all');
+    setListSearchQuery('', { rerender: false, syncInput: true });
+    renderList();
+    showOnly('list');
+    setStatus('list');
+  }
+
   function ensureLevelSelected(){
     return !!getLevel();
   }
@@ -1019,7 +1787,7 @@
 
   function updateListSubtitle(){
     if (!listSubtitleEl) return;
-    const base = CATEGORY_LABEL[activeCategory] || CATEGORY_LABEL.all;
+    const base = categoryLabel(activeCategory) || categoryLabel('all');
     if (activeSubgroup && activeSubgroup !== 'all'){
       listSubtitleEl.textContent = `${base} - ${subgroupLabel(activeSubgroup)}`;
       return;
@@ -1152,6 +1920,7 @@
     const group = String(meta?.group || '').toLowerCase();
     const subgroup = deriveSubgroup(meta);
     const topic = (REG && REG.byId) ? REG.byId[key] : null;
+    const profile = getRuleProfile(meta);
 
     const metaParts = [
       meta?.id,
@@ -1162,6 +1931,13 @@
       CATEGORY_LABEL[group] || '',
       subgroup,
       subgroupLabel(subgroup),
+      profile?.family || '',
+      familyLabel(profile?.family || ''),
+      Array.isArray(profile?.intents) ? profile.intents.join(' ') : '',
+      Array.isArray(profile?.patterns) ? profile.patterns.join(' ') : '',
+      Array.isArray(profile?.mistakes) ? profile.mistakes.join(' ') : '',
+      Array.isArray(profile?.routes) ? profile.routes.join(' ') : '',
+      Array.isArray(profile?.aliases) ? profile.aliases.join(' ') : '',
       Array.isArray(meta?.levels) ? meta.levels.join(' ') : ''
     ];
 
@@ -1189,6 +1965,7 @@
       meta,
       group,
       subgroup,
+      family: profile?.family || '',
       text,
       metaText,
       ruleText,
@@ -1198,7 +1975,8 @@
       ruleTokenSet,
       titleText,
       titleTokens,
-      titleTokenSet
+      titleTokenSet,
+      profile
     };
     SEARCH_DOC_CACHE.set(key, doc);
     return doc;
@@ -1335,6 +2113,7 @@
       const category = String(meta.group || '').toLowerCase();
       const categoryLabel = CATEGORY_LABEL[category] || category;
       const subgroupText = subgroupLabel(row.subgroup);
+      const familyText = familyLabel(row.profile?.family || getRuleProfile(meta)?.family || '');
       const levelsText = Array.isArray(meta.levels) && meta.levels.length ? meta.levels.join(' / ') : '';
       const selectedLevel = getLevel();
       const outOfLevel = !!(selectedLevel && Array.isArray(meta.levels) && !meta.levels.includes(selectedLevel));
@@ -1344,7 +2123,7 @@
       if (row.fieldHits?.rules) matchFields.push('rules');
       const matchText = matchFields.length ? `совпадение: ${matchFields.join('/')}` : '';
       const snippetText = row.snippet ? `найдено: ${row.snippet}` : '';
-      const metaLine = [categoryLabel, subgroupText, levelsText, outOfLevel ? 'другой уровень' : '', matchText].filter(Boolean).join(' • ');
+      const metaLine = [categoryLabel, subgroupText, familyText, levelsText, outOfLevel ? 'другой уровень' : '', matchText].filter(Boolean).join(' • ');
 
       const li = document.createElement('li');
       li.className = 'is-clickable';
@@ -1775,6 +2554,36 @@
     }
     setCategory(category);
     setSubgroup('all');
+    clearFinderFilters({ rerender: false });
+    renderList();
+    showOnly('list');
+    setStatus('list');
+  }
+
+  function openCuratedSection(options){
+    if (!ensureLevelSelected()){
+      showOnly('home');
+      setStatus('выбери уровень');
+      return;
+    }
+
+    const opts = Object.assign({
+      category: 'all',
+      subgroup: 'all',
+      finderMode: 'all',
+      finderValue: '',
+      search: ''
+    }, options || {});
+
+    const category = CATEGORY_LABEL[opts.category] ? opts.category : 'all';
+    setCategory(category);
+    if (category === 'all') setSubgroup('all');
+    else setSubgroup(opts.subgroup || 'all');
+
+    setFinderMode(opts.finderMode || 'all', { keepValue: false, rerender: false });
+    setFinderValue(opts.finderValue || '', { rerender: false });
+    setListSearchQuery(opts.search || '', { rerender: false, syncInput: true });
+
     renderList();
     showOnly('list');
     setStatus('list');
@@ -1948,61 +2757,130 @@
   // -------------------------
   // List
   // -------------------------
+  function getListSectionKey(meta){
+    if (activeCategory === 'all' || activeCategory === 'active_tenses'){
+      const key = String(meta?.group || 'universal').toLowerCase();
+      return key || 'universal';
+    }
+    return deriveSubgroup(meta) || 'all';
+  }
+
+  function getListSectionTitle(sectionKey){
+    if (activeCategory === 'all' || activeCategory === 'active_tenses'){
+      return categoryLabel(sectionKey) || sectionKey;
+    }
+    return subgroupLabel(sectionKey);
+  }
+
+  function getListSectionOrder(keys){
+    const list = Array.isArray(keys) ? [...keys] : [];
+    if (!list.length) return [];
+
+    if (activeCategory === 'all'){
+      const order = ['present', 'past', 'future', 'universal'];
+      return [
+        ...order.filter((k)=> list.includes(k)),
+        ...list.filter((k)=> !order.includes(k)).sort((a, b)=> String(a).localeCompare(String(b)))
+      ];
+    }
+
+    if (activeCategory === 'active_tenses'){
+      const order = ['present', 'past', 'future'];
+      return [
+        ...order.filter((k)=> list.includes(k)),
+        ...list.filter((k)=> !order.includes(k)).sort((a, b)=> String(a).localeCompare(String(b)))
+      ];
+    }
+
+    return sortSubgroups(list);
+  }
+
+  function buildListSections(metas){
+    const map = new Map();
+    for (const meta of (metas || [])){
+      const key = getListSectionKey(meta);
+      if (!map.has(key)) map.set(key, []);
+      map.get(key).push(meta);
+    }
+    const keys = getListSectionOrder(Array.from(map.keys()));
+    return keys.map((key)=> ({ key, title: getListSectionTitle(key), items: map.get(key) || [] }));
+  }
+
   function renderList(){
+    renderCategoryBar();
     renderSubgroupBar();
-    const visibleMetas = sortMetasForDisplay(getFilteredMetas({ category: activeCategory, subgroup: activeSubgroup }));
+
+    const baseMetas = sortMetasForDisplay(getFilteredMetas({ category: activeCategory, subgroup: activeSubgroup }));
+    const visibleMetas = baseMetas.filter((meta) => {
+      const profile = getRuleProfile(meta);
+      if (!matchesFinderProfile(profile)) return false;
+      if (!matchesListQuery(meta, profile, listSearchQuery)) return false;
+      return true;
+    });
+
     const compactMode = isCompactList();
     if (countBadge) countBadge.textContent = `grammar: ${visibleMetas.length}`;
     updateListSubtitle();
+    syncFinderUi(baseMetas, visibleMetas.length);
 
     listEl.innerHTML = '';
     if (!visibleMetas.length){
       const li = document.createElement('li');
-      li.innerHTML = '<p class="ik-itemline">Для этого уровня пока нет тем в выбранной категории.</p>';
+      li.innerHTML = `<p class="ik-itemline">${isEnLang() ? 'No topics match current filters.' : 'По текущим фильтрам темы не найдены.'}</p>`;
       listEl.appendChild(li);
       return;
     }
 
-    for (const meta of visibleMetas){
-      const prog = loadProgress(meta.id);
-      const subgroupText = subgroupLabel(deriveSubgroup(meta));
-      const metaHint = meta.hint || meta.subtitle || '';
+    const sections = buildListSections(visibleMetas);
+    for (const section of sections){
+      const head = document.createElement('li');
+      head.className = 'sh-list-section';
+      head.innerHTML = `<p class="sh-list-section__title">${escapeHtml(section.title)} • ${section.items.length}</p>`;
+      listEl.appendChild(head);
 
-      const li = document.createElement('li');
-      li.className = 'is-clickable';
-      li.addEventListener('click', ()=> openTense(meta.id));
+      for (const meta of section.items){
+        const prog = loadProgress(meta.id);
+        const subgroupText = subgroupLabel(deriveSubgroup(meta));
+        const metaHint = meta.hint || meta.subtitle || '';
+        const profile = getRuleProfile(meta);
+        const familyText = familyLabel(profile?.family || '');
 
-      const left = document.createElement('div');
-      if (compactMode){
-        left.innerHTML = `<p class="ik-itemline"><b>${escapeHtml(meta.title)}</b></p>
-                          <p class="ik-itemline ik-muted">${escapeHtml(subgroupText)}</p>`;
-      } else {
-        left.innerHTML = `<p class="ik-itemline"><b>${escapeHtml(meta.title)}</b></p>
-                          <p class="ik-itemline ik-muted">${escapeHtml(metaHint)} • ${escapeHtml(subgroupText)}</p>`;
+        const li = document.createElement('li');
+        li.className = 'is-clickable';
+        li.addEventListener('click', ()=> openTense(meta.id));
+
+        const left = document.createElement('div');
+        if (compactMode){
+          left.innerHTML = `<p class="ik-itemline"><b>${escapeHtml(meta.title)}</b></p>
+                            <p class="ik-itemline ik-muted">${escapeHtml(subgroupText)} • ${escapeHtml(familyText)}</p>`;
+        } else {
+          left.innerHTML = `<p class="ik-itemline"><b>${escapeHtml(meta.title)}</b></p>
+                            <p class="ik-itemline ik-muted">${escapeHtml(metaHint)} • ${escapeHtml(subgroupText)} • ${escapeHtml(familyText)}</p>`;
+        }
+
+        const right = document.createElement('div');
+        right.className = 'ik-mini';
+
+        const badge = document.createElement('span');
+        badge.className = 'ik-badge';
+        badge.textContent = `${masteryLabel(prog.mastery)} - ${prog.mastery}/5`;
+
+        const btnRule = document.createElement('button');
+        btnRule.className = 'ik-btn ik-btn--black';
+        btnRule.type = 'button';
+        btnRule.textContent = isEnLang() ? 'rule' : 'правило';
+        btnRule.addEventListener('click', (e)=>{
+          e.stopPropagation();
+          openTense(meta.id);
+        });
+
+        right.appendChild(badge);
+        right.appendChild(btnRule);
+
+        li.appendChild(left);
+        li.appendChild(right);
+        listEl.appendChild(li);
       }
-
-      const right = document.createElement('div');
-      right.className = 'ik-mini';
-
-      const badge = document.createElement('span');
-      badge.className = 'ik-badge';
-      badge.textContent = `${masteryLabel(prog.mastery)} - ${prog.mastery}/5`;
-
-      const btnRule = document.createElement('button');
-      btnRule.className = 'ik-btn ik-btn--black';
-      btnRule.type = 'button';
-      btnRule.textContent = 'правило';
-      btnRule.addEventListener('click', (e)=>{
-        e.stopPropagation();
-        openTense(meta.id);
-      });
-
-      right.appendChild(badge);
-      right.appendChild(btnRule);
-
-      li.appendChild(left);
-      li.appendChild(right);
-      listEl.appendChild(li);
     }
   }
 
@@ -4717,6 +5595,7 @@
 
     setCategory('all');
     setSubgroup('all');
+    clearFinderFilters({ rerender: false });
 
     if (REG.byId && REG.byId[BASIC_OVERVIEW_ID]){
       openTense(BASIC_OVERVIEW_ID);
@@ -4729,16 +5608,7 @@
   });
 
   btnGoTheory.addEventListener('click', ()=>{
-    if (!ensureLevelSelected()){
-      showOnly('home');
-      setStatus('выбери уровень');
-      return;
-    }
-    setCategory('all');
-    setSubgroup('all');
-    renderList();
-    showOnly('list');
-    setStatus('list');
+    openListWithCurrentFinder();
   });
 
   btnGoPractice.addEventListener('click', ()=>{
@@ -4751,7 +5621,28 @@
 
   btnGoActiveTenses && btnGoActiveTenses.addEventListener('click', ()=> openCategory('active_tenses'));
   btnGoUniversal && btnGoUniversal.addEventListener('click', ()=> openCategory('universal'));
+  btnGoPresent && btnGoPresent.addEventListener('click', ()=> openCuratedSection({ category: 'present' }));
+  btnGoPast && btnGoPast.addEventListener('click', ()=> openCuratedSection({ category: 'past' }));
+  btnGoFuture && btnGoFuture.addEventListener('click', ()=> openCuratedSection({ category: 'future' }));
+  btnGoConditionals && btnGoConditionals.addEventListener('click', ()=> openCuratedSection({ category: 'universal', subgroup: 'conditionals' }));
+  btnGoModals && btnGoModals.addEventListener('click', ()=> openCuratedSection({ category: 'universal', subgroup: 'modals' }));
+  btnGoPassive && btnGoPassive.addEventListener('click', ()=> openCuratedSection({ category: 'universal', subgroup: 'voice', finderMode: 'intent', finderValue: 'passive' }));
+  btnGoReportedClauses && btnGoReportedClauses.addEventListener('click', ()=> openCuratedSection({ category: 'universal', subgroup: 'clauses', finderMode: 'intent', finderValue: 'reporting' }));
+  btnGoVerbPatterns && btnGoVerbPatterns.addEventListener('click', ()=> openCuratedSection({ category: 'universal', subgroup: 'verb_patterns' }));
+  btnGoArticles && btnGoArticles.addEventListener('click', ()=> openCuratedSection({ category: 'universal', subgroup: 'articles' }));
+  btnGoSyntax && btnGoSyntax.addEventListener('click', ()=> openCuratedSection({ category: 'universal', subgroup: 'syntax' }));
+  btnGoWritingPack && btnGoWritingPack.addEventListener('click', ()=> openCuratedSection({ category: 'all', finderMode: 'route', finderValue: 'writing_pack' }));
+  btnGoExamRoute && btnGoExamRoute.addEventListener('click', ()=> openCuratedSection({ category: 'all', finderMode: 'route', finderValue: 'exam_b1b2' }));
   btnOpenConstructor && btnOpenConstructor.addEventListener('click', ()=> showConstructor());
+  homeFinderOpenBtn && homeFinderOpenBtn.addEventListener('click', ()=>{
+    openListWithCurrentFinder();
+  });
+  homeFinderResetBtn && homeFinderResetBtn.addEventListener('click', ()=>{
+    clearFinderFilters({ rerender: false });
+  });
+  homeFinderConstructorBtn && homeFinderConstructorBtn.addEventListener('click', ()=>{
+    showConstructor();
+  });
   btnBackHomeFromConstructor && btnBackHomeFromConstructor.addEventListener('click', ()=>{
     showOnly('home');
     setStatus('home');
@@ -4766,6 +5657,27 @@
   compactListToggle && compactListToggle.addEventListener('change', ()=>{
     setCompactList(!!compactListToggle.checked);
     renderList();
+  });
+
+  finderResetBtn && finderResetBtn.addEventListener('click', ()=>{
+    clearFinderFilters();
+  });
+
+  listSearchInput && listSearchInput.addEventListener('input', ()=>{
+    setListSearchQuery(listSearchInput.value || '');
+  });
+
+  listSearchInput && listSearchInput.addEventListener('keydown', (e)=>{
+    if (e.key !== 'Enter') return;
+    const firstClickable = listEl ? listEl.querySelector('li.is-clickable') : null;
+    if (!firstClickable) return;
+    e.preventDefault();
+    firstClickable.click();
+  });
+
+  listSearchClearBtn && listSearchClearBtn.addEventListener('click', ()=>{
+    setListSearchQuery('');
+    listSearchInput && listSearchInput.focus();
   });
 
   ruleModeShortBtn && ruleModeShortBtn.addEventListener('click', ()=> setRuleMode('short'));
@@ -5286,6 +6198,7 @@ btnDailyStart && btnDailyStart.addEventListener('click', ()=> startDaily(false))
 btnDailyNew && btnDailyNew.addEventListener('click', ()=> startDaily(true));
 
 document.addEventListener('ik:languagechange', ()=>{
+  syncHomeFinderUi();
   if (listView && !listView.hidden) renderList();
   if (constructorView && !constructorView.hidden){
     if (builderLastRec) renderBuilderResult(builderLastRec);
@@ -5295,12 +6208,16 @@ document.addEventListener('ik:languagechange', ()=>{
 });
 
   // Init
+  finderMode = normalizeFinderMode(finderMode);
+  finderValue = normalizeFinderValue(finderMode, finderValue);
   refreshLevelUI();
   if (compactListToggle) compactListToggle.checked = isCompactList();
+  if (listSearchInput) listSearchInput.value = listSearchQuery || '';
   updateRuleModeButtons();
   initSearchUI();
-  if (countBadge) countBadge.textContent = `grammar: ${getFilteredMetas({ category: activeCategory, subgroup: activeSubgroup }).length}`;
-  setGrammarHomeTab('rules');
+  if (countBadge) countBadge.textContent = `grammar: ${getListFilteredMetas().length}`;
+  setGrammarHomeTab(grammarHomeTab);
+  syncHomeFinderUi();
   showOnly('home');
 
   // -------------------------

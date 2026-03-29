@@ -1401,6 +1401,158 @@ body {
   width: 0%;
 }
 
+.sh-category{
+  margin: 10px 0 12px;
+}
+
+.sh-category__title{
+  margin: 0 0 8px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 11px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  opacity: .82;
+}
+
+.sh-category__bar{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.sh-category__bar .ik-btn{
+  padding: 8px 10px;
+  font-size: 11px;
+}
+
+.sh-category__bar .ik-btn.is-active{
+  background: #000;
+  color: #fff;
+}
+
+.sh-finder{
+  border: 2px solid #000;
+  background: linear-gradient(180deg, rgba(0,0,0,0.045), rgba(0,0,0,0.015));
+  padding: 12px;
+  margin: 0 0 12px;
+}
+
+.sh-finder__head{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.sh-finder__title{
+  margin: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 12px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  font-weight: 900;
+}
+
+.sh-finder__modes{
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.sh-finder__modes .ik-btn.is-active{
+  background: #000;
+  color: #fff;
+}
+
+.sh-finder__chips{
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.sh-finder__chip{
+  border: 2px solid #000;
+  background: #fff;
+  color: #000;
+  padding: 7px 10px;
+  min-height: 34px;
+  font-size: 11px;
+  letter-spacing: .03em;
+  text-transform: none;
+}
+
+.sh-finder__chip.is-active{
+  background: #000;
+  color: #fff;
+}
+
+.sh-finder__chip:disabled{
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+.sh-finder__chip-count{
+  opacity: .74;
+  margin-left: 6px;
+}
+
+.sh-finder__search{
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.sh-finder__search .ik-input{
+  min-width: 320px;
+  flex: 1 1 auto;
+}
+
+.sh-finder__summary{
+  margin: 8px 0 0;
+}
+
+.sh-home-finder{
+  margin-bottom: 12px;
+}
+
+.sh-home-finder__actions{
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+#grammarHomeTileGrid{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+@media (min-width: 1280px){
+  #grammarHomeTileGrid{
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.sh-list-section{
+  background: rgba(0,0,0,0.06);
+  border-top: 2px solid #000 !important;
+}
+
+.sh-list-section__title{
+  margin: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 11px;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  font-weight: 900;
+}
+
 .sh-subgroup{
   margin: 10px 0 12px;
 }
@@ -1453,6 +1605,30 @@ body {
 }
 
 #tensesHomeView[data-grammar-home-tab="practice"] #grammarBuilderBox,
+#tensesHomeView[data-grammar-home-tab="practice"] #grammarHomeFinderWrap,
 #tensesHomeView[data-grammar-home-tab="practice"] #grammarSearchBox{
   display: none;
+}
+
+@media (max-width: 760px){
+  .sh-home-finder__actions{
+    width: 100%;
+  }
+
+  .sh-home-finder__actions .ik-btn{
+    width: 100%;
+  }
+
+  #grammarHomeTileGrid{
+    grid-template-columns: 1fr;
+  }
+
+  .sh-finder__search .ik-input{
+    min-width: 0;
+    width: 100%;
+  }
+
+  .sh-finder__search .ik-btn{
+    width: 100%;
+  }
 }

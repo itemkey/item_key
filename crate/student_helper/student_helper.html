@@ -722,8 +722,23 @@
               <p class="ik-title">grammar hub</p>
               <p class="ik-sub">один раздел: времена + грамматические структуры</p>
 
+              <section class="sh-finder sh-home-finder" id="grammarHomeFinderWrap" aria-label="Быстрый старт по grammar">
+                <div class="sh-finder__head">
+                  <p class="sh-finder__title" id="grammarHomeFinderTitle">быстрый старт: выбери логику и сразу открой список</p>
+                  <div class="sh-home-finder__actions" role="group" aria-label="Действия быстрого старта grammar">
+                    <button class="ik-btn" id="grammarHomeFinderResetBtn" type="button">сбросить</button>
+                    <button class="ik-btn" id="grammarHomeFinderConstructorBtn" type="button">не уверен -> конструктор</button>
+                    <button class="ik-btn ik-btn--black" id="grammarHomeFinderOpenBtn" type="button">открыть список</button>
+                  </div>
+                </div>
+
+                <div class="sh-finder__modes" id="grammarHomeFinderModes" role="tablist" aria-label="Режимы быстрого старта grammar"></div>
+                <div class="sh-finder__chips" id="grammarHomeFinderChips" role="group" aria-label="Быстрые фильтры на главной grammar"></div>
+                <p class="ik-footnote sh-finder__summary" id="grammarHomeFinderSummary">режим: всё • фильтр: нет • тем: 0</p>
+              </section>
+
               <div class="sh-search-box" id="grammarSearchBox">
-                <p class="sh-search-box__title">быстрый поиск по грамматике</p>
+                <p class="sh-search-box__title">дополнительно: строковый поиск</p>
                 <div class="sh-search-box__row">
                   <input class="ik-input" id="grammarSearchInput" type="search" autocomplete="off" spellcheck="false" placeholder="поиск темы, формулы, категории..." aria-label="Поиск по grammar" />
                   <button class="ik-btn" id="grammarSearchClearBtn" type="button">очистить</button>
@@ -733,8 +748,8 @@
               </div>
 
               <div class="sh-builder-box" id="grammarBuilderBox">
-                <p class="sh-builder-box__title">конструктор по грамматике</p>
-                <p class="sh-builder-box__sub">простые вопросы в 2-4 шага -> 1 главный вариант + 2 альтернативы</p>
+                <p class="sh-builder-box__title">дополнительно: конструктор</p>
+                <p class="sh-builder-box__sub">если не уверен в выборе: простые вопросы в 2-4 шага -> 1 главный вариант + 2 альтернативы</p>
                 <button class="ik-btn ik-btn--black" id="grammarOpenConstructorBtn" type="button">запустить конструктор</button>
               </div>
 
@@ -756,7 +771,7 @@
                 <button class="ik-tab" id="grammarHomeTabAll" role="tab" aria-selected="false" type="button" data-grammar-home-tab="all">всё</button>
               </div>
 
-              <p class="ik-sub" id="grammarHomeTabHint">раздел «правила»: только темы и теория</p>
+              <p class="ik-sub" id="grammarHomeTabHint">раздел «правила»: крупные разделы + быстрый старт + точечные фильтры</p>
 
               <div class="sh-grid" id="grammarHomeTileGrid" role="list">
                 <button class="sh-tile" id="tensesGoBasics" type="button" role="listitem" aria-label="Открыть базовый экскурс по временам" data-grammar-home-group="rules">
@@ -766,8 +781,26 @@
                 </button>
 
                 <button class="sh-tile" id="tensesGoTheory" type="button" role="listitem" aria-label="Открыть карту грамматики" data-grammar-home-group="rules">
-                  <div class="sh-tile__head">правила</div>
-                  <div class="sh-tile__body">отдельный список правил: темы, формулы, примеры</div>
+                  <div class="sh-tile__head">все правила (карта)</div>
+                  <div class="sh-tile__body">единый список всех тем: фильтры по смыслу, формуле, ошибкам и маршрутам</div>
+                  <div class="sh-tile__foot">открыть</div>
+                </button>
+
+                <button class="sh-tile" id="grammarGoPresent" type="button" role="listitem" aria-label="Открыть Present system" data-grammar-home-group="rules">
+                  <div class="sh-tile__head">present system</div>
+                  <div class="sh-tile__body">present simple / continuous / perfect / perfect continuous + карта выбора</div>
+                  <div class="sh-tile__foot">открыть</div>
+                </button>
+
+                <button class="sh-tile" id="grammarGoPast" type="button" role="listitem" aria-label="Открыть Past system" data-grammar-home-group="rules">
+                  <div class="sh-tile__head">past system</div>
+                  <div class="sh-tile__body">past simple / continuous / perfect / perfect continuous + контрасты</div>
+                  <div class="sh-tile__foot">открыть</div>
+                </button>
+
+                <button class="sh-tile" id="grammarGoFuture" type="button" role="listitem" aria-label="Открыть Future system" data-grammar-home-group="rules">
+                  <div class="sh-tile__head">future system</div>
+                  <div class="sh-tile__body">will, be going to, present forms for future, future perfect/continuous</div>
                   <div class="sh-tile__foot">открыть</div>
                 </button>
 
@@ -777,9 +810,63 @@
                   <div class="sh-tile__foot">открыть</div>
                 </button>
 
+                <button class="sh-tile" id="grammarGoConditionals" type="button" role="listitem" aria-label="Открыть Conditionals" data-grammar-home-group="rules">
+                  <div class="sh-tile__head">conditionals</div>
+                  <div class="sh-tile__body">zero / first / second / third / mixed + if-логика и типичные ошибки</div>
+                  <div class="sh-tile__foot">открыть</div>
+                </button>
+
+                <button class="sh-tile" id="grammarGoModals" type="button" role="listitem" aria-label="Открыть Modals" data-grammar-home-group="rules">
+                  <div class="sh-tile__head">modals</div>
+                  <div class="sh-tile__body">can, could, may, might, must, should, have to, would</div>
+                  <div class="sh-tile__foot">открыть</div>
+                </button>
+
+                <button class="sh-tile" id="grammarGoPassive" type="button" role="listitem" aria-label="Открыть Passive voice" data-grammar-home-group="rules">
+                  <div class="sh-tile__head">passive voice</div>
+                  <div class="sh-tile__body">пассивный залог по временам + contrast active vs passive</div>
+                  <div class="sh-tile__foot">открыть</div>
+                </button>
+
+                <button class="sh-tile" id="grammarGoReportedClauses" type="button" role="listitem" aria-label="Открыть Reported speech and clauses" data-grammar-home-group="rules">
+                  <div class="sh-tile__head">reported + clauses</div>
+                  <div class="sh-tile__body">reported speech, sequence of tenses, noun/time clauses</div>
+                  <div class="sh-tile__foot">открыть</div>
+                </button>
+
+                <button class="sh-tile" id="grammarGoVerbPatterns" type="button" role="listitem" aria-label="Открыть Verb patterns" data-grammar-home-group="rules">
+                  <div class="sh-tile__head">verb patterns</div>
+                  <div class="sh-tile__body">gerund vs infinitive, wish/if only, causative, stative verbs</div>
+                  <div class="sh-tile__foot">открыть</div>
+                </button>
+
+                <button class="sh-tile" id="grammarGoArticles" type="button" role="listitem" aria-label="Открыть Articles and nouns" data-grammar-home-group="rules">
+                  <div class="sh-tile__head">articles + nouns</div>
+                  <div class="sh-tile__body">a/an/the, zero article, число существительных и согласование</div>
+                  <div class="sh-tile__foot">открыть</div>
+                </button>
+
+                <button class="sh-tile" id="grammarGoSyntax" type="button" role="listitem" aria-label="Открыть Syntax and word choice" data-grammar-home-group="rules">
+                  <div class="sh-tile__head">syntax + word choice</div>
+                  <div class="sh-tile__body">adverbs, inversion, cleft sentences, question tags</div>
+                  <div class="sh-tile__foot">открыть</div>
+                </button>
+
                 <button class="sh-tile" id="grammarGoUniversal" type="button" role="listitem" aria-label="Открыть Universal grammar" data-grammar-home-group="rules">
                   <div class="sh-tile__head">universal</div>
                   <div class="sh-tile__body">структуры вне одного времени: passive, conditionals, modals</div>
+                  <div class="sh-tile__foot">открыть</div>
+                </button>
+
+                <button class="sh-tile" id="grammarGoWritingPack" type="button" role="listitem" aria-label="Открыть writing accuracy route" data-grammar-home-group="rules">
+                  <div class="sh-tile__head">writing accuracy route</div>
+                  <div class="sh-tile__body">маршрут для точности письма: пассив, reported, clauses, conditionals, syntax</div>
+                  <div class="sh-tile__foot">открыть</div>
+                </button>
+
+                <button class="sh-tile" id="grammarGoExamRoute" type="button" role="listitem" aria-label="Открыть exam route B1-B2" data-grammar-home-group="rules">
+                  <div class="sh-tile__head">exam route B1-B2</div>
+                  <div class="sh-tile__body">сфокусированный список тем для экзаменационного уровня B1-B2</div>
                   <div class="sh-tile__foot">открыть</div>
                 </button>
 
@@ -904,6 +991,28 @@
 
               <p class="ik-title">грамматика</p>
               <p class="ik-sub" id="tensesListSubtitle">выбери тему</p>
+
+              <div class="sh-category" id="grammarCategoryWrap">
+                <p class="sh-category__title">раздел</p>
+                <div class="sh-category__bar" id="grammarCategoryBar" role="group" aria-label="Категория grammar"></div>
+              </div>
+
+              <section class="sh-finder" id="grammarFinderWrap" aria-label="Система разделов grammar">
+                <div class="sh-finder__head">
+                  <p class="sh-finder__title" id="grammarFinderTitle">система разделов: найди правило за секунды</p>
+                  <button class="ik-btn" id="grammarFinderResetBtn" type="button">сбросить фильтры</button>
+                </div>
+
+                <div class="sh-finder__modes" id="grammarFinderModes" role="tablist" aria-label="Режимы поиска правил"></div>
+                <div class="sh-finder__chips" id="grammarFinderChips" role="group" aria-label="Быстрые фильтры по grammar"></div>
+
+                <div class="sh-finder__search">
+                  <input class="ik-input" id="grammarListSearchInput" type="search" autocomplete="off" spellcheck="false" placeholder="фильтр по теме, формуле, ошибке..." aria-label="Фильтр списка grammar" />
+                  <button class="ik-btn" id="grammarListSearchClearBtn" type="button">очистить</button>
+                </div>
+
+                <p class="ik-footnote sh-finder__summary" id="grammarFinderSummary">режим: всё • фильтр: нет</p>
+              </section>
 
               <label class="ik-label sh-list-compact-toggle">
                 <input type="checkbox" id="grammarCompactListToggle" checked />
