@@ -362,6 +362,17 @@
     "levels": ["A2-B1", "B1-B2", "B2-C1"]
   },
   {
+    "id": "adverbs",
+    "title": "Adverbs",
+    "subtitle": "прилагательные vs наречия: форма, значение, позиция",
+    "hint": "adjective/adverb • linking verbs • hard/hardly • so/such/enough",
+    "file": "adverbs.json",
+    "group": "universal",
+    "kind": "structure",
+    "compare": false,
+    "levels": ["A2-B1", "B1-B2", "B2-C1"]
+  },
+  {
     "id": "modalsPossibilityDeduction",
     "title": "Modals: Possibility and Deduction",
     "subtitle": "might/may/could, must, can't",

@@ -905,6 +905,7 @@
     }
 
     if (group !== 'universal') return 'simple';
+    if (id.includes('adverb')) return 'syntax';
     if (id.includes('conditional')) return 'conditionals';
     if (id.includes('modal')) return 'modals';
     if (id.includes('passive')) return 'voice';
@@ -2010,7 +2011,7 @@
   // -------------------------
   function blocksForRuleMode(blocks){
     const source = Array.isArray(blocks) ? blocks : [];
-    if (ruleMode === 'full' || currentId === BASIC_OVERVIEW_ID || currentId === 'presentPerfect' || currentId === 'presentPerfectContinuous' || currentId === 'presentPerfectVsPresentPerfectContinuous') return source;
+    if (ruleMode === 'full' || currentId === BASIC_OVERVIEW_ID || currentId === 'adverbs' || currentId === 'presentPerfect' || currentId === 'presentPerfectContinuous' || currentId === 'presentPerfectVsPresentPerfectContinuous') return source;
 
     const out = [];
     let heading = 0;
