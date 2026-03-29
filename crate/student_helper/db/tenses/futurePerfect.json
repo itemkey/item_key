@@ -55,15 +55,15 @@
       "rows": [
         [
           "срок",
-          "by 5 o'clock, by tomorrow, by next week"
+          "by 9 o'clock, by tomorrow, by next week"
+        ],
+        [
+          "будущая точка отсчета",
+          "(by) this time tomorrow, by then"
         ],
         [
           "граница",
           "by the time, before"
-        ],
-        [
-          "контекст",
-          "in two years (к этому времени), by then"
         ]
       ]
     },

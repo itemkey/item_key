@@ -9,7 +9,7 @@
     },
     {
       "type": "text",
-      "text": "В придаточных времени и условия (if, when, as soon as, before, after, until, unless) в future-контексте обычно ставим Present Simple, а не will."
+      "text": "В придаточных времени и условия (if, when, while, as soon as, before, after, by the time, in case, till/until, unless) в future-контексте обычно ставим Present Simple, а не will."
     },
     {
       "type": "table",
@@ -34,6 +34,32 @@
           "Итог",
           "future + when/if + Present Simple",
           "I'll call you when I arrive"
+        ]
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Союзы, которые чаще запускают правило no will",
+      "columns": [
+        "Группа",
+        "Союзы",
+        "Пример"
+      ],
+      "rows": [
+        [
+          "условие",
+          "if, unless, in case",
+          "If you leave your car here, you will get a fine."
+        ],
+        [
+          "время",
+          "when, while, as soon as, before, after, by the time",
+          "When you see Nelly, ask her to call me."
+        ],
+        [
+          "граница",
+          "till / until",
+          "We'll keep the boxes until we move."
         ]
       ]
     },

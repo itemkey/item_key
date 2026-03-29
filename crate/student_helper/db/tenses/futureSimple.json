@@ -15,9 +15,11 @@
       "type": "highlight",
       "title": "Основные случаи",
       "lines": [
-        "решение в момент речи: I'll open the window.",
-        "прогноз/мнение: I think it will rain.",
-        "обещание/угроза/предложение: I will help you. / Will you have some tea?"
+        "однократное действие в будущем: I will check in at the hotel and then go for a walk.",
+        "спонтанное решение в момент речи: I'm sleepy. I will go to bed.",
+        "прогноз/мнение после I think, I hope, I believe, I wonder: I don't think you will like my advice.",
+        "обещание / просьба / предложение: I will help you with your homework. / Will you stay longer?",
+        "неизбежное действие, на которое трудно повлиять: The temperature will fall to 3 C tomorrow."
       ]
     },
     {
@@ -56,15 +58,71 @@
       "rows": [
         [
           "типичные",
-          "tomorrow, next week, in a year, one day, soon, later"
+          "tomorrow, tonight, tomorrow morning, the day after tomorrow, next year, this weekend, soon, one day, in a week, in 2030, in the near future"
         ],
         [
           "прогноз",
           "I think, I guess, probably, perhaps, sure, definitely"
         ],
         [
-          "условные предложения",
-          "Conditional 1: main clause (If + Present Simple, ... will + V1)"
+          "future clauses",
+          "if, when, while, as soon as, before, after, by the time, in case, till/until, unless + Present Simple"
+        ]
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Наречия времени (частотные пары)",
+      "columns": [
+        "Английский",
+        "Русский"
+      ],
+      "rows": [
+        [
+          "tomorrow",
+          "завтра"
+        ],
+        [
+          "the day after tomorrow",
+          "послезавтра"
+        ],
+        [
+          "soon / one day",
+          "скоро / однажды"
+        ],
+        [
+          "in 2030 / in the near future",
+          "в 2030 / в ближайшем будущем"
+        ]
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Future clause pattern: will + IF/WHEN + Present Simple"
+    },
+    {
+      "type": "table",
+      "caption": "Главная идея",
+      "columns": [
+        "Где",
+        "Форма",
+        "Пример"
+      ],
+      "rows": [
+        [
+          "главная часть",
+          "will + V1",
+          "You will get a fine ..."
+        ],
+        [
+          "придаточная after if/when/etc.",
+          "Present Simple",
+          "... if you leave your car here."
+        ],
+        [
+          "типичная ошибка",
+          "не ставим will в if/when-clause",
+          "When you see Nelly, ask her to call me."
         ]
       ]
     },

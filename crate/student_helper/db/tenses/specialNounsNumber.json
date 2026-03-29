@@ -36,7 +36,7 @@
       "rows": [
         [
           "Только singular",
-          "advice, chess, clothing, furniture, gossip, hair, homework, jewellery, knowledge, money, moustache, news, trouble, information, progress, weather",
+          "advice, evidence, chess, clothing, furniture, gossip, hair, homework, jewellery, knowledge, lightning, money, news, research, success, trouble, information, progress, weather, work",
           "The news is important. / Her hair is wet."
         ],
         [
@@ -71,7 +71,7 @@
       "rows": [
         [
           "Только plural",
-          "binoculars, clothes, glasses, goods, headphones, outskirts, police, pyjamas, scales, scissors, stairs, thanks, tights, traffic lights, trousers, jeans, shorts",
+          "binoculars, clothes, congratulations, glasses, goods, headphones, outskirts, police, pyjamas, scales, scissors, stairs, thanks, tights, traffic lights, trousers, jeans, shorts",
           "My trousers are new. / The police are here."
         ],
         [
@@ -130,9 +130,19 @@
           "Bison are huge."
         ],
         [
+          "aircraft",
+          "This aircraft is new.",
+          "These aircraft are new."
+        ],
+        [
           "crossroads",
           "The crossroads is empty at night.",
           "The crossroads are busy in the morning."
+        ],
+        [
+          "works (factory)",
+          "The steel works is old.",
+          "The steel works are working day and night."
         ]
       ]
     },
@@ -377,6 +387,42 @@
             ],
             "correctIndex": 1,
             "explain": "mice - plural form (mouse -> mice)"
+          },
+          {
+            "id": "snn_m_13",
+            "instruction": "Выбери категорию",
+            "prompt": "aircraft",
+            "options": [
+              "is",
+              "are",
+              "is / are"
+            ],
+            "correctIndex": 2,
+            "explain": "aircraft: одна и та же форма в singular и plural"
+          },
+          {
+            "id": "snn_m_14",
+            "instruction": "Выбери категорию",
+            "prompt": "evidence",
+            "options": [
+              "is",
+              "are",
+              "is / are"
+            ],
+            "correctIndex": 0,
+            "explain": "evidence употребляется как singular/uncountable"
+          },
+          {
+            "id": "snn_m_15",
+            "instruction": "Выбери категорию",
+            "prompt": "congratulations",
+            "options": [
+              "is",
+              "are",
+              "is / are"
+            ],
+            "correctIndex": 1,
+            "explain": "congratulations обычно употребляется как plural"
           }
         ]
       },
@@ -510,6 +556,42 @@
               "are"
             ],
             "explain": "traffic lights - plural-only noun"
+          },
+          {
+            "id": "snn_f_15",
+            "instruction": "Вставь слово",
+            "prompt": "The research ____ very promising.",
+            "accepted": [
+              "is"
+            ],
+            "explain": "research употребляется как singular/uncountable"
+          },
+          {
+            "id": "snn_f_16",
+            "instruction": "Вставь слово",
+            "prompt": "His evidence ____ weak.",
+            "accepted": [
+              "is"
+            ],
+            "explain": "evidence - singular/uncountable"
+          },
+          {
+            "id": "snn_f_17",
+            "instruction": "Вставь слово",
+            "prompt": "These aircraft ____ ready for take-off.",
+            "accepted": [
+              "are"
+            ],
+            "explain": "aircraft не меняет форму; здесь plural контекст"
+          },
+          {
+            "id": "snn_f_18",
+            "instruction": "Вставь слово",
+            "prompt": "Congratulations ____ in order!",
+            "accepted": [
+              "are"
+            ],
+            "explain": "congratulations обычно требует plural agreement"
           }
         ]
       },

@@ -17,6 +17,7 @@
       "lines": [
         "процесс в моменте будущего: This time tomorrow I will be flying to Rome.",
         "ожидаемая ситуация по плану: At 8 p.m. we will be having dinner.",
+        "длительное действие в будущем периоде: I will be shopping for two hours.",
         "вежливый вопрос о планах: Will you be using your laptop tonight?"
       ]
     },
@@ -55,16 +56,16 @@
       ],
       "rows": [
         [
-          "момент в будущем",
-          "this time tomorrow, at 8 tomorrow, at noon next Friday"
+          "точный момент",
+          "this time tomorrow, at 3 o'clock, at midnight, at noon next Friday"
         ],
         [
-          "контекст",
-          "while, when (будущее время в придаточном)"
+          "отрезок длительности",
+          "from 5 to 6, for a week, all day long, the whole day"
         ],
         [
-          "вежливые вопросы",
-          "Will you be ...?"
+          "контекст и вежливые вопросы",
+          "when/while + Present Simple, Will you be ...?"
         ]
       ]
     },

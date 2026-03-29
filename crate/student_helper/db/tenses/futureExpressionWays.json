@@ -54,6 +54,45 @@
       ]
     },
     {
+      "type": "heading",
+      "text": "Если главное предложение в Past (Future-in-the-Past)"
+    },
+    {
+      "type": "text",
+      "text": "Когда мы пересказываем будущие планы/договоренности из точки прошлого (часто в reported speech), формы будущего обычно сдвигаются на шаг назад." 
+    },
+    {
+      "type": "table",
+      "caption": "Типичные сдвиги",
+      "columns": [
+        "Исходная форма",
+        "Форма после Past",
+        "Пример"
+      ],
+      "rows": [
+        [
+          "will + V1",
+          "would + V1",
+          "Ted promised that he would help me."
+        ],
+        [
+          "Present Simple (в if/when-clause)",
+          "Past Simple",
+          "Mary said we would go out if the weather was fine."
+        ],
+        [
+          "Present Continuous",
+          "Past Continuous",
+          "He said we were meeting Max the next week."
+        ],
+        [
+          "am/is/are going to + V1",
+          "was/were going to + V1",
+          "Dad said we were going to visit Granny."
+        ]
+      ]
+    },
+    {
       "type": "highlight",
       "title": "Типичные ошибки",
       "lines": [

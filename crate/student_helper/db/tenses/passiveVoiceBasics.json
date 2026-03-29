@@ -21,6 +21,15 @@
       ]
     },
     {
+      "type": "highlight",
+      "title": "Какие глаголы можно ставить в Passive",
+      "lines": [
+        "Пассив обычно строится только от переходных глаголов (которые берут прямой объект: кого? что?).",
+        "Непереходные глаголы обычно не пассивятся: appear, arrive, go, happen, rise, run, sit, sleep.",
+        "Правильно: Small cracks appeared. / It happened yesterday. (не were appeared / was happened)"
+      ]
+    },
+    {
       "type": "table",
       "caption": "Базовые формы (как на шпаргалке)",
       "columns": ["Время / группа", "Формула", "Пример"],
@@ -33,6 +42,7 @@
         ["Past Perfect", "had been + V3", "By 2010 the plan had been approved."],
         ["Present Continuous", "am/is/are being + V3", "The house is being painted."],
         ["Past Continuous", "was/were being + V3", "The road was being repaired."],
+        ["Future Continuous", "-", "Форма passive почти не используется: will be being + V3 звучит неестественно."],
         ["Future Perfect", "will have been + V3", "The work will have been completed by Friday."]
       ]
     },

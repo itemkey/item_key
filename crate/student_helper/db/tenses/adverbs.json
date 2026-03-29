@@ -96,6 +96,26 @@
           "wait too long"
         ],
         [
+          "little",
+          "a little chance",
+          "sleep little"
+        ],
+        [
+          "monthly",
+          "a monthly report",
+          "pay monthly"
+        ],
+        [
+          "straight",
+          "a straight line",
+          "go straight home"
+        ],
+        [
+          "well",
+          "I am well",
+          "do well"
+        ],
+        [
           "hard",
           "a hard task",
           "work hard"
@@ -119,6 +139,10 @@
           "in a friendly way"
         ],
         [
+          "likely",
+          "probably / very likely"
+        ],
+        [
           "lovely",
           "in a lovely way / in a lovely manner"
         ],
@@ -127,8 +151,16 @@
           "in a lively way"
         ],
         [
+          "lonely",
+          "in a lonely way"
+        ],
+        [
           "silly",
           "in a silly way"
+        ],
+        [
+          "timely",
+          "in a timely way"
         ],
         [
           "cowardly",
@@ -246,6 +278,10 @@
         "Action verb + adverb"
       ],
       "rows": [
+        [
+          "She appeared calm.",
+          "She appeared unexpectedly."
+        ],
         [
           "He looked nervous.",
           "He looked around nervously."

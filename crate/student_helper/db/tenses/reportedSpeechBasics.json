@@ -5,21 +5,44 @@
   "ruleBlocks": [
     {
       "type": "heading",
-      "text": "Основы Reported Speech"
+      "text": "Согласование времен в Reported Speech"
     },
     {
       "type": "text",
       "text": "Reported Speech передает чужую речь косвенно: кавычки исчезают, часто сдвигаем время назад (backshift), а также меняем местоимения и указатели времени (today -> that day, now -> then)."
     },
     {
+      "type": "highlight",
+      "title": "Два базовых правила",
+      "lines": [
+        "Если в главной части глагол в настоящем/будущем, в придаточной можно оставить нужное исходное время: He says that you are right.",
+        "Если в главной части глагол в прошлом (said/told/promised), обычно делаем backshift: Present -> Past, will -> would.",
+        "Форму выбираем по логике: одновременность, предшествование или последующее действие относительно главной части."
+      ]
+    },
+    {
       "type": "table",
-      "caption": "Базовые сдвиги",
+      "caption": "Основные сдвиги времен",
       "columns": ["Direct", "Reported", "Пример"],
       "rows": [
         ["Present Simple", "Past Simple", "He said, \"I work.\" -> He said (that) he worked."],
         ["Present Continuous", "Past Continuous", "She said, \"I am waiting.\" -> She said she was waiting."],
-        ["will", "would", "They said, \"We will help.\" -> They said they would help."],
-        ["can", "could", "Tom said, \"I can swim.\" -> Tom said he could swim."]
+        ["Present Perfect", "Past Perfect", "She said, \"I have done it.\" -> She said she had done it."],
+        ["Present Perfect Continuous", "Past Perfect Continuous", "He said, \"I have been waiting.\" -> He said he had been waiting."],
+        ["Past Simple", "Past Perfect", "I did -> I had done"],
+        ["Past Continuous", "Past Perfect Continuous", "I was doing -> I had been doing"],
+        ["Past Perfect", "Past Perfect", "I had done -> I had done"],
+        ["Future Simple", "Future-in-the-Past (would)", "They said, \"We will help.\" -> They said they would help."]
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Сдвиг модальных глаголов",
+      "columns": ["Direct", "Reported", "Пример"],
+      "rows": [
+        ["can", "could", "I can do -> I could do"],
+        ["may", "might", "I may do -> I might do"],
+        ["have to", "had to", "I have to do -> I had to do"]
       ]
     },
     {
@@ -27,17 +50,32 @@
       "title": "Ключевые моменты",
       "lines": [
         "say + that-clause, tell + object + that-clause",
-        "backshift часто нужен, если вводный глагол в прошлом",
-        "если факт все еще верен, backshift иногда можно не делать"
+        "если вводный глагол в прошлом, backshift чаще обязателен",
+        "если факт все еще верен или это общеизвестная истина, сдвиг иногда можно не делать"
       ]
     },
     {
       "type": "examples",
       "items": [
+        { "en": "He says that you are right.", "ru": "Он говорит, что вы правы (без обязательного сдвига, т.к. главное в Present)." },
         { "en": "Anna said, \"I am busy now.\" -> Anna said she was busy then.", "ru": "Анна сказала: \"Я сейчас занята\" -> Анна сказала, что тогда была занята." },
+        { "en": "I thought that they were waiting for me in the lobby.", "ru": "Я думал, что они ждут меня в холле." },
         { "en": "He said, \"I will call you tomorrow.\" -> He said he would call me the next day.", "ru": "Он сказал: \"Я позвоню тебе завтра\" -> Он сказал, что позвонит мне на следующий день." },
+        { "en": "Dad promised that we would go on a picnic if it was sunny.", "ru": "Папа пообещал, что мы поедем на пикник, если будет солнечно." },
         { "en": "She told me, \"You should rest.\" -> She told me that I should rest.", "ru": "Она сказала мне: \"Тебе стоит отдохнуть\" -> Она сказала мне, что мне стоит отдохнуть." },
         { "en": "Mike said, \"I can help.\" -> Mike said he could help.", "ru": "Майк сказал: \"Я могу помочь\" -> Майк сказал, что мог помочь." }
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Секрет из шпаргалки: придаточные времени"
+    },
+    {
+      "type": "highlight",
+      "title": "После when/while/before/since",
+      "lines": [
+        "В придаточных времени после when/while/before/since в backshift-контексте обычно выбираем Past Simple/Past Continuous по смыслу, а не механически Perfect.",
+        "He said that his car had broken down while he was driving to work."
       ]
     }
   ],
