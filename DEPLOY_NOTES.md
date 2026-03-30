@@ -18,6 +18,7 @@ Order for fresh environment:
 14. Run `supabase/sql/stage19_schedule_series_compact.sql`
 15. (Optional) Run `supabase/sql/stage12_seed_public_user_dictionaries.sql`
 16. (Optional, if stage12 was used) Run `supabase/sql/stage17_fix_memorize_spelling.sql`
+17. (Optional, force refresh Unit 24) Run `supabase/sql/stage20_force_update_destination_b1_unit24.sql`
 
 After SQL:
 
