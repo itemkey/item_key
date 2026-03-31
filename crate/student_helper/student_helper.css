@@ -1179,6 +1179,403 @@ body {
   }
 }
 
+.sh-practice-flow{
+  margin-top: 12px;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 1.1fr 1fr .95fr;
+  align-items: start;
+}
+
+.sh-practice-box{
+  border: 2px solid #000;
+  background: #fff;
+  padding: 12px;
+}
+
+.sh-practice-box__title{
+  margin: 0 0 10px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.sh-practice-box__goal-row{
+  gap: 8px;
+}
+
+.sh-practice-box__actions{
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.sh-practice-source{
+  margin-top: 10px;
+  border: 2px solid #000;
+  background: rgba(0,0,0,0.04);
+  padding: 10px;
+}
+
+.sh-practice-source__text{
+  margin: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.sh-practice-source__actions{
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.sh-practice-launch-actions{
+  display: grid;
+  gap: 8px;
+}
+
+.sh-practice-launch-actions .ik-btn{
+  width: 100%;
+}
+
+.sh-practice-show-after{
+  margin-top: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sh-selected-chips{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.sh-selected-empty{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 11px;
+  opacity: .8;
+}
+
+.sh-selected-chip{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 2px solid #000;
+  background: #fff;
+  padding: 4px 8px;
+  max-width: 100%;
+}
+
+.sh-selected-chip.is-compact{
+  font-size: 11px;
+  padding: 3px 6px;
+}
+
+.sh-selected-chip__text{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 11px;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.sh-selected-chip__remove{
+  appearance: none;
+  border: 1px solid #000;
+  background: #fff;
+  color: #000;
+  width: 18px;
+  height: 18px;
+  font-size: 10px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+}
+
+html.sh-selector-open,
+body.sh-selector-open{
+  overflow: hidden !important;
+}
+
+.sh-selector-modal{
+  position: fixed;
+  inset: 0;
+  z-index: 4000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  box-sizing: border-box;
+  background: #e9e9ec;
+  overflow: hidden;
+}
+
+.sh-selector-modal[hidden]{
+  display: none !important;
+}
+
+.sh-selector-modal__backdrop{
+  display: none;
+}
+
+.sh-selector-modal__panel{
+  position: relative;
+  z-index: 1;
+  width: min(980px, calc(100vw - 20px));
+  height: min(740px, calc(100vh - 20px));
+  max-height: min(740px, calc(100vh - 20px));
+  box-sizing: border-box;
+  border: 2px solid #000;
+  background: #fff;
+  box-shadow: 0 10px 28px rgba(0,0,0,0.18);
+  display: grid;
+  grid-template-rows: auto 1fr;
+  overflow: hidden;
+}
+
+.sh-selector-modal__head{
+  border-bottom: 2px solid #000;
+  background: #f3f3f5;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.sh-selector-modal__head .ik-title{
+  margin: 0;
+}
+
+.sh-selector-modal__layout{
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 270px 1fr 250px;
+  height: 100%;
+}
+
+.sh-selector-side,
+.sh-selector-main,
+.sh-selector-sticky{
+  min-height: 0;
+  padding: 10px;
+}
+
+.sh-selector-side{ overflow: auto; }
+
+.sh-selector-side{
+  border-right: 2px solid #000;
+  background: #fafafa;
+}
+
+.sh-selector-side__search{
+  display: grid;
+  gap: 8px;
+}
+
+.sh-selector-side__search .ik-input{
+  min-width: 0;
+  width: 100%;
+}
+
+.sh-selector-side__title{
+  margin: 12px 0 6px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  opacity: .86;
+}
+
+.sh-selector-quick,
+.sh-selector-groups,
+.sh-selector-presets{
+  display: grid;
+  gap: 6px;
+}
+
+.sh-selector-group-btn,
+.sh-selector-filter-btn,
+.sh-selector-preset-btn{
+  width: 100%;
+  text-align: left;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 12px;
+}
+
+.sh-selector-group-btn.is-active,
+.sh-selector-filter-btn.is-active{
+  background: #000;
+  color: #fff;
+}
+
+.sh-selector-main{
+  background: #fff;
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: auto auto auto minmax(0, 1fr);
+}
+
+.sh-selector-main__head{
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.sh-selector-main__title{
+  margin: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 13px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+
+.sh-selector-main__actions{
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.sh-selector-main__actions .ik-btn{
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 12px;
+}
+
+#tensesCustomPrevPageBtn,
+#tensesCustomNextPageBtn{
+  min-width: 112px;
+}
+
+#tensesCustomPrevPageBtn[disabled],
+#tensesCustomNextPageBtn[disabled]{
+  opacity: .4;
+}
+
+.sh-selector-topics{
+  display: grid;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.sh-selector-main.is-scrollable .sh-selector-topics{
+  overflow: auto;
+}
+
+.sh-selector-topic{
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+  border: 2px solid #000;
+  background: #fff;
+  padding: 6px 8px;
+  cursor: pointer;
+}
+
+.sh-selector-topic:hover{
+  background: rgba(0,0,0,0.04);
+}
+
+.sh-selector-topic__cb{
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  accent-color: #000;
+}
+
+.sh-selector-topic__body{
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.sh-selector-topic__title{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.sh-selector-topic__sub{
+  display: none;
+}
+
+.sh-selector-topic__meta{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.sh-selector-topic__badge{
+  font-size: 9px;
+  padding: 3px 5px;
+}
+
+.sh-selector-sticky{
+  border-left: 2px solid #000;
+  background: #fafafa;
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  position: sticky;
+  top: 0;
+  overflow: hidden;
+}
+
+.sh-selector-sticky .ik-btn{
+  width: 100%;
+}
+
+@media (max-width: 1100px){
+  .sh-practice-flow{
+    grid-template-columns: 1fr;
+  }
+
+  .sh-selector-modal__layout{
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+  }
+
+  .sh-selector-side,
+  .sh-selector-main,
+  .sh-selector-sticky{
+    border: 0;
+    border-bottom: 2px solid #000;
+  }
+
+  .sh-selector-sticky{
+    position: static;
+    border-bottom: 0;
+  }
+}
+
+@media (max-width: 760px){
+  .sh-selector-modal__panel{
+    width: calc(100vw - 8px);
+    height: calc(100vh - 8px);
+    max-height: calc(100vh - 8px);
+  }
+
+  .sh-selector-main__actions .ik-btn,
+  .sh-selector-group-btn,
+  .sh-selector-filter-btn,
+  .sh-selector-preset-btn{
+    font-size: 11px;
+  }
+}
+
 .sh-run-card{
   border: 2px solid #000;
   padding: 14px;

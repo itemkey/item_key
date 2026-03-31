@@ -193,8 +193,33 @@
   const customSearchInput = document.getElementById('tensesCustomSearchInput');
   const customSearchClearBtn = document.getElementById('tensesCustomSearchClearBtn');
   const customSearchEmpty = document.getElementById('tensesCustomSearchEmpty');
+  const customSelectedChips = document.getElementById('tensesCustomSelectedChips');
+  const customSelectedMoreBtn = document.getElementById('tensesCustomSelectedMoreBtn');
+  const customStickyGoal = document.getElementById('tensesCustomStickyGoal');
+  const customStickyCount = document.getElementById('tensesCustomStickyCount');
+  const customStickyChips = document.getElementById('tensesCustomStickyChips');
+  const btnCustomOpenPicker = document.getElementById('tensesCustomOpenPickerBtn');
+  const btnCustomEdit = document.getElementById('tensesCustomEditBtn');
+  const customModal = document.getElementById('tensesCustomSelectorModal');
+  const customModalBackdrop = document.getElementById('tensesCustomSelectorBackdrop');
+  const btnCustomModalClose = document.getElementById('tensesCustomSelectorCloseBtn');
+  const customGroupList = document.getElementById('tensesCustomGroupList');
+  const customQuickFilters = document.getElementById('tensesCustomQuickFilters');
+  const customPresetList = document.getElementById('tensesCustomPresetList');
+  const customGroupTitle = document.getElementById('tensesCustomGroupTitle');
+  const customGroupMeta = document.getElementById('tensesCustomGroupMeta');
+  const btnCustomPrevPage = document.getElementById('tensesCustomPrevPageBtn');
+  const btnCustomNextPage = document.getElementById('tensesCustomNextPageBtn');
+  const btnCustomSelectGroup = document.getElementById('tensesCustomSelectGroupBtn');
+  const btnCustomClearGroup = document.getElementById('tensesCustomClearGroupBtn');
   const btnCustomSelectAll = document.getElementById('tensesCustomSelectAllBtn');
+  const btnCustomClearVisible = document.getElementById('tensesCustomClearVisibleBtn');
   const btnCustomClearAll = document.getElementById('tensesCustomClearAllBtn');
+  const btnCustomStartFromSelector = document.getElementById('tensesCustomStartFromSelectorBtn');
+  const sourceNotice = document.getElementById('tensesPracticeSourceNotice');
+  const sourceNoticeName = document.getElementById('tensesPracticeSourceName');
+  const btnSourceRemove = document.getElementById('tensesPracticeSourceRemoveBtn');
+  const btnSourceEdit = document.getElementById('tensesPracticeSourceEditBtn');
 
   const builderBody = document.getElementById('grammarBuilderBody');
   const builderStepBadge = document.getElementById('grammarBuilderStepBadge');
@@ -208,9 +233,25 @@
   let runKeyHandler = null;
   let runReturnState = null;
   let customSearchQuery = '';
+  let customSelectedState = null;
+  let customSelectorGroup = 'present';
+  let customQuickFilter = 'all';
+  let customTopicPage = 0;
+  let customDisplayedMetaIds = [];
+  let sourceTopicId = '';
+  let selectorLockScrollY = 0;
+  let selectorLockActive = false;
   const RULE_PROFILE_CACHE = new Map();
   let detailBackStack = [];
   let overviewFloatingSyncBound = false;
+
+  if (customModal && customModal.parentElement !== document.body){
+    document.body.appendChild(customModal);
+  }
+  if (customModal){
+    customModal.hidden = true;
+    customModal.style.display = 'none';
+  }
 
   function syncDetailReturnButtons(){
     const hasRunReturn = !!runReturnState;
@@ -246,6 +287,8 @@
   const KEY_LIST_SEARCH = 'sh_grammar_list_search_v1';
   const KEY_LAST_TOPIC = 'sh_grammar_last_topic_v1';
   const KEY_SEARCH_MODE = 'sh_grammar_search_mode_v1';
+  const KEY_CUSTOM_RECENT = 'sh_grammar_custom_recent_v1';
+  const KEY_CUSTOM_USAGE = 'sh_grammar_custom_usage_v1';
   const BASIC_OVERVIEW_ID = 'tensesBasicOverview';
   const CUSTOM_TENSE_ID = 'custom';
   const LEVELS = ['A2-B1', 'B1-B2', 'B2-C1'];
@@ -420,6 +463,41 @@
     mixed: 'смешанные упражнения: автоматический микс тем по твоему уровню',
     custom: 'пользовательские упражнения: сам выбираешь правила и времена в удобных группах'
   };
+
+  const PRACTICE_SELECTOR_GROUPS = [
+    { id: 'present', title: 'Present' },
+    { id: 'past', title: 'Past' },
+    { id: 'future', title: 'Future' },
+    { id: 'universal', title: 'Universal' },
+    { id: 'conditionals', title: 'Conditionals' },
+    { id: 'modals', title: 'Modals' },
+    { id: 'voice', title: 'Passive' },
+    { id: 'clauses', title: 'Clauses' },
+    { id: 'syntax', title: 'Syntax' },
+    { id: 'verb_patterns', title: 'Verb patterns' },
+    { id: 'frequent', title: 'Часто используемые' },
+    { id: 'recent', title: 'Недавно выбранные' }
+  ];
+
+  const PRACTICE_QUICK_FILTERS = [
+    { id: 'all', title: 'все' },
+    { id: 'selected', title: 'выбранные' },
+    { id: 'tenses', title: 'времена' },
+    { id: 'universal', title: 'универсальные' },
+    { id: 'basic', title: 'базовые' },
+    { id: 'advanced', title: 'продвинутые' },
+    { id: 'frequent', title: 'часто выбираемые' },
+    { id: 'recent', title: 'недавние' }
+  ];
+
+  const PRACTICE_PRESETS = [
+    { id: 'basic_tenses', title: 'Базовые времена' },
+    { id: 'all_perfect', title: 'Все Perfect' },
+    { id: 'all_continuous', title: 'Все Continuous' },
+    { id: 'conditionals', title: 'Условные предложения' },
+    { id: 'passive_reported', title: 'Пассив + Reported Speech' },
+    { id: 'common_mistakes', title: 'Частые ошибки' }
+  ];
 
   const CONSTRUCTOR_NODES = {
     root: {
@@ -4007,6 +4085,7 @@
 
     if (m === 'custom') renderCustomPicker();
     setCustomPickerVisible(m === 'custom');
+    renderPracticeSourceNotice();
 
     if (opts.persist){
       saveUIState({ practiceMode: m, tense: tenseSelect?.value || 'mixedAll' });
@@ -4039,240 +4118,744 @@
     tenseSelect.appendChild(optCustom);
   }
 
+  function getPracticeSelectableMetas(){
+    const metas = sortMetasForDisplay(getFilteredMetas({ category: 'all' }));
+    return metas.filter((meta)=> hasPracticeForTopic(REG.byId[meta.id]));
+  }
+
   function getCoreTenseIds(){
-    return getFilteredMetas({ category: 'all' }).map(x=>x.id).filter(Boolean);
+    return getPracticeSelectableMetas().map((x)=> x.id).filter(Boolean);
+  }
+
+  function sanitizeCustomIds(ids){
+    const valid = new Set(getCoreTenseIds());
+    const seen = new Set();
+    const out = [];
+    for (const raw of (Array.isArray(ids) ? ids : [])){
+      const id = String(raw || '').trim();
+      if (!id || !valid.has(id) || seen.has(id)) continue;
+      seen.add(id);
+      out.push(id);
+    }
+    return out;
+  }
+
+  function loadRecentCustomIds(){
+    try{
+      return sanitizeCustomIds(JSON.parse(localStorage.getItem(KEY_CUSTOM_RECENT) || '[]'));
+    }catch(_){
+      return [];
+    }
+  }
+
+  function saveRecentCustomIds(ids){
+    try{ localStorage.setItem(KEY_CUSTOM_RECENT, JSON.stringify(sanitizeCustomIds(ids).slice(0, 30))); }catch(_){ }
+  }
+
+  function touchRecentCustomIds(ids){
+    const arr = Array.isArray(ids) ? ids : [ids];
+    let recent = loadRecentCustomIds();
+    for (const raw of arr){
+      const id = String(raw || '').trim();
+      if (!id) continue;
+      recent = [id, ...recent.filter((x)=> x !== id)];
+    }
+    saveRecentCustomIds(recent);
+  }
+
+  function loadCustomUsageMap(){
+    try{
+      const raw = JSON.parse(localStorage.getItem(KEY_CUSTOM_USAGE) || '{}') || {};
+      const out = {};
+      for (const id of getCoreTenseIds()){
+        const n = Number(raw[id] || 0);
+        if (Number.isFinite(n) && n > 0) out[id] = Math.round(n);
+      }
+      return out;
+    }catch(_){
+      return {};
+    }
+  }
+
+  function saveCustomUsageMap(map){
+    try{ localStorage.setItem(KEY_CUSTOM_USAGE, JSON.stringify(map || {})); }catch(_){ }
+  }
+
+  function bumpCustomUsage(ids){
+    const uniq = sanitizeCustomIds(ids);
+    if (!uniq.length) return;
+    const usage = loadCustomUsageMap();
+    for (const id of uniq){
+      usage[id] = Number(usage[id] || 0) + 1;
+    }
+    saveCustomUsageMap(usage);
+  }
+
+  function normalizeCustomSelectorGroup(value){
+    const key = String(value || '').trim().toLowerCase();
+    if (PRACTICE_SELECTOR_GROUPS.some((x)=> x.id === key)) return key;
+    return 'present';
+  }
+
+  function normalizeCustomQuickFilter(value){
+    const key = String(value || '').trim().toLowerCase();
+    if (PRACTICE_QUICK_FILTERS.some((x)=> x.id === key)) return key;
+    return 'all';
   }
 
   function getSavedCustomIds(){
-    const ids = getCoreTenseIds();
-    if (!ids.length) return [];
     const ui = loadUIState();
     const saved = Array.isArray(ui.customTenses) ? ui.customTenses : [];
-    const valid = saved.filter(id => ids.includes(id));
-    if (valid.length) return valid;
-    return [];
+    return sanitizeCustomIds(saved);
+  }
+
+  function ensureCustomSelectionState(){
+    if (!Array.isArray(customSelectedState)) customSelectedState = getSavedCustomIds();
+    customSelectedState = sanitizeCustomIds(customSelectedState);
+    return customSelectedState;
   }
 
   function getCustomSelectedIds(){
-    if (!customGrid) return getSavedCustomIds();
-    const ids = [];
-    customGrid.querySelectorAll('input[type="checkbox"][data-tense-id]').forEach((el)=>{
-      if (el.checked) ids.push(el.getAttribute('data-tense-id'));
+    return [...ensureCustomSelectionState()];
+  }
+
+  function selectorGroupLabel(groupId){
+    const key = normalizeCustomSelectorGroup(groupId);
+    const ru = {
+      present: 'Present',
+      past: 'Past',
+      future: 'Future',
+      universal: 'Universal',
+      conditionals: 'Conditionals',
+      modals: 'Modals',
+      voice: 'Passive',
+      clauses: 'Clauses',
+      syntax: 'Syntax',
+      verb_patterns: 'Verb patterns',
+      frequent: 'Часто используемые',
+      recent: 'Недавно выбранные'
+    };
+    const en = {
+      present: 'Present',
+      past: 'Past',
+      future: 'Future',
+      universal: 'Universal',
+      conditionals: 'Conditionals',
+      modals: 'Modals',
+      voice: 'Passive',
+      clauses: 'Clauses',
+      syntax: 'Syntax',
+      verb_patterns: 'Verb patterns',
+      frequent: 'Frequently used',
+      recent: 'Recently selected'
+    };
+    return isEnLang() ? (en[key] || ru[key] || key) : (ru[key] || en[key] || key);
+  }
+
+  function getSelectorGroupBaseMetas(groupId){
+    const key = normalizeCustomSelectorGroup(groupId);
+    const metas = getPracticeSelectableMetas();
+    const byId = new Map(metas.map((m)=> [m.id, m]));
+
+    if (key === 'recent') return loadRecentCustomIds().map((id)=> byId.get(id)).filter(Boolean);
+
+    if (key === 'frequent'){
+      const usage = loadCustomUsageMap();
+      return Object.keys(usage)
+        .sort((a, b)=> Number(usage[b] || 0) - Number(usage[a] || 0))
+        .map((id)=> byId.get(id))
+        .filter(Boolean);
+    }
+
+    if (key === 'present' || key === 'past' || key === 'future' || key === 'universal'){
+      return metas.filter((meta)=> String(meta.group || '').toLowerCase() === key);
+    }
+
+    return metas.filter((meta)=> deriveSubgroup(meta) === key);
+  }
+
+  function passesQuickFilter(meta, filterId){
+    const key = normalizeCustomQuickFilter(filterId);
+    const group = String(meta?.group || '').toLowerCase();
+    const levels = Array.isArray(meta?.levels) ? meta.levels : [];
+    const selectedSet = new Set(getCustomSelectedIds());
+
+    if (key === 'all') return true;
+    if (key === 'selected') return selectedSet.has(meta.id);
+    if (key === 'tenses') return group === 'present' || group === 'past' || group === 'future';
+    if (key === 'universal') return group === 'universal';
+    if (key === 'basic') return !levels.length || levels.includes('A2-B1');
+    if (key === 'advanced') return levels.includes('B2-C1');
+    if (key === 'recent') return loadRecentCustomIds().includes(meta.id);
+    if (key === 'frequent') return Number(loadCustomUsageMap()[meta.id] || 0) > 0;
+    return true;
+  }
+
+  function matchesCustomSelectorSearch(meta, bundle){
+    const terms = Array.isArray(bundle?.terms) ? bundle.terms : [];
+    if (!terms.length) return true;
+
+    const doc = buildSearchDoc(meta);
+    for (const term of terms){
+      const variants = Array.isArray(term?.variants) && term.variants.length
+        ? term.variants
+        : [term?.base];
+
+      const titleHit = getFieldMatchQuality(doc.titleTokens, doc.titleTokenSet, doc.titleStemSet, variants);
+      const metaHit = getFieldMatchQuality(doc.metaTokens, doc.metaTokenSet, doc.metaStemSet, variants);
+      const ruleHit = getFieldMatchQuality(doc.ruleTokens, doc.ruleTokenSet, doc.ruleStemSet, variants);
+      const fuzzyHit = findFuzzyMatch(doc.titleMetaTokens, term.base);
+      if (!(titleHit || metaHit || ruleHit || fuzzyHit)) return false;
+    }
+    return true;
+  }
+
+  function getSelectorVisibleMetas(){
+    const recent = loadRecentCustomIds();
+    const recentRank = new Map(recent.map((id, i)=> [id, i]));
+    const usage = loadCustomUsageMap();
+    const bundle = buildSearchQueryBundle(customSearchQuery || '');
+
+    let metas = getSelectorGroupBaseMetas(customSelectorGroup)
+      .filter((meta)=> passesQuickFilter(meta, customQuickFilter));
+
+    if (bundle.terms.length){
+      metas = metas.filter((meta)=> matchesCustomSelectorSearch(meta, bundle));
+    }
+
+    metas.sort((a, b)=>{
+      if (customSelectorGroup === 'recent' || customQuickFilter === 'recent'){
+        const ar = recentRank.has(a.id) ? recentRank.get(a.id) : 999;
+        const br = recentRank.has(b.id) ? recentRank.get(b.id) : 999;
+        if (ar !== br) return ar - br;
+      }
+
+      if (customSelectorGroup === 'frequent' || customQuickFilter === 'frequent'){
+        const au = Number(usage[a.id] || 0);
+        const bu = Number(usage[b.id] || 0);
+        if (au !== bu) return bu - au;
+      }
+
+      return String(a.title || a.id).localeCompare(String(b.title || b.id));
     });
-    return ids;
+
+    return metas;
   }
 
   function setCustomPickerVisible(visible){
-    if (!customPicker) return;
-    customPicker.hidden = !visible;
-    if (visible) applyCustomSearchFilter();
+    if (customPicker) customPicker.hidden = !visible;
+    if (!visible) closeCustomSelector();
   }
 
-  function applyCustomSearchFilter(){
-    if (!customGrid) return;
-    const query = normalize(customSearchQuery || '');
-    const hasQuery = !!query;
-    let anyVisible = false;
-
-    customGrid.querySelectorAll('.sh-custom-group').forEach((groupEl)=>{
-      let groupVisible = false;
-      groupEl.querySelectorAll('.sh-custom-subgroup').forEach((subEl)=>{
-        let subVisible = false;
-        subEl.querySelectorAll('.sh-custom-tense').forEach((itemEl)=>{
-          const hay = String(itemEl.getAttribute('data-search') || '');
-          const match = !hasQuery || hay.includes(query);
-          itemEl.hidden = !match;
-          if (match) subVisible = true;
-        });
-        subEl.hidden = !subVisible;
-        if (subVisible) groupVisible = true;
-      });
-      groupEl.hidden = !groupVisible;
-      if (groupVisible) anyVisible = true;
-    });
-
-    if (customSearchEmpty) customSearchEmpty.hidden = !hasQuery || anyVisible;
+  function isCustomSelectorOpen(){
+    return !!(customModal && !customModal.hidden);
   }
 
-  function saveCustomSelection(ids){
-    saveUIState({ customTenses: ids });
-    updateCustomHint(ids.length);
-    refreshCustomGroupCounts();
+  function lockSelectorViewport(){
+    if (selectorLockActive) return;
+    selectorLockActive = true;
+    selectorLockScrollY = Math.max(0, window.scrollY || window.pageYOffset || 0);
+
+    document.documentElement.classList.add('sh-selector-open');
+    document.body.classList.add('sh-selector-open');
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${selectorLockScrollY}px`;
+    document.body.style.left = '0';
+    document.body.style.right = '0';
+    document.body.style.width = '100%';
+    document.body.style.overflowY = 'scroll';
+  }
+
+  function unlockSelectorViewport(){
+    if (!selectorLockActive) return;
+    selectorLockActive = false;
+
+    document.documentElement.classList.remove('sh-selector-open');
+    document.body.classList.remove('sh-selector-open');
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.left = '';
+    document.body.style.right = '';
+    document.body.style.width = '';
+    document.body.style.overflowY = '';
+
+    window.scrollTo({ top: selectorLockScrollY, behavior: 'auto' });
+  }
+
+  function captureSelectorScrollState(){
+    if (!customModal || customModal.hidden) return null;
+    const side = customModal.querySelector('.sh-selector-side');
+    const main = customModal.querySelector('.sh-selector-main');
+    const sticky = customModal.querySelector('.sh-selector-sticky');
+    return {
+      sideTop: Number(side?.scrollTop || 0),
+      mainTop: Number(main?.scrollTop || 0),
+      stickyTop: Number(sticky?.scrollTop || 0)
+    };
+  }
+
+  function restoreSelectorScrollState(state){
+    if (!state || !customModal || customModal.hidden) return;
+    const side = customModal.querySelector('.sh-selector-side');
+    const main = customModal.querySelector('.sh-selector-main');
+    const sticky = customModal.querySelector('.sh-selector-sticky');
+    if (side) side.scrollTop = Number(state.sideTop || 0);
+    if (main) main.scrollTop = Number(state.mainTop || 0);
+    if (sticky) sticky.scrollTop = Number(state.stickyTop || 0);
+  }
+
+  function openCustomSelector(options){
+    if (!customModal) return;
+    const opts = options || {};
+    if (opts.group) customSelectorGroup = normalizeCustomSelectorGroup(opts.group);
+    if (opts.quickFilter) customQuickFilter = normalizeCustomQuickFilter(opts.quickFilter);
+    customTopicPage = 0;
+    if (!opts.keepSearch){
+      customSearchQuery = '';
+      if (customSearchInput) customSearchInput.value = '';
+    }
+    customModal.hidden = false;
+    customModal.style.display = 'flex';
+    lockSelectorViewport();
+    renderCustomPicker();
+    customSearchInput?.focus?.();
+  }
+
+  function closeCustomSelector(){
+    if (!customModal || customModal.hidden) return;
+    customModal.hidden = true;
+    customModal.style.display = 'none';
+    unlockSelectorViewport();
+    renderCustomPicker();
     if (tenseSelect?.value === CUSTOM_TENSE_ID) renderPracticeInfo();
   }
 
-  function setAllCustomSelection(checked){
+  function renderSelectedChipList(mount, ids, options){
+    if (!mount) return;
+    const opts = Object.assign({ removable: false, compact: false }, options || {});
+    mount.innerHTML = '';
+
+    const byId = new Map(getPracticeSelectableMetas().map((m)=> [m.id, m]));
+    for (const id of ids){
+      const meta = byId.get(id);
+      if (!meta) continue;
+
+      const chip = document.createElement('span');
+      chip.className = `sh-selected-chip${opts.compact ? ' is-compact' : ''}`;
+
+      const text = document.createElement('span');
+      text.className = 'sh-selected-chip__text';
+      text.textContent = meta.title || meta.id;
+      chip.appendChild(text);
+
+      if (opts.removable){
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'sh-selected-chip__remove';
+        btn.textContent = 'x';
+        btn.title = isEnLang() ? 'remove topic' : 'убрать тему';
+        btn.addEventListener('click', ()=>{
+          const next = getCustomSelectedIds().filter((x)=> x !== id);
+          saveCustomSelection(next);
+        });
+        chip.appendChild(btn);
+      }
+
+      mount.appendChild(chip);
+    }
+
+    if (!mount.children.length){
+      const empty = document.createElement('span');
+      empty.className = 'sh-selected-empty';
+      empty.textContent = isEnLang() ? 'Nothing selected yet' : 'Пока ничего не выбрано';
+      mount.appendChild(empty);
+    }
+  }
+
+  function renderCustomSelectorGroups(){
+    if (!customGroupList) return;
+    customGroupList.innerHTML = '';
+    const selectedSet = new Set(getCustomSelectedIds());
+
+    for (const def of PRACTICE_SELECTOR_GROUPS){
+      const metas = getSelectorGroupBaseMetas(def.id);
+      const selected = metas.filter((meta)=> selectedSet.has(meta.id)).length;
+
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'ik-btn sh-selector-group-btn';
+      if (def.id === customSelectorGroup) btn.classList.add('is-active');
+      btn.textContent = `${selectorGroupLabel(def.id)} (${selected}/${metas.length})`;
+      btn.addEventListener('click', ()=>{
+        customSelectorGroup = normalizeCustomSelectorGroup(def.id);
+        customTopicPage = 0;
+        renderCustomPicker();
+      });
+      customGroupList.appendChild(btn);
+    }
+  }
+
+  function renderCustomQuickFilters(){
+    if (!customQuickFilters) return;
+    customQuickFilters.innerHTML = '';
+
+    for (const def of PRACTICE_QUICK_FILTERS){
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'ik-btn sh-selector-filter-btn';
+      if (def.id === customQuickFilter) btn.classList.add('is-active');
+      btn.textContent = def.title;
+      btn.addEventListener('click', ()=>{
+        customQuickFilter = normalizeCustomQuickFilter(def.id);
+        customTopicPage = 0;
+        renderCustomPicker();
+      });
+      customQuickFilters.appendChild(btn);
+    }
+  }
+
+  function getPresetTopicIds(presetId){
+    const metas = getPracticeSelectableMetas();
+    if (presetId === 'basic_tenses'){
+      return metas
+        .filter((meta)=> {
+          const g = String(meta.group || '').toLowerCase();
+          return (g === 'present' || g === 'past' || g === 'future') && passesQuickFilter(meta, 'basic');
+        })
+        .map((meta)=> meta.id);
+    }
+    if (presetId === 'all_perfect'){
+      return metas
+        .filter((meta)=> {
+          const sub = deriveSubgroup(meta);
+          return sub === 'perfect' || sub === 'perfect_continuous';
+        })
+        .map((meta)=> meta.id);
+    }
+    if (presetId === 'all_continuous'){
+      return metas
+        .filter((meta)=> {
+          const sub = deriveSubgroup(meta);
+          return sub === 'continuous' || sub === 'perfect_continuous';
+        })
+        .map((meta)=> meta.id);
+    }
+    if (presetId === 'conditionals'){
+      return metas.filter((meta)=> deriveSubgroup(meta) === 'conditionals').map((meta)=> meta.id);
+    }
+    if (presetId === 'passive_reported'){
+      return metas
+        .filter((meta)=> {
+          const sub = deriveSubgroup(meta);
+          if (sub === 'voice') return true;
+          if (sub !== 'clauses') return false;
+          return String(meta.id || '').toLowerCase().includes('reported');
+        })
+        .map((meta)=> meta.id);
+    }
+    if (presetId === 'common_mistakes'){
+      return metas
+        .filter((meta)=> {
+          const profile = getRuleProfile(meta);
+          return Array.isArray(profile?.mistakes) && profile.mistakes.length > 0;
+        })
+        .slice(0, 12)
+        .map((meta)=> meta.id);
+    }
+    return [];
+  }
+
+  function applyCustomPreset(presetId){
+    const ids = getPresetTopicIds(presetId);
+    if (!ids.length){
+      setStatus(isEnLang() ? 'preset is empty' : 'в этом пресете пока нет тем');
+      return;
+    }
+    const next = new Set(getCustomSelectedIds());
+    ids.forEach((id)=> next.add(id));
+    saveCustomSelection(Array.from(next));
+    touchRecentCustomIds(ids.slice(0, 6));
+    setStatus(isEnLang() ? 'preset added' : 'пресет добавлен');
+  }
+
+  function renderCustomPresets(){
+    if (!customPresetList) return;
+    customPresetList.innerHTML = '';
+    for (const def of PRACTICE_PRESETS){
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'ik-btn sh-selector-preset-btn';
+      btn.textContent = def.title;
+      btn.addEventListener('click', ()=> applyCustomPreset(def.id));
+      customPresetList.appendChild(btn);
+    }
+  }
+
+  function renderCustomTopicCards(){
     if (!customGrid) return;
-    customGrid.querySelectorAll('input[type="checkbox"][data-tense-id]').forEach((el)=>{
-      el.checked = !!checked;
-    });
-    saveCustomSelection(getCustomSelectedIds());
+    const allVisible = getSelectorVisibleMetas();
+    const selectedSet = new Set(getCustomSelectedIds());
+    const usage = loadCustomUsageMap();
+    const recent = new Set(loadRecentCustomIds().slice(0, 8));
+    const allowMainScroll = customSelectorGroup === 'recent' || customQuickFilter === 'recent';
+
+    const mainWrap = customModal ? customModal.querySelector('.sh-selector-main') : null;
+    if (mainWrap){
+      mainWrap.classList.toggle('is-scrollable', !!allowMainScroll);
+      if (!allowMainScroll) mainWrap.scrollTop = 0;
+    }
+
+    customGrid.innerHTML = '';
+    customDisplayedMetaIds = [];
+    if (customGroupTitle) customGroupTitle.textContent = selectorGroupLabel(customSelectorGroup);
+    if (!allVisible.length){
+      if (customSearchEmpty) customSearchEmpty.hidden = false;
+      if (customGroupMeta) customGroupMeta.textContent = '0';
+      if (btnCustomPrevPage){
+        btnCustomPrevPage.hidden = false;
+        btnCustomPrevPage.disabled = true;
+      }
+      if (btnCustomNextPage){
+        btnCustomNextPage.hidden = false;
+        btnCustomNextPage.disabled = true;
+      }
+      return;
+    }
+
+    if (customSearchEmpty) customSearchEmpty.hidden = true;
+
+    const pageSize = 6;
+    const totalPages = allowMainScroll ? 1 : Math.max(1, Math.ceil(allVisible.length / pageSize));
+    if (allowMainScroll) customTopicPage = 0;
+    customTopicPage = Math.max(0, Math.min(customTopicPage, totalPages - 1));
+
+    const visible = allowMainScroll
+      ? allVisible
+      : allVisible.slice(customTopicPage * pageSize, (customTopicPage + 1) * pageSize);
+
+    customDisplayedMetaIds = visible.map((meta)=> meta.id);
+
+    if (btnCustomPrevPage){
+      btnCustomPrevPage.hidden = false;
+      btnCustomPrevPage.disabled = customTopicPage <= 0;
+      btnCustomPrevPage.textContent = isEnLang() ? 'previous' : 'предыдущие';
+    }
+
+    if (btnCustomNextPage){
+      btnCustomNextPage.hidden = false;
+      btnCustomNextPage.disabled = customTopicPage >= totalPages - 1;
+      btnCustomNextPage.textContent = isEnLang() ? 'next' : 'следующие';
+    }
+
+    if (customGroupMeta){
+      const selectedInVisible = allVisible.filter((meta)=> selectedSet.has(meta.id)).length;
+      const pageText = totalPages > 1 ? ` • ${customTopicPage + 1}/${totalPages}` : '';
+      customGroupMeta.textContent = `${selectedInVisible}/${allVisible.length}${pageText}`;
+    }
+
+    for (const meta of visible){
+      const label = document.createElement('label');
+      label.className = 'sh-selector-topic';
+
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.className = 'sh-selector-topic__cb';
+      cb.checked = selectedSet.has(meta.id);
+
+      const body = document.createElement('span');
+      body.className = 'sh-selector-topic__body';
+
+      const title = document.createElement('span');
+      title.className = 'sh-selector-topic__title';
+      title.textContent = meta.title || meta.id;
+
+      const sub = document.createElement('span');
+      sub.className = 'sh-selector-topic__sub';
+      sub.textContent = meta.subtitle || meta.hint || '';
+
+      const metaRow = document.createElement('span');
+      metaRow.className = 'sh-selector-topic__meta';
+
+      const subgroupBadge = document.createElement('span');
+      subgroupBadge.className = 'ik-badge sh-selector-topic__badge';
+      subgroupBadge.textContent = subgroupLabel(deriveSubgroup(meta));
+      metaRow.appendChild(subgroupBadge);
+
+      if (recent.has(meta.id)){
+        const rec = document.createElement('span');
+        rec.className = 'ik-badge sh-selector-topic__badge';
+        rec.textContent = isEnLang() ? 'recent' : 'недавно';
+        metaRow.appendChild(rec);
+      }
+
+      if (Number(usage[meta.id] || 0) > 0){
+        const used = document.createElement('span');
+        used.className = 'ik-badge sh-selector-topic__badge';
+        used.textContent = `${isEnLang() ? 'used' : 'исп.'}: ${usage[meta.id]}`;
+        metaRow.appendChild(used);
+      }
+
+      body.appendChild(title);
+      body.appendChild(sub);
+      body.appendChild(metaRow);
+      label.appendChild(cb);
+      label.appendChild(body);
+      customGrid.appendChild(label);
+
+      cb.addEventListener('change', ()=>{
+        const set = new Set(getCustomSelectedIds());
+        if (cb.checked) set.add(meta.id);
+        else set.delete(meta.id);
+        saveCustomSelection(Array.from(set));
+      });
+    }
+  }
+
+  function renderCustomStickySummary(){
+    const ids = getCustomSelectedIds();
+    if (customStickyGoal){
+      const goalId = getSelectedGoalId();
+      const goal = GOALS.find((x)=> x.id === goalId);
+      customStickyGoal.textContent = `цель: ${goal?.title || goalId}`;
+    }
+    if (customStickyCount) customStickyCount.textContent = `выбрано: ${ids.length}`;
+    renderSelectedChipList(customStickyChips, ids.slice(0, 3), { removable: true, compact: true });
+
+    if (customStickyChips && ids.length > 3){
+      const extra = document.createElement('span');
+      extra.className = 'ik-badge';
+      extra.textContent = `+${ids.length - 3} еще`;
+      customStickyChips.appendChild(extra);
+    }
+  }
+
+  function applyCustomSearchFilter(){
+    renderCustomTopicCards();
+  }
+
+  function saveCustomSelection(ids){
+    const scrollState = captureSelectorScrollState();
+    const next = sanitizeCustomIds(ids);
+    const prev = new Set(getCustomSelectedIds());
+    const modalOpen = isCustomSelectorOpen();
+    customSelectedState = next;
+    saveUIState({ customTenses: next });
+
+    const added = next.filter((id)=> !prev.has(id));
+    if (added.length) touchRecentCustomIds(added);
+
+    if (!modalOpen){
+      updateCustomHint(next.length);
+      renderSelectedChipList(customSelectedChips, next.slice(0, 3), { removable: true });
+      if (customSelectedMoreBtn){
+        const rest = Math.max(0, next.length - 3);
+        customSelectedMoreBtn.hidden = rest <= 0;
+        customSelectedMoreBtn.textContent = `+${rest} еще`;
+      }
+    }
+
+    renderCustomStickySummary();
+    refreshCustomGroupCounts();
+    renderCustomTopicCards();
+
+    if (sourceTopicId && !next.includes(sourceTopicId)){
+      sourceTopicId = '';
+      renderPracticeSourceNotice();
+    }
+
+    restoreSelectorScrollState(scrollState);
+
+    if (tenseSelect?.value === CUSTOM_TENSE_ID && !modalOpen){
+      renderPracticeInfo();
+    }
+  }
+
+  function setAllCustomSelection(checked){
+    const ids = (Array.isArray(customDisplayedMetaIds) && customDisplayedMetaIds.length)
+      ? [...customDisplayedMetaIds]
+      : getSelectorVisibleMetas().map((meta)=> meta.id);
+    const set = new Set(getCustomSelectedIds());
+    for (const id of ids){
+      if (checked) set.add(id);
+      else set.delete(id);
+    }
+    saveCustomSelection(Array.from(set));
+  }
+
+  function setGroupCustomSelection(checked){
+    const ids = getSelectorGroupBaseMetas(customSelectorGroup).map((meta)=> meta.id);
+    const set = new Set(getCustomSelectedIds());
+    for (const id of ids){
+      if (checked) set.add(id);
+      else set.delete(id);
+    }
+    saveCustomSelection(Array.from(set));
   }
 
   function refreshCustomGroupCounts(){
-    if (!customGrid) return;
-    customGrid.querySelectorAll('.sh-custom-group').forEach((groupEl)=>{
-      const c = groupEl.querySelector('.sh-custom-group__count');
-      if (!c) return;
-      const boxes = Array.from(groupEl.querySelectorAll('input[type="checkbox"][data-tense-id]'));
-      const total = boxes.length;
-      const selected = boxes.filter((el)=> el.checked).length;
-      c.textContent = `${selected}/${total}`;
-    });
+    renderCustomSelectorGroups();
   }
 
   function renderCustomPicker(){
-    if (!customGrid) return;
-    const selected = new Set(getSavedCustomIds());
-    const metas = sortMetasForDisplay(getFilteredMetas({ category: 'all' }));
-    customGrid.innerHTML = '';
-    const catOrder = ['present', 'past', 'future', 'universal'];
-    const catMap = new Map();
+    const selected = getCustomSelectedIds();
+    const modalOpen = isCustomSelectorOpen();
 
-    for (const meta of metas){
-      const cat = String(meta.group || 'universal').toLowerCase();
-      if (!catMap.has(cat)) catMap.set(cat, []);
-      catMap.get(cat).push(meta);
+    if (!modalOpen){
+      updateCustomHint(selected.length);
+      renderSelectedChipList(customSelectedChips, selected.slice(0, 3), { removable: true });
+      if (customSelectedMoreBtn){
+        const rest = Math.max(0, selected.length - 3);
+        customSelectedMoreBtn.hidden = rest <= 0;
+        customSelectedMoreBtn.textContent = `+${rest} еще`;
+      }
     }
 
-    const orderedCats = [...catOrder.filter((cat)=> catMap.has(cat)), ...Array.from(catMap.keys()).filter((cat)=> !catOrder.includes(cat))];
-
-    for (const cat of orderedCats){
-      const groupMetas = catMap.get(cat) || [];
-      if (!groupMetas.length) continue;
-
-      const group = document.createElement('section');
-      group.className = 'sh-custom-group';
-      group.setAttribute('data-cat', cat);
-
-      const groupHead = document.createElement('div');
-      groupHead.className = 'sh-custom-group__head';
-
-      const groupTitle = document.createElement('p');
-      groupTitle.className = 'sh-custom-group__title';
-      groupTitle.textContent = CATEGORY_LABEL[cat] || cat;
-
-      const groupCount = document.createElement('span');
-      groupCount.className = 'ik-badge sh-custom-group__count';
-      groupCount.textContent = '0/0';
-
-      const groupActions = document.createElement('div');
-      groupActions.className = 'sh-custom-group__actions';
-
-      const btnPickGroup = document.createElement('button');
-      btnPickGroup.type = 'button';
-      btnPickGroup.className = 'ik-btn';
-      btnPickGroup.textContent = 'всё в разделе';
-      btnPickGroup.addEventListener('click', ()=>{
-        group.querySelectorAll('input[type="checkbox"][data-tense-id]').forEach((el)=>{ el.checked = true; });
-        saveCustomSelection(getCustomSelectedIds());
-      });
-
-      const btnClearGroup = document.createElement('button');
-      btnClearGroup.type = 'button';
-      btnClearGroup.className = 'ik-btn';
-      btnClearGroup.textContent = 'очистить раздел';
-      btnClearGroup.addEventListener('click', ()=>{
-        group.querySelectorAll('input[type="checkbox"][data-tense-id]').forEach((el)=>{ el.checked = false; });
-        saveCustomSelection(getCustomSelectedIds());
-      });
-
-      groupActions.appendChild(btnPickGroup);
-      groupActions.appendChild(btnClearGroup);
-
-      groupHead.appendChild(groupTitle);
-      groupHead.appendChild(groupCount);
-      groupHead.appendChild(groupActions);
-      group.appendChild(groupHead);
-
-      const subgroupMap = new Map();
-      for (const meta of groupMetas){
-        const sub = deriveSubgroup(meta) || 'all';
-        if (!subgroupMap.has(sub)) subgroupMap.set(sub, []);
-        subgroupMap.get(sub).push(meta);
-      }
-
-      const subgroupOrder = [...SUBGROUP_ORDER.filter((s)=> subgroupMap.has(s)), ...Array.from(subgroupMap.keys()).filter((s)=> !SUBGROUP_ORDER.includes(s))];
-
-      const subgroupWrap = document.createElement('div');
-      subgroupWrap.className = 'sh-custom-group__body';
-
-      for (const sub of subgroupOrder){
-        const subMetas = subgroupMap.get(sub) || [];
-        if (!subMetas.length) continue;
-
-        const subCard = document.createElement('div');
-        subCard.className = 'sh-custom-subgroup';
-
-        const subTitle = document.createElement('p');
-        subTitle.className = 'sh-custom-subgroup__title';
-        subTitle.textContent = subgroupLabel(sub);
-        subCard.appendChild(subTitle);
-
-        const subItems = document.createElement('div');
-        subItems.className = 'sh-custom-subgroup__items';
-
-        for (const meta of subMetas){
-          const label = document.createElement('label');
-          label.className = 'sh-custom-tense';
-          label.setAttribute('data-search', normalize([
-            meta.title || meta.id || '',
-            meta.subtitle || '',
-            meta.hint || '',
-            meta.id || '',
-            subgroupLabel(sub),
-            CATEGORY_LABEL[cat] || cat
-          ].join(' ')));
-
-          const cb = document.createElement('input');
-          cb.type = 'checkbox';
-          cb.className = 'sh-custom-tense__cb';
-          cb.setAttribute('data-tense-id', meta.id);
-          cb.checked = selected.has(meta.id);
-
-          const textWrap = document.createElement('span');
-          textWrap.className = 'sh-custom-tense__text';
-
-          const t = document.createElement('span');
-          t.className = 'sh-custom-tense__title';
-          t.textContent = meta.title || meta.id;
-
-          const s = document.createElement('span');
-          s.className = 'sh-custom-tense__sub';
-          s.textContent = meta.subtitle || meta.hint || '';
-
-          textWrap.appendChild(t);
-          textWrap.appendChild(s);
-          label.appendChild(cb);
-          label.appendChild(textWrap);
-          subItems.appendChild(label);
-
-          cb.addEventListener('change', ()=>{
-            saveCustomSelection(getCustomSelectedIds());
-          });
-        }
-
-        subCard.appendChild(subItems);
-        subgroupWrap.appendChild(subCard);
-      }
-
-      group.appendChild(subgroupWrap);
-      customGrid.appendChild(group);
-    }
-
-    updateCustomHint(selected.size);
-    refreshCustomGroupCounts();
-    applyCustomSearchFilter();
+    renderPracticeSourceNotice();
+    renderCustomQuickFilters();
+    renderCustomSelectorGroups();
+    renderCustomPresets();
+    renderCustomTopicCards();
+    renderCustomStickySummary();
   }
 
   function updateCustomHint(selectedCount){
     if (!customHint) return;
-    const total = getFilteredMetas({ category: 'all' }).length;
+    const total = getCoreTenseIds().length;
     if (!selectedCount){
-      customHint.textContent = `выбрано: 0 из ${total}. Отметь темы, чтобы собрать свой набор.`;
+      customHint.textContent = `Выбрано: 0 правил из ${total}`;
       return;
     }
-    customHint.textContent = `выбрано: ${selectedCount} из ${total}`;
+    customHint.textContent = `Выбрано: ${selectedCount} правил из ${total}`;
+  }
+
+  function setPracticeSourceTopic(id){
+    const key = String(id || '').trim();
+    const has = !!(key && REG.byId && REG.byId[key]);
+    sourceTopicId = has ? key : '';
+    renderPracticeSourceNotice();
+  }
+
+  function renderPracticeSourceNotice(){
+    if (!sourceNotice) return;
+    const inCustomMode = normalizePracticeMode(tenseSelect?.value === CUSTOM_TENSE_ID ? 'custom' : 'mixed') === 'custom';
+    const selectedSet = new Set(getCustomSelectedIds());
+    if (!sourceTopicId || !inCustomMode || !selectedSet.has(sourceTopicId)){
+      if (sourceTopicId && !selectedSet.has(sourceTopicId)) sourceTopicId = '';
+      sourceNotice.hidden = true;
+      if (sourceNoticeName) sourceNoticeName.textContent = '—';
+      return;
+    }
+
+    const meta = getMetaById(sourceTopicId) || REG.byId[sourceTopicId] || null;
+    if (!meta){
+      sourceTopicId = '';
+      sourceNotice.hidden = true;
+      if (sourceNoticeName) sourceNoticeName.textContent = '—';
+      return;
+    }
+
+    sourceNotice.hidden = false;
+    if (sourceNoticeName) sourceNoticeName.textContent = String(meta.title || sourceTopicId);
   }
 
   function buildMixedAllTense(){
@@ -4426,7 +5009,7 @@
     if (tenseId === CUSTOM_TENSE_ID && getCustomSelectedIds().length === 0){
       const box = document.createElement('div');
       box.className = 'sh-highlight';
-      box.innerHTML = '<p class="sh-highlight-title">Пользовательские упражнения</p><ul class="sh-highlight-list"><li>Сначала отметь хотя бы одну тему в блоке выбора выше.</li><li>Удобно начать с одной категории: present / past / future.</li></ul>';
+      box.innerHTML = '<p class="sh-highlight-title">Пользовательские упражнения</p><ul class="sh-highlight-list"><li>Нажми «Выбрать правила и времена» и добавь хотя бы одну тему.</li><li>Быстрый старт: открой группу Present / Past / Future и выбери нужные карты.</li></ul>';
       practiceBody.innerHTML = '';
       practiceBody.appendChild(box);
       saveUIState({ goal: goalId, tense: tenseId, category: activeCategory, subgroup: activeSubgroup });
@@ -7190,13 +7773,31 @@ btnResetProgress && btnResetProgress.addEventListener('click', ()=>{
 
     fillGoalOptions();
     fillTenseOptions();
-    renderCustomPicker();
+    customSelectedState = getSavedCustomIds();
+    customSearchQuery = '';
+    customQuickFilter = 'all';
+    customSelectorGroup = 'present';
+    customTopicPage = 0;
+    if (customSearchInput) customSearchInput.value = '';
 
-    if (ui.goal && GOALS.some(x=>x.id === ui.goal)) goalSelect.value = ui.goal;
+    if (opts.keepGoalSelection && ui.goal && GOALS.some((x)=> x.id === ui.goal)){
+      goalSelect.value = ui.goal;
+    } else {
+      goalSelect.value = 'all';
+      saveUIState({ goal: 'all' });
+    }
 
     const forcedMode = opts.forceMode ? normalizePracticeMode(opts.forceMode) : '';
     const mode = forcedMode || inferPracticeModeFromUi(ui);
     setPracticeMode(mode, { persist: !!forcedMode, rerender: false });
+
+    if (opts.sourceTopicId){
+      setPracticeSourceTopic(opts.sourceTopicId);
+    } else if (!opts.keepSourceTopic){
+      setPracticeSourceTopic('');
+    }
+
+    renderCustomPicker();
 
     showOnly('practice');
     renderPracticeInfo();
@@ -7221,16 +7822,22 @@ btnResetProgress && btnResetProgress.addEventListener('click', ()=>{
   });
 
   function goPracticeForTense(id){
-    if (!showPractice({ keepCurrentFilter: true, forceMode: 'custom' })) return;
+    if (!showPractice({ keepCurrentFilter: true, forceMode: 'custom', sourceTopicId: id })) return;
 
     const meta = (REG.INDEX || []).find((m) => m.id === id);
     if (meta && meta.id){
-      saveCustomSelection([meta.id]);
+      const set = new Set(getCustomSelectedIds());
+      set.add(meta.id);
+      saveCustomSelection(Array.from(set));
       setPracticeMode('custom', { persist: true, rerender: false });
+      setPracticeSourceTopic(meta.id);
     } else {
       setPracticeMode('mixed', { persist: true, rerender: false });
+      setPracticeSourceTopic('');
     }
 
+    if (goalSelect) goalSelect.value = 'all';
+    saveUIState({ goal: 'all' });
     renderPracticeInfo();
   }
 
@@ -7241,27 +7848,90 @@ btnResetProgress && btnResetProgress.addEventListener('click', ()=>{
     if (currentId) goPracticeForTense(currentId);
   });
 
-  goalSelect && goalSelect.addEventListener('change', renderPracticeInfo);
+  goalSelect && goalSelect.addEventListener('change', ()=>{
+    renderCustomStickySummary();
+    renderPracticeInfo();
+  });
   modeMixedBtn && modeMixedBtn.addEventListener('click', ()=> setPracticeMode('mixed'));
   modeCustomBtn && modeCustomBtn.addEventListener('click', ()=> setPracticeMode('custom'));
   tenseSelect && tenseSelect.addEventListener('change', ()=>{
     const mode = tenseSelect.value === CUSTOM_TENSE_ID ? 'custom' : 'mixed';
-    applyPracticeModeButtons(mode);
-    setCustomPickerVisible(mode === 'custom');
-    if (mode === 'custom') updateCustomHint(getCustomSelectedIds().length);
+    setPracticeMode(mode, { persist: true, rerender: false });
     renderPracticeInfo();
   });
+
+  btnCustomOpenPicker && btnCustomOpenPicker.addEventListener('click', ()=>{
+    setPracticeMode('custom', { persist: true, rerender: true });
+    openCustomSelector({ quickFilter: 'all' });
+  });
+
+  btnCustomEdit && btnCustomEdit.addEventListener('click', ()=>{
+    setPracticeMode('custom', { persist: true, rerender: false });
+    openCustomSelector({ quickFilter: 'all' });
+  });
+
+  customSelectedMoreBtn && customSelectedMoreBtn.addEventListener('click', ()=>{
+    setPracticeMode('custom', { persist: true, rerender: false });
+    openCustomSelector({ quickFilter: 'selected' });
+  });
+
+  btnCustomModalClose && btnCustomModalClose.addEventListener('click', closeCustomSelector);
+  customModalBackdrop && customModalBackdrop.addEventListener('click', closeCustomSelector);
+  document.addEventListener('keydown', (e)=>{
+    if (e.key !== 'Escape') return;
+    if (!customModal || customModal.hidden) return;
+    e.preventDefault();
+    closeCustomSelector();
+  });
+
+  btnCustomSelectGroup && btnCustomSelectGroup.addEventListener('click', ()=> setGroupCustomSelection(true));
+  btnCustomClearGroup && btnCustomClearGroup.addEventListener('click', ()=> setGroupCustomSelection(false));
+  btnCustomPrevPage && btnCustomPrevPage.addEventListener('click', ()=>{
+    customTopicPage = Math.max(0, customTopicPage - 1);
+    renderCustomTopicCards();
+  });
+  btnCustomNextPage && btnCustomNextPage.addEventListener('click', ()=>{
+    customTopicPage += 1;
+    renderCustomTopicCards();
+  });
   btnCustomSelectAll && btnCustomSelectAll.addEventListener('click', ()=> setAllCustomSelection(true));
-  btnCustomClearAll && btnCustomClearAll.addEventListener('click', ()=> setAllCustomSelection(false));
+  btnCustomClearVisible && btnCustomClearVisible.addEventListener('click', ()=> setAllCustomSelection(false));
+
+  btnCustomClearAll && btnCustomClearAll.addEventListener('click', ()=>{
+    saveCustomSelection([]);
+    setPracticeSourceTopic('');
+    setStatus(isEnLang() ? 'custom selection cleared' : 'пользовательский выбор очищен');
+  });
+
+  btnCustomStartFromSelector && btnCustomStartFromSelector.addEventListener('click', ()=>{
+    closeCustomSelector();
+    setPracticeMode('custom', { persist: true, rerender: false });
+    btnStart && btnStart.click();
+  });
+
   customSearchInput && customSearchInput.addEventListener('input', ()=>{
+    customTopicPage = 0;
     customSearchQuery = String(customSearchInput.value || '');
     applyCustomSearchFilter();
   });
   customSearchClearBtn && customSearchClearBtn.addEventListener('click', ()=>{
+    customTopicPage = 0;
     customSearchQuery = '';
     if (customSearchInput) customSearchInput.value = '';
     applyCustomSearchFilter();
     customSearchInput?.focus?.();
+  });
+
+  btnSourceEdit && btnSourceEdit.addEventListener('click', ()=>{
+    setPracticeMode('custom', { persist: true, rerender: false });
+    openCustomSelector({ quickFilter: 'all' });
+  });
+
+  btnSourceRemove && btnSourceRemove.addEventListener('click', ()=>{
+    if (!sourceTopicId) return;
+    const next = getCustomSelectedIds().filter((id)=> id !== sourceTopicId);
+    saveCustomSelection(next);
+    setPracticeSourceTopic('');
   });
 
   btnStart && btnStart.addEventListener('click', ()=>{
@@ -7269,6 +7939,11 @@ btnResetProgress && btnResetProgress.addEventListener('click', ()=>{
     const tenseObj = getTenseForPractice(tenseId);
     const goalId = getSelectedGoalId();
     const exIds = gatherExerciseIds(tenseObj, goalId);
+
+    if (tenseId === CUSTOM_TENSE_ID){
+      bumpCustomUsage(getCustomSelectedIds());
+      renderCustomPicker();
+    }
 
     const showAfter = !!cbShowAfter?.checked;
     startRun(tenseObj, exIds, { showAfterEach: showAfter, onlyMistakes: false });
@@ -7597,6 +8272,10 @@ document.addEventListener('ik:languagechange', ()=>{
   if (constructorView && !constructorView.hidden){
     if (builderLastRec) renderBuilderResult(builderLastRec);
     else renderBuilderQuestion();
+  }
+  if (practiceView && !practiceView.hidden){
+    renderCustomPicker();
+    renderPracticeInfo();
   }
   if (searchInput && searchInput.value.trim()) renderSearchResults(searchInput.value);
 });

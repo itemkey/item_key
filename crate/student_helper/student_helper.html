@@ -21,7 +21,7 @@
   <!-- Match main site look -->
   <link rel="stylesheet" href="../../assets/css/styles.css" />
 
-  <link rel="stylesheet" href="./student_helper.css?v=20260331-01" />
+  <link rel="stylesheet" href="./student_helper.css?v=20260331-06" />
 
 <style id="ik-site-nav-css">
 .ik-site-nav, .ik-site-nav *{ box-sizing: border-box; }
@@ -1097,39 +1097,108 @@
 
               <p class="ik-sub" id="tensesPracticeModeHint">смешанные упражнения: автоматический микс тем по твоему уровню</p>
 
-              <div class="ik-row" style="margin-top:8px;">
-                <label class="ik-label" for="tensesGoalSelect">цель</label>
-                <select class="ik-select" id="tensesGoalSelect" style="min-width: 260px;"></select>
+              <div class="sh-practice-flow">
+                <section class="sh-practice-box sh-practice-box--control" aria-label="Управление практикой">
+                  <p class="sh-practice-box__title">управление</p>
 
-                <select class="ik-select" id="tensesTenseSelect" hidden></select>
+                  <div class="ik-row sh-practice-box__goal-row">
+                    <label class="ik-label" for="tensesGoalSelect">цель</label>
+                    <select class="ik-select" id="tensesGoalSelect" style="min-width: 260px;"></select>
+                    <select class="ik-select" id="tensesTenseSelect" hidden></select>
+                    <button class="ik-btn" id="tensesCustomOpenPickerBtn" type="button">выбрать правила и времена</button>
+                  </div>
 
-                <button class="ik-btn ik-btn--black" id="tensesStartBtn" type="button">start</button>
-                <button class="ik-btn" id="tensesRetryMistakesBtn" type="button">retry mistakes</button>
-<button class="ik-btn" id="tensesClearMistakesBtn" type="button">clear mistakes</button>
-<button class="ik-btn" id="tensesResetProgressBtn" type="button">reset progress</button>
+                  <div class="sh-practice-source" id="tensesPracticeSourceNotice" hidden>
+                    <p class="sh-practice-source__text">Добавлено из темы: <strong id="tensesPracticeSourceName">—</strong></p>
+                    <div class="sh-practice-source__actions">
+                      <button class="ik-btn" id="tensesPracticeSourceRemoveBtn" type="button">убрать</button>
+                      <button class="ik-btn" id="tensesPracticeSourceEditBtn" type="button">изменить выбор</button>
+                    </div>
+                  </div>
+                </section>
 
+                <section id="tensesCustomPicker" class="sh-practice-box sh-practice-box--selected" aria-label="Выбранные темы" hidden>
+                  <p class="sh-practice-box__title">выбрано</p>
+                  <p class="ik-footnote" id="tensesCustomHint">выбрано: 0 из 0</p>
 
-                <span class="ik-spacer" aria-hidden="true"></span>
+                  <div class="sh-selected-chips" id="tensesCustomSelectedChips" aria-label="Выбранные правила"></div>
+                  <button class="ik-btn" id="tensesCustomSelectedMoreBtn" type="button" hidden>+0 еще</button>
 
-                <label class="ik-label" style="display:flex; align-items:center; gap:8px;">
-                  <input type="checkbox" id="tensesShowAfterEach" checked />
-                  show answers after each
-                </label>
+                  <div class="sh-practice-box__actions">
+                    <button class="ik-btn" id="tensesCustomEditBtn" type="button">изменить</button>
+                    <button class="ik-btn" id="tensesCustomClearAllBtn" type="button">очистить все</button>
+                  </div>
+                </section>
+
+                <section class="sh-practice-box sh-practice-box--launch" aria-label="Запуск практики">
+                  <p class="sh-practice-box__title">запуск</p>
+
+                  <div class="sh-practice-launch-actions">
+                    <button class="ik-btn ik-btn--black" id="tensesStartBtn" type="button">start</button>
+                    <button class="ik-btn" id="tensesRetryMistakesBtn" type="button">retry mistakes</button>
+                    <button class="ik-btn" id="tensesClearMistakesBtn" type="button">clear mistakes</button>
+                    <button class="ik-btn" id="tensesResetProgressBtn" type="button">reset progress</button>
+                  </div>
+
+                  <label class="ik-label sh-practice-show-after">
+                    <input type="checkbox" id="tensesShowAfterEach" checked />
+                    show answers after each
+                  </label>
+                </section>
               </div>
 
-              <div id="tensesCustomPicker" class="sh-custom-picker" hidden>
-                <p class="sh-custom-picker__title">пользовательские упражнения: выбери правила и времена</p>
-                <p class="sh-custom-picker__sub" id="tensesCustomHint">собери свой набор по категориям — без длинного сплошного списка</p>
-                <div class="sh-custom-picker__search">
-                  <input class="ik-input" id="tensesCustomSearchInput" type="search" autocomplete="off" spellcheck="false" placeholder="найти правило: passive, perfect, conditionals..." />
-                  <button class="ik-btn" id="tensesCustomSearchClearBtn" type="button">очистить поиск</button>
-                </div>
-                <div class="sh-custom-picker__actions">
-                  <button class="ik-btn" id="tensesCustomSelectAllBtn" type="button">выбрать все</button>
-                  <button class="ik-btn" id="tensesCustomClearAllBtn" type="button">снять все</button>
-                </div>
-                <p class="ik-footnote" id="tensesCustomSearchEmpty" hidden>ничего не найдено, уточни запрос</p>
-                <div class="sh-custom-picker__grid" id="tensesCustomGrid" aria-label="Custom tenses list"></div>
+              <div class="sh-selector-modal" id="tensesCustomSelectorModal" hidden>
+                <div class="sh-selector-modal__backdrop" id="tensesCustomSelectorBackdrop"></div>
+                <section class="sh-selector-modal__panel" role="dialog" aria-modal="true" aria-label="Выбор правил и времен">
+                  <div class="sh-selector-modal__head">
+                    <p class="ik-title">выбор правил и времен</p>
+                    <button class="ik-btn" id="tensesCustomSelectorCloseBtn" type="button">закрыть</button>
+                  </div>
+
+                  <div class="sh-selector-modal__layout">
+                    <aside class="sh-selector-side" aria-label="Навигация по выбору">
+                      <div class="sh-selector-side__search">
+                        <input class="ik-input" id="tensesCustomSearchInput" type="search" autocomplete="off" spellcheck="false" placeholder="найти правило: perfect, passive, condition..." />
+                        <button class="ik-btn" id="tensesCustomSearchClearBtn" type="button">очистить</button>
+                      </div>
+
+                      <p class="sh-selector-side__title">быстрые фильтры</p>
+                      <div class="sh-selector-quick" id="tensesCustomQuickFilters"></div>
+
+                      <p class="sh-selector-side__title">группы</p>
+                      <div class="sh-selector-groups" id="tensesCustomGroupList"></div>
+
+                      <p class="sh-selector-side__title">пресеты</p>
+                      <div class="sh-selector-presets" id="tensesCustomPresetList"></div>
+                    </aside>
+
+                    <section class="sh-selector-main" aria-label="Список правил">
+                      <div class="sh-selector-main__head">
+                        <p class="sh-selector-main__title" id="tensesCustomGroupTitle">все темы</p>
+                        <span class="ik-badge" id="tensesCustomGroupMeta">0</span>
+                      </div>
+
+                      <div class="sh-selector-main__actions">
+                        <button class="ik-btn" id="tensesCustomPrevPageBtn" type="button" hidden>предыдущие</button>
+                        <button class="ik-btn" id="tensesCustomNextPageBtn" type="button" hidden>следующие</button>
+                        <button class="ik-btn" id="tensesCustomSelectGroupBtn" type="button">выбрать группу</button>
+                        <button class="ik-btn" id="tensesCustomClearGroupBtn" type="button">очистить группу</button>
+                        <button class="ik-btn" id="tensesCustomSelectAllBtn" type="button">выбрать видимые</button>
+                        <button class="ik-btn" id="tensesCustomClearVisibleBtn" type="button">снять видимые</button>
+                      </div>
+
+                      <p class="ik-footnote" id="tensesCustomSearchEmpty" hidden>ничего не найдено, уточни запрос</p>
+                      <div class="sh-selector-topics" id="tensesCustomGrid" aria-label="Custom tenses list"></div>
+                    </section>
+
+                    <aside class="sh-selector-sticky" aria-label="Выбранные правила и запуск">
+                      <span class="ik-badge" id="tensesCustomStickyGoal">цель: all</span>
+                      <span class="ik-badge" id="tensesCustomStickyCount">выбрано: 0</span>
+                      <div class="sh-selected-chips sh-selected-chips--compact" id="tensesCustomStickyChips"></div>
+                      <button class="ik-btn ik-btn--black" id="tensesCustomStartFromSelectorBtn" type="button">start custom</button>
+                    </aside>
+                  </div>
+                </section>
               </div>
 
               <div class="ik-divider"></div>
@@ -1414,7 +1483,7 @@
   <script src="./js/lobby.js?v=20260314-02"></script>
   <script src="./js/structure_data.js"></script>
   <script src="./js/structure.js"></script>
-  <script src="./js/tenses.js?v=20260331-02"></script>
+  <script src="./js/tenses.js?v=20260331-07"></script>
   <script src="./js/word_transformation.js?v=20260317-01"></script>
   <script src="./js/dictionary.js" onerror="window.IKAdminLog && window.IKAdminLog('error','student_helper','dictionary.js failed to load')"></script>
   <script>
