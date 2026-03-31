@@ -5,6 +5,8 @@ html,
 body {
   margin: 0;
   min-height: 100%;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
   background: var(--ik-bg, var(--bg, #fff)) !important;
   background-image: none !important;
   filter: none !important;
@@ -185,6 +187,21 @@ body {
       max-width:100%;
       overflow-wrap:anywhere;
       word-break:break-word;
+    }
+
+    #dictCardFront,
+    #dictCardBack,
+    #dictQuizFront,
+    #dictQuizBack,
+    #dictLearnFront,
+    #dictLearnBack{
+      font-size: clamp(20px, 4.4vw, 42px);
+      line-height: 1.12;
+      max-width: 100%;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      hyphens: auto;
+      text-wrap: balance;
     }
 
     .ik-sentence{
@@ -403,6 +420,7 @@ body {
       justify-content:center;
       padding:18px;
       text-align:center;
+      overflow: hidden;
     }
     .ik-flip-face::before{
       content:"";
@@ -1181,6 +1199,12 @@ body {
 
 .sh-choice{
   transition: background 120ms ease, box-shadow 120ms ease, transform 80ms ease;
+  text-transform: none;
+  letter-spacing: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  text-align: left;
 }
 
 .sh-choice.is-picked{
@@ -1200,6 +1224,123 @@ body {
 
 .sh-choice.is-wrong{
   background: rgba(220, 20, 60, 0.14);
+}
+
+.sh-choice.is-missed{
+  background: rgba(255, 191, 0, 0.18);
+  box-shadow: inset 0 0 0 2px rgba(185, 125, 0, 0.45);
+}
+
+.sh-choice.is-picked.is-wrong{
+  background: rgba(220, 20, 60, 0.2);
+  box-shadow: inset 0 0 0 2px rgba(160, 0, 0, 0.45);
+}
+
+.sh-choice.is-picked.is-correct{
+  background: rgba(0, 180, 60, 0.2);
+}
+
+.sh-match-left{
+  text-transform: none;
+  letter-spacing: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  line-height: 1.25;
+}
+
+.sh-drag-board{
+  margin-top: 12px;
+  display: grid;
+  gap: 12px;
+}
+
+.sh-drag-source,
+.sh-drag-zone{
+  border: 2px solid #000;
+  background: #fff;
+}
+
+.sh-drag-source{
+  padding: 10px;
+}
+
+.sh-drag-source__title,
+.sh-drag-zone__title{
+  margin: 0 0 8px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  font-weight: 900;
+}
+
+.sh-drag-source__body,
+.sh-drag-zone__body{
+  min-height: 64px;
+  display: flex;
+  align-content: flex-start;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 2px;
+}
+
+.sh-drag-source__body{
+  border: 2px dashed rgba(0,0,0,0.35);
+  background: rgba(0,0,0,0.03);
+}
+
+.sh-drag-zones{
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+
+.sh-drag-zone{
+  padding: 8px;
+}
+
+.sh-drag-source__body.is-drag-over,
+.sh-drag-zone__body.is-drag-over{
+  box-shadow: inset 0 0 0 2px rgba(0,0,0,0.25);
+}
+
+.sh-drag-chip{
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 13px;
+  padding: 8px 10px;
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.sh-drag-chip.is-assigned{
+  background: rgba(0,0,0,0.03);
+}
+
+.sh-drag-chip.is-selected{
+  box-shadow: inset 0 0 0 2px rgba(0,0,0,0.65);
+}
+
+.sh-drag-chip.is-correct{
+  background: rgba(0, 180, 60, 0.15);
+}
+
+.sh-drag-chip.is-wrong{
+  background: rgba(220, 20, 60, 0.16);
+}
+
+@media (max-width: 760px){
+  .sh-drag-zones{
+    grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+    gap: 8px;
+  }
+
+  .sh-drag-chip{
+    width: 100%;
+    text-align: left;
+  }
 }
 
 .sh-overview-floating-nav{
@@ -1630,5 +1771,328 @@ body {
 
   .sh-finder__search .ik-btn{
     width: 100%;
+  }
+}
+
+/* -------------------------------------------- */
+/* Grammar IA redesign                          */
+/* -------------------------------------------- */
+
+.sh-grammar-hero{
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 12px;
+}
+
+.sh-grammar-hero__meta{
+  display: grid;
+  gap: 8px;
+  justify-items: end;
+}
+
+.sh-grammar-hero__level{
+  margin: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.sh-search-box__modes{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.sh-search-box__modes .ik-btn.is-active{
+  background: #000;
+  color: #fff;
+}
+
+.sh-grammar-action-grid{
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 12px 0;
+}
+
+.sh-action-btn{
+  border: 2px solid #000;
+  background: linear-gradient(180deg, #fff 0%, #f7f7f8 100%);
+  padding: 14px;
+  text-align: left;
+  display: grid;
+  gap: 8px;
+  cursor: pointer;
+  transition: transform 90ms ease, background 140ms ease;
+}
+
+.sh-action-btn:hover{
+  transform: translateY(-1px);
+  background: #000;
+  color: #fff;
+}
+
+.sh-action-btn__title{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.sh-action-btn__sub{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 12px;
+  line-height: 1.45;
+  opacity: .82;
+}
+
+.sh-grammar-block{
+  border: 2px solid #000;
+  background: #fff;
+  padding: 12px;
+  margin-top: 12px;
+}
+
+.sh-grammar-block__head{
+  margin-bottom: 8px;
+}
+
+.sh-grammar-block__title{
+  margin: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  font-weight: 900;
+}
+
+.sh-grammar-block__sub{
+  margin: 6px 0 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 11px;
+  line-height: 1.4;
+  opacity: .8;
+}
+
+.sh-grammar-grid{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.sh-card{
+  border: 2px solid #000;
+  background: #fff;
+  color: #000;
+  text-align: left;
+  padding: 12px;
+  display: grid;
+  gap: 7px;
+  min-height: 132px;
+  cursor: pointer;
+  transition: transform 90ms ease, background 130ms ease;
+}
+
+.sh-card:hover{
+  transform: translateY(-1px);
+  background: #000;
+  color: #fff;
+}
+
+.sh-card__type{
+  justify-self: start;
+  border: 1px solid currentColor;
+  padding: 3px 6px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 10px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  opacity: .9;
+}
+
+.sh-card__title{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+  line-height: 1.25;
+}
+
+.sh-card__text{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 12px;
+  line-height: 1.45;
+  opacity: .82;
+}
+
+.sh-card__cta{
+  margin-top: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.sh-topic-meta-row{
+  margin-bottom: 10px;
+}
+
+.sh-topic-quick{
+  border: 2px solid #000;
+  background: linear-gradient(180deg, #fff 0%, #f4f4f6 100%);
+  padding: 10px;
+  display: grid;
+  gap: 8px;
+}
+
+.sh-topic-quick__title{
+  margin: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+.sh-topic-quick__grid{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.sh-topic-quick__item{
+  border: 1px solid #000;
+  background: #fff;
+  padding: 8px;
+  display: grid;
+  gap: 4px;
+}
+
+.sh-topic-quick__label{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  opacity: .8;
+}
+
+.sh-topic-quick__text{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.sh-topic-nav{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.sh-topic-nav__btn{
+  border: 2px solid #000;
+  background: #fff;
+  padding: 8px 10px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.sh-topic-nav__btn:hover,
+.sh-topic-nav__btn.is-active{
+  background: #000;
+  color: #fff;
+}
+
+.sh-topic-section{
+  border: 2px solid #000;
+  background: #fff;
+  padding: 12px;
+  margin-top: 10px;
+}
+
+.sh-topic-section__title{
+  margin: 0 0 10px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+
+.sh-topic-practice{
+  border: 2px solid #000;
+  background: linear-gradient(180deg, #fff 0%, #f5f7ff 100%);
+  padding: 12px;
+  margin-top: 10px;
+}
+
+.sh-topic-practice__list{
+  margin: 8px 0 0;
+  padding-left: 18px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.sh-topic-related{
+  border: 2px solid #000;
+  background: #fff;
+  padding: 12px;
+  margin-top: 10px;
+}
+
+.sh-topic-related__grid{
+  margin-top: 8px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.sh-topic-related__btn{
+  border: 2px solid #000;
+  background: #fff;
+  text-align: left;
+  padding: 8px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.sh-topic-related__btn:hover{
+  background: #000;
+  color: #fff;
+}
+
+@media (max-width: 920px){
+  .sh-grammar-action-grid{
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px){
+  .sh-grammar-hero{
+    grid-template-columns: 1fr;
+  }
+
+  .sh-grammar-hero__meta{
+    justify-items: start;
+  }
+
+  .sh-grammar-grid,
+  .sh-topic-quick__grid,
+  .sh-topic-related__grid{
+    grid-template-columns: 1fr;
   }
 }

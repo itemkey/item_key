@@ -355,6 +355,13 @@
     "title": "Special Nouns: Singular/Plural",
     "subtitle": "особенные существительные и согласование is/are",
     "hint": "singular-only, plural-only, same form, irregular plurals",
+    "aliases": [
+      "единственное число",
+      "множественное число",
+      "число существительных",
+      "noun number agreement",
+      "special nouns"
+    ],
     "file": "specialNounsNumber.json",
     "group": "universal",
     "kind": "structure",

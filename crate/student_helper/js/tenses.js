@@ -76,18 +76,19 @@
   const btnGoDaily = document.getElementById('tensesGoDaily');
   const btnGoMixed = document.getElementById('tensesGoMixed');
   const btnGoBasics = document.getElementById('tensesGoBasics');
-  const btnGoActiveTenses = document.getElementById('grammarGoActiveTenses');
-  const btnGoUniversal = document.getElementById('grammarGoUniversal');
-  const btnGoPresent = document.getElementById('grammarGoPresent');
-  const btnGoPast = document.getElementById('grammarGoPast');
-  const btnGoFuture = document.getElementById('grammarGoFuture');
-  const btnGoConditionals = document.getElementById('grammarGoConditionals');
-  const btnGoModals = document.getElementById('grammarGoModals');
-  const btnGoPassive = document.getElementById('grammarGoPassive');
-  const btnGoReportedClauses = document.getElementById('grammarGoReportedClauses');
-  const btnGoVerbPatterns = document.getElementById('grammarGoVerbPatterns');
-  const btnGoArticles = document.getElementById('grammarGoArticles');
-  const btnGoSyntax = document.getElementById('grammarGoSyntax');
+  const btnContinueTopic = document.getElementById('grammarContinueBtn');
+  const btnGoTopicPractice = document.getElementById('tensesGoTopicPractice');
+  const btnGoPracticeCustom = document.getElementById('tensesGoPracticeCustom');
+
+  const btnGroupTenses = document.getElementById('grammarGroupTenses');
+  const btnGroupCondModals = document.getElementById('grammarGroupCondModals');
+  const btnGroupPassiveReported = document.getElementById('grammarGroupPassiveReported');
+  const btnGroupVerbPatterns = document.getElementById('grammarGroupVerbPatterns');
+  const btnGroupArticlesNouns = document.getElementById('grammarGroupArticlesNouns');
+  const btnGroupSyntaxChoice = document.getElementById('grammarGroupSyntaxChoice');
+  const btnGroupUniversal = document.getElementById('grammarGroupUniversal');
+  const btnGroupExamApplied = document.getElementById('grammarGroupExamApplied');
+
   const btnGoWritingPack = document.getElementById('grammarGoWritingPack');
   const btnGoExamRoute = document.getElementById('grammarGoExamRoute');
 
@@ -95,21 +96,25 @@
   const searchClearBtn = document.getElementById('grammarSearchClearBtn');
   const searchHint = document.getElementById('grammarSearchHint');
   const searchResults = document.getElementById('grammarSearchResults');
+  const searchModeTopicBtn = document.getElementById('grammarSearchModeTopic');
+  const searchModeErrorBtn = document.getElementById('grammarSearchModeError');
+  const searchModeSituationBtn = document.getElementById('grammarSearchModeSituation');
   const btnOpenConstructor = document.getElementById('grammarOpenConstructorBtn');
-  const homeFinderWrap = document.getElementById('grammarHomeFinderWrap');
-  const homeFinderTitleEl = document.getElementById('grammarHomeFinderTitle');
-  const homeFinderModesEl = document.getElementById('grammarHomeFinderModes');
-  const homeFinderChipsEl = document.getElementById('grammarHomeFinderChips');
-  const homeFinderSummaryEl = document.getElementById('grammarHomeFinderSummary');
-  const homeFinderOpenBtn = document.getElementById('grammarHomeFinderOpenBtn');
-  const homeFinderResetBtn = document.getElementById('grammarHomeFinderResetBtn');
-  const homeFinderConstructorBtn = document.getElementById('grammarHomeFinderConstructorBtn');
-  const grammarHomeTabs = document.getElementById('grammarHomeTabs');
-  const grammarHomeTabHint = document.getElementById('grammarHomeTabHint');
-  const grammarHomeTileGrid = document.getElementById('grammarHomeTileGrid');
+  const homeFinderWrap = null;
+  const homeFinderTitleEl = null;
+  const homeFinderModesEl = null;
+  const homeFinderChipsEl = null;
+  const homeFinderSummaryEl = null;
+  const homeFinderOpenBtn = null;
+  const homeFinderResetBtn = null;
+  const homeFinderConstructorBtn = null;
+  const grammarHomeTabs = null;
+  const grammarHomeTabHint = null;
+  const grammarHomeTileGrid = null;
 
   const levelBox = document.getElementById('grammarLevelBox');
   const levelValue = document.getElementById('grammarLevelValue');
+  const levelValueInline = document.getElementById('grammarLevelValueInline');
   const levelPrompt = document.getElementById('grammarLevelPrompt');
   const levelChangeBtn = document.getElementById('grammarLevelChangeBtn');
   const levelButtons = Array.from(document.querySelectorAll('[data-grammar-level]'));
@@ -162,6 +167,11 @@
   const tenseTitleEl = document.getElementById('tenseTitle');
   const tenseSubtitleEl = document.getElementById('tenseSubtitle');
   const tenseMasteryBadge = document.getElementById('tenseMasteryBadge');
+  const tenseMetaType = document.getElementById('tenseMetaType');
+  const tenseMetaLevel = document.getElementById('tenseMetaLevel');
+  const tenseMetaTime = document.getElementById('tenseMetaTime');
+  const tenseQuickAnswer = document.getElementById('tenseQuickAnswer');
+  const tenseLocalNav = document.getElementById('tenseLocalNav');
   const ruleModeShortBtn = document.getElementById('tenseRuleModeShortBtn');
   const ruleModeFullBtn = document.getElementById('tenseRuleModeFullBtn');
   const ruleBody = document.getElementById('tenseRuleBody');
@@ -202,14 +212,26 @@
   let detailBackStack = [];
   let overviewFloatingSyncBound = false;
 
-  function setRunReturnState(state){
-    runReturnState = state || null;
+  function syncDetailReturnButtons(){
+    const hasRunReturn = !!runReturnState;
+
     if (btnBackToRunFromDetail){
-      btnBackToRunFromDetail.hidden = !runReturnState;
-      btnBackToRunFromDetail.title = runReturnState
+      btnBackToRunFromDetail.hidden = !hasRunReturn;
+      btnBackToRunFromDetail.title = hasRunReturn
         ? 'Вернуться к упражнению на текущем вопросе'
         : '';
+      btnBackToRunFromDetail.setAttribute('aria-hidden', hasRunReturn ? 'false' : 'true');
     }
+
+    if (btnBackToList){
+      btnBackToList.hidden = hasRunReturn;
+      btnBackToList.setAttribute('aria-hidden', hasRunReturn ? 'true' : 'false');
+    }
+  }
+
+  function setRunReturnState(state){
+    runReturnState = state || null;
+    syncDetailReturnButtons();
   }
 
   const KEY_UI = 'sh_tenses_ui_v1';
@@ -222,6 +244,8 @@
   const KEY_FINDER_MODE = 'sh_grammar_finder_mode_v1';
   const KEY_FINDER_VALUE = 'sh_grammar_finder_value_v1';
   const KEY_LIST_SEARCH = 'sh_grammar_list_search_v1';
+  const KEY_LAST_TOPIC = 'sh_grammar_last_topic_v1';
+  const KEY_SEARCH_MODE = 'sh_grammar_search_mode_v1';
   const BASIC_OVERVIEW_ID = 'tensesBasicOverview';
   const CUSTOM_TENSE_ID = 'custom';
   const LEVELS = ['A2-B1', 'B1-B2', 'B2-C1'];
@@ -296,12 +320,14 @@
 
   const FINDER_MODE_ORDER = ['all', 'intent', 'pattern', 'mistake', 'route'];
 
+  const SEARCH_MODE_ORDER = ['topic', 'error', 'situation'];
+
   const FINDER_MODE_LABEL = {
-    all: { ru: 'всё', en: 'all' },
-    intent: { ru: 'по смыслу', en: 'by meaning' },
-    pattern: { ru: 'по формуле', en: 'by pattern' },
-    mistake: { ru: 'по ошибке', en: 'by mistake' },
-    route: { ru: 'маршруты', en: 'routes' }
+    all: { ru: 'все', en: 'all' },
+    intent: { ru: 'ситуация', en: 'situation' },
+    pattern: { ru: 'формула', en: 'formula' },
+    mistake: { ru: 'ошибка', en: 'error' },
+    route: { ru: 'подборка', en: 'collection' }
   };
 
   const FINDER_OPTIONS = {
@@ -377,6 +403,7 @@
   let finderMode = loadFinderMode();
   let finderValue = loadFinderValue();
   let listSearchQuery = loadListSearchQuery();
+  let searchMode = loadSearchMode();
   if (activeCategory === 'all') activeSubgroup = 'all';
 
   const GOALS = [
@@ -702,7 +729,10 @@
         detailView.classList.remove('has-overview-floating-nav');
       }
     }
-    if (viewName === 'home') applyGrammarHomeTab();
+    if (viewName === 'home'){
+      applyGrammarHomeTab();
+      syncContinueButton();
+    }
     if (viewName !== 'home' && searchResults) searchResults.hidden = true;
     window.scrollTo(0, 0);
   }
@@ -852,15 +882,15 @@
 
   function normalizeGrammarHomeTab(tab){
     const v = String(tab || '').trim().toLowerCase();
-    if (v === 'tools') return 'practice';
-    return (v === 'rules' || v === 'practice' || v === 'all') ? v : 'rules';
+    if (v === 'tools') return 'all';
+    return (v === 'rules' || v === 'practice' || v === 'all') ? v : 'all';
   }
 
   function loadGrammarHomeTab(){
     try{
-      return normalizeGrammarHomeTab(localStorage.getItem(KEY_GRAMMAR_HOME_TAB) || 'rules');
+      return normalizeGrammarHomeTab(localStorage.getItem(KEY_GRAMMAR_HOME_TAB) || 'all');
     } catch(_){
-      return 'rules';
+      return 'all';
     }
   }
 
@@ -871,7 +901,8 @@
   }
 
   function applyGrammarHomeTab(){
-    const selected = normalizeGrammarHomeTab(grammarHomeTab);
+    const selected = 'all';
+    grammarHomeTab = selected;
 
     if (homeView){
       homeView.setAttribute('data-grammar-home-tab', selected);
@@ -907,15 +938,14 @@
 
     if (btnOpenConstructor){
       const wrap = document.getElementById('grammarBuilderBox');
-      if (wrap) wrap.hidden = (selected === 'practice');
+      if (wrap) wrap.hidden = false;
     }
 
     const searchWrap = document.getElementById('grammarSearchBox');
-    if (searchWrap) searchWrap.hidden = (selected === 'practice');
+    if (searchWrap) searchWrap.hidden = false;
 
     if (homeFinderWrap){
-      homeFinderWrap.hidden = (selected === 'practice');
-      if (selected !== 'practice') syncHomeFinderUi();
+      homeFinderWrap.hidden = true;
     }
   }
 
@@ -949,6 +979,38 @@
     refreshLevelUI();
     syncHomeFinderUi();
     if (countBadge) countBadge.textContent = 'grammar: 0';
+  }
+
+  function normalizeTopicId(id){
+    const key = String(id || '').trim();
+    return key && REG.byId && REG.byId[key] ? key : '';
+  }
+
+  function loadLastTopicId(){
+    try{
+      return normalizeTopicId(localStorage.getItem(KEY_LAST_TOPIC) || '');
+    }catch(_){
+      return '';
+    }
+  }
+
+  function saveLastTopicId(id){
+    const key = normalizeTopicId(id);
+    if (!key) return;
+    try{ localStorage.setItem(KEY_LAST_TOPIC, key); }catch(_){ }
+  }
+
+  function syncContinueButton(){
+    if (!btnContinueTopic) return;
+    const id = loadLastTopicId();
+    if (!id){
+      btnContinueTopic.hidden = true;
+      return;
+    }
+    const meta = getMetaById(id) || REG.byId[id] || {};
+    const title = String(meta.title || id);
+    btnContinueTopic.textContent = isEnLang() ? `continue: ${title}` : `продолжить: ${title}`;
+    btnContinueTopic.hidden = false;
   }
 
   function loadCategory(){
@@ -1027,6 +1089,64 @@
       return String(localStorage.getItem(KEY_LIST_SEARCH) || '').trim();
     }catch(_){
       return '';
+    }
+  }
+
+  function normalizeSearchMode(mode){
+    const key = String(mode || '').trim().toLowerCase();
+    return SEARCH_MODE_ORDER.includes(key) ? key : 'topic';
+  }
+
+  function loadSearchMode(){
+    try{
+      return normalizeSearchMode(localStorage.getItem(KEY_SEARCH_MODE) || 'topic');
+    }catch(_){
+      return 'topic';
+    }
+  }
+
+  function getSearchHintText(mode){
+    const m = normalizeSearchMode(mode);
+    if (m === 'error'){
+      return isEnLang()
+        ? 'Examples: have went, if + will, good vs well, active vs passive'
+        : 'примеры: have went, if + will, good vs well, active vs passive';
+    }
+    if (m === 'situation'){
+      return isEnLang()
+        ? 'Examples: how to talk about plans, uncertainty, advice, reported speech'
+        : 'примеры: как говорить о плане, вероятности, совете, косвенной речи';
+    }
+    return isEnLang()
+      ? 'Examples: passive, present perfect, singular/plural nouns, future clauses'
+      : 'примеры: passive, present perfect, единственное число, future clauses';
+  }
+
+  function syncSearchModeUi(){
+    const m = normalizeSearchMode(searchMode);
+    const pairs = [
+      [searchModeTopicBtn, 'topic'],
+      [searchModeErrorBtn, 'error'],
+      [searchModeSituationBtn, 'situation']
+    ];
+    for (const [btn, key] of pairs){
+      if (!btn) continue;
+      const active = key === m;
+      btn.classList.toggle('is-active', active);
+      btn.setAttribute('aria-selected', active ? 'true' : 'false');
+    }
+    if (searchHint && (!searchInput || !String(searchInput.value || '').trim())){
+      searchHint.textContent = getSearchHintText(m);
+    }
+  }
+
+  function setSearchMode(mode, options){
+    const opts = Object.assign({ rerender: true }, options || {});
+    searchMode = normalizeSearchMode(mode);
+    try{ localStorage.setItem(KEY_SEARCH_MODE, searchMode); }catch(_){ }
+    syncSearchModeUi();
+    if (opts.rerender && searchInput && searchInput.value.trim()){
+      renderSearchResults(searchInput.value);
     }
   }
 
@@ -1278,11 +1398,41 @@
     return out;
   }
 
+  function normalizeAliasArray(value){
+    const arr = Array.isArray(value) ? value : (value ? [value] : []);
+    const out = [];
+    const seen = new Set();
+    for (const item of arr){
+      const text = normalizeSearchText(item)
+        .replace(/[_/]+/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+      if (!text || seen.has(text)) continue;
+      seen.add(text);
+      out.push(text);
+    }
+    return out;
+  }
+
   function mergeTags(){
     const seen = new Set();
     const out = [];
     for (const list of arguments){
       const tags = normalizeTagArray(list);
+      for (const tag of tags){
+        if (seen.has(tag)) continue;
+        seen.add(tag);
+        out.push(tag);
+      }
+    }
+    return out;
+  }
+
+  function mergeAliasTags(){
+    const seen = new Set();
+    const out = [];
+    for (const list of arguments){
+      const tags = normalizeAliasArray(list);
       for (const tag of tags){
         if (seen.has(tag)) continue;
         seen.add(tag);
@@ -1411,7 +1561,20 @@
     if (id.includes('passive')) out.push('passive voice', 'be + v3', 'страдательный залог');
     if (id.includes('reported')) out.push('reported speech', 'согласование времен', 'future in the past');
     if (id.includes('adverb')) out.push('good well', 'hard hardly', 'adjective adverb', 'so such enough too');
-    if (id.includes('specialnounsnumber')) out.push('is are nouns', 'singular plural', 'news money scissors');
+    if (id.includes('specialnounsnumber')){
+      out.push(
+        'is are nouns',
+        'singular plural',
+        'news money scissors',
+        'special nouns singular plural',
+        'singular-only plural-only same form',
+        'единственное число',
+        'множественное число',
+        'число существительных',
+        'особые существительные',
+        'согласование is are'
+      );
+    }
 
     return out;
   }
@@ -1430,7 +1593,7 @@
     const patterns = mergeTags(meta.patterns, inferRulePatterns(meta));
     const mistakes = mergeTags(meta.mistakes, inferRuleMistakes(meta));
     const routes = mergeTags(meta.routes, inferRuleRoutes(meta));
-    const aliases = mergeTags(meta.aliases, inferRuleAliases(meta));
+    const aliases = mergeAliasTags(meta.aliases, inferRuleAliases(meta));
 
     const searchText = normalizeSearchText([
       meta.id,
@@ -1488,24 +1651,17 @@
     const q = normalizeSearchText(query || '');
     if (!q) return true;
 
-    const terms = splitWords(q);
-    if (!terms.length) return true;
+    const bundle = buildSearchQueryBundle(q);
+    if (!bundle.terms.length) return true;
 
-    const haystack = [
-      normalizeSearchText(meta?.title || ''),
-      normalizeSearchText(meta?.subtitle || ''),
-      normalizeSearchText(meta?.hint || ''),
-      profile?.searchText || ''
-    ].join(' ');
-
-    return terms.every((term) => {
-      if (!term) return true;
-      if (haystack.includes(term)) return true;
-      if (term.length >= 4){
-        return profile?.searchTokens?.some((tk)=> tk.startsWith(term));
-      }
-      return false;
+    const doc = buildSearchDoc(meta);
+    const row = scoreDocForSearch(doc, bundle, {
+      mode: 'topic',
+      relaxed: true,
+      allowFuzzy: true,
+      level: getLevel()
     });
+    return !!row;
   }
 
   function getListFilteredMetas(){
@@ -1625,16 +1781,16 @@
     finderWrap.hidden = false;
     if (finderTitleEl){
       finderTitleEl.textContent = isEnLang()
-        ? 'Section system: find any rule fast'
-        : 'система разделов: найди правило за секунды';
+        ? 'Catalog filters'
+        : 'фильтры каталога';
     }
     if (finderResetBtn){
-      finderResetBtn.textContent = isEnLang() ? 'reset filters' : 'сбросить фильтры';
+      finderResetBtn.textContent = isEnLang() ? 'reset' : 'сбросить';
     }
     if (listSearchInput){
       listSearchInput.placeholder = isEnLang()
-        ? 'filter by topic, formula, error...'
-        : 'фильтр по теме, формуле, ошибке...';
+        ? 'search by topic, error, or situation...'
+        : 'поиск по теме, ошибке или ситуации...';
       if (listSearchInput.value !== (listSearchQuery || '')) listSearchInput.value = listSearchQuery || '';
     }
     if (listSearchClearBtn){
@@ -1775,7 +1931,9 @@
 
   function refreshLevelUI(){
     const level = getLevel();
-    if (levelValue) levelValue.textContent = level || 'не выбран';
+    const emptyLabel = isEnLang() ? 'not selected' : 'не выбран';
+    if (levelValue) levelValue.textContent = level || emptyLabel;
+    if (levelValueInline) levelValueInline.textContent = level || emptyLabel;
     if (levelPrompt) levelPrompt.hidden = !!level;
     if (levelBox) levelBox.classList.toggle('is-empty', !level);
 
@@ -1783,6 +1941,8 @@
       const btnLevel = normalizeLevel(btn.getAttribute('data-grammar-level'));
       btn.classList.toggle('is-active', !!level && btnLevel === level);
     });
+
+    syncContinueButton();
   }
 
   function updateListSubtitle(){
@@ -1831,15 +1991,66 @@
     subgroupWrap.hidden = false;
   }
 
-  const SEARCH_HINT_DEFAULT = searchHint ? searchHint.textContent : '';
-
   const SEARCH_DOC_CACHE = new Map();
+  let SEARCH_SYNONYM_MAP = null;
+
+  const SEARCH_STOP_WORDS = new Set([
+    'и', 'или', 'по', 'к', 'ко', 'в', 'во', 'на', 'о', 'об', 'про', 'для', 'как', 'что', 'это', 'этот', 'эта', 'эти', 'the', 'a', 'an', 'of', 'to', 'in', 'on', 'at', 'for', 'by', 'about'
+  ]);
+
+  const SEARCH_SYNONYM_GROUPS = [
+    ['singular', 'single', 'единственное', 'единственного', 'единственному', 'единственным', 'единств'],
+    ['plural', 'множественное', 'множественного', 'множественному', 'множественным', 'множеств'],
+    ['noun', 'nouns', 'существительное', 'существительные', 'существительных', 'существит'],
+    ['number', 'agreement', 'число', 'числа', 'согласование'],
+    ['special', 'особый', 'особые', 'особенные', 'специальные'],
+    ['passive', 'пассив', 'пассивный', 'страдательный'],
+    ['reported', 'reporting', 'reported speech', 'косвенная', 'косвенной', 'косвенную'],
+    ['condition', 'conditional', 'conditionals', 'условие', 'условные'],
+    ['article', 'articles', 'артикль', 'артикли', 'артикля'],
+    ['adverb', 'adverbs', 'наречие', 'наречия'],
+    ['future', 'будущее', 'будущем', 'будущего'],
+    ['present', 'настоящее', 'настоящем', 'настоящего'],
+    ['past', 'прошлое', 'прошедшее', 'прошлом', 'прошедшем'],
+    ['gerund', 'infinitive', 'герундий', 'инфинитив']
+  ];
+
+  const SEARCH_LAYOUT_EN = "`qwertyuiop[]\\asdfghjkl;'zxcvbnm,./";
+  const SEARCH_LAYOUT_RU = 'ёйцукенгшщзхъ\\фывапролджэячсмитьбю.';
+  const SEARCH_LAYOUT_EN_TO_RU = buildLayoutMap(SEARCH_LAYOUT_EN, SEARCH_LAYOUT_RU);
+  const SEARCH_LAYOUT_RU_TO_EN = buildLayoutMap(SEARCH_LAYOUT_RU, SEARCH_LAYOUT_EN);
+
+  const RU_STEM_SUFFIXES = [
+    'иями', 'ями', 'ами', 'ого', 'его', 'ому', 'ему', 'ыми', 'ими', 'ость', 'ости',
+    'ение', 'ений', 'ением', 'ениях', 'овать', 'ировать', 'ирование',
+    'ыми', 'ими', 'ого', 'ему', 'ому',
+    'ыми', 'ими', 'ами', 'ях', 'ах', 'ев', 'ов',
+    'ый', 'ий', 'ой', 'ая', 'яя', 'ое', 'ее', 'ые', 'ие',
+    'ам', 'ям', 'ом', 'ем', 'у', 'ю', 'а', 'я', 'ы', 'и', 'е', 'о'
+  ];
+
+  function buildLayoutMap(from, to){
+    const out = Object.create(null);
+    const len = Math.min(String(from || '').length, String(to || '').length);
+    for (let i = 0; i < len; i += 1){
+      out[from[i]] = to[i];
+    }
+    return out;
+  }
 
   function normalizeSearchText(text){
     return String(text || '')
       .toLowerCase()
       .replace(/[`´]/g, "'")
+      .replace(/ё/g, 'е')
+      .replace(/[–—]/g, '-')
       .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  function normalizeSearchToken(token){
+    return normalizeSearchText(token)
+      .replace(/^'+|'+$/g, '')
       .trim();
   }
 
@@ -1848,6 +2059,174 @@
       .split(/[^a-z0-9а-яё']+/i)
       .map((w)=> w.replace(/^'+|'+$/g, ''))
       .filter(Boolean);
+  }
+
+  function isSearchStopWord(token){
+    return SEARCH_STOP_WORDS.has(normalizeSearchToken(token));
+  }
+
+  function stemRuToken(token){
+    let t = normalizeSearchToken(token).replace(/[^а-я0-9]/g, '');
+    if (!t) return '';
+    if (t.length <= 3) return t;
+
+    for (const suffix of RU_STEM_SUFFIXES){
+      if (!suffix) continue;
+      if (!t.endsWith(suffix)) continue;
+      const next = t.slice(0, t.length - suffix.length);
+      if (next.length < 3) continue;
+      t = next;
+      break;
+    }
+    return t;
+  }
+
+  function stemEnToken(token){
+    let t = normalizeSearchToken(token).replace(/[^a-z0-9']/g, '');
+    if (!t) return '';
+    if (t.length <= 3) return t;
+
+    if (t.endsWith('ies') && t.length > 4) return `${t.slice(0, -3)}y`;
+    if (t.endsWith('ing') && t.length > 5) return t.slice(0, -3);
+    if (t.endsWith('ed') && t.length > 4) return t.slice(0, -2);
+    if (t.endsWith('es') && t.length > 4) return t.slice(0, -2);
+    if (t.endsWith('s') && t.length > 3 && !t.endsWith('ss')) return t.slice(0, -1);
+    return t;
+  }
+
+  function stemSearchToken(token){
+    const t = normalizeSearchToken(token);
+    if (!t) return '';
+    if (/[а-я]/i.test(t)) return stemRuToken(t);
+    if (/[a-z]/i.test(t)) return stemEnToken(t);
+    return t;
+  }
+
+  function swapKeyboardLayoutToken(token){
+    const src = normalizeSearchToken(token);
+    if (!src) return '';
+    const hasRu = /[а-я]/i.test(src);
+    const hasEn = /[a-z]/i.test(src);
+    if (hasRu === hasEn) return '';
+
+    const map = hasEn ? SEARCH_LAYOUT_EN_TO_RU : SEARCH_LAYOUT_RU_TO_EN;
+    let out = '';
+    for (const ch of src){
+      out += map[ch] || ch;
+    }
+    return normalizeSearchToken(out);
+  }
+
+  function buildSearchSynonymMap(){
+    const map = new Map();
+    for (const group of SEARCH_SYNONYM_GROUPS){
+      const variants = [];
+      for (const raw of (group || [])){
+        for (const tk of splitWords(raw)){
+          const key = normalizeSearchToken(tk);
+          if (!key) continue;
+          variants.push(key);
+          const stem = stemSearchToken(key);
+          if (stem) variants.push(stem);
+        }
+      }
+
+      const uniq = [];
+      const seen = new Set();
+      for (const value of variants){
+        if (!value || seen.has(value)) continue;
+        seen.add(value);
+        uniq.push(value);
+      }
+
+      for (const token of uniq){
+        if (!map.has(token)) map.set(token, new Set());
+        const bucket = map.get(token);
+        for (const other of uniq){
+          if (other !== token) bucket.add(other);
+        }
+      }
+    }
+    return map;
+  }
+
+  function getSearchSynonyms(token){
+    const key = normalizeSearchToken(token);
+    if (!key) return [];
+    if (!SEARCH_SYNONYM_MAP) SEARCH_SYNONYM_MAP = buildSearchSynonymMap();
+    return Array.from(SEARCH_SYNONYM_MAP.get(key) || []);
+  }
+
+  function buildQueryTokenVariants(token){
+    const base = normalizeSearchToken(token);
+    if (!base) return [];
+
+    const out = [];
+    const seen = new Set();
+
+    function addOne(value){
+      const key = normalizeSearchToken(value);
+      if (!key || seen.has(key)) return;
+      seen.add(key);
+      out.push(key);
+    }
+
+    function addWithStem(value){
+      addOne(value);
+      const stem = stemSearchToken(value);
+      if (stem) addOne(stem);
+    }
+
+    addWithStem(base);
+
+    const swapped = swapKeyboardLayoutToken(base);
+    if (swapped) addWithStem(swapped);
+
+    for (const syn of getSearchSynonyms(base)) addWithStem(syn);
+    const stem = stemSearchToken(base);
+    if (stem && stem !== base){
+      for (const syn of getSearchSynonyms(stem)) addWithStem(syn);
+    }
+
+    return out;
+  }
+
+  function buildSearchQueryBundle(query){
+    const norm = normalizeSearchText(query || '');
+    const rawTokens = splitWords(norm);
+    if (!rawTokens.length){
+      return { norm, rawTokens: [], terms: [], snippetTerms: [] };
+    }
+
+    let filtered = rawTokens.filter((token)=> !isSearchStopWord(token));
+    if (!filtered.length) filtered = rawTokens;
+
+    const terms = [];
+    const seen = new Set();
+    for (const token of filtered){
+      const key = normalizeSearchToken(token);
+      if (!key || seen.has(key)) continue;
+      seen.add(key);
+      terms.push({
+        base: key,
+        variants: buildQueryTokenVariants(key)
+      });
+    }
+
+    const snippetTerms = [];
+    const snippetSeen = new Set();
+    for (const term of terms){
+      const pool = [term.base, ...term.variants];
+      for (const variant of pool){
+        if (!variant || snippetSeen.has(variant)) continue;
+        snippetSeen.add(variant);
+        snippetTerms.push(variant);
+        if (snippetTerms.length >= 24) break;
+      }
+      if (snippetTerms.length >= 24) break;
+    }
+
+    return { norm, rawTokens, terms, snippetTerms };
   }
 
   function collectStrings(value, out){
@@ -1866,7 +2245,11 @@
   function collectPracticeSearchText(practice, out){
     if (!practice || !Array.isArray(practice.exercises)) return;
     for (const ex of practice.exercises){
-      out.push(ex?.title || '', ex?.goal || '');
+      out.push(ex?.title || '', ex?.goal || '', ex?.instruction || '', ex?.kind || '');
+      for (const item of (ex?.items || [])){
+        out.push(item?.instruction || '', item?.prompt || '', item?.explain || '');
+        if (Array.isArray(item?.options)) out.push(item.options.join(' '));
+      }
     }
   }
 
@@ -1875,14 +2258,6 @@
       if (tk.startsWith(term)) return true;
     }
     return false;
-  }
-
-  function countToken(tokens, term){
-    let n = 0;
-    for (const tk of (tokens || [])){
-      if (tk === term) n += 1;
-    }
-    return n;
   }
 
   function buildSnippet(tokens, terms){
@@ -1956,13 +2331,25 @@
     const ruleTokens = splitWords(ruleText);
     const metaTokenSet = new Set(metaTokens);
     const ruleTokenSet = new Set(ruleTokens);
+    const metaStemSet = new Set(metaTokens.map(stemSearchToken).filter(Boolean));
+    const ruleStemSet = new Set(ruleTokens.map(stemSearchToken).filter(Boolean));
 
     const titleText = normalizeSearchText([meta?.title || '', meta?.id || '', meta?.subtitle || ''].join(' '));
     const titleTokens = splitWords(titleText);
     const titleTokenSet = new Set(titleTokens);
+    const titleStemSet = new Set(titleTokens.map(stemSearchToken).filter(Boolean));
+
+    const titleMetaTokens = [];
+    const titleMetaSeen = new Set();
+    for (const token of [...titleTokens, ...metaTokens]){
+      if (!token || titleMetaSeen.has(token)) continue;
+      titleMetaSeen.add(token);
+      titleMetaTokens.push(token);
+    }
 
     const doc = {
       meta,
+      idNorm: normalizeSearchText(meta?.id || ''),
       group,
       subgroup,
       family: profile?.family || '',
@@ -1973,9 +2360,13 @@
       ruleTokens,
       metaTokenSet,
       ruleTokenSet,
+      metaStemSet,
+      ruleStemSet,
       titleText,
       titleTokens,
       titleTokenSet,
+      titleStemSet,
+      titleMetaTokens,
       profile
     };
     SEARCH_DOC_CACHE.set(key, doc);
@@ -1986,88 +2377,232 @@
     return Array.isArray(REG.INDEX) ? [...REG.INDEX] : [];
   }
 
-  function searchGrammarMetas(query){
-    const q = normalizeSearchText(query || '');
-    const terms = splitWords(q);
-    if (!terms.length) return [];
+  function getFieldMatchQuality(tokens, tokenSet, stemSet, variants){
+    let best = 0;
+    for (const variant of (variants || [])){
+      const key = normalizeSearchToken(variant);
+      if (!key) continue;
+      if (tokenSet.has(key)) return 3;
+      if (key.length >= 4 && hasTokenPrefix(tokens, key)) best = Math.max(best, 2);
+      const stem = stemSearchToken(key);
+      if (stem && stemSet.has(stem)) best = Math.max(best, 1);
+    }
+    return best;
+  }
 
-    const level = getLevel();
-    const rows = [];
+  function fuzzyThreshold(term){
+    const len = String(term || '').length;
+    if (len <= 4) return 0;
+    if (len <= 7) return 1;
+    return 2;
+  }
 
-    for (const meta of getSearchBaseMetas()){
-      const doc = buildSearchDoc(meta);
-      let score = 0;
-      let allMatch = true;
-      const fieldHits = { title: 0, meta: 0, rules: 0 };
-      const exactMatches = [];
+  function findFuzzyMatch(tokens, term){
+    const key = normalizeSearchToken(term);
+    const threshold = fuzzyThreshold(key);
+    if (!key || !threshold) return null;
 
-      for (const t of terms){
-        const prefixAllowed = t.length >= 4;
+    let best = null;
+    for (const tk of (tokens || [])){
+      if (!tk) continue;
+      if (Math.abs(tk.length - key.length) > threshold) continue;
+      const dist = levenshtein(key, tk);
+      if (dist > threshold) continue;
+      if (!best || dist < best.distance){
+        best = { token: tk, distance: dist };
+      }
+      if (best && best.distance === 1) break;
+    }
+    return best;
+  }
 
-        const titleExact = doc.titleTokenSet.has(t);
-        const titlePrefix = !titleExact && prefixAllowed ? hasTokenPrefix(doc.titleTokens, t) : false;
+  function countModeHits(modeText, terms){
+    const text = normalizeSearchText(modeText || '');
+    if (!text) return 0;
 
-        const metaExact = doc.metaTokenSet.has(t);
-        const metaPrefix = !metaExact && prefixAllowed ? hasTokenPrefix(doc.metaTokens, t) : false;
+    let hits = 0;
+    for (const term of (terms || [])){
+      const variants = Array.isArray(term?.variants) ? term.variants : [term?.base];
+      const match = variants.some((variant)=> {
+        const key = normalizeSearchToken(variant);
+        if (!key) return false;
+        if (key.length <= 2) return text.split(' ').includes(key);
+        return text.includes(key);
+      });
+      if (match) hits += 1;
+    }
+    return hits;
+  }
 
-        const ruleExact = doc.ruleTokenSet.has(t);
-        const rulePrefix = !ruleExact && prefixAllowed ? hasTokenPrefix(doc.ruleTokens, t) : false;
-        exactMatches.push(!!(titleExact || metaExact || ruleExact));
+  function scoreDocForSearch(doc, bundle, options){
+    const opts = Object.assign({ mode: 'topic', relaxed: false, allowFuzzy: false, level: '' }, options || {});
+    const terms = Array.isArray(bundle?.terms) ? bundle.terms : [];
+    if (!terms.length) return null;
 
-        if (!titleExact && !titlePrefix && !metaExact && !metaPrefix && !ruleExact && !rulePrefix){
-          allMatch = false;
-          break;
+    const fieldHits = { title: 0, meta: 0, rules: 0, fuzzy: 0 };
+    let score = 0;
+    let matchedTerms = 0;
+    let fuzzyMatches = 0;
+
+    for (const term of terms){
+      const variants = Array.isArray(term?.variants) && term.variants.length
+        ? term.variants
+        : [term?.base];
+
+      const titleQuality = getFieldMatchQuality(doc.titleTokens, doc.titleTokenSet, doc.titleStemSet, variants);
+      const metaQuality = getFieldMatchQuality(doc.metaTokens, doc.metaTokenSet, doc.metaStemSet, variants);
+      const ruleQuality = getFieldMatchQuality(doc.ruleTokens, doc.ruleTokenSet, doc.ruleStemSet, variants);
+
+      let matched = !!(titleQuality || metaQuality || ruleQuality);
+      if (!matched && opts.allowFuzzy){
+        const fuzzy = findFuzzyMatch(doc.titleMetaTokens, term.base);
+        if (fuzzy){
+          matched = true;
+          fuzzyMatches += 1;
+          fieldHits.fuzzy += 1;
+          score += Math.max(6, 20 - fuzzy.distance * 6);
         }
-
-        if (titleExact) score += 80 + Math.min(30, countToken(doc.titleTokens, t) * 4);
-        else if (titlePrefix) score += 40;
-        if (titleExact || titlePrefix) fieldHits.title += 1;
-
-        if (metaExact) score += 26 + Math.min(18, countToken(doc.metaTokens, t) * 3);
-        else if (metaPrefix) score += 11;
-        if (metaExact || metaPrefix) fieldHits.meta += 1;
-
-        if (ruleExact) score += 9 + Math.min(20, countToken(doc.ruleTokens, t) * 2);
-        else if (rulePrefix) score += 3;
-        if (ruleExact || rulePrefix) fieldHits.rules += 1;
       }
 
-      if (!allMatch) continue;
+      if (!matched) continue;
+      matchedTerms += 1;
 
-      const idNorm = normalizeSearchText(meta.id || '');
-      if (doc.titleText === q) score += 120;
-      else if (doc.titleText.startsWith(q)) score += 50;
-      if (idNorm === q) score += 90;
-      else if (idNorm.startsWith(q)) score += 30;
-
-      const levelMatch = !level || (Array.isArray(meta.levels) && meta.levels.includes(level));
-      if (levelMatch) score += 8;
-
-      const snippet = buildSearchSnippet(doc, terms);
-
-      rows.push({
-        meta,
-        subgroup: doc.subgroup,
-        score,
-        levelMatch,
-        fieldHits,
-        allTermsExact: exactMatches.every(Boolean),
-        snippet
-      });
+      if (titleQuality){
+        fieldHits.title += 1;
+        if (titleQuality === 3) score += 112;
+        else if (titleQuality === 2) score += 72;
+        else score += 46;
+      }
+      if (metaQuality){
+        fieldHits.meta += 1;
+        if (metaQuality === 3) score += 44;
+        else if (metaQuality === 2) score += 24;
+        else score += 15;
+      }
+      if (ruleQuality){
+        fieldHits.rules += 1;
+        if (ruleQuality === 3) score += 18;
+        else if (ruleQuality === 2) score += 10;
+        else score += 6;
+      }
     }
 
+    const totalTerms = terms.length;
+    const minCoverage = opts.relaxed
+      ? (totalTerms <= 2 ? 1 : Math.max(2, Math.ceil(totalTerms * 0.55)))
+      : totalTerms;
+    if (matchedTerms < minCoverage) return null;
+
+    const missedTerms = Math.max(0, totalTerms - matchedTerms);
+    score += matchedTerms * 12;
+    if (missedTerms) score -= missedTerms * (opts.relaxed ? 14 : 48);
+
+    const q = normalizeSearchText(bundle?.norm || '');
+    if (q){
+      if (doc.titleText.includes(q)) score += 180;
+      else if (doc.metaText.includes(q)) score += 64;
+      else if (doc.ruleText.includes(q)) score += 24;
+
+      if (doc.idNorm === q) score += 130;
+      else if (doc.idNorm.startsWith(q)) score += 44;
+    }
+
+    const profile = doc.profile || getRuleProfile(doc.meta);
+    if (opts.mode === 'error'){
+      const errorText = normalizeSearchText([
+        ...(Array.isArray(profile?.mistakes) ? profile.mistakes : []),
+        ...(Array.isArray(profile?.aliases) ? profile.aliases : [])
+      ].join(' '));
+      const modeHits = countModeHits(errorText, terms);
+      score += modeHits ? (84 + modeHits * 16) : 4;
+    } else if (opts.mode === 'situation'){
+      const intentText = normalizeSearchText([
+        ...(Array.isArray(profile?.intents) ? profile.intents : []),
+        ...(Array.isArray(profile?.aliases) ? profile.aliases : []),
+        doc?.meta?.subtitle || '',
+        doc?.meta?.hint || ''
+      ].join(' '));
+      const modeHits = countModeHits(intentText, terms);
+      score += modeHits ? (76 + modeHits * 14) : 8;
+    }
+
+    const levelMatch = !opts.level || (Array.isArray(doc?.meta?.levels) && doc.meta.levels.includes(opts.level));
+    if (levelMatch) score += 10;
+
+    return {
+      meta: doc.meta,
+      subgroup: doc.subgroup,
+      profile,
+      mode: opts.mode,
+      score,
+      levelMatch,
+      fieldHits,
+      fuzzyMatches,
+      coverage: matchedTerms / Math.max(1, totalTerms),
+      snippet: buildSearchSnippet(doc, bundle?.snippetTerms || [])
+    };
+  }
+
+  function sortSearchRows(rows){
     rows.sort((a, b) => {
       if (b.score !== a.score) return b.score - a.score;
       if (a.levelMatch !== b.levelMatch) return a.levelMatch ? -1 : 1;
-      return String(a.meta.title || '').localeCompare(String(b.meta.title || ''));
+      if (b.coverage !== a.coverage) return b.coverage - a.coverage;
+      return String(a.meta?.title || '').localeCompare(String(b.meta?.title || ''));
     });
+  }
 
-    if (terms.length === 1 && terms[0].length <= 3){
-      const strictRows = rows.filter((r)=> r.allTermsExact);
-      if (strictRows.length) return strictRows.slice(0, 20);
+  function searchGrammarMetas(query){
+    const bundle = buildSearchQueryBundle(query || '');
+    if (!bundle.terms.length) return [];
+
+    const mode = normalizeSearchMode(searchMode);
+    const level = getLevel();
+    const strictRows = [];
+    const relaxedRows = [];
+
+    for (const meta of getSearchBaseMetas()){
+      const doc = buildSearchDoc(meta);
+      const profile = doc.profile || getRuleProfile(meta);
+      if (!profile) continue;
+
+      if (mode === 'error' && !(Array.isArray(profile.mistakes) && profile.mistakes.length)) continue;
+      if (mode === 'situation' && !(Array.isArray(profile.intents) && profile.intents.length)) continue;
+
+      const strict = scoreDocForSearch(doc, bundle, {
+        mode,
+        level,
+        relaxed: false,
+        allowFuzzy: false
+      });
+      if (strict){
+        strictRows.push(strict);
+        continue;
+      }
+
+      const relaxed = scoreDocForSearch(doc, bundle, {
+        mode,
+        level,
+        relaxed: true,
+        allowFuzzy: true
+      });
+      if (relaxed) relaxedRows.push(relaxed);
     }
 
-    return rows.slice(0, 20);
+    sortSearchRows(strictRows);
+    sortSearchRows(relaxedRows);
+
+    const out = [];
+    const seen = new Set();
+    for (const row of [...strictRows, ...relaxedRows]){
+      const id = String(row?.meta?.id || '');
+      if (!id || seen.has(id)) continue;
+      seen.add(id);
+      out.push(row);
+      if (out.length >= 20) break;
+    }
+
+    return out;
   }
 
   function openFromSearch(meta, subgroup){
@@ -2093,7 +2628,7 @@
     if (!query){
       searchResults.innerHTML = '';
       searchResults.hidden = true;
-      if (searchHint) searchHint.textContent = SEARCH_HINT_DEFAULT;
+      if (searchHint) searchHint.textContent = getSearchHintText(searchMode);
       return;
     }
 
@@ -2102,7 +2637,7 @@
 
     if (!rows.length){
       const li = document.createElement('li');
-      li.innerHTML = '<p class="ik-itemline">ничего не найдено</p>';
+      li.innerHTML = `<p class="ik-itemline">${isEnLang() ? 'No topics found for this query.' : 'Ничего не найдено по этому запросу.'}</p>`;
       searchResults.appendChild(li);
       searchResults.hidden = false;
       return;
@@ -2114,6 +2649,7 @@
       const categoryLabel = CATEGORY_LABEL[category] || category;
       const subgroupText = subgroupLabel(row.subgroup);
       const familyText = familyLabel(row.profile?.family || getRuleProfile(meta)?.family || '');
+      const entityType = entityTypeLabel(meta);
       const levelsText = Array.isArray(meta.levels) && meta.levels.length ? meta.levels.join(' / ') : '';
       const selectedLevel = getLevel();
       const outOfLevel = !!(selectedLevel && Array.isArray(meta.levels) && !meta.levels.includes(selectedLevel));
@@ -2121,12 +2657,24 @@
       if (row.fieldHits?.title) matchFields.push('title');
       if (row.fieldHits?.meta) matchFields.push('meta');
       if (row.fieldHits?.rules) matchFields.push('rules');
-      const matchText = matchFields.length ? `совпадение: ${matchFields.join('/')}` : '';
+      if (row.fieldHits?.fuzzy) matchFields.push(isEnLang() ? 'fuzzy' : 'опечатка');
+      const coveragePct = Math.round((Number(row.coverage) || 0) * 100);
+      const matchText = matchFields.length
+        ? `${isEnLang() ? 'match' : 'совпадение'}: ${matchFields.join('/')} (${coveragePct}%)`
+        : '';
       const snippetText = row.snippet ? `найдено: ${row.snippet}` : '';
-      const metaLine = [categoryLabel, subgroupText, familyText, levelsText, outOfLevel ? 'другой уровень' : '', matchText].filter(Boolean).join(' • ');
+      const metaLine = [
+        `${isEnLang() ? 'type' : 'тип'}: ${entityType}`,
+        categoryLabel,
+        subgroupText,
+        familyText,
+        levelsText,
+        outOfLevel ? (isEnLang() ? 'different level' : 'другой уровень') : '',
+        matchText
+      ].filter(Boolean).join(' • ');
 
       const li = document.createElement('li');
-      li.className = 'is-clickable';
+      li.className = 'sh-topic-row';
 
       const left = document.createElement('div');
       left.innerHTML = `<p class="ik-itemline"><b>${escapeHtml(meta.title || meta.id)}</b></p>
@@ -2140,7 +2688,7 @@
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'ik-btn ik-btn--black';
-      btn.textContent = 'open';
+      btn.textContent = isEnLang() ? 'open' : 'открыть';
       btn.addEventListener('click', (e)=>{
         e.stopPropagation();
         openFromSearch(meta, row.subgroup);
@@ -2149,7 +2697,6 @@
       right.appendChild(btn);
       li.appendChild(left);
       li.appendChild(right);
-      li.addEventListener('click', ()=> openFromSearch(meta, row.subgroup));
       searchResults.appendChild(li);
     }
 
@@ -2158,6 +2705,8 @@
 
   function initSearchUI(){
     if (!searchInput || !searchResults) return;
+
+    syncSearchModeUi();
 
     searchInput.addEventListener('input', ()=>{
       renderSearchResults(searchInput.value);
@@ -2181,6 +2730,10 @@
       searchInput.focus();
     });
 
+    searchModeTopicBtn && searchModeTopicBtn.addEventListener('click', ()=> setSearchMode('topic'));
+    searchModeErrorBtn && searchModeErrorBtn.addEventListener('click', ()=> setSearchMode('error'));
+    searchModeSituationBtn && searchModeSituationBtn.addEventListener('click', ()=> setSearchMode('situation'));
+
     document.addEventListener('click', (e)=>{
       if (!searchResults || searchResults.hidden) return;
       if (e.target === searchInput || e.target === searchClearBtn) return;
@@ -2191,6 +2744,24 @@
 
   function getMetaById(id){
     return (REG.INDEX || []).find((m) => m.id === id) || null;
+  }
+
+  function resolveMetaEntityType(meta){
+    const id = String(meta?.id || '').toLowerCase();
+    const title = String(meta?.title || '').toLowerCase();
+    if (!id) return { key: 'topic', ru: 'тема', en: 'topic' };
+    if (id === BASIC_OVERVIEW_ID.toLowerCase() || id.includes('route')){
+      return { key: 'collection', ru: 'подборка', en: 'collection' };
+    }
+    if (id.includes('usagemap') || id.includes('expressionways') || id.includes('vs') || title.includes(' vs ')){
+      return { key: 'compare', ru: 'сравнение', en: 'comparison' };
+    }
+    return { key: 'topic', ru: 'тема', en: 'topic' };
+  }
+
+  function entityTypeLabel(meta){
+    const type = resolveMetaEntityType(meta);
+    return isEnLang() ? (type.en || type.ru) : (type.ru || type.en);
   }
 
   function isLevelMatchId(id){
@@ -2592,8 +3163,9 @@
   // -------------------------
   // Rule renderer (same format as Structure)
   // -------------------------
-  function renderRuleBlocks(container, blocks){
-    container.innerHTML = '';
+  function renderRuleBlocks(container, blocks, options){
+    const opts = options || {};
+    if (!opts.append) container.innerHTML = '';
     for (const b of (blocks || [])){
       if (b.type === 'heading'){
         const h = document.createElement('h3');
@@ -2672,7 +3244,11 @@
               }
             }
 
-            openTense(topicId, { fromTopicLink: true, returnScrollY: window.scrollY });
+            openTense(topicId, {
+              fromTopicLink: true,
+              returnScrollY: window.scrollY,
+              keepRunReturn: !!runReturnState
+            });
           });
           list.appendChild(btn);
         }
@@ -2754,6 +3330,370 @@
     }
   }
 
+  function blockTextRaw(block){
+    if (!block || typeof block !== 'object') return '';
+    const parts = [];
+    if (block.type === 'heading' || block.type === 'text') parts.push(block.text || '');
+    if (block.type === 'highlight'){
+      parts.push(block.title || '');
+      if (Array.isArray(block.lines)) parts.push(block.lines.join(' '));
+    }
+    if (block.type === 'table'){
+      parts.push(block.caption || '');
+      if (Array.isArray(block.columns)) parts.push(block.columns.join(' '));
+      if (Array.isArray(block.rows)) parts.push(block.rows.flat().join(' '));
+    }
+    if (block.type === 'examples' && Array.isArray(block.items)){
+      for (const it of block.items) parts.push(it?.en || '', it?.ru || '');
+    }
+    if (block.type === 'topicLinks'){
+      parts.push(block.title || '', block.note || '');
+      if (Array.isArray(block.items)){
+        for (const it of block.items) parts.push(it?.label || '', it?.note || '');
+      }
+    }
+    return normalizeSearchText(parts.filter(Boolean).join(' '));
+  }
+
+  function blockHas(text, needles){
+    const src = String(text || '');
+    return (needles || []).some((n)=> src.includes(n));
+  }
+
+  function classifyRuleBlocks(blocks){
+    const buckets = {
+      essence: [],
+      usage: [],
+      form: [],
+      markers: [],
+      compare: [],
+      mistakes: [],
+      examples: [],
+      mini: [],
+      related: [],
+      extra: []
+    };
+
+    for (const block of (blocks || [])){
+      if (!block || typeof block !== 'object') continue;
+      if (block.type === 'topicLinks'){
+        buckets.related.push(block);
+        continue;
+      }
+      if (block.type === 'examples'){
+        buckets.examples.push(block);
+        continue;
+      }
+
+      const txt = blockTextRaw(block);
+
+      if (blockHas(txt, ['мини', 'проверк', 'чек', 'mini-check', 'mini check'])){
+        buckets.mini.push(block);
+      } else if (blockHas(txt, ['ошиб', 'ловуш', 'trap', 'wrong', 'типич'])){
+        buckets.mistakes.push(block);
+      } else if (blockHas(txt, ['сравн', 'разниц', 'contrast', ' vs ', 'пута', 'confus'])){
+        buckets.compare.push(block);
+      } else if (blockHas(txt, ['маркер', 'signal', 'marker', 'by ', 'for ', 'since', 'already', 'yet', 'just', 'ever', 'never'])){
+        buckets.markers.push(block);
+      } else if (blockHas(txt, ['формул', 'formula', 'схема', 'form ', 'v1', 'v2', 'v3', 'be +', 'have +', 'строит'])){
+        buckets.form.push(block);
+      } else if (blockHas(txt, ['когда', 'использ', 'when ', 'use ', 'usage'])){
+        buckets.usage.push(block);
+      } else if (blockHas(txt, ['что такое', 'что это', 'знач', 'meaning', 'идея', 'what is'])){
+        buckets.essence.push(block);
+      } else {
+        buckets.extra.push(block);
+      }
+    }
+
+    const fallbackKeys = ['essence', 'usage', 'form', 'markers', 'compare', 'mistakes', 'mini'];
+    for (const key of fallbackKeys){
+      if (!buckets[key].length && buckets.extra.length){
+        buckets[key].push(buckets.extra.shift());
+      }
+    }
+    if (buckets.extra.length){
+      buckets.form.push(...buckets.extra);
+      buckets.extra = [];
+    }
+
+    return buckets;
+  }
+
+  function topicSectionTitle(key){
+    const map = {
+      essence: { ru: 'Что это означает', en: 'What this means' },
+      usage: { ru: 'Когда использовать', en: 'When to use' },
+      form: { ru: 'Как строится форма', en: 'Form' },
+      markers: { ru: 'Маркеры и сигналы', en: 'Markers and signals' },
+      compare: { ru: 'С чем путают', en: 'Common contrasts' },
+      mistakes: { ru: 'Типичные ошибки', en: 'Typical mistakes' },
+      examples: { ru: 'Примеры', en: 'Examples' },
+      mini: { ru: 'Мини-проверка', en: 'Mini-check' },
+      practice: { ru: 'Практика', en: 'Practice' },
+      related: { ru: 'Связанные темы', en: 'Related topics' }
+    };
+    const dict = map[key] || { ru: key, en: key };
+    return isEnLang() ? (dict.en || dict.ru) : (dict.ru || dict.en);
+  }
+
+  function firstMeaningLine(blocks){
+    for (const b of (blocks || [])){
+      if (b.type === 'text' && b.text) return String(b.text);
+      if (b.type === 'heading' && b.text) return String(b.text);
+      if (b.type === 'highlight' && Array.isArray(b.lines) && b.lines.length) return String(b.lines[0]);
+      if (b.type === 'table' && Array.isArray(b.rows) && b.rows.length && Array.isArray(b.rows[0]) && b.rows[0].length){
+        return String(b.rows[0].join(' - '));
+      }
+    }
+    return '';
+  }
+
+  function estimateTopicMinutes(topic){
+    const blocksCount = Array.isArray(topic?.ruleBlocks) ? topic.ruleBlocks.length : 0;
+    let questionCount = 0;
+    const exercises = Array.isArray(topic?.practice?.exercises) ? topic.practice.exercises : [];
+    for (const ex of exercises){
+      questionCount += Array.isArray(ex?.items) ? ex.items.length : 0;
+    }
+    const estimate = Math.round(5 + blocksCount * 0.42 + questionCount * 0.06);
+    return Math.max(6, Math.min(30, estimate));
+  }
+
+  function collectRelatedTopicIds(blocks){
+    const out = [];
+    const seen = new Set();
+    for (const b of (blocks || [])){
+      if (b?.type !== 'topicLinks' || !Array.isArray(b.items)) continue;
+      for (const item of b.items){
+        const id = String(item?.id || '').trim();
+        if (!id || id === currentId || seen.has(id) || !REG.byId[id]) continue;
+        seen.add(id);
+        out.push(id);
+        if (out.length >= 5) return out;
+      }
+    }
+    return out;
+  }
+
+  function scrollToTopicAnchor(anchor){
+    if (!ruleBody) return;
+    const key = String(anchor || '').trim();
+    if (!key) return;
+    const target = ruleBody.querySelector(`[data-topic-anchor="${key}"]`);
+    if (!target) return;
+    const navShift = 96;
+    const top = target.getBoundingClientRect().top + window.scrollY - navShift;
+    window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+  }
+
+  function renderTopicLocalNav(keys){
+    if (!tenseLocalNav) return;
+    tenseLocalNav.innerHTML = '';
+    const uniqKeys = [];
+    const seen = new Set();
+    for (const key of (keys || [])){
+      if (!key || seen.has(key)) continue;
+      seen.add(key);
+      uniqKeys.push(key);
+    }
+    if (!uniqKeys.length){
+      tenseLocalNav.hidden = true;
+      return;
+    }
+    for (const key of uniqKeys){
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'sh-topic-nav__btn';
+      btn.textContent = topicSectionTitle(key);
+      btn.addEventListener('click', ()=>{
+        tenseLocalNav.querySelectorAll('.sh-topic-nav__btn').forEach((el)=> el.classList.remove('is-active'));
+        btn.classList.add('is-active');
+        scrollToTopicAnchor(key);
+      });
+      tenseLocalNav.appendChild(btn);
+    }
+    const first = tenseLocalNav.querySelector('.sh-topic-nav__btn');
+    if (first) first.classList.add('is-active');
+    tenseLocalNav.hidden = false;
+  }
+
+  function renderTopicQuickAnswer(topic, sections){
+    if (!tenseQuickAnswer) return;
+    const usageLine = firstMeaningLine(sections.usage) || topic?.subtitle || '';
+    const formLine = firstMeaningLine(sections.form) || firstMeaningLine(sections.markers) || '-';
+    const compareLine = firstMeaningLine(sections.compare) || '-';
+    const mistakeLine = firstMeaningLine(sections.mistakes) || '-';
+
+    tenseQuickAnswer.innerHTML = '';
+
+    const title = document.createElement('p');
+    title.className = 'sh-topic-quick__title';
+    title.textContent = isEnLang() ? 'Quick answer (20 seconds)' : 'быстрый ответ (20 секунд)';
+    tenseQuickAnswer.appendChild(title);
+
+    const grid = document.createElement('div');
+    grid.className = 'sh-topic-quick__grid';
+
+    const cards = [
+      { label: isEnLang() ? 'when' : 'когда', text: usageLine },
+      { label: isEnLang() ? 'form' : 'как строится', text: formLine },
+      { label: isEnLang() ? 'contrast' : 'с чем путают', text: compareLine },
+      { label: isEnLang() ? 'mistake' : 'типичная ошибка', text: mistakeLine }
+    ];
+
+    for (const item of cards){
+      const card = document.createElement('div');
+      card.className = 'sh-topic-quick__item';
+      card.innerHTML = `<span class="sh-topic-quick__label">${escapeHtml(item.label)}</span><span class="sh-topic-quick__text">${escapeHtml(item.text || '-')}</span>`;
+      grid.appendChild(card);
+    }
+
+    tenseQuickAnswer.appendChild(grid);
+    tenseQuickAnswer.hidden = false;
+  }
+
+  function buildTopicPracticeBlock(topic){
+    const exercises = Array.isArray(topic?.practice?.exercises) ? topic.practice.exercises : [];
+    const prompts = [];
+    for (const ex of exercises){
+      for (const item of (ex.items || [])){
+        const text = String(item?.prompt || item?.instruction || '').trim();
+        if (!text) continue;
+        prompts.push(text);
+        if (prompts.length >= 3) break;
+      }
+      if (prompts.length >= 3) break;
+    }
+    if (!prompts.length) return null;
+
+    const box = document.createElement('section');
+    box.className = 'sh-topic-practice';
+    box.setAttribute('data-topic-anchor', 'practice');
+
+    const title = document.createElement('p');
+    title.className = 'sh-topic-section__title';
+    title.textContent = topicSectionTitle('practice');
+    box.appendChild(title);
+
+    const list = document.createElement('ul');
+    list.className = 'sh-topic-practice__list';
+    for (const prompt of prompts){
+      const li = document.createElement('li');
+      li.textContent = prompt;
+      list.appendChild(li);
+    }
+    box.appendChild(list);
+
+    const actions = document.createElement('div');
+    actions.className = 'ik-row';
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'ik-btn ik-btn--black';
+    btn.textContent = isEnLang() ? 'full practice for this topic' : 'полная практика по теме';
+    btn.addEventListener('click', ()=>{
+      if (currentId) goPracticeForTense(currentId);
+    });
+    actions.appendChild(btn);
+    box.appendChild(actions);
+    return box;
+  }
+
+  function buildTopicRelatedBlock(blocks){
+    const ids = collectRelatedTopicIds(blocks);
+    if (!ids.length) return null;
+
+    const box = document.createElement('section');
+    box.className = 'sh-topic-related';
+    box.setAttribute('data-topic-anchor', 'related');
+
+    const title = document.createElement('p');
+    title.className = 'sh-topic-section__title';
+    title.textContent = topicSectionTitle('related');
+    box.appendChild(title);
+
+    const grid = document.createElement('div');
+    grid.className = 'sh-topic-related__grid';
+
+    for (const id of ids){
+      const meta = getMetaById(id) || REG.byId[id] || {};
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'sh-topic-related__btn';
+      btn.textContent = String(meta.title || id);
+      btn.addEventListener('click', ()=> openTense(id, {
+        fromTopicLink: true,
+        returnScrollY: window.scrollY,
+        keepRunReturn: !!runReturnState
+      }));
+      grid.appendChild(btn);
+    }
+
+    box.appendChild(grid);
+    return box;
+  }
+
+  function renderTopicTemplate(topic, meta, blocks){
+    if (!ruleBody) return;
+    const sectionBlocks = classifyRuleBlocks(blocks);
+    renderTopicQuickAnswer(topic, sectionBlocks);
+
+    const shell = document.createElement('div');
+
+    const order = ['essence', 'usage', 'form', 'markers', 'compare', 'mistakes', 'examples', 'mini'];
+    const navKeys = [];
+
+    for (const key of order){
+      const list = sectionBlocks[key] || [];
+      if (!list.length) continue;
+      navKeys.push(key);
+
+      const section = document.createElement('section');
+      section.className = 'sh-topic-section';
+      section.setAttribute('data-topic-anchor', key);
+
+      const title = document.createElement('p');
+      title.className = 'sh-topic-section__title';
+      title.textContent = topicSectionTitle(key);
+      section.appendChild(title);
+
+      const body = document.createElement('div');
+      renderRuleBlocks(body, list);
+      section.appendChild(body);
+      shell.appendChild(section);
+    }
+
+    const practice = buildTopicPracticeBlock(topic);
+    if (practice){
+      navKeys.push('practice');
+      shell.appendChild(practice);
+    }
+
+    const related = buildTopicRelatedBlock(blocks);
+    if (related){
+      navKeys.push('related');
+      shell.appendChild(related);
+    }
+
+    ruleBody.innerHTML = '';
+    ruleBody.appendChild(shell);
+    renderTopicLocalNav(navKeys);
+
+    if (tenseMetaType){
+      const type = resolveMetaEntityType(meta || topic || {});
+      const typeLabel = isEnLang() ? (type.en || type.ru) : (type.ru || type.en);
+      tenseMetaType.textContent = `${isEnLang() ? 'type' : 'тип'}: ${typeLabel}`;
+    }
+    if (tenseMetaLevel){
+      const levels = Array.isArray(meta?.levels) && meta.levels.length ? meta.levels.join(' / ') : '-';
+      tenseMetaLevel.textContent = `${isEnLang() ? 'level' : 'уровень'}: ${levels}`;
+    }
+    if (tenseMetaTime){
+      const mins = estimateTopicMinutes(topic);
+      tenseMetaTime.textContent = isEnLang() ? `~${mins} min` : `~${mins} мин`;
+    }
+  }
+
   // -------------------------
   // List
   // -------------------------
@@ -2810,7 +3750,8 @@
     renderCategoryBar();
     renderSubgroupBar();
 
-    const baseMetas = sortMetasForDisplay(getFilteredMetas({ category: activeCategory, subgroup: activeSubgroup }));
+    const allBaseMetas = sortMetasForDisplay(getFilteredMetas({ category: activeCategory, subgroup: activeSubgroup }));
+    const baseMetas = allBaseMetas.filter((meta)=> resolveMetaEntityType(meta).key !== 'collection');
     const visibleMetas = baseMetas.filter((meta) => {
       const profile = getRuleProfile(meta);
       if (!matchesFinderProfile(profile)) return false;
@@ -2844,18 +3785,18 @@
         const metaHint = meta.hint || meta.subtitle || '';
         const profile = getRuleProfile(meta);
         const familyText = familyLabel(profile?.family || '');
+        const typeText = entityTypeLabel(meta);
 
         const li = document.createElement('li');
-        li.className = 'is-clickable';
-        li.addEventListener('click', ()=> openTense(meta.id));
+        li.className = 'sh-topic-row';
 
         const left = document.createElement('div');
         if (compactMode){
           left.innerHTML = `<p class="ik-itemline"><b>${escapeHtml(meta.title)}</b></p>
-                            <p class="ik-itemline ik-muted">${escapeHtml(subgroupText)} • ${escapeHtml(familyText)}</p>`;
+                            <p class="ik-itemline ik-muted">${escapeHtml(typeText)} • ${escapeHtml(subgroupText)} • ${escapeHtml(familyText)}</p>`;
         } else {
           left.innerHTML = `<p class="ik-itemline"><b>${escapeHtml(meta.title)}</b></p>
-                            <p class="ik-itemline ik-muted">${escapeHtml(metaHint)} • ${escapeHtml(subgroupText)} • ${escapeHtml(familyText)}</p>`;
+                            <p class="ik-itemline ik-muted">${escapeHtml(metaHint)} • ${escapeHtml(typeText)} • ${escapeHtml(subgroupText)} • ${escapeHtml(familyText)}</p>`;
         }
 
         const right = document.createElement('div');
@@ -2868,9 +3809,8 @@
         const btnRule = document.createElement('button');
         btnRule.className = 'ik-btn ik-btn--black';
         btnRule.type = 'button';
-        btnRule.textContent = isEnLang() ? 'rule' : 'правило';
-        btnRule.addEventListener('click', (e)=>{
-          e.stopPropagation();
+        btnRule.textContent = isEnLang() ? 'open' : 'открыть';
+        btnRule.addEventListener('click', ()=>{
           openTense(meta.id);
         });
 
@@ -2955,7 +3895,8 @@
     if (!currentId) return;
     const t = REG.byId[currentId];
     if (!t) return;
-    renderRuleBlocks(ruleBody, blocksForRuleMode(t.ruleBlocks || []));
+    const meta = getMetaById(currentId) || { id: currentId, title: t.title || currentId, levels: [] };
+    renderTopicTemplate(t, meta, blocksForRuleMode(t.ruleBlocks || []));
     renderBasicOverviewQuickNav();
   }
 
@@ -2966,6 +3907,8 @@
     const options = opts || {};
     if (options.fromRun){
       setRunReturnState(options.runContext || { sourceTenseId: id });
+    } else if (options.keepRunReturn && runReturnState){
+      setRunReturnState(runReturnState);
     } else {
       setRunReturnState(null);
     }
@@ -2980,6 +3923,8 @@
     }
 
     currentId = id;
+    saveLastTopicId(id);
+    syncContinueButton();
 
     tenseTitleEl.textContent = t.title || id;
     tenseSubtitleEl.textContent = t.subtitle || '';
@@ -3523,7 +4468,7 @@
   }
 
   // -------------------------
-  // Practice run (choice/input/multi/match/multi_input/inline_select)
+  // Practice run (choice/input/multi/match/multi_input/inline_select/drag_sort)
   // -------------------------
   function startRun(tenseObj, exerciseIds, opts, mountEl){
     const practiceBody = mountEl || document.getElementById('tensesPracticeBody');
@@ -3553,6 +4498,60 @@
       return a;
     }
 
+    function pickRandomSubset(arr, count){
+      const pool = Array.isArray(arr) ? [...arr] : [];
+      if (!pool.length) return [];
+      shuffleInPlace(pool);
+      const n = Math.max(0, Math.min(Number(count) || 0, pool.length));
+      return pool.slice(0, n);
+    }
+
+    function rebalanceMultiItemOptions(it){
+      if (!Array.isArray(it?.options) || !it.options.length || !Array.isArray(it?.correctIndices)) return;
+      const total = it.options.length;
+      if (total < 8) return;
+
+      const correctSet = new Set(
+        it.correctIndices
+          .map((x)=> Number(x))
+          .filter((x)=> Number.isInteger(x) && x >= 0 && x < total)
+      );
+      if (!correctSet.size) return;
+
+      const correctIdx = Array.from(correctSet).sort((a, b)=> a - b);
+      const wrongIdx = [];
+      for (let i = 0; i < total; i += 1){
+        if (!correctSet.has(i)) wrongIdx.push(i);
+      }
+
+      const ratio = correctIdx.length / total;
+      if (ratio <= 0.7) return;
+      if (!wrongIdx.length) return;
+
+      const targetTotal = Math.min(total, 12);
+      let targetCorrect = Math.max(3, Math.min(correctIdx.length, Math.round(targetTotal * 0.58)));
+      let targetWrong = Math.max(2, Math.min(wrongIdx.length, targetTotal - targetCorrect));
+
+      if (targetCorrect + targetWrong > targetTotal){
+        targetCorrect = Math.max(2, targetTotal - targetWrong);
+      }
+      if (targetWrong < 2 || targetCorrect < 2) return;
+
+      const keepCorrect = pickRandomSubset(correctIdx, targetCorrect);
+      const keepWrong = pickRandomSubset(wrongIdx, targetWrong);
+      const keep = [...keepCorrect, ...keepWrong].sort((a, b)=> a - b);
+      if (keep.length < 4) return;
+
+      const oldToNew = new Map();
+      keep.forEach((oldIdx, newIdx)=> oldToNew.set(oldIdx, newIdx));
+
+      it.options = keep.map((idx)=> it.options[idx]);
+      it.correctIndices = keepCorrect
+        .map((idx)=> oldToNew.get(idx))
+        .filter((idx)=> Number.isInteger(idx))
+        .sort((a, b)=> a - b);
+    }
+
     function prepareItemForRun(kind, item){
       // Shallow clone + copy arrays we mutate
       const it = Object.assign({}, item);
@@ -3560,12 +4559,24 @@
       if (Array.isArray(item.correctIndices)) it.correctIndices = [...item.correctIndices];
       if (Array.isArray(item.pairs)) it.pairs = item.pairs.map(p => ({ left: p.left, right: p.right }));
       if (Array.isArray(item.segments)) it.segments = [...item.segments];
+      if (Array.isArray(item.words)){
+        it.words = item.words.map((w)=>{
+          if (typeof w === 'string') return { text: w, bin: '' };
+          return {
+            text: String(w?.text || w?.left || '').trim(),
+            bin: String(w?.bin || w?.right || w?.category || '').trim()
+          };
+        });
+      }
+      if (Array.isArray(item.bins)) it.bins = item.bins.map((x)=> String(x || '').trim()).filter(Boolean);
       if (Array.isArray(item.blanks)){
         it.blanks = item.blanks.map((b)=>({
           options: Array.isArray(b?.options) ? [...b.options] : [],
           correctIndex: Number(b?.correctIndex)
         }));
       }
+
+      if (kind === 'multi') rebalanceMultiItemOptions(it);
 
       // Shuffle options to avoid fixed patterns
       if ((kind === 'choice' || kind === 'multi') && Array.isArray(it.options) && it.options.length > 1){
@@ -3590,6 +4601,10 @@
       // Shuffle pair rows in matching tasks too
       if (kind === 'match' && Array.isArray(it.pairs) && it.pairs.length > 1){
         shuffleInPlace(it.pairs);
+      }
+
+      if (kind === 'drag_sort' && Array.isArray(it.words) && it.words.length > 1){
+        shuffleInPlace(it.words);
       }
 
       return it;
@@ -3691,6 +4706,7 @@
     let selectedIndex = null;
     let selectedSet = new Set(); // for multi
     let matchState = null; // { rights:[], selects:[] }
+    let dragSortState = null; // { bins, words, selectedWordId, zoneBodies, sourceBody }
     let multiInputs = null; // [inputEl,...]
     let inlineSelectState = null; // { slots:[{mount,select,options,correctIndex}], segments:[] }
 
@@ -3708,6 +4724,7 @@
       selectedIndex = null;
       selectedSet = new Set();
       matchState = null;
+      dragSortState = null;
       multiInputs = null;
       inlineSelectState = null;
       lastCheck = null;
@@ -3766,6 +4783,11 @@
         return raw;
       }
 
+      if (kind === 'drag_sort'){
+        if (!raw || generic) return 'Перетащи слова по корзинам';
+        return raw;
+      }
+
       if (kind === 'correction'){
         if (!raw) return 'Исправь ошибку';
         return raw;
@@ -3796,6 +4818,7 @@
         return 'Формат: мультивыбор. Можно выбрать несколько вариантов; проверь, чтобы отметить все правильные.';
       }
       if (kind === 'match') return 'Сопоставь пары во всех строках, затем нажми «проверить».';
+      if (kind === 'drag_sort') return 'Перетаскивай слова в нужные корзины. На телефоне: нажми слово, потом корзину.';
       if (kind === 'multi_input') return 'Заполни каждое поле по порядку: одно поле = одна часть правильной формы.';
       if (kind === 'inline_select') return 'Выбери вариант в каждом выпадающем поле, затем нажми «проверить».';
       if (kind === 'correction') return 'Можно ввести либо всё исправленное предложение, либо только исправленный фрагмент.';
@@ -3813,6 +4836,7 @@
       if (kind === 'choice') return 'выбери один вариант и нажми check';
       if (kind === 'multi') return 'выбери все подходящие варианты и нажми проверить';
       if (kind === 'match') return 'заполни пары и нажми проверить';
+      if (kind === 'drag_sort') return 'распредели слова по корзинам и нажми проверить';
       if (kind === 'multi_input') return 'заполни все поля и нажми check';
       if (kind === 'inline_select') return 'выбери варианты во всех полях и нажми check';
       if (kind === 'correction') return 'исправь ошибку и нажми check';
@@ -4503,6 +5527,16 @@
             const slotHint = buildInlineSelectSlotHint(check);
             if (slotHint) pushExplainLine(lines, `Где ошибка: ${slotHint}.`);
           }
+        } else if (check.kind === 'drag_sort'){
+          if (check.ok){
+            pushExplainLine(lines, `Сортировка выполнена верно: ${check.correctCount}/${check.total}.`);
+          } else {
+            pushExplainLine(lines, `Результат сортировки: ${check.correctCount}/${check.total}.`);
+            const wrong = (check.mismatches || [])
+              .slice(0, 4)
+              .map((x)=> `${x.text} -> ${x.expected}${x.picked ? ` (у тебя: ${x.picked})` : ''}`);
+            if (wrong.length) pushExplainLine(lines, `Где ошибка: ${wrong.join(' | ')}.`);
+          }
         }
 
         const resolved = buildResolvedSentence(q, check, meta);
@@ -4629,7 +5663,7 @@
       elCard.appendChild(p);
 
       const pairs = q.item.pairs || [];
-      const rights = shuffle(pairs.map(x=>x.right));
+      const rights = shuffle(Array.from(new Set(pairs.map((x)=> String(x?.right || '').trim()).filter(Boolean))));
       const wrap = document.createElement('div');
       wrap.style.display = 'grid';
       wrap.style.gridTemplateColumns = '1fr 1fr';
@@ -4640,7 +5674,7 @@
 
       pairs.forEach((pair, idx)=>{
         const left = document.createElement('div');
-        left.className = 'ik-badge';
+        left.className = 'ik-badge sh-match-left';
         left.textContent = pair.left;
 
         const sel = document.createElement('select');
@@ -4666,6 +5700,231 @@
 
       matchState = { rights, selects, pairs };
       elCard.appendChild(wrap);
+    }
+
+    function dragBinKey(v){
+      return String(v || '').trim().toLowerCase().replace(/\s+/g, ' ');
+    }
+
+    function getDragSortModel(item){
+      const rawBins = Array.isArray(item?.bins)
+        ? item.bins
+        : [];
+      const words = [];
+
+      if (Array.isArray(item?.words) && item.words.length){
+        for (const entry of item.words){
+          const text = String(entry?.text || entry?.left || '').trim();
+          const bin = String(entry?.bin || entry?.right || entry?.category || '').trim();
+          if (!text || !bin) continue;
+          words.push({ text, bin });
+        }
+      } else if (Array.isArray(item?.pairs) && item.pairs.length){
+        for (const pair of item.pairs){
+          const text = String(pair?.left || '').trim();
+          const bin = String(pair?.right || '').trim();
+          if (!text || !bin) continue;
+          words.push({ text, bin });
+        }
+      }
+
+      const bins = [];
+      const seenBins = new Set();
+      for (const b of rawBins){
+        const text = String(b || '').trim();
+        const key = dragBinKey(text);
+        if (!text || !key || seenBins.has(key)) continue;
+        seenBins.add(key);
+        bins.push(text);
+      }
+      for (const w of words){
+        const key = dragBinKey(w.bin);
+        if (!key || seenBins.has(key)) continue;
+        seenBins.add(key);
+        bins.push(w.bin);
+      }
+
+      const uniqWords = [];
+      const seenWords = new Set();
+      for (const w of words){
+        const key = normalizeSearchText(`${w.text}@@${w.bin}`);
+        if (!key || seenWords.has(key)) continue;
+        seenWords.add(key);
+        uniqWords.push(w);
+      }
+
+      return { bins, words: uniqWords };
+    }
+
+    function renderDragSort(q){
+      const p = document.createElement('div');
+      p.className = 'sh-run-prompt';
+      p.textContent = String(q.item.prompt || '').trim() || 'Распредели слова по правильным корзинам.';
+      elCard.appendChild(p);
+
+      const model = getDragSortModel(q.item || {});
+      if (!model.words.length || !model.bins.length){
+        const warn = document.createElement('p');
+        warn.className = 'ik-footnote';
+        warn.textContent = 'Ошибка данных: не удалось собрать слова или корзины.';
+        elCard.appendChild(warn);
+        dragSortState = { bins: [], words: [], selectedWordId: '', sourceBody: null, zoneBodies: new Map() };
+        return;
+      }
+
+      const board = document.createElement('div');
+      board.className = 'sh-drag-board';
+
+      const bank = document.createElement('div');
+      bank.className = 'sh-drag-source';
+      const bankTitle = document.createElement('p');
+      bankTitle.className = 'sh-drag-source__title';
+      bankTitle.textContent = isEnLang() ? 'Words' : 'Слова';
+      const bankBody = document.createElement('div');
+      bankBody.className = 'sh-drag-source__body';
+      bank.appendChild(bankTitle);
+      bank.appendChild(bankBody);
+
+      const zones = document.createElement('div');
+      zones.className = 'sh-drag-zones';
+
+      const zoneBodies = new Map();
+      const binLabelByKey = new Map();
+      for (const bin of model.bins){
+        const key = dragBinKey(bin);
+        const zone = document.createElement('div');
+        zone.className = 'sh-drag-zone';
+        zone.setAttribute('data-bin', key);
+
+        const title = document.createElement('p');
+        title.className = 'sh-drag-zone__title';
+        title.textContent = bin;
+
+        const body = document.createElement('div');
+        body.className = 'sh-drag-zone__body';
+        body.setAttribute('data-bin', key);
+
+        zone.appendChild(title);
+        zone.appendChild(body);
+        zones.appendChild(zone);
+        zoneBodies.set(key, body);
+        binLabelByKey.set(key, bin);
+      }
+
+      board.appendChild(bank);
+      board.appendChild(zones);
+      elCard.appendChild(board);
+
+      const words = model.words.map((w, i)=> ({
+        id: `drag_${q.item.id || 'item'}_${i}`,
+        text: String(w.text || ''),
+        correctBin: String(w.bin || ''),
+        currentBin: ''
+      }));
+
+      function getWordById(wordId){
+        return words.find((w)=> w.id === wordId) || null;
+      }
+
+      function setSelectedWord(wordId){
+        if (checked) return;
+        const nextId = dragSortState?.selectedWordId === wordId ? '' : String(wordId || '');
+        dragSortState.selectedWordId = nextId;
+        words.forEach((w)=>{
+          if (!w.chipEl) return;
+          w.chipEl.classList.toggle('is-selected', !!nextId && w.id === nextId);
+        });
+      }
+
+      function placeWord(wordId, targetBin){
+        if (checked) return;
+        const word = getWordById(wordId);
+        if (!word || !word.chipEl) return;
+
+        const key = dragBinKey(targetBin);
+        word.currentBin = key ? key : '';
+
+        if (!key){
+          bankBody.appendChild(word.chipEl);
+        } else {
+          const zoneBody = zoneBodies.get(key);
+          if (!zoneBody) return;
+          zoneBody.appendChild(word.chipEl);
+        }
+
+        word.chipEl.classList.toggle('is-assigned', !!key);
+        setSelectedWord('');
+      }
+
+      function bindDropTarget(targetEl, targetBin){
+        targetEl.addEventListener('dragover', (e)=>{
+          if (checked) return;
+          e.preventDefault();
+          targetEl.classList.add('is-drag-over');
+        });
+        targetEl.addEventListener('dragleave', ()=>{
+          targetEl.classList.remove('is-drag-over');
+        });
+        targetEl.addEventListener('drop', (e)=>{
+          if (checked) return;
+          e.preventDefault();
+          targetEl.classList.remove('is-drag-over');
+          const wordId = String(e.dataTransfer?.getData('text/plain') || dragSortState?.selectedWordId || '').trim();
+          if (!wordId) return;
+          placeWord(wordId, targetBin);
+        });
+        targetEl.addEventListener('click', ()=>{
+          if (checked) return;
+          const wordId = String(dragSortState?.selectedWordId || '').trim();
+          if (!wordId) return;
+          placeWord(wordId, targetBin);
+        });
+      }
+
+      bindDropTarget(bankBody, '');
+      zoneBodies.forEach((zoneBody, key)=> bindDropTarget(zoneBody, key));
+
+      words.forEach((word)=>{
+        const chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = 'ik-btn sh-drag-chip';
+        chip.draggable = true;
+        chip.textContent = word.text;
+
+        chip.addEventListener('click', ()=>{
+          setSelectedWord(word.id);
+        });
+        chip.addEventListener('dragstart', (e)=>{
+          if (checked){
+            e.preventDefault();
+            return;
+          }
+          e.dataTransfer?.setData('text/plain', word.id);
+          e.dataTransfer?.setData('text/word-id', word.id);
+          setSelectedWord(word.id);
+          chip.classList.add('is-dragging');
+        });
+        chip.addEventListener('dragend', ()=> chip.classList.remove('is-dragging'));
+
+        word.chipEl = chip;
+        bankBody.appendChild(chip);
+      });
+
+      const hint = document.createElement('p');
+      hint.className = 'ik-footnote';
+      hint.textContent = isEnLang()
+        ? 'Desktop: drag a word. Mobile: tap word, then tap category.'
+        : 'ПК: перетащи слово. Телефон: нажми слово, потом нужную корзину.';
+      elCard.appendChild(hint);
+
+      dragSortState = {
+        bins: [...model.bins],
+        words,
+        selectedWordId: '',
+        sourceBody: bankBody,
+        zoneBodies,
+        binLabelByKey
+      };
     }
 
     function renderMultiInput(q){
@@ -4805,6 +6064,8 @@
         renderMulti(q);
       } else if (q.kind === 'match'){
         renderMatch(q);
+      } else if (q.kind === 'drag_sort'){
+        renderDragSort(q);
       } else if (q.kind === 'multi_input'){
         renderMultiInput(q);
       } else if (q.kind === 'inline_select'){
@@ -4943,9 +6204,12 @@
 
         const btns = elCard.querySelectorAll('.sh-choice-list .sh-choice');
         btns.forEach((b, i)=>{
-          b.classList.remove('is-correct', 'is-wrong');
-          if (correctSet.has(i)) b.classList.add('is-correct');
-          if (selectedSet.has(i) && !correctSet.has(i)) b.classList.add('is-wrong');
+          b.classList.remove('is-correct', 'is-wrong', 'is-missed');
+          const picked = selectedSet.has(i);
+          const should = correctSet.has(i);
+          if (picked && should) b.classList.add('is-correct');
+          else if (picked && !should) b.classList.add('is-wrong');
+          else if (!picked && should) b.classList.add('is-missed');
         });
 
         if (ok){
@@ -4954,7 +6218,14 @@
           setFeedback('correct', 'ok', 'верно');
         } else {
           mistakesSet.add(q.item.id);
-          setFeedback('wrong', 'no', cbShowAfterLocal.checked ? `неверно (правильно: ${correctLabels.join(', ')})` : 'неверно');
+          if (cbShowAfterLocal.checked){
+            const details = [];
+            if (missingLabels.length) details.push(`не хватает: ${missingLabels.join(', ')}`);
+            if (extraLabels.length) details.push(`лишние: ${extraLabels.join(', ')}`);
+            setFeedback('wrong', 'no', details.length ? `неверно (${details.join(' | ')})` : `неверно (правильно: ${correctLabels.join(', ')})`);
+          } else {
+            setFeedback('wrong', 'no', 'неверно');
+          }
         }
 
         lastCheck = {
@@ -5014,6 +6285,76 @@
         lastCheck = {
           kind: 'match',
           ok,
+          mismatches
+        };
+
+        saveMistakesSnapshot();
+        return ok;
+      }
+
+      if (q.kind === 'drag_sort'){
+        const st = dragSortState;
+        if (!st || !Array.isArray(st.words) || !st.words.length){
+          setFeedback('idle', 'sort', 'не удалось загрузить слова');
+          lastCheck = null;
+          return null;
+        }
+
+        const unassigned = st.words.filter((w)=> !dragBinKey(w.currentBin));
+        if (unassigned.length){
+          setFeedback('idle', 'sort', isEnLang() ? 'assign all words first' : 'распредели все слова по корзинам');
+          lastCheck = null;
+          return null;
+        }
+
+        countAttempt(q);
+        let okCount = 0;
+        const mismatches = [];
+
+        for (const word of st.words){
+          const shouldKey = dragBinKey(word.correctBin);
+          const pickedKey = dragBinKey(word.currentBin);
+          const isOk = !!shouldKey && shouldKey === pickedKey;
+          if (isOk) okCount += 1;
+
+          if (word.chipEl){
+            word.chipEl.classList.remove('is-selected', 'is-correct', 'is-wrong', 'is-missed');
+            word.chipEl.classList.add(isOk ? 'is-correct' : 'is-wrong');
+          }
+
+          if (!isOk){
+            mismatches.push({
+              text: word.text,
+              expected: word.correctBin,
+              picked: st.binLabelByKey?.get(pickedKey) || word.currentBin || ''
+            });
+          }
+        }
+
+        const total = st.words.length;
+        const ok = okCount === total;
+        if (ok){
+          exCorrect[q.exId] = (exCorrect[q.exId] || 0) + 1;
+          mistakesSet.delete(q.item.id);
+          setFeedback('correct', 'ok', `верно (${okCount}/${total})`);
+        } else {
+          mistakesSet.add(q.item.id);
+          if (cbShowAfterLocal.checked){
+            const preview = mismatches
+              .slice(0, 3)
+              .map((x)=> `${x.text} -> ${x.expected}`)
+              .join(' | ');
+            setFeedback('wrong', 'no', preview ? `неверно (${okCount}/${total}) • ${preview}` : `неверно (${okCount}/${total})`);
+          } else {
+            setFeedback('wrong', 'no', `неверно (${okCount}/${total})`);
+          }
+        }
+
+        lastCheck = {
+          kind: 'drag_sort',
+          ok,
+          total,
+          correctCount: okCount,
           mismatches
         };
 
@@ -5303,6 +6644,30 @@
           kind: 'match',
           ok: false,
           mismatches: [],
+          forcedUnknown: true
+        };
+      } else if (q.kind === 'drag_sort'){
+        const st = dragSortState;
+        const mismatches = [];
+        if (st && Array.isArray(st.words)){
+          st.words.forEach((word)=>{
+            const key = dragBinKey(word.correctBin);
+            const zone = st.zoneBodies?.get(key);
+            word.currentBin = key;
+            if (zone && word.chipEl) zone.appendChild(word.chipEl);
+            if (word.chipEl){
+              word.chipEl.classList.remove('is-selected', 'is-wrong', 'is-missed');
+              word.chipEl.classList.add('is-correct');
+            }
+            mismatches.push({ text: word.text, expected: word.correctBin, picked: '' });
+          });
+        }
+        lastCheck = {
+          kind: 'drag_sort',
+          ok: false,
+          correctCount: 0,
+          total: st?.words?.length || 0,
+          mismatches,
           forcedUnknown: true
         };
       } else if (q.kind === 'multi_input'){
@@ -5615,22 +6980,39 @@
     openPracticeMode('custom', { autoStart: false });
   });
 
+  btnContinueTopic && btnContinueTopic.addEventListener('click', ()=>{
+    const id = loadLastTopicId();
+    if (!id) return;
+    openTense(id);
+  });
+
   btnGoMixed && btnGoMixed.addEventListener('click', ()=>{
     openPracticeMode('mixed', { autoStart: true });
   });
 
-  btnGoActiveTenses && btnGoActiveTenses.addEventListener('click', ()=> openCategory('active_tenses'));
-  btnGoUniversal && btnGoUniversal.addEventListener('click', ()=> openCategory('universal'));
-  btnGoPresent && btnGoPresent.addEventListener('click', ()=> openCuratedSection({ category: 'present' }));
-  btnGoPast && btnGoPast.addEventListener('click', ()=> openCuratedSection({ category: 'past' }));
-  btnGoFuture && btnGoFuture.addEventListener('click', ()=> openCuratedSection({ category: 'future' }));
-  btnGoConditionals && btnGoConditionals.addEventListener('click', ()=> openCuratedSection({ category: 'universal', subgroup: 'conditionals' }));
-  btnGoModals && btnGoModals.addEventListener('click', ()=> openCuratedSection({ category: 'universal', subgroup: 'modals' }));
-  btnGoPassive && btnGoPassive.addEventListener('click', ()=> openCuratedSection({ category: 'universal', subgroup: 'voice', finderMode: 'intent', finderValue: 'passive' }));
-  btnGoReportedClauses && btnGoReportedClauses.addEventListener('click', ()=> openCuratedSection({ category: 'universal', subgroup: 'clauses', finderMode: 'intent', finderValue: 'reporting' }));
-  btnGoVerbPatterns && btnGoVerbPatterns.addEventListener('click', ()=> openCuratedSection({ category: 'universal', subgroup: 'verb_patterns' }));
-  btnGoArticles && btnGoArticles.addEventListener('click', ()=> openCuratedSection({ category: 'universal', subgroup: 'articles' }));
-  btnGoSyntax && btnGoSyntax.addEventListener('click', ()=> openCuratedSection({ category: 'universal', subgroup: 'syntax' }));
+  btnGoPracticeCustom && btnGoPracticeCustom.addEventListener('click', ()=>{
+    openPracticeMode('custom', { autoStart: false });
+  });
+
+  btnGoTopicPractice && btnGoTopicPractice.addEventListener('click', ()=>{
+    if (!ensureLevelSelected()){
+      showOnly('home');
+      setStatus('выбери уровень');
+      return;
+    }
+    openListWithCurrentFinder();
+    setStatus(isEnLang() ? 'pick topic' : 'выбери тему');
+  });
+
+  btnGroupTenses && btnGroupTenses.addEventListener('click', ()=> openCategory('active_tenses'));
+  btnGroupCondModals && btnGroupCondModals.addEventListener('click', ()=> openCuratedSection({ category: 'universal', search: 'conditionals modals' }));
+  btnGroupPassiveReported && btnGroupPassiveReported.addEventListener('click', ()=> openCuratedSection({ category: 'universal', search: 'passive reported speech' }));
+  btnGroupVerbPatterns && btnGroupVerbPatterns.addEventListener('click', ()=> openCuratedSection({ category: 'universal', subgroup: 'verb_patterns' }));
+  btnGroupArticlesNouns && btnGroupArticlesNouns.addEventListener('click', ()=> openCuratedSection({ category: 'universal', search: 'articles nouns special nouns' }));
+  btnGroupSyntaxChoice && btnGroupSyntaxChoice.addEventListener('click', ()=> openCuratedSection({ category: 'universal', subgroup: 'syntax' }));
+  btnGroupUniversal && btnGroupUniversal.addEventListener('click', ()=> openCategory('universal'));
+  btnGroupExamApplied && btnGroupExamApplied.addEventListener('click', ()=> openCuratedSection({ category: 'all', finderMode: 'route', finderValue: 'exam_b1b2' }));
+
   btnGoWritingPack && btnGoWritingPack.addEventListener('click', ()=> openCuratedSection({ category: 'all', finderMode: 'route', finderValue: 'writing_pack' }));
   btnGoExamRoute && btnGoExamRoute.addEventListener('click', ()=> openCuratedSection({ category: 'all', finderMode: 'route', finderValue: 'exam_b1b2' }));
   btnOpenConstructor && btnOpenConstructor.addEventListener('click', ()=> showConstructor());
@@ -5669,10 +7051,10 @@
 
   listSearchInput && listSearchInput.addEventListener('keydown', (e)=>{
     if (e.key !== 'Enter') return;
-    const firstClickable = listEl ? listEl.querySelector('li.is-clickable') : null;
-    if (!firstClickable) return;
+    const firstAction = listEl ? listEl.querySelector('li.sh-topic-row .ik-btn.ik-btn--black') : null;
+    if (!firstAction) return;
     e.preventDefault();
-    firstClickable.click();
+    firstAction.click();
   });
 
   listSearchClearBtn && listSearchClearBtn.addEventListener('click', ()=>{
@@ -5759,7 +7141,20 @@ btnResetProgress && btnResetProgress.addEventListener('click', ()=>{
     setStatus('home');
   });
 
+  function returnToRunFromDetail(){
+    if (!runReturnState) return false;
+    showOnly('practice');
+    setStatus('practice');
+    requestAnimationFrame(()=>{
+      const card = document.querySelector('#shTRunCard');
+      if (card) card.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    });
+    return true;
+  }
+
   btnBackToList && btnBackToList.addEventListener('click', ()=>{
+    if (returnToRunFromDetail()) return;
+
     if (detailBackStack.length){
       const prev = detailBackStack.pop();
       const prevId = String(prev?.id || '');
@@ -5776,13 +7171,7 @@ btnResetProgress && btnResetProgress.addEventListener('click', ()=>{
   });
 
   btnBackToRunFromDetail && btnBackToRunFromDetail.addEventListener('click', ()=>{
-    if (!runReturnState) return;
-    showOnly('practice');
-    setStatus('practice');
-    requestAnimationFrame(()=>{
-      const card = document.querySelector('#shTRunCard');
-      if (card) card.scrollIntoView({ block: 'center', behavior: 'smooth' });
-    });
+    returnToRunFromDetail();
   });
 
   function showPractice(options){
@@ -6198,8 +7587,13 @@ btnDailyStart && btnDailyStart.addEventListener('click', ()=> startDaily(false))
 btnDailyNew && btnDailyNew.addEventListener('click', ()=> startDaily(true));
 
 document.addEventListener('ik:languagechange', ()=>{
+  SEARCH_DOC_CACHE.clear();
+  refreshLevelUI();
+  syncContinueButton();
+  syncSearchModeUi();
   syncHomeFinderUi();
   if (listView && !listView.hidden) renderList();
+  if (detailView && !detailView.hidden) renderCurrentRule();
   if (constructorView && !constructorView.hidden){
     if (builderLastRec) renderBuilderResult(builderLastRec);
     else renderBuilderQuestion();
@@ -6210,13 +7604,15 @@ document.addEventListener('ik:languagechange', ()=>{
   // Init
   finderMode = normalizeFinderMode(finderMode);
   finderValue = normalizeFinderValue(finderMode, finderValue);
+  searchMode = normalizeSearchMode(searchMode);
   refreshLevelUI();
+  syncContinueButton();
   if (compactListToggle) compactListToggle.checked = isCompactList();
   if (listSearchInput) listSearchInput.value = listSearchQuery || '';
   updateRuleModeButtons();
   initSearchUI();
   if (countBadge) countBadge.textContent = `grammar: ${getListFilteredMetas().length}`;
-  setGrammarHomeTab(grammarHomeTab);
+  setGrammarHomeTab('all');
   syncHomeFinderUi();
   showOnly('home');
 

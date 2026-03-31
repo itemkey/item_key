@@ -605,51 +605,33 @@
             "instruction": "Выбери слова для is",
             "prompt": "Категория is",
             "options": [
-              "meat",
-              "weather",
-              "water",
-              "space",
-              "advice",
-              "mathematics",
-              "clothing",
-              "work",
-              "hair",
-              "phonetics",
-              "physics",
-              "progress",
-              "chess",
-              "homework",
-              "news",
-              "athletics",
-              "information",
-              "economics",
               "knowledge",
+              "scissors",
+              "people",
+              "homework",
               "money",
               "trousers",
-              "people",
-              "scissors"
+              "news",
+              "mice",
+              "physics",
+              "jeans",
+              "information",
+              "police",
+              "mathematics",
+              "economics",
+              "series",
+              "weather"
             ],
             "correctIndices": [
               0,
-              1,
-              2,
               3,
               4,
-              5,
               6,
-              7,
               8,
-              9,
               10,
-              11,
               12,
               13,
-              14,
-              15,
-              16,
-              17,
-              18,
-              19
+              15
             ],
             "explain": "Это singular-колонка из тренировки: uncountable nouns + существительные на -s, которые употребляются как singular"
           },
@@ -659,39 +641,30 @@
             "prompt": "Категория are",
             "options": [
               "gentlemen",
+              "news",
               "trousers",
+              "knowledge",
               "stairs",
-              "clothes",
-              "tights",
+              "series",
               "mice",
               "cakes",
               "people",
+              "economics",
               "scissors",
-              "goods",
-              "jeans",
-              "pyjamas",
-              "men",
               "glasses",
               "police",
-              "news",
-              "knowledge"
+              "money"
             ],
             "correctIndices": [
               0,
-              1,
               2,
-              3,
               4,
-              5,
               6,
               7,
               8,
-              9,
               10,
               11,
-              12,
-              13,
-              14
+              12
             ],
             "explain": "Это plural-колонка: plural-only nouns и обычные формы множественного числа"
           },
@@ -709,7 +682,10 @@
               "bison",
               "deer",
               "homework",
-              "weather"
+              "weather",
+              "news",
+              "trousers",
+              "people"
             ],
             "correctIndices": [
               0,
@@ -810,6 +786,71 @@
               }
             ],
             "explain": "Согласование зависит от категории слова, а не только от окончания"
+          }
+        ]
+      },
+      {
+        "id": "markers_drag",
+        "goal": "markers",
+        "title": "Быстрая сортировка (Drag)",
+        "kind": "drag_sort",
+        "items": [
+          {
+            "id": "snn_drag_1",
+            "instruction": "Перетащи слова по категориям",
+            "prompt": "Распредели слова по корзинам: is / are / is / are",
+            "bins": [
+              "is",
+              "are",
+              "is / are"
+            ],
+            "words": [
+              {
+                "text": "news",
+                "bin": "is"
+              },
+              {
+                "text": "money",
+                "bin": "is"
+              },
+              {
+                "text": "physics",
+                "bin": "is"
+              },
+              {
+                "text": "people",
+                "bin": "are"
+              },
+              {
+                "text": "scissors",
+                "bin": "are"
+              },
+              {
+                "text": "police",
+                "bin": "are"
+              },
+              {
+                "text": "jeans",
+                "bin": "are"
+              },
+              {
+                "text": "series",
+                "bin": "is / are"
+              },
+              {
+                "text": "species",
+                "bin": "is / are"
+              },
+              {
+                "text": "sheep",
+                "bin": "is / are"
+              },
+              {
+                "text": "deer",
+                "bin": "is / are"
+              }
+            ],
+            "explain": "Сначала определи тип существительного: singular-only -> is, plural-only -> are, одинаковая форма -> is / are по контексту."
           }
         ]
       },
