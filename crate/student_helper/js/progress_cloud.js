@@ -5,7 +5,8 @@
 
   const EXACT_KEYS = [
     'sh_tenses_ui_v1',
-    'sh_tenses_daily_v1'
+    'sh_tenses_daily_v1',
+    'sh_library_v1'
   ];
 
   const PREFIX_KEYS = [

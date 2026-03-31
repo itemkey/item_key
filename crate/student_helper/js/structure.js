@@ -14,6 +14,7 @@
   const subEl = document.getElementById('structSubtitle');
   const masteryBadge = document.getElementById('structMasteryBadge');
   const btnStartTop = document.getElementById('structStartPracticeTop');
+  const btnAddToLibrary = document.getElementById('structAddToLibraryBtn');
 
   const tabRule = document.getElementById('struct-tab-rule');
   const tabPractice = document.getElementById('struct-tab-practice');
@@ -699,6 +700,22 @@
     masteryBadge.title = masteryLabel(p.mastery || 0);
   }
 
+  function addCurrentToLibrary(){
+    if (!currentId) return;
+    const s = REG.byId[currentId];
+    if (!s) return;
+    const lib = window.StudentHelperLibrary;
+    if (!lib) return;
+    const payload = {
+      source: 'structure',
+      id: String(s.id || currentId),
+      title: String(s.title || currentId),
+      subtitle: String(s.subtitle || '')
+    };
+    if (typeof lib.quickAddWithPicker === 'function') lib.quickAddWithPicker(payload);
+    else if (typeof lib.quickAdd === 'function') lib.quickAdd(payload);
+  }
+
   // -------------------------
   // Events
   // -------------------------
@@ -713,6 +730,29 @@
     if (s) renderPracticeHome(s);
     const btn = practiceBody.querySelector('#structStartFull');
     btn && btn.click();
+  });
+
+  btnAddToLibrary && btnAddToLibrary.addEventListener('click', addCurrentToLibrary);
+
+  document.addEventListener('sh:library-open', (e)=>{
+    const detail = e && e.detail ? e.detail : {};
+    if (String(detail.source || '').toLowerCase() !== 'structure') return;
+    const id = String(detail.id || '').trim();
+    if (!id || !REG.byId[id]) return;
+    openStructure(id);
+    setSubTab('rule');
+  });
+
+  document.addEventListener('sh:library-practice', (e)=>{
+    const detail = e && e.detail ? e.detail : {};
+    if (String(detail.source || '').toLowerCase() !== 'structure') return;
+    const ids = Array.isArray(detail.ids) ? detail.ids : [];
+    const id = String(ids[0] || detail.id || '').trim();
+    if (!id || !REG.byId[id]) return;
+    openStructure(id);
+    setSubTab('practice');
+    const btn = practiceBody.querySelector('#structStartFull');
+    if (btn) btn.click();
   });
 
   // Init

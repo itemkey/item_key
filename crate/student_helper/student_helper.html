@@ -21,7 +21,7 @@
   <!-- Match main site look -->
   <link rel="stylesheet" href="../../assets/css/styles.css" />
 
-  <link rel="stylesheet" href="./student_helper.css?v=20260331-06" />
+  <link rel="stylesheet" href="./student_helper.css?v=20260331-10" />
 
 <style id="ik-site-nav-css">
 .ik-site-nav, .ik-site-nav *{ box-sizing: border-box; }
@@ -252,10 +252,62 @@
           <p class="ik-title">обучение</p>
 
           <div class="ik-tabs" role="tablist" aria-label="Разделы">
+            <button class="ik-tab" id="tab-library" role="tab" aria-selected="false" aria-controls="panel-library" type="button">библиотека</button>
             <button class="ik-tab" id="tab-dict" role="tab" aria-selected="false" aria-controls="panel-dict" type="button">dictionary</button>
             <button class="ik-tab" id="tab-struct" role="tab" aria-selected="false" aria-controls="panel-struct" type="button" hidden>structure</button>
             <button class="ik-tab" id="tab-tenses" role="tab" aria-selected="false" aria-controls="panel-tenses" type="button">grammar</button>
 <button class="ik-tab" id="tab-wt" role="tab" aria-selected="true" aria-controls="panel-wt" type="button">word transformation</button>
+          </div>
+
+          <div id="panel-library" role="tabpanel" aria-labelledby="tab-library" hidden>
+            <div class="ik-row">
+              <span class="ik-badge" id="libraryCountBadge">library: 0</span>
+              <span class="ik-spacer" aria-hidden="true"></span>
+              <span class="ik-pill" title="Библиотека хранится в браузере (localStorage)">
+                <span>library</span>
+                <span id="libraryStatus" class="ik-muted">ready</span>
+              </span>
+            </div>
+
+            <div class="ik-divider"></div>
+
+            <section class="ik-ex" aria-label="Библиотека пользователя">
+              <p class="ik-title">библиотека пользователя</p>
+              <p class="ik-sub">создавай свои категории и добавляй туда нужные правила из grammar / structure / word transformation</p>
+
+              <div class="sh-library-layout">
+                <aside class="sh-library-categories" aria-label="Категории библиотеки">
+                  <div class="ik-row">
+                    <input class="ik-input" id="libraryNewCategoryInput" type="text" autocomplete="off" spellcheck="false" placeholder="новая категория" />
+                    <button class="ik-btn" id="libraryAddCategoryBtn" type="button">создать</button>
+                  </div>
+
+                  <div class="ik-row" style="margin-top:8px;">
+                    <button class="ik-btn" id="libraryRenameCategoryBtn" type="button">переименовать</button>
+                    <button class="ik-btn" id="libraryDeleteCategoryBtn" type="button">удалить</button>
+                  </div>
+
+                  <ul class="ik-list" id="libraryCategoryList" aria-label="Список категорий"></ul>
+                  <p class="ik-footnote">подсказка: в любом разделе нажми «в библиотеку», чтобы быстро сохранить правило</p>
+                </aside>
+
+                <section class="sh-library-items" aria-label="Элементы категории">
+                  <div class="ik-row">
+                    <p class="ik-title" id="libraryActiveCategoryTitle">категория: —</p>
+                    <span class="ik-spacer" aria-hidden="true"></span>
+                    <input class="ik-input" id="libraryItemSearchInput" type="search" autocomplete="off" spellcheck="false" placeholder="поиск внутри категории" />
+                  </div>
+
+                  <div class="ik-row" style="margin-top:8px;">
+                    <button class="ik-btn ik-btn--black" id="libraryStartCategoryPracticeBtn" type="button">практика по категории</button>
+                    <button class="ik-btn" id="libraryClearCategoryBtn" type="button">очистить категорию</button>
+                  </div>
+
+                  <ul class="ik-list" id="libraryItemList" aria-label="Элементы библиотеки"></ul>
+                  <p class="ik-footnote" id="libraryEmptyHint">в категории пока ничего нет</p>
+                </section>
+              </div>
+            </section>
           </div>
 
           <div id="panel-dict" role="tabpanel" aria-labelledby="tab-dict" hidden>
@@ -682,6 +734,7 @@
                   <p class="ik-sub" id="structSubtitle">...</p>
                 </div>
                 <span class="ik-spacer" aria-hidden="true"></span>
+                <button class="ik-btn" id="structAddToLibraryBtn" type="button">в библиотеку</button>
                 <button class="ik-btn ik-btn--black" id="structStartPracticeTop" type="button">start practice</button>
               </div>
 
@@ -1033,6 +1086,7 @@
                 <button class="ik-btn" id="tensesBackToList" type="button">назад</button>
                 <button class="ik-btn" id="tensesBackToRunFromDetail" type="button" hidden>вернуться к упражнению</button>
                 <span class="ik-spacer" aria-hidden="true"></span>
+                <button class="ik-btn" id="tensesAddToLibraryBtn" type="button">в библиотеку</button>
                 <button class="ik-btn ik-btn--black" id="tensesGoPracticeFromDetail" type="button" hidden>упражнения по теме</button>
               </div>
 
@@ -1260,6 +1314,9 @@
             <div id="panel-rule" role="tabpanel" aria-labelledby="subtab-rule">
               <section class="ik-ex" aria-label="Правило">
                 <p class="ik-title">правило</p>
+                <div class="ik-row" style="margin-top:8px; margin-bottom:8px;">
+                  <button class="ik-btn" id="wtAddRuleToLibraryBtn" type="button">в библиотеку</button>
+                </div>
                 <div class="ik-rule is-open" id="rulePanel" aria-label="Rule" aria-hidden="false">
                   <p class="ik-sub" id="ruleTitle">rule</p>
                   <div id="ruleBody"></div>
@@ -1440,7 +1497,7 @@
   <script src="../../assets/js/theme.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../../assets/js/supabase-client.js"></script>
-  <script src="./js/tabs.js?v=20260314-02"></script>
+  <script src="./js/tabs.js?v=20260331-03"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function(){
       var backBtn = document.getElementById('ikBackBtn');
@@ -1480,11 +1537,12 @@
       }
     });
   </script>
-  <script src="./js/lobby.js?v=20260314-02"></script>
+  <script src="./js/lobby.js?v=20260331-03"></script>
+  <script src="./js/library.js?v=20260331-03"></script>
   <script src="./js/structure_data.js"></script>
-  <script src="./js/structure.js"></script>
-  <script src="./js/tenses.js?v=20260331-07"></script>
-  <script src="./js/word_transformation.js?v=20260317-01"></script>
+  <script src="./js/structure.js?v=20260331-01"></script>
+  <script src="./js/tenses.js?v=20260331-09"></script>
+  <script src="./js/word_transformation.js?v=20260331-02"></script>
   <script src="./js/dictionary.js" onerror="window.IKAdminLog && window.IKAdminLog('error','student_helper','dictionary.js failed to load')"></script>
   <script>
     (function(){

@@ -2,11 +2,13 @@
 // Tabs (main + WT subtabs)
 // -----------------------------
 (function(){
+  const tabLibrary = document.getElementById('tab-library');
   const tabDict   = document.getElementById('tab-dict');
   const tabStruct = document.getElementById('tab-struct');
   const tabTenses = document.getElementById('tab-tenses');
   const tabWT     = document.getElementById('tab-wt');
 
+  const panelLibrary = document.getElementById('panel-library');
   const panelDict   = document.getElementById('panel-dict');
   const panelStruct = document.getElementById('panel-struct');
   const panelTenses = document.getElementById('panel-tenses');
@@ -14,16 +16,19 @@
 
   function setMainTab(which){
     const w =
+      (which === 'library') ? 'library' :
       (which === 'struct') ? 'struct' :
       (which === 'tenses') ? 'tenses' :
       (which === 'wt') ? 'wt' :
       'dict';
 
+    if (tabLibrary) tabLibrary.setAttribute('aria-selected', String(w === 'library'));
     if (tabDict)   tabDict.setAttribute('aria-selected', String(w === 'dict'));
     if (tabStruct) tabStruct.setAttribute('aria-selected', String(w === 'struct'));
     if (tabTenses) tabTenses.setAttribute('aria-selected', String(w === 'tenses'));
     if (tabWT)     tabWT.setAttribute('aria-selected', String(w === 'wt'));
 
+    if (panelLibrary) panelLibrary.hidden = (w !== 'library');
     if (panelDict)   panelDict.hidden   = (w !== 'dict');
     if (panelStruct) panelStruct.hidden = (w !== 'struct');
     if (panelTenses) panelTenses.hidden = (w !== 'tenses');
@@ -35,6 +40,7 @@
   }
 
   function getMainTab(){
+    if (panelLibrary && !panelLibrary.hidden) return 'library';
     if (panelStruct && !panelStruct.hidden) return 'struct';
     if (panelTenses && !panelTenses.hidden) return 'tenses';
     if (panelWT && !panelWT.hidden) return 'wt';
@@ -53,6 +59,7 @@
     fallback();
   }
 
+  if (tabLibrary) tabLibrary.addEventListener('click', ()=> goRouteOrFallback('library', ()=> setMainTab('library')));
   if (tabDict) tabDict.addEventListener('click', ()=> goRouteOrFallback('dict', ()=> setMainTab('dict')));
   if (tabStruct) tabStruct.addEventListener('click', ()=> goRouteOrFallback('struct', ()=> setMainTab('struct')));
   if (tabTenses) tabTenses.addEventListener('click', ()=> goRouteOrFallback('tenses', ()=> setMainTab('tenses')));
@@ -60,6 +67,7 @@
 
   // Init from markup
   let init = 'dict';
+  if (tabLibrary && tabLibrary.getAttribute('aria-selected') === 'true') init = 'library';
   if (tabStruct && tabStruct.getAttribute('aria-selected') === 'true') init = 'struct';
   if (tabTenses && tabTenses.getAttribute('aria-selected') === 'true') init = 'tenses';
   if (tabWT && tabWT.getAttribute('aria-selected') === 'true') init = 'wt';

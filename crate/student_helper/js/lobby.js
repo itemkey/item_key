@@ -10,7 +10,7 @@
 
   const KEY_LAST = 'sh_last_module';
   const KEY_SEEN = 'sh_seen_lobby';
-  const VALID_ROUTES = new Set(['menu', 'dict', 'grammar', 'struct', 'tenses', 'wt', 'wt-rule', 'wt-practice', 'wt-text', 'wt-builder']);
+  const VALID_ROUTES = new Set(['menu', 'library', 'dict', 'grammar', 'struct', 'tenses', 'wt', 'wt-rule', 'wt-practice', 'wt-text', 'wt-builder']);
 
   let ignoreNextHashChange = false;
 
@@ -82,6 +82,7 @@
     if (btnContinue){
       btnContinue.hidden = !last;
       if (last === 'dict') btnContinue.textContent = 'продолжить: dictionary';
+      if (last === 'library') btnContinue.textContent = 'продолжить: библиотека';
       if (last === 'grammar' || last === 'struct' || last === 'tenses') btnContinue.textContent = 'продолжить: grammar';
       if (last === 'wt') btnContinue.textContent = 'продолжить: word transformation';
     }
@@ -103,6 +104,7 @@
     const parsed = parseRoute(mod) || { main: 'dict', wtSubtab: '' };
 
     const module =
+      (parsed.main === 'library') ? 'library' :
       (parsed.main === 'grammar') ? 'grammar' :
       (parsed.main === 'wt') ? 'wt' :
       (parsed.main === 'struct' || parsed.main === 'tenses') ? 'grammar' :
@@ -165,6 +167,7 @@
     if(window.StudentHelperTabs && typeof window.StudentHelperTabs.getMainTab === 'function'){
       main = window.StudentHelperTabs.getMainTab() || 'dict';
     }
+    if(main === 'library') return 'library';
     if(main === 'tenses' || main === 'struct') return 'grammar';
     if(main !== 'wt') return main;
 

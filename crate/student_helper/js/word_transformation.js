@@ -1354,6 +1354,7 @@ async function fetchJson(relPath){
   const btnTextReveal = document.getElementById('btnTextReveal');
   const btnTextCheckNext = document.getElementById('btnTextCheckNext');
   const btnTextShowAnswer = document.getElementById('btnTextShowAnswer');
+  const btnWtAddToLibrary = document.getElementById('wtAddRuleToLibraryBtn');
 
   const adminStatus = {};
   function setAdminText(el, text, label){
@@ -1530,6 +1531,32 @@ async function fetchJson(relPath){
 
   function currentRuleTypeIds(){
     return getEffectiveTypeIds();
+  }
+
+  function setCustomTypes(typeIds){
+    const next = normalizeWtTypeIds(typeIds);
+    if(!next.length) return false;
+    wtCustomTypeIds = next;
+    saveWtCustomTypes(wtCustomTypeIds);
+    setWtMode(WT_MODE_CUSTOM);
+    ensurePrimaryTransformType();
+    refreshAfterScopeChange();
+    return true;
+  }
+
+  function addCurrentRuleToLibrary(){
+    const lib = window.StudentHelperLibrary;
+    if(!lib) return;
+    const typeId = normTransformType(transformType);
+    if(!typeId) return;
+    const payload = {
+      source: 'wt',
+      id: typeId,
+      title: wtTypeLabel(typeId),
+      subtitle: wtText('правило word transformation', 'word transformation rule')
+    };
+    if(typeof lib.quickAddWithPicker === 'function') lib.quickAddWithPicker(payload);
+    else if(typeof lib.quickAdd === 'function') lib.quickAdd(payload);
   }
 
   function refreshAfterScopeChange(){
@@ -2485,6 +2512,7 @@ async function fetchJson(relPath){
     applyWtModeUi();
     refreshAfterScopeChange();
   });
+  btnWtAddToLibrary && btnWtAddToLibrary.addEventListener('click', addCurrentRuleToLibrary);
 
   elAnswer.addEventListener('keydown', (e)=>{
     if(e.key === 'Enter'){
@@ -2525,6 +2553,29 @@ if(e.key.toLowerCase() === 't'){
     const detail = e && e.detail ? e.detail : {};
     if(detail.main !== 'wt') return;
     syncBuilderTypeControlVisibility();
+  });
+
+  document.addEventListener('sh:library-open', (e)=>{
+    const detail = e && e.detail ? e.detail : {};
+    if(String(detail.source || '').toLowerCase() !== 'wt') return;
+    const id = String(detail.id || '').trim();
+    if(!id) return;
+    if(!setCustomTypes([id])) return;
+    if(window.StudentHelperTabs && typeof window.StudentHelperTabs.setWTSubTab === 'function'){
+      window.StudentHelperTabs.setWTSubTab('rule');
+    }
+  });
+
+  document.addEventListener('sh:library-practice', (e)=>{
+    const detail = e && e.detail ? e.detail : {};
+    if(String(detail.source || '').toLowerCase() !== 'wt') return;
+    const ids = Array.isArray(detail.ids) ? detail.ids : [detail.id];
+    if(!setCustomTypes(ids)) return;
+    if(window.StudentHelperTabs && typeof window.StudentHelperTabs.setWTSubTab === 'function'){
+      window.StudentHelperTabs.setWTSubTab('practice');
+    }
+    resetPracticeSession();
+    goNext();
   });
 
   elPracticeCategory.addEventListener('change', ()=>{

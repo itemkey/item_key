@@ -161,6 +161,7 @@
 
   const btnBackToList = document.getElementById('tensesBackToList');
   const btnBackToRunFromDetail = document.getElementById('tensesBackToRunFromDetail');
+  const btnAddToLibrary = document.getElementById('tensesAddToLibraryBtn');
   const btnGoPracticeFromDetail = document.getElementById('tensesGoPracticeFromDetail');
   const btnGoPracticeBottom = document.getElementById('tensesGoPracticeBottom');
 
@@ -841,7 +842,7 @@
   function normalizeHeadingKey(text){
     return String(text || '')
       .toLowerCase()
-      .replace(/^\d+\.\s*/,'')
+      .replace(/^\d+\s*[\.)\-:]*\s*/,'')
       .replace(/[^a-zа-яё0-9]+/gi,'-')
       .replace(/^-+|-+$/g,'');
   }
@@ -3408,106 +3409,88 @@
     }
   }
 
-  function blockTextRaw(block){
-    if (!block || typeof block !== 'object') return '';
-    const parts = [];
-    if (block.type === 'heading' || block.type === 'text') parts.push(block.text || '');
-    if (block.type === 'highlight'){
-      parts.push(block.title || '');
-      if (Array.isArray(block.lines)) parts.push(block.lines.join(' '));
-    }
-    if (block.type === 'table'){
-      parts.push(block.caption || '');
-      if (Array.isArray(block.columns)) parts.push(block.columns.join(' '));
-      if (Array.isArray(block.rows)) parts.push(block.rows.flat().join(' '));
-    }
-    if (block.type === 'examples' && Array.isArray(block.items)){
-      for (const it of block.items) parts.push(it?.en || '', it?.ru || '');
-    }
-    if (block.type === 'topicLinks'){
-      parts.push(block.title || '', block.note || '');
-      if (Array.isArray(block.items)){
-        for (const it of block.items) parts.push(it?.label || '', it?.note || '');
-      }
-    }
-    return normalizeSearchText(parts.filter(Boolean).join(' '));
+  function cleanInlineText(text){
+    return String(text || '').replace(/\s+/g, ' ').trim();
   }
 
-  function blockHas(text, needles){
-    const src = String(text || '');
-    return (needles || []).some((n)=> src.includes(n));
+  function trimPreviewText(text, maxLen){
+    const src = cleanInlineText(text);
+    if (!src) return '';
+    const limit = Math.max(24, Number(maxLen) || 160);
+    if (src.length <= limit) return src;
+    return `${src.slice(0, limit - 1).trimEnd()}…`;
   }
 
-  function classifyRuleBlocks(blocks){
-    const buckets = {
-      essence: [],
-      usage: [],
-      form: [],
-      markers: [],
-      compare: [],
-      mistakes: [],
-      examples: [],
-      mini: [],
-      related: [],
-      extra: []
-    };
+  function makeUniqueAnchor(base, used){
+    const root = String(base || '').trim() || 'section';
+    let key = root;
+    let idx = 2;
+    while (used.has(key)){
+      key = `${root}-${idx}`;
+      idx += 1;
+    }
+    used.add(key);
+    return key;
+  }
 
-    for (const block of (blocks || [])){
+  function defaultTopicSectionTitle(index){
+    if (index <= 1) return isEnLang() ? 'Overview' : 'Обзор';
+    return isEnLang() ? `Section ${index}` : `Раздел ${index}`;
+  }
+
+  function extractTopicSections(blocks){
+    const source = Array.isArray(blocks) ? blocks : [];
+    const sections = [];
+    const usedAnchors = new Set();
+    let current = null;
+    let sectionIndex = 0;
+
+    function pushCurrent(){
+      if (!current) return;
+      if (current.title || current.blocks.length) sections.push(current);
+      current = null;
+    }
+
+    function openSection(rawTitle, fromHeading){
+      sectionIndex += 1;
+      const title = cleanInlineText(rawTitle);
+      const label = title || defaultTopicSectionTitle(sectionIndex);
+      const baseAnchor = normalizeHeadingKey(title || label) || `section-${sectionIndex}`;
+      const anchor = makeUniqueAnchor(baseAnchor, usedAnchors);
+      current = {
+        anchor,
+        title: label,
+        headingKey: (fromHeading && title) ? normalizeHeadingKey(title) : '',
+        blocks: []
+      };
+    }
+
+    for (const block of source){
       if (!block || typeof block !== 'object') continue;
-      if (block.type === 'topicLinks'){
-        buckets.related.push(block);
+      if (block.type === 'heading'){
+        pushCurrent();
+        openSection(block.text || '', true);
         continue;
       }
-      if (block.type === 'examples'){
-        buckets.examples.push(block);
-        continue;
-      }
+      if (!current) openSection('', false);
+      current.blocks.push(block);
+    }
+    pushCurrent();
 
-      const txt = blockTextRaw(block);
-
-      if (blockHas(txt, ['мини', 'проверк', 'чек', 'mini-check', 'mini check'])){
-        buckets.mini.push(block);
-      } else if (blockHas(txt, ['ошиб', 'ловуш', 'trap', 'wrong', 'типич'])){
-        buckets.mistakes.push(block);
-      } else if (blockHas(txt, ['сравн', 'разниц', 'contrast', ' vs ', 'пута', 'confus'])){
-        buckets.compare.push(block);
-      } else if (blockHas(txt, ['маркер', 'signal', 'marker', 'by ', 'for ', 'since', 'already', 'yet', 'just', 'ever', 'never'])){
-        buckets.markers.push(block);
-      } else if (blockHas(txt, ['формул', 'formula', 'схема', 'form ', 'v1', 'v2', 'v3', 'be +', 'have +', 'строит'])){
-        buckets.form.push(block);
-      } else if (blockHas(txt, ['когда', 'использ', 'when ', 'use ', 'usage'])){
-        buckets.usage.push(block);
-      } else if (blockHas(txt, ['что такое', 'что это', 'знач', 'meaning', 'идея', 'what is'])){
-        buckets.essence.push(block);
-      } else {
-        buckets.extra.push(block);
-      }
+    if (!sections.length){
+      sections.push({
+        anchor: 'section-1',
+        title: defaultTopicSectionTitle(1),
+        headingKey: '',
+        blocks: []
+      });
     }
 
-    const fallbackKeys = ['essence', 'usage', 'form', 'markers', 'compare', 'mistakes', 'mini'];
-    for (const key of fallbackKeys){
-      if (!buckets[key].length && buckets.extra.length){
-        buckets[key].push(buckets.extra.shift());
-      }
-    }
-    if (buckets.extra.length){
-      buckets.form.push(...buckets.extra);
-      buckets.extra = [];
-    }
-
-    return buckets;
+    return sections;
   }
 
   function topicSectionTitle(key){
     const map = {
-      essence: { ru: 'Что это означает', en: 'What this means' },
-      usage: { ru: 'Когда использовать', en: 'When to use' },
-      form: { ru: 'Как строится форма', en: 'Form' },
-      markers: { ru: 'Маркеры и сигналы', en: 'Markers and signals' },
-      compare: { ru: 'С чем путают', en: 'Common contrasts' },
-      mistakes: { ru: 'Типичные ошибки', en: 'Typical mistakes' },
-      examples: { ru: 'Примеры', en: 'Examples' },
-      mini: { ru: 'Мини-проверка', en: 'Mini-check' },
       practice: { ru: 'Практика', en: 'Practice' },
       related: { ru: 'Связанные темы', en: 'Related topics' }
     };
@@ -3515,14 +3498,60 @@
     return isEnLang() ? (dict.en || dict.ru) : (dict.ru || dict.en);
   }
 
-  function firstMeaningLine(blocks){
-    for (const b of (blocks || [])){
-      if (b.type === 'text' && b.text) return String(b.text);
-      if (b.type === 'heading' && b.text) return String(b.text);
-      if (b.type === 'highlight' && Array.isArray(b.lines) && b.lines.length) return String(b.lines[0]);
-      if (b.type === 'table' && Array.isArray(b.rows) && b.rows.length && Array.isArray(b.rows[0]) && b.rows[0].length){
-        return String(b.rows[0].join(' - '));
+  function blockPreviewText(block){
+    if (!block || typeof block !== 'object') return '';
+
+    if (block.type === 'text'){
+      return cleanInlineText(block.text || '');
+    }
+
+    if (block.type === 'highlight'){
+      if (Array.isArray(block.lines)){
+        for (const line of block.lines){
+          const text = cleanInlineText(line);
+          if (text) return text;
+        }
       }
+      return cleanInlineText(block.title || '');
+    }
+
+    if (block.type === 'table'){
+      const caption = cleanInlineText(block.caption || '');
+      if (caption) return caption;
+      if (Array.isArray(block.columns) && block.columns.length){
+        return cleanInlineText(block.columns.slice(0, 3).join(' • '));
+      }
+      return '';
+    }
+
+    if (block.type === 'examples' && Array.isArray(block.items) && block.items.length){
+      const first = block.items[0] || {};
+      const en = cleanInlineText(first.en || '');
+      const ru = cleanInlineText(first.ru || '');
+      if (en && ru) return `${en} — ${ru}`;
+      return en || ru;
+    }
+
+    if (block.type === 'topicLinks'){
+      const note = cleanInlineText(block.note || '');
+      if (note) return note;
+      const title = cleanInlineText(block.title || '');
+      if (title) return title;
+      if (Array.isArray(block.items) && block.items.length){
+        const first = block.items[0] || {};
+        return cleanInlineText(first.note || first.label || first.id || '');
+      }
+      return '';
+    }
+
+    return '';
+  }
+
+  function sectionPreviewText(section){
+    const blocks = Array.isArray(section?.blocks) ? section.blocks : [];
+    for (const block of blocks){
+      const preview = blockPreviewText(block);
+      if (preview) return trimPreviewText(preview, 170);
     }
     return '';
   }
@@ -3565,29 +3594,41 @@
     window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
   }
 
-  function renderTopicLocalNav(keys){
+  function renderTopicLocalNav(items){
     if (!tenseLocalNav) return;
     tenseLocalNav.innerHTML = '';
-    const uniqKeys = [];
+    const navItems = [];
     const seen = new Set();
-    for (const key of (keys || [])){
-      if (!key || seen.has(key)) continue;
-      seen.add(key);
-      uniqKeys.push(key);
+
+    for (const raw of (items || [])){
+      const anchor = cleanInlineText(typeof raw === 'string' ? raw : (raw?.anchor || raw?.key || ''));
+      if (!anchor || seen.has(anchor)) continue;
+      seen.add(anchor);
+
+      const labelText = (typeof raw === 'string')
+        ? topicSectionTitle(raw)
+        : cleanInlineText(raw?.label || topicSectionTitle(anchor));
+
+      navItems.push({
+        anchor,
+        label: trimPreviewText(labelText || anchor, 80)
+      });
     }
-    if (!uniqKeys.length){
+
+    if (!navItems.length){
       tenseLocalNav.hidden = true;
       return;
     }
-    for (const key of uniqKeys){
+
+    for (const item of navItems){
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'sh-topic-nav__btn';
-      btn.textContent = topicSectionTitle(key);
+      btn.textContent = item.label;
       btn.addEventListener('click', ()=>{
         tenseLocalNav.querySelectorAll('.sh-topic-nav__btn').forEach((el)=> el.classList.remove('is-active'));
         btn.classList.add('is-active');
-        scrollToTopicAnchor(key);
+        scrollToTopicAnchor(item.anchor);
       });
       tenseLocalNav.appendChild(btn);
     }
@@ -3598,12 +3639,32 @@
 
   function renderTopicQuickAnswer(topic, sections){
     if (!tenseQuickAnswer) return;
-    const usageLine = firstMeaningLine(sections.usage) || topic?.subtitle || '';
-    const formLine = firstMeaningLine(sections.form) || firstMeaningLine(sections.markers) || '-';
-    const compareLine = firstMeaningLine(sections.compare) || '-';
-    const mistakeLine = firstMeaningLine(sections.mistakes) || '-';
+
+    const cards = [];
+    for (const section of (sections || [])){
+      const label = trimPreviewText(section?.title || '', 72);
+      const text = sectionPreviewText(section);
+      if (!label || !text) continue;
+      cards.push({ label, text });
+      if (cards.length >= 4) break;
+    }
+
+    if (!cards.length){
+      const fallback = trimPreviewText(topic?.subtitle || '', 170);
+      if (fallback){
+        cards.push({
+          label: isEnLang() ? 'overview' : 'обзор',
+          text: fallback
+        });
+      }
+    }
 
     tenseQuickAnswer.innerHTML = '';
+
+    if (!cards.length){
+      tenseQuickAnswer.hidden = true;
+      return;
+    }
 
     const title = document.createElement('p');
     title.className = 'sh-topic-quick__title';
@@ -3612,13 +3673,6 @@
 
     const grid = document.createElement('div');
     grid.className = 'sh-topic-quick__grid';
-
-    const cards = [
-      { label: isEnLang() ? 'when' : 'когда', text: usageLine },
-      { label: isEnLang() ? 'form' : 'как строится', text: formLine },
-      { label: isEnLang() ? 'contrast' : 'с чем путают', text: compareLine },
-      { label: isEnLang() ? 'mistake' : 'типичная ошибка', text: mistakeLine }
-    ];
 
     for (const item of cards){
       const card = document.createElement('div');
@@ -3713,49 +3767,54 @@
 
   function renderTopicTemplate(topic, meta, blocks){
     if (!ruleBody) return;
-    const sectionBlocks = classifyRuleBlocks(blocks);
-    renderTopicQuickAnswer(topic, sectionBlocks);
+    const sections = extractTopicSections(blocks);
+    renderTopicQuickAnswer(topic, sections);
 
     const shell = document.createElement('div');
 
-    const order = ['essence', 'usage', 'form', 'markers', 'compare', 'mistakes', 'examples', 'mini'];
-    const navKeys = [];
+    const navItems = [];
 
-    for (const key of order){
-      const list = sectionBlocks[key] || [];
-      if (!list.length) continue;
-      navKeys.push(key);
+    for (const sectionInfo of sections){
+      const blocksForSection = Array.isArray(sectionInfo.blocks) ? sectionInfo.blocks : [];
+      if (!sectionInfo.title && !blocksForSection.length) continue;
 
       const section = document.createElement('section');
       section.className = 'sh-topic-section';
-      section.setAttribute('data-topic-anchor', key);
+      section.setAttribute('data-topic-anchor', sectionInfo.anchor);
 
       const title = document.createElement('p');
       title.className = 'sh-topic-section__title';
-      title.textContent = topicSectionTitle(key);
+      title.textContent = sectionInfo.title;
+      if (currentId === BASIC_OVERVIEW_ID && sectionInfo.headingKey){
+        title.setAttribute('data-basic-heading-key', sectionInfo.headingKey);
+      }
       section.appendChild(title);
 
-      const body = document.createElement('div');
-      renderRuleBlocks(body, list);
-      section.appendChild(body);
+      if (blocksForSection.length){
+        const body = document.createElement('div');
+        renderRuleBlocks(body, blocksForSection);
+        section.appendChild(body);
+      }
+
       shell.appendChild(section);
+      navItems.push({ anchor: sectionInfo.anchor, label: sectionInfo.title });
     }
 
     const practice = buildTopicPracticeBlock(topic);
     if (practice){
-      navKeys.push('practice');
+      navItems.push({ anchor: 'practice', label: topicSectionTitle('practice') });
       shell.appendChild(practice);
     }
 
     const related = buildTopicRelatedBlock(blocks);
     if (related){
-      navKeys.push('related');
+      navItems.push({ anchor: 'related', label: topicSectionTitle('related') });
       shell.appendChild(related);
     }
 
     ruleBody.innerHTML = '';
     ruleBody.appendChild(shell);
-    renderTopicLocalNav(navKeys);
+    renderTopicLocalNav(navItems);
 
     if (tenseMetaType){
       const type = resolveMetaEntityType(meta || topic || {});
@@ -7841,12 +7900,29 @@ btnResetProgress && btnResetProgress.addEventListener('click', ()=>{
     renderPracticeInfo();
   }
 
+  function addCurrentTopicToLibrary(){
+    if (!currentId) return;
+    const lib = window.StudentHelperLibrary;
+    if (!lib) return;
+    const meta = getMetaById(currentId) || REG.byId[currentId];
+    if (!meta || !meta.id) return;
+    const payload = {
+      source: 'tenses',
+      id: String(meta.id),
+      title: String(meta.title || meta.id),
+      subtitle: String(meta.hint || meta.subtitle || '')
+    };
+    if (typeof lib.quickAddWithPicker === 'function') lib.quickAddWithPicker(payload);
+    else if (typeof lib.quickAdd === 'function') lib.quickAdd(payload);
+  }
+
   btnGoPracticeFromDetail && btnGoPracticeFromDetail.addEventListener('click', ()=>{
     if (currentId) goPracticeForTense(currentId);
   });
   btnGoPracticeBottom && btnGoPracticeBottom.addEventListener('click', ()=>{
     if (currentId) goPracticeForTense(currentId);
   });
+  btnAddToLibrary && btnAddToLibrary.addEventListener('click', addCurrentTopicToLibrary);
 
   goalSelect && goalSelect.addEventListener('change', ()=>{
     renderCustomStickySummary();
@@ -8279,6 +8355,30 @@ document.addEventListener('ik:languagechange', ()=>{
   }
   if (searchInput && searchInput.value.trim()) renderSearchResults(searchInput.value);
 });
+
+  document.addEventListener('sh:library-open', (e)=>{
+    const detail = e && e.detail ? e.detail : {};
+    if (String(detail.source || '').toLowerCase() !== 'tenses') return;
+    const id = String(detail.id || '').trim();
+    if (!id || !REG.byId[id]) return;
+    openTense(id);
+  });
+
+  document.addEventListener('sh:library-practice', (e)=>{
+    const detail = e && e.detail ? e.detail : {};
+    if (String(detail.source || '').toLowerCase() !== 'tenses') return;
+    const idsRaw = Array.isArray(detail.ids) ? detail.ids : [detail.id];
+    const ids = sanitizeCustomIds(idsRaw);
+    if (!ids.length) return;
+    if (!showPractice({ keepCurrentFilter: true, forceMode: 'custom', keepSourceTopic: false })) return;
+    saveCustomSelection(ids);
+    setPracticeMode('custom', { persist: true, rerender: false });
+    setPracticeSourceTopic(ids[0]);
+    renderPracticeInfo();
+    if (detail.autoStart !== false){
+      setTimeout(()=>{ btnStart && btnStart.click(); }, 0);
+    }
+  });
 
   // Init
   finderMode = normalizeFinderMode(finderMode);
