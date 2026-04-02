@@ -1,0 +1,799 @@
+<header class="ik-site-nav" id="ikSiteNav">
+    <button type="button" class="ik-site-nav__link" id="ikBackBtn" title="Вернуться назад">← Назад</button>
+    <a class="ik-site-nav__link" href="../../">Главное меню</a>
+  </header>
+
+  <div class="ik-hidden-ui" aria-hidden="true">
+    <button class="ik-btn" id="shHomeBtn" type="button" title="Главное меню">меню</button>
+    <span class="ik-pill" title="Локальная база IndexedDB (в браузере)">
+      <span>db</span>
+      <span id="dbStatus" class="ik-muted">...</span>
+    </span>
+  </div>
+
+  <main class="learn-stage" aria-label="Student Helper">
+    <div class="learn-wrap" data-ik-stage="content">
+
+      <section id="shLobby" class="ik-card sh-lobby" data-ik-stage="hero" aria-label="Главное меню">
+        <div class="ik-inner">
+          <p class="ik-title">student helper</p>
+          <p class="ik-sub">выбери раздел, чтобы начать</p>
+
+          <div class="sh-grid" role="list">
+            <button class="sh-tile" id="shGoDict" type="button" role="listitem" aria-label="Открыть dictionary">
+              <div class="sh-tile__head">dictionary</div>
+              <div class="sh-tile__body">карточки, practice, learn, constructor</div>
+              <div class="sh-tile__foot">перейти</div>
+            </button>
+
+            <button class="sh-tile" id="shGoGrammar" type="button" role="listitem" aria-label="Открыть grammar">
+              <div class="sh-tile__head">grammar</div>
+              <div class="sh-tile__body">грамматика: времена + структуры + практика</div>
+              <div class="sh-tile__foot">перейти</div>
+            </button>
+
+<button class="sh-tile" id="shGoWT" type="button" role="listitem" aria-label="Открыть word transformation">
+              <div class="sh-tile__head">word transformation</div>
+              <div class="sh-tile__body">practice и constructor для word forms</div>
+              <div class="sh-tile__foot">перейти</div>
+            </button>
+          </div>
+
+          <div class="ik-divider"></div>
+
+          <div class="ik-row sh-lobby-row">
+            <button class="ik-btn" id="shContinue" type="button" hidden>продолжить</button>
+            <span class="ik-spacer" aria-hidden="true"></span>
+            <p class="ik-footnote sh-lobby-note">можно вернуться сюда кнопкой "меню" сверху</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="shApp" class="ik-card" data-ik-stage="content" aria-label="Меню обучения" hidden>
+        <div class="ik-inner">
+          <p class="ik-title">обучение</p>
+
+          <div class="ik-tabs" role="tablist" aria-label="Разделы">
+            <button class="ik-tab" id="tab-library" role="tab" aria-selected="false" aria-controls="panel-library" type="button">библиотека</button>
+            <button class="ik-tab" id="tab-dict" role="tab" aria-selected="false" aria-controls="panel-dict" type="button">dictionary</button>
+            <button class="ik-tab" id="tab-struct" role="tab" aria-selected="false" aria-controls="panel-struct" type="button" hidden>structure</button>
+            <button class="ik-tab" id="tab-tenses" role="tab" aria-selected="false" aria-controls="panel-tenses" type="button">grammar</button>
+<button class="ik-tab" id="tab-wt" role="tab" aria-selected="true" aria-controls="panel-wt" type="button">word transformation</button>
+          </div>
+
+          <div id="panel-library" role="tabpanel" aria-labelledby="tab-library" hidden>
+            <div class="ik-row">
+              <span class="ik-badge" id="libraryCountBadge">library: 0</span>
+              <span class="ik-spacer" aria-hidden="true"></span>
+              <span class="ik-pill" title="Библиотека хранится в браузере (localStorage)">
+                <span>library</span>
+                <span id="libraryStatus" class="ik-muted">ready</span>
+              </span>
+            </div>
+
+            <div class="ik-divider"></div>
+
+            <section class="ik-ex" aria-label="Библиотека пользователя">
+              <p class="ik-title">библиотека пользователя</p>
+              <p class="ik-sub">создавай свои категории и добавляй туда нужные правила из grammar / structure / word transformation</p>
+
+              <div class="sh-library-layout">
+                <aside class="sh-library-categories" aria-label="Категории библиотеки">
+                  <div class="ik-row">
+                    <input class="ik-input" id="libraryNewCategoryInput" type="text" autocomplete="off" spellcheck="false" placeholder="новая категория" />
+                    <button class="ik-btn" id="libraryAddCategoryBtn" type="button">создать</button>
+                  </div>
+
+                  <div class="ik-row" style="margin-top:8px;">
+                    <button class="ik-btn" id="libraryRenameCategoryBtn" type="button">переименовать</button>
+                    <button class="ik-btn" id="libraryDeleteCategoryBtn" type="button">удалить</button>
+                  </div>
+
+                  <ul class="ik-list" id="libraryCategoryList" aria-label="Список категорий"></ul>
+                  <p class="ik-footnote">подсказка: в любом разделе нажми «в библиотеку», чтобы быстро сохранить правило</p>
+                </aside>
+
+                <section class="sh-library-items" aria-label="Элементы категории">
+                  <div class="ik-row">
+                    <p class="ik-title" id="libraryActiveCategoryTitle">категория: —</p>
+                    <span class="ik-spacer" aria-hidden="true"></span>
+                    <input class="ik-input" id="libraryItemSearchInput" type="search" autocomplete="off" spellcheck="false" placeholder="поиск внутри категории" />
+                  </div>
+
+                  <div class="ik-row" style="margin-top:8px;">
+                    <button class="ik-btn ik-btn--black" id="libraryStartCategoryPracticeBtn" type="button">практика по категории</button>
+                    <button class="ik-btn" id="libraryClearCategoryBtn" type="button">очистить категорию</button>
+                  </div>
+
+                  <ul class="ik-list" id="libraryItemList" aria-label="Элементы библиотеки"></ul>
+                  <p class="ik-footnote" id="libraryEmptyHint">в категории пока ничего нет</p>
+                </section>
+              </div>
+            </section>
+          </div>
+
+          <div id="panel-dict" role="tabpanel" aria-labelledby="tab-dict" hidden>
+            <div class="ik-row">
+              <span class="ik-badge" id="dictCountBadge">words: 0</span>
+              <span class="ik-badge ik-admin-indicator" id="dictSeedBadge" title="Автозагрузка json при пустой базе">json: ...</span>
+              <span class="ik-badge ik-admin-indicator" id="dictDbNameLine">db: ...</span>
+              <span class="ik-spacer" aria-hidden="true"></span>
+              <span class="ik-pill ik-admin-indicator" title="Локальная база IndexedDB (в браузере)">
+                <span>dict db</span>
+                <span id="dictDbStatus" class="ik-muted">...</span>
+              </span>
+            </div>
+
+            <div class="ik-divider"></div>
+
+            <section class="ik-ex" id="dictFirstPick" aria-label="Выбор раздела">
+              <p class="ik-title">dictionary</p>
+              <p class="ik-sub">выбери раздел чтобы начать</p>
+
+              <div class="ik-row" style="margin-top:8px;">
+                <input class="ik-input" id="dictFirstPickSearch" type="text" placeholder="поиск..." />
+                <span class="ik-spacer" aria-hidden="true"></span>
+                <button class="ik-btn" id="dictFirstPickOpenConstructor" type="button" title="Открыть constructor">constructor</button>
+              </div>
+
+              <div class="ik-divider"></div>
+
+              <ul class="ik-list" id="dictFirstPickList" aria-label="Список разделов"></ul>
+
+              <p class="ik-footnote">подсказка: позже можно сменить раздел через кнопку "разделы" в cards</p>
+            </section>
+
+            <div id="dictSubtabsWrap" hidden>
+            <div class="ik-tabs" role="tablist" aria-label="Режимы dictionary">
+              <button class="ik-btn" id="dictCardsChooseSection" type="button" title="Выбрать раздел">разделы</button>
+              <button class="ik-tab" id="dict-tab-view" role="tab" aria-selected="false" aria-controls="dict-panel-view" type="button">просмотр</button>
+              <button class="ik-tab" id="dict-tab-cards" role="tab" aria-selected="true" aria-controls="dict-panel-cards" type="button">cards</button>
+              <button class="ik-tab" id="dict-tab-learn" role="tab" aria-selected="false" aria-controls="dict-panel-learn" type="button">learn</button>
+              <button class="ik-tab" id="dict-tab-quiz" role="tab" aria-selected="false" aria-controls="dict-panel-quiz" type="button">practice</button>
+<button class="ik-tab" id="dict-tab-builder" role="tab" aria-selected="false" aria-controls="dict-panel-builder" type="button">constructor</button>
+            </div>
+
+            <!-- CARDS -->
+            <div id="dict-panel-cards" role="tabpanel" aria-labelledby="dict-tab-cards">
+              <section class="ik-ex" aria-label="Карточки">
+                <p class="ik-title">карточки</p>
+
+                <div class="ik-row">
+                  <button class="ik-btn" id="dictCardsPrev" type="button" title="Предыдущая карточка">назад</button>
+                  <button class="ik-btn ik-btn--black" id="dictCardsNext" type="button" title="Следующая карточка">далее</button>
+
+                  <label class="ik-label">
+                    <input type="checkbox" id="dictCardsRandom" checked />
+                    random
+                  </label>
+
+                  <label class="ik-label" for="dictCardsFront">front</label>
+                  <select class="ik-select" id="dictCardsFront" style="min-width: 180px;">
+                    <option value="en">англ</option>
+                    <option value="ru">рус</option>
+                    <option value="mix">mix</option>
+                  </select>
+
+                  <span class="ik-spacer" aria-hidden="true"></span>
+
+                  <label class="ik-label" for="dictSectionCards">section</label>
+                  <select class="ik-select" id="dictSectionCards" style="min-width: 260px;"></select>
+                </div>
+
+                <div class="ik-divider"></div>
+
+                <p class="ik-prompt">нажми на карточку чтобы перевернуть</p>
+
+                <div class="ik-flip-stage" aria-label="Flashcard">
+                  <div class="ik-flip-card" id="dictFlipCard" tabindex="0" role="button" aria-pressed="false">
+                    <div class="ik-flip-inner">
+                      <div class="ik-flip-face ik-flip-front">
+                        <p class="ik-word" id="dictCardFront">...</p>
+                        <p class="ik-sub ik-muted" id="dictCardFrontLang">...</p>
+                      </div>
+                      <div class="ik-flip-face ik-flip-back">
+                        <p class="ik-word" id="dictCardBack">...</p>
+                        <p class="ik-sub ik-muted" id="dictCardBackLang">...</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <p class="ik-footnote" id="dictCardsMeta">...</p>
+                <div class="ik-row" id="dictCardsDoneRow" style="display:none; justify-content:center; gap:10px; margin-top:8px;" hidden>
+                  <span class="ik-footnote">вы просмотрели все слова</span>
+                  <button class="ik-btn ik-btn--black" id="dictCardsRestart" type="button">еще раз</button>
+                </div>
+              </section>
+            </div>
+
+            <!-- PRACTICE -->
+            <div id="dict-panel-quiz" role="tabpanel" aria-labelledby="dict-tab-quiz" hidden>
+              <section class="ik-ex" aria-label="Практика">
+                <p class="ik-title">практика</p>
+
+                <div class="ik-row">
+                  <label class="ik-label" for="dictQuizMode">направление</label>
+                  <select class="ik-select" id="dictQuizMode" style="min-width: 180px;">
+                    <option value="en">EN -> RU</option><option value="ru">RU -> EN</option><option value="mix">mix</option><option value="weak">по слабым</option></select>
+
+                  <span class="ik-badge" id="dictQuizScore">0/0</span>
+
+                  <button class="ik-btn" id="dictPracticeSettingsBtn" type="button" title="Настройки practice">⚙</button>
+
+                  <span class="ik-spacer" aria-hidden="true"></span>
+
+                  <label class="ik-label" for="dictSectionQuiz">section</label>
+                  <select class="ik-select" id="dictSectionQuiz" style="min-width: 260px;"></select>
+                  <button class="ik-btn" id="dictQuizChooseSection" type="button" title="Выбрать раздел">разделы</button>
+                </div>
+
+                <div id="dictPracticeSettings" style="display:none; margin: 10px 0 6px 0;">
+  <div class="ik-row" style="gap:12px; flex-wrap:wrap;">
+    <label class="ik-label" for="dictPracticeSession">сессия</label>
+    <select class="ik-select" id="dictPracticeSession" style="min-width: 120px;">
+      <option value="10">10</option>
+      <option value="20" selected>20</option>
+      <option value="50">50</option>
+      <option value="all">all</option>
+    </select>
+    <label class="ik-label" style="display:flex; align-items:center; gap:8px;">
+      <input type="checkbox" id="dictPracticeTypos" checked />
+      опечатки
+    </label>
+    <label class="ik-label" style="display:flex; align-items:center; gap:8px;">
+      <input type="checkbox" id="dictPracticeIgnoreTo" checked />
+      "to" не обяз.
+    </label>
+    <label class="ik-label" style="display:flex; align-items:center; gap:8px;">
+      <input type="checkbox" id="dictPracticeIgnoreArticles" checked />
+      артикли не обяз.
+    </label>
+  </div>
+  <p class="ik-footnote" style="margin-top:6px;">настройки сохраняются в браузере</p>
+</div>
+
+<div class="ik-divider"></div>
+
+                <p class="ik-prompt" id="dictQuizPromptLabel">переведи</p>
+
+                <div class="ik-flip-stage" aria-label="Quiz card">
+                  <div class="ik-flip-card" id="dictQuizCard" tabindex="0" role="button" aria-pressed="false" title="Нажми чтобы посмотреть ответ (после проверки)">
+                    <div class="ik-flip-inner">
+                      <div class="ik-flip-face ik-flip-front">
+                        <p class="ik-word" id="dictQuizFront">...</p>
+                        <p class="ik-sub ik-muted" id="dictQuizFrontLang">...</p>
+                      </div>
+                      <div class="ik-flip-face ik-flip-back">
+                        <p class="ik-word" id="dictQuizBack">...</p>
+                        <p class="ik-sub ik-muted" id="dictQuizBackLang">...</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="ik-row" style="margin-top:12px;">
+                  <input class="ik-input" id="dictQuizInput" type="text" autocomplete="off" spellcheck="false" placeholder="Ответ" />
+                  <button class="ik-btn ik-btn--black" id="dictQuizCheckNext" type="button" title="Check (Enter)">check</button>
+                  <button class="ik-btn" id="dictPracticeHint" type="button" title="Подсказка">hint</button>
+                  <button class="ik-btn" id="dictQuizSkip" type="button" title="Показать ответ (считается ошибкой)">сдаюсь</button>
+                </div>
+
+                <div class="ik-divider"></div>
+
+                <div class="ik-feedback" id="dictQuizFeedback" data-state="idle" aria-live="polite">
+                  <div class="ik-feedback__stamp" id="dictQuizStamp">ready</div>
+                  
+                <div class="ik-row" id="dictPracticeFuzzyActions" style="display:none; justify-content:center; gap:10px; margin-top:10px;">
+                  <button class="ik-btn ik-btn--black" id="dictPracticeFuzzyAccept" type="button">засчитать</button>
+                  <button class="ik-btn" id="dictPracticeFuzzyReject" type="button">не засчитывать</button>
+                </div>
+<p class="ik-feedback__line" id="dictQuizLine">введи перевод и нажми check</p>
+                </div>
+
+                <p class="ik-footnote">правило: после проверки переписать нельзя - только далее. неверные слова вернутся позже.</p>
+              </section>
+            </div>
+
+            
+            <!-- LEARN -->
+            <div id="dict-panel-learn" role="tabpanel" aria-labelledby="dict-tab-learn" hidden>
+              <section class="ik-ex" aria-label="Заучивание">
+                <p class="ik-title">заучивание</p>
+
+                <div class="ik-row">
+                  <span class="ik-badge" id="dictLearnProgress">0/0</span>
+
+                  <button class="ik-btn" id="dictLearnSettingsBtn" type="button" title="Настройки learn">⚙</button>
+
+                  <span class="ik-spacer" aria-hidden="true"></span>
+
+                  <label class="ik-label" for="dictSectionLearn">section</label>
+                  <select class="ik-select" id="dictSectionLearn" style="min-width: 260px;"></select>
+                  <button class="ik-btn" id="dictLearnChooseSection" type="button" title="Выбрать раздел">разделы</button>
+                </div>
+
+                <div id="dictLearnSettings" style="display:none; margin: 10px 0 6px 0;">
+                  <div class="ik-row" style="gap:12px; flex-wrap:wrap;">
+                    <label class="ik-label" for="dictLearnSource">источник</label>
+                    <select class="ik-select" id="dictLearnSource" style="min-width: 180px;">
+                      <option value="new" selected>новые</option>
+                      <option value="due">пора повторить</option>
+                      <option value="weak">слабые</option>
+                      <option value="all">все</option>
+                    </select>
+
+                    <label class="ik-label" for="dictLearnPortion">порция</label>
+                    <select class="ik-select" id="dictLearnPortion" style="min-width: 120px;">
+                      <option value="5">5</option>
+                      <option value="8" selected>8</option>
+                      <option value="10">10</option>
+                      <option value="12">12</option>
+                    </select>
+
+                    <label class="ik-label" for="dictLearnDir">направление</label>
+                    <select class="ik-select" id="dictLearnDir" style="min-width: 180px;">
+                      <option value="ru" selected>RU -> EN</option>
+                      <option value="en">EN -> RU</option>
+                      <option value="mix">mix</option>
+                      <option value="weak">по слабым</option>
+                    </select>
+
+                    <label class="ik-label" for="dictLearnGoal">цель</label>
+                    <select class="ik-select" id="dictLearnGoal" style="min-width: 180px;">
+                      <option value="fast" selected>быстро запомнить</option>
+                      <option value="long">закрепить надолго</option>
+                    </select>
+
+                    <label class="ik-label" for="dictLearnStrict">строгость</label>
+                    <select class="ik-select" id="dictLearnStrict" style="min-width: 140px;">
+                      <option value="soft" selected>мягко</option>
+                      <option value="strict">строго</option>
+                    </select>
+
+                    <label class="ik-label" style="display:flex; align-items:center; gap:8px;">
+                      <input type="checkbox" id="dictLearnTypos" checked />
+                      опечатки
+                    </label>
+
+                    <label class="ik-label" style="display:flex; align-items:center; gap:8px;">
+                      <input type="checkbox" id="dictLearnForms" checked />
+                      формы (EN)
+                    </label>
+
+                    <label class="ik-label" style="display:flex; align-items:center; gap:8px;">
+                      <input type="checkbox" id="dictLearnIgnoreTo" checked />
+                      "to" не обяз.
+                    </label>
+
+                    <label class="ik-label" style="display:flex; align-items:center; gap:8px;">
+                      <input type="checkbox" id="dictLearnIgnoreArticles" checked />
+                      артикли не обяз.
+                    </label>
+
+                    <label class="ik-label" style="display:flex; align-items:center; gap:8px;">
+                      <input type="checkbox" id="dictLearnHints" checked />
+                      подсказки
+                    </label>
+
+                    <button class="ik-btn ik-btn--black" id="dictLearnRestart" type="button" title="Начать заново">start</button>
+                  </div>
+                  <p class="ik-footnote" style="margin-top:6px;">заучивание: быстрый показ -> ввод -> умные повторы</p>
+                </div>
+
+                <div class="ik-divider"></div>
+
+                <p class="ik-prompt" id="dictLearnPromptLabel">...</p>
+
+                <div class="ik-flip-stage" aria-label="Learn card">
+                  <div class="ik-flip-card" id="dictLearnCard" tabindex="0" role="button" aria-pressed="false" title="Нажми чтобы перевернуть (после проверки)">
+                    <div class="ik-flip-inner">
+                      <div class="ik-flip-face ik-flip-front">
+                        <p class="ik-word" id="dictLearnFront">...</p>
+                        <p class="ik-sub ik-muted" id="dictLearnFrontLang">...</p>
+                      </div>
+                      <div class="ik-flip-face ik-flip-back">
+                        <p class="ik-word" id="dictLearnBack">...</p>
+                        <p class="ik-sub ik-muted" id="dictLearnBackLang">...</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="ik-row" id="dictLearnAnswerRow" style="margin-top:12px;">
+                  <input class="ik-input" id="dictLearnInput" type="text" autocomplete="off" spellcheck="false" placeholder="Введите перевод..." />
+                  <button class="ik-btn ik-btn--black" id="dictLearnCheckNext" type="button" title="Check (Enter)">check</button>
+                  <button class="ik-btn" id="dictLearnHint" type="button" title="Подсказка">hint</button>
+                  <button class="ik-btn" id="dictLearnGiveUp" type="button" title="Показать ответ (считается ошибкой)">сдаюсь</button>
+                </div>
+
+                <div class="ik-divider"></div>
+
+                <div class="ik-feedback" id="dictLearnFeedback" data-state="idle" aria-live="polite">
+                  <div class="ik-feedback__stamp" id="dictLearnStamp">ready</div>
+                  <p class="ik-feedback__line" id="dictLearnLine">нажми start или выбери section</p>
+                </div>
+
+                <p class="ik-footnote">слово считается выученным в сессии, если 2 раза подряд ответил верно без подсказок и между ответами было хотя бы 10 заданий.</p>
+              </section>
+            </div>
+
+            <!-- VIEW -->
+            <div id="dict-panel-view" role="tabpanel" aria-labelledby="dict-tab-view" hidden>
+              <section class="ik-ex" aria-label="Просмотр словаря">
+                <p class="ik-title">просмотр слов</p>
+
+                <div class="ik-row">
+                  <label class="ik-label" for="dictSectionView">section</label>
+                  <select class="ik-select" id="dictSectionView" style="min-width: 260px;"></select>
+                  <span class="ik-spacer" aria-hidden="true"></span>
+                  <span class="ik-badge" id="dictViewMeta">0</span>
+                </div>
+
+                <div class="ik-divider"></div>
+
+                <div class="dict-view-wrap">
+                  <div class="dict-view-sticky">
+                    <input class="ik-input" id="dictViewSearch" type="text" autocomplete="off" spellcheck="false" placeholder="поиск по EN/RU..." />
+                  </div>
+                  <ul class="ik-list dict-view-list" id="dictViewList" aria-label="Просмотр слов"></ul>
+                </div>
+              </section>
+            </div>
+
+<!-- BUILDER -->
+            <div id="dict-panel-builder" role="tabpanel" aria-labelledby="dict-tab-builder" hidden>
+              <section class="ik-ex" aria-label="Конструктор dictionary">
+                <p class="ik-title">разделы</p>
+
+                <div class="ik-row">
+                  <input class="ik-input" id="dictNewSectionName" type="text" placeholder="название раздела" />
+                  <button class="ik-btn ik-btn--black" id="dictAddSection" type="button">создать</button>
+                </div>
+
+                <div class="ik-divider"></div>
+
+                <div class="ik-row">
+                  <label class="ik-label" for="dictBuilderSection">section</label>
+                  <select class="ik-select" id="dictBuilderSection" style="min-width: 260px;"></select>
+                  <button class="ik-btn" id="dictDeleteSection" type="button" title="Удалит раздел и все слова внутри">удалить раздел</button>
+                  <button class="ik-btn" id="dictSubmitModeration" type="button" title="Отправить текущий section на модерацию">на модерацию</button>
+
+                  <span class="ik-spacer" aria-hidden="true"></span>
+
+                  <button class="ik-btn ik-btn--black" id="dictExportDb" type="button" title="Скачать json со всеми разделами">save db</button>
+                  <button class="ik-btn" id="dictImportDb" type="button" title="Загрузить json">load db</button>
+
+                  <label class="ik-label" style="display:flex; align-items:center; gap:8px;">
+                    <input type="checkbox" id="dictImportReplace" />
+                    replace
+                  </label>
+
+                  <input type="file" id="dictFileImport" accept=".json,application/json" hidden />
+                </div>
+
+                <div class="ik-divider"></div>
+
+                <p class="ik-title">слова</p>
+                <div class="ik-row">
+                  <input class="ik-input" id="dictEnInput" type="text" placeholder="word/phrase (EN)" />
+                  <input class="ik-input" id="dictRuInput" type="text" placeholder="перевод (RU)" />
+                  <button class="ik-btn ik-btn--black" id="dictAddWord" type="button">сохранить</button>
+                </div>
+
+                <div class="ik-divider"></div>
+
+                <p class="ik-sub">список разделов</p>
+                <ul class="ik-list" id="dictSectionList" aria-label="Список разделов"></ul>
+
+                <div class="ik-divider"></div>
+
+                <p class="ik-sub">слова в разделе</p>
+                <ul class="ik-list" id="dictWordList" aria-label="Список слов"></ul>
+              </section>
+            </div>
+
+            </div>
+
+          </div>
+
+          
+          <div id="panel-struct" role="tabpanel" aria-labelledby="tab-struct" hidden>
+            <div class="ik-row">
+              <span class="ik-badge" id="structCountBadge">structures: 0</span>
+              <span class="ik-spacer" aria-hidden="true"></span>
+              <span class="ik-pill" title="Прогресс хранится в браузере (localStorage)">
+                <span>structure</span>
+                <span id="structStatus" class="ik-muted">ready</span>
+              </span>
+            </div>
+
+            <div class="ik-divider"></div>
+
+            <!-- LIST -->
+            <section class="ik-ex" id="structListView" aria-label="Structure list">
+              <p class="ik-title">structure</p>
+              <p class="ik-sub">выбери грамматическую тему</p>
+
+              <ul class="ik-list" id="structList" aria-label="Список структур"></ul>
+
+              <p class="ik-footnote">структуры - это мини-курсы: правило + практика + прогресс</p>
+            </section>
+
+            <!-- DETAIL -->
+            <section class="ik-ex" id="structDetailView" aria-label="Structure detail" hidden>
+              <div class="ik-row">
+                <button class="ik-btn" id="structBackToList" type="button">назад</button>
+                <span class="ik-spacer" aria-hidden="true"></span>
+                <span class="ik-badge" id="structMasteryBadge">mastery 0/5</span>
+              </div>
+
+              <div class="ik-divider"></div>
+
+              <div class="ik-row" style="align-items:flex-end;">
+                <div>
+                  <p class="ik-title" id="structTitle">...</p>
+                  <p class="ik-sub" id="structSubtitle">...</p>
+                </div>
+                <span class="ik-spacer" aria-hidden="true"></span>
+                <button class="ik-btn" id="structAddToLibraryBtn" type="button">в библиотеку</button>
+                <button class="ik-btn ik-btn--black" id="structStartPracticeTop" type="button">start practice</button>
+              </div>
+
+              <div class="ik-divider"></div>
+
+              <div class="ik-tabs" role="tablist" aria-label="Structure tabs">
+                <button class="ik-tab" id="struct-tab-rule" role="tab" aria-selected="true" aria-controls="struct-panel-rule" type="button">rule</button>
+                <button class="ik-tab" id="struct-tab-practice" role="tab" aria-selected="false" aria-controls="struct-panel-practice" type="button">practice</button>
+              </div>
+
+              <!-- RULE -->
+              <div id="struct-panel-rule" role="tabpanel" aria-labelledby="struct-tab-rule">
+                <div id="structRuleBody" class="sh-struct-rule" aria-label="Rule content"></div>
+              </div>
+
+              <!-- PRACTICE -->
+              <div id="struct-panel-practice" role="tabpanel" aria-labelledby="struct-tab-practice" hidden>
+                <div id="structPracticeBody" class="sh-struct-practice" aria-label="Practice content"></div>
+              </div>
+            </section>
+          </div>
+
+
+          <div id="panel-tenses" role="tabpanel" aria-labelledby="tab-tenses" hidden>
+            <section class="ik-ex" aria-label="Grammar React app">
+              <p class="ik-title">grammar</p>
+              <p class="ik-sub">next/react/tailwind grammar runtime</p>
+            </section>
+          </div>
+
+<div id="panel-wt" role="tabpanel" aria-labelledby="tab-wt">
+            <div class="ik-row">
+              <label class="ik-label" for="transformType" id="transformTypeLabel" hidden>тип</label>
+              <select class="ik-select" id="transformType" style="min-width: 260px;" hidden>
+                <option value="noun_to_adj">образование прилагательного</option>
+                <option value="in_un_prefix">приставки in- или un-</option>
+                <option value="noun_to_verb">образование глагола</option>
+                <option value="word_to_noun">образование существительного</option>
+              </select>
+
+              <span class="ik-badge" id="taskCountBadge">tasks: 0</span>
+              <span class="ik-badge ik-admin-indicator" id="seedBadge" title="Автозагрузка из json при пустой базе">json: ...</span>
+            </div>
+
+            <p class="ik-footnote ik-admin-indicator" id="dbNameLine">...</p>
+
+            <div class="ik-divider"></div>
+
+            <p class="ik-title">словообразование</p>
+            <p class="ik-sub">два режима: смешанный или пользовательский</p>
+
+            <div class="sh-practice-mode" id="wtModeSwitch" role="group" aria-label="Режим word transformation">
+              <button class="ik-btn ik-btn--black" id="wtModeMixedBtn" type="button">смешанный</button>
+              <button class="ik-btn" id="wtModeCustomBtn" type="button">пользовательский</button>
+            </div>
+
+            <p class="ik-sub" id="wtModeHint">смешанный: все типы словообразования</p>
+
+            <div id="wtCustomTypePicker" class="sh-custom-picker" hidden>
+              <p class="sh-custom-picker__title" id="wtCustomTypeTitle">пользовательский: выбери типы словообразования</p>
+              <p class="sh-custom-picker__sub" id="wtCustomTypeHint">собери свой набор типов: можно выбрать один или несколько</p>
+              <div class="sh-custom-picker__actions">
+                <button class="ik-btn" id="wtCustomTypeSelectAllBtn" type="button">выбрать все</button>
+                <button class="ik-btn" id="wtCustomTypeClearAllBtn" type="button">снять все</button>
+              </div>
+              <div class="sh-custom-picker__grid" id="wtCustomTypeGrid" aria-label="Custom word transformation types"></div>
+            </div>
+
+            <div class="ik-divider"></div>
+
+            <div class="ik-tabs" role="tablist" aria-label="Режимы word transformation">
+              <button class="ik-tab" id="subtab-rule" role="tab" aria-selected="true" aria-controls="panel-rule" type="button">правило</button>
+              <button class="ik-tab" id="subtab-practice" role="tab" aria-selected="false" aria-controls="panel-practice" type="button">practice</button>
+              <button class="ik-tab" id="subtab-text" role="tab" aria-selected="false" aria-controls="panel-text" type="button">в тексте</button>
+              <button class="ik-tab" id="subtab-builder" role="tab" aria-selected="false" aria-controls="panel-builder" type="button">constructor</button>
+            </div>
+
+            <!-- RULE -->
+            <div id="panel-rule" role="tabpanel" aria-labelledby="subtab-rule">
+              <section class="ik-ex" aria-label="Правило">
+                <p class="ik-title">правило</p>
+                <div class="ik-row" style="margin-top:8px; margin-bottom:8px;">
+                  <button class="ik-btn" id="wtAddRuleToLibraryBtn" type="button">в библиотеку</button>
+                </div>
+                <div class="ik-rule is-open" id="rulePanel" aria-label="Rule" aria-hidden="false">
+                  <p class="ik-sub" id="ruleTitle">rule</p>
+                  <div id="ruleBody"></div>
+                </div>
+              </section>
+            </div>
+
+            <!-- PRACTICE -->
+            <div id="panel-practice" role="tabpanel" aria-labelledby="subtab-practice" hidden>
+              <section class="ik-ex" aria-label="Практика">
+                <p class="ik-title">практика</p>
+
+                <div class="ik-row">
+                  <button class="ik-btn" id="btnPrev" type="button" title="Предыдущий вопрос">назад</button>
+                  <button class="ik-btn ik-btn--black" id="btnNext" type="button" title="Следующий вопрос">далее</button>
+
+                  <label class="ik-label">
+                    <input type="checkbox" id="randomOrder" checked />
+                    random
+                  </label>
+
+                  <span class="ik-spacer" aria-hidden="true"></span>
+
+                  <label class="ik-label" for="practiceCategory">category</label>
+                  <select class="ik-select" id="practiceCategory" style="min-width: 180px;">
+                    <option value="All">All</option>
+                    <option value="Suffixes">Suffixes</option>
+                    <option value="Prefixes">Prefixes</option>
+                  </select>
+
+                  <span class="ik-badge" id="qBadge">q: 0</span>
+                  <span class="ik-badge" id="sessionScore">0/0</span>
+                </div>
+
+                <p class="ik-prompt" id="promptLabel">Образуй нужную форму слова</p>
+
+                <div class="ik-wordbar">
+                  <p class="ik-word" id="promptEn">...</p>
+                  <button class="ik-btn" id="btnReveal" type="button" title="Перевод (t)">перевод</button>
+                </div>
+
+                <p class="ik-ru" id="promptRu" hidden>...</p>
+
+                <div class="ik-row" style="margin-top:12px;">
+                  <input class="ik-input" id="answerInput" type="text" autocomplete="off" spellcheck="false" placeholder="Ответ (EN)" />
+                  <button class="ik-btn ik-btn--black" id="btnCheckNext" type="button" title="Check (Enter)">check</button>
+                  <button class="ik-btn" id="btnShowAnswer" type="button" title="Показать правильный ответ">ответ</button>
+                </div>
+
+                <div class="ik-row" id="inUnPrefixPicker" style="margin-top:8px;" hidden>
+                  <span class="ik-label">выбери приставку</span>
+                  <button class="ik-btn" id="btnPrefixIn" type="button">in-</button>
+                  <button class="ik-btn" id="btnPrefixUn" type="button">un-</button>
+                </div>
+
+                <div class="ik-divider"></div>
+
+                <div class="ik-feedback" id="feedbackBox" data-state="idle" aria-live="polite">
+                  <div class="ik-feedback__stamp" id="feedbackStamp">ready</div>
+                  <p class="ik-feedback__line" id="feedbackLine">введи ответ и нажми check</p>
+                </div>
+              </section>
+            </div>
+
+            <!-- IN TEXT -->
+            <div id="panel-text" role="tabpanel" aria-labelledby="subtab-text" hidden>
+              <section class="ik-ex" aria-label="В тексте">
+                <p class="ik-title">в тексте</p>
+
+                <div class="ik-row">
+                  <button class="ik-btn" id="btnTextPrev" type="button" title="Предыдущий вопрос">назад</button>
+                  <button class="ik-btn ik-btn--black" id="btnTextNext" type="button" title="Следующий вопрос">далее</button>
+
+                  <label class="ik-label">
+                    <input type="checkbox" id="textRandomOrder" checked />
+                    случайно
+                  </label>
+
+                  <span class="ik-spacer" aria-hidden="true"></span>
+
+                  <label class="ik-label" for="textCategory">категория</label>
+                  <select class="ik-select" id="textCategory" style="min-width: 180px;">
+                    <option value="All">All</option>
+                    <option value="Suffixes">Suffixes</option>
+                    <option value="Prefixes">Prefixes</option>
+                  </select>
+
+                  <span class="ik-badge" id="textQBadge">q: 0</span>
+                  <span class="ik-badge" id="textSessionScore">0/0</span>
+                </div>
+
+                <div class="ik-divider"></div>
+
+                <p class="ik-prompt" id="textPromptLabel">вставь подходящую форму слова в текст</p>
+                <p class="ik-sentence" id="textSentenceEn">...</p>
+
+                <div class="ik-row" style="margin-top:8px;">
+                  <button class="ik-btn" id="btnTextReveal" type="button" title="Перевод предложения">перевод</button>
+                </div>
+
+                <p class="ik-ru" id="textSentenceRu" hidden>...</p>
+
+                <div class="ik-row" style="margin-top:12px;">
+                  <input class="ik-input" id="textAnswerInput" type="text" autocomplete="off" spellcheck="false" placeholder="Ответ (EN)" />
+                  <button class="ik-btn ik-btn--black" id="btnTextCheckNext" type="button" title="Check (Enter)">check</button>
+                  <button class="ik-btn" id="btnTextShowAnswer" type="button" title="Показать правильный ответ">ответ</button>
+                </div>
+
+                <div class="ik-feedback" id="textFeedbackBox" data-state="idle" aria-live="polite" style="margin-top:12px;">
+                  <div class="ik-feedback__stamp" id="textFeedbackStamp">ready</div>
+                  <p class="ik-feedback__line" id="textFeedbackLine">введи ответ и нажми check</p>
+                </div>
+              </section>
+            </div>
+
+            <!-- BUILDER -->
+            <div id="panel-builder" role="tabpanel" aria-labelledby="subtab-builder" hidden>
+              <section class="ik-ex" aria-label="Конструктор">
+                <p class="ik-title">конструктор</p>
+
+                <div class="ik-row">
+                  <label class="ik-label" for="viewCategory">view</label>
+                  <select class="ik-select" id="viewCategory" style="min-width: 180px;">
+                    <option value="All">All</option>
+                    <option value="Suffixes">Suffixes</option>
+                    <option value="Prefixes">Prefixes</option>
+                  </select>
+
+                  <label class="ik-label" for="addCategory">add</label>
+                  <select class="ik-select" id="addCategory" style="min-width: 180px;">
+                    <option value="Suffixes">Suffixes</option>
+                    <option value="Prefixes">Prefixes</option>
+                  </select>
+                </div>
+
+                <div class="ik-row">
+                  <input class="ik-input" id="inEnWord" type="text" placeholder="word (EN)" />
+                  <input class="ik-input" id="inEnAnswer" type="text" placeholder="answer (EN)" />
+                </div>
+                <div class="ik-row">
+                  <input class="ik-input" id="inRuWord" type="text" placeholder="слово (RU)" />
+                  <input class="ik-input" id="inRuAnswer" type="text" placeholder="ответ (RU)" />
+                </div>
+
+                <div class="ik-row" style="margin-top:10px;">
+                  <button class="ik-btn ik-btn--black" id="btnAddTask" type="button">сохранить</button>
+                  <button class="ik-btn" id="btnResetFromJson" type="button" title="Загрузит наборы из json для текущего типа">восстановить из json</button>
+                </div>
+
+                <div class="ik-divider"></div>
+
+                <div class="ik-row">
+                  <button class="ik-btn ik-btn--black" id="btnExportDb" type="button" title="Скачать json (view category)">save db</button>
+                  <button class="ik-btn" id="btnImportDb" type="button" title="Загрузить json">load db</button>
+
+                  <label class="ik-label" style="display:flex; align-items:center; gap:8px;">
+                    <input type="checkbox" id="importReplace" />
+                    replace
+                  </label>
+
+                  <input type="file" id="fileImport" accept=".json,application/json" hidden />
+                </div>
+
+                <div class="ik-divider"></div>
+
+                <p class="ik-sub">задания</p>
+                <ul class="ik-list" id="taskList" aria-label="Список заданий"></ul>
+              </section>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>

@@ -1,0 +1,12 @@
+.next/
+out/
+node_modules/
+npm-debug.log*
+public/assets/
+public/logo_item.png
+public/01.png
+public/02.png
+public/crate/**/*
+!public/crate/
+!public/crate/**/
+!public/crate/**/*.html

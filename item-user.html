@@ -174,7 +174,8 @@
 
       const params = new URLSearchParams(location.search);
       const ownPath = String(location.pathname || "").replace(/^\/+/, "");
-      const appRoot = ownPath.includes("/") ? ownPath.split("/").slice(0, -1).join("/") : "";
+      const ownParts = ownPath.split("/").filter(Boolean);
+      const appRoot = ownParts.length ? ownParts[0] : "";
 
       const getRefPath = () => {
         const ref = document.referrer || "";
@@ -221,9 +222,18 @@
           clean = clean.slice(appRoot.length + 1);
         }
         if (!clean || clean.includes("..")) return null;
-        if (!/^[a-z0-9_./\-]+\.html$/i.test(clean)) return null;
-        if (/item-user\.html$/i.test(clean)) return null;
-        return clean;
+
+        const isHtml = /^[a-z0-9_./\-]+\.html$/i.test(clean);
+        const isCanonical = /^[a-z0-9_./\-]+\/?$/i.test(clean);
+        if (!isHtml && !isCanonical) return null;
+
+        clean = clean.replace(/\/+$/, "");
+        if (!clean || /^index(?:\.html)?$/i.test(clean)) return "index.html";
+        if (/item-user(?:\.html)?$/i.test(clean)) return null;
+
+        if (/\.html$/i.test(clean)) return clean;
+        if (clean === "item-crate" || clean === "item-user" || clean.startsWith("crate/")) return `${clean}/`;
+        return `${clean}/`;
       };
 
       const dest = safePath(candidate) || "index.html";
@@ -234,9 +244,9 @@
 
 
       const label =
-        dest.toLowerCase() === "index.html"
+        /^index(?:\.html)?$/i.test(dest)
           ? "item-key"
-          : dest.split("/").pop().replace(/\.html$/i, "");
+          : dest.replace(/\/$/, "").split("/").pop().replace(/\.html$/i, "");
 
       if (tag) tag.textContent = label;
       link.setAttribute("aria-label", `back to ${label}`);

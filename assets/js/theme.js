@@ -399,16 +399,17 @@
     let relative = pathname.startsWith(appRootPath)
       ? pathname.slice(appRootPath.length)
       : pathname.replace(/^\/+/, "");
-    if (!relative) relative = "index.html";
-    if (relative.endsWith("/")) relative += "index.html";
-    return relative;
+    if (!relative) return "/";
+    relative = relative.replace(/^\/+/, "");
+    if (!relative) return "/";
+    return `/${relative}`;
   }
 
   function buildAccountHref(view) {
     const params = new URLSearchParams();
     params.set("view", view === "friends" ? "friends" : "profile");
     params.set("returnTo", currentAppRelativePath());
-    return `${appPrefix}item-user.html?${params.toString()}`;
+    return `${appPrefix}item-user/?${params.toString()}`;
   }
 
   function ensureAccountLinks(panel) {

@@ -1,0 +1,593 @@
+import Head from "next/head";
+
+const THEME_BOOTSTRAP_SCRIPT = `
+(function() {
+  var key = "ik_site_theme_v1";
+  var stored = null;
+  try { stored = localStorage.getItem(key); } catch (e) {}
+  var theme = (stored === "dark" || stored === "light")
+    ? stored
+    : ((window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) ? "dark" : "light");
+  document.documentElement.setAttribute("data-theme", theme);
+  document.documentElement.style.colorScheme = theme;
+})();
+`;
+
+const ITEM_CRATE_STYLE = `
+:root{
+  --crate-max: 920px;
+  --crate-gap: clamp(10px, 2vw, 14px);
+  --crate-pad: clamp(10px, 2.6vw, 16px);
+  --tap: 44px;
+}
+
+/* ================================
+   Site nav: "Главное меню" (scrolls with page)
+   ================================ */
+.ik-site-nav, .ik-site-nav *{ box-sizing: border-box; }
+
+.ik-site-nav{
+  position: relative;
+  z-index: 50;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px 14px;
+  margin: 0 0 18px;
+  background: #fff;
+  border-bottom: 1px solid rgba(0,0,0,.14);
+}
+
+.ik-site-nav__link{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  padding: 10px 16px;
+  border: 1px solid rgba(0,0,0,.14);
+  background: #fff;
+  color: rgba(0,0,0,.86);
+  text-decoration: none;
+  font-size: 11px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  border-radius: 0;
+}
+
+.ik-site-nav__link:hover{ border-color: rgba(0,0,0,.25); }
+
+.ik-site-nav__actions{
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ik-gear-btn{
+  appearance: none;
+  border: 1px solid rgba(0,0,0,.14);
+  background: #fff;
+  color: rgba(0,0,0,.86);
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  display: inline-grid;
+  place-items: center;
+  cursor: pointer;
+  border-radius: 0;
+  transition: transform .18s ease, border-color .18s ease, opacity .18s ease;
+}
+
+.ik-gear-btn:hover{
+  transform: translateY(-1px);
+  border-color: rgba(0,0,0,.28);
+  opacity: .98;
+}
+
+.ik-gear-btn:focus-visible{
+  outline: 2px solid rgba(0,0,0,.55);
+  outline-offset: 2px;
+}
+
+.ik-gear-btn svg{
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+.ik-settings-panel{
+  position: fixed;
+  top: 68px;
+  right: 16px;
+  z-index: 100101;
+  width: min(320px, calc(100vw - 24px));
+  border: 1px solid rgba(0,0,0,.18);
+  background: rgba(255,255,255,.98);
+  box-shadow: 0 10px 32px rgba(0,0,0,.10);
+  padding: 14px;
+  border-radius: 0;
+}
+
+.ik-settings-panel[hidden]{
+  display: none !important;
+}
+
+.ik-settings-panel__head{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.ik-settings-panel__title{
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+}
+
+.ik-settings-panel__close{
+  appearance: none;
+  border: 1px solid rgba(0,0,0,.14);
+  background: #fff;
+  color: rgba(0,0,0,.86);
+  padding: 8px 10px;
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 0;
+}
+
+.ik-settings-group{
+  display: grid;
+  gap: 10px;
+}
+
+.ik-settings-label{
+  font-size: 10px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: rgba(0,0,0,.58);
+}
+
+.ik-lang-switch{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.ik-lang-option{
+  border: 1px solid rgba(0,0,0,.14);
+  background: rgba(255,255,255,.92);
+  min-height: 42px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.ik-lang-option input{
+  margin: 0;
+}
+
+.ik-lang-option.is-active{
+  border-color: rgba(0,0,0,.34);
+  background: rgba(0,0,0,.03);
+}
+
+@media (max-width: 520px){
+  .ik-site-nav{ padding: 14px 12px; margin-bottom: 14px; }
+  .ik-site-nav__link{ padding: 10px 12px; letter-spacing: 3px; }
+  .ik-site-nav__actions{ right: 12px; }
+  .ik-settings-panel{ top: 62px; right: 12px; }
+}
+
+.crate-hub{
+  width: min(var(--crate-max), 92vw);
+  margin: 0 auto;
+  display: grid;
+  gap: 16px;
+  text-align: center;
+}
+
+.crate-title{
+  display: grid;
+  gap: 8px;
+  padding: 10px 6px;
+}
+
+.crate-title h1{
+  margin: 0;
+  font-size: clamp(14px, 1.2vw + 12px, 18px);
+  letter-spacing: 5px;
+  text-transform: uppercase;
+}
+
+.crate-title .sub{
+  font-size: clamp(11px, 0.7vw + 9px, 12px);
+  letter-spacing: 3.5px;
+  text-transform: uppercase;
+  color: rgba(0,0,0,.55);
+}
+
+.crate-grid{
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--crate-gap);
+}
+
+.crate-card{
+  display: grid;
+  gap: 10px;
+  padding: var(--crate-pad);
+  border: 1px solid rgba(0,0,0,.14);
+  background: rgba(255,255,255,.86);
+  text-decoration: none;
+  color: inherit;
+  transition: transform .18s ease, border-color .18s ease, opacity .18s ease;
+  min-height: 138px;
+  align-content: start;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  border-radius: 0;
+}
+
+.crate-card:hover{
+  transform: translateY(-2px);
+  border-color: rgba(0,0,0,.22);
+  opacity: .98;
+}
+
+.crate-card:active{
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.crate-card:focus-visible{
+  outline: 2px solid rgba(0,0,0,.45);
+  outline-offset: 3px;
+}
+
+.crate-card__kicker{
+  font-size: 10px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: rgba(0,0,0,.55);
+}
+
+.crate-card__name{
+  font-size: 12px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.crate-card__meta{
+  font-size: 11px;
+  line-height: 1.45;
+  color: rgba(0,0,0,.72);
+  margin: 0;
+  text-wrap: pretty;
+}
+
+@media (max-width: 920px){
+  .crate-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 620px){
+  .crate-grid{ grid-template-columns: 1fr; }
+  .crate-card{ min-height: unset; }
+}
+
+@media (hover: none) and (pointer: coarse){
+  .crate-card:hover{ transform: none; }
+}
+
+.center-stage{
+  padding-left: 12px !important;
+  padding-right: 12px !important;
+  padding-bottom: calc(92px + env(safe-area-inset-bottom)) !important;
+  padding-top: 0 !important;
+}
+
+.crate-hub{
+  width: min(var(--crate-max), 96vw);
+  gap: 14px;
+}
+
+.crate-title{
+  padding: 10px 4px;
+}
+
+.crate-card{
+  border-radius: 0 !important;
+}
+`;
+
+const SETTINGS_SCRIPT = `
+(() => {
+  const STORAGE_KEY = 'ik_site_lang_v1';
+  const DEFAULT_LANG = 'ru';
+
+  const TEXT = {
+    ru: {
+      pageTitle: 'Item Crate - item-crate',
+      mainMenu: 'Главное меню',
+      gearLabel: 'Настройки сайта',
+      settingsTitle: 'Настройки',
+      settingsClose: 'Закрыть',
+      langLabel: 'Язык сайта',
+      langRu: 'Русский',
+      langEn: 'English',
+      sectionAria: 'item-crate menu',
+      navAria: 'Разделы item-crate',
+      title: 'item-crate',
+      subtitle: 'архив знаний',
+      module: 'module',
+      notesTitle: 'заметки',
+      notesMeta: 'удобный менеджер заметок: категории/подкатегории, форматирование, картинки, авто-сохранение и “Прошептать” в whisperer.',
+      planningTitle: 'планирование',
+      planningMeta: 'чистая доска проектов и задач без расписания.',
+      scheduleTitle: 'расписание',
+      scheduleMeta: 'сегодня, общее расписание и умный помощник с дедлайнами.',
+      studyTitle: 'Учебный центр',
+      studyMeta: 'модуль активен. тренажер / база / поиск.',
+      whispererTitle: 'прошептать',
+      whispererMeta: 'диктор для докладов: озвучка текста с подсветкой и гибкими настройками.',
+      footerLeft: 'crate · hub',
+      footerRight: 'pre-alpha'
+    },
+    en: {
+      pageTitle: 'Item Crate - item-crate',
+      mainMenu: 'Main menu',
+      gearLabel: 'Site settings',
+      settingsTitle: 'Settings',
+      settingsClose: 'Close',
+      langLabel: 'Site language',
+      langRu: 'Russian',
+      langEn: 'English',
+      sectionAria: 'item-crate menu',
+      navAria: 'Item-crate sections',
+      title: 'item-crate',
+      subtitle: 'knowledge archive',
+      module: 'module',
+      notesTitle: 'notes',
+      notesMeta: 'convenient notes manager: categories/subcategories, formatting, images, auto-save, and “Whisper it” to whisperer.',
+      planningTitle: 'planning',
+      planningMeta: 'clean board for projects and tasks without scheduling.',
+      scheduleTitle: 'schedule',
+      scheduleMeta: 'today focus, full calendar, and smart assistant built around deadlines.',
+      studyTitle: 'Study Center',
+      studyMeta: 'module is active. trainer / knowledge base / search.',
+      whispererTitle: 'whisperer',
+      whispererMeta: 'narrator for presentations: text-to-speech with highlighting and flexible settings.',
+      footerLeft: 'crate · hub',
+      footerRight: 'pre-alpha'
+    }
+  };
+
+  function getLang() {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      return saved === 'en' ? 'en' : DEFAULT_LANG;
+    } catch (e) {
+      return DEFAULT_LANG;
+    }
+  }
+
+  function setLang(lang) {
+    const next = lang === 'en' ? 'en' : 'ru';
+    try {
+      localStorage.setItem(STORAGE_KEY, next);
+    } catch (e) {}
+    applyLanguage(next);
+  }
+
+  function applyLanguage(lang) {
+    const t = TEXT[lang] || TEXT.ru;
+
+    document.documentElement.lang = lang;
+    document.title = t.pageTitle;
+
+    const byId = (id) => document.getElementById(id);
+
+    byId('ikMainMenuLink').textContent = t.mainMenu;
+    byId('ikGlobalSettingsBtn').setAttribute('aria-label', t.gearLabel);
+    byId('ikGlobalSettingsBtn').setAttribute('title', t.gearLabel);
+    byId('ikSiteSettingsTitle').textContent = t.settingsTitle;
+    byId('ikSiteSettingsClose').textContent = t.settingsClose;
+    byId('ikSiteLangLabel').textContent = t.langLabel;
+    byId('ikLangRuText').textContent = t.langRu;
+    byId('ikLangEnText').textContent = t.langEn;
+    byId('cratePageTitle').textContent = t.title;
+    byId('cratePageSubtitle').textContent = t.subtitle;
+    byId('cardNotesTitle').textContent = t.notesTitle;
+    byId('cardNotesMeta').textContent = t.notesMeta;
+    byId('cardPlanningTitle').textContent = t.planningTitle;
+    byId('cardPlanningMeta').textContent = t.planningMeta;
+    byId('cardScheduleTitle').textContent = t.scheduleTitle;
+    byId('cardScheduleMeta').textContent = t.scheduleMeta;
+    byId('cardStudyTitle').textContent = t.studyTitle;
+    byId('cardStudyMeta').textContent = t.studyMeta;
+    byId('cardWhispererTitle').textContent = t.whispererTitle;
+    byId('cardWhispererMeta').textContent = t.whispererMeta;
+
+    const footerHintLeft = byId('footerHintLeft');
+    const footerHintRight = byId('footerHintRight');
+    if (footerHintLeft) footerHintLeft.textContent = t.footerLeft;
+    if (footerHintRight) footerHintRight.textContent = t.footerRight;
+
+    byId('crateHubSection').setAttribute('aria-label', t.sectionAria);
+    byId('crateGridNav').setAttribute('aria-label', t.navAria);
+
+    document.querySelectorAll('[data-i18n="module"]').forEach((el) => {
+      el.textContent = t.module;
+    });
+
+    const ruInput = byId('ikLangRu');
+    const enInput = byId('ikLangEn');
+    ruInput.checked = lang === 'ru';
+    enInput.checked = lang === 'en';
+
+    document.querySelectorAll('.ik-lang-option').forEach((label) => {
+      const input = label.querySelector('input');
+      label.classList.toggle('is-active', !!input && input.checked);
+    });
+  }
+
+  const panel = document.getElementById('ikSiteSettingsPanel');
+  const gearBtn = document.getElementById('ikGlobalSettingsBtn');
+  const closeBtn = document.getElementById('ikSiteSettingsClose');
+
+  function openPanel() {
+    panel.hidden = false;
+  }
+
+  function closePanel() {
+    panel.hidden = true;
+  }
+
+  gearBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    panel.hidden ? openPanel() : closePanel();
+  });
+
+  closeBtn.addEventListener('click', closePanel);
+  panel.addEventListener('click', (e) => e.stopPropagation());
+
+  document.addEventListener('click', () => {
+    if (!panel.hidden) closePanel();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !panel.hidden) closePanel();
+  });
+
+  document.querySelectorAll('input[name="ikSiteLang"]').forEach((input) => {
+    input.addEventListener('change', () => setLang(input.value));
+  });
+
+  applyLanguage(getLang());
+})();
+`;
+
+const DONE_SCRIPT = `
+document.addEventListener("DOMContentLoaded", function () {
+  if (window.IKLoading) window.IKLoading.done();
+});
+`;
+
+export default function ItemCratePage() {
+  return (
+    <>
+      <Head>
+        <title>Item Crate - item-crate</title>
+        <base href="../" />
+        <link rel="stylesheet" href="assets/css/styles.css" />
+        <style dangerouslySetInnerHTML={{ __html: ITEM_CRATE_STYLE }} />
+        <link rel="stylesheet" href="assets/css/theme.css" />
+      </Head>
+
+      <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP_SCRIPT }} />
+
+      <header className="ik-site-nav" id="ikSiteNav">
+        <a className="ik-site-nav__link" id="ikMainMenuLink" href="index.html">Главное меню</a>
+        <div className="ik-site-nav__actions">
+          <button
+            type="button"
+            className="ik-gear-btn"
+            id="ikGlobalSettingsBtn"
+            aria-label="Настройки сайта"
+            title="Настройки сайта"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+              <path d="M12 8.4A3.6 3.6 0 1 0 12 15.6A3.6 3.6 0 1 0 12 8.4Z" />
+              <path d="M19.4 15a1 1 0 0 0 .2 1.1l.1.1a1.2 1.2 0 0 1 0 1.7l-1.6 1.6a1.2 1.2 0 0 1-1.7 0l-.1-.1a1 1 0 0 0-1.1-.2 1 1 0 0 0-.6.9V20a1.2 1.2 0 0 1-1.2 1.2h-2.3A1.2 1.2 0 0 1 9.9 20v-.2a1 1 0 0 0-.6-.9 1 1 0 0 0-1.1.2l-.1.1a1.2 1.2 0 0 1-1.7 0l-1.6-1.6a1.2 1.2 0 0 1 0-1.7l.1-.1a1 1 0 0 0 .2-1.1 1 1 0 0 0-.9-.6H4A1.2 1.2 0 0 1 2.8 13v-2.3A1.2 1.2 0 0 1 4 9.5h.2a1 1 0 0 0 .9-.6 1 1 0 0 0-.2-1.1l-.1-.1a1.2 1.2 0 0 1 0-1.7l1.6-1.6a1.2 1.2 0 0 1 1.7 0l.1.1a1 1 0 0 0 1.1.2 1 1 0 0 0 .6-.9V4A1.2 1.2 0 0 1 11.1 2.8h2.3A1.2 1.2 0 0 1 14.6 4v.2a1 1 0 0 0 .6.9 1 1 0 0 0 1.1-.2l.1-.1a1.2 1.2 0 0 1 1.7 0l1.6 1.6a1.2 1.2 0 0 1 0 1.7l-.1.1a1 1 0 0 0-.2 1.1 1 1 0 0 0 .9.6h.2A1.2 1.2 0 0 1 21.2 10.7V13A1.2 1.2 0 0 1 20 14.2h-.2a1 1 0 0 0-.4.8Z" />
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <div className="ik-settings-panel" id="ikSiteSettingsPanel" hidden>
+        <div className="ik-settings-panel__head">
+          <p className="ik-settings-panel__title" id="ikSiteSettingsTitle">Настройки</p>
+          <button type="button" className="ik-settings-panel__close" id="ikSiteSettingsClose">Закрыть</button>
+        </div>
+
+        <div className="ik-settings-group">
+          <div className="ik-settings-label" id="ikSiteLangLabel">Язык сайта</div>
+
+          <div className="ik-lang-switch">
+            <label className="ik-lang-option" id="ikLangRuLabel" htmlFor="ikLangRu">
+              <input type="radio" name="ikSiteLang" id="ikLangRu" value="ru" />
+              <span id="ikLangRuText">Русский</span>
+            </label>
+
+            <label className="ik-lang-option" id="ikLangEnLabel" htmlFor="ikLangEn">
+              <input type="radio" name="ikSiteLang" id="ikLangEn" value="en" />
+              <span id="ikLangEnText">English</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <main className="center-stage" aria-label="item-crate center">
+        <section className="crate-hub" aria-label="item-crate menu" id="crateHubSection">
+          <div className="crate-title" data-ik-stage="hero">
+            <h1 id="cratePageTitle">item-crate</h1>
+            <div className="sub" id="cratePageSubtitle">архив знаний</div>
+          </div>
+
+          <div className="crate-grid" data-ik-stage="content" role="navigation" aria-label="Разделы item-crate" id="crateGridNav">
+            <a className="crate-card" href="crate/onoi_notes/">
+              <div className="crate-card__kicker" data-i18n="module">module</div>
+              <h2 className="crate-card__name" id="cardNotesTitle">заметки</h2>
+              <p className="crate-card__meta" id="cardNotesMeta">удобный менеджер заметок: категории/подкатегории, форматирование, картинки, авто-сохранение и “Прошептать” в whisperer.</p>
+            </a>
+
+            <a className="crate-card" href="crate/planning/">
+              <div className="crate-card__kicker" data-i18n="module">module</div>
+              <h2 className="crate-card__name" id="cardPlanningTitle">планирование</h2>
+              <p className="crate-card__meta" id="cardPlanningMeta">чистая доска проектов и задач без расписания.</p>
+            </a>
+
+            <a className="crate-card" href="crate/schedule/">
+              <div className="crate-card__kicker" data-i18n="module">module</div>
+              <h2 className="crate-card__name" id="cardScheduleTitle">расписание</h2>
+              <p className="crate-card__meta" id="cardScheduleMeta">сегодня, общее расписание и умный помощник с дедлайнами.</p>
+            </a>
+
+            <a className="crate-card" href="crate/student_helper/">
+              <div className="crate-card__kicker" data-i18n="module">module</div>
+              <h2 className="crate-card__name" id="cardStudyTitle">Учебный центр</h2>
+              <p className="crate-card__meta" id="cardStudyMeta">модуль активен. тренажер / база / поиск.</p>
+            </a>
+
+            <a className="crate-card" href="crate/whisperer/">
+              <div className="crate-card__kicker" data-i18n="module">module</div>
+              <h2 className="crate-card__name" id="cardWhispererTitle">прошептать</h2>
+              <p className="crate-card__meta" id="cardWhispererMeta">диктор для докладов: озвучка текста с подсветкой и гибкими настройками.</p>
+            </a>
+          </div>
+        </section>
+      </main>
+
+      <script dangerouslySetInnerHTML={{ __html: SETTINGS_SCRIPT }} />
+      <script src="assets/js/theme.js" />
+      <script dangerouslySetInnerHTML={{ __html: DONE_SCRIPT }} />
+      <script src="assets/js/main.js" />
+    </>
+  );
+}

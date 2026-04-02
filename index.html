@@ -8,8 +8,8 @@
       try {
         if (location.hash && /access_token=/.test(location.hash)) {
           var repoPath = "/item_key/";
-          if (location.pathname === "/" || location.pathname === repoPath) {
-            location.replace(repoPath + "item-user.html" + location.hash);
+          if (location.pathname === "/" || location.pathname === repoPath || /\/index\.html$/i.test(location.pathname)) {
+            location.replace(repoPath + "item-user/" + location.hash);
           }
         }
       } catch (e) {}
@@ -321,13 +321,13 @@ html::after {
       </div>
     </div>
   </div>
-  <a class="nav-btn nav-btn--user" href="item-user.html?returnTo=index.html" aria-label="Item User">
+  <a class="nav-btn nav-btn--user" href="item-user/?returnTo=index.html" aria-label="Item User">
     <span class="nav-btn__name">item-user</span>
     <span class="nav-btn__hint">перейти</span>
     <span class="nav-btn__arrow">→</span>
   </a>
 
-  <a class="nav-btn nav-btn--crate" href="item-crate.html" aria-label="Item Crate">
+  <a class="nav-btn nav-btn--crate" href="item-crate/" aria-label="Item Crate">
     <span class="nav-btn__name">item-crate</span>
     <span class="nav-btn__hint">перейти</span>
     <span class="nav-btn__arrow">→</span>

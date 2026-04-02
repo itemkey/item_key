@@ -18,6 +18,31 @@
     })();
   </script>
 
+  <script>
+    (function() {
+      var search = String(window.location.search || "");
+      if (/(^|[?&])legacy=1(?:&|$)/i.test(search)) return;
+
+      var path = String(window.location.pathname || "");
+      if (!/\/crate\/student_helper\/(?:student_helper\.html)?\/?$/i.test(path)) return;
+
+      var targetPath = path.replace(/student_helper\.html\/?$/i, "");
+      if (targetPath.charAt(0) !== "/") targetPath = "/" + targetPath;
+      if (!targetPath) targetPath = "./";
+      if (targetPath.charAt(targetPath.length - 1) !== "/") targetPath += "/";
+
+      var cleanSearch = search
+        .replace(/[?&]legacy=1(?=&|$)/gi, "")
+        .replace(/^&/, "?")
+        .replace(/[?&]$/, "");
+
+      var target = targetPath + cleanSearch + String(window.location.hash || "");
+      var current = path + search + String(window.location.hash || "");
+      if (target === current) return;
+      window.location.replace(target);
+    })();
+  </script>
+
   <!-- Match main site look -->
   <link rel="stylesheet" href="../../assets/css/styles.css" />
 
@@ -198,7 +223,7 @@
 <body class="page page-learning ik-booting" data-i18n-page="student_helper" data-ik-loading>
   <header class="ik-site-nav" id="ikSiteNav">
     <button type="button" class="ik-site-nav__link" id="ikBackBtn" title="Вернуться назад">← Назад</button>
-    <a class="ik-site-nav__link" href="../../index.html">Главное меню</a>
+    <a class="ik-site-nav__link" href="../../">Главное меню</a>
   </header>
 
   <div class="ik-hidden-ui" aria-hidden="true">
@@ -759,507 +784,9 @@
 
 
           <div id="panel-tenses" role="tabpanel" aria-labelledby="tab-tenses" hidden>
-            <div class="ik-row">
-              <span class="ik-badge" id="tensesCountBadge">grammar: 0</span>
-              <span class="ik-spacer" aria-hidden="true"></span>
-              <span class="ik-pill" title="Прогресс хранится в браузере (localStorage)">
-                <span>grammar</span>
-                <span id="tensesStatus" class="ik-muted">ready</span>
-              </span>
-            </div>
-
-            <div class="ik-divider"></div>
-
-            <!-- HOME -->
-            <section class="ik-ex" id="tensesHomeView" aria-label="Grammar home" data-grammar-home-tab="all">
-              <div class="sh-grammar-hero">
-                <div>
-                  <p class="ik-title">грамматика</p>
-                  <p class="ik-sub">три задачи: найти тему, сравнить темы, потренироваться</p>
-                </div>
-                <div class="sh-grammar-hero__meta">
-                  <p class="sh-grammar-hero__level">уровень: <span id="grammarLevelValueInline">не выбран</span></p>
-                  <button class="ik-btn ik-btn--black" id="grammarContinueBtn" type="button" hidden>продолжить</button>
-                </div>
-              </div>
-
-              <div class="sh-level-box" id="grammarLevelBox">
-                <p class="sh-level-box__title">выбери уровень один раз</p>
-                <p class="sh-level-box__value" id="grammarLevelValue">не выбран</p>
-                <p class="sh-level-box__hint" id="grammarLevelPrompt">уровень применяется ко всему разделу</p>
-                <div class="sh-level-box__actions" role="group" aria-label="Grammar level picker">
-                  <button class="ik-btn" type="button" data-grammar-level="A2-B1">A2-B1</button>
-                  <button class="ik-btn" type="button" data-grammar-level="B1-B2">B1-B2</button>
-                  <button class="ik-btn" type="button" data-grammar-level="B2-C1">B2-C1</button>
-                  <button class="ik-btn" type="button" id="grammarLevelChangeBtn">сбросить</button>
-                </div>
-              </div>
-
-              <div class="sh-search-box" id="grammarSearchBox">
-                <p class="sh-search-box__title">поиск темы</p>
-                <div class="sh-search-box__modes" role="tablist" aria-label="Режим поиска grammar">
-                  <button class="ik-btn is-active" id="grammarSearchModeTopic" type="button" data-search-mode="topic">тема</button>
-                  <button class="ik-btn" id="grammarSearchModeError" type="button" data-search-mode="error">ошибка</button>
-                  <button class="ik-btn" id="grammarSearchModeSituation" type="button" data-search-mode="situation">ситуация</button>
-                </div>
-                <div class="sh-search-box__row">
-                  <input class="ik-input" id="grammarSearchInput" type="search" autocomplete="off" spellcheck="false" placeholder="например: passive, have went, как говорить о будущем плане" aria-label="Поиск по grammar" />
-                  <button class="ik-btn" id="grammarSearchClearBtn" type="button">очистить</button>
-                </div>
-                <p class="sh-search-box__hint" id="grammarSearchHint">введи запрос - система сама поймет, что искать</p>
-                <ul class="ik-list sh-search-results" id="grammarSearchResults" aria-label="Результаты поиска grammar" hidden></ul>
-              </div>
-
-              <div class="sh-builder-box" id="grammarBuilderBox">
-                <p class="sh-builder-box__title">помощник выбора</p>
-                <p class="sh-builder-box__sub">не знаешь, с чего начать? мини-сценарий на 2-4 шага приведет к теме</p>
-                <button class="ik-btn" id="grammarOpenConstructorBtn" type="button">не знаю, что выбрать</button>
-              </div>
-
-              <section class="sh-grammar-action-grid" role="group" aria-label="Главные действия grammar">
-                <button class="sh-action-btn" id="tensesGoTheory" type="button" aria-label="Найти тему">
-                  <span class="sh-action-btn__title">Найти тему</span>
-                  <span class="sh-action-btn__sub">открыть каталог и перейти к нужному правилу</span>
-                </button>
-                <button class="sh-action-btn" id="tensesGoCompare" type="button" aria-label="Сравнить темы">
-                  <span class="sh-action-btn__title">Сравнить темы</span>
-                  <span class="sh-action-btn__sub">разобрать различия между похожими темами</span>
-                </button>
-                <button class="sh-action-btn" id="tensesGoPractice" type="button" aria-label="Начать практику">
-                  <span class="sh-action-btn__title">Начать практику</span>
-                  <span class="sh-action-btn__sub">перейти в тренировку по теме или набору</span>
-                </button>
-              </section>
-
-              <section class="sh-grammar-block" aria-label="Каталог тем">
-                <div class="sh-grammar-block__head">
-                  <p class="sh-grammar-block__title">каталог тем</p>
-                  <p class="sh-grammar-block__sub">8 крупных групп без смешения с маршрутами и тренажерами</p>
-                </div>
-                <div class="sh-grammar-grid" role="list">
-                  <button class="sh-card sh-card--topic" id="grammarGroupTenses" type="button" role="listitem">
-                    <span class="sh-card__type">тема</span>
-                    <span class="sh-card__title">Времена</span>
-                    <span class="sh-card__text">Present, Past, Future + карты выбора</span>
-                    <span class="sh-card__cta">Открыть</span>
-                  </button>
-                  <button class="sh-card sh-card--topic" id="grammarGroupCondModals" type="button" role="listitem">
-                    <span class="sh-card__type">тема</span>
-                    <span class="sh-card__title">Conditionals и modals</span>
-                    <span class="sh-card__text">if-логика, should/must/could, выводы и советы</span>
-                    <span class="sh-card__cta">Открыть</span>
-                  </button>
-                  <button class="sh-card sh-card--topic" id="grammarGroupPassiveReported" type="button" role="listitem">
-                    <span class="sh-card__type">тема</span>
-                    <span class="sh-card__title">Passive и reported speech</span>
-                    <span class="sh-card__text">passive voice, reported speech, clauses</span>
-                    <span class="sh-card__cta">Открыть</span>
-                  </button>
-                  <button class="sh-card sh-card--topic" id="grammarGroupVerbPatterns" type="button" role="listitem">
-                    <span class="sh-card__type">тема</span>
-                    <span class="sh-card__title">Verb patterns</span>
-                    <span class="sh-card__text">gerund/infinitive, wish, causative, stative verbs</span>
-                    <span class="sh-card__cta">Открыть</span>
-                  </button>
-                  <button class="sh-card sh-card--topic" id="grammarGroupArticlesNouns" type="button" role="listitem">
-                    <span class="sh-card__type">тема</span>
-                    <span class="sh-card__title">Articles и nouns</span>
-                    <span class="sh-card__text">a/an/the, zero article, singular/plural</span>
-                    <span class="sh-card__cta">Открыть</span>
-                  </button>
-                  <button class="sh-card sh-card--topic" id="grammarGroupSyntaxChoice" type="button" role="listitem">
-                    <span class="sh-card__type">тема</span>
-                    <span class="sh-card__title">Syntax и word choice</span>
-                    <span class="sh-card__text">adverbs, inversion, cleft, question tags</span>
-                    <span class="sh-card__cta">Открыть</span>
-                  </button>
-                  <button class="sh-card sh-card--topic" id="grammarGroupUniversal" type="button" role="listitem">
-                    <span class="sh-card__type">тема</span>
-                    <span class="sh-card__title">Универсальные конструкции</span>
-                    <span class="sh-card__text">структуры вне одной временной линии</span>
-                    <span class="sh-card__cta">Открыть</span>
-                  </button>
-                  <button class="sh-card sh-card--topic" id="grammarGroupExamApplied" type="button" role="listitem">
-                    <span class="sh-card__type">подборка</span>
-                    <span class="sh-card__title">Экзаменационные и прикладные темы</span>
-                    <span class="sh-card__text">B1-B2 фокус и writing accuracy</span>
-                    <span class="sh-card__cta">Смотреть</span>
-                  </button>
-                </div>
-              </section>
-
-              <section class="sh-grammar-block" aria-label="Подборки grammar">
-                <div class="sh-grammar-block__head">
-                  <p class="sh-grammar-block__title">подборки</p>
-                  <p class="sh-grammar-block__sub">отдельный слой: обзоры и маршруты, а не отдельные темы</p>
-                </div>
-                <div class="sh-grammar-grid sh-grammar-grid--collections" role="list">
-                  <button class="sh-card sh-card--collection" id="tensesGoBasics" type="button" role="listitem" aria-label="Открыть базовый экскурс по временам">
-                    <span class="sh-card__type">обзор</span>
-                    <span class="sh-card__title">Базовый экскурс по временам</span>
-                    <span class="sh-card__text">единая карта 3 времен + главные контрасты</span>
-                    <span class="sh-card__cta">Смотреть</span>
-                  </button>
-                  <button class="sh-card sh-card--collection" id="grammarGoWritingPack" type="button" role="listitem" aria-label="Открыть writing accuracy route">
-                    <span class="sh-card__type">маршрут</span>
-                    <span class="sh-card__title">Writing accuracy route</span>
-                    <span class="sh-card__text">пассив, reported speech, clauses, conditionals, syntax</span>
-                    <span class="sh-card__cta">Смотреть</span>
-                  </button>
-                  <button class="sh-card sh-card--collection" id="grammarGoExamRoute" type="button" role="listitem" aria-label="Открыть exam route B1-B2">
-                    <span class="sh-card__type">маршрут</span>
-                    <span class="sh-card__title">Exam route B1-B2</span>
-                    <span class="sh-card__text">сфокусированный набор тем для экзамена</span>
-                    <span class="sh-card__cta">Смотреть</span>
-                  </button>
-                </div>
-              </section>
-
-              <section class="sh-grammar-block" aria-label="Практика grammar">
-                <div class="sh-grammar-block__head">
-                  <p class="sh-grammar-block__title">практика</p>
-                  <p class="sh-grammar-block__sub">тренировка живет рядом с темами, а не отдельным миром</p>
-                </div>
-                <div class="sh-grammar-grid sh-grammar-grid--practice" role="list">
-                  <button class="sh-card sh-card--practice" id="tensesGoTopicPractice" type="button" role="listitem">
-                    <span class="sh-card__type">практика</span>
-                    <span class="sh-card__title">Практика по теме</span>
-                    <span class="sh-card__text">выбери одну тему и сразу начни тренировку</span>
-                    <span class="sh-card__cta">Начать</span>
-                  </button>
-                  <button class="sh-card sh-card--practice" id="tensesGoMixed" type="button" role="listitem" aria-label="Запустить смешанную тренировку">
-                    <span class="sh-card__type">практика</span>
-                    <span class="sh-card__title">Смешанная практика</span>
-                    <span class="sh-card__text">автоматический микс по выбранному уровню</span>
-                    <span class="sh-card__cta">Начать</span>
-                  </button>
-                  <button class="sh-card sh-card--practice" id="tensesGoDaily" type="button" role="listitem" aria-label="Ежедневная мини-сессия">
-                    <span class="sh-card__type">практика</span>
-                    <span class="sh-card__title">На сегодня</span>
-                    <span class="sh-card__text">быстрая сессия из 10 заданий</span>
-                    <span class="sh-card__cta">Начать</span>
-                  </button>
-                  <button class="sh-card sh-card--practice" id="tensesGoPracticeCustom" type="button" role="listitem">
-                    <span class="sh-card__type">практика</span>
-                    <span class="sh-card__title">Пользовательский набор</span>
-                    <span class="sh-card__text">собери свой набор тем и работай точечно</span>
-                    <span class="sh-card__cta">Начать</span>
-                  </button>
-                </div>
-              </section>
-
-              <p class="ik-footnote">подсказка: внутри каждой темы есть быстрые задания и переход в полную практику</p>
-            </section>
-
-            <section class="ik-ex" id="tensesConstructorView" aria-label="Grammar constructor" hidden>
-              <div class="ik-row">
-                <button class="ik-btn" id="tensesBackToHomeFromConstructor" type="button">назад</button>
-                <span class="ik-spacer" aria-hidden="true"></span>
-                <span class="ik-badge" id="grammarBuilderStepBadge">шаг 1</span>
-              </div>
-
-              <div class="ik-divider"></div>
-
-              <p class="ik-title">конструктор по грамматике</p>
-              <p class="ik-sub" id="grammarBuilderSubtitle">выбери смысл, а мы подскажем лучшую тему</p>
-
-              <div class="sh-builder-phrase">
-                <p class="sh-builder-phrase__title">твоя фраза (необязательно)</p>
-                <input class="ik-input" id="grammarBuilderPhraseInput" type="text" autocomplete="off" spellcheck="false" placeholder="например: я хочу домой" />
-                <p class="sh-builder-phrase__hint">чем точнее пример, тем точнее рекомендация</p>
-              </div>
-
-              <div class="sh-builder" id="grammarBuilderBody" aria-label="Grammar constructor flow"></div>
-            </section>
-
-<!-- COMPARE -->
-<section class="ik-ex" id="tensesCompareView" aria-label="Grammar compare" hidden>
-  <div class="ik-row">
-    <button class="ik-btn" id="tensesBackToHomeFromCompare" type="button">назад</button>
-    <span class="ik-spacer" aria-hidden="true"></span>
-  </div>
-
-  <div class="ik-divider"></div>
-
-  <p class="ik-title">сравнение тем</p>
-  <p class="ik-sub">выбери любые 2 темы</p>
-
-  <div class="ik-row" style="margin-top:8px; flex-wrap: wrap; gap: 8px;">
-    <label class="ik-label" for="tensesCompareA">A</label>
-    <select class="ik-select" id="tensesCompareA" style="min-width: 220px;"></select>
-
-    <label class="ik-label" for="tensesCompareB">B</label>
-    <select class="ik-select" id="tensesCompareB" style="min-width: 220px;"></select>
-
-    <button class="ik-btn ik-btn--black" id="tensesCompareBtn" type="button">compare</button>
-  </div>
-
-  <div class="ik-divider"></div>
-
-  <div class="sh-compare">
-    <div class="sh-compare__rule" id="tensesCompareRule"></div>
-    <div class="sh-compare__table" id="tensesCompareTable"></div>
-  </div>
-
-  <div class="ik-divider"></div>
-
-  <div class="ik-row">
-    <button class="ik-btn ik-btn--black" id="tensesCompareStartMiniBtn" type="button">mini training (10)</button>
-    <button class="ik-btn" id="tensesCompareStartMini5Btn" type="button">mini (5)</button>
-    <span class="ik-spacer" aria-hidden="true"></span>
-  </div>
-
-  <div id="tensesCompareRunBody" style="margin-top:12px;"></div>
-</section>
-
-<!-- DAILY -->
-<section class="ik-ex" id="tensesDailyView" aria-label="Grammar daily" hidden>
-  <div class="ik-row">
-    <button class="ik-btn" id="tensesBackToHomeFromDaily" type="button">назад</button>
-    <span class="ik-spacer" aria-hidden="true"></span>
-  </div>
-
-  <div class="ik-divider"></div>
-
-  <p class="ik-title">daily mini-session</p>
-  <p class="ik-sub">10 случайных заданий на сегодня</p>
-
-  <div class="ik-row" style="margin-top:8px;">
-    <button class="ik-btn ik-btn--black" id="tensesDailyStartBtn" type="button">start daily (10)</button>
-    <button class="ik-btn" id="tensesDailyNewBtn" type="button">new set</button>
-    <span class="ik-spacer" aria-hidden="true"></span>
-  </div>
-
-  <div id="tensesDailyRunBody" style="margin-top:12px;"></div>
-</section>
-
-            <!-- LIST -->
-            <section class="ik-ex" id="tensesListView" aria-label="Grammar topics list" hidden>
-              <div class="ik-row">
-                <button class="ik-btn" id="tensesBackToHomeFromList" type="button">назад</button>
-                <span class="ik-spacer" aria-hidden="true"></span>
-              </div>
-
-              <div class="ik-divider"></div>
-
-              <p class="ik-title">грамматика</p>
-              <p class="ik-sub" id="tensesListSubtitle">каталог тем</p>
-
-              <div class="sh-category" id="grammarCategoryWrap">
-                <p class="sh-category__title">группа тем</p>
-                <div class="sh-category__bar" id="grammarCategoryBar" role="group" aria-label="Категория grammar"></div>
-              </div>
-
-              <section class="sh-finder" id="grammarFinderWrap" aria-label="Система разделов grammar">
-                <div class="sh-finder__head">
-                  <p class="sh-finder__title" id="grammarFinderTitle">фильтры каталога</p>
-                  <button class="ik-btn" id="grammarFinderResetBtn" type="button">сбросить</button>
-                </div>
-
-                <div class="sh-finder__modes" id="grammarFinderModes" role="tablist" aria-label="Режимы поиска правил"></div>
-                <div class="sh-finder__chips" id="grammarFinderChips" role="group" aria-label="Быстрые фильтры по grammar"></div>
-
-                <div class="sh-finder__search">
-                  <input class="ik-input" id="grammarListSearchInput" type="search" autocomplete="off" spellcheck="false" placeholder="поиск по теме, ошибке или ситуации..." aria-label="Фильтр списка grammar" />
-                  <button class="ik-btn" id="grammarListSearchClearBtn" type="button">очистить</button>
-                </div>
-
-                <p class="ik-footnote sh-finder__summary" id="grammarFinderSummary">режим: всё • фильтр: нет</p>
-              </section>
-
-              <label class="ik-label sh-list-compact-toggle">
-                <input type="checkbox" id="grammarCompactListToggle" checked />
-                минимальный список (без перегруза)
-              </label>
-
-              <div class="sh-subgroup" id="grammarSubgroupWrap" hidden>
-                <p class="sh-subgroup__title">подкатегория</p>
-                <div class="sh-subgroup__bar" id="grammarSubgroupBar" role="group" aria-label="Grammar subgroup filter"></div>
-              </div>
-
-              <ul class="ik-list" id="tensesList" aria-label="Список грамматических тем"></ul>
-            </section>
-
-            <!-- DETAIL -->
-            <section class="ik-ex" id="tensesDetailView" aria-label="Tense detail" hidden>
-              <div class="ik-row">
-                <button class="ik-btn" id="tensesBackToList" type="button">назад</button>
-                <button class="ik-btn" id="tensesBackToRunFromDetail" type="button" hidden>вернуться к упражнению</button>
-                <span class="ik-spacer" aria-hidden="true"></span>
-                <button class="ik-btn" id="tensesAddToLibraryBtn" type="button">в библиотеку</button>
-                <button class="ik-btn ik-btn--black" id="tensesGoPracticeFromDetail" type="button" hidden>упражнения по теме</button>
-              </div>
-
-              <div class="ik-divider"></div>
-
-              <div class="ik-row" style="align-items:flex-end;">
-                <div>
-                  <p class="ik-title" id="tenseTitle">...</p>
-                  <p class="ik-sub" id="tenseSubtitle">...</p>
-                </div>
-                <span class="ik-spacer" aria-hidden="true"></span>
-                <div class="ik-mini" role="group" aria-label="Rule mode">
-                  <button class="ik-btn" id="tenseRuleModeShortBtn" type="button">кратко</button>
-                  <button class="ik-btn" id="tenseRuleModeFullBtn" type="button">полно</button>
-                </div>
-                <span class="ik-badge" id="tenseMasteryBadge">mastery 0/5</span>
-              </div>
-
-              <div class="ik-divider"></div>
-
-              <div class="ik-row sh-topic-meta-row" id="tenseMetaRow" aria-label="Метаданные темы">
-                <span class="ik-badge" id="tenseMetaType">тип: тема</span>
-                <span class="ik-badge" id="tenseMetaLevel">уровень: -</span>
-                <span class="ik-badge" id="tenseMetaTime">~10 мин</span>
-              </div>
-
-              <div class="sh-topic-quick" id="tenseQuickAnswer" aria-label="Быстрый ответ"></div>
-
-              <div class="sh-topic-nav" id="tenseLocalNav" role="navigation" aria-label="Навигация по теме"></div>
-
-              <div class="ik-divider"></div>
-
-              <div class="sh-overview-floating-nav" id="tensesOverviewFloatingNav" aria-label="Быстрая навигация по обзору" hidden></div>
-
-              <div id="tenseRuleBody" class="sh-struct-rule" aria-label="Theory content"></div>
-
-              <div class="ik-divider"></div>
-
-                <div class="ik-row">
-                  <span class="ik-spacer" aria-hidden="true"></span>
-                  <button class="ik-btn ik-btn--black" id="tensesGoPracticeBottom" type="button" hidden>перейти к упражнениям</button>
-                </div>
-              </section>
-
-            <!-- PRACTICE -->
-            <section class="ik-ex" id="tensesPracticeView" aria-label="Grammar practice" hidden>
-              <div class="ik-row">
-                <button class="ik-btn" id="tensesBackToHomeFromPractice" type="button">назад</button>
-                <span class="ik-spacer" aria-hidden="true"></span>
-                <span class="ik-badge" id="tensesPracticeMeta">0/0</span>
-              </div>
-
-              <div class="ik-divider"></div>
-
-              <p class="ik-title">упражнения по грамматике</p>
-              <p class="ik-sub">два режима: смешанные упражнения или пользовательские упражнения</p>
-
-              <div class="sh-practice-mode" id="tensesPracticeModeSwitch" role="group" aria-label="Режим практики">
-                <button class="ik-btn ik-btn--black" id="tensesModeMixedBtn" type="button">смешанные упражнения</button>
-                <button class="ik-btn" id="tensesModeCustomBtn" type="button">пользовательские упражнения</button>
-              </div>
-
-              <p class="ik-sub" id="tensesPracticeModeHint">смешанные упражнения: автоматический микс тем по твоему уровню</p>
-
-              <div class="sh-practice-flow">
-                <section class="sh-practice-box sh-practice-box--control" aria-label="Управление практикой">
-                  <p class="sh-practice-box__title">управление</p>
-
-                  <div class="ik-row sh-practice-box__goal-row">
-                    <label class="ik-label" for="tensesGoalSelect">цель</label>
-                    <select class="ik-select" id="tensesGoalSelect" style="min-width: 260px;"></select>
-                    <select class="ik-select" id="tensesTenseSelect" hidden></select>
-                    <button class="ik-btn" id="tensesCustomOpenPickerBtn" type="button">выбрать правила и времена</button>
-                  </div>
-
-                  <div class="sh-practice-source" id="tensesPracticeSourceNotice" hidden>
-                    <p class="sh-practice-source__text">Добавлено из темы: <strong id="tensesPracticeSourceName">—</strong></p>
-                    <div class="sh-practice-source__actions">
-                      <button class="ik-btn" id="tensesPracticeSourceRemoveBtn" type="button">убрать</button>
-                      <button class="ik-btn" id="tensesPracticeSourceEditBtn" type="button">изменить выбор</button>
-                    </div>
-                  </div>
-                </section>
-
-                <section id="tensesCustomPicker" class="sh-practice-box sh-practice-box--selected" aria-label="Выбранные темы" hidden>
-                  <p class="sh-practice-box__title">выбрано</p>
-                  <p class="ik-footnote" id="tensesCustomHint">выбрано: 0 из 0</p>
-
-                  <div class="sh-selected-chips" id="tensesCustomSelectedChips" aria-label="Выбранные правила"></div>
-                  <button class="ik-btn" id="tensesCustomSelectedMoreBtn" type="button" hidden>+0 еще</button>
-
-                  <div class="sh-practice-box__actions">
-                    <button class="ik-btn" id="tensesCustomEditBtn" type="button">изменить</button>
-                    <button class="ik-btn" id="tensesCustomClearAllBtn" type="button">очистить все</button>
-                  </div>
-                </section>
-
-                <section class="sh-practice-box sh-practice-box--launch" aria-label="Запуск практики">
-                  <p class="sh-practice-box__title">запуск</p>
-
-                  <div class="sh-practice-launch-actions">
-                    <button class="ik-btn ik-btn--black" id="tensesStartBtn" type="button">start</button>
-                    <button class="ik-btn" id="tensesRetryMistakesBtn" type="button">retry mistakes</button>
-                    <button class="ik-btn" id="tensesClearMistakesBtn" type="button">clear mistakes</button>
-                    <button class="ik-btn" id="tensesResetProgressBtn" type="button">reset progress</button>
-                  </div>
-
-                  <label class="ik-label sh-practice-show-after">
-                    <input type="checkbox" id="tensesShowAfterEach" checked />
-                    show answers after each
-                  </label>
-                </section>
-              </div>
-
-              <div class="sh-selector-modal" id="tensesCustomSelectorModal" hidden>
-                <div class="sh-selector-modal__backdrop" id="tensesCustomSelectorBackdrop"></div>
-                <section class="sh-selector-modal__panel" role="dialog" aria-modal="true" aria-label="Выбор правил и времен">
-                  <div class="sh-selector-modal__head">
-                    <p class="ik-title">выбор правил и времен</p>
-                    <button class="ik-btn" id="tensesCustomSelectorCloseBtn" type="button">закрыть</button>
-                  </div>
-
-                  <div class="sh-selector-modal__layout">
-                    <aside class="sh-selector-side" aria-label="Навигация по выбору">
-                      <div class="sh-selector-side__search">
-                        <input class="ik-input" id="tensesCustomSearchInput" type="search" autocomplete="off" spellcheck="false" placeholder="найти правило: perfect, passive, condition..." />
-                        <button class="ik-btn" id="tensesCustomSearchClearBtn" type="button">очистить</button>
-                      </div>
-
-                      <p class="sh-selector-side__title">быстрые фильтры</p>
-                      <div class="sh-selector-quick" id="tensesCustomQuickFilters"></div>
-
-                      <p class="sh-selector-side__title">группы</p>
-                      <div class="sh-selector-groups" id="tensesCustomGroupList"></div>
-
-                      <p class="sh-selector-side__title">пресеты</p>
-                      <div class="sh-selector-presets" id="tensesCustomPresetList"></div>
-                    </aside>
-
-                    <section class="sh-selector-main" aria-label="Список правил">
-                      <div class="sh-selector-main__head">
-                        <p class="sh-selector-main__title" id="tensesCustomGroupTitle">все темы</p>
-                        <span class="ik-badge" id="tensesCustomGroupMeta">0</span>
-                      </div>
-
-                      <div class="sh-selector-main__actions">
-                        <button class="ik-btn" id="tensesCustomPrevPageBtn" type="button" hidden>предыдущие</button>
-                        <button class="ik-btn" id="tensesCustomNextPageBtn" type="button" hidden>следующие</button>
-                        <button class="ik-btn" id="tensesCustomSelectGroupBtn" type="button">выбрать группу</button>
-                        <button class="ik-btn" id="tensesCustomClearGroupBtn" type="button">очистить группу</button>
-                        <button class="ik-btn" id="tensesCustomSelectAllBtn" type="button">выбрать видимые</button>
-                        <button class="ik-btn" id="tensesCustomClearVisibleBtn" type="button">снять видимые</button>
-                      </div>
-
-                      <p class="ik-footnote" id="tensesCustomSearchEmpty" hidden>ничего не найдено, уточни запрос</p>
-                      <div class="sh-selector-topics" id="tensesCustomGrid" aria-label="Custom tenses list"></div>
-                    </section>
-
-                    <aside class="sh-selector-sticky" aria-label="Выбранные правила и запуск">
-                      <span class="ik-badge" id="tensesCustomStickyGoal">цель: all</span>
-                      <span class="ik-badge" id="tensesCustomStickyCount">выбрано: 0</span>
-                      <div class="sh-selected-chips sh-selected-chips--compact" id="tensesCustomStickyChips"></div>
-                      <button class="ik-btn ik-btn--black" id="tensesCustomStartFromSelectorBtn" type="button">start custom</button>
-                    </aside>
-                  </div>
-                </section>
-              </div>
-
-              <div class="ik-divider"></div>
-
-              <div id="tensesPracticeBody" class="sh-struct-practice" aria-label="Practice content"></div>
-
-              <p class="ik-footnote">enter - check/next • esc - выйти в меню</p>
+            <section class="ik-ex" aria-label="Grammar React app">
+              <p class="ik-title">grammar</p>
+              <p class="ik-sub">next/react/tailwind grammar runtime</p>
             </section>
           </div>
 
@@ -1529,9 +1056,9 @@
         backBtn.addEventListener('click', function(event){
           event.preventDefault();
           if(window.IKLoading && typeof window.IKLoading.leave === 'function'){
-            window.IKLoading.leave(function(){ safeBrowserBack('../../index.html'); });
+            window.IKLoading.leave(function(){ safeBrowserBack('../../'); });
           } else {
-            safeBrowserBack('../../index.html');
+            safeBrowserBack('../../');
           }
         });
       }
@@ -1541,7 +1068,6 @@
   <script src="./js/library.js?v=20260331-03"></script>
   <script src="./js/structure_data.js"></script>
   <script src="./js/structure.js?v=20260331-01"></script>
-  <script src="./js/tenses.js?v=20260331-09"></script>
   <script src="./js/word_transformation.js?v=20260331-02"></script>
   <script src="./js/dictionary.js" onerror="window.IKAdminLog && window.IKAdminLog('error','student_helper','dictionary.js failed to load')"></script>
   <script>

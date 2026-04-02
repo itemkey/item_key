@@ -344,6 +344,7 @@ body {
       overflow: auto;
       border: 2px solid #000;
       background: #fff;
+      position: relative;
     }
     .dict-view-sticky{
       position: sticky;
@@ -363,6 +364,13 @@ body {
       margin: 0;
       max-height: none;
       overflow: visible;
+      transition: opacity .14s ease;
+    }
+    .dict-view-wrap.is-loading{
+      cursor: progress;
+    }
+    .dict-view-wrap.is-loading .ik-list.dict-view-list{
+      opacity: .78;
     }
 
     @media (prefers-reduced-motion: no-preference){

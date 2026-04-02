@@ -27,10 +27,9 @@
     const origin = window.location.origin;
     if (!origin || origin === "null") return null;
     const path = String(window.location.pathname || "/");
-    const baseDir = path.replace(/[^/]*$/, "");
-    let base = origin + baseDir;
-    if (!base.endsWith("/")) base += "/";
-    return base + "item-user.html";
+    const parts = path.split("/").filter(Boolean);
+    const appRoot = parts.length && parts[0] === "item_key" ? "/item_key/" : "/";
+    return `${origin}${appRoot}item-user/`;
   }
 
   async function resendSignupEmail(email) {

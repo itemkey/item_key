@@ -1,10 +1,24 @@
 // Небольшой “живой” штрих: подсветка активной страницы и мягкий звук/эффект можно добавить позже.
 (() => {
-  const path = (location.pathname.split("/").pop() || "index.html").toLowerCase();
+  const normalizePath = (raw) => {
+    const p = String(raw || "").trim().toLowerCase();
+    if (!p || p === "/") return "index";
+    const clean = p.replace(/^\/+/, "").replace(/\/+$/, "");
+    if (!clean || clean === "index" || clean === "index.html") return "index";
+    return clean.replace(/\.html$/i, "");
+  };
+
+  const path = normalizePath(location.pathname);
 
   const links = document.querySelectorAll("a[href]");
   links.forEach(a => {
-    const href = (a.getAttribute("href") || "").toLowerCase();
+    const hrefRaw = (a.getAttribute("href") || "").trim();
+    if (!hrefRaw || hrefRaw.startsWith("#") || /^https?:/i.test(hrefRaw) || /^mailto:/i.test(hrefRaw) || /^tel:/i.test(hrefRaw)) return;
+    let hrefPath = hrefRaw;
+    try {
+      hrefPath = new URL(hrefRaw, location.href).pathname;
+    } catch (_) {}
+    const href = normalizePath(hrefPath);
     if (href === path) a.classList.add("is-active");
   });
 })();
@@ -223,8 +237,8 @@
     current = null;
   }
 
-  // Ищем ссылку в шапке на item-user.html (есть на всех твоих страницах)
-  const userLink = document.querySelector('a.toplink[href^="item-user.html"]');
+  // Ищем ссылку в шапке на item-user (legacy .html and canonical)
+  const userLink = document.querySelector('a.toplink[href*="item-user"]');
   if (!userLink) return;
 
   const tag = userLink.querySelector(".tag");

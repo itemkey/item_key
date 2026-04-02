@@ -6,9 +6,15 @@
   function getPageId(){
     const page = document.body?.dataset?.i18nPage;
     if(page) return page;
-    const path = window.location.pathname;
-    const match = path.match(/\/([^\/]+)\.html$/);
-    return match ? match[1] : 'unknown';
+    const path = String(window.location.pathname || '').replace(/\/+$/, '');
+    const htmlMatch = path.match(/\/([^\/]+)\.html$/);
+    if(htmlMatch) return htmlMatch[1];
+
+    const parts = path.split('/').filter(Boolean);
+    if(!parts.length) return 'index';
+    const last = parts[parts.length - 1];
+    if(last === 'item_key') return 'index';
+    return last || 'unknown';
   }
 
   function getStoredState(){

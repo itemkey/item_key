@@ -588,7 +588,7 @@
 <body class="page page-crate ik-booting" data-i18n-page="whisperer" data-ik-loading>
   <header class="ik-site-nav" id="ikSiteNav">
     <button type="button" class="ik-site-nav__link" id="ikBackBtn" title="Вернуться назад">← Назад</button>
-    <a class="ik-site-nav__link" href="../../index.html">Главное меню</a>
+    <a class="ik-site-nav__link" href="../../">Главное меню</a>
   </header>
 
 
@@ -907,9 +907,9 @@
           event.preventDefault();
           if(tryInternalBack()) return;
           if(window.IKLoading && typeof window.IKLoading.leave === 'function'){
-            window.IKLoading.leave(function(){ safeBrowserBack('../../index.html'); });
+            window.IKLoading.leave(function(){ safeBrowserBack('../../'); });
           } else {
-            safeBrowserBack('../../index.html');
+            safeBrowserBack('../../');
           }
         });
       }

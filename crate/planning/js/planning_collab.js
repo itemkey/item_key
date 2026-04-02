@@ -1209,7 +1209,7 @@ export class PlanningCollabApp {
     if (this.els.viewSelect) this.els.viewSelect.value = 'board';
     this.setView('board');
     this.renderAssigneeFilter();
-    this.renderEmptyBoard(this.t('требуется вход. откройте item-user.html и авторизуйтесь.', 'login required. open item-user.html and sign in.'));
+    this.renderEmptyBoard(this.t('требуется вход. откройте item-user и авторизуйтесь.', 'login required. open item-user and sign in.'));
     this.renderProjectSelect();
     this.renderProjectBar();
     this.renderPresence();
