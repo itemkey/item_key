@@ -2634,3 +2634,328 @@ body.sh-library-picker-open{
     grid-template-columns: 1fr;
   }
 }
+
+/* -------------------------------------------- */
+/* Grammar React runtime (Next/React)           */
+/* -------------------------------------------- */
+
+.sh-react-grammar{
+  border: 2px solid #000 !important;
+  background: #fff;
+  box-shadow: 0 0 0 6px rgba(0,0,0,0.06);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+.sh-react-grammar *{
+  box-sizing: border-box;
+}
+
+.sh-react-grammar__head{
+  display: grid;
+  gap: 10px;
+}
+
+.sh-react-grammar__head-main{
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.sh-react-grammar__title{
+  font-size: 14px;
+  letter-spacing: .06em;
+  line-height: 1.15;
+}
+
+.sh-react-grammar__subtitle{
+  line-height: 1.45;
+  opacity: .84;
+}
+
+.sh-react-grammar__head-actions{
+  display: grid;
+  gap: 8px;
+}
+
+.sh-react-grammar__tabs{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.sh-react-grammar__tabs--main{
+  border-bottom: 1px solid rgba(0,0,0,0.14);
+  padding-bottom: 8px;
+}
+
+.sh-react-grammar__tabs button{
+  min-height: 36px;
+  min-width: 106px;
+}
+
+.sh-react-grammar__meta-row{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.sh-react-grammar__meta-pill{
+  display: inline-flex;
+  align-items: center;
+  border: 2px solid #000;
+  background: #fff;
+  padding: 5px 8px;
+  font-size: 11px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  font-weight: 900;
+  line-height: 1.15;
+}
+
+.sh-react-grammar__quick-grid{
+  align-items: stretch;
+}
+
+.sh-react-grammar__quick-card{
+  display: grid;
+  gap: 2px;
+  min-height: 122px;
+}
+
+.sh-react-grammar__topic-list{
+  margin-top: 2px;
+}
+
+.sh-react-grammar__topic-row{
+  transition: transform 90ms ease, background-color 130ms ease, box-shadow 130ms ease;
+}
+
+.sh-react-grammar__topic-row:hover{
+  background: rgba(0,0,0,0.03);
+  box-shadow: 0 2px 0 rgba(0,0,0,0.16);
+}
+
+.sh-react-grammar button{
+  border-radius: 0;
+  font-family: inherit;
+  font-weight: 900;
+  transition: transform 90ms ease, border-color 130ms ease, background-color 130ms ease, color 130ms ease;
+}
+
+.sh-react-grammar button:hover{
+  transform: translateY(-1px);
+}
+
+.sh-react-grammar button:active{
+  transform: translateY(0);
+}
+
+.sh-react-grammar button[disabled]{
+  opacity: .52;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.sh-react-grammar input:not([type="checkbox"]):not([type="radio"]),
+.sh-react-grammar select,
+.sh-react-grammar textarea{
+  border-width: 2px !important;
+  border-color: #000 !important;
+  border-radius: 0;
+  background: #fff;
+  color: #000;
+  font-family: inherit;
+}
+
+.sh-react-grammar textarea{
+  line-height: 1.45;
+}
+
+.sh-react-grammar .tw-border{
+  border-width: 2px !important;
+  border-color: #000 !important;
+}
+
+.sh-react-grammar .tw-border-b{
+  border-bottom-width: 1px !important;
+  border-bottom-color: rgba(0,0,0,0.16) !important;
+}
+
+.sh-react-grammar .tw-border-zinc-200{
+  border-color: rgba(0,0,0,0.14) !important;
+}
+
+.sh-react-grammar .tw-border-zinc-300,
+.sh-react-grammar .tw-border-zinc-400{
+  border-color: rgba(0,0,0,0.26) !important;
+}
+
+.sh-react-grammar .tw-bg-white{
+  background: #fff !important;
+}
+
+.sh-react-grammar .tw-bg-zinc-50{
+  background: rgba(0,0,0,0.03) !important;
+}
+
+.sh-react-grammar .tw-bg-zinc-100{
+  background: rgba(0,0,0,0.06) !important;
+}
+
+.sh-react-grammar .tw-bg-black{
+  background: #000 !important;
+  border-color: #000 !important;
+}
+
+.sh-react-grammar .tw-text-zinc-900{
+  color: #000 !important;
+}
+
+.sh-react-grammar .tw-text-zinc-800{
+  color: rgba(0,0,0,0.9) !important;
+}
+
+.sh-react-grammar .tw-text-zinc-700{
+  color: rgba(0,0,0,0.78) !important;
+}
+
+.sh-react-grammar .tw-text-zinc-600{
+  color: rgba(0,0,0,0.64) !important;
+}
+
+.sh-react-grammar .tw-border-emerald-300{
+  border-color: rgba(0, 140, 60, 0.42) !important;
+}
+
+.sh-react-grammar .tw-bg-emerald-50{
+  background: rgba(0, 180, 60, 0.14) !important;
+}
+
+.sh-react-grammar .tw-border-amber-300{
+  border-color: rgba(160, 110, 0, 0.42) !important;
+}
+
+.sh-react-grammar .tw-bg-amber-50{
+  background: rgba(255, 191, 0, 0.18) !important;
+}
+
+.sh-react-grammar .hover\:tw-border-black:hover{
+  border-color: #000 !important;
+}
+
+.sh-react-grammar .hover\:tw-bg-zinc-800:hover{
+  background: #171717 !important;
+}
+
+@media (min-width: 1020px){
+  .sh-react-grammar__head{
+    grid-template-columns: minmax(260px, 1fr) minmax(0, 1.5fr);
+    align-items: end;
+  }
+
+  .sh-react-grammar__head-actions{
+    align-items: end;
+  }
+
+  .sh-react-grammar__tabs--main{
+    justify-content: flex-end;
+  }
+
+  .sh-react-grammar__tabs--tools{
+    justify-content: flex-end;
+  }
+}
+
+@media (max-width: 760px){
+  .sh-react-grammar{
+    padding: 12px !important;
+  }
+
+  .sh-react-grammar__tabs{
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sh-react-grammar__tabs button{
+    width: 100%;
+    min-width: 0;
+  }
+
+  .sh-react-grammar__meta-pill{
+    font-size: 10px;
+    letter-spacing: .03em;
+  }
+}
+
+@media (max-width: 520px){
+  .sh-react-grammar__tabs{
+    grid-template-columns: 1fr;
+  }
+}
+
+html[data-theme="dark"] .page-learning .sh-react-grammar{
+  background: var(--ik-surface);
+  border-color: var(--ik-border-strong) !important;
+  box-shadow: none;
+  color: var(--ik-text);
+}
+
+html[data-theme="dark"] .page-learning .sh-react-grammar .tw-border,
+html[data-theme="dark"] .page-learning .sh-react-grammar .tw-border-zinc-200,
+html[data-theme="dark"] .page-learning .sh-react-grammar .tw-border-zinc-300,
+html[data-theme="dark"] .page-learning .sh-react-grammar .tw-border-zinc-400,
+html[data-theme="dark"] .page-learning .sh-react-grammar .tw-border-b,
+html[data-theme="dark"] .page-learning .sh-react-grammar .sh-react-grammar__meta-pill{
+  border-color: var(--ik-border) !important;
+}
+
+html[data-theme="dark"] .page-learning .sh-react-grammar input:not([type="checkbox"]):not([type="radio"]),
+html[data-theme="dark"] .page-learning .sh-react-grammar select,
+html[data-theme="dark"] .page-learning .sh-react-grammar textarea{
+  border-color: var(--ik-border) !important;
+  background: var(--ik-surface) !important;
+  color: var(--ik-text) !important;
+}
+
+html[data-theme="dark"] .page-learning .sh-react-grammar .tw-bg-white,
+html[data-theme="dark"] .page-learning .sh-react-grammar .sh-react-grammar__meta-pill{
+  background: var(--ik-surface) !important;
+}
+
+html[data-theme="dark"] .page-learning .sh-react-grammar .tw-bg-zinc-50{
+  background: var(--ik-surface-soft) !important;
+}
+
+html[data-theme="dark"] .page-learning .sh-react-grammar .tw-bg-zinc-100{
+  background: var(--ik-surface-alt) !important;
+}
+
+html[data-theme="dark"] .page-learning .sh-react-grammar .tw-text-zinc-900,
+html[data-theme="dark"] .page-learning .sh-react-grammar .tw-text-zinc-800,
+html[data-theme="dark"] .page-learning .sh-react-grammar .tw-text-zinc-700{
+  color: var(--ik-text) !important;
+}
+
+html[data-theme="dark"] .page-learning .sh-react-grammar .tw-text-zinc-600,
+html[data-theme="dark"] .page-learning .sh-react-grammar .sh-react-grammar__subtitle{
+  color: var(--ik-muted) !important;
+}
+
+html[data-theme="dark"] .page-learning .sh-react-grammar .tw-bg-black{
+  background: #ecf2ff !important;
+  color: #0f1218 !important;
+  border-color: #ecf2ff !important;
+}
+
+html[data-theme="dark"] .page-learning .sh-react-grammar .tw-text-white{
+  color: #0f1218 !important;
+}
+
+html[data-theme="dark"] .page-learning .sh-react-grammar .hover\:tw-bg-zinc-800:hover{
+  background: #dce8ff !important;
+}
+
+html[data-theme="dark"] .page-learning .sh-react-grammar .sh-react-grammar__topic-row:hover{
+  background: color-mix(in srgb, var(--ik-surface-soft) 72%, #000 28%) !important;
+  box-shadow: none;
+}

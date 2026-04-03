@@ -383,6 +383,54 @@ function initAnswer(node) {
   return {};
 }
 
+function canCheckAnswer(node, answer) {
+  const kind = asText(node && node.kind);
+  const item = (node && node.item) || {};
+
+  if (kind === "choice") return Number(answer && answer.selectedIndex) >= 0;
+
+  if (kind === "multi") {
+    const selected = (answer && answer.selected) || {};
+    return Object.keys(selected).some((key) => !!selected[key]);
+  }
+
+  if (kind === "input" || kind === "correction") {
+    return asText(answer && answer.text).length > 0;
+  }
+
+  if (kind === "multi_input") {
+    const values = asList(answer && answer.values);
+    if (!values.length) return false;
+    return values.every((value) => asText(value).length > 0);
+  }
+
+  if (kind === "inline_select") {
+    const blanks = asList(item && item.blanks);
+    if (!blanks.length) return false;
+    const values = asList(answer && answer.values);
+    return blanks.every((_, idx) => Number(values[idx]) >= 0);
+  }
+
+  if (kind === "match") {
+    const pairs = asList(item && item.pairs);
+    if (!pairs.length) return false;
+    const picks = (answer && answer.picks) || {};
+    return pairs.every((pair) => {
+      const left = asText(pair && pair.left);
+      return left && asText(picks[left]).length > 0;
+    });
+  }
+
+  if (kind === "drag_sort") {
+    const words = asList(item && item.words);
+    if (!words.length) return false;
+    const picks = asList(answer && answer.picks);
+    return words.every((_, idx) => asText(picks[idx]).length > 0);
+  }
+
+  return true;
+}
+
 function evaluateAnswer(node, answer) {
   const kind = asText(node && node.kind);
   const item = (node && node.item) || {};
@@ -691,7 +739,8 @@ export default function GrammarReactAppPortal() {
     try {
       const lastView = asText(localStorage.getItem(KEY_LAST_VIEW));
       if (lastView && ["home", "list", "detail", "constructor", "compare", "daily", "practice"].includes(lastView)) {
-        setView(lastView);
+        if (["constructor", "compare", "daily"].includes(lastView)) setView("home");
+        else setView(lastView);
       }
     } catch (_err) {}
   }, []);
@@ -739,7 +788,7 @@ export default function GrammarReactAppPortal() {
         }
       } catch (err) {
         if (cancelled) return;
-        setIndexError(asText(err && err.message) || "failed to load grammar index");
+        setIndexError("Не удалось загрузить каталог тем.");
       } finally {
         if (!cancelled) setLoadingIndex(false);
       }
@@ -775,7 +824,7 @@ export default function GrammarReactAppPortal() {
       setTopicDocs((prev) => ({ ...prev, [id]: doc }));
       return doc;
     } catch (err) {
-      setDocError(asText(err && err.message) || "failed to load topic");
+      setDocError("Не удалось открыть эту тему.");
       return null;
     }
   };
@@ -1091,7 +1140,7 @@ export default function GrammarReactAppPortal() {
     try {
       const items = await buildCompareItems(aid, bid, count);
       if (!items.length) {
-        setDocError("нет enough compare items для этих тем");
+        setDocError("Для выбранной пары пока нет заданий для сравнения.");
         return;
       }
 
@@ -1199,7 +1248,7 @@ export default function GrammarReactAppPortal() {
     try {
       const picked = await pickDailySet(!!forceNew);
       if (!picked.length) {
-        setDocError("daily pool is empty");
+        setDocError("На сегодня нет доступных заданий.");
         return;
       }
 
@@ -1431,28 +1480,29 @@ export default function GrammarReactAppPortal() {
 
   const renderRuleBlock = (block, idx) => {
     const type = asText(block && block.type);
+    const cardClass = "tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 sm:tw-p-5";
 
     if (type === "heading") {
       return (
-        <h3 key={`${idx}-heading`} className="tw-m-0 tw-text-base tw-font-semibold tw-text-zinc-900">
-          {asText(block.text)}
-        </h3>
+        <div key={`${idx}-heading`} className={cardClass}>
+          <h3 className="tw-m-0 tw-text-base tw-font-semibold tw-text-slate-900">{asText(block.text)}</h3>
+        </div>
       );
     }
 
     if (type === "text") {
       return (
-        <p key={`${idx}-text`} className="tw-m-0 tw-text-sm tw-leading-relaxed tw-text-zinc-800">
-          {asText(block.text)}
-        </p>
+        <div key={`${idx}-text`} className={cardClass}>
+          <p className="tw-m-0 tw-text-sm tw-leading-relaxed tw-text-slate-700">{asText(block.text)}</p>
+        </div>
       );
     }
 
     if (type === "highlight") {
       return (
-        <div key={`${idx}-highlight`} className="tw-border tw-border-zinc-300 tw-bg-zinc-50 tw-p-3">
-          {asText(block.title) ? <p className="tw-m-0 tw-text-sm tw-font-semibold tw-text-zinc-900">{asText(block.title)}</p> : null}
-          <ul className="tw-m-0 tw-mt-2 tw-list-disc tw-space-y-1 tw-pl-5 tw-text-sm tw-text-zinc-800">
+        <div key={`${idx}-highlight`} className={`${cardClass} tw-bg-slate-50`}>
+          {asText(block.title) ? <p className="tw-m-0 tw-text-sm tw-font-semibold tw-text-slate-900">{asText(block.title)}</p> : null}
+          <ul className="tw-m-0 tw-list-disc tw-space-y-1.5 tw-pl-5 tw-text-sm tw-text-slate-700">
             {asList(block.lines).map((line, lineIdx) => (
               <li key={`${idx}-line-${lineIdx}`}>{asText(line)}</li>
             ))}
@@ -1463,8 +1513,8 @@ export default function GrammarReactAppPortal() {
 
     if (type === "table") {
       return (
-        <div key={`${idx}-table`} className="tw-space-y-2">
-          {asText(block.caption) ? <p className="tw-m-0 tw-text-sm tw-font-semibold tw-text-zinc-900">{asText(block.caption)}</p> : null}
+        <div key={`${idx}-table`} className={cardClass}>
+          {asText(block.caption) ? <p className="tw-m-0 tw-text-sm tw-font-semibold tw-text-slate-900">{asText(block.caption)}</p> : null}
           <RuleTable block={block} />
         </div>
       );
@@ -1472,13 +1522,13 @@ export default function GrammarReactAppPortal() {
 
     if (type === "examples") {
       return (
-        <div key={`${idx}-examples`} className="tw-border tw-border-zinc-300 tw-bg-white tw-p-3">
-          <p className="tw-m-0 tw-text-sm tw-font-semibold tw-text-zinc-900">examples</p>
-          <ul className="tw-m-0 tw-mt-2 tw-list-none tw-space-y-2 tw-p-0">
+        <div key={`${idx}-examples`} className={cardClass}>
+          <p className="tw-m-0 tw-text-sm tw-font-semibold tw-text-slate-900">Примеры</p>
+          <ul className="tw-m-0 tw-list-none tw-space-y-2 tw-p-0">
             {asList(block.items).map((item, itemIdx) => (
-              <li key={`${idx}-example-${itemIdx}`} className="tw-border-b tw-border-zinc-200 tw-pb-2 last:tw-border-b-0 last:tw-pb-0">
-                <p className="tw-m-0 tw-text-sm tw-font-semibold tw-text-zinc-900">{asText(item && item.en)}</p>
-                <p className="tw-m-0 tw-mt-1 tw-text-sm tw-text-zinc-700">{asText(item && item.ru)}</p>
+              <li key={`${idx}-example-${itemIdx}`} className="tw-rounded-xl tw-border tw-border-slate-200 tw-bg-slate-50 tw-p-3">
+                <p className="tw-m-0 tw-text-sm tw-font-medium tw-text-slate-900">{asText(item && item.en)}</p>
+                <p className="tw-m-0 tw-mt-1 tw-text-sm tw-text-slate-600">{asText(item && item.ru)}</p>
               </li>
             ))}
           </ul>
@@ -1488,23 +1538,23 @@ export default function GrammarReactAppPortal() {
 
     if (type === "topicLinks") {
       return (
-        <div key={`${idx}-links`} className="tw-border tw-border-zinc-300 tw-bg-zinc-50 tw-p-3">
-          {asText(block.title) ? <p className="tw-m-0 tw-text-sm tw-font-semibold tw-text-zinc-900">{asText(block.title)}</p> : null}
-          {asText(block.note) ? <p className="tw-m-0 tw-mt-1 tw-text-xs tw-text-zinc-600">{asText(block.note)}</p> : null}
-          <div className="tw-mt-2 tw-space-y-2">
+        <div key={`${idx}-links`} className={`${cardClass} tw-bg-slate-50`}>
+          {asText(block.title) ? <p className="tw-m-0 tw-text-sm tw-font-semibold tw-text-slate-900">{asText(block.title)}</p> : null}
+          {asText(block.note) ? <p className="tw-m-0 tw-text-sm tw-text-slate-600">{asText(block.note)}</p> : null}
+          <div className="tw-space-y-2">
             {asList(block.items).map((item, itemIdx) => {
               const linkedId = asText(item && item.id);
               return (
-                <div key={`${idx}-topic-link-${itemIdx}`} className="tw-border tw-border-zinc-200 tw-bg-white tw-p-2">
-                  <p className="tw-m-0 tw-text-sm tw-font-semibold tw-text-zinc-900">{asText(item && item.label) || linkedId || "topic"}</p>
-                  {asText(item && item.note) ? <p className="tw-m-0 tw-mt-1 tw-text-xs tw-text-zinc-600">{asText(item.note)}</p> : null}
+                <div key={`${idx}-topic-link-${itemIdx}`} className="tw-rounded-xl tw-border tw-border-slate-200 tw-bg-white tw-p-3">
+                  <p className="tw-m-0 tw-text-sm tw-font-semibold tw-text-slate-900">{asText(item && item.label) || linkedId || "Тема"}</p>
+                  {asText(item && item.note) ? <p className="tw-m-0 tw-mt-1 tw-text-sm tw-text-slate-600">{asText(item.note)}</p> : null}
                   {linkedId ? (
                     <button
                       type="button"
-                      className="tw-mt-2 tw-border tw-border-zinc-400 tw-bg-white tw-px-2 tw-py-1 tw-text-[11px] tw-uppercase tw-tracking-[0.08em] hover:tw-border-black"
+                      className="tw-mt-3 tw-inline-flex tw-items-center tw-rounded-lg tw-border tw-border-slate-300 tw-bg-white tw-px-3 tw-py-1.5 tw-text-xs tw-font-medium tw-text-slate-700 hover:tw-border-slate-500"
                       onClick={() => openTopic(linkedId)}
                     >
-                      открыть тему
+                      Открыть тему
                     </button>
                   ) : null}
                 </div>
@@ -1516,9 +1566,9 @@ export default function GrammarReactAppPortal() {
     }
 
     return (
-      <pre key={`${idx}-unknown`} className="tw-overflow-auto tw-border tw-border-zinc-300 tw-bg-zinc-50 tw-p-2 tw-text-xs tw-text-zinc-700">
-        {JSON.stringify(block, null, 2)}
-      </pre>
+      <div key={`${idx}-unknown`} className={`${cardClass} tw-bg-slate-50`}>
+        <p className="tw-m-0 tw-text-sm tw-text-slate-600">Дополнительный материал недоступен в упрощенном режиме.</p>
+      </div>
     );
   };
 
@@ -1528,19 +1578,28 @@ export default function GrammarReactAppPortal() {
     const kind = asText(current.kind);
 
     if (kind === "choice") {
+      const selectedIndex = Number(answerState && answerState.selectedIndex);
+      const correctIndex = Number(item && item.correctIndex);
       return (
-        <ul className="tw-m-0 tw-list-none tw-space-y-2 tw-p-0">
+        <ul className="tw-m-0 tw-list-none tw-space-y-3 tw-p-0">
           {asList(item.options).map((opt, idx) => {
-            const active = Number(answerState.selectedIndex) === idx;
+            const active = selectedIndex === idx;
+            const isCorrect = checked && idx === correctIndex;
+            const isWrong = checked && active && idx !== correctIndex;
+            const baseClass = "tw-w-full tw-rounded-xl tw-border tw-px-4 tw-py-3 tw-text-left tw-text-sm tw-font-medium tw-transition";
+            let stateClass = "tw-border-slate-200 tw-bg-white tw-text-slate-800 hover:tw-border-slate-400";
+
+            if (active && !checked) stateClass = "tw-border-sky-500 tw-bg-sky-50 tw-text-slate-900";
+            if (isCorrect) stateClass = "tw-border-emerald-400 tw-bg-emerald-50 tw-text-emerald-900";
+            if (isWrong) stateClass = "tw-border-rose-400 tw-bg-rose-50 tw-text-rose-900";
+
             return (
               <li key={`${current.key}-choice-${idx}`}>
                 <button
                   type="button"
+                  disabled={checked}
                   onClick={() => setAnswerState({ selectedIndex: idx })}
-                  className={[
-                    "tw-w-full tw-border tw-px-3 tw-py-2 tw-text-left tw-text-sm",
-                    active ? "tw-border-black tw-bg-black tw-text-white" : "tw-border-zinc-300 tw-bg-white tw-text-zinc-900 hover:tw-border-zinc-500",
-                  ].join(" ")}
+                  className={`${baseClass} ${stateClass}`}
                 >
                   {asText(opt)}
                 </button>
@@ -1552,15 +1611,26 @@ export default function GrammarReactAppPortal() {
     }
 
     if (kind === "multi") {
+      const expectedSet = new Set(asList(item.correctIndices).map((x) => Number(x)));
       return (
-        <ul className="tw-m-0 tw-list-none tw-space-y-2 tw-p-0">
+        <ul className="tw-m-0 tw-list-none tw-space-y-3 tw-p-0">
           {asList(item.options).map((opt, idx) => {
             const selected = !!(answerState.selected && answerState.selected[idx]);
+            const expected = expectedSet.has(idx);
+            const isCorrect = checked && selected && expected;
+            const isWrong = checked && selected && !expected;
+            const isMissed = checked && !selected && expected;
+            let stateClass = "tw-border-slate-200 tw-bg-white";
+            if (selected && !checked) stateClass = "tw-border-sky-500 tw-bg-sky-50";
+            if (isCorrect) stateClass = "tw-border-emerald-400 tw-bg-emerald-50";
+            if (isWrong) stateClass = "tw-border-rose-400 tw-bg-rose-50";
+            if (isMissed) stateClass = "tw-border-amber-400 tw-bg-amber-50";
             return (
               <li key={`${current.key}-multi-${idx}`}>
-                <label className="tw-flex tw-items-start tw-gap-2 tw-border tw-border-zinc-300 tw-bg-white tw-px-3 tw-py-2 tw-text-sm tw-text-zinc-900">
+                <label className={`tw-flex tw-items-start tw-gap-3 tw-rounded-xl tw-border tw-px-4 tw-py-3 tw-text-sm tw-text-slate-800 ${stateClass}`}>
                   <input
                     type="checkbox"
+                    disabled={checked}
                     checked={selected}
                     onChange={(e) => {
                       setAnswerState((prev) => ({
@@ -1581,12 +1651,16 @@ export default function GrammarReactAppPortal() {
     }
 
     if (kind === "input" || kind === "correction") {
+      let fieldClass = "tw-border-slate-300 focus:tw-border-sky-500";
+      if (checked && resultState && resultState.ok) fieldClass = "tw-border-emerald-500 tw-bg-emerald-50";
+      if (checked && resultState && !resultState.ok) fieldClass = "tw-border-rose-500 tw-bg-rose-50";
       return (
         <textarea
-          className="tw-min-h-[92px] tw-w-full tw-border tw-border-zinc-400 tw-bg-white tw-px-3 tw-py-2 tw-text-sm tw-text-zinc-900 tw-outline-none focus:tw-border-black"
+          className={`tw-min-h-[120px] tw-w-full tw-rounded-xl tw-border tw-bg-white tw-px-4 tw-py-3 tw-text-sm tw-text-slate-900 tw-outline-none ${fieldClass}`}
+          disabled={checked}
           value={asText(answerState.text)}
           onChange={(e) => setAnswerState({ text: e.target.value })}
-          placeholder="введи ответ"
+          placeholder="Введите ответ"
         />
       );
     }
@@ -1595,19 +1669,30 @@ export default function GrammarReactAppPortal() {
       const inputs = asList(item.inputs);
       const values = asList(answerState.values);
       return (
-        <div className="tw-space-y-2">
+        <div className="tw-space-y-3">
           {inputs.map((_, idx) => (
-            <input
-              key={`${current.key}-multi-input-${idx}`}
-              className="tw-w-full tw-border tw-border-zinc-400 tw-bg-white tw-px-3 tw-py-2 tw-text-sm tw-text-zinc-900 tw-outline-none focus:tw-border-black"
-              value={asText(values[idx])}
-              onChange={(e) => {
-                const next = values.slice();
-                next[idx] = e.target.value;
-                setAnswerState({ values: next });
-              }}
-              placeholder={`ответ ${idx + 1}`}
-            />
+            <div key={`${current.key}-multi-input-wrap-${idx}`} className="tw-space-y-1">
+              <p className="tw-m-0 tw-text-xs tw-font-medium tw-uppercase tw-tracking-[0.08em] tw-text-slate-500">Ответ {idx + 1}</p>
+              <input
+                key={`${current.key}-multi-input-${idx}`}
+                className={[
+                  "tw-w-full tw-rounded-xl tw-border tw-bg-white tw-px-4 tw-py-3 tw-text-sm tw-text-slate-900 tw-outline-none",
+                  checked
+                    ? (inputAccepted(values[idx], inputs[idx] && inputs[idx].accepted, inputs[idx] && inputs[idx].acceptedShort)
+                      ? "tw-border-emerald-500 tw-bg-emerald-50"
+                      : "tw-border-rose-500 tw-bg-rose-50")
+                    : "tw-border-slate-300 focus:tw-border-sky-500",
+                ].join(" ")}
+                disabled={checked}
+                value={asText(values[idx])}
+                onChange={(e) => {
+                  const next = values.slice();
+                  next[idx] = e.target.value;
+                  setAnswerState({ values: next });
+                }}
+                placeholder={`Ответ ${idx + 1}`}
+              />
+            </div>
           ))}
         </div>
       );
@@ -1618,14 +1703,22 @@ export default function GrammarReactAppPortal() {
       const blanks = asList(item.blanks);
       const values = asList(answerState.values);
       return (
-        <div className="tw-space-y-3">
-          {asText(item.storyTitle) ? <p className="tw-m-0 tw-text-sm tw-font-semibold tw-text-zinc-900">{asText(item.storyTitle)}</p> : null}
-          <div className="tw-flex tw-flex-wrap tw-items-center tw-gap-2 tw-text-sm tw-text-zinc-900">
+        <div className="tw-space-y-4">
+          {asText(item.storyTitle) ? <p className="tw-m-0 tw-text-base tw-font-semibold tw-text-slate-900">{asText(item.storyTitle)}</p> : null}
+          <div className="tw-flex tw-flex-wrap tw-items-center tw-gap-2 tw-text-sm tw-leading-relaxed tw-text-slate-800">
             {blanks.map((blank, idx) => (
               <span key={`${current.key}-inline-${idx}`} className="tw-flex tw-items-center tw-gap-2">
                 <span>{asText(segments[idx])}</span>
                 <select
-                  className="tw-border tw-border-zinc-400 tw-bg-white tw-px-2 tw-py-1 tw-text-sm tw-outline-none focus:tw-border-black"
+                  className={[
+                    "tw-rounded-lg tw-border tw-bg-white tw-px-2.5 tw-py-1.5 tw-text-sm tw-outline-none",
+                    checked
+                      ? (Number(values[idx]) === Number(blank && blank.correctIndex)
+                        ? "tw-border-emerald-500 tw-bg-emerald-50"
+                        : "tw-border-rose-500 tw-bg-rose-50")
+                      : "tw-border-slate-300 focus:tw-border-sky-500",
+                  ].join(" ")}
+                  disabled={checked}
                   value={Number.isFinite(Number(values[idx])) ? String(values[idx]) : ""}
                   onChange={(e) => {
                     const next = values.slice();
@@ -1655,14 +1748,20 @@ export default function GrammarReactAppPortal() {
       const picks = (answerState && answerState.picks) || {};
 
       return (
-        <div className="tw-space-y-2">
+        <div className="tw-space-y-3">
           {pairs.map((pair, idx) => {
             const left = asText(pair && pair.left);
+            const expected = asText(pair && pair.right);
+            const actual = asText(picks[left]);
+            const rowState = !checked
+              ? "tw-border-slate-200"
+              : (actual && actual === expected ? "tw-border-emerald-400 tw-bg-emerald-50" : "tw-border-rose-400 tw-bg-rose-50");
             return (
-              <div key={`${current.key}-match-${idx}`} className="tw-grid tw-gap-2 sm:tw-grid-cols-[minmax(180px,1fr)_minmax(200px,1fr)]">
-                <div className="tw-border tw-border-zinc-300 tw-bg-zinc-50 tw-px-3 tw-py-2 tw-text-sm tw-text-zinc-900">{left}</div>
+              <div key={`${current.key}-match-${idx}`} className={`tw-grid tw-gap-2 tw-rounded-xl tw-border tw-p-3 sm:tw-grid-cols-[minmax(180px,1fr)_minmax(220px,1fr)] ${rowState}`}>
+                <div className="tw-text-sm tw-font-medium tw-text-slate-900">{left}</div>
                 <select
-                  className="tw-border tw-border-zinc-400 tw-bg-white tw-px-2 tw-py-2 tw-text-sm tw-outline-none focus:tw-border-black"
+                  className="tw-rounded-lg tw-border tw-border-slate-300 tw-bg-white tw-px-3 tw-py-2 tw-text-sm tw-outline-none focus:tw-border-sky-500"
+                  disabled={checked}
                   value={asText(picks[left])}
                   onChange={(e) => {
                     setAnswerState((prev) => ({
@@ -1693,12 +1792,21 @@ export default function GrammarReactAppPortal() {
       const picks = asList(answerState.picks);
 
       return (
-        <div className="tw-space-y-2">
+        <div className="tw-space-y-3">
           {words.map((word, idx) => (
-            <div key={`${current.key}-drag-${idx}`} className="tw-grid tw-gap-2 sm:tw-grid-cols-[minmax(180px,1fr)_minmax(200px,1fr)]">
-              <div className="tw-border tw-border-zinc-300 tw-bg-zinc-50 tw-px-3 tw-py-2 tw-text-sm tw-text-zinc-900">{asText(word && word.text)}</div>
+            <div
+              key={`${current.key}-drag-${idx}`}
+              className={[
+                "tw-grid tw-gap-2 tw-rounded-xl tw-border tw-p-3 sm:tw-grid-cols-[minmax(180px,1fr)_minmax(220px,1fr)]",
+                !checked
+                  ? "tw-border-slate-200"
+                  : (asText(picks[idx]) === asText(word && word.bin) ? "tw-border-emerald-400 tw-bg-emerald-50" : "tw-border-rose-400 tw-bg-rose-50"),
+              ].join(" ")}
+            >
+              <div className="tw-text-sm tw-font-medium tw-text-slate-900">{asText(word && word.text)}</div>
               <select
-                className="tw-border tw-border-zinc-400 tw-bg-white tw-px-2 tw-py-2 tw-text-sm tw-outline-none focus:tw-border-black"
+                className="tw-rounded-lg tw-border tw-border-slate-300 tw-bg-white tw-px-3 tw-py-2 tw-text-sm tw-outline-none focus:tw-border-sky-500"
+                disabled={checked}
                 value={asText(picks[idx])}
                 onChange={(e) => {
                   const next = picks.slice();
@@ -1720,9 +1828,9 @@ export default function GrammarReactAppPortal() {
     }
 
     return (
-      <pre className="tw-overflow-auto tw-border tw-border-zinc-300 tw-bg-zinc-50 tw-p-2 tw-text-xs tw-text-zinc-700">
-        {JSON.stringify(item, null, 2)}
-      </pre>
+      <div className="tw-rounded-xl tw-border tw-border-slate-200 tw-bg-slate-50 tw-p-4 tw-text-sm tw-text-slate-600">
+        Этот тип задания скоро появится в обновленном режиме практики.
+      </div>
     );
   };
 
@@ -1755,739 +1863,645 @@ export default function GrammarReactAppPortal() {
     })
     .filter(Boolean);
 
+  const isHomeTab = view === "home" || view === "constructor" || view === "compare" || view === "daily";
+  const isTopicsTab = view === "list" || view === "detail";
+  const isPracticeTab = view === "practice";
+  const canCheckCurrent = canCheckAnswer(current, answerState);
+  const answeredCount = attempted + (checked ? 1 : 0);
+  const liveScore = score + (checked && resultState && resultState.ok ? 1 : 0);
+  const practiceProgressPercent = queue.length ? Math.round(((cursor + 1) / queue.length) * 100) : 0;
+
+  const groupedTopicsMap = {};
+  for (const topic of filteredTopics) {
+    const group = asText(topic && topic.group) || "other";
+    if (!groupedTopicsMap[group]) groupedTopicsMap[group] = [];
+    groupedTopicsMap[group].push(topic);
+  }
+  const groupedTopics = Object.keys(groupedTopicsMap)
+    .sort((a, b) => groupTitle(a).localeCompare(groupTitle(b)))
+    .map((group) => ({ group, items: groupedTopicsMap[group] }));
+
+  const explanationLines = [];
+  const markerLinesRaw = [];
+  const formulaLinesRaw = [];
+  const exampleItemsRaw = [];
+  const compareItemsRaw = [];
+  let compareNote = "";
+
+  for (const block of ruleBlocks) {
+    const type = asText(block && block.type);
+
+    if (type === "heading" || type === "text") {
+      const text = asText(block && block.text);
+      if (text) explanationLines.push(text);
+    }
+
+    if (type === "highlight") {
+      const title = normalize(block && block.title);
+      const lines = asList(block && block.lines).map(asText).filter(Boolean);
+      if (title.includes("маркер") || title.includes("marker")) markerLinesRaw.push(...lines);
+      else if (lines.length && explanationLines.length < 4) explanationLines.push(...lines.slice(0, 2));
+    }
+
+    if (type === "table") {
+      const caption = normalize(block && block.caption);
+      if (caption.includes("формул") || caption.includes("formula")) {
+        const rows = asList(block && block.rows);
+        for (const row of rows.slice(0, 4)) {
+          const cells = asList(row).map(asText).filter(Boolean);
+          if (cells.length >= 2) formulaLinesRaw.push(`${cells[0]}: ${cells[1]}`);
+          else if (cells.length) formulaLinesRaw.push(cells[0]);
+        }
+      }
+    }
+
+    if (type === "examples") {
+      for (const item of asList(block && block.items)) {
+        const en = asText(item && item.en);
+        const ru = asText(item && item.ru);
+        if (en || ru) exampleItemsRaw.push({ en, ru });
+      }
+    }
+
+    if (type === "topicLinks") {
+      compareNote = asText(block && block.note) || compareNote;
+      for (const item of asList(block && block.items)) {
+        const label = asText(item && item.label);
+        const note = asText(item && item.note);
+        if (label || note) compareItemsRaw.push({ label, note, id: asText(item && item.id) });
+      }
+    }
+  }
+
+  if (!explanationLines.length) {
+    const fallback = asText(selectedMeta && (selectedMeta.subtitle || selectedMeta.hint)) || asText(selectedDoc && selectedDoc.subtitle);
+    if (fallback) explanationLines.push(fallback);
+  }
+
+  if (!markerLinesRaw.length) {
+    const markerText = extractQuickField(ruleBlocks, "маркеры") || extractQuickField(ruleBlocks, "markers");
+    if (markerText) markerLinesRaw.push(...markerText.split("•").map(asText).filter(Boolean));
+  }
+
+  if (!formulaLinesRaw.length) {
+    const formulaText = extractFormula(ruleBlocks);
+    if (formulaText) formulaLinesRaw.push(formulaText);
+  }
+
+  const markerLines = [...new Set(markerLinesRaw)].slice(0, 6);
+  const formulaLines = [...new Set(formulaLinesRaw)].slice(0, 4);
+  const exampleItems = exampleItemsRaw.slice(0, 6);
+  const compareItems = compareItemsRaw.slice(0, 4);
+
+  const topTabClass = (active) => [
+    "tw-rounded-lg tw-border tw-px-3 tw-py-2 tw-text-xs tw-font-medium tw-uppercase tw-tracking-[0.08em] tw-transition",
+    active ? "tw-border-slate-900 tw-bg-slate-900 tw-text-white" : "tw-border-slate-300 tw-bg-white tw-text-slate-700 hover:tw-border-slate-500",
+  ].join(" ");
+
+  const levelClass = (active) => [
+    "tw-rounded-lg tw-border tw-px-3 tw-py-1.5 tw-text-xs tw-font-medium tw-uppercase tw-tracking-[0.06em] tw-transition",
+    active ? "tw-border-slate-900 tw-bg-slate-900 tw-text-white" : "tw-border-slate-300 tw-bg-white tw-text-slate-700 hover:tw-border-slate-500",
+  ].join(" ");
+
+  const primaryBtnClass = "tw-inline-flex tw-items-center tw-justify-center tw-rounded-xl tw-border tw-border-slate-900 tw-bg-slate-900 tw-px-4 tw-py-2.5 tw-text-sm tw-font-semibold tw-text-white tw-transition hover:tw-bg-slate-700 disabled:tw-cursor-not-allowed disabled:tw-opacity-50";
+  const secondaryBtnClass = "tw-inline-flex tw-items-center tw-justify-center tw-rounded-xl tw-border tw-border-slate-300 tw-bg-white tw-px-4 tw-py-2.5 tw-text-sm tw-font-semibold tw-text-slate-700 tw-transition hover:tw-border-slate-500 disabled:tw-cursor-not-allowed disabled:tw-opacity-50";
+
   return createPortal(
-    <section className="tw-border tw-border-black tw-bg-white tw-p-4" aria-label="Grammar React section">
-      <div className="tw-flex tw-flex-wrap tw-items-center tw-gap-2 tw-border-b tw-border-zinc-300 tw-pb-3">
-        <p className="tw-m-0 tw-text-lg tw-font-semibold tw-uppercase tw-tracking-[0.16em]">grammar</p>
-        <span className="tw-border tw-border-zinc-400 tw-px-2 tw-py-0.5 tw-text-[11px] tw-uppercase tw-tracking-[0.12em]">next/react/tailwind</span>
-        <div className="tw-ml-auto tw-flex tw-flex-wrap tw-gap-2">
-          <button
-            type="button"
-            onClick={() => setView("home")}
-            className={[
-              "tw-border tw-px-3 tw-py-1.5 tw-text-xs tw-uppercase tw-tracking-[0.1em]",
-              view === "home" ? "tw-border-black tw-bg-black tw-text-white" : "tw-border-zinc-400 tw-bg-white hover:tw-border-black",
-            ].join(" ")}
-          >
-            home
-          </button>
-          <button
-            type="button"
-            onClick={() => setView("list")}
-            className={[
-              "tw-border tw-px-3 tw-py-1.5 tw-text-xs tw-uppercase tw-tracking-[0.1em]",
-              view === "list" ? "tw-border-black tw-bg-black tw-text-white" : "tw-border-zinc-400 tw-bg-white hover:tw-border-black",
-            ].join(" ")}
-          >
-            topics
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              if (!selectedId) return;
-              setView("detail");
-              ensureDoc(selectedId);
-            }}
-            className={[
-              "tw-border tw-px-3 tw-py-1.5 tw-text-xs tw-uppercase tw-tracking-[0.1em]",
-              view === "detail" ? "tw-border-black tw-bg-black tw-text-white" : "tw-border-zinc-400 tw-bg-white hover:tw-border-black",
-            ].join(" ")}
-            disabled={!selectedId}
-          >
-            rule
-          </button>
-          <button
-            type="button"
-            onClick={() => setView("constructor")}
-            className={[
-              "tw-border tw-px-3 tw-py-1.5 tw-text-xs tw-uppercase tw-tracking-[0.1em]",
-              view === "constructor" ? "tw-border-black tw-bg-black tw-text-white" : "tw-border-zinc-400 tw-bg-white hover:tw-border-black",
-            ].join(" ")}
-          >
-            constructor
-          </button>
-          <button
-            type="button"
-            onClick={() => setView("compare")}
-            className={[
-              "tw-border tw-px-3 tw-py-1.5 tw-text-xs tw-uppercase tw-tracking-[0.1em]",
-              view === "compare" ? "tw-border-black tw-bg-black tw-text-white" : "tw-border-zinc-400 tw-bg-white hover:tw-border-black",
-            ].join(" ")}
-          >
-            compare
-          </button>
-          <button
-            type="button"
-            onClick={() => setView("daily")}
-            className={[
-              "tw-border tw-px-3 tw-py-1.5 tw-text-xs tw-uppercase tw-tracking-[0.1em]",
-              view === "daily" ? "tw-border-black tw-bg-black tw-text-white" : "tw-border-zinc-400 tw-bg-white hover:tw-border-black",
-            ].join(" ")}
-          >
-            daily
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              if (!selectedId) return;
-              startTopicPractice(selectedId);
-            }}
-            className={[
-              "tw-border tw-px-3 tw-py-1.5 tw-text-xs tw-uppercase tw-tracking-[0.1em]",
-              view === "practice" ? "tw-border-black tw-bg-black tw-text-white" : "tw-border-zinc-400 tw-bg-white hover:tw-border-black",
-            ].join(" ")}
-            disabled={!selectedId}
-          >
-            practice
-          </button>
-        </div>
-      </div>
-
-      <p className="tw-m-0 tw-mt-2 tw-text-sm tw-text-zinc-700">
-        Новые правила и упражнения добавляй в `crate/student_helper/db/tenses/index.json` и `crate/student_helper/db/tenses/*.json`.
-      </p>
-
-      {loadingIndex ? <p className="tw-m-0 tw-mt-3 tw-text-sm tw-text-zinc-600">загрузка grammar index...</p> : null}
-      {indexError ? <p className="tw-m-0 tw-mt-3 tw-text-sm tw-text-red-700">{indexError}</p> : null}
-      {docError ? <p className="tw-m-0 tw-mt-2 tw-text-sm tw-text-red-700">{docError}</p> : null}
-
-      {view === "home" ? (
-        <div className="tw-mt-4 tw-space-y-4">
-          <div className="tw-border tw-border-zinc-300 tw-bg-zinc-50 tw-p-3">
-            <p className="tw-m-0 tw-text-sm tw-font-semibold tw-text-zinc-900">уровень grammar</p>
-            <p className="tw-m-0 tw-mt-1 tw-text-sm tw-text-zinc-700">фильтрует каталог и помогает constructor выбирать более точные рекомендации.</p>
-            <div className="tw-mt-2 tw-flex tw-flex-wrap tw-gap-2">
-              <button
-                type="button"
-                onClick={() => persistGrammarLevel("")}
-                className={[
-                  "tw-border tw-px-3 tw-py-1.5 tw-text-xs tw-uppercase tw-tracking-[0.08em]",
-                  !grammarLevel ? "tw-border-black tw-bg-black tw-text-white" : "tw-border-zinc-400 tw-bg-white hover:tw-border-black",
-                ].join(" ")}
-              >
-                all levels
-              </button>
-              {LEVELS.map((level) => (
-                <button
-                  key={`level-home-${level}`}
-                  type="button"
-                  onClick={() => persistGrammarLevel(level)}
-                  className={[
-                    "tw-border tw-px-3 tw-py-1.5 tw-text-xs tw-uppercase tw-tracking-[0.08em]",
-                    grammarLevel === level ? "tw-border-black tw-bg-black tw-text-white" : "tw-border-zinc-400 tw-bg-white hover:tw-border-black",
-                  ].join(" ")}
-                >
-                  {level}
-                </button>
-              ))}
-            </div>
+    <section className="sh-react-grammar tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-slate-50 tw-p-4 sm:tw-p-6" aria-label="Grammar section">
+      <div className="tw-space-y-4">
+        <header className="tw-flex tw-flex-wrap tw-items-start tw-justify-between tw-gap-3">
+          <div>
+            <p className="tw-m-0 tw-text-lg tw-font-semibold tw-text-slate-900">Grammar</p>
+            <p className="tw-m-0 tw-mt-1 tw-text-sm tw-text-slate-600">Четкие блоки, короткие шаги и фокус на действии.</p>
           </div>
-
-          <div className="tw-grid tw-gap-3 md:tw-grid-cols-2 xl:tw-grid-cols-4">
-            {groups.map((group) => {
-              const count = topicsByLevel.filter((topic) => topic.group === group).length;
-              return (
-                <button
-                  key={`group-${group}`}
-                  type="button"
-                  onClick={() => {
-                    setGroupFilter(group);
-                    setView("list");
-                  }}
-                  className="tw-border tw-border-zinc-300 tw-bg-zinc-50 tw-p-3 tw-text-left hover:tw-border-black"
-                >
-                  <span className="tw-block tw-text-xs tw-uppercase tw-tracking-[0.1em] tw-text-zinc-600">group</span>
-                  <span className="tw-mt-1 tw-block tw-text-base tw-font-semibold tw-text-zinc-900">{groupTitle(group)}</span>
-                  <span className="tw-mt-1 tw-block tw-text-sm tw-text-zinc-700">тем: {count}</span>
-                </button>
-              );
-            })}
-          </div>
-          {!topicsByLevel.length ? <p className="tw-m-0 tw-text-sm tw-text-zinc-600">для выбранного уровня пока нет тем</p> : null}
-
-          <div className="tw-border tw-border-zinc-300 tw-bg-white tw-p-3">
-            <p className="tw-m-0 tw-text-sm tw-font-semibold tw-text-zinc-900">быстрый старт</p>
-            <div className="tw-mt-2 tw-flex tw-flex-wrap tw-gap-2">
-              {topicsByLevel.slice(0, 8).map((topic) => (
-                <button
-                  key={`quick-${topic.id}`}
-                  type="button"
-                  onClick={() => openTopic(topic.id)}
-                  className="tw-border tw-border-zinc-400 tw-bg-white tw-px-3 tw-py-1.5 tw-text-xs tw-text-zinc-900 hover:tw-border-black"
-                >
-                  {topic.title || topic.id}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="tw-border tw-border-zinc-300 tw-bg-zinc-50 tw-p-3">
-            <p className="tw-m-0 tw-text-sm tw-font-semibold tw-text-zinc-900">grammar constructor</p>
-            <p className="tw-m-0 tw-mt-1 tw-text-sm tw-text-zinc-700">если не уверен какое правило выбрать, задай смысл и получи 1 главный вариант + альтернативы.</p>
-            <div className="tw-mt-2 tw-flex tw-flex-wrap tw-gap-2">
-              <button
-                type="button"
-                onClick={() => setView("constructor")}
-                className="tw-border tw-border-black tw-bg-black tw-px-3 tw-py-2 tw-text-xs tw-uppercase tw-tracking-[0.1em] tw-text-white hover:tw-bg-zinc-800"
-              >
-                открыть constructor
-              </button>
-              <button
-                type="button"
-                onClick={resetConstructor}
-                className="tw-border tw-border-zinc-400 tw-bg-white tw-px-3 tw-py-2 tw-text-xs tw-uppercase tw-tracking-[0.1em] hover:tw-border-black"
-              >
-                сбросить шаги
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
-
-      {view === "list" ? (
-        <div className="tw-mt-4 tw-space-y-3">
-          <div className="tw-flex tw-flex-wrap tw-gap-2">
-            <select
-              className="tw-border tw-border-zinc-400 tw-bg-white tw-px-2 tw-py-2 tw-text-sm tw-outline-none focus:tw-border-black"
-              value={grammarLevel}
-              onChange={(e) => persistGrammarLevel(e.target.value)}
-            >
-              <option value="">all levels</option>
-              {LEVELS.map((level) => (
-                <option key={`level-list-${level}`} value={level}>
-                  {level}
-                </option>
-              ))}
-            </select>
-
-            <select
-              className="tw-border tw-border-zinc-400 tw-bg-white tw-px-2 tw-py-2 tw-text-sm tw-outline-none focus:tw-border-black"
-              value={groupFilter}
-              onChange={(e) => setGroupFilter(e.target.value)}
-            >
-              <option value="all">all groups</option>
-              {groups.map((group) => (
-                <option key={`filter-${group}`} value={group}>
-                  {groupTitle(group)}
-                </option>
-              ))}
-            </select>
-
-            <input
-              className="tw-min-w-[240px] tw-flex-1 tw-border tw-border-zinc-400 tw-bg-white tw-px-3 tw-py-2 tw-text-sm tw-outline-none focus:tw-border-black"
-              type="search"
-              placeholder="поиск: perfect, passive, adverbs..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
+          <nav className="tw-flex tw-flex-wrap tw-gap-2" aria-label="Grammar views">
+            <button type="button" onClick={() => setView("home")} className={topTabClass(isHomeTab)}>Home</button>
             <button
               type="button"
-              onClick={() => setSearch("")}
-              className="tw-border tw-border-zinc-400 tw-bg-white tw-px-3 tw-py-2 tw-text-xs tw-uppercase tw-tracking-[0.1em] hover:tw-border-black"
+              onClick={() => {
+                setGroupFilter("all");
+                setView("list");
+              }}
+              className={topTabClass(isTopicsTab)}
             >
-              очистить
+              Topics
             </button>
-          </div>
+            <button
+              type="button"
+              onClick={() => {
+                const id = selectedId || asText(topicsByLevel[0] && topicsByLevel[0].id);
+                if (!id) {
+                  setView("list");
+                  return;
+                }
+                startTopicPractice(id);
+              }}
+              className={topTabClass(isPracticeTab)}
+              disabled={!topicsByLevel.length}
+            >
+              Practice
+            </button>
+          </nav>
+        </header>
 
-          {!filteredTopics.length ? <p className="tw-m-0 tw-text-sm tw-text-zinc-600">ничего не найдено</p> : null}
+        {loadingIndex ? <p className="tw-m-0 tw-text-sm tw-text-slate-500">Загрузка грамматических тем...</p> : null}
+        {indexError ? <p className="tw-m-0 tw-rounded-xl tw-border tw-border-rose-200 tw-bg-rose-50 tw-p-3 tw-text-sm tw-text-rose-700">Не удалось загрузить темы. Попробуйте обновить страницу.</p> : null}
+        {docError ? <p className="tw-m-0 tw-rounded-xl tw-border tw-border-rose-200 tw-bg-rose-50 tw-p-3 tw-text-sm tw-text-rose-700">{docError}</p> : null}
 
-          <ul className="tw-m-0 tw-list-none tw-space-y-2 tw-p-0">
-            {filteredTopics.map((topic) => (
-              <li key={`topic-row-${topic.id}`} className="tw-border tw-border-zinc-300 tw-bg-white tw-p-3">
-                <div className="tw-flex tw-flex-wrap tw-items-start tw-gap-2">
-                  <div>
-                    <p className="tw-m-0 tw-text-base tw-font-semibold tw-text-zinc-900">{topic.title || topic.id}</p>
-                    <p className="tw-mt-1 tw-text-sm tw-text-zinc-700">{topic.subtitle || topic.hint || "—"}</p>
-                    <p className="tw-mt-1 tw-text-xs tw-text-zinc-600">group: {groupTitle(topic.group)} • kind: {topic.kind || "topic"}</p>
-                    <p className="tw-mt-1 tw-text-xs tw-text-zinc-600">
-                      mastery: {Number(progressById[topic.id] && progressById[topic.id].mastery) || 0}/5 ({masteryLabel(progressById[topic.id] && progressById[topic.id].mastery)})
-                    </p>
-                    <p className="tw-mt-1 tw-text-xs tw-text-zinc-600">
-                      mistakes: {asList(progressById[topic.id] && progressById[topic.id].mistakes).length}
-                    </p>
-                  </div>
-                  <div className="tw-ml-auto tw-flex tw-flex-wrap tw-gap-2">
-                    <button
-                      type="button"
-                      onClick={() => openTopic(topic.id)}
-                      className="tw-border tw-border-black tw-bg-black tw-px-3 tw-py-2 tw-text-xs tw-uppercase tw-tracking-[0.1em] tw-text-white hover:tw-bg-zinc-800"
-                    >
-                      открыть
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => startTopicPractice(topic.id)}
-                      className="tw-border tw-border-zinc-400 tw-bg-white tw-px-3 tw-py-2 tw-text-xs tw-uppercase tw-tracking-[0.1em] hover:tw-border-black"
-                    >
-                      practice
-                    </button>
-                    {asList(progressById[topic.id] && progressById[topic.id].mistakes).length ? (
-                      <button
-                        type="button"
-                        onClick={() => startTopicMistakesPractice(topic.id)}
-                        className="tw-border tw-border-zinc-400 tw-bg-white tw-px-3 tw-py-2 tw-text-xs tw-uppercase tw-tracking-[0.1em] hover:tw-border-black"
-                      >
-                        mistakes
-                      </button>
-                    ) : null}
-                    <button
-                      type="button"
-                      onClick={() => addTopicToLibrary(topic.id)}
-                      className="tw-border tw-border-zinc-400 tw-bg-white tw-px-3 tw-py-2 tw-text-xs tw-uppercase tw-tracking-[0.1em] hover:tw-border-black"
-                    >
-                      в библиотеку
-                    </button>
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
-
-      {view === "constructor" ? (
-        <div className="tw-mt-4 tw-space-y-3">
-          <div className="tw-border tw-border-zinc-300 tw-bg-zinc-50 tw-p-3">
-            <p className="tw-m-0 tw-text-sm tw-font-semibold tw-text-zinc-900">grammar constructor</p>
-            <p className="tw-m-0 tw-mt-1 tw-text-sm tw-text-zinc-700">опиши свою фразу (по желанию), пройди по шагам и получи точную тему + альтернативы.</p>
-            {grammarLevel ? <p className="tw-m-0 tw-mt-1 tw-text-xs tw-text-zinc-600">активный уровень: {grammarLevel}</p> : null}
-            <textarea
-              className="tw-mt-2 tw-min-h-[82px] tw-w-full tw-border tw-border-zinc-400 tw-bg-white tw-px-3 tw-py-2 tw-text-sm tw-text-zinc-900 tw-outline-none focus:tw-border-black"
-              value={constructorPhrase}
-              onChange={(e) => updateConstructorPhrase(e.target.value)}
-              placeholder="пример: Я планирую начать курс в следующем месяце"
-            />
-          </div>
-
-          {!constructorRec ? (
-            <div className="tw-border tw-border-zinc-300 tw-bg-white tw-p-3">
-              <p className="tw-m-0 tw-text-xs tw-uppercase tw-tracking-[0.1em] tw-text-zinc-600">шаг {constructorPath.length + 1}</p>
-              <p className="tw-m-0 tw-mt-2 tw-text-base tw-font-semibold tw-text-zinc-900">{asText(constructorNode && constructorNode.q) || "выбери вариант"}</p>
-              {asText(constructorNode && constructorNode.hint) ? (
-                <p className="tw-m-0 tw-mt-1 tw-text-sm tw-text-zinc-700">{asText(constructorNode.hint)}</p>
-              ) : null}
-              {constructorPathLabels.length ? (
-                <p className="tw-m-0 tw-mt-2 tw-text-xs tw-text-zinc-600">путь: {constructorPathLabels.join(" -> ")}</p>
-              ) : null}
+        {view === "home" ? (
+          <div className="tw-space-y-4">
+            <section className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 sm:tw-p-5">
+              <p className="tw-m-0 tw-text-sm tw-font-semibold tw-text-slate-900">Выберите уровень</p>
               <div className="tw-mt-3 tw-flex tw-flex-wrap tw-gap-2">
-                {asList(constructorNode && constructorNode.options).map((opt, idx) => (
-                  <button
-                    key={`constructor-opt-${constructorNodeId}-${idx}`}
-                    type="button"
-                    onClick={() => chooseConstructorOption(opt)}
-                    className="tw-border tw-border-zinc-400 tw-bg-white tw-px-3 tw-py-2 tw-text-xs tw-uppercase tw-tracking-[0.08em] hover:tw-border-black"
-                  >
-                    {asText(opt && opt.label) || asText(opt && opt.id) || "option"}
+                <button type="button" onClick={() => persistGrammarLevel("")} className={levelClass(!grammarLevel)}>Все</button>
+                {LEVELS.map((level) => (
+                  <button key={`level-home-${level}`} type="button" onClick={() => persistGrammarLevel(level)} className={levelClass(grammarLevel === level)}>
+                    {level}
                   </button>
                 ))}
-                {constructorPath.length ? (
-                  <button
-                    type="button"
-                    onClick={backConstructorStep}
-                    className="tw-border tw-border-zinc-400 tw-bg-white tw-px-3 tw-py-2 tw-text-xs tw-uppercase tw-tracking-[0.08em] hover:tw-border-black"
-                  >
-                    назад
-                  </button>
-                ) : null}
-                <button
-                  type="button"
-                  onClick={resetConstructor}
-                  className="tw-border tw-border-zinc-400 tw-bg-white tw-px-3 tw-py-2 tw-text-xs tw-uppercase tw-tracking-[0.08em] hover:tw-border-black"
-                >
-                  сброс
-                </button>
               </div>
-            </div>
-          ) : (
-            <>
-              <div className="tw-border tw-border-zinc-300 tw-bg-white tw-p-3">
-                <p className="tw-m-0 tw-text-xs tw-uppercase tw-tracking-[0.1em] tw-text-zinc-600">главный вариант</p>
-                <p className="tw-m-0 tw-mt-2 tw-text-lg tw-font-semibold tw-text-zinc-900">{asText(constructorMainMeta && constructorMainMeta.title) || asText(constructorRec.mainId)}</p>
-                <p className="tw-m-0 tw-mt-1 tw-text-sm tw-text-zinc-700">{asText(constructorMainMeta && (constructorMainMeta.subtitle || constructorMainMeta.hint)) || "—"}</p>
-                {asText(constructorRec.reason) ? <p className="tw-m-0 tw-mt-2 tw-text-sm tw-text-zinc-800">{asText(constructorRec.reason)}</p> : null}
-                {asText(constructorRec.smartNote) ? (
-                  <p className="tw-m-0 tw-mt-2 tw-border tw-border-zinc-300 tw-bg-zinc-50 tw-p-2 tw-text-sm tw-text-zinc-800">{asText(constructorRec.smartNote)}</p>
-                ) : null}
-                {constructorRec.outOfLevel ? (
-                  <p className="tw-m-0 tw-mt-2 tw-text-xs tw-text-zinc-600">тема может быть выше/ниже текущего уровня, но по смыслу она наиболее точная.</p>
-                ) : null}
+            </section>
 
-                <div className="tw-mt-3 tw-flex tw-flex-wrap tw-gap-2">
-                  <button
-                    type="button"
-                    onClick={() => openConstructorRule(constructorRec.mainId)}
-                    className="tw-border tw-border-black tw-bg-black tw-px-3 tw-py-2 tw-text-xs tw-uppercase tw-tracking-[0.1em] tw-text-white hover:tw-bg-zinc-800"
-                  >
-                    открыть правило
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => startTopicPractice(constructorRec.mainId)}
-                    className="tw-border tw-border-zinc-400 tw-bg-white tw-px-3 tw-py-2 tw-text-xs tw-uppercase tw-tracking-[0.1em] hover:tw-border-black"
-                  >
-                    сразу practice
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => addTopicToLibrary(constructorRec.mainId)}
-                    className="tw-border tw-border-zinc-400 tw-bg-white tw-px-3 tw-py-2 tw-text-xs tw-uppercase tw-tracking-[0.1em] hover:tw-border-black"
-                  >
-                    в библиотеку
-                  </button>
-                  <button
-                    type="button"
-                    onClick={resetConstructor}
-                    className="tw-border tw-border-zinc-400 tw-bg-white tw-px-3 tw-py-2 tw-text-xs tw-uppercase tw-tracking-[0.1em] hover:tw-border-black"
-                  >
-                    начать заново
-                  </button>
-                </div>
-              </div>
-
-              {constructorAltMetas.length ? (
-                <div className="tw-space-y-2">
-                  <p className="tw-m-0 tw-text-sm tw-font-semibold tw-text-zinc-900">альтернативы</p>
-                  {constructorAltMetas.map((meta) => (
-                    <div key={`constructor-alt-${meta.id}`} className="tw-border tw-border-zinc-300 tw-bg-white tw-p-3">
-                      <p className="tw-m-0 tw-text-base tw-font-semibold tw-text-zinc-900">{meta.title || meta.id}</p>
-                      <p className="tw-m-0 tw-mt-1 tw-text-sm tw-text-zinc-700">{meta.subtitle || meta.hint || "—"}</p>
-                      <div className="tw-mt-2 tw-flex tw-flex-wrap tw-gap-2">
-                        <button
-                          type="button"
-                          onClick={() => openConstructorRule(meta.id)}
-                          className="tw-border tw-border-zinc-400 tw-bg-white tw-px-3 tw-py-2 tw-text-xs tw-uppercase tw-tracking-[0.08em] hover:tw-border-black"
-                        >
-                          открыть
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => startTopicPractice(meta.id)}
-                          className="tw-border tw-border-zinc-400 tw-bg-white tw-px-3 tw-py-2 tw-text-xs tw-uppercase tw-tracking-[0.08em] hover:tw-border-black"
-                        >
-                          practice
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : null}
-            </>
-          )}
-        </div>
-      ) : null}
-
-      {view === "compare" ? (
-        <div className="tw-mt-4 tw-space-y-3">
-          {!comparableTopics.length ? (
-            <p className="tw-m-0 tw-text-sm tw-text-zinc-600">для compare нужно минимум 2 темы с kind: tense</p>
-          ) : (
-            <>
-              <div className="tw-grid tw-gap-2 sm:tw-grid-cols-2">
-                <label className="tw-space-y-1 tw-text-sm tw-text-zinc-700">
-                  <span className="tw-block tw-text-xs tw-uppercase tw-tracking-[0.1em]">topic A</span>
-                  <select
-                    className="tw-w-full tw-border tw-border-zinc-400 tw-bg-white tw-px-2 tw-py-2 tw-text-sm tw-outline-none focus:tw-border-black"
-                    value={compareA}
-                    onChange={(e) => setCompareA(e.target.value)}
-                  >
-                    {comparableTopics.map((topic) => (
-                      <option key={`cmp-a-${topic.id}`} value={topic.id}>
-                        {topic.title || topic.id}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label className="tw-space-y-1 tw-text-sm tw-text-zinc-700">
-                  <span className="tw-block tw-text-xs tw-uppercase tw-tracking-[0.1em]">topic B</span>
-                  <select
-                    className="tw-w-full tw-border tw-border-zinc-400 tw-bg-white tw-px-2 tw-py-2 tw-text-sm tw-outline-none focus:tw-border-black"
-                    value={compareB}
-                    onChange={(e) => setCompareB(e.target.value)}
-                  >
-                    {comparableTopics.map((topic) => (
-                      <option key={`cmp-b-${topic.id}`} value={topic.id}>
-                        {topic.title || topic.id}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              </div>
-
-              {compareA && compareB && compareA !== compareB ? (
-                <>
-                  <div className="tw-border tw-border-zinc-300 tw-bg-zinc-50 tw-p-3 tw-text-sm tw-text-zinc-800">
-                    {compareRuleHint(compareA, compareB)}
-                  </div>
-                  <div className="tw-overflow-x-auto tw-border tw-border-zinc-300">
-                    <table className="tw-min-w-full tw-border-collapse tw-text-left tw-text-sm">
-                      <thead className="tw-bg-zinc-100">
-                        <tr>
-                          <th className="tw-border-b tw-border-zinc-300 tw-px-3 tw-py-2" />
-                          <th className="tw-border-b tw-border-zinc-300 tw-px-3 tw-py-2 tw-font-semibold tw-text-zinc-900">
-                            {asText(compareMetaA && compareMetaA.title) || compareA}
-                          </th>
-                          <th className="tw-border-b tw-border-zinc-300 tw-px-3 tw-py-2 tw-font-semibold tw-text-zinc-900">
-                            {asText(compareMetaB && compareMetaB.title) || compareB}
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr className="odd:tw-bg-white even:tw-bg-zinc-50">
-                          <th className="tw-border-b tw-border-zinc-200 tw-px-3 tw-py-2 tw-text-xs tw-uppercase tw-tracking-[0.08em] tw-text-zinc-600">когда</th>
-                          <td className="tw-border-b tw-border-zinc-200 tw-px-3 tw-py-2 tw-text-zinc-800">{asText(compareQuickA && compareQuickA.when) || "—"}</td>
-                          <td className="tw-border-b tw-border-zinc-200 tw-px-3 tw-py-2 tw-text-zinc-800">{asText(compareQuickB && compareQuickB.when) || "—"}</td>
-                        </tr>
-                        <tr className="odd:tw-bg-white even:tw-bg-zinc-50">
-                          <th className="tw-border-b tw-border-zinc-200 tw-px-3 tw-py-2 tw-text-xs tw-uppercase tw-tracking-[0.08em] tw-text-zinc-600">маркеры</th>
-                          <td className="tw-border-b tw-border-zinc-200 tw-px-3 tw-py-2 tw-text-zinc-800">{asText(compareQuickA && compareQuickA.markers) || "—"}</td>
-                          <td className="tw-border-b tw-border-zinc-200 tw-px-3 tw-py-2 tw-text-zinc-800">{asText(compareQuickB && compareQuickB.markers) || "—"}</td>
-                        </tr>
-                        <tr className="odd:tw-bg-white even:tw-bg-zinc-50">
-                          <th className="tw-border-b tw-border-zinc-200 tw-px-3 tw-py-2 tw-text-xs tw-uppercase tw-tracking-[0.08em] tw-text-zinc-600">формула</th>
-                          <td className="tw-border-b tw-border-zinc-200 tw-px-3 tw-py-2 tw-text-zinc-800">{asText(compareQuickA && compareQuickA.formula) || "—"}</td>
-                          <td className="tw-border-b tw-border-zinc-200 tw-px-3 tw-py-2 tw-text-zinc-800">{asText(compareQuickB && compareQuickB.formula) || "—"}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-
-                  <div className="tw-flex tw-flex-wrap tw-gap-2">
-                    <button
-                      type="button"
-                      onClick={() => startComparePractice(10)}
-                      className="tw-border tw-border-black tw-bg-black tw-px-3 tw-py-2 tw-text-xs tw-uppercase tw-tracking-[0.1em] tw-text-white hover:tw-bg-zinc-800"
-                      disabled={compareBusy}
-                    >
-                      {compareBusy ? "loading..." : "mini training (10)"}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => startComparePractice(5)}
-                      className="tw-border tw-border-zinc-400 tw-bg-white tw-px-3 tw-py-2 tw-text-xs tw-uppercase tw-tracking-[0.1em] hover:tw-border-black"
-                      disabled={compareBusy}
-                    >
-                      mini (5)
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <p className="tw-m-0 tw-text-sm tw-text-zinc-600">выбери 2 разные темы</p>
-              )}
-            </>
-          )}
-        </div>
-      ) : null}
-
-      {view === "daily" ? (
-        <div className="tw-mt-4 tw-space-y-3">
-          <div className="tw-border tw-border-zinc-300 tw-bg-zinc-50 tw-p-3">
-            <p className="tw-m-0 tw-text-sm tw-font-semibold tw-text-zinc-900">daily mini-session</p>
-            <p className="tw-m-0 tw-mt-1 tw-text-sm tw-text-zinc-700">10 случайных заданий на сегодня из текущей grammar базы.</p>
-            {dailyDate ? <p className="tw-m-0 tw-mt-1 tw-text-xs tw-text-zinc-600">кэш: {dailyDate} • заданий: {dailyCount}</p> : null}
+            <section className="tw-grid tw-gap-3 md:tw-grid-cols-3">
+              <button
+                type="button"
+                onClick={() => {
+                  resetConstructor();
+                  setView("constructor");
+                }}
+                className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 tw-text-left tw-transition hover:tw-border-slate-400"
+              >
+                <p className="tw-m-0 tw-text-base tw-font-semibold tw-text-slate-900">Конструктор</p>
+                <p className="tw-m-0 tw-mt-1 tw-text-sm tw-text-slate-600">Пошагово подобрать нужное правило.</p>
+              </button>
+              <button
+                type="button"
+                onClick={() => setView("compare")}
+                className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 tw-text-left tw-transition hover:tw-border-slate-400"
+              >
+                <p className="tw-m-0 tw-text-base tw-font-semibold tw-text-slate-900">Сравнить</p>
+                <p className="tw-m-0 tw-mt-1 tw-text-sm tw-text-slate-600">Аккуратно увидеть разницу между темами.</p>
+              </button>
+              <button
+                type="button"
+                onClick={() => setView("daily")}
+                className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 tw-text-left tw-transition hover:tw-border-slate-400"
+              >
+                <p className="tw-m-0 tw-text-base tw-font-semibold tw-text-slate-900">На сегодня</p>
+                <p className="tw-m-0 tw-mt-1 tw-text-sm tw-text-slate-600">Короткая ежедневная мини-сессия.</p>
+              </button>
+            </section>
           </div>
+        ) : null}
 
-          <div className="tw-flex tw-flex-wrap tw-gap-2">
-            <button
-              type="button"
-              onClick={() => startDailyPractice(false)}
-              className="tw-border tw-border-black tw-bg-black tw-px-3 tw-py-2 tw-text-xs tw-uppercase tw-tracking-[0.1em] tw-text-white hover:tw-bg-zinc-800"
-              disabled={dailyBusy}
-            >
-              {dailyBusy ? "loading..." : "start daily (10)"}
-            </button>
-            <button
-              type="button"
-              onClick={() => startDailyPractice(true)}
-              className="tw-border tw-border-zinc-400 tw-bg-white tw-px-3 tw-py-2 tw-text-xs tw-uppercase tw-tracking-[0.1em] hover:tw-border-black"
-              disabled={dailyBusy}
-            >
-              new set
-            </button>
-          </div>
-        </div>
-      ) : null}
-
-      {view === "detail" ? (
-        <div className="tw-mt-4 tw-space-y-3">
-          {!selectedMeta ? (
-            <p className="tw-m-0 tw-text-sm tw-text-zinc-600">выбери тему в topics</p>
-          ) : (
-            <>
-              <div className="tw-flex tw-flex-wrap tw-items-start tw-gap-2">
-                <div>
-                  <p className="tw-m-0 tw-text-lg tw-font-semibold tw-text-zinc-900">{selectedMeta.title || selectedMeta.id}</p>
-                  <p className="tw-mt-1 tw-text-sm tw-text-zinc-700">{selectedMeta.subtitle || selectedMeta.hint || "—"}</p>
-                  <p className="tw-mt-1 tw-text-xs tw-text-zinc-600">
-                    mastery: {Number(selectedProgress && selectedProgress.mastery) || 0}/5 ({masteryLabel(selectedProgress && selectedProgress.mastery)})
-                  </p>
-                  <p className="tw-mt-1 tw-text-xs tw-text-zinc-600">mistakes: {selectedMistakesCount}</p>
-                </div>
-                <div className="tw-ml-auto tw-flex tw-flex-wrap tw-gap-2">
-                  <button
-                    type="button"
-                    onClick={() => startTopicPractice(selectedMeta.id)}
-                    className="tw-border tw-border-black tw-bg-black tw-px-3 tw-py-2 tw-text-xs tw-uppercase tw-tracking-[0.1em] tw-text-white hover:tw-bg-zinc-800"
-                  >
-                    начать practice
-                  </button>
-                  {selectedMistakesCount ? (
-                    <button
-                      type="button"
-                      onClick={() => startTopicMistakesPractice(selectedMeta.id)}
-                      className="tw-border tw-border-zinc-400 tw-bg-white tw-px-3 tw-py-2 tw-text-xs tw-uppercase tw-tracking-[0.1em] hover:tw-border-black"
-                    >
-                      practice mistakes
-                    </button>
-                  ) : null}
-                  <button
-                    type="button"
-                    onClick={() => addTopicToLibrary(selectedMeta.id)}
-                    className="tw-border tw-border-zinc-400 tw-bg-white tw-px-3 tw-py-2 tw-text-xs tw-uppercase tw-tracking-[0.1em] hover:tw-border-black"
-                  >
-                    в библиотеку
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => clearTopicMistakes(selectedMeta.id)}
-                    className="tw-border tw-border-zinc-400 tw-bg-white tw-px-3 tw-py-2 tw-text-xs tw-uppercase tw-tracking-[0.1em] hover:tw-border-black"
-                  >
-                    очистить ошибки
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => resetTopicProgress(selectedMeta.id)}
-                    className="tw-border tw-border-zinc-400 tw-bg-white tw-px-3 tw-py-2 tw-text-xs tw-uppercase tw-tracking-[0.1em] hover:tw-border-black"
-                  >
-                    reset progress
-                  </button>
-                </div>
-              </div>
-
-              {!selectedDoc ? (
-                <p className="tw-m-0 tw-text-sm tw-text-zinc-600">загрузка правила...</p>
-              ) : (
-                <div className="tw-space-y-3">
-                  {shownRuleBlocks.map((block, idx) => renderRuleBlock(block, idx))}
-                  {ruleBlocks.length > RULE_PREVIEW_LIMIT ? (
-                    <button
-                      type="button"
-                      onClick={() => setExpandedRule((v) => !v)}
-                      className="tw-border tw-border-zinc-400 tw-bg-white tw-px-3 tw-py-2 tw-text-xs tw-uppercase tw-tracking-[0.1em] hover:tw-border-black"
-                    >
-                      {expandedRule ? "показать меньше" : `показать все (${ruleBlocks.length})`}
-                    </button>
-                  ) : null}
-                </div>
-              )}
-            </>
-          )}
-        </div>
-      ) : null}
-
-      {view === "practice" ? (
-        <div className="tw-mt-4 tw-space-y-3">
-          {!selectedId ? (
-            <p className="tw-m-0 tw-text-sm tw-text-zinc-600">выбери тему в topics</p>
-          ) : !selectedDoc ? (
-            <p className="tw-m-0 tw-text-sm tw-text-zinc-600">загрузка practice...</p>
-          ) : !queue.length ? (
-            <div className="tw-border tw-border-zinc-300 tw-bg-zinc-50 tw-p-3">
-              <p className="tw-m-0 tw-text-sm tw-text-zinc-700">
-                {practiceMistakesMode ? "Для этой темы сейчас нет сохраненных ошибок для повтора." : "Для этой темы пока нет упражнений в `practice.exercises`."}
-              </p>
-            </div>
-          ) : (
-            <>
+        {view === "list" ? (
+          <div className="tw-space-y-4">
+            <section className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 sm:tw-p-5">
               <div className="tw-flex tw-flex-wrap tw-items-center tw-gap-2">
-                <p className="tw-m-0 tw-text-base tw-font-semibold tw-text-zinc-900">{practiceHeading || "practice"}</p>
-                <span className="tw-border tw-border-zinc-400 tw-px-2 tw-py-0.5 tw-text-xs tw-text-zinc-700">
-                  {cursor + 1} / {queue.length}
-                </span>
-                <span className="tw-border tw-border-zinc-400 tw-px-2 tw-py-0.5 tw-text-xs tw-text-zinc-700">
-                  score: {score + (checked && resultState && resultState.ok ? 1 : 0)} / {attempted + (checked ? 1 : 0)}
-                </span>
-                <span className="tw-border tw-border-zinc-400 tw-px-2 tw-py-0.5 tw-text-xs tw-text-zinc-700">
-                  mode: {practiceMistakesMode ? "mistakes" : "all"}
-                </span>
-                {selectedMeta && selectedMistakesCount ? (
-                  <button
-                    type="button"
-                    onClick={() => startTopicMistakesPractice(selectedMeta.id)}
-                    className="tw-border tw-border-zinc-400 tw-bg-white tw-px-2 tw-py-1 tw-text-[11px] tw-uppercase tw-tracking-[0.08em] hover:tw-border-black"
-                  >
-                    retry mistakes ({selectedMistakesCount})
-                  </button>
-                ) : null}
+                <p className="tw-m-0 tw-text-base tw-font-semibold tw-text-slate-900">Topics</p>
+                {grammarLevel ? <span className="tw-rounded-full tw-bg-slate-100 tw-px-2.5 tw-py-1 tw-text-xs tw-font-medium tw-text-slate-700">{grammarLevel}</span> : null}
               </div>
+              <div className="tw-mt-3 tw-grid tw-gap-2 sm:tw-grid-cols-[220px_1fr_auto]">
+                <select
+                  className="tw-rounded-xl tw-border tw-border-slate-300 tw-bg-white tw-px-3 tw-py-2 tw-text-sm tw-outline-none focus:tw-border-sky-500"
+                  value={grammarLevel}
+                  onChange={(e) => persistGrammarLevel(e.target.value)}
+                >
+                  <option value="">Все уровни</option>
+                  {LEVELS.map((level) => (
+                    <option key={`level-list-${level}`} value={level}>{level}</option>
+                  ))}
+                </select>
+                <input
+                  className="tw-rounded-xl tw-border tw-border-slate-300 tw-bg-white tw-px-3 tw-py-2 tw-text-sm tw-outline-none focus:tw-border-sky-500"
+                  type="search"
+                  placeholder="Поиск темы..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
+                <button type="button" onClick={() => setSearch("")} className={secondaryBtnClass}>Очистить</button>
+              </div>
+            </section>
 
-              <div className="tw-border tw-border-zinc-300 tw-bg-white tw-p-3">
-                <p className="tw-m-0 tw-text-xs tw-uppercase tw-tracking-[0.1em] tw-text-zinc-600">{asText(current.exerciseTitle) || asText(current.exerciseId) || current.kind}</p>
-                {asText(current.item && current.item.instruction) ? (
-                  <p className="tw-m-0 tw-mt-2 tw-text-sm tw-font-semibold tw-text-zinc-900">{asText(current.item.instruction)}</p>
-                ) : null}
-                {asText(current.item && current.item.prompt) ? (
-                  <p className="tw-m-0 tw-mt-2 tw-whitespace-pre-wrap tw-text-sm tw-text-zinc-800">{asText(current.item.prompt)}</p>
-                ) : null}
+            {!groupedTopics.length ? (
+              <div className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 tw-text-sm tw-text-slate-600">Темы не найдены для выбранного фильтра.</div>
+            ) : (
+              groupedTopics.map((groupRow) => (
+                <section key={`topic-group-${groupRow.group}`} className="tw-space-y-3">
+                  <p className="tw-m-0 tw-text-xs tw-font-semibold tw-uppercase tw-tracking-[0.08em] tw-text-slate-500">{groupTitle(groupRow.group)}</p>
+                  <div className="tw-grid tw-gap-3 lg:tw-grid-cols-2">
+                    {groupRow.items.map((topic) => {
+                      const mastery = Number(progressById[topic.id] && progressById[topic.id].mastery) || 0;
+                      return (
+                        <article key={`topic-row-${topic.id}`} className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 sm:tw-p-5">
+                          <div className="tw-flex tw-items-start tw-justify-between tw-gap-2">
+                            <div>
+                              <p className="tw-m-0 tw-text-base tw-font-semibold tw-text-slate-900">{topic.title || topic.id}</p>
+                              <p className="tw-m-0 tw-mt-1 tw-text-sm tw-text-slate-600">{topic.subtitle || topic.hint || "Краткое описание темы"}</p>
+                            </div>
+                            <span className="tw-rounded-full tw-bg-slate-100 tw-px-2.5 tw-py-1 tw-text-xs tw-font-medium tw-text-slate-700">{masteryLabel(mastery)}</span>
+                          </div>
+                          <div className="tw-mt-4 tw-flex tw-flex-wrap tw-gap-2">
+                            <button type="button" onClick={() => openTopic(topic.id)} className={primaryBtnClass}>Открыть правило</button>
+                            <button type="button" onClick={() => startTopicPractice(topic.id)} className={secondaryBtnClass}>Practice</button>
+                          </div>
+                        </article>
+                      );
+                    })}
+                  </div>
+                </section>
+              ))
+            )}
+          </div>
+        ) : null}
 
-                <div className="tw-mt-3">{renderPracticeInput()}</div>
+        {view === "detail" ? (
+          <div className="tw-space-y-4">
+            {!selectedMeta ? (
+              <div className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 tw-text-sm tw-text-slate-600">Выберите тему на вкладке Topics.</div>
+            ) : (
+              <>
+                <button type="button" onClick={() => setView("list")} className={secondaryBtnClass}>Назад к темам</button>
 
-                {checked && resultState ? (
-                  <div
-                    className={[
-                      "tw-mt-3 tw-border tw-p-3",
-                      resultState.ok ? "tw-border-emerald-300 tw-bg-emerald-50" : "tw-border-amber-300 tw-bg-amber-50",
-                    ].join(" ")}
-                  >
-                    <p className="tw-m-0 tw-text-sm tw-font-semibold tw-text-zinc-900">{resultState.ok ? "верно" : "нужно поправить"}</p>
-                    {resultState.expectedText ? <p className="tw-m-0 tw-mt-1 tw-text-sm tw-text-zinc-800">ожидалось: {resultState.expectedText}</p> : null}
-                    {resultState.explain ? <p className="tw-m-0 tw-mt-1 tw-text-sm tw-text-zinc-700">{resultState.explain}</p> : null}
-                    {!resultState.ok && resultState.linkedTopicId ? (
-                      <button
-                        type="button"
-                        onClick={() => openTopic(resultState.linkedTopicId)}
-                        className="tw-mt-2 tw-border tw-border-zinc-400 tw-bg-white tw-px-2 tw-py-1 tw-text-[11px] tw-uppercase tw-tracking-[0.08em] hover:tw-border-black"
-                      >
-                        открыть связанное правило
-                      </button>
+                <section className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 sm:tw-p-5">
+                  <div className="tw-flex tw-flex-wrap tw-items-start tw-justify-between tw-gap-2">
+                    <div>
+                      <p className="tw-m-0 tw-text-xl tw-font-semibold tw-text-slate-900">{selectedMeta.title || selectedMeta.id}</p>
+                      <p className="tw-m-0 tw-mt-2 tw-text-sm tw-text-slate-600">{asText(selectedMeta.subtitle || selectedMeta.hint) || "Короткое объяснение темы."}</p>
+                    </div>
+                    {selectedProgress ? (
+                      <span className="tw-rounded-full tw-bg-slate-100 tw-px-2.5 tw-py-1 tw-text-xs tw-font-medium tw-text-slate-700">{masteryLabel(selectedProgress.mastery)}</span>
                     ) : null}
                   </div>
+                </section>
+
+                <div className="tw-grid tw-gap-3 md:tw-grid-cols-2">
+                  <section className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 sm:tw-p-5">
+                    <p className="tw-m-0 tw-text-sm tw-font-semibold tw-text-slate-900">Формула</p>
+                    {formulaLines.length ? (
+                      <ul className="tw-m-0 tw-mt-2 tw-list-disc tw-space-y-1.5 tw-pl-5 tw-text-sm tw-text-slate-700">
+                        {formulaLines.map((line, idx) => <li key={`formula-${idx}`}>{line}</li>)}
+                      </ul>
+                    ) : (
+                      <p className="tw-m-0 tw-mt-2 tw-text-sm tw-text-slate-500">Формула не указана.</p>
+                    )}
+                  </section>
+
+                  <section className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 sm:tw-p-5">
+                    <p className="tw-m-0 tw-text-sm tw-font-semibold tw-text-slate-900">Ключевые маркеры</p>
+                    {markerLines.length ? (
+                      <div className="tw-mt-2 tw-flex tw-flex-wrap tw-gap-2">
+                        {markerLines.map((line, idx) => (
+                          <span key={`marker-${idx}`} className="tw-rounded-full tw-bg-slate-100 tw-px-2.5 tw-py-1 tw-text-xs tw-font-medium tw-text-slate-700">{line}</span>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="tw-m-0 tw-mt-2 tw-text-sm tw-text-slate-500">Маркеров для этой темы пока нет.</p>
+                    )}
+                  </section>
+                </div>
+
+                <section className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 sm:tw-p-5">
+                  <p className="tw-m-0 tw-text-sm tw-font-semibold tw-text-slate-900">Кратко о правиле</p>
+                  <div className="tw-mt-2 tw-space-y-2">
+                    {explanationLines.map((line, idx) => (
+                      <p key={`explain-${idx}`} className="tw-m-0 tw-text-sm tw-leading-relaxed tw-text-slate-700">{line}</p>
+                    ))}
+                  </div>
+                </section>
+
+                {exampleItems.length ? (
+                  <section className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 sm:tw-p-5">
+                    <p className="tw-m-0 tw-text-sm tw-font-semibold tw-text-slate-900">Примеры</p>
+                    <ul className="tw-m-0 tw-mt-3 tw-list-none tw-space-y-2 tw-p-0">
+                      {exampleItems.map((item, idx) => (
+                        <li key={`example-${idx}`} className="tw-rounded-xl tw-border tw-border-slate-200 tw-bg-slate-50 tw-p-3">
+                          <p className="tw-m-0 tw-text-sm tw-font-medium tw-text-slate-900">{item.en}</p>
+                          <p className="tw-m-0 tw-mt-1 tw-text-sm tw-text-slate-600">{item.ru}</p>
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
                 ) : null}
 
+                {compareItems.length || compareNote ? (
+                  <section className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 sm:tw-p-5">
+                    <p className="tw-m-0 tw-text-sm tw-font-semibold tw-text-slate-900">Сравнение и близкие темы</p>
+                    {compareNote ? <p className="tw-m-0 tw-mt-2 tw-text-sm tw-text-slate-700">{compareNote}</p> : null}
+                    {compareItems.length ? (
+                      <div className="tw-mt-3 tw-grid tw-gap-2 sm:tw-grid-cols-2">
+                        {compareItems.map((item, idx) => (
+                          <button
+                            key={`compare-item-${idx}`}
+                            type="button"
+                            onClick={() => {
+                              if (!item.id) return;
+                              openTopic(item.id);
+                            }}
+                            disabled={!item.id}
+                            className="tw-rounded-xl tw-border tw-border-slate-200 tw-bg-slate-50 tw-p-3 tw-text-left tw-transition enabled:hover:tw-border-slate-400 disabled:tw-opacity-60"
+                          >
+                            <p className="tw-m-0 tw-text-sm tw-font-semibold tw-text-slate-900">{item.label || "Тема"}</p>
+                            {item.note ? <p className="tw-m-0 tw-mt-1 tw-text-sm tw-text-slate-600">{item.note}</p> : null}
+                          </button>
+                        ))}
+                      </div>
+                    ) : null}
+                  </section>
+                ) : null}
+
+                <section className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 sm:tw-p-5">
+                  <div className="tw-flex tw-flex-wrap tw-gap-2">
+                    <button type="button" onClick={() => startTopicPractice(selectedMeta.id)} className={primaryBtnClass}>Practice this rule</button>
+                    <button type="button" onClick={() => setView("list")} className={secondaryBtnClass}>Back to Topics</button>
+                  </div>
+                </section>
+
+                {!selectedDoc ? (
+                  <div className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 tw-text-sm tw-text-slate-600">Загрузка полного материала...</div>
+                ) : (
+                  <section className="tw-space-y-3">
+                    {shownRuleBlocks.map((block, idx) => renderRuleBlock(block, idx))}
+                    {ruleBlocks.length > RULE_PREVIEW_LIMIT ? (
+                      <button type="button" onClick={() => setExpandedRule((v) => !v)} className={secondaryBtnClass}>
+                        {expandedRule ? "Свернуть материал" : `Показать все блоки (${ruleBlocks.length})`}
+                      </button>
+                    ) : null}
+                  </section>
+                )}
+              </>
+            )}
+          </div>
+        ) : null}
+
+        {view === "constructor" ? (
+          <div className="tw-space-y-4">
+            <button type="button" onClick={() => setView("home")} className={secondaryBtnClass}>Назад на Home</button>
+
+            <section className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 sm:tw-p-5">
+              <p className="tw-m-0 tw-text-base tw-font-semibold tw-text-slate-900">Конструктор</p>
+              <p className="tw-m-0 tw-mt-1 tw-text-sm tw-text-slate-600">Пройдите шаги и получите точное правило.</p>
+              <textarea
+                className="tw-mt-3 tw-min-h-[92px] tw-w-full tw-rounded-xl tw-border tw-border-slate-300 tw-bg-white tw-px-4 tw-py-3 tw-text-sm tw-text-slate-900 tw-outline-none focus:tw-border-sky-500"
+                value={constructorPhrase}
+                onChange={(e) => updateConstructorPhrase(e.target.value)}
+                placeholder="Пример: Я планирую начать курс в следующем месяце"
+              />
+            </section>
+
+            {!constructorRec ? (
+              <section className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 sm:tw-p-5">
+                <p className="tw-m-0 tw-text-xs tw-font-semibold tw-uppercase tw-tracking-[0.08em] tw-text-slate-500">Шаг {constructorPath.length + 1}</p>
+                <p className="tw-m-0 tw-mt-2 tw-text-lg tw-font-semibold tw-text-slate-900">{asText(constructorNode && constructorNode.q) || "Выберите вариант"}</p>
+                {asText(constructorNode && constructorNode.hint) ? <p className="tw-m-0 tw-mt-1 tw-text-sm tw-text-slate-600">{asText(constructorNode.hint)}</p> : null}
+                {constructorPathLabels.length ? <p className="tw-m-0 tw-mt-2 tw-text-xs tw-text-slate-500">Путь: {constructorPathLabels.join(" -> ")}</p> : null}
+
+                <div className="tw-mt-4 tw-grid tw-gap-2 sm:tw-grid-cols-2">
+                  {asList(constructorNode && constructorNode.options).map((opt, idx) => (
+                    <button
+                      key={`constructor-opt-${constructorNodeId}-${idx}`}
+                      type="button"
+                      onClick={() => chooseConstructorOption(opt)}
+                      className="tw-rounded-xl tw-border tw-border-slate-300 tw-bg-white tw-px-4 tw-py-3 tw-text-left tw-text-sm tw-font-medium tw-text-slate-700 tw-transition hover:tw-border-slate-500"
+                    >
+                      {asText(opt && opt.label) || asText(opt && opt.id) || "Вариант"}
+                    </button>
+                  ))}
+                </div>
+
                 <div className="tw-mt-3 tw-flex tw-flex-wrap tw-gap-2">
+                  {constructorPath.length ? <button type="button" onClick={backConstructorStep} className={secondaryBtnClass}>Назад</button> : null}
+                  <button type="button" onClick={resetConstructor} className={secondaryBtnClass}>Сброс</button>
+                </div>
+              </section>
+            ) : (
+              <>
+                <section className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 sm:tw-p-5">
+                  <p className="tw-m-0 tw-text-xs tw-font-semibold tw-uppercase tw-tracking-[0.08em] tw-text-slate-500">Главный вариант</p>
+                  <p className="tw-m-0 tw-mt-2 tw-text-xl tw-font-semibold tw-text-slate-900">{asText(constructorMainMeta && constructorMainMeta.title) || asText(constructorRec.mainId)}</p>
+                  <p className="tw-m-0 tw-mt-1 tw-text-sm tw-text-slate-600">{asText(constructorMainMeta && (constructorMainMeta.subtitle || constructorMainMeta.hint)) || "Короткое описание темы"}</p>
+                  {asText(constructorRec.reason) ? <p className="tw-m-0 tw-mt-2 tw-text-sm tw-text-slate-700">{asText(constructorRec.reason)}</p> : null}
+                  {asText(constructorRec.smartNote) ? <p className="tw-m-0 tw-mt-2 tw-rounded-xl tw-border tw-border-slate-200 tw-bg-slate-50 tw-p-3 tw-text-sm tw-text-slate-700">{asText(constructorRec.smartNote)}</p> : null}
+
+                  <div className="tw-mt-4 tw-flex tw-flex-wrap tw-gap-2">
+                    <button type="button" onClick={() => openConstructorRule(constructorRec.mainId)} className={primaryBtnClass}>Открыть правило</button>
+                    <button type="button" onClick={() => startTopicPractice(constructorRec.mainId)} className={secondaryBtnClass}>Practice</button>
+                    <button type="button" onClick={resetConstructor} className={secondaryBtnClass}>Новый выбор</button>
+                  </div>
+                </section>
+
+                {constructorAltMetas.length ? (
+                  <section className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 sm:tw-p-5">
+                    <p className="tw-m-0 tw-text-sm tw-font-semibold tw-text-slate-900">Альтернативы</p>
+                    <div className="tw-mt-3 tw-grid tw-gap-2 sm:tw-grid-cols-2">
+                      {constructorAltMetas.map((meta) => (
+                        <article key={`constructor-alt-${meta.id}`} className="tw-rounded-xl tw-border tw-border-slate-200 tw-bg-slate-50 tw-p-3">
+                          <p className="tw-m-0 tw-text-sm tw-font-semibold tw-text-slate-900">{meta.title || meta.id}</p>
+                          <p className="tw-m-0 tw-mt-1 tw-text-sm tw-text-slate-600">{meta.subtitle || meta.hint || "Описание темы"}</p>
+                          <div className="tw-mt-2 tw-flex tw-gap-2">
+                            <button type="button" onClick={() => openConstructorRule(meta.id)} className={secondaryBtnClass}>Открыть</button>
+                            <button type="button" onClick={() => startTopicPractice(meta.id)} className={secondaryBtnClass}>Practice</button>
+                          </div>
+                        </article>
+                      ))}
+                    </div>
+                  </section>
+                ) : null}
+              </>
+            )}
+          </div>
+        ) : null}
+
+        {view === "compare" ? (
+          <div className="tw-space-y-4">
+            <button type="button" onClick={() => setView("home")} className={secondaryBtnClass}>Назад на Home</button>
+
+            {!comparableTopics.length ? (
+              <div className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 tw-text-sm tw-text-slate-600">Недостаточно тем для сравнения.</div>
+            ) : (
+              <>
+                <section className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 sm:tw-p-5">
+                  <p className="tw-m-0 tw-text-base tw-font-semibold tw-text-slate-900">Сравнение правил</p>
+                  <div className="tw-mt-3 tw-grid tw-gap-2 sm:tw-grid-cols-2">
+                    <label className="tw-space-y-1 tw-text-sm tw-text-slate-700">
+                      <span className="tw-block tw-text-xs tw-font-semibold tw-uppercase tw-tracking-[0.08em] tw-text-slate-500">Правило A</span>
+                      <select
+                        className="tw-w-full tw-rounded-xl tw-border tw-border-slate-300 tw-bg-white tw-px-3 tw-py-2 tw-text-sm tw-outline-none focus:tw-border-sky-500"
+                        value={compareA}
+                        onChange={(e) => setCompareA(e.target.value)}
+                      >
+                        {comparableTopics.map((topic) => (
+                          <option key={`cmp-a-${topic.id}`} value={topic.id}>{topic.title || topic.id}</option>
+                        ))}
+                      </select>
+                    </label>
+                    <label className="tw-space-y-1 tw-text-sm tw-text-slate-700">
+                      <span className="tw-block tw-text-xs tw-font-semibold tw-uppercase tw-tracking-[0.08em] tw-text-slate-500">Правило B</span>
+                      <select
+                        className="tw-w-full tw-rounded-xl tw-border tw-border-slate-300 tw-bg-white tw-px-3 tw-py-2 tw-text-sm tw-outline-none focus:tw-border-sky-500"
+                        value={compareB}
+                        onChange={(e) => setCompareB(e.target.value)}
+                      >
+                        {comparableTopics.map((topic) => (
+                          <option key={`cmp-b-${topic.id}`} value={topic.id}>{topic.title || topic.id}</option>
+                        ))}
+                      </select>
+                    </label>
+                  </div>
+                </section>
+
+                {compareA && compareB && compareA !== compareB ? (
+                  <>
+                    <div className="tw-grid tw-gap-3 lg:tw-grid-cols-2">
+                      <section className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 sm:tw-p-5">
+                        <p className="tw-m-0 tw-text-base tw-font-semibold tw-text-slate-900">{asText(compareMetaA && compareMetaA.title) || compareA}</p>
+                        <div className="tw-mt-3 tw-space-y-3">
+                          <div>
+                            <p className="tw-m-0 tw-text-xs tw-font-semibold tw-uppercase tw-tracking-[0.08em] tw-text-slate-500">Когда использовать</p>
+                            <p className="tw-m-0 tw-mt-1 tw-text-sm tw-text-slate-700">{asText(compareQuickA && compareQuickA.when) || "—"}</p>
+                          </div>
+                          <div>
+                            <p className="tw-m-0 tw-text-xs tw-font-semibold tw-uppercase tw-tracking-[0.08em] tw-text-slate-500">Маркеры</p>
+                            <p className="tw-m-0 tw-mt-1 tw-text-sm tw-text-slate-700">{asText(compareQuickA && compareQuickA.markers) || "—"}</p>
+                          </div>
+                          <div>
+                            <p className="tw-m-0 tw-text-xs tw-font-semibold tw-uppercase tw-tracking-[0.08em] tw-text-slate-500">Формула</p>
+                            <p className="tw-m-0 tw-mt-1 tw-text-sm tw-text-slate-700">{asText(compareQuickA && compareQuickA.formula) || "—"}</p>
+                          </div>
+                        </div>
+                      </section>
+
+                      <section className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 sm:tw-p-5">
+                        <p className="tw-m-0 tw-text-base tw-font-semibold tw-text-slate-900">{asText(compareMetaB && compareMetaB.title) || compareB}</p>
+                        <div className="tw-mt-3 tw-space-y-3">
+                          <div>
+                            <p className="tw-m-0 tw-text-xs tw-font-semibold tw-uppercase tw-tracking-[0.08em] tw-text-slate-500">Когда использовать</p>
+                            <p className="tw-m-0 tw-mt-1 tw-text-sm tw-text-slate-700">{asText(compareQuickB && compareQuickB.when) || "—"}</p>
+                          </div>
+                          <div>
+                            <p className="tw-m-0 tw-text-xs tw-font-semibold tw-uppercase tw-tracking-[0.08em] tw-text-slate-500">Маркеры</p>
+                            <p className="tw-m-0 tw-mt-1 tw-text-sm tw-text-slate-700">{asText(compareQuickB && compareQuickB.markers) || "—"}</p>
+                          </div>
+                          <div>
+                            <p className="tw-m-0 tw-text-xs tw-font-semibold tw-uppercase tw-tracking-[0.08em] tw-text-slate-500">Формула</p>
+                            <p className="tw-m-0 tw-mt-1 tw-text-sm tw-text-slate-700">{asText(compareQuickB && compareQuickB.formula) || "—"}</p>
+                          </div>
+                        </div>
+                      </section>
+                    </div>
+
+                    <section className="tw-rounded-2xl tw-border tw-border-amber-200 tw-bg-amber-50 tw-p-4 tw-text-sm tw-text-amber-900">
+                      {compareRuleHint(compareA, compareB)}
+                    </section>
+
+                    <div className="tw-flex tw-flex-wrap tw-gap-2">
+                      <button type="button" onClick={() => startComparePractice(10)} className={primaryBtnClass} disabled={compareBusy}>
+                        {compareBusy ? "Подготовка..." : "Тренировка (10)"}
+                      </button>
+                      <button type="button" onClick={() => startComparePractice(5)} className={secondaryBtnClass} disabled={compareBusy}>Короткая (5)</button>
+                    </div>
+                  </>
+                ) : (
+                  <div className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 tw-text-sm tw-text-slate-600">Выберите две разные темы для сравнения.</div>
+                )}
+              </>
+            )}
+          </div>
+        ) : null}
+
+        {view === "daily" ? (
+          <div className="tw-space-y-4">
+            <button type="button" onClick={() => setView("home")} className={secondaryBtnClass}>Назад на Home</button>
+
+            <section className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 sm:tw-p-5">
+              <p className="tw-m-0 tw-text-base tw-font-semibold tw-text-slate-900">На сегодня</p>
+              <p className="tw-m-0 tw-mt-1 tw-text-sm tw-text-slate-600">Короткая мини-сессия из 10 случайных заданий.</p>
+              {dailyDate ? <p className="tw-m-0 tw-mt-2 tw-text-xs tw-text-slate-500">Последний набор: {dailyDate} ({dailyCount} заданий)</p> : null}
+              <div className="tw-mt-4 tw-flex tw-flex-wrap tw-gap-2">
+                <button type="button" onClick={() => startDailyPractice(false)} className={primaryBtnClass} disabled={dailyBusy}>
+                  {dailyBusy ? "Подготовка..." : "Начать сессию"}
+                </button>
+                <button type="button" onClick={() => setView("list")} className={secondaryBtnClass}>К темам</button>
+              </div>
+            </section>
+          </div>
+        ) : null}
+
+        {view === "practice" ? (
+          <div className="tw-space-y-4">
+            {!selectedId ? (
+              <div className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 tw-text-sm tw-text-slate-600">Сначала выберите тему в Topics.</div>
+            ) : !selectedDoc ? (
+              <div className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 tw-text-sm tw-text-slate-600">Подготовка практики...</div>
+            ) : !queue.length ? (
+              <div className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 tw-text-sm tw-text-slate-600">
+                {practiceMistakesMode ? "Для режима ошибок пока нет заданий." : "Для этой темы пока нет упражнений."}
+              </div>
+            ) : (
+              <>
+                <section className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 sm:tw-p-5">
+                  <div className="tw-flex tw-flex-wrap tw-items-center tw-justify-between tw-gap-2">
+                    <p className="tw-m-0 tw-text-base tw-font-semibold tw-text-slate-900">Practice · {practiceHeading || "Тренировка"}</p>
+                    <div className="tw-flex tw-flex-wrap tw-gap-2">
+                      <span className="tw-rounded-full tw-bg-slate-100 tw-px-2.5 tw-py-1 tw-text-xs tw-font-medium tw-text-slate-700">{cursor + 1} / {queue.length}</span>
+                      <span className="tw-rounded-full tw-bg-slate-100 tw-px-2.5 tw-py-1 tw-text-xs tw-font-medium tw-text-slate-700">Счет {liveScore} / {answeredCount}</span>
+                    </div>
+                  </div>
+                  <div className="tw-mt-3 tw-h-2 tw-w-full tw-overflow-hidden tw-rounded-full tw-bg-slate-200">
+                    <div className="tw-h-full tw-rounded-full tw-bg-slate-900 tw-transition-all" style={{ width: `${Math.max(4, practiceProgressPercent)}%` }} />
+                  </div>
+                </section>
+
+                <section className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 sm:tw-p-6">
+                  {asText(current.item && current.item.instruction) ? (
+                    <p className="tw-m-0 tw-text-xs tw-font-semibold tw-uppercase tw-tracking-[0.08em] tw-text-slate-500">{asText(current.item.instruction)}</p>
+                  ) : null}
+                  {asText(current.item && current.item.prompt) ? (
+                    <p className="tw-m-0 tw-mt-3 tw-whitespace-pre-wrap tw-text-lg tw-font-semibold tw-leading-relaxed tw-text-slate-900">{asText(current.item.prompt)}</p>
+                  ) : null}
+
+                  <div className="tw-mt-5">{renderPracticeInput()}</div>
+                </section>
+
+                {checked && resultState ? (
+                  <section className={[
+                    "tw-rounded-2xl tw-border tw-p-4 sm:tw-p-5",
+                    resultState.ok ? "tw-border-emerald-300 tw-bg-emerald-50" : "tw-border-rose-300 tw-bg-rose-50",
+                  ].join(" ")}>
+                    <p className="tw-m-0 tw-text-sm tw-font-semibold tw-text-slate-900">{resultState.ok ? "Правильно" : "Есть ошибка"}</p>
+                    {resultState.expectedText ? <p className="tw-m-0 tw-mt-1 tw-text-sm tw-text-slate-700">Верный вариант: {resultState.expectedText}</p> : null}
+                    {resultState.explain ? <p className="tw-m-0 tw-mt-1 tw-text-sm tw-text-slate-700">{resultState.explain}</p> : null}
+                    {!resultState.ok && resultState.linkedTopicId ? (
+                      <button type="button" onClick={() => openTopic(resultState.linkedTopicId)} className="tw-mt-3 tw-inline-flex tw-items-center tw-rounded-lg tw-border tw-border-slate-300 tw-bg-white tw-px-3 tw-py-1.5 tw-text-xs tw-font-medium tw-text-slate-700 hover:tw-border-slate-500">
+                        Открыть нужное правило
+                      </button>
+                    ) : null}
+                  </section>
+                ) : null}
+
+                <section className="tw-flex tw-flex-wrap tw-gap-2">
                   {!checked ? (
-                    <button
-                      type="button"
-                      onClick={checkCurrent}
-                      className="tw-border tw-border-black tw-bg-black tw-px-3 tw-py-2 tw-text-xs tw-uppercase tw-tracking-[0.1em] tw-text-white hover:tw-bg-zinc-800"
-                    >
-                      check
-                    </button>
+                    <button type="button" onClick={checkCurrent} className={primaryBtnClass} disabled={!canCheckCurrent}>Проверить</button>
                   ) : !done ? (
-                    <button
-                      type="button"
-                      onClick={nextCurrent}
-                      className="tw-border tw-border-black tw-bg-black tw-px-3 tw-py-2 tw-text-xs tw-uppercase tw-tracking-[0.1em] tw-text-white hover:tw-bg-zinc-800"
-                    >
-                      next
-                    </button>
+                    <button type="button" onClick={nextCurrent} className={primaryBtnClass}>Дальше</button>
                   ) : (
                     <>
-                      <button
-                        type="button"
-                        onClick={restartPractice}
-                        className="tw-border tw-border-black tw-bg-black tw-px-3 tw-py-2 tw-text-xs tw-uppercase tw-tracking-[0.1em] tw-text-white hover:tw-bg-zinc-800"
-                      >
-                        restart
-                      </button>
-                      <p className="tw-m-0 tw-self-center tw-text-sm tw-text-zinc-700">итог: {score + (resultState && resultState.ok ? 1 : 0)} / {queue.length}</p>
+                      <button type="button" onClick={restartPractice} className={primaryBtnClass}>Пройти заново</button>
+                      <button type="button" onClick={() => setView("list")} className={secondaryBtnClass}>К темам</button>
                     </>
                   )}
-                </div>
-              </div>
-            </>
-          )}
-        </div>
-      ) : null}
+
+                  {selectedMeta && selectedMistakesCount && !practiceMistakesMode ? (
+                    <button type="button" onClick={() => startTopicMistakesPractice(selectedMeta.id)} className={secondaryBtnClass}>
+                      Повторить ошибки ({selectedMistakesCount})
+                    </button>
+                  ) : null}
+                </section>
+              </>
+            )}
+          </div>
+        ) : null}
+      </div>
     </section>,
     hostEl,
   );

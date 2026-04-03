@@ -26,7 +26,7 @@ export default function StudentHelperPage({ studentHelperBodyHtml }) {
       <Head>
         <title>Student Helper</title>
         <link rel="stylesheet" href="../../assets/css/styles.css" />
-        <link rel="stylesheet" href="./student_helper.css?v=20260331-10" />
+        <link rel="stylesheet" href="./student_helper.css?v=20260402-11" />
         <link rel="stylesheet" href="./student-helper-inline.css" />
         <link rel="stylesheet" href="../../assets/css/theme.css" />
       </Head>
