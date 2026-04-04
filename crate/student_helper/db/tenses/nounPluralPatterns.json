@@ -5,94 +5,266 @@
   "ruleBlocks": [
     {
       "type": "heading",
-      "text": "Plural patterns: regular, irregular, exceptions"
+      "text": "Образование множественного числа: полный конспект"
     },
     {
       "type": "text",
-      "text": "Здесь собраны карточки из фото по образованию множественного числа: базовые окончания, чередования корневых гласных, -f/-ves, сложные существительные и группы слов с фиксированным употреблением." 
+      "text": "В этой теме важно разделять три уровня: регулярные формулы (добавление -s/-es), орфографические трансформации (y -> ies, f/fe -> ves), и лексические исключения (man -> men, child -> children). Если смешать уровни, начинаются хаотичные ошибки вроде *childs, *mouses, *informations."
     },
     {
-      "type": "highlight",
-      "title": "Что входит в блок",
-      "lines": [
-        "N + s, -y -> -ies, -s/-ss/-x/-z/-ch/-sh + es, отдельные случаи с -o",
-        "irregular plural: man/men, woman/women, child/children, foot/feet, tooth/teeth, goose/geese, mouse/mice, ox/oxen",
-        "-f/-fe -> -ves и исключения (belief, roof, giraffe)",
-        "compound nouns: passers-by, mothers-in-law, commanders-in-chief",
-        "same form nouns (fish, deer, sheep, species, means, series), nouns on -s with singular agreement, singular-only и plural-only списки"
+      "type": "table",
+      "caption": "Как выбирать форму plural по шагам",
+      "columns": [
+        "Шаг",
+        "Проверка",
+        "Что делать",
+        "Пример"
+      ],
+      "rows": [
+        [
+          "1",
+          "Слово в списке irregular?",
+          "берем готовую форму",
+          "person -> people"
+        ],
+        [
+          "2",
+          "Конец на consonant + y?",
+          "y -> ies",
+          "city -> cities"
+        ],
+        [
+          "3",
+          "Конец на s/ss/x/z/ch/sh?",
+          "+ es",
+          "box -> boxes"
+        ],
+        [
+          "4",
+          "Конец на -f/-fe и это слово из ves-группы?",
+          "f/fe -> ves",
+          "knife -> knives"
+        ],
+        [
+          "5",
+          "Иначе регулярная форма",
+          "+ s",
+          "student -> students"
+        ]
       ]
     },
     {
-      "type": "imageGallery",
-      "title": "Источник (без потерь, 1:1)",
-      "note": "Каждый скан включен целиком; текст и примеры не редактировались.",
-      "items": [
-        {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_5_2026-04-04_12-26-14.jpg",
-          "alt": "Plural basic rule card",
-          "caption": "photo_5"
-        },
-        {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_6_2026-04-04_12-26-14.jpg",
-          "alt": "Irregular plural by vowel alternation",
-          "caption": "photo_6"
-        },
-        {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_7_2026-04-04_12-26-14.jpg",
-          "alt": "f to ves and compound nouns",
-          "caption": "photo_7"
-        },
-        {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_8_2026-04-04_12-26-14.jpg",
-          "alt": "Same form and nouns on s",
-          "caption": "photo_8"
-        },
-        {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_9_2026-04-04_12-26-14.jpg",
-          "alt": "Singular only and plural only lists",
-          "caption": "photo_9"
-        },
-        {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_36_2026-04-04_12-26-14.jpg",
-          "alt": "Workbook excerpt with noun lists",
-          "caption": "photo_36"
-        },
-        {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_43_2026-04-04_12-26-14.jpg",
-          "alt": "Basic rule card duplicate",
-          "caption": "photo_43"
-        },
-        {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_44_2026-04-04_12-26-14.jpg",
-          "alt": "Irregular card duplicate",
-          "caption": "photo_44"
-        },
-        {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_45_2026-04-04_12-26-14.jpg",
-          "alt": "f to ves card duplicate",
-          "caption": "photo_45"
-        },
-        {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_46_2026-04-04_12-26-14.jpg",
-          "alt": "Compound nouns card duplicate",
-          "caption": "photo_46"
-        },
-        {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_47_2026-04-04_12-26-14.jpg",
-          "alt": "Same form and nouns on s card duplicate",
-          "caption": "photo_47"
-        },
-        {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_48_2026-04-04_12-26-14.jpg",
-          "alt": "Singular only and plural only card duplicate",
-          "caption": "photo_48"
-        }
+      "type": "table",
+      "caption": "Basic Rule (Noun)",
+      "columns": [
+        "Паттерн",
+        "Формула",
+        "Примеры"
+      ],
+      "rows": [
+        [
+          "обычное окончание",
+          "N + s",
+          "students, months"
+        ],
+        [
+          "гласный + y",
+          "N + y -> ys",
+          "days, monkeys, journeys"
+        ],
+        [
+          "согласный + y",
+          "N + y -> ies",
+          "lady -> ladies, city -> cities"
+        ],
+        [
+          "s, ss, x, z, ch, sh",
+          "+ es",
+          "buses, glasses, boxes, buzzes, watches, brushes"
+        ],
+        [
+          "часть слов на -o",
+          "o + es",
+          "heroes, tomatoes, potatoes"
+        ],
+        [
+          "исключения на -o",
+          "o + s",
+          "studios, zoos, photos, kilos, memos, pianos"
+        ]
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Irregular plural (чередование корневой гласной)",
+      "columns": [
+        "Singular",
+        "Plural"
+      ],
+      "rows": [
+        [
+          "man",
+          "men"
+        ],
+        [
+          "woman",
+          "women"
+        ],
+        [
+          "foot",
+          "feet"
+        ],
+        [
+          "tooth",
+          "teeth"
+        ],
+        [
+          "goose",
+          "geese"
+        ],
+        [
+          "mouse",
+          "mice"
+        ],
+        [
+          "child",
+          "children"
+        ],
+        [
+          "ox",
+          "oxen"
+        ]
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "-f / -fe -> -ves",
+      "columns": [
+        "Паттерн",
+        "Примеры"
+      ],
+      "rows": [
+        [
+          "f -> ves",
+          "half -> halves, leaf -> leaves, loaf -> loaves, wolf -> wolves"
+        ],
+        [
+          "fe -> ves",
+          "knife -> knives, life -> lives, wife -> wives"
+        ],
+        [
+          "исключения",
+          "belief -> beliefs, roof -> roofs, giraffe -> giraffes"
+        ]
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Plural of compound nouns",
+      "columns": [
+        "Шаблон",
+        "Примеры"
+      ],
+      "rows": [
+        [
+          "N + Ns",
+          "roommates, boyfriends"
+        ],
+        [
+          "Ns + prep",
+          "passers-by"
+        ],
+        [
+          "Ns + prep + N",
+          "mothers-in-law, commanders-in-chief, lilies-of-the-valley"
+        ],
+        [
+          "(No noun) + s",
+          "grown-ups, merry-go-rounds, forget-me-nots, break-ins"
+        ]
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Одинаковая форма в singular и plural",
+      "columns": [
+        "Слово",
+        "Singular",
+        "Plural"
+      ],
+      "rows": [
+        [
+          "fish",
+          "a fish",
+          "two fish"
+        ],
+        [
+          "deer",
+          "a deer",
+          "five deer"
+        ],
+        [
+          "sheep",
+          "a sheep",
+          "a lot of sheep"
+        ],
+        [
+          "bison",
+          "a bison",
+          "two bison"
+        ],
+        [
+          "species",
+          "a species",
+          "some species"
+        ],
+        [
+          "means",
+          "a means",
+          "means"
+        ],
+        [
+          "series",
+          "a series",
+          "five series"
+        ]
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Списки фиксированного употребления",
+      "columns": [
+        "Категория",
+        "Слова"
+      ],
+      "rows": [
+        [
+          "на -s, но singular",
+          "mathematics, physics, phonetics, politics, economics, gymnastics, athletics, measles, rickets, mumps"
+        ],
+        [
+          "только singular",
+          "money, news, advice, knowledge, information, progress, weather"
+        ],
+        [
+          "только plural",
+          "clothes, trousers, jeans, tights, shorts, pyjamas, glasses, scissors, police, stairs, goods"
+        ]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Ключевые противопоставления",
+      "lines": [
+        "clothing (singular category) vs clothes (plural items)",
+        "hair (mass noun) vs hairs (отдельные волоски)",
+        "news is, police are",
+        "a number of + plural verb; the number of + singular verb"
       ]
     },
     {
       "type": "topicLinks",
       "title": "Смежные правила раздела",
-      "note": "Продолжай в соседних темах для согласования и количественных слов.",
       "items": [
         {
           "id": "specialNounsNumber",

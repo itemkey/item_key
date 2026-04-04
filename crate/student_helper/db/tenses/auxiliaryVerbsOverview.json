@@ -9,24 +9,127 @@
     },
     {
       "type": "text",
-      "text": "Схема из фото: как работают DO/DOES/DID, HAVE/HAS/HAD, AM/IS/ARE/WAS/WERE, а также BE/BEEN в вопросах, отрицаниях, временах Continuous/Perfect и Passive." 
+      "text": "В английском auxiliary - это не просто дополнительный элемент, а каркас грамматики. Он показывает время, тип вопроса/отрицания, залог и согласование. Если правильно выбрать auxiliary, структура предложения обычно уже наполовину решена."
     },
     {
-      "type": "highlight",
-      "title": "Мини-карта",
-      "lines": [
-        "DO / DOES / DID -> Present Simple и Past Simple (вопросы/отрицания)",
-        "HAVE / HAS / HAD -> Present Perfect / Present Perfect Continuous / Past Perfect",
-        "AM / IS / ARE / WAS / WERE -> to be как смысловой и вспомогательный",
-        "BE / BEEN -> после will/modals и в Perfect Continuous"
+      "type": "table",
+      "caption": "Кто за что отвечает",
+      "columns": [
+        "Auxiliary",
+        "Основная функция",
+        "Где чаще всего ломаются",
+        "Быстрый ориентир"
+      ],
+      "rows": [
+        [
+          "DO/DOES/DID",
+          "вопросы и отрицания в Simple (без be)",
+          "подстановка be вместо do",
+          "Если это Simple и нет be/modal -> почти всегда do-family"
+        ],
+        [
+          "HAVE/HAS/HAD",
+          "Perfect формы",
+          "путаница have как auxiliary и have как смысловой глагол",
+          "Если есть V3 и результат/опыт к моменту -> have-family"
+        ],
+        [
+          "AM/IS/ARE/WAS/WERE",
+          "be как смысловой; Continuous; Passive",
+          "пропуск be в Continuous/Passive",
+          "Если есть V-ing или be + V3 -> нужен be-family"
+        ],
+        [
+          "BE/BEEN",
+          "инфинитив/причастие в сложных формах",
+          "путаница be vs been",
+          "после modal/will в Passive -> be; в perfect-continuous встречается been"
+        ]
       ]
     },
     {
-      "type": "image",
-      "title": "Источник (без потерь, 1:1)",
-      "note": "Полная шпаргалка из фото.",
-      "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_21_2026-04-04_12-26-14.jpg",
-      "alt": "Auxiliary verbs map photo 21"
+      "type": "table",
+      "caption": "DO - DOES - DID",
+      "columns": [
+        "Роль",
+        "Где используется",
+        "Примеры"
+      ],
+      "rows": [
+        [
+          "вопросы и отрицания",
+          "Present Simple / Past Simple",
+          "How DO you get to school? / Helga DOES not drink coffee in the morning, DOES she? / I DID not make any mistakes in the test. / DID you use to go to the gym regularly?"
+        ]
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "HAVE - HAS - HAD",
+      "columns": [
+        "Роль",
+        "Где используется",
+        "Примеры"
+      ],
+      "rows": [
+        [
+          "вспомогательный глагол",
+          "Present Perfect / Present Perfect Continuous",
+          "HAVE you ever been to China? / He HAS been living in Minsk for many years, HASN'T he?"
+        ],
+        [
+          "вспомогательный глагол",
+          "Past Perfect",
+          "I HAD read the book before I watched the film adaptation."
+        ]
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "AM - IS - ARE; WAS - WERE",
+      "columns": [
+        "Роль",
+        "Где используется",
+        "Примеры"
+      ],
+      "rows": [
+        [
+          "смысловой to be",
+          "являться/быть/находиться",
+          "We ARE best friends. / The damage WAS not serious, WAS it?"
+        ],
+        [
+          "вспомогательный глагол",
+          "Present Continuous / Past Continuous",
+          "He IS learning to ride a bike, ISN'T he? / We WERE waiting for the test results."
+        ],
+        [
+          "вспомогательный глагол",
+          "Present Simple Passive / Past Simple Passive",
+          "The rubbish IS collected twice a week, ISN'T it? / The messages WERE not delivered, WERE they?"
+        ]
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "BE / BEEN",
+      "columns": [
+        "Форма",
+        "Где используется",
+        "Примеры"
+      ],
+      "rows": [
+        [
+          "BE",
+          "после will и modal verbs (active/passive)",
+          "I will BE ready in 5 minutes. / The painting will BE sold at auction next week. / Homework must BE handed in tomorrow morning."
+        ],
+        [
+          "BEEN",
+          "Present Perfect Continuous",
+          "It has BEEN raining since morning."
+        ]
+      ]
     },
     {
       "type": "topicLinks",
@@ -44,9 +147,14 @@
           "note": "короткие реплики с нужным auxiliary"
         },
         {
+          "id": "echoQuestions",
+          "label": "Echo Questions",
+          "note": "переспрос через auxiliary: Is it? Did you?"
+        },
+        {
           "id": "specialNounsNumber",
           "label": "Special Nouns: Singular/Plural",
-          "note": "связка auxiliary + согласование с noun"
+          "note": "часть примеров auxiliary завязана на noun agreement"
         }
       ]
     }

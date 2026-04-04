@@ -68,6 +68,12 @@ Used by constructor and compare logic:
 - `image` (`src`, optional `title`, `note`, `alt`)
 - `imageGallery` (`title`, `note`, `items[]` with `src`, optional `alt`, `caption`)
 
+Optional for rule detail mode switch:
+
+- `ruleMode`: `"tag-rule"` or `"full-rule"`
+  - If omitted, block is available in both modes
+  - `tag-rule` mode in UI also applies automatic shortening (fewer rows/examples)
+
 ### `practice.exercises` supported kinds
 
 - `choice`

@@ -14,14 +14,12 @@ export default function RuleView({
   compareNote,
   selectedDoc,
   shownRuleBlocks,
-  ruleBlocksCount,
-  expandedRule,
-  onToggleExpanded,
+  ruleViewMode,
+  onRuleViewModeChange,
   onBackToTopics,
   onStartPractice,
   onOpenTopic,
   masteryLabel,
-  rulePreviewLimit,
 }) {
   if (!selectedMeta) {
     return (
@@ -33,7 +31,35 @@ export default function RuleView({
 
   return (
     <div className="tw-space-y-4">
-      <button type="button" onClick={onBackToTopics} className={secondaryBtnClass}>Назад к темам</button>
+      <div className="tw-flex tw-flex-wrap tw-items-center tw-justify-between tw-gap-2">
+        <button type="button" onClick={onBackToTopics} className={secondaryBtnClass}>Назад к темам</button>
+        <div className="tw-inline-flex tw-overflow-hidden tw-rounded-xl tw-border tw-border-slate-300 tw-bg-white">
+          <button
+            type="button"
+            onClick={() => onRuleViewModeChange("tag-rule")}
+            className={[
+              "tw-inline-flex tw-items-center tw-justify-center tw-px-3 tw-py-2 tw-text-xs tw-font-semibold tw-transition",
+              ruleViewMode === "tag-rule"
+                ? "tw-bg-slate-900 tw-text-white"
+                : "tw-bg-white tw-text-slate-700 hover:tw-bg-slate-100",
+            ].join(" ")}
+          >
+            tag-rule
+          </button>
+          <button
+            type="button"
+            onClick={() => onRuleViewModeChange("full-rule")}
+            className={[
+              "tw-inline-flex tw-items-center tw-justify-center tw-border-l tw-border-slate-300 tw-px-3 tw-py-2 tw-text-xs tw-font-semibold tw-transition",
+              ruleViewMode === "full-rule"
+                ? "tw-bg-slate-900 tw-text-white"
+                : "tw-bg-white tw-text-slate-700 hover:tw-bg-slate-100",
+            ].join(" ")}
+          >
+            full-rule
+          </button>
+        </div>
+      </div>
 
       <section className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 sm:tw-p-5">
         <div className="tw-flex tw-flex-wrap tw-items-start tw-justify-between tw-gap-2">
@@ -134,11 +160,6 @@ export default function RuleView({
       ) : (
         <section className="tw-space-y-3">
           <RuleBlocksRenderer blocks={shownRuleBlocks} onOpenTopic={onOpenTopic} />
-          {ruleBlocksCount > rulePreviewLimit ? (
-            <button type="button" onClick={onToggleExpanded} className={secondaryBtnClass}>
-              {expandedRule ? "Свернуть материал" : `Показать все блоки (${ruleBlocksCount})`}
-            </button>
-          ) : null}
         </section>
       )}
     </div>

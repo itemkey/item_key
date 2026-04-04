@@ -5,45 +5,135 @@
   "ruleBlocks": [
     {
       "type": "heading",
-      "text": "Как отвечать: Me too / Me neither / So do I / Neither do I"
+      "text": "Как отвечать на чужую реплику"
     },
     {
       "type": "text",
-      "text": "Блок собран из учебных фото: визуальная схема, подробные пояснения на русском и упражнения на выбор правильного вспомогательного глагола в ответных репликах."
+      "text": "Эта тема тренирует реактивные реплики в диалоге. Сначала ты определяешь полярность стимула (утверждение или отрицание), затем выбираешь тип реакции (согласие или возражение), и только потом подставляешь нужный auxiliary в правильном времени."
     },
     {
-      "type": "highlight",
-      "title": "Быстрый ориентир",
-      "lines": [
-        "Утверждение + согласие: Me too / So + auxiliary + I",
-        "Отрицание + согласие: Me neither / Neither (Nor) + auxiliary + I",
-        "Возражение: But I do / But I don't / Oh, I did",
-        "Auxiliary в ответе должен совпадать с временем и формой в реплике-стимуле"
+      "type": "table",
+      "caption": "Пошаговый выбор реплики",
+      "columns": [
+        "Шаг",
+        "Что проверить",
+        "Что выбрать",
+        "Пример"
+      ],
+      "rows": [
+        [
+          "1",
+          "Стимул positive?",
+          "so / too / as well",
+          "I like jazz. - So do I."
+        ],
+        [
+          "2",
+          "Стимул negative?",
+          "neither / nor / either",
+          "I don't smoke. - Neither do I."
+        ],
+        [
+          "3",
+          "Нужна инверсия?",
+          "so/neither + auxiliary + subject",
+          "So has she. / Neither can we."
+        ],
+        [
+          "4",
+          "Нужно возразить?",
+          "opposite auxiliary form",
+          "You didn't call. - But I did!"
+        ]
       ]
     },
     {
-      "type": "imageGallery",
-      "title": "Источник (без потерь, 1:1)",
+      "type": "table",
+      "caption": "Схема ответов",
+      "columns": [
+        "Стимул",
+        "Согласие",
+        "Вариант с inversion",
+        "Возражение"
+      ],
+      "rows": [
+        [
+          "I really love tea.",
+          "Me too! / I love tea, too!",
+          "So do I!",
+          "But I don't!"
+        ],
+        [
+          "I didn't order any coffee.",
+          "Me neither! / I didn't order it, either!",
+          "Neither did I. / Nor did I.",
+          "Oh, I did!"
+        ]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Подробные правила",
+      "lines": [
+        "too и either часто стоят в конце предложения: too в утвердительных, either в отрицательных.",
+        "Обороты so / neither / nor начинают ответ, затем идет auxiliary нужного времени и подлежащее.",
+        "В отрицательных стимулах используются neither/nor, в утвердительных — so.",
+        "Чтобы возразить, auxiliary в ответе берется в противоположной форме: I miss you. — You don't! / You haven't done your homework. — But I have!"
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Упражнение (карточка из набора)",
+      "columns": [
+        "№",
+        "Sentence",
+        "Answer"
+      ],
+      "rows": [
+        ["1", "I think every child should play a sport. ~ So ___ I.", "do"],
+        ["2", "My sister doesn't like wearing skirts and neither ___ I.", "do"],
+        ["3", "Julia is revising for her History test and so ___ we.", "are"],
+        ["4", "My school doesn't have a football pitch and nor ___ yours.", "does"],
+        ["5", "Unfortunately, Pat lost a match yesterday. ~ So ___ we.", "did"],
+        ["6", "My sister doesn't watch TV at all. ~ Neither ___ mine.", "does"],
+        ["7", "My dad ___ never take up yoga and neither will my mum.", "will"],
+        ["8", "I get bored watching football matches, and so ___ my sister.", "does"],
+        ["9", "My mum can't stand techno music. ~ And neither ___ mine.", "can"],
+        ["10", "We ___ a bit slow during the match and so were the other players.", "were"],
+        ["11", "To keep fit, Dan goes for a swim every Friday and so ___ his bestie.", "does"],
+        ["12", "Diana has never let her friends down and neither ___ Bobbie.", "has"],
+        ["13", "I signed up for a computer course yesterday, and so ___ my classmate.", "did"],
+        ["14", "As a child, Olga wasn't very competitive and neither ___ her brothers.", "were"],
+        ["15", "Lucy ___ going to do a course in judo. ~ So is Miranda.", "is"],
+        ["16", "You ___ not feed the dog! ~ That's not true. I fed him!", "did"],
+        ["17", "On average, people who don't smoke are healthier than people who ___.", "do"],
+        ["18", "Those workers who ___ not eat breakfast felt more tired than those who did.", "did"],
+        ["19", "Students who studied while they were listening to music had lower scores than those who ___ not.", "did"],
+        ["20", "Emergency vehicles with lights and sirens active ___ allowed to pass through a red light.", "are"]
+      ]
+    },
+    {
+      "type": "examples",
       "items": [
         {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_49_2026-04-04_12-26-14.jpg",
-          "alt": "Visual cheat sheet for agreement replies",
-          "caption": "photo_49"
+          "en": "I'm hungry. ~ Me too.",
+          "ru": "Я голоден. ~ Я тоже."
         },
         {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_50_2026-04-04_12-26-14.jpg",
-          "alt": "Detailed explanation in Russian",
-          "caption": "photo_50"
+          "en": "I can't believe he's sixty. ~ I can't either.",
+          "ru": "Не могу поверить, что ему шестьдесят. ~ Я тоже не могу."
         },
         {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_51_2026-04-04_12-26-14.jpg",
-          "alt": "Exercise set with filled answers",
-          "caption": "photo_51"
+          "en": "I like milk. ~ So do I.",
+          "ru": "Я люблю молоко. ~ Я тоже."
         },
         {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_52_2026-04-04_12-26-14.jpg",
-          "alt": "Continuation of exercise lines",
-          "caption": "photo_52"
+          "en": "He left on Sunday. ~ So did she.",
+          "ru": "Он уехал в воскресенье. ~ Она тоже."
+        },
+        {
+          "en": "I don't have any money. ~ Neither (Nor) do I.",
+          "ru": "У меня нет денег. ~ У меня тоже нет."
         }
       ]
     },
@@ -60,6 +150,16 @@
           "id": "auxiliaryMixedCards",
           "label": "Auxiliary Mixed Cards",
           "note": "дополнительная тренировка на формы auxiliary"
+        },
+        {
+          "id": "echoQuestions",
+          "label": "Echo Questions",
+          "note": "переспрос: удивление, интерес, уточнение через auxiliary"
+        },
+        {
+          "id": "questionTagsBasics",
+          "label": "Question Tags Basics",
+          "note": "не путай переспрос с question tags"
         }
       ]
     }

@@ -5,44 +5,291 @@
   "ruleBlocks": [
     {
       "type": "heading",
-      "text": "Согласование: когда is, а когда are"
+      "text": "Согласование: где is/are, was/were, has/have"
     },
     {
       "type": "text",
-      "text": "Этот блок собирает таблицы из фото в формате 1:1. Здесь правила согласования для there is/are, a number/the number, each/every, a lot/lots/plenty, collective nouns и существительных на -ics."
+      "text": "Это табличная версия всех правил согласования из конспекта и фото: there is/are, number patterns, quantifier patterns, each/every, -ics nouns, collective nouns, меры времени/денег/расстояния."
     },
     {
-      "type": "highlight",
-      "title": "Ключевые паттерны из таблиц",
-      "lines": [
-        "there is/was + singular; there are/were + plural",
-        "the number of + plural noun -> singular verb",
-        "a number of + plural noun -> plural verb",
-        "each/every + singular noun -> singular verb",
-        "collective nouns (family/team/audience/staff) могут быть singular или plural по смыслу"
+      "type": "heading",
+      "text": "Главная учебная идея"
+    },
+    {
+      "type": "text",
+      "text": "В заданиях на agreement ошибка часто появляется из-за ближайшего слова: студент видит рядом plural и ставит are, хотя грамматический центр подлежащего singular. Поэтому здесь важно идти по алгоритму: сначала найти ядро подлежащего, потом проверить паттерн (there is/are, a number/the number, each/every, of-phrase), и только после этого выбирать форму глагола."
+    },
+    {
+      "type": "table",
+      "caption": "Алгоритм согласования (экзаменационный)",
+      "columns": [
+        "Шаг",
+        "Что сделать",
+        "Типичная ошибка",
+        "Правильная логика"
+      ],
+      "rows": [
+        [
+          "1",
+          "Найди ядро подлежащего",
+          "согласование с ближайшим словом",
+          "A number of students are... (ядро students)"
+        ],
+        [
+          "2",
+          "Проверь фиксированные шаблоны",
+          "*The number of students are",
+          "the number + singular verb"
+        ],
+        [
+          "3",
+          "Для of-структур смотри noun после of",
+          "*Most of money are",
+          "Most of money is..."
+        ],
+        [
+          "4",
+          "В there is/are смотри первое noun после there",
+          "ставить are только из-за второго plural",
+          "There is a table and two chairs."
+        ],
+        [
+          "5",
+          "Проверь ловушки measures/collectives/-ics",
+          "*Three million dollars are",
+          "как единый пакет -> singular"
+        ]
       ]
     },
     {
-      "type": "imageGallery",
-      "title": "Источник (без потерь, 1:1)",
-      "note": "Сканы из фото, включены полностью как учебный оригинал.",
-      "items": [
-        {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_1_2026-04-04_12-26-14.jpg",
-          "alt": "Noun agreement table photo 1",
-          "caption": "photo_1: большая таблица согласования имени существительного со сказуемым"
-        },
-        {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_22_2026-04-04_12-26-14.jpg",
-          "alt": "Noun agreement table photo 22",
-          "caption": "photo_22: дополнительные таблицы there is/are, number, each/every, -ics"
-        }
+      "type": "table",
+      "caption": "there is / there are (смотрим на первое существительное после there)",
+      "columns": [
+        "Тип",
+        "Шаблон",
+        "Примеры"
+      ],
+      "rows": [
+        [
+          "Singular",
+          "there is / there was + singular noun",
+          "There was no one in sight. / There is one table and some chairs in the room."
+        ],
+        [
+          "Plural",
+          "there are / there were + plural noun",
+          "There are some men and a woman in the room. / There were over a hundred guests at the party."
+        ],
+        [
+          "Порядок важен",
+          "глагол согласуется с ближайшим noun",
+          "There is a woman and some men in the room. / There are some men and a woman in the room."
+        ]
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "a number of / the number of",
+      "columns": [
+        "Шаблон",
+        "Глагол",
+        "Примеры"
+      ],
+      "rows": [
+        [
+          "a number of + plural noun",
+          "plural verb",
+          "A number of students are absent. / A number of scientists study climate change."
+        ],
+        [
+          "the number of + plural noun",
+          "singular verb",
+          "The number of problems is increasing. / The number of students is growing."
+        ]
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "majority / minority",
+      "columns": [
+        "Фокус",
+        "Глагол",
+        "Примеры"
+      ],
+      "rows": [
+        [
+          "группа как одно явление",
+          "чаще singular",
+          "The majority is always right. / The minority is silent."
+        ],
+        [
+          "участники внутри группы",
+          "часто plural",
+          "The majority of users make payments online. / The minority of voters are against the law."
+        ]
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "a lot of / lots of / plenty of / most / half / all / rest",
+      "columns": [
+        "Шаблон",
+        "Что решает число",
+        "Примеры"
+      ],
+      "rows": [
+        [
+          "a lot of / lots of / plenty of + noun",
+          "число noun после of",
+          "There is plenty of time left. / There are lots of apps available. / Plenty of stores stay open late."
+        ],
+        [
+          "most of + noun",
+          "uncountable -> singular; plural noun -> plural",
+          "Most of my salary is spent on food. / Most students are tired."
+        ],
+        [
+          "half of + noun",
+          "uncountable -> singular; plural noun -> plural",
+          "Half of the cake is gone. / Half of the students don't like school."
+        ],
+        [
+          "all / rest of + noun",
+          "по числу noun",
+          "All the information is clear. / All the files are ready."
+        ]
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "each / every",
+      "columns": [
+        "Шаблон",
+        "Глагол",
+        "Примеры"
+      ],
+      "rows": [
+        [
+          "each + singular noun",
+          "singular",
+          "Each child likes New Year. / Each student has to take the test."
+        ],
+        [
+          "every + singular noun",
+          "singular",
+          "Every child is happy. / Every student has a book."
+        ],
+        [
+          "each of + plural noun",
+          "singular",
+          "Each of the students has a laptop."
+        ],
+        [
+          "every of ...",
+          "нельзя",
+          "Неправильно: Every of the students ..."
+        ]
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Время, деньги, вес, расстояние, скорость как единая мера",
+      "columns": [
+        "Тип",
+        "Глагол",
+        "Примеры"
+      ],
+      "rows": [
+        [
+          "measure as one package",
+          "обычно singular",
+          "Twenty miles is a long way. / Three million dollars is a huge sum. / Ninety kilometers an hour is over the speed limit."
+        ],
+        [
+          "когда фокус на единицах",
+          "возможен plural",
+          "Three dollars are lying on the table."
+        ]
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Слова на -s, которые остаются singular",
+      "columns": [
+        "Группа",
+        "Слова",
+        "Примеры"
+      ],
+      "rows": [
+        [
+          "науки",
+          "mathematics, physics, phonetics, politics, economics",
+          "Mathematics is often called the queen of science."
+        ],
+        [
+          "виды спорта",
+          "gymnastics, athletics, rhythmic gymnastics",
+          "Rhythmic gymnastics is a women-only event."
+        ],
+        [
+          "болезни",
+          "measles, rickets, mumps",
+          "Measles is dangerous without vaccination."
+        ]
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Названия городов/государств/организаций",
+      "columns": [
+        "Принцип",
+        "Глагол",
+        "Примеры"
+      ],
+      "rows": [
+        [
+          "если это один объект",
+          "singular",
+          "Athens is a mecca for tourists. / The United States is a powerful country."
+        ]
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Collective nouns: family, team, committee, audience, staff",
+      "columns": [
+        "Фокус",
+        "Глагол",
+        "Примеры"
+      ],
+      "rows": [
+        [
+          "группа как одно целое",
+          "singular",
+          "Every family has its own history. / The committee was presided over by its chairman."
+        ],
+        [
+          "члены группы",
+          "plural",
+          "The family were having lunch. / The teaching staff are all women."
+        ]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Экзаменационный алгоритм",
+      "lines": [
+        "Шаг 1: найди подлежащее (смысловой центр), а не ближайшее слово.",
+        "Шаг 2: проверь ловушки: news, police, people, each/every, a number/the number.",
+        "Шаг 3: если есть of-phrase, смотри на noun после of (a lot of money is; a lot of books are).",
+        "Шаг 4: для there is/are ориентируйся на первое существительное после there.",
+        "Шаг 5: для мер времени/денег/расстояния проверь, мыслится ли это как единый пакет."
       ]
     },
     {
       "type": "topicLinks",
       "title": "Смежные правила раздела",
-      "note": "Все правила в этом разделе самостоятельные, это только удобные переходы.",
+      "note": "Все правила в этом разделе самостоятельные.",
       "items": [
         {
           "id": "specialNounsNumber",

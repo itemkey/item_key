@@ -10,7 +10,6 @@ import PracticeInputRenderer from "./grammar/PracticeInputRenderer";
 
 const INDEX_PATH = "./db/tenses/index.json";
 const DB_DIR = "./db/tenses/";
-const RULE_PREVIEW_LIMIT = 10;
 const SYNTH_COMPARE_ID = "__react_compare__";
 const SYNTH_DAILY_ID = "__react_daily__";
 const SYNTH_LIBRARY_ID = "__react_library__";
@@ -22,6 +21,7 @@ const KEY_LAST_VIEW = "sh_tenses_last_view_react";
 const KEY_LEVEL = "sh_grammar_level_v1";
 const KEY_PRACTICE_STATS = "sh_tenses_practice_stats_v1";
 const KEY_SHOW_ANSWERS = "sh_tenses_show_answers_v1";
+const KEY_RULE_VIEW_MODE = "sh_grammar_rule_view_mode_v1";
 const LEVELS = ["A2-B1", "B1-B2", "B2-C1"];
 const PRACTICE_GOAL_OPTIONS = [
   { value: "all_goals", label: "общее (all goals)" },
@@ -66,6 +66,12 @@ function normalizePracticeGoal(value) {
   const goal = asText(value);
   const exists = PRACTICE_GOAL_OPTIONS.some((row) => row.value === goal);
   return exists ? goal : "all_goals";
+}
+
+function normalizeRuleViewMode(value) {
+  const mode = normalize(value);
+  if (mode === "tag" || mode === "tag-rule" || mode === "tagrule") return "tag-rule";
+  return "full-rule";
 }
 
 function practiceGoalLabel(goal) {
@@ -135,6 +141,7 @@ function subgroupTitle(group, subgroup) {
   if (g === "parts_of_speech") {
     if (s === "nouns") return "Nouns";
     if (s === "verbs") return "Verbs";
+    if (s === "adverbs") return "Adverbs";
   }
 
   return s;
@@ -715,6 +722,143 @@ function quickCompareData(meta, doc) {
   };
 }
 
+function blockDeclaredMode(block) {
+  return normalize(block && (block.ruleMode || block.mode || block.audience || block.detailMode || block.detailLevel));
+}
+
+function blockAllowedForMode(block, mode) {
+  const declared = blockDeclaredMode(block);
+  if (!declared) return true;
+
+  const tokens = declared
+    .split(/[\s,|/]+/)
+    .map((v) => normalize(v))
+    .filter(Boolean);
+
+  const hasTag = tokens.includes("tag") || tokens.includes("tag-rule") || tokens.includes("tagrule");
+  const hasFull = tokens.includes("full") || tokens.includes("full-rule") || tokens.includes("fullrule");
+
+  if (mode === "tag-rule") {
+    if (hasTag) return true;
+    if (hasFull && !hasTag) return false;
+    return true;
+  }
+
+  if (hasFull) return true;
+  if (hasTag && !hasFull) return false;
+  return true;
+}
+
+function isDrillBlock(block) {
+  const type = asText(block && block.type);
+  if (type !== "table") return false;
+  const caption = normalize(block && block.caption);
+  return caption.includes("exercise") || caption.includes("упраж") || caption.includes("bank") || caption.includes("card") || caption.includes("карточ");
+}
+
+function toTagBlock(block) {
+  const type = asText(block && block.type);
+
+  if (type === "table") {
+    return {
+      ...block,
+      rows: asList(block && block.rows).slice(0, 6),
+    };
+  }
+
+  if (type === "examples") {
+    return {
+      ...block,
+      items: asList(block && block.items).slice(0, 3),
+    };
+  }
+
+  if (type === "highlight") {
+    return {
+      ...block,
+      lines: asList(block && block.lines).slice(0, 5),
+    };
+  }
+
+  if (type === "topicLinks") {
+    return {
+      ...block,
+      items: asList(block && block.items).slice(0, 3),
+    };
+  }
+
+  return block;
+}
+
+function selectTagRuleBlocks(blocks) {
+  const source = asList(blocks);
+  const out = [];
+  const pickedIndices = new Set();
+  const limits = {
+    heading: 1,
+    text: 2,
+    highlight: 2,
+    table: 2,
+    examples: 1,
+    topicLinks: 1,
+  };
+  const used = {
+    heading: 0,
+    text: 0,
+    highlight: 0,
+    table: 0,
+    examples: 0,
+    topicLinks: 0,
+  };
+
+  for (let idx = 0; idx < source.length; idx += 1) {
+    const block = source[idx];
+    const type = asText(block && block.type);
+    if (!limits[type]) continue;
+    if (used[type] >= limits[type]) continue;
+    if (isDrillBlock(block)) continue;
+
+    if (type === "table") {
+      const caption = normalize(block && block.caption);
+      const isPriority = caption.includes("формул")
+        || caption.includes("formula")
+        || caption.includes("схем")
+        || caption.includes("алгорит")
+        || caption.includes("баз")
+        || caption.includes("карт")
+        || caption.includes("overview")
+        || caption.includes("как выбрать");
+
+      if (!isPriority && used.table > 0) continue;
+    }
+
+    out.push(toTagBlock(block));
+    pickedIndices.add(idx);
+    used[type] += 1;
+  }
+
+  if (out.length >= 4) return out;
+
+  for (let idx = 0; idx < source.length; idx += 1) {
+    if (pickedIndices.has(idx)) continue;
+    const block = source[idx];
+    const type = asText(block && block.type);
+    if (!["heading", "text", "highlight", "table", "examples"].includes(type)) continue;
+    out.push(toTagBlock(block));
+    pickedIndices.add(idx);
+    if (out.length >= 4) break;
+  }
+
+  return out;
+}
+
+function filterRuleBlocksByMode(blocks, modeRaw) {
+  const mode = normalizeRuleViewMode(modeRaw);
+  const allowed = asList(blocks).filter((block) => blockAllowedForMode(block, mode));
+  if (mode === "tag-rule") return selectTagRuleBlocks(allowed);
+  return allowed;
+}
+
 export default function GrammarReactAppPortal() {
   const [hostEl, setHostEl] = useState(null);
   const legacyNodesRef = useRef([]);
@@ -729,7 +873,7 @@ export default function GrammarReactAppPortal() {
   const [selectedId, setSelectedId] = useState("");
   const [search, setSearch] = useState("");
   const [groupFilter, setGroupFilter] = useState("all");
-  const [expandedRule, setExpandedRule] = useState(false);
+  const [ruleViewMode, setRuleViewMode] = useState("full-rule");
   const [compareA, setCompareA] = useState("");
   const [compareB, setCompareB] = useState("");
   const [compareBusy, setCompareBusy] = useState(false);
@@ -807,6 +951,11 @@ export default function GrammarReactAppPortal() {
     setDailyCached(readDailyCache());
     setPracticeStats(readPracticeStats());
     setShowAnswersAfterEach(readShowAnswersSetting());
+    try {
+      setRuleViewMode(normalizeRuleViewMode(localStorage.getItem(KEY_RULE_VIEW_MODE)));
+    } catch (_err) {
+      setRuleViewMode("full-rule");
+    }
   }, []);
 
   useEffect(() => {
@@ -939,9 +1088,13 @@ export default function GrammarReactAppPortal() {
     } catch (_err) {}
   };
 
-  useEffect(() => {
-    setExpandedRule(false);
-  }, [selectedId]);
+  const persistRuleViewMode = (modeRaw) => {
+    const mode = normalizeRuleViewMode(modeRaw);
+    setRuleViewMode(mode);
+    try {
+      localStorage.setItem(KEY_RULE_VIEW_MODE, mode);
+    } catch (_err) {}
+  };
 
   useEffect(() => {
     if (!current) {
@@ -1837,7 +1990,7 @@ export default function GrammarReactAppPortal() {
   if (!hostEl) return null;
 
   const ruleBlocks = asList(selectedDoc && selectedDoc.ruleBlocks);
-  const shownRuleBlocks = expandedRule ? ruleBlocks : ruleBlocks.slice(0, RULE_PREVIEW_LIMIT);
+  const shownRuleBlocks = filterRuleBlocksByMode(ruleBlocks, ruleViewMode);
   const compareMetaA = compareA ? topicById.get(compareA) : null;
   const compareMetaB = compareB ? topicById.get(compareB) : null;
   const compareDocA = compareA ? topicDocs[compareA] : null;
@@ -2018,9 +2171,8 @@ export default function GrammarReactAppPortal() {
             compareNote={compareNote}
             selectedDoc={selectedDoc}
             shownRuleBlocks={shownRuleBlocks}
-            ruleBlocksCount={ruleBlocks.length}
-            expandedRule={expandedRule}
-            onToggleExpanded={() => setExpandedRule((v) => !v)}
+            ruleViewMode={ruleViewMode}
+            onRuleViewModeChange={persistRuleViewMode}
             onBackToTopics={() => setView("list")}
             onStartPractice={() => {
               if (!selectedMeta) return;
@@ -2028,7 +2180,6 @@ export default function GrammarReactAppPortal() {
             }}
             onOpenTopic={openTopic}
             masteryLabel={masteryLabel}
-            rulePreviewLimit={RULE_PREVIEW_LIMIT}
           />
         ) : null}
 

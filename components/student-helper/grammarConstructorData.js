@@ -243,6 +243,6 @@ export const CONSTRUCTOR_RESULTS = {
   emphasis_wish: { reason: "Ты хочешь выразить сожаление или желание о другой реальности.", picks: ["wishIfOnly", "conditionalsSecondThird", "mixedConditionals"] },
   emphasis_inversion: { reason: "Нужен формальный/сильный акцент в порядке слов.", picks: ["inversionAdvanced", "cleftSentencesBasics", "questionTagsBasics"] },
   emphasis_cleft: { reason: "Нужно выделить важную часть высказывания.", picks: ["cleftSentencesBasics", "inversionAdvanced", "nounClausesBasics"] },
-  emphasis_tag: { reason: "Нужно короткое подтверждение в конце фразы.", picks: ["questionTagsBasics", "modalsObligationAdvice", "presentSimple"] },
+  emphasis_tag: { reason: "Нужна короткая ответная реплика или подтверждение.", picks: ["echoQuestions", "questionTagsBasics", "agreementRepliesSoNeither"] },
   emphasis_causative: { reason: "Ты описываешь действие, которое выполняет другой человек.", picks: ["causativeHaveGet", "passiveVoiceBasics", "universalUsageMap"] },
 };

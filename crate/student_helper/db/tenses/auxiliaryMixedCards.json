@@ -9,123 +9,98 @@
     },
     {
       "type": "text",
-      "text": "Ниже собраны все карточки из фото с заданиями на вставку одного auxiliary. Включены и листы с ответами, чтобы можно было сверяться без потери деталей." 
+      "text": "Ниже текстовая версия mixed cards: в каждом пункте нужно вставить один вспомогательный глагол (do/does/did, have/has/had, am/is/are/was/were, be/been)."
+    },
+    {
+      "type": "heading",
+      "text": "Как разбирать задание как в учебнике"
+    },
+    {
+      "type": "text",
+      "text": "Смотри на грамматические сигналы, а не на перевод. V-ing почти всегда тянет be-family, V3 в пассивном значении тянет be/been, результат к моменту тянет have-family, а Simple вопрос/отрицание без be требует do-family. Этот порядок уменьшает случайные ошибки в mixed drills."
     },
     {
       "type": "highlight",
-      "title": "Покрытие",
+      "title": "Алгоритм выбора",
       "lines": [
-        "CARD 1-6: задания (passive + special nouns и mixed auxiliary)",
-        "листы с ответами к наборам упражнений",
-        "все сканы добавлены в исходном виде (1:1)"
+        "Present/Past Simple вопрос/отрицание -> do/does/did.",
+        "Perfect формы -> have/has/had.",
+        "Continuous и Passive -> am/is/are/was/were (+ being/been по форме).",
+        "После modal/will -> be в пассиве: must be done, will be sent.",
+        "В tag question повторяется тот же auxiliary, что в главной части."
       ]
     },
     {
-      "type": "imageGallery",
-      "title": "Карточки с заданиями",
-      "items": [
-        {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_23_2026-04-04_12-26-14.jpg",
-          "alt": "Auxiliary exercise card 10",
-          "caption": "photo_23"
-        },
-        {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_24_2026-04-04_12-26-14.jpg",
-          "alt": "Auxiliary exercise card 11",
-          "caption": "photo_24"
-        },
-        {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_25_2026-04-04_12-26-14.jpg",
-          "alt": "Auxiliary exercise card 12",
-          "caption": "photo_25"
-        },
-        {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_26_2026-04-04_12-26-14.jpg",
-          "alt": "Auxiliary exercise card 13",
-          "caption": "photo_26"
-        },
-        {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_27_2026-04-04_12-26-14.jpg",
-          "alt": "Auxiliary exercise card 14",
-          "caption": "photo_27"
-        },
-        {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_28_2026-04-04_12-26-14.jpg",
-          "alt": "Auxiliary exercise card 15",
-          "caption": "photo_28"
-        },
-        {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_37_2026-04-04_12-26-14.jpg",
-          "alt": "Card 1 passive plus special nouns",
-          "caption": "photo_37"
-        },
-        {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_38_2026-04-04_12-26-14.jpg",
-          "alt": "Card 2 mixed auxiliary",
-          "caption": "photo_38"
-        },
-        {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_39_2026-04-04_12-26-14.jpg",
-          "alt": "Card 3 mixed auxiliary",
-          "caption": "photo_39"
-        },
-        {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_40_2026-04-04_12-26-14.jpg",
-          "alt": "Card 4 mixed auxiliary",
-          "caption": "photo_40"
-        },
-        {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_41_2026-04-04_12-26-14.jpg",
-          "alt": "Card 5 mixed auxiliary",
-          "caption": "photo_41"
-        },
-        {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_42_2026-04-04_12-26-14.jpg",
-          "alt": "Card 6 mixed auxiliary",
-          "caption": "photo_42"
-        }
+      "type": "table",
+      "caption": "Card A - вставь auxiliary",
+      "columns": [
+        "#",
+        "Sentence",
+        "Answer"
+      ],
+      "rows": [
+        ["1", "Where ___ you usually buy groceries?", "do"],
+        ["2", "She ___ not like noisy places.", "does"],
+        ["3", "___ they finish the report yesterday?", "did"],
+        ["4", "I ___ never seen this actor before.", "have"],
+        ["5", "He ___ already left the office.", "has"],
+        ["6", "By 8 p.m. we ___ completed the task.", "had"],
+        ["7", "Look! The kids ___ playing outside.", "are"],
+        ["8", "When I called, she ___ cooking dinner.", "was"],
+        ["9", "The letters ___ sent this morning.", "were"],
+        ["10", "The package will ___ delivered tomorrow.", "be"]
       ]
     },
     {
-      "type": "imageGallery",
-      "title": "Листы с ответами",
-      "note": "Ответы сохранены в том же виде, как в исходных фото.",
-      "items": [
-        {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_29_2026-04-04_12-26-14.jpg",
-          "alt": "Answer sheet 1",
-          "caption": "photo_29"
-        },
-        {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_30_2026-04-04_12-26-14.jpg",
-          "alt": "Answer sheet 2",
-          "caption": "photo_30"
-        },
-        {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_31_2026-04-04_12-26-14.jpg",
-          "alt": "Answer sheet 3",
-          "caption": "photo_31"
-        },
-        {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_32_2026-04-04_12-26-14.jpg",
-          "alt": "Answer sheet 4",
-          "caption": "photo_32"
-        },
-        {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_33_2026-04-04_12-26-14.jpg",
-          "alt": "Answer sheet 5",
-          "caption": "photo_33"
-        },
-        {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_34_2026-04-04_12-26-14.jpg",
-          "alt": "Answer sheet 6",
-          "caption": "photo_34"
-        },
-        {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_35_2026-04-04_12-26-14.jpg",
-          "alt": "Answer sheet 7",
-          "caption": "photo_35"
-        }
+      "type": "table",
+      "caption": "Card B - passive, tags, special nouns",
+      "columns": [
+        "#",
+        "Sentence",
+        "Answer"
+      ],
+      "rows": [
+        ["1", "The news ___ shocking, isn't it?", "is"],
+        ["2", "My jeans ___ too tight today.", "are"],
+        ["3", "A number of students ___ absent.", "are"],
+        ["4", "The number of students ___ increasing.", "is"],
+        ["5", "Each of the answers ___ correct.", "is"],
+        ["6", "Neither of them ___ ready yet.", "is"],
+        ["7", "The room ___ cleaned every day.", "is"],
+        ["8", "The documents ___ not signed yesterday.", "were"],
+        ["9", "You have finished, ___ you?", "haven't"],
+        ["10", "She doesn't eat meat, ___ she?", "does"]
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Card C - mixed tense drill",
+      "columns": [
+        "#",
+        "Sentence",
+        "Answer"
+      ],
+      "rows": [
+        ["1", "How long ___ you been waiting?", "have"],
+        ["2", "What ___ he doing at 9 last night?", "was"],
+        ["3", "Why ___ they cancel the meeting?", "did"],
+        ["4", "The results ___ announced tomorrow.", "will be"],
+        ["5", "She ___ just called me back.", "has"],
+        ["6", "We ___ not informed in advance.", "were"],
+        ["7", "There ___ a lot of traffic at this hour.", "is"],
+        ["8", "There ___ two mistakes in your sentence.", "are"],
+        ["9", "By next May, they ___ finished the project.", "will have"],
+        ["10", "The work must ___ completed by Friday.", "be"]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Быстрая самопроверка",
+      "lines": [
+        "Если в предложении есть V3 и действие совершается над предметом, чаще нужен be (is/are/was/were/be).",
+        "Если важен опыт/результат к моменту, чаще нужен have/has/had.",
+        "Если это простой вопрос/отрицание без be и without modal, чаще нужен do/does/did.",
+        "Для noun-traps проверяй группу: news/advice -> singular, police/trousers -> plural."
       ]
     },
     {

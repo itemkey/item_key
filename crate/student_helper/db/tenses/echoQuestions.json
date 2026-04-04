@@ -1,0 +1,899 @@
+{
+  "id": "echoQuestions",
+  "title": "Echo Questions",
+  "subtitle": "переспрос: реакция на информацию через auxiliary + pronoun",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Echo Questions: учебниковый разбор"
+    },
+    {
+      "type": "text",
+      "text": "Echo question это короткий переспрос в ответ на фразу собеседника. Он нужен не для новой информации, а для реакции: удивление, проверка, просьба повторить, эмоциональное включение в диалог. Базовый вид: auxiliary + pronoun."
+    },
+    {
+      "type": "text",
+      "text": "Ключевая мысль: здесь всегда два говорящих и две отдельные реплики. Поэтому echo question не является хвостиком одного и того же предложения, как question tag."
+    },
+    {
+      "type": "highlight",
+      "title": "Когда естественно использовать переспрос",
+      "lines": [
+        "Не расслышал и хочешь уточнить услышанное.",
+        "Удивился неожиданному факту.",
+        "Показываешь интерес и поддерживаешь разговор.",
+        "Проверяешь, правильно ли понял собеседника."
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Базовая формула",
+      "columns": [
+        "Стимул",
+        "Структура переспроса",
+        "Пример"
+      ],
+      "rows": [
+        [
+          "утвердительный",
+          "auxiliary + pronoun?",
+          "A: She is a famous artist. B: Is she?"
+        ],
+        [
+          "отрицательный",
+          "negative auxiliary + pronoun?",
+          "A: They didn't want to be there. B: Didn't they?"
+        ],
+        [
+          "с модальным глаголом",
+          "тот же modal + pronoun?",
+          "A: He can solve it. B: Can he?"
+        ]
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Шаг 1: выбери правильный auxiliary"
+    },
+    {
+      "type": "text",
+      "text": "В echo question повторяется грамматический каркас исходной фразы. Сначала определи, какой тип сказуемого в стимуле: be, simple, perfect, continuous, passive или modal. После этого выбор auxiliary обычно становится очевидным."
+    },
+    {
+      "type": "table",
+      "caption": "Карта выбора auxiliary",
+      "columns": [
+        "Тип стимула",
+        "Auxiliary в переспросе",
+        "Пример"
+      ],
+      "rows": [
+        [
+          "be как смысловой глагол",
+          "am/is/are/was/were",
+          "A: The weather is awful. B: Is it?"
+        ],
+        [
+          "Present/Past Simple без be",
+          "do/does/did",
+          "A: They play chess every day. B: Do they?"
+        ],
+        [
+          "Perfect формы",
+          "have/has/had",
+          "A: She has finished. B: Has she?"
+        ],
+        [
+          "Continuous формы",
+          "be-family нужного времени",
+          "A: They were waiting. B: Were they?"
+        ],
+        [
+          "Modal / will",
+          "тот же modal / will",
+          "A: We will leave now. B: Will you?"
+        ],
+        [
+          "Passive",
+          "be-family из пассивной формы",
+          "A: The files were deleted. B: Were they?"
+        ],
+        [
+          "lexical have",
+          "часто do-support",
+          "A: They have a new car. B: Do they?"
+        ]
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Алгоритм выбора без угадывания",
+      "columns": [
+        "Шаг",
+        "Что проверяешь",
+        "Вывод"
+      ],
+      "rows": [
+        ["1", "Есть modal или will", "повтори его"],
+        ["2", "Есть have/has/had как auxiliary", "бери have-family"],
+        ["3", "Есть be как часть continuous/passive или как main verb", "бери be-family"],
+        ["4", "Иначе это simple без be", "используй do/does/did"]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Быстрый тест на экзамене",
+      "lines": [
+        "Видишь V-ing -> почти всегда be-family.",
+        "Видишь have + V3 -> have-family.",
+        "Видишь только V2/V1 в simple без be -> do-family.",
+        "Видишь modal/will -> повторяешь modal/will."
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Шаг 2: правильно поменяй местоимение"
+    },
+    {
+      "type": "text",
+      "text": "В диалоге перспектива меняется. Если говорящий A сказал I, то для B это уже you. Поэтому ошибка в echo question чаще связана не с временем, а с неверным pronoun."
+    },
+    {
+      "type": "table",
+      "caption": "Смена лица в ответной реплике",
+      "columns": [
+        "Стимул A",
+        "Echo B",
+        "Пояснение"
+      ],
+      "rows": [
+        [
+          "I'm saving up for a new phone.",
+          "Are you?",
+          "I у A становится you у B"
+        ],
+        [
+          "You look tired.",
+          "Do I?",
+          "you у A становится I у B"
+        ],
+        [
+          "We didn't know.",
+          "Didn't you?",
+          "we у A становится you у B"
+        ],
+        [
+          "My sister can solve it.",
+          "Can she?",
+          "именная группа заменяется на she"
+        ],
+        [
+          "The boys were late.",
+          "Were they?",
+          "plural noun заменяется на they"
+        ]
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Особые случаи с формальными подлежащими",
+      "columns": [
+        "Стимул",
+        "Переспрос",
+        "Почему"
+      ],
+      "rows": [
+        [
+          "There is a new update.",
+          "Is there?",
+          "there остается there"
+        ],
+        [
+          "There were many people.",
+          "Were there?",
+          "для there-construction местоимение не меняется"
+        ],
+        [
+          "This tastes strange.",
+          "Does it?",
+          "this часто переходит в it"
+        ],
+        [
+          "Diana posted a dance video.",
+          "Did she?",
+          "имя заменяется на личное местоимение"
+        ]
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Полярность и интонация"
+    },
+    {
+      "type": "text",
+      "text": "В отличие от question tags, переспрос обычно сохраняет полярность стимула. Если стимул отрицательный, echo question тоже часто отрицательный: I haven't seen it. - Haven't you? Интонация может быть нейтральной, удивленной или недоверчивой и влияет на оттенок, но не меняет грамматическую формулу."
+    },
+    {
+      "type": "table",
+      "caption": "Одна структура, разные коммуникативные оттенки",
+      "columns": [
+        "Ситуация",
+        "Реплика",
+        "Оттенок"
+      ],
+      "rows": [
+        [
+          "уточнение",
+          "Did you?",
+          "нейтральный переспрос"
+        ],
+        [
+          "сильное удивление",
+          "Did you?!",
+          "эмоциональная реакция"
+        ],
+        [
+          "недоверие",
+          "Didn't they?",
+          "мягкая проверка правдивости"
+        ],
+        [
+          "заинтересованность",
+          "Have you?",
+          "приглашение продолжить рассказ"
+        ]
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Echo questions vs Question Tags vs Agreement Replies"
+    },
+    {
+      "type": "table",
+      "caption": "Не путай три похожих механизма",
+      "columns": [
+        "Параметр",
+        "Echo question",
+        "Question tag",
+        "So/Neither reply"
+      ],
+      "rows": [
+        [
+          "Кто говорит",
+          "обычно другой человек",
+          "тот же человек",
+          "другой человек"
+        ],
+        [
+          "Позиция",
+          "отдельная реплика",
+          "хвостик в том же предложении",
+          "отдельная реплика"
+        ],
+        [
+          "Полярность",
+          "часто сохраняется",
+          "часто противоположная",
+          "зависит от согласия или отрицания"
+        ],
+        [
+          "Цель",
+          "переспрос и реакция",
+          "подтверждение",
+          "согласие или несогласие"
+        ],
+        [
+          "Пример",
+          "A: She passed. B: Did she?",
+          "She passed, didn't she?",
+          "She passed. - So did I."
+        ]
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Типичные ошибки и как их чинить"
+    },
+    {
+      "type": "table",
+      "caption": "Анти-ошибочный блок",
+      "columns": [
+        "Ошибка",
+        "Правильно",
+        "Почему"
+      ],
+      "rows": [
+        [
+          "A: I saw him. B: Saw you?",
+          "A: I saw him. B: Did you?",
+          "в simple нужен do-support"
+        ],
+        [
+          "A: I am late. B: Am I?",
+          "A: I am late. B: Are you?",
+          "I у A становится you у B"
+        ],
+        [
+          "A: She has a car. B: Has she? (в американском стандарте всегда)",
+          "A: She has a car. B: Do(es) she?",
+          "lexical have часто берет do-support"
+        ],
+        [
+          "A: They were invited. B: Did they?",
+          "A: They were invited. B: Were they?",
+          "в пассиве повторяем be-family"
+        ],
+        [
+          "A: I don't like sushi. B: Do you?",
+          "A: I don't like sushi. B: Don't you?",
+          "полярность переспроса обычно сохраняется"
+        ]
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        {
+          "en": "A: I've just got my driver's license! B: Have you? No way!",
+          "ru": "Present Perfect в стимуле -> have в переспросе."
+        },
+        {
+          "en": "A: My parents won't let me go out tonight. B: Won't they?",
+          "ru": "Modal/will повторяется в ответной реплике."
+        },
+        {
+          "en": "A: I can't find my earbuds. B: Can't you?",
+          "ru": "Отрицательный modal-стимул -> отрицательный переспрос."
+        },
+        {
+          "en": "A: There is a new update. B: Is there?",
+          "ru": "Для there-construction сохраняется there."
+        },
+        {
+          "en": "A: We were waiting outside. B: Were you?",
+          "ru": "we у говорящего A переходит в you у B."
+        },
+        {
+          "en": "A: Diana posted a dance video. B: Did she?",
+          "ru": "Имя заменяем на she в переспросе."
+        }
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Чек-лист перед тем как нажать answer",
+      "lines": [
+        "Определи тип сказуемого в стимуле и выбери auxiliary по модели.",
+        "Проверь смену местоимения из позиции A в позицию B.",
+        "Для there-конструкций сохраняй there.",
+        "Не смешивай echo question с question tag.",
+        "Если сомневаешься в simple, проверь do-support."
+      ]
+    },
+    {
+      "type": "topicLinks",
+      "title": "Смежные правила раздела",
+      "items": [
+        {
+          "id": "auxiliaryVerbsOverview",
+          "label": "Auxiliary Verbs Overview",
+          "note": "база по DO/HAVE/BE для выбора формы переспроса"
+        },
+        {
+          "id": "questionTagsBasics",
+          "label": "Question Tags Basics",
+          "note": "сравни механику tag и echo"
+        },
+        {
+          "id": "agreementRepliesSoNeither",
+          "label": "Agreement Replies: So / Neither / Me too",
+          "note": "другой тип коротких реактивных реплик"
+        }
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": [
+      {
+        "id": "meaning",
+        "title": "Choose the best echo reply",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "eq_m_1",
+            "instruction": "Выбери ответную реплику",
+            "prompt": "A: I can't believe it's already senior year. Time flies!\nB: ___ It feels like just yesterday we were freshmen.",
+            "options": [
+              "Does it?",
+              "Has it?",
+              "Isn't it?",
+              "Do you?"
+            ],
+            "correctIndex": 0,
+            "explain": "Time flies -> Present Simple без be, нужен does."
+          },
+          {
+            "id": "eq_m_2",
+            "instruction": "Выбери ответную реплику",
+            "prompt": "A: I'm saving up for a new phone. This one is ancient!\nB: ___ Which one are you planning to get?",
+            "options": [
+              "Are you?",
+              "Do you?",
+              "Is it?",
+              "Was it?"
+            ],
+            "correctIndex": 0,
+            "explain": "I'm ... -> Are you?"
+          },
+          {
+            "id": "eq_m_3",
+            "instruction": "Выбери ответную реплику",
+            "prompt": "A: My crush finally texted me back!\nB: ___ OMG! What did he say?",
+            "options": [
+              "Did he?",
+              "Has he?",
+              "Was he?",
+              "Does he?"
+            ],
+            "correctIndex": 0,
+            "explain": "texted -> Past Simple, нужен did."
+          },
+          {
+            "id": "eq_m_4",
+            "instruction": "Выбери ответную реплику",
+            "prompt": "A: I'm going to ask Helga out on a date.\nB: ___ Wow, good for you!",
+            "options": [
+              "Are you?",
+              "Will you?",
+              "Do you?",
+              "Aren't you?"
+            ],
+            "correctIndex": 0,
+            "explain": "I'm going to ... -> Are you?"
+          },
+          {
+            "id": "eq_m_5",
+            "instruction": "Выбери ответную реплику",
+            "prompt": "A: I've just got my driver's license!\nB: ___ No way!",
+            "options": [
+              "Have you?",
+              "Did you?",
+              "Had you?",
+              "Haven't you?"
+            ],
+            "correctIndex": 0,
+            "explain": "I've got ... -> Have you?"
+          },
+          {
+            "id": "eq_m_6",
+            "instruction": "Выбери ответную реплику",
+            "prompt": "A: I totally flunked that chemistry test.\nB: ___ Do you want me to quiz you later?",
+            "options": [
+              "Did you?",
+              "Don't you?",
+              "Have you?",
+              "Won't you?"
+            ],
+            "correctIndex": 0,
+            "explain": "flunked -> Past Simple, нужен did."
+          },
+          {
+            "id": "eq_m_7",
+            "instruction": "Выбери ответную реплику",
+            "prompt": "A: I'm binge-watching this new show on Netflix. It's totally addictive!\nB: ___ What's it called?",
+            "options": [
+              "Is it?",
+              "Does it?",
+              "Are you?",
+              "Has it?"
+            ],
+            "correctIndex": 0,
+            "explain": "It's ... -> Is it?"
+          },
+          {
+            "id": "eq_m_8",
+            "instruction": "Выбери ответную реплику",
+            "prompt": "A: I've received my first paycheck already!\nB: ___ Congrats! What are you going to spend it on?",
+            "options": [
+              "Have you?",
+              "Did you?",
+              "Had you?",
+              "Are you?"
+            ],
+            "correctIndex": 0,
+            "explain": "Present Perfect -> have."
+          },
+          {
+            "id": "eq_m_9",
+            "instruction": "Выбери ответную реплику",
+            "prompt": "A: My parents won't let me go out tonight.\nB: ___ That's a bummer.",
+            "options": [
+              "Won't they?",
+              "Will they?",
+              "Do they?",
+              "Don't they?"
+            ],
+            "correctIndex": 0,
+            "explain": "Отрицательный стимул с will -> Won't they?"
+          },
+          {
+            "id": "eq_m_10",
+            "instruction": "Выбери ответную реплику",
+            "prompt": "A: I saw Liam holding hands with some girl in the park today.\nB: ___ No way!",
+            "options": [
+              "Did you?",
+              "Didn't you?",
+              "Were you?",
+              "Did they?"
+            ],
+            "correctIndex": 0,
+            "explain": "saw -> did you?"
+          },
+          {
+            "id": "eq_m_11",
+            "instruction": "Выбери ответную реплику",
+            "prompt": "A: I haven't read any of the Harry Potter books.\nB: ___ I can't believe that!",
+            "options": [
+              "Haven't you?",
+              "Have you?",
+              "Didn't you?",
+              "Aren't you?"
+            ],
+            "correctIndex": 0,
+            "explain": "Отрицательная perfect-форма сохраняется: haven't you?"
+          },
+          {
+            "id": "eq_m_12",
+            "instruction": "Выбери ответную реплику",
+            "prompt": "A: I can't find my earbuds anywhere!\nB: ___ Here they are!",
+            "options": [
+              "Can't you?",
+              "Can you?",
+              "Do you?",
+              "Don't you?"
+            ],
+            "correctIndex": 0,
+            "explain": "can not find -> can't you?"
+          },
+          {
+            "id": "eq_m_13",
+            "instruction": "Выбери ответную реплику",
+            "prompt": "A: I have no idea what I want to do after I graduate.\nB: ___ Same here!",
+            "options": [
+              "Don't you?",
+              "Do you?",
+              "Haven't you?",
+              "Have you?"
+            ],
+            "correctIndex": 0,
+            "explain": "Лексическое have в отрицательном стимуле часто дает do-support: don't you?"
+          },
+          {
+            "id": "eq_m_14",
+            "instruction": "Выбери ответную реплику",
+            "prompt": "A: This new season of the anime is amazing!\nB: ___",
+            "options": [
+              "Is it?",
+              "Does it?",
+              "Are you?",
+              "Do you?"
+            ],
+            "correctIndex": 0,
+            "explain": "is amazing -> Is it?"
+          },
+          {
+            "id": "eq_m_15",
+            "instruction": "Выбери ответную реплику",
+            "prompt": "A: England lost in the Euro final.\nB: ___",
+            "options": [
+              "Did they?",
+              "Were they?",
+              "Have they?",
+              "Will they?"
+            ],
+            "correctIndex": 0,
+            "explain": "lost -> Past Simple, нужен did."
+          }
+        ]
+      },
+      {
+        "id": "formula",
+        "title": "Build the echo question",
+        "kind": "input",
+        "items": [
+          {
+            "id": "eq_f_1",
+            "instruction": "Вставь краткий переспрос",
+            "prompt": "She is a famous artist. -> ____",
+            "accepted": ["is she", "is she?"],
+            "explain": "be -> is she?"
+          },
+          {
+            "id": "eq_f_2",
+            "instruction": "Вставь краткий переспрос",
+            "prompt": "They didn't want to be there. -> ____",
+            "accepted": ["didn't they", "didn't they?"],
+            "explain": "Отрицательный Past Simple -> didn't they?"
+          },
+          {
+            "id": "eq_f_3",
+            "instruction": "Вставь краткий переспрос",
+            "prompt": "You look tired. (ответ от собеседника) -> ____",
+            "accepted": ["do i", "do i?"],
+            "explain": "you (стимул) -> I (ответ)."
+          },
+          {
+            "id": "eq_f_4",
+            "instruction": "Вставь краткий переспрос",
+            "prompt": "I can help you with this. -> ____",
+            "accepted": ["can you", "can you?"],
+            "explain": "modal can сохраняется."
+          },
+          {
+            "id": "eq_f_5",
+            "instruction": "Вставь краткий переспрос",
+            "prompt": "We will leave on Tuesday. -> ____",
+            "accepted": ["will you", "will you?"],
+            "explain": "we (у A) -> you (у B)."
+          },
+          {
+            "id": "eq_f_6",
+            "instruction": "Вставь краткий переспрос",
+            "prompt": "Martin has completed the task. -> ____",
+            "accepted": ["has he", "has he?"],
+            "explain": "Present Perfect -> has he?"
+          },
+          {
+            "id": "eq_f_7",
+            "instruction": "Вставь краткий переспрос",
+            "prompt": "I am late again. -> ____",
+            "accepted": ["are you", "are you?"],
+            "explain": "I -> you в ответной реплике."
+          },
+          {
+            "id": "eq_f_8",
+            "instruction": "Вставь краткий переспрос",
+            "prompt": "My friends have officially registered their marriage. -> ____",
+            "accepted": ["have they", "have they?"],
+            "explain": "have + they"
+          },
+          {
+            "id": "eq_f_9",
+            "instruction": "Вставь краткий переспрос",
+            "prompt": "My sister can solve a Rubik's Cube in under a minute. -> ____",
+            "accepted": ["can she", "can she?"],
+            "explain": "can + she"
+          },
+          {
+            "id": "eq_f_10",
+            "instruction": "Вставь краткий переспрос",
+            "prompt": "Diana posted a dance video that went viral. -> ____",
+            "accepted": ["did she", "did she?"],
+            "explain": "posted -> did she?"
+          },
+          {
+            "id": "eq_f_11",
+            "instruction": "Вставь краткий переспрос",
+            "prompt": "There is a new update coming out. -> ____",
+            "accepted": ["is there", "is there?"],
+            "explain": "there is -> is there?"
+          },
+          {
+            "id": "eq_f_12",
+            "instruction": "Вставь краткий переспрос",
+            "prompt": "I was going to ask Mika out, but I chickened out. -> ____",
+            "accepted": ["were you", "were you?"],
+            "explain": "I was -> Were you?"
+          }
+        ]
+      },
+      {
+        "id": "markers",
+        "title": "Match statement and echo question",
+        "kind": "match",
+        "items": [
+          {
+            "id": "eq_mark_1",
+            "instruction": "Соотнеси стимул и переспрос",
+            "pairs": [
+              { "left": "The weather is fantastic!", "right": "Is it?" },
+              { "left": "It was a disaster!", "right": "Was it?" },
+              { "left": "You look bored.", "right": "Do I?" },
+              { "left": "They travelled to India.", "right": "Did they?" },
+              { "left": "We will leave on Tuesday.", "right": "Will you?" },
+              { "left": "She can help you with this.", "right": "Can she?" },
+              { "left": "Martin has completed the task.", "right": "Has he?" },
+              { "left": "He couldn't come.", "right": "Couldn't he?" },
+              { "left": "We didn't know the truth.", "right": "Didn't you?" },
+              { "left": "They have a new car.", "right": "Do they?" }
+            ],
+            "explain": "Выбирай auxiliary по исходному предложению и учитывай смену местоимений."
+          }
+        ]
+      },
+      {
+        "id": "compare",
+        "title": "Echo question or Question tag?",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "eq_cmp_1",
+            "instruction": "Выбери тип",
+            "prompt": "It's cold, isn't it?",
+            "options": ["Echo question", "Question tag"],
+            "correctIndex": 1,
+            "explain": "Это хвостик в одном предложении."
+          },
+          {
+            "id": "eq_cmp_2",
+            "instruction": "Выбери тип",
+            "prompt": "A: It's cold today. B: Is it?",
+            "options": ["Echo question", "Question tag"],
+            "correctIndex": 0,
+            "explain": "Это отдельная реакция собеседника."
+          },
+          {
+            "id": "eq_cmp_3",
+            "instruction": "Выбери тип",
+            "prompt": "You don't eat meat, do you?",
+            "options": ["Echo question", "Question tag"],
+            "correctIndex": 1,
+            "explain": "Классический tag."
+          },
+          {
+            "id": "eq_cmp_4",
+            "instruction": "Выбери тип",
+            "prompt": "A: I don't eat meat. B: Don't you?",
+            "options": ["Echo question", "Question tag"],
+            "correctIndex": 0,
+            "explain": "Отдельный переспрос во второй реплике."
+          },
+          {
+            "id": "eq_cmp_5",
+            "instruction": "Выбери тип",
+            "prompt": "Let's go, shall we?",
+            "options": ["Echo question", "Question tag"],
+            "correctIndex": 1,
+            "explain": "Это tag после let's."
+          },
+          {
+            "id": "eq_cmp_6",
+            "instruction": "Выбери тип",
+            "prompt": "A: I've just passed my exam! B: Have you?",
+            "options": ["Echo question", "Question tag"],
+            "correctIndex": 0,
+            "explain": "Отдельный переспрос."
+          },
+          {
+            "id": "eq_cmp_7",
+            "instruction": "Выбери тип",
+            "prompt": "They are coming, aren't they?",
+            "options": ["Echo question", "Question tag"],
+            "correctIndex": 1,
+            "explain": "В одном предложении и с противоположной полярностью."
+          },
+          {
+            "id": "eq_cmp_8",
+            "instruction": "Выбери тип",
+            "prompt": "A: They are coming. B: Are they?",
+            "options": ["Echo question", "Question tag"],
+            "correctIndex": 0,
+            "explain": "Отдельная ответная реплика."
+          }
+        ]
+      },
+      {
+        "id": "markers_2",
+        "goal": "markers",
+        "title": "Choose the stimulus for the reply",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "eq_m2_1",
+            "instruction": "Выбери подходящую реплику-стимул",
+            "prompt": "Reply: Is it?",
+            "options": [
+              "There's a new update for CS2 coming out!",
+              "My dog loves to chase squirrels in the park.",
+              "This new season is amazing!",
+              "I'm really stressed about exams."
+            ],
+            "correctIndex": 2,
+            "explain": "is + adjective -> Is it?"
+          },
+          {
+            "id": "eq_m2_2",
+            "instruction": "Выбери подходящую реплику-стимул",
+            "prompt": "Reply: Do you?",
+            "options": [
+              "I love watching funny cat videos on YouTube.",
+              "I'm really into K-pop music.",
+              "I was supposed to be at school at 8.",
+              "I'm thinking of getting a pet snake."
+            ],
+            "correctIndex": 0,
+            "explain": "Present Simple без be -> Do you?"
+          },
+          {
+            "id": "eq_m2_3",
+            "instruction": "Выбери подходящую реплику-стимул",
+            "prompt": "Reply: Wasn't it?",
+            "options": [
+              "The meme was hilarious.",
+              "It wasn't the first time.",
+              "A bar song is catchy.",
+              "It costs a fortune."
+            ],
+            "correctIndex": 1,
+            "explain": "Отрицательный Past Simple с be -> Wasn't it?"
+          },
+          {
+            "id": "eq_m2_4",
+            "instruction": "Выбери подходящую реплику-стимул",
+            "prompt": "Reply: Can it?",
+            "options": [
+              "My dog can fetch my slippers every time!",
+              "Memes can boost positive emotions.",
+              "That cafe has amazing reviews.",
+              "I can't find my charger."
+            ],
+            "correctIndex": 0,
+            "explain": "dog -> it; can -> Can it?"
+          },
+          {
+            "id": "eq_m2_5",
+            "instruction": "Выбери подходящую реплику-стимул",
+            "prompt": "Reply: Did you really?",
+            "options": [
+              "I found a way to get free in-game currency!",
+              "I've just signed up for a dance class!",
+              "I could get the latest iPhone for my birthday.",
+              "I never got a 10 in my exams."
+            ],
+            "correctIndex": 0,
+            "explain": "Past Simple -> Did you really?"
+          },
+          {
+            "id": "eq_m2_6",
+            "instruction": "Выбери подходящую реплику-стимул",
+            "prompt": "Reply: Will he? No way!",
+            "options": [
+              "Ryan Reynolds will continue his action-film streak.",
+              "My brother is going to study abroad next year.",
+              "He won't be allowed to stay out late.",
+              "My favourite YouTuber is doing a live Q&A this Friday."
+            ],
+            "correctIndex": 0,
+            "explain": "will в стимуле -> Will he?"
+          },
+          {
+            "id": "eq_m2_7",
+            "instruction": "Выбери подходящую реплику-стимул",
+            "prompt": "Reply: Have they? You're kidding!",
+            "options": [
+              "My friends are all going to the amusement park this weekend.",
+              "They have officially registered their marriage.",
+              "Everyone is talking about the latest Marvel movie.",
+              "They say TikTok is being banned in the US."
+            ],
+            "correctIndex": 1,
+            "explain": "Present Perfect -> Have they?"
+          },
+          {
+            "id": "eq_m2_8",
+            "instruction": "Выбери подходящую реплику-стимул",
+            "prompt": "Reply: Were you? What?!",
+            "options": [
+              "I was going to ask Mika out, but I chickened out.",
+              "I finally tried that viral whipped coffee recipe!",
+              "I told you not to post that photo online!",
+              "I'm trying to improve my grades."
+            ],
+            "correctIndex": 0,
+            "explain": "I was ... -> Were you?"
+          }
+        ]
+      }
+    ]
+  }
+}

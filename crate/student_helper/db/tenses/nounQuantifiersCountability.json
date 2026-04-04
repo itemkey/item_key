@@ -5,82 +5,286 @@
   "ruleBlocks": [
     {
       "type": "heading",
-      "text": "Quantifiers with nouns"
+      "text": "Quantifiers + countable/uncountable nouns"
     },
     {
       "type": "text",
-      "text": "Этот урок собран из фото с диаграммой и упражнениями. Внутри: выбор quantifier по типу существительного (исчисляемое/неисчисляемое) и по оттенку значения (много/мало/достаточно/слишком много)."
+      "text": "Эта тема не про механическое запоминание списка, а про логику сочетаний. Сначала определи тип существительного (countable plural или uncountable), затем выбери семантику количества (много / мало / достаточно / недостаточно), и только после этого подставляй quantifier."
     },
     {
-      "type": "highlight",
-      "title": "Логика выбора",
-      "lines": [
-        "many, few, a few, several, a number of -> обычно с countable plural",
-        "much, little, a little, a great deal of, an amount of -> обычно с uncountable",
-        "a lot of / lots of / plenty of -> работают в обеих колонках по контексту",
-        "so/very/too усиливают количество в зависимости от типа существительного"
+      "type": "table",
+      "caption": "Учебный алгоритм выбора quantifier",
+      "columns": [
+        "Шаг",
+        "Вопрос",
+        "Если ответ: да",
+        "Пример"
+      ],
+      "rows": [
+        [
+          "1",
+          "Существительное можно считать поштучно?",
+          "many / few / a few / several",
+          "many books, a few students"
+        ],
+        [
+          "2",
+          "Это масса/вещество/абстракция?",
+          "much / little / a little",
+          "much water, little time"
+        ],
+        [
+          "3",
+          "Нужна универсальная нейтральная форма?",
+          "a lot of / lots of / plenty of",
+          "a lot of ideas / a lot of work"
+        ],
+        [
+          "4",
+          "Есть конструкция of + noun?",
+          "глагол согласуется с noun после of",
+          "A lot of money is... / A lot of books are..."
+        ]
       ]
     },
     {
-      "type": "imageGallery",
-      "title": "Источник (без потерь, 1:1)",
-      "note": "Все упражнения и формулировки оставлены как в исходных фото.",
-      "items": [
-        {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_10_2026-04-04_12-26-14.jpg",
-          "alt": "Quantifier cup map",
-          "caption": "photo_10"
-        },
-        {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_11_2026-04-04_12-26-14.jpg",
-          "alt": "Dropdown exercise set 1",
-          "caption": "photo_11"
-        },
-        {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_12_2026-04-04_12-26-14.jpg",
-          "alt": "Dropdown exercise set 2",
-          "caption": "photo_12"
-        },
-        {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_13_2026-04-04_12-26-14.jpg",
-          "alt": "Choice exercise set 3 part 1",
-          "caption": "photo_13"
-        },
-        {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_14_2026-04-04_12-26-14.jpg",
-          "alt": "Choice exercise set 3 part 2",
-          "caption": "photo_14"
-        },
-        {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_15_2026-04-04_12-26-14.jpg",
-          "alt": "Choice exercise set 3 part 3",
-          "caption": "photo_15"
-        },
-        {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_16_2026-04-04_12-26-14.jpg",
-          "alt": "Choice exercise set 3 part 4",
-          "caption": "photo_16"
-        },
-        {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_17_2026-04-04_12-26-14.jpg",
-          "alt": "Large dropdown exercise part 1",
-          "caption": "photo_17"
-        },
-        {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_18_2026-04-04_12-26-14.jpg",
-          "alt": "Large dropdown exercise part 2",
-          "caption": "photo_18"
-        },
-        {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_19_2026-04-04_12-26-14.jpg",
-          "alt": "Large dropdown exercise part 3",
-          "caption": "photo_19"
-        },
-        {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_20_2026-04-04_12-26-14.jpg",
-          "alt": "Large dropdown exercise final part",
-          "caption": "photo_20"
-        }
+      "type": "table",
+      "caption": "Карта quantifiers (по учебной схеме)",
+      "columns": [
+        "Уровень",
+        "Countable",
+        "Uncountable",
+        "Работает с обеими"
+      ],
+      "rows": [
+        [
+          "очень много",
+          "so very too many, a (large/great) number of, a great many",
+          "so very too much, a (large/great) amount of, a great deal of",
+          "plenty of, a lot of, lots of, a (large) quantity of"
+        ],
+        [
+          "немного, но достаточно",
+          "a few, several, a couple of",
+          "a little",
+          "some (+), any (-/?)"
+        ],
+        [
+          "мало, недостаточно",
+          "few",
+          "little",
+          "fewer / less для сравнения"
+        ]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Базовая логика",
+      "lines": [
+        "many, few, a few, several, a number of -> с countable plural",
+        "much, little, a little, a great deal of, an amount of -> с uncountable",
+        "a lot of / lots of / plenty of -> подходят и к countable, и к uncountable",
+        "число глагола после of зависит от noun после of"
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Точечные правила из конспекта",
+      "columns": [
+        "Паттерн",
+        "Примеры"
+      ],
+      "rows": [
+        [
+          "a lot/lots/plenty of + uncountable -> singular verb",
+          "There is plenty of time left. / A lot of money was spent."
+        ],
+        [
+          "a lot/lots/plenty of + plural noun -> plural verb",
+          "There are lots of apps available. / Plenty of stores stay open late."
+        ],
+        [
+          "most/half + noun -> число глагола по noun",
+          "Most of my salary is spent on food. / Half of the students don't like school."
+        ],
+        [
+          "many water / much people",
+          "нельзя; правильно much water, many people"
+        ]
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Exercise bank A (dropdown sets, photo 11-12)",
+      "columns": [
+        "№",
+        "Sentence with blank",
+        "Typical options"
+      ],
+      "rows": [
+        [
+          "A1",
+          "She listens to a ___ of music while studying.",
+          "lot / much / many / lots"
+        ],
+        [
+          "A2",
+          "There isn't ___ sand left in the hourglass.",
+          "much / many / little / few"
+        ],
+        [
+          "A3",
+          "They bought ___ tables for the new restaurant.",
+          "many / much / few / little"
+        ],
+        [
+          "A4",
+          "There isn't ___ cheese in the fridge for the recipe.",
+          "much / many / little / few"
+        ],
+        [
+          "A5",
+          "The children brought ___ of happiness to their grandparents.",
+          "lots / much / many / lot"
+        ],
+        [
+          "A6",
+          "We have a ___ of tickets for the concert tonight.",
+          "lot / little / few / much"
+        ],
+        [
+          "A7",
+          "The room has a ___ of air circulation, making it very comfortable.",
+          "lot / little / many / few"
+        ],
+        [
+          "A8",
+          "There are a ___ of candles on the birthday cake.",
+          "lot / much / many / little"
+        ],
+        [
+          "A9",
+          "She drank ___ of bottles of water during the hike.",
+          "lots / many / much / little"
+        ],
+        [
+          "A10",
+          "___ flowers bloomed in the garden after the rain.",
+          "lot / much / many / lots"
+        ],
+        [
+          "B1",
+          "___ cars were seen on the road during the storm.",
+          "few / little / several / much"
+        ],
+        [
+          "B2",
+          "She bought a ___ apples from the market for the pie.",
+          "few / little / many / much"
+        ],
+        [
+          "B3",
+          "There's only a ___ water left in the bottle.",
+          "little / few / many / several"
+        ],
+        [
+          "B4",
+          "They put a ___ sugar in their coffee to sweeten it.",
+          "little / few / much / many"
+        ],
+        [
+          "B5",
+          "We need a ___ chairs for the guests who just arrived.",
+          "few / little / many / much"
+        ],
+        [
+          "B6",
+          "He added a ___ rice to the soup to make it thicker.",
+          "little / few / many / much"
+        ],
+        [
+          "B7",
+          "I'll give you a ___ advice before your presentation.",
+          "little / few / several / many"
+        ],
+        [
+          "B8",
+          "A ___ books were left on the shelf after the library sale.",
+          "few / little / many / much"
+        ],
+        [
+          "B9",
+          "There are ___ dogs playing in the park today.",
+          "many / much / little / few"
+        ],
+        [
+          "B10",
+          "She has ___ knowledge of the subject, so she's nervous about the exam.",
+          "little / few / several / many"
+        ]
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Exercise bank B (extended sets, photo 13-20)",
+      "columns": [
+        "№",
+        "Sentence with blank"
+      ],
+      "rows": [
+        ["C1", "So ... students participated in the competition that we had to extend the deadline."],
+        ["C2", "So ... money was left in the budget after the event that we couldn't afford to print the reports."],
+        ["C3", "Too ... students attended the lecture, which made it hard for the professor to continue."],
+        ["C4", "The team had very ... experience, so they found it challenging to handle the pressure of the project."],
+        ["C5", "There is so ... time left to finish the project that we had to work nonstop to meet the deadline."],
+        ["C6", "There are so ... things I want to accomplish, but it's hard to keep up with everything."],
+        ["C7", "He was one of only ... people who knew about the company's financial problems."],
+        ["C8", "She applied only ... make-up, and it made her look stunning."],
+        ["C9", "A ... money can go a long way when you're starting a small business."],
+        ["C10", "Too ... salt is in this soup, and it doesn't taste as good as expected."],
+        ["C11", "So ... children came to the event that it was almost canceled."],
+        ["C12", "There were too ... things to do, but they managed to finish it all by the deadline."],
+        ["C13", "A ... students struggle to keep up with the workload, but they eventually succeed."],
+        ["C14", "Too ... buildings are being torn down in the city, erasing important parts of its history."],
+        ["C15", "The recipe calls for too ... salt, which ruins the flavor of the dish."],
+        ["D1", "A ... of incredible scientists are working on new technologies to help reduce climate change."],
+        ["D2", "Did you know that ... of people around the world are trying to protect endangered species from extinction?"],
+        ["D3", "There's a great ... of excitement around the release of the new superhero movie."],
+        ["D4", "... astronauts just returned from space after spending six months on the International Space Station."],
+        ["D5", "A ... of famous musicians are collaborating on a new album."],
+        ["D6", "A great ... of animals are being trained to help people with disabilities."],
+        ["D7", "... of young people are using social media to create positive change in their communities."],
+        ["D8", "It's amazing that a ... of $1 million was raised in just one week to support the fight against hunger!"],
+        ["D9", "A ... of athletes are breaking records, and some of them are still in their teens!"],
+        ["D10", "... of amazing books have been published this year, and readers can't stop talking about them."],
+        ["D11", "... countries are working together to build a sustainable future by investing in renewable energy."],
+        ["D12", "There's a great ... of enthusiasm for the new virtual reality games that are hitting the market."],
+        ["D13", "... of students are now learning about artificial intelligence in school."],
+        ["D14", "Did you know that a big ... of flowers are used to make biodegradable plastic?"],
+        ["D15", "A ... of famous athletes are using their platforms to encourage kids to stay active and healthy."],
+        ["D16", "There's ... of online content that teaches young people how to become great leaders."],
+        ["D17", "... countries are competing to develop the fastest electric cars, and the race is on!"],
+        ["D18", "A ... of $500,000 was donated to support a new program that gives laptops to students."],
+        ["D19", "A great ... of attention is focused on how clean energy can power the world."],
+        ["D20", "... of famous artists are using digital tools to create masterpieces."],
+        ["D21", "... young innovators are creating apps to help people stay healthy and motivated."],
+        ["D22", "A ... of billionaires have pledged to donate their wealth."],
+        ["D23", "There are a ... of young activists leading marches to demand action on climate change."],
+        ["D24", "... of people have been adopting pets during the pandemic."],
+        ["D25", "A ... of snacks are created to help athletes fuel their bodies and perform at their best."],
+        ["E1", "... of buildings are being renovated in the city, which will change its entire look."],
+        ["E2", "Only a ... children managed to finish the race before it started raining."],
+        ["E3", "There are times when a ... students struggle to keep up with the workload."],
+        ["E4", "So ... work was required for the project that she hardly had any time for herself."],
+        ["E5", "The event was a success, even though we had only a ... money left to decorate the venue."],
+        ["E6", "Very ... people truly understand the complexity of this problem."],
+        ["E7", "A ... experience can make a huge difference when dealing with complex situations."],
+        ["E8", "Only a ... time was left before the exam, so review thoroughly."],
+        ["E9", "So ... ideas were presented during the brainstorming session that we didn't know where to start."],
+        ["E10", "There are too ... buildings with energy-efficient designs, which could have saved the city a lot of money."],
+        ["E11", "... of people are attending the concert tonight, and the atmosphere is electric."],
+        ["E12", "Too ... traffic on the streets in the morning makes commuting stressful."],
+        ["E13", "So ... children showed up for the event that the organizers had to cancel it." ]
       ]
     },
     {

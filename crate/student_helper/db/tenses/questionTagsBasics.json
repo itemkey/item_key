@@ -39,6 +39,27 @@
         { "en": "She has finished, hasn't she?", "ru": "Она уже закончила, не так ли?" },
         { "en": "Let's go, shall we?", "ru": "Давай пойдем, хорошо?" }
       ]
+    },
+    {
+      "type": "topicLinks",
+      "title": "Смежные правила раздела",
+      "items": [
+        {
+          "id": "echoQuestions",
+          "label": "Echo Questions",
+          "note": "переспрос и реакция на слова собеседника"
+        },
+        {
+          "id": "agreementRepliesSoNeither",
+          "label": "Agreement Replies: So / Neither / Me too",
+          "note": "короткие согласительные ответы с auxiliary"
+        },
+        {
+          "id": "auxiliaryVerbsOverview",
+          "label": "Auxiliary Verbs Overview",
+          "note": "карта вспомогательных глаголов для tag и echo"
+        }
+      ]
     }
   ],
   "practice": {

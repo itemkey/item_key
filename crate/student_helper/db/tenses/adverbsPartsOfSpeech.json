@@ -1,0 +1,903 @@
+{
+  "id": "adverbs",
+  "title": "Adverbs",
+  "subtitle": "adjective vs adverb: форма, смысл, позиция, ловушки и маркеры",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Adjective vs Adverb: это не слова, а роли"
+    },
+    {
+      "type": "text",
+      "text": "Главная ошибка в этой теме: выбирать форму по внешнему виду слова, а не по функции в предложении. Правильный путь такой: сначала определяем, что именно описываем, и только потом выбираем adjective или adverb."
+    },
+    {
+      "type": "text",
+      "text": "Adjective отвечает за признак существительного или за состояние после глагола-связки. Adverb описывает действие, степень признака или отношение говорящего к ситуации. Поэтому вопрос какой ведет к adjective, а вопросы как и насколько ведут к adverb."
+    },
+    {
+      "type": "table",
+      "caption": "Первый шаг в любом задании",
+      "columns": [
+        "Что описывается",
+        "Нужная часть речи",
+        "Сигнал",
+        "Пример"
+      ],
+      "rows": [
+        [
+          "существительное",
+          "adjective",
+          "какой предмет",
+          "She has a beautiful dress."
+        ],
+        [
+          "действие",
+          "adverb",
+          "как выполняется действие",
+          "She is dressed beautifully."
+        ],
+        [
+          "состояние после linking verb",
+          "adjective",
+          "be, seem, look, feel, become...",
+          "You look great."
+        ],
+        [
+          "усиление признака",
+          "adverb",
+          "насколько",
+          "extremely busy, surprisingly easy"
+        ]
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Как образуются adverbs"
+    },
+    {
+      "type": "text",
+      "text": "Часто adverb образуется от adjective через -ly, но это не универсальная кнопка. Нужно учитывать орфографию (simple -> simply, global -> globally), слова с одинаковой формой (fast, early), и слова на -ly, которые остаются adjective (friendly, lovely)."
+    },
+    {
+      "type": "table",
+      "caption": "Рабочие модели образования adverbs",
+      "columns": [
+        "Модель",
+        "Формула",
+        "Примеры"
+      ],
+      "rows": [
+        [
+          "базовая",
+          "adjective + ly",
+          "careful -> carefully, clear -> clearly"
+        ],
+        [
+          "конец на -y",
+          "y -> ily",
+          "easy -> easily, happy -> happily"
+        ],
+        [
+          "конец на -le",
+          "le -> ly",
+          "simple -> simply, gentle -> gently"
+        ],
+        [
+          "конец на -ic",
+          "+ ally",
+          "basic -> basically, dramatic -> dramatically"
+        ],
+        [
+          "нерегулярная пара",
+          "good -> well",
+          "You speak English well."
+        ]
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Когда форма adjective и adverb совпадает",
+      "columns": [
+        "Слово",
+        "Как adjective",
+        "Как adverb"
+      ],
+      "rows": [
+        ["early", "an early train", "arrive early"],
+        ["daily", "a daily routine", "exercise daily"],
+        ["fast", "a fast car", "drive fast"],
+        ["hard", "a hard task", "work hard"],
+        ["late", "a late answer", "arrive late"],
+        ["near", "the near wall", "come near"],
+        ["far", "a far country", "live far away"],
+        ["long", "a long road", "wait long"],
+        ["straight", "a straight line", "go straight"],
+        ["low", "a low voice", "fly low"]
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Слова на -ly, которые не становятся adverb",
+      "columns": [
+        "Слово",
+        "Часть речи",
+        "Как выразить adverb-идею"
+      ],
+      "rows": [
+        ["friendly", "adjective", "in a friendly way"],
+        ["lovely", "adjective", "in a lovely way"],
+        ["lively", "adjective", "in a lively manner"],
+        ["silly", "adjective", "in a silly way"],
+        ["cowardly", "adjective", "in a cowardly way"],
+        ["likely", "adjective", "likely -> probably as adverb idea"],
+        ["elderly", "adjective", "for elderly people"],
+        ["lonely", "adjective", "feel lonely"]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Частая ловушка",
+      "lines": [
+        "Не каждое слово на -ly является adverb.",
+        "friendlyly, lovelyly, cowardlyly - неверно.",
+        "Если слово уже adjective на -ly, adverb-значение строим через in a ... way/manner.",
+        "Всегда проверяй роль слова в предложении, а не только окончание."
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Linking verbs: после них только adjective"
+    },
+    {
+      "type": "text",
+      "text": "В английском языке после глаголов-связок употребляются только прилагательные. Здесь глагол не описывает действие, а соединяет подлежащее с признаком или состоянием. Поэтому: The weather is fine, I feel bad, You look great, It is getting late."
+    },
+    {
+      "type": "table",
+      "caption": "Глаголы-связки из учебной схемы",
+      "columns": [
+        "Глагол",
+        "Значение",
+        "После него",
+        "Пример"
+      ],
+      "rows": [
+        ["appear", "выглядеть, казаться", "adjective", "She appears calm."],
+        ["be", "быть", "adjective", "The room is quiet."],
+        ["become", "становиться", "adjective", "He became famous."],
+        ["feel", "чувствовать себя", "adjective", "I feel tired."],
+        ["get", "становиться", "adjective", "It gets cold at night."],
+        ["grow", "становиться", "adjective", "He grew impatient."],
+        ["look", "выглядеть", "adjective", "You look confident."],
+        ["seem", "казаться", "adjective", "It seems impossible."],
+        ["smell", "пахнуть", "adjective", "The soup smells amazing."],
+        ["sound", "звучать", "adjective", "That sounds strange."],
+        ["taste", "быть на вкус", "adjective", "This sauce tastes sweet."],
+        ["turn", "становиться", "adjective", "His face turned pale."]
+      ]
+    },
+    {
+      "type": "text",
+      "text": "Некоторые из этих же глаголов могут быть смысловыми, а не глаголами-связками. Тогда меняется значение и рядом требуется adverb, а не adjective. Это именно тот момент, который чаще всего проверяют в тестах."
+    },
+    {
+      "type": "table",
+      "caption": "Когда те же глаголы становятся смысловыми",
+      "columns": [
+        "Глагол",
+        "Смысловой перевод",
+        "Что рядом",
+        "Пример"
+      ],
+      "rows": [
+        ["appear", "появляться", "adverb", "The notification appeared suddenly."],
+        ["grow", "расти", "adverb", "Sales grew rapidly."],
+        ["look", "смотреть", "adverb", "He looked around nervously."],
+        ["smell", "нюхать", "adverb", "She smelled the milk carefully."],
+        ["taste", "пробовать", "adverb", "He tasted the soup cautiously."],
+        ["turn", "поворачивать", "adverb", "She turned quickly at the corner."]
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Сравни пары: linking vs lexical",
+      "columns": [
+        "Linking verb + adjective",
+        "Lexical verb + adverb",
+        "Комментарий"
+      ],
+      "rows": [
+        [
+          "He looked nervous.",
+          "He looked around nervously.",
+          "выглядел vs оглядывался"
+        ],
+        [
+          "The meat smelled suspicious.",
+          "She smelled the meat suspiciously.",
+          "пахло vs нюхала"
+        ],
+        [
+          "The soup tastes salty.",
+          "The chef tasted the soup carefully.",
+          "на вкус vs попробовал"
+        ],
+        [
+          "The child grew quiet.",
+          "The child grew quickly.",
+          "стал спокойным vs рос быстро"
+        ],
+        [
+          "He turned red.",
+          "He turned sharply left.",
+          "стал красным vs резко повернул"
+        ],
+        [
+          "The app appears useful.",
+          "The app appeared unexpectedly.",
+          "кажется полезным vs появилась неожиданно"
+        ]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "to be well и to look well",
+      "lines": [
+        "В выражениях be well и look well слово well является adjective в значении здоров.",
+        "I am well = Я здоров. / She looks well = Она выглядит здоровой.",
+        "You cook well = well уже adverb, потому что описывает действие cook.",
+        "Не путай health-meaning и manner-meaning у well."
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "good vs well: рабочая матрица",
+      "columns": [
+        "Контекст",
+        "Правильно",
+        "Почему"
+      ],
+      "rows": [
+        [
+          "действие",
+          "She sings well.",
+          "well = adverb, описывает как поет"
+        ],
+        [
+          "здоровье",
+          "She is well.",
+          "well = adjective, состояние"
+        ],
+        [
+          "впечатление/эмоция",
+          "I feel good.",
+          "good = оценка/самочувствие в широком смысле"
+        ],
+        [
+          "после taste/smell/look как linking",
+          "The pizza tastes good.",
+          "после linking verb нужен adjective"
+        ]
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Tricky pairs: где -ly меняет значение"
+    },
+    {
+      "type": "text",
+      "text": "Это отдельный словарный блок: формы без -ly и с -ly часто не взаимозаменяемы. Здесь ошибка не грамматическая, а лексическая, поэтому пары нужно учить как самостоятельные единицы."
+    },
+    {
+      "type": "table",
+      "caption": "Смысловые пары",
+      "columns": [
+        "Без -ly",
+        "С -ly",
+        "Контраст"
+      ],
+      "rows": [
+        ["hard", "hardly", "hard = усердно; hardly = едва"],
+        ["late", "lately", "late = поздно; lately = недавно"],
+        ["near", "nearly", "near = рядом; nearly = почти"],
+        ["close", "closely", "close = близко; closely = внимательно"],
+        ["deep", "deeply", "deep = физически; deeply = эмоционально/сильно"],
+        ["high", "highly", "high = высоко; highly = весьма"],
+        ["free", "freely", "free = бесплатно; freely = свободно"],
+        ["sharp", "sharply", "sharp = резко/точно; sharply = резко, внезапно"],
+        ["wide", "widely", "wide = широко (пространство); widely = повсеместно"],
+        ["pretty", "prettily", "pretty = довольно; prettily = красиво"]
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Степени сравнения adverbs"
+    },
+    {
+      "type": "text",
+      "text": "Сравнение adverbs строится по двум моделям. Короткие формы обычно берут -er/-est, а формы на -ly обычно используют more/most. Отдельно помни irregular set: well -> better -> best, badly -> worse -> worst."
+    },
+    {
+      "type": "table",
+      "caption": "Comparative / Superlative",
+      "columns": [
+        "Тип adverb",
+        "Comparative",
+        "Superlative",
+        "Примеры"
+      ],
+      "rows": [
+        [
+          "односложные + early",
+          "-er",
+          "-est",
+          "fast -> faster -> fastest; early -> earlier -> earliest"
+        ],
+        [
+          "формы на -ly",
+          "more + adverb",
+          "most + adverb",
+          "more carefully -> most carefully"
+        ],
+        [
+          "снижение степени",
+          "less + adverb",
+          "least + adverb",
+          "less often -> least often"
+        ],
+        [
+          "irregular",
+          "better / worse / more / less",
+          "best / worst / most / least",
+          "well -> better -> best; badly -> worse -> worst"
+        ]
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "SO / SUCH / ENOUGH / TOO / ALSO / TOO / AS WELL / EITHER"
+    },
+    {
+      "type": "text",
+      "text": "В этом блоке ошибки чаще всего позиционные. Студент знает слово, но ставит его не туда. Поэтому здесь важны именно шаблоны позиции: so перед adjective/adverb, such перед noun phrase, enough после adjective/adverb и перед noun, too/as well в конце утверждений, either в конце отрицаний, also обычно перед смысловым глаголом."
+    },
+    {
+      "type": "table",
+      "caption": "Позиция и формулы маркеров",
+      "columns": [
+        "Маркер",
+        "Формула",
+        "Пример"
+      ],
+      "rows": [
+        [
+          "so",
+          "so + adjective/adverb",
+          "This phone is so expensive. / You walk so slowly."
+        ],
+        [
+          "such",
+          "such + (adjective) + noun",
+          "It was such an amazing experience."
+        ],
+        [
+          "so + many/much/few/little",
+          "so + quantifier + noun",
+          "There are so many options."
+        ],
+        [
+          "enough",
+          "adjective/adverb/verb + enough; enough + noun",
+          "old enough, quickly enough, know enough, enough time"
+        ],
+        [
+          "too",
+          "too + adjective/adverb/many/much",
+          "The coffee is too hot. / Too many mistakes."
+        ],
+        [
+          "too / as well",
+          "в конце утверждения",
+          "I liked it too. / I liked it as well."
+        ],
+        [
+          "either",
+          "в конце отрицания",
+          "I can't swim. I can't dive either."
+        ],
+        [
+          "also",
+          "перед смысловым глаголом; после be; иногда в начале",
+          "She also works online. / He is also here. / Also, we need a backup plan."
+        ]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Финальный алгоритм перед ответом",
+      "lines": [
+        "Шаг 1: определи роль слова: предмет, действие, состояние или степень.",
+        "Шаг 2: проверь, не linking ли это verb. Если да - ставь adjective.",
+        "Шаг 3: если глагол смысловой, обычно нужен adverb для описания действия.",
+        "Шаг 4: проверь лексические пары hard/hardly, late/lately, near/nearly и другие.",
+        "Шаг 5: отдельно проверь позицию so/such/enough/too/also/either."
+      ]
+    },
+    {
+      "type": "topicLinks",
+      "title": "Смежные правила раздела",
+      "items": [
+        {
+          "id": "stativeVerbs",
+          "label": "Stative Verbs",
+          "note": "смыслы глаголов состояния и ограничения с Continuous"
+        },
+        {
+          "id": "presentSimple",
+          "label": "Present Simple",
+          "note": "база для adverbs frequency и привычек"
+        },
+        {
+          "id": "presentContinuous",
+          "label": "Present Continuous",
+          "note": "контраст с Present Simple и роль adverb markers"
+        },
+        {
+          "id": "echoQuestions",
+          "label": "Echo Questions",
+          "note": "короткие реплики, где важен выбор auxiliary и позиции"
+        }
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": [
+      {
+        "id": "meaning",
+        "title": "Adjective or Adverb? (Meaning)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "adv2_m_1",
+            "instruction": "Выбери правильную форму",
+            "prompt": "The sunset looked ___ over the mountains.",
+            "options": ["beautiful", "beautifully"],
+            "correctIndex": 0,
+            "explain": "looked как linking verb -> adjective."
+          },
+          {
+            "id": "adv2_m_2",
+            "instruction": "Выбери правильную форму",
+            "prompt": "She explained the task ___, so everyone understood.",
+            "options": ["clear", "clearly"],
+            "correctIndex": 1,
+            "explain": "explained - действие, нужен adverb."
+          },
+          {
+            "id": "adv2_m_3",
+            "instruction": "Выбери правильную форму",
+            "prompt": "Her dress was ___ and perfectly tailored.",
+            "options": ["elegant", "elegantly"],
+            "correctIndex": 0,
+            "explain": "was + adjective."
+          },
+          {
+            "id": "adv2_m_4",
+            "instruction": "Выбери правильную форму",
+            "prompt": "The model walked ___ down the runway.",
+            "options": ["elegant", "elegantly"],
+            "correctIndex": 1,
+            "explain": "walked - действие, нужен adverb."
+          },
+          {
+            "id": "adv2_m_5",
+            "instruction": "Выбери правильную форму",
+            "prompt": "The fresh pizza smells ___ .",
+            "options": ["delicious", "deliciously"],
+            "correctIndex": 0,
+            "explain": "smells как linking verb -> adjective."
+          },
+          {
+            "id": "adv2_m_6",
+            "instruction": "Выбери правильную форму",
+            "prompt": "She smelled the drink ___, unsure about the ingredients.",
+            "options": ["strange", "strangely"],
+            "correctIndex": 1,
+            "explain": "smelled как действие нюхала -> adverb."
+          },
+          {
+            "id": "adv2_m_7",
+            "instruction": "Выбери правильную форму",
+            "prompt": "Things became ___ when someone mentioned layoffs.",
+            "options": ["serious", "seriously"],
+            "correctIndex": 0,
+            "explain": "became + adjective."
+          },
+          {
+            "id": "adv2_m_8",
+            "instruction": "Выбери правильную форму",
+            "prompt": "That viral challenge is growing ___ every day.",
+            "options": ["quick", "quickly"],
+            "correctIndex": 1,
+            "explain": "growing как процесс -> adverb."
+          },
+          {
+            "id": "adv2_m_9",
+            "instruction": "Выбери правильную форму",
+            "prompt": "After that workout, I feel ___ .",
+            "options": ["good", "well"],
+            "correctIndex": 1,
+            "explain": "feel well чаще про физическое состояние."
+          },
+          {
+            "id": "adv2_m_10",
+            "instruction": "Выбери правильную форму",
+            "prompt": "After a productive week, Friday night feels ___ .",
+            "options": ["good", "well"],
+            "correctIndex": 0,
+            "explain": "feel good как эмоциональная оценка."
+          },
+          {
+            "id": "adv2_m_11",
+            "instruction": "Выбери правильную форму",
+            "prompt": "How ___ the stars appear tonight!",
+            "options": ["beautiful", "beautifully"],
+            "correctIndex": 0,
+            "explain": "appear как linking verb -> adjective."
+          },
+          {
+            "id": "adv2_m_12",
+            "instruction": "Выбери правильную форму",
+            "prompt": "The fans yelled ___ when their team scored.",
+            "options": ["excited", "excitedly"],
+            "correctIndex": 1,
+            "explain": "yelled - действие, нужен adverb."
+          }
+        ]
+      },
+      {
+        "id": "formula",
+        "title": "Fill in: adjective or adverb (Set A)",
+        "kind": "input",
+        "items": [
+          { "id": "adv2_f_1", "instruction": "Вставь слово", "prompt": "The kitten was so ___ about the new toy. (curious / curiously)", "accepted": ["curious"], "explain": "was + adjective" },
+          { "id": "adv2_f_2", "instruction": "Вставь слово", "prompt": "The storm hit the town ___, causing widespread damage. (terrible / terribly)", "accepted": ["terribly"], "explain": "hit - действие" },
+          { "id": "adv2_f_3", "instruction": "Вставь слово", "prompt": "The sunset looked ___ over the mountains. (beautiful / beautifully)", "accepted": ["beautiful"], "explain": "looked (linking)" },
+          { "id": "adv2_f_4", "instruction": "Вставь слово", "prompt": "He applied the new strategy ___ and got great results. (effective / effectively)", "accepted": ["effectively"], "explain": "applied - действие" },
+          { "id": "adv2_f_5", "instruction": "Вставь слово", "prompt": "Her dress was ___ and perfectly tailored. (elegant / elegantly)", "accepted": ["elegant"], "explain": "was + adjective" },
+          { "id": "adv2_f_6", "instruction": "Вставь слово", "prompt": "She explained the task ___, so everyone understood. (clear / clearly)", "accepted": ["clearly"], "explain": "explained - adverb" },
+          { "id": "adv2_f_7", "instruction": "Вставь слово", "prompt": "This book is the most ___ in my collection. (valuable / valuably)", "accepted": ["valuable"], "explain": "most + adjective" },
+          { "id": "adv2_f_8", "instruction": "Вставь слово", "prompt": "The model walked ___ down the runway. (elegant / elegantly)", "accepted": ["elegantly"], "explain": "walked - действие" },
+          { "id": "adv2_f_9", "instruction": "Вставь слово", "prompt": "It was a ___ evening by the lake. (quiet / quietly)", "accepted": ["quiet"], "explain": "evening - noun" },
+          { "id": "adv2_f_10", "instruction": "Вставь слово", "prompt": "The weather today is ___ for a picnic. (terrible / terribly)", "accepted": ["terrible"], "explain": "is + adjective" },
+          { "id": "adv2_f_11", "instruction": "Вставь слово", "prompt": "The students finished their homework ___ in just an hour. (easy / easily)", "accepted": ["easily"], "explain": "finished - действие" },
+          { "id": "adv2_f_12", "instruction": "Вставь слово", "prompt": "His explanation was not very ___. (clear / clearly)", "accepted": ["clear"], "explain": "was + adjective" },
+          { "id": "adv2_f_13", "instruction": "Вставь слово", "prompt": "Their house is always ___ and organized. (tidy / tidily)", "accepted": ["tidy"], "explain": "is + adjective" },
+          { "id": "adv2_f_14", "instruction": "Вставь слово", "prompt": "She sang the song ___ during the concert. (beautiful / beautifully)", "accepted": ["beautifully"], "explain": "sang - adverb" },
+          { "id": "adv2_f_15", "instruction": "Вставь слово", "prompt": "He walked into the room ___ to avoid waking the baby. (quiet / quietly)", "accepted": ["quietly"], "explain": "walked - adverb" },
+          { "id": "adv2_f_16", "instruction": "Вставь слово", "prompt": "The puppy sniffed ___ around the garden. (curious / curiously)", "accepted": ["curiously"], "explain": "sniffed - adverb" },
+          { "id": "adv2_f_17", "instruction": "Вставь слово", "prompt": "This solution is very ___ for solving the problem. (effective / effectively)", "accepted": ["effective"], "explain": "is + adjective" },
+          { "id": "adv2_f_18", "instruction": "Вставь слово", "prompt": "She arranged the flowers ___, creating a stunning bouquet. (neat / neatly)", "accepted": ["neatly"], "explain": "arranged - adverb" },
+          { "id": "adv2_f_19", "instruction": "Вставь слово", "prompt": "She handled the antique vase ___ to avoid breaking it. (careful / carefully)", "accepted": ["carefully"], "explain": "handled - adverb" },
+          { "id": "adv2_f_20", "instruction": "Вставь слово", "prompt": "The test was surprisingly ___ for most students. (easy / easily)", "accepted": ["easy"], "explain": "was + adjective" }
+        ]
+      },
+      {
+        "id": "formula_2",
+        "goal": "formula",
+        "title": "Fill in: mixed contexts (Set B)",
+        "kind": "input",
+        "items": [
+          { "id": "adv2_f2_1", "instruction": "Вставь слово", "prompt": "I've been eating better and working out, and now I feel ___ enough to take on anything. (good / well)", "accepted": ["well", "good"], "explain": "Возможны оба, но well чаще про физическое состояние." },
+          { "id": "adv2_f2_2", "instruction": "Вставь слово", "prompt": "She turned ___, tossing the ball in the air. (playful / playfully)", "accepted": ["playful"], "explain": "turn + adjective" },
+          { "id": "adv2_f2_3", "instruction": "Вставь слово", "prompt": "He looked ___ at the new app, trying to spot red flags. (suspicious / suspiciously)", "accepted": ["suspiciously"], "explain": "looked at = действие" },
+          { "id": "adv2_f2_4", "instruction": "Вставь слово", "prompt": "The ocean seemed ___ this morning. (calm / calmly)", "accepted": ["calm"], "explain": "seemed + adjective" },
+          { "id": "adv2_f2_5", "instruction": "Вставь слово", "prompt": "That new challenge is growing ___ now. (quick / quickly)", "accepted": ["quickly"], "explain": "growing как процесс" },
+          { "id": "adv2_f2_6", "instruction": "Вставь слово", "prompt": "Things became ___ at the party. (serious / seriously)", "accepted": ["serious"], "explain": "became + adjective" },
+          { "id": "adv2_f2_7", "instruction": "Вставь слово", "prompt": "After a solid week, Friday night feels ___. (good / well)", "accepted": ["good"], "explain": "feel good как оценка/эмоция" },
+          { "id": "adv2_f2_8", "instruction": "Вставь слово", "prompt": "The freshly baked pizza smells ___. (delicious / deliciously)", "accepted": ["delicious"], "explain": "smells + adjective" },
+          { "id": "adv2_f2_9", "instruction": "Вставь слово", "prompt": "This sweater feels so ___ - like wearing a cloud. (soft / softly)", "accepted": ["soft"], "explain": "feels + adjective" },
+          { "id": "adv2_f2_10", "instruction": "Вставь слово", "prompt": "Those guys outside the venue look ___. (suspicious / suspiciously)", "accepted": ["suspicious"], "explain": "look в значении выглядеть" },
+          { "id": "adv2_f2_11", "instruction": "Вставь слово", "prompt": "She dances ___ and everyone watches in awe. (beautiful / beautifully)", "accepted": ["beautifully"], "explain": "dances - adverb" },
+          { "id": "adv2_f2_12", "instruction": "Вставь слово", "prompt": "That cake tastes ___ in every bite. (sweet / sweetly)", "accepted": ["sweet"], "explain": "tastes + adjective" },
+          { "id": "adv2_f2_13", "instruction": "Вставь слово", "prompt": "The crowd got ___ when the band played their hit song. (happy / happily)", "accepted": ["happy"], "explain": "got + adjective" },
+          { "id": "adv2_f2_14", "instruction": "Вставь слово", "prompt": "Your perfume smells ___. (wonderful / wonderfully)", "accepted": ["wonderful"], "explain": "smells + adjective" },
+          { "id": "adv2_f2_15", "instruction": "Вставь слово", "prompt": "My teacher used to ask: Will you ___ think before you speak? (kind / kindly)", "accepted": ["kindly"], "explain": "kindly здесь наречие" },
+          { "id": "adv2_f2_16", "instruction": "Вставь слово", "prompt": "Life has been ___ busy these days. (extreme / extremely)", "accepted": ["extremely"], "explain": "наречие усиливает adjective busy" },
+          { "id": "adv2_f2_17", "instruction": "Вставь слово", "prompt": "This list appears ___ . No more items need to be added. (complete / completely)", "accepted": ["complete"], "explain": "appears как linking verb" },
+          { "id": "adv2_f2_18", "instruction": "Вставь слово", "prompt": "I looked ___ in both directions before crossing the tracks. (cautious / cautiously)", "accepted": ["cautiously"], "explain": "looked в значении посмотрел" },
+          { "id": "adv2_f2_19", "instruction": "Вставь слово", "prompt": "During my younger days I often felt ___ . (awkward / awkwardly)", "accepted": ["awkward"], "explain": "felt + adjective" },
+          { "id": "adv2_f2_20", "instruction": "Вставь слово", "prompt": "Wherever it's ___, short domestic flights are being reduced. (possible / possibly)", "accepted": ["possible"], "explain": "it's possible" }
+        ]
+      },
+      {
+        "id": "formula_3",
+        "goal": "formula",
+        "title": "Two blanks in one sentence (Set C)",
+        "kind": "multi_input",
+        "items": [
+          {
+            "id": "adv2_f3_1",
+            "instruction": "Заполни оба пропуска",
+            "prompt": "If food smells ___ but tastes ___, is it still OK to eat it?",
+            "inputs": [
+              { "accepted": ["awful"] },
+              { "accepted": ["fine"] }
+            ],
+            "explain": "smell/taste как linking verbs -> adjectives"
+          },
+          {
+            "id": "adv2_f3_2",
+            "instruction": "Заполни оба пропуска",
+            "prompt": "Simon was one hundred percent ___ that he would pass the test ___.",
+            "inputs": [
+              { "accepted": ["sure"] },
+              { "accepted": ["easily"] }
+            ],
+            "explain": "be sure + pass easily"
+          },
+          {
+            "id": "adv2_f3_3",
+            "instruction": "Заполни оба пропуска",
+            "prompt": "My parents ___ love each other and are ___ together.",
+            "inputs": [
+              { "accepted": ["strongly"] },
+              { "accepted": ["happy"] }
+            ],
+            "explain": "love (как?) strongly; are (какие?) happy"
+          },
+          {
+            "id": "adv2_f3_4",
+            "instruction": "Заполни оба пропуска",
+            "prompt": "Being ___ to others and smiling often makes you seem ___.",
+            "inputs": [
+              { "accepted": ["friendly"] },
+              { "accepted": ["confident"] }
+            ],
+            "explain": "friendly - adjective; seem + adjective"
+          },
+          {
+            "id": "adv2_f3_5",
+            "instruction": "Заполни оба пропуска",
+            "prompt": "If you want to look more ___, you need to dress more ___.",
+            "inputs": [
+              { "accepted": ["attractive"] },
+              { "accepted": ["attractively"] }
+            ],
+            "explain": "look + adjective; dress + adverb"
+          },
+          {
+            "id": "adv2_f3_6",
+            "instruction": "Заполни оба пропуска",
+            "prompt": "The weather made the trip more ___, and we all became more ___.",
+            "inputs": [
+              { "accepted": ["pleasant"] },
+              { "accepted": ["cheerful"] }
+            ],
+            "explain": "после more здесь нужны adjectives"
+          }
+        ]
+      },
+      {
+        "id": "compare",
+        "title": "Tricky pairs and comparison forms",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "adv2_cmp_1",
+            "instruction": "Выбери форму",
+            "prompt": "He worked ___ all week to meet the deadline.",
+            "options": ["hard", "hardly", "hardlier"],
+            "correctIndex": 0,
+            "explain": "work hard = усердно работать"
+          },
+          {
+            "id": "adv2_cmp_2",
+            "instruction": "Выбери форму",
+            "prompt": "I could ___ hear the announcement because of loud music.",
+            "options": ["hard", "hardly", "hardlyly"],
+            "correctIndex": 1,
+            "explain": "hardly = едва"
+          },
+          {
+            "id": "adv2_cmp_3",
+            "instruction": "Выбери форму",
+            "prompt": "She arrived ___ to the meeting because of traffic.",
+            "options": ["late", "lately", "latest"],
+            "correctIndex": 0,
+            "explain": "arrive late"
+          },
+          {
+            "id": "adv2_cmp_4",
+            "instruction": "Выбери форму",
+            "prompt": "___, I've been feeling more energized since I started exercising.",
+            "options": ["Late", "Lately", "Lateness"],
+            "correctIndex": 1,
+            "explain": "lately = недавно"
+          },
+          {
+            "id": "adv2_cmp_5",
+            "instruction": "Выбери форму",
+            "prompt": "He watched the match ___ to catch every detail.",
+            "options": ["close", "closely", "closed"],
+            "correctIndex": 1,
+            "explain": "watch closely = внимательно"
+          },
+          {
+            "id": "adv2_cmp_6",
+            "instruction": "Выбери форму",
+            "prompt": "The tickets were ___ for the first 100 attendees.",
+            "options": ["free", "freely", "freed"],
+            "correctIndex": 0,
+            "explain": "for free"
+          },
+          {
+            "id": "adv2_cmp_7",
+            "instruction": "Выбери форму",
+            "prompt": "Visitors can move ___ around the hall.",
+            "options": ["free", "freely", "freeful"],
+            "correctIndex": 1,
+            "explain": "move freely"
+          },
+          {
+            "id": "adv2_cmp_8",
+            "instruction": "Выбери форму",
+            "prompt": "The book was ___ recommended by critics.",
+            "options": ["high", "highly", "highest"],
+            "correctIndex": 1,
+            "explain": "highly recommended"
+          },
+          {
+            "id": "adv2_cmp_9",
+            "instruction": "Выбери форму",
+            "prompt": "Correct comparative form of quickly:",
+            "options": ["quicklier", "more quickly", "most quickly"],
+            "correctIndex": 1,
+            "explain": "-ly adverbs -> more/most"
+          },
+          {
+            "id": "adv2_cmp_10",
+            "instruction": "Выбери форму",
+            "prompt": "Correct superlative form of fast:",
+            "options": ["most fast", "fastest", "most fastest"],
+            "correctIndex": 1,
+            "explain": "односложное наречие -> -est"
+          },
+          {
+            "id": "adv2_cmp_11",
+            "instruction": "Выбери корректную цепочку",
+            "prompt": "well -> ?",
+            "options": ["well - better - best", "well - gooder - goodest", "well - more well - most well"],
+            "correctIndex": 0,
+            "explain": "неправильные формы"
+          },
+          {
+            "id": "adv2_cmp_12",
+            "instruction": "Выбери корректное предложение",
+            "prompt": "taste как linking verb:",
+            "options": [
+              "This pizza tastes so well.",
+              "This pizza tastes so good.",
+              "This pizza tastes so goodly."
+            ],
+            "correctIndex": 1,
+            "explain": "после linking verb нужен adjective"
+          }
+        ]
+      },
+      {
+        "id": "mistakes",
+        "goal": "mistakes",
+        "title": "Fix mistakes where needed",
+        "kind": "correction",
+        "items": [
+          {
+            "id": "adv2_err_1",
+            "instruction": "Исправь ошибку. Если всё верно - напиши '-'",
+            "prompt": "She plays the guitar so good that her videos often go viral online.",
+            "accepted": ["She plays the guitar so well that her videos often go viral online."],
+            "acceptedShort": ["so well"],
+            "explain": "play (как?) well"
+          },
+          {
+            "id": "adv2_err_2",
+            "instruction": "Исправь ошибку. Если всё верно - напиши '-'",
+            "prompt": "The city center is always so lively, especially on Friday nights.",
+            "accepted": ["-"],
+            "acceptedShort": ["-"],
+            "explain": "Предложение корректно."
+          },
+          {
+            "id": "adv2_err_3",
+            "instruction": "Исправь ошибку. Если всё верно - напиши '-'",
+            "prompt": "The cheetah runs incredibly fastly, making it the perfect hunter in the wild.",
+            "accepted": ["The cheetah runs incredibly fast, making it the perfect hunter in the wild."],
+            "acceptedShort": ["incredibly fast"],
+            "explain": "fastly не используется"
+          },
+          {
+            "id": "adv2_err_4",
+            "instruction": "Исправь ошибку. Если всё верно - напиши '-'",
+            "prompt": "It was obviously that he didn't study for the test.",
+            "accepted": ["It was obvious that he didn't study for the test."],
+            "acceptedShort": ["was obvious"],
+            "explain": "после was нужен adjective obvious"
+          },
+          {
+            "id": "adv2_err_5",
+            "instruction": "Исправь ошибку. Если всё верно - напиши '-'",
+            "prompt": "The movie was bad written, but the acting was decent.",
+            "accepted": ["The movie was badly written, but the acting was decent."],
+            "acceptedShort": ["badly written"],
+            "explain": "written как действие требует adverb badly"
+          },
+          {
+            "id": "adv2_err_6",
+            "instruction": "Исправь ошибку. Если всё верно - напиши '-'",
+            "prompt": "That documentary was so interestingly that I forgot to check my phone.",
+            "accepted": ["That documentary was so interesting that I forgot to check my phone."],
+            "acceptedShort": ["so interesting that"],
+            "explain": "so + adjective + that"
+          },
+          {
+            "id": "adv2_err_7",
+            "instruction": "Исправь ошибку. Если всё верно - напиши '-'",
+            "prompt": "This pizza tastes so well, I might order another one.",
+            "accepted": ["This pizza tastes so good, I might order another one."],
+            "acceptedShort": ["tastes so good"],
+            "explain": "taste как linking verb -> good"
+          },
+          {
+            "id": "adv2_err_8",
+            "instruction": "Исправь ошибку. Если всё верно - напиши '-'",
+            "prompt": "The customer support specialist was incredibly politely and solved my issue quickly.",
+            "accepted": ["The customer support specialist was incredibly polite and solved my issue quickly."],
+            "acceptedShort": ["incredibly polite"],
+            "explain": "was + adjective polite"
+          },
+          {
+            "id": "adv2_err_9",
+            "instruction": "Исправь ошибку. Если всё верно - напиши '-'",
+            "prompt": "We arrived early to the concert and got front-row seats without even trying.",
+            "accepted": ["-"],
+            "acceptedShort": ["-"],
+            "explain": "Предложение корректно."
+          },
+          {
+            "id": "adv2_err_10",
+            "instruction": "Исправь ошибку. Если всё верно - напиши '-'",
+            "prompt": "He acted so cowardly during the argument that even his friends were embarrassed.",
+            "accepted": [
+              "He acted in such a cowardly way during the argument that even his friends were embarrassed.",
+              "He acted in such a cowardly manner during the argument that even his friends were embarrassed."
+            ],
+            "acceptedShort": ["in such a cowardly way", "in such a cowardly manner"],
+            "explain": "cowardly - adjective; нужна конструкция way/manner"
+          }
+        ]
+      },
+      {
+        "id": "markers",
+        "title": "Insert one word (so/such/as/than/enough)",
+        "kind": "input",
+        "items": [
+          { "id": "adv2_mark_1", "instruction": "Вставь одно слово", "prompt": "According to experts, going on a strict diet is likely to do more harm ___ good.", "accepted": ["than"], "explain": "more ... than" },
+          { "id": "adv2_mark_2", "instruction": "Вставь одно слово", "prompt": "Friendship is ___ important to our well-being as eating right and exercising.", "accepted": ["as"], "explain": "as ... as" },
+          { "id": "adv2_mark_3", "instruction": "Вставь одно слово", "prompt": "Being a couch potato is even worse ___ you thought.", "accepted": ["than"], "explain": "worse than" },
+          { "id": "adv2_mark_4", "instruction": "Вставь одно слово", "prompt": "Surveys show that more and ___ teenagers are suffering from smartphone addiction.", "accepted": ["more"], "explain": "more and more" },
+          { "id": "adv2_mark_5", "instruction": "Вставь одно слово", "prompt": "Berta wasn't feeling very ___ yesterday, so she decided to see the doctor.", "accepted": ["well"], "explain": "feel well" },
+          { "id": "adv2_mark_6", "instruction": "Вставь одно слово", "prompt": "The menu was ___ full of amazing dishes that I changed my mind several times.", "accepted": ["so"], "explain": "so + adjective + that" },
+          { "id": "adv2_mark_7", "instruction": "Вставь одно слово", "prompt": "It was ___ a boring film that I can't even remember most of it now.", "accepted": ["such"], "explain": "such + noun phrase" },
+          { "id": "adv2_mark_8", "instruction": "Вставь одно слово", "prompt": "London could see the wettest month in more ___ 150 years.", "accepted": ["than"], "explain": "more than" },
+          { "id": "adv2_mark_9", "instruction": "Вставь одно слово", "prompt": "As far ___ I know, Oasis is China's version of Instagram.", "accepted": ["as"], "explain": "as far as I know" },
+          { "id": "adv2_mark_10", "instruction": "Вставь одно слово", "prompt": "I'd rather do something I love badly ___ feel bad about avoiding what I love.", "accepted": ["than"], "explain": "would rather ... than" },
+          { "id": "adv2_mark_11", "instruction": "Вставь одно слово", "prompt": "Sign up to receive product news as well ___ useful advice.", "accepted": ["as"], "explain": "as well as" },
+          { "id": "adv2_mark_12", "instruction": "Вставь одно слово", "prompt": "Most teenagers need from about eight and a half to ___ than nine hours of sleep.", "accepted": ["more"], "explain": "more than" },
+          { "id": "adv2_mark_13", "instruction": "Вставь одно слово", "prompt": "The great white shark is one of the ___ powerful sharks in the world.", "accepted": ["most"], "explain": "one of the most" },
+          { "id": "adv2_mark_14", "instruction": "Вставь одно слово", "prompt": "Even after graduation, many people are not lucky ___ to find a job quickly.", "accepted": ["enough"], "explain": "adjective + enough + to" }
+        ]
+      }
+    ]
+  }
+}

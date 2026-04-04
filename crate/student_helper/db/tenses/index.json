@@ -442,12 +442,25 @@
     "levels": ["A2-B1", "B1-B2", "B2-C1"]
   },
   {
+    "id": "echoQuestions",
+    "title": "Echo Questions",
+    "subtitle": "переспрос: Is it? Did you? Have they?",
+    "hint": "auxiliary + pronoun • surprise/interest • not question tags",
+    "file": "echoQuestions.json",
+    "group": "parts_of_speech",
+    "subgroup": "verbs",
+    "kind": "structure",
+    "compare": false,
+    "levels": ["A2-B1", "B1-B2", "B2-C1"]
+  },
+  {
     "id": "adverbs",
     "title": "Adverbs",
-    "subtitle": "прилагательные vs наречия: форма, значение, позиция",
-    "hint": "adjective/adverb • linking verbs • hard/hardly • so/such/enough",
-    "file": "adverbs.json",
-    "group": "universal",
+    "subtitle": "adjective vs adverb: форма, ловушки, позиция, сравнение",
+    "hint": "-ly patterns • tricky pairs • linking verbs • so/such/enough/too",
+    "file": "adverbsPartsOfSpeech.json",
+    "group": "parts_of_speech",
+    "subgroup": "adverbs",
     "kind": "structure",
     "compare": false,
     "levels": ["A2-B1", "B1-B2", "B2-C1"]

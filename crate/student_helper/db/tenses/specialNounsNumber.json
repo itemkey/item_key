@@ -12,6 +12,50 @@
       "text": "Некоторые английские существительные не подчиняются простому правилу «если есть -s, значит множественное». Поэтому для них важно запоминать категорию: всегда singular (is), всегда plural (are), одинаковая форма (is/are по контексту), или особая форма множественного числа."
     },
     {
+      "type": "heading",
+      "text": "Почему правило кажется нелогичным"
+    },
+    {
+      "type": "text",
+      "text": "Проблема в том, что английское согласование строится не только по форме слова, но и по его грамматическому типу. Например, news заканчивается на -s, но это singular noun; police выглядит как одно слово, но ведет себя как plural group. Поэтому в этой теме надо учить не окончание, а грамматический паспорт существительного."
+    },
+    {
+      "type": "table",
+      "caption": "Диагностика: как быстро выбрать is/are",
+      "columns": [
+        "Шаг",
+        "Проверка",
+        "Выбор",
+        "Пример"
+      ],
+      "rows": [
+        [
+          "1",
+          "Слово из singular-only списка?",
+          "is / was",
+          "The information is useful."
+        ],
+        [
+          "2",
+          "Слово из plural-only списка?",
+          "are / were",
+          "These trousers are expensive."
+        ],
+        [
+          "3",
+          "Форма одинаковая в ед. и мн. числе?",
+          "смотри на контекст (this/these, one/many)",
+          "This species is rare. / These species are rare."
+        ],
+        [
+          "4",
+          "Irregular plural?",
+          "обычно are / were",
+          "Children are noisy."
+        ]
+      ]
+    },
+    {
       "type": "highlight",
       "title": "База",
       "lines": [
@@ -237,25 +281,64 @@
       ]
     },
     {
-      "type": "imageGallery",
-      "title": "Источник (без потерь, 1:1)",
-      "note": "Базовые материалы и схемы из исходных фото по этой теме.",
-      "items": [
-        {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_2_2026-04-04_12-26-14.jpg",
-          "alt": "Special nouns overview photo 2",
-          "caption": "photo_2"
-        },
-        {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_3_2026-04-04_12-26-14.jpg",
-          "alt": "Where rule appears and singular triggers",
-          "caption": "photo_3"
-        },
-        {
-          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_4_2026-04-04_12-26-14.jpg",
-          "alt": "Plural triggers and continuation",
-          "caption": "photo_4"
-        }
+      "type": "table",
+      "caption": "Ловушки из конспекта 13вф (короткий справочник)",
+      "columns": [
+        "Ловушка",
+        "Правильно",
+        "Комментарий"
+      ],
+      "rows": [
+        [
+          "news",
+          "The news is good.",
+          "Форма с -s, но грамматически singular."
+        ],
+        [
+          "advice / information / furniture",
+          "The advice is useful.",
+          "Не ставятся в plural как *advices/*informations/*furnitures."
+        ],
+        [
+          "police",
+          "The police are investigating.",
+          "Как группа людей обычно требует plural verb."
+        ],
+        [
+          "people",
+          "People are waiting.",
+          "Plural по значению (ед.ч. person)."
+        ],
+        [
+          "series / species / means",
+          "This series is long. / These series are long.",
+          "Одинаковая форма, число определяется контекстом."
+        ],
+        [
+          "sheep / deer / fish",
+          "One sheep is here. / Three sheep are here.",
+          "Форма не меняется, смотри на детерминатор и смысл."
+        ],
+        [
+          "a number of / the number of",
+          "A number of students are absent. / The number of students is high.",
+          "С устойчивыми связками глагол меняется по шаблону."
+        ],
+        [
+          "each / every",
+          "Each student is ready. / Every student is ready.",
+          "После each/every нужен singular noun и singular verb."
+        ],
+        [
+          "measure expressions",
+          "Ten miles is a long distance.",
+          "Время, деньги, расстояние часто мыслятся как единый пакет."
+        ],
+        [
+          "collective nouns",
+          "The team is winning. / The team are arguing.",
+          "Singular как единое целое; plural, если важны участники."
+        ]
       ]
     },
     {
