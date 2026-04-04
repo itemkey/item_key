@@ -1,0 +1,112 @@
+{
+  "id": "nounQuantifiersCountability",
+  "title": "Noun Quantifiers and Countability",
+  "subtitle": "many/much, few/little, a few/a little, a lot/lots/plenty, amount/number",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Quantifiers with nouns"
+    },
+    {
+      "type": "text",
+      "text": "Этот урок собран из фото с диаграммой и упражнениями. Внутри: выбор quantifier по типу существительного (исчисляемое/неисчисляемое) и по оттенку значения (много/мало/достаточно/слишком много)."
+    },
+    {
+      "type": "highlight",
+      "title": "Логика выбора",
+      "lines": [
+        "many, few, a few, several, a number of -> обычно с countable plural",
+        "much, little, a little, a great deal of, an amount of -> обычно с uncountable",
+        "a lot of / lots of / plenty of -> работают в обеих колонках по контексту",
+        "so/very/too усиливают количество в зависимости от типа существительного"
+      ]
+    },
+    {
+      "type": "imageGallery",
+      "title": "Источник (без потерь, 1:1)",
+      "note": "Все упражнения и формулировки оставлены как в исходных фото.",
+      "items": [
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_10_2026-04-04_12-26-14.jpg",
+          "alt": "Quantifier cup map",
+          "caption": "photo_10"
+        },
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_11_2026-04-04_12-26-14.jpg",
+          "alt": "Dropdown exercise set 1",
+          "caption": "photo_11"
+        },
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_12_2026-04-04_12-26-14.jpg",
+          "alt": "Dropdown exercise set 2",
+          "caption": "photo_12"
+        },
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_13_2026-04-04_12-26-14.jpg",
+          "alt": "Choice exercise set 3 part 1",
+          "caption": "photo_13"
+        },
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_14_2026-04-04_12-26-14.jpg",
+          "alt": "Choice exercise set 3 part 2",
+          "caption": "photo_14"
+        },
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_15_2026-04-04_12-26-14.jpg",
+          "alt": "Choice exercise set 3 part 3",
+          "caption": "photo_15"
+        },
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_16_2026-04-04_12-26-14.jpg",
+          "alt": "Choice exercise set 3 part 4",
+          "caption": "photo_16"
+        },
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_17_2026-04-04_12-26-14.jpg",
+          "alt": "Large dropdown exercise part 1",
+          "caption": "photo_17"
+        },
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_18_2026-04-04_12-26-14.jpg",
+          "alt": "Large dropdown exercise part 2",
+          "caption": "photo_18"
+        },
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_19_2026-04-04_12-26-14.jpg",
+          "alt": "Large dropdown exercise part 3",
+          "caption": "photo_19"
+        },
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_20_2026-04-04_12-26-14.jpg",
+          "alt": "Large dropdown exercise final part",
+          "caption": "photo_20"
+        }
+      ]
+    },
+    {
+      "type": "topicLinks",
+      "title": "Смежные правила раздела",
+      "note": "После quantifiers удобно закрепить согласование и формы множественного числа.",
+      "items": [
+        {
+          "id": "specialNounsNumber",
+          "label": "Special Nouns: Singular/Plural",
+          "note": "категории noun и согласование is/are"
+        },
+        {
+          "id": "nounAgreementPatterns",
+          "label": "Noun Agreement Patterns",
+          "note": "табличные кейсы согласования"
+        },
+        {
+          "id": "nounPluralPatterns",
+          "label": "Noun Plural Patterns",
+          "note": "regular/irregular plural и исключения"
+        }
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": []
+  }
+}

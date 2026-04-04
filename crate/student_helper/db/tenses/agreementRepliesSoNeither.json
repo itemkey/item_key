@@ -1,0 +1,70 @@
+{
+  "id": "agreementRepliesSoNeither",
+  "title": "Agreement Replies: So / Neither / Me too",
+  "subtitle": "короткие реплики согласия и несогласия через auxiliary",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Как отвечать: Me too / Me neither / So do I / Neither do I"
+    },
+    {
+      "type": "text",
+      "text": "Блок собран из учебных фото: визуальная схема, подробные пояснения на русском и упражнения на выбор правильного вспомогательного глагола в ответных репликах."
+    },
+    {
+      "type": "highlight",
+      "title": "Быстрый ориентир",
+      "lines": [
+        "Утверждение + согласие: Me too / So + auxiliary + I",
+        "Отрицание + согласие: Me neither / Neither (Nor) + auxiliary + I",
+        "Возражение: But I do / But I don't / Oh, I did",
+        "Auxiliary в ответе должен совпадать с временем и формой в реплике-стимуле"
+      ]
+    },
+    {
+      "type": "imageGallery",
+      "title": "Источник (без потерь, 1:1)",
+      "items": [
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_49_2026-04-04_12-26-14.jpg",
+          "alt": "Visual cheat sheet for agreement replies",
+          "caption": "photo_49"
+        },
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_50_2026-04-04_12-26-14.jpg",
+          "alt": "Detailed explanation in Russian",
+          "caption": "photo_50"
+        },
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_51_2026-04-04_12-26-14.jpg",
+          "alt": "Exercise set with filled answers",
+          "caption": "photo_51"
+        },
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_52_2026-04-04_12-26-14.jpg",
+          "alt": "Continuation of exercise lines",
+          "caption": "photo_52"
+        }
+      ]
+    },
+    {
+      "type": "topicLinks",
+      "title": "Смежные правила раздела",
+      "items": [
+        {
+          "id": "auxiliaryVerbsOverview",
+          "label": "Auxiliary Verbs Overview",
+          "note": "основа для подбора правильного auxiliary в ответе"
+        },
+        {
+          "id": "auxiliaryMixedCards",
+          "label": "Auxiliary Mixed Cards",
+          "note": "дополнительная тренировка на формы auxiliary"
+        }
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": []
+  }
+}

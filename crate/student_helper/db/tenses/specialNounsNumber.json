@@ -235,6 +235,55 @@
           "ru": "Полиция ищет свидетелей."
         }
       ]
+    },
+    {
+      "type": "imageGallery",
+      "title": "Источник (без потерь, 1:1)",
+      "note": "Базовые материалы и схемы из исходных фото по этой теме.",
+      "items": [
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_2_2026-04-04_12-26-14.jpg",
+          "alt": "Special nouns overview photo 2",
+          "caption": "photo_2"
+        },
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_3_2026-04-04_12-26-14.jpg",
+          "alt": "Where rule appears and singular triggers",
+          "caption": "photo_3"
+        },
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_4_2026-04-04_12-26-14.jpg",
+          "alt": "Plural triggers and continuation",
+          "caption": "photo_4"
+        }
+      ]
+    },
+    {
+      "type": "topicLinks",
+      "title": "Смежные правила раздела",
+      "note": "Эти темы находятся в новом разделе «Части речи» и открываются как самостоятельные правила.",
+      "items": [
+        {
+          "id": "nounAgreementPatterns",
+          "label": "Noun Agreement Patterns",
+          "note": "таблицы согласования существительного со сказуемым"
+        },
+        {
+          "id": "nounPluralPatterns",
+          "label": "Noun Plural Patterns",
+          "note": "образование множественного числа и исключения"
+        },
+        {
+          "id": "nounQuantifiersCountability",
+          "label": "Noun Quantifiers and Countability",
+          "note": "many/much/few/little и выбор quantifier"
+        },
+        {
+          "id": "auxiliaryMixedCards",
+          "label": "Auxiliary Mixed Cards",
+          "note": "карточки, где согласование noun часто влияет на auxiliary"
+        }
+      ]
     }
   ],
   "practice": {

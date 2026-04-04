@@ -1,0 +1,68 @@
+{
+  "id": "nounAgreementPatterns",
+  "title": "Noun Agreement Patterns",
+  "subtitle": "согласование существительного со сказуемым в числе",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Согласование: когда is, а когда are"
+    },
+    {
+      "type": "text",
+      "text": "Этот блок собирает таблицы из фото в формате 1:1. Здесь правила согласования для there is/are, a number/the number, each/every, a lot/lots/plenty, collective nouns и существительных на -ics."
+    },
+    {
+      "type": "highlight",
+      "title": "Ключевые паттерны из таблиц",
+      "lines": [
+        "there is/was + singular; there are/were + plural",
+        "the number of + plural noun -> singular verb",
+        "a number of + plural noun -> plural verb",
+        "each/every + singular noun -> singular verb",
+        "collective nouns (family/team/audience/staff) могут быть singular или plural по смыслу"
+      ]
+    },
+    {
+      "type": "imageGallery",
+      "title": "Источник (без потерь, 1:1)",
+      "note": "Сканы из фото, включены полностью как учебный оригинал.",
+      "items": [
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_1_2026-04-04_12-26-14.jpg",
+          "alt": "Noun agreement table photo 1",
+          "caption": "photo_1: большая таблица согласования имени существительного со сказуемым"
+        },
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_22_2026-04-04_12-26-14.jpg",
+          "alt": "Noun agreement table photo 22",
+          "caption": "photo_22: дополнительные таблицы there is/are, number, each/every, -ics"
+        }
+      ]
+    },
+    {
+      "type": "topicLinks",
+      "title": "Смежные правила раздела",
+      "note": "Все правила в этом разделе самостоятельные, это только удобные переходы.",
+      "items": [
+        {
+          "id": "specialNounsNumber",
+          "label": "Special Nouns: Singular/Plural",
+          "note": "базовые категории singular/plural/same form"
+        },
+        {
+          "id": "nounPluralPatterns",
+          "label": "Noun Plural Patterns",
+          "note": "образование множественного числа"
+        },
+        {
+          "id": "nounQuantifiersCountability",
+          "label": "Noun Quantifiers and Countability",
+          "note": "many/much/few/little и выбор к существительному"
+        }
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": []
+  }
+}

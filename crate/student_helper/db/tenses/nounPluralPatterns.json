@@ -1,0 +1,118 @@
+{
+  "id": "nounPluralPatterns",
+  "title": "Noun Plural Patterns",
+  "subtitle": "правила образования множественного числа и исключения",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Plural patterns: regular, irregular, exceptions"
+    },
+    {
+      "type": "text",
+      "text": "Здесь собраны карточки из фото по образованию множественного числа: базовые окончания, чередования корневых гласных, -f/-ves, сложные существительные и группы слов с фиксированным употреблением." 
+    },
+    {
+      "type": "highlight",
+      "title": "Что входит в блок",
+      "lines": [
+        "N + s, -y -> -ies, -s/-ss/-x/-z/-ch/-sh + es, отдельные случаи с -o",
+        "irregular plural: man/men, woman/women, child/children, foot/feet, tooth/teeth, goose/geese, mouse/mice, ox/oxen",
+        "-f/-fe -> -ves и исключения (belief, roof, giraffe)",
+        "compound nouns: passers-by, mothers-in-law, commanders-in-chief",
+        "same form nouns (fish, deer, sheep, species, means, series), nouns on -s with singular agreement, singular-only и plural-only списки"
+      ]
+    },
+    {
+      "type": "imageGallery",
+      "title": "Источник (без потерь, 1:1)",
+      "note": "Каждый скан включен целиком; текст и примеры не редактировались.",
+      "items": [
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_5_2026-04-04_12-26-14.jpg",
+          "alt": "Plural basic rule card",
+          "caption": "photo_5"
+        },
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_6_2026-04-04_12-26-14.jpg",
+          "alt": "Irregular plural by vowel alternation",
+          "caption": "photo_6"
+        },
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_7_2026-04-04_12-26-14.jpg",
+          "alt": "f to ves and compound nouns",
+          "caption": "photo_7"
+        },
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_8_2026-04-04_12-26-14.jpg",
+          "alt": "Same form and nouns on s",
+          "caption": "photo_8"
+        },
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_9_2026-04-04_12-26-14.jpg",
+          "alt": "Singular only and plural only lists",
+          "caption": "photo_9"
+        },
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_36_2026-04-04_12-26-14.jpg",
+          "alt": "Workbook excerpt with noun lists",
+          "caption": "photo_36"
+        },
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_43_2026-04-04_12-26-14.jpg",
+          "alt": "Basic rule card duplicate",
+          "caption": "photo_43"
+        },
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_44_2026-04-04_12-26-14.jpg",
+          "alt": "Irregular card duplicate",
+          "caption": "photo_44"
+        },
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_45_2026-04-04_12-26-14.jpg",
+          "alt": "f to ves card duplicate",
+          "caption": "photo_45"
+        },
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_46_2026-04-04_12-26-14.jpg",
+          "alt": "Compound nouns card duplicate",
+          "caption": "photo_46"
+        },
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_47_2026-04-04_12-26-14.jpg",
+          "alt": "Same form and nouns on s card duplicate",
+          "caption": "photo_47"
+        },
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_48_2026-04-04_12-26-14.jpg",
+          "alt": "Singular only and plural only card duplicate",
+          "caption": "photo_48"
+        }
+      ]
+    },
+    {
+      "type": "topicLinks",
+      "title": "Смежные правила раздела",
+      "note": "Продолжай в соседних темах для согласования и количественных слов.",
+      "items": [
+        {
+          "id": "specialNounsNumber",
+          "label": "Special Nouns: Singular/Plural",
+          "note": "категории слова и выбор is/are"
+        },
+        {
+          "id": "nounAgreementPatterns",
+          "label": "Noun Agreement Patterns",
+          "note": "таблицы согласования со сказуемым"
+        },
+        {
+          "id": "nounQuantifiersCountability",
+          "label": "Noun Quantifiers and Countability",
+          "note": "many/much/few/little и countable/uncountable"
+        }
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": []
+  }
+}

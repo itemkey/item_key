@@ -1,0 +1,57 @@
+{
+  "id": "auxiliaryVerbsOverview",
+  "title": "Auxiliary Verbs Overview",
+  "subtitle": "DO/HAVE/BE и их роли в грамматике",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Система вспомогательных глаголов"
+    },
+    {
+      "type": "text",
+      "text": "Схема из фото: как работают DO/DOES/DID, HAVE/HAS/HAD, AM/IS/ARE/WAS/WERE, а также BE/BEEN в вопросах, отрицаниях, временах Continuous/Perfect и Passive." 
+    },
+    {
+      "type": "highlight",
+      "title": "Мини-карта",
+      "lines": [
+        "DO / DOES / DID -> Present Simple и Past Simple (вопросы/отрицания)",
+        "HAVE / HAS / HAD -> Present Perfect / Present Perfect Continuous / Past Perfect",
+        "AM / IS / ARE / WAS / WERE -> to be как смысловой и вспомогательный",
+        "BE / BEEN -> после will/modals и в Perfect Continuous"
+      ]
+    },
+    {
+      "type": "image",
+      "title": "Источник (без потерь, 1:1)",
+      "note": "Полная шпаргалка из фото.",
+      "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_21_2026-04-04_12-26-14.jpg",
+      "alt": "Auxiliary verbs map photo 21"
+    },
+    {
+      "type": "topicLinks",
+      "title": "Смежные правила раздела",
+      "note": "Дальше — карточки на mixed auxiliary и ответные реплики.",
+      "items": [
+        {
+          "id": "auxiliaryMixedCards",
+          "label": "Auxiliary Mixed Cards",
+          "note": "большой набор карточек на один пропуск"
+        },
+        {
+          "id": "agreementRepliesSoNeither",
+          "label": "Agreement Replies: So / Neither / Me too",
+          "note": "короткие реплики с нужным auxiliary"
+        },
+        {
+          "id": "specialNounsNumber",
+          "label": "Special Nouns: Singular/Plural",
+          "note": "связка auxiliary + согласование с noun"
+        }
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": []
+  }
+}

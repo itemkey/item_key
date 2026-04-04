@@ -1,0 +1,156 @@
+{
+  "id": "auxiliaryMixedCards",
+  "title": "Auxiliary Mixed Cards",
+  "subtitle": "карточки на вставку одного вспомогательного глагола",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Mixed auxiliary: workbook cards"
+    },
+    {
+      "type": "text",
+      "text": "Ниже собраны все карточки из фото с заданиями на вставку одного auxiliary. Включены и листы с ответами, чтобы можно было сверяться без потери деталей." 
+    },
+    {
+      "type": "highlight",
+      "title": "Покрытие",
+      "lines": [
+        "CARD 1-6: задания (passive + special nouns и mixed auxiliary)",
+        "листы с ответами к наборам упражнений",
+        "все сканы добавлены в исходном виде (1:1)"
+      ]
+    },
+    {
+      "type": "imageGallery",
+      "title": "Карточки с заданиями",
+      "items": [
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_23_2026-04-04_12-26-14.jpg",
+          "alt": "Auxiliary exercise card 10",
+          "caption": "photo_23"
+        },
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_24_2026-04-04_12-26-14.jpg",
+          "alt": "Auxiliary exercise card 11",
+          "caption": "photo_24"
+        },
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_25_2026-04-04_12-26-14.jpg",
+          "alt": "Auxiliary exercise card 12",
+          "caption": "photo_25"
+        },
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_26_2026-04-04_12-26-14.jpg",
+          "alt": "Auxiliary exercise card 13",
+          "caption": "photo_26"
+        },
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_27_2026-04-04_12-26-14.jpg",
+          "alt": "Auxiliary exercise card 14",
+          "caption": "photo_27"
+        },
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_28_2026-04-04_12-26-14.jpg",
+          "alt": "Auxiliary exercise card 15",
+          "caption": "photo_28"
+        },
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_37_2026-04-04_12-26-14.jpg",
+          "alt": "Card 1 passive plus special nouns",
+          "caption": "photo_37"
+        },
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_38_2026-04-04_12-26-14.jpg",
+          "alt": "Card 2 mixed auxiliary",
+          "caption": "photo_38"
+        },
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_39_2026-04-04_12-26-14.jpg",
+          "alt": "Card 3 mixed auxiliary",
+          "caption": "photo_39"
+        },
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_40_2026-04-04_12-26-14.jpg",
+          "alt": "Card 4 mixed auxiliary",
+          "caption": "photo_40"
+        },
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_41_2026-04-04_12-26-14.jpg",
+          "alt": "Card 5 mixed auxiliary",
+          "caption": "photo_41"
+        },
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_42_2026-04-04_12-26-14.jpg",
+          "alt": "Card 6 mixed auxiliary",
+          "caption": "photo_42"
+        }
+      ]
+    },
+    {
+      "type": "imageGallery",
+      "title": "Листы с ответами",
+      "note": "Ответы сохранены в том же виде, как в исходных фото.",
+      "items": [
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_29_2026-04-04_12-26-14.jpg",
+          "alt": "Answer sheet 1",
+          "caption": "photo_29"
+        },
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_30_2026-04-04_12-26-14.jpg",
+          "alt": "Answer sheet 2",
+          "caption": "photo_30"
+        },
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_31_2026-04-04_12-26-14.jpg",
+          "alt": "Answer sheet 3",
+          "caption": "photo_31"
+        },
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_32_2026-04-04_12-26-14.jpg",
+          "alt": "Answer sheet 4",
+          "caption": "photo_32"
+        },
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_33_2026-04-04_12-26-14.jpg",
+          "alt": "Answer sheet 5",
+          "caption": "photo_33"
+        },
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_34_2026-04-04_12-26-14.jpg",
+          "alt": "Answer sheet 6",
+          "caption": "photo_34"
+        },
+        {
+          "src": "/crate/student_helper/db/tenses/media/parts_of_speech/photo_35_2026-04-04_12-26-14.jpg",
+          "alt": "Answer sheet 7",
+          "caption": "photo_35"
+        }
+      ]
+    },
+    {
+      "type": "topicLinks",
+      "title": "Смежные правила раздела",
+      "items": [
+        {
+          "id": "auxiliaryVerbsOverview",
+          "label": "Auxiliary Verbs Overview",
+          "note": "карта по DO/HAVE/BE перед практикой"
+        },
+        {
+          "id": "agreementRepliesSoNeither",
+          "label": "Agreement Replies: So / Neither / Me too",
+          "note": "короткие ответные реплики с auxiliary"
+        },
+        {
+          "id": "specialNounsNumber",
+          "label": "Special Nouns: Singular/Plural",
+          "note": "контексты в карточках часто завязаны на noun agreement"
+        }
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": []
+  }
+}

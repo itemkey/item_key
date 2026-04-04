@@ -1,6 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { CONSTRUCTOR_NODES, CONSTRUCTOR_RESULTS } from "./grammarConstructorData";
+import TopNav from "./grammar/TopNav";
+import HomePanel from "./grammar/HomePanel";
+import TopicsView from "./grammar/TopicsView";
+import RuleView from "./grammar/RuleView";
+import PracticeView from "./grammar/PracticeView";
+import PracticeInputRenderer from "./grammar/PracticeInputRenderer";
 
 const INDEX_PATH = "./db/tenses/index.json";
 const DB_DIR = "./db/tenses/";
@@ -8,11 +14,24 @@ const RULE_PREVIEW_LIMIT = 10;
 const SYNTH_COMPARE_ID = "__react_compare__";
 const SYNTH_DAILY_ID = "__react_daily__";
 const SYNTH_LIBRARY_ID = "__react_library__";
+const SYNTH_CUSTOM_ID = "__react_custom__";
+const SYNTH_MISTAKES_ID = "__react_mistakes__";
 const KEY_DAILY = "sh_tenses_daily_v1";
 const KEY_LAST_TOPIC = "sh_grammar_last_topic_v1";
 const KEY_LAST_VIEW = "sh_tenses_last_view_react";
 const KEY_LEVEL = "sh_grammar_level_v1";
+const KEY_PRACTICE_STATS = "sh_tenses_practice_stats_v1";
+const KEY_SHOW_ANSWERS = "sh_tenses_show_answers_v1";
 const LEVELS = ["A2-B1", "B1-B2", "B2-C1"];
+const PRACTICE_GOAL_OPTIONS = [
+  { value: "all_goals", label: "общее (all goals)" },
+  { value: "meaning", label: "когда используем (meaning)" },
+  { value: "formula", label: "формула (formula)" },
+  { value: "dropdown_story", label: "контекст (dropdown story)" },
+  { value: "markers", label: "маркеры (markers)" },
+  { value: "mistakes", label: "ошибки (mistakes)" },
+  { value: "compare", label: "сравнение (compare)" },
+];
 
 function shuffleList(items) {
   const out = items.slice();
@@ -43,6 +62,54 @@ function normalize(value) {
   return asText(value).toLowerCase().replace(/\s+/g, " ").trim();
 }
 
+function normalizePracticeGoal(value) {
+  const goal = asText(value);
+  const exists = PRACTICE_GOAL_OPTIONS.some((row) => row.value === goal);
+  return exists ? goal : "all_goals";
+}
+
+function practiceGoalLabel(goal) {
+  const key = normalizePracticeGoal(goal);
+  const found = PRACTICE_GOAL_OPTIONS.find((row) => row.value === key);
+  return found ? found.label : "общее (all goals)";
+}
+
+function exerciseMatchesGoal(exercise, rawGoal) {
+  const goal = normalizePracticeGoal(rawGoal);
+  if (goal === "all_goals") return true;
+
+  const ex = exercise || {};
+  const exId = normalize(ex && ex.id);
+  const exGoal = normalize(ex && ex.goal);
+  const exKind = normalize(ex && ex.kind);
+
+  if (goal === "meaning") {
+    return exGoal === "meaning" || exId === "meaning";
+  }
+
+  if (goal === "formula") {
+    return exGoal === "formula" || exId.startsWith("formula");
+  }
+
+  if (goal === "dropdown_story") {
+    return exGoal === "story_cloze" || exId.includes("story") || exKind === "inline_select";
+  }
+
+  if (goal === "markers") {
+    return exGoal === "markers" || exId.startsWith("markers");
+  }
+
+  if (goal === "mistakes") {
+    return exGoal === "mistakes" || exId.startsWith("mistakes");
+  }
+
+  if (goal === "compare") {
+    return exGoal === "compare" || exId.startsWith("compare");
+  }
+
+  return true;
+}
+
 function toTopicFile(meta) {
   const file = asText(meta && meta.file);
   if (file) return file;
@@ -52,11 +119,25 @@ function toTopicFile(meta) {
 
 function groupTitle(group) {
   const g = asText(group).toLowerCase();
-  if (g === "present") return "present";
-  if (g === "past") return "past";
-  if (g === "future") return "future";
-  if (g === "universal") return "universal";
+  if (g === "present") return "Present";
+  if (g === "past") return "Past";
+  if (g === "future") return "Future";
+  if (g === "universal") return "Universal";
+  if (g === "parts_of_speech") return "Части речи";
   return g || "other";
+}
+
+function subgroupTitle(group, subgroup) {
+  const g = asText(group).toLowerCase();
+  const s = asText(subgroup).toLowerCase();
+  if (!s || s === "__default__") return "";
+
+  if (g === "parts_of_speech") {
+    if (s === "nouns") return "Nouns";
+    if (s === "verbs") return "Verbs";
+  }
+
+  return s;
 }
 
 function compareRuleHint(aId, bId) {
@@ -129,6 +210,38 @@ function readStoredLevel() {
   } catch (_err) {
     return "";
   }
+}
+
+function readPracticeStats() {
+  try {
+    const raw = localStorage.getItem(KEY_PRACTICE_STATS);
+    if (!raw) return { attempts: 0, errors: 0 };
+    const parsed = JSON.parse(raw);
+    return {
+      attempts: Math.max(0, Number(parsed && parsed.attempts) || 0),
+      errors: Math.max(0, Number(parsed && parsed.errors) || 0),
+    };
+  } catch (_err) {
+    return { attempts: 0, errors: 0 };
+  }
+}
+
+function savePracticeStats(stats) {
+  try {
+    localStorage.setItem(KEY_PRACTICE_STATS, JSON.stringify({
+      attempts: Math.max(0, Number(stats && stats.attempts) || 0),
+      errors: Math.max(0, Number(stats && stats.errors) || 0),
+    }));
+  } catch (_err) {}
+}
+
+function readShowAnswersSetting() {
+  try {
+    const raw = localStorage.getItem(KEY_SHOW_ANSWERS);
+    if (raw === "0") return false;
+    if (raw === "1") return true;
+  } catch (_err) {}
+  return true;
 }
 
 function isLevelMatch(meta, level) {
@@ -541,41 +654,6 @@ function evaluateAnswer(node, answer) {
   return { ok: false, expectedText: "unsupported exercise kind", explain: "" };
 }
 
-function RuleTable({ block }) {
-  const cols = asList(block && block.columns);
-  const rows = asList(block && block.rows);
-  if (!cols.length && !rows.length) return null;
-
-  return (
-    <div className="tw-overflow-x-auto tw-border tw-border-zinc-300">
-      <table className="tw-min-w-full tw-border-collapse tw-text-left tw-text-sm">
-        {cols.length ? (
-          <thead className="tw-bg-zinc-100">
-            <tr>
-              {cols.map((col, idx) => (
-                <th key={`${idx}-${asText(col)}`} className="tw-border-b tw-border-zinc-300 tw-px-3 tw-py-2 tw-font-semibold tw-text-zinc-900">
-                  {asText(col)}
-                </th>
-              ))}
-            </tr>
-          </thead>
-        ) : null}
-        <tbody>
-          {rows.map((row, rowIdx) => (
-            <tr key={`${rowIdx}`} className="odd:tw-bg-white even:tw-bg-zinc-50">
-              {asList(row).map((cell, cellIdx) => (
-                <td key={`${rowIdx}-${cellIdx}`} className="tw-border-b tw-border-zinc-200 tw-px-3 tw-py-2 tw-align-top tw-text-zinc-800">
-                  {asText(cell)}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
 function extractQuickField(blocks, field) {
   const list = asList(blocks);
   const target = normalize(field);
@@ -658,6 +736,13 @@ export default function GrammarReactAppPortal() {
   const [practiceTitle, setPracticeTitle] = useState("");
   const [practiceFilterIds, setPracticeFilterIds] = useState([]);
   const [practiceOriginTopicId, setPracticeOriginTopicId] = useState("");
+  const [practiceStage, setPracticeStage] = useState("setup");
+  const [practiceMode, setPracticeMode] = useState("mixed");
+  const [practiceGoal, setPracticeGoal] = useState("all_goals");
+  const [customTopicIds, setCustomTopicIds] = useState([]);
+  const [showCustomPicker, setShowCustomPicker] = useState(false);
+  const [showAnswersAfterEach, setShowAnswersAfterEach] = useState(true);
+  const [practiceStats, setPracticeStats] = useState({ attempts: 0, errors: 0 });
   const [dailyCached, setDailyCached] = useState(null);
   const [dailyBusy, setDailyBusy] = useState(false);
   const [progressById, setProgressById] = useState({});
@@ -720,6 +805,8 @@ export default function GrammarReactAppPortal() {
 
   useEffect(() => {
     setDailyCached(readDailyCache());
+    setPracticeStats(readPracticeStats());
+    setShowAnswersAfterEach(readShowAnswersSetting());
   }, []);
 
   useEffect(() => {
@@ -740,7 +827,10 @@ export default function GrammarReactAppPortal() {
       const lastView = asText(localStorage.getItem(KEY_LAST_VIEW));
       if (lastView && ["home", "list", "detail", "constructor", "compare", "daily", "practice"].includes(lastView)) {
         if (["constructor", "compare", "daily"].includes(lastView)) setView("home");
-        else setView(lastView);
+        else if (lastView === "practice") {
+          setView("practice");
+          setPracticeStage("setup");
+        } else setView(lastView);
       }
     } catch (_err) {}
   }, []);
@@ -764,6 +854,7 @@ export default function GrammarReactAppPortal() {
             file: toTopicFile(item),
             levels: asList(item && item.levels),
             group: asText(item && item.group),
+            subgroup: asText(item && item.subgroup),
             kind: asText(item && item.kind),
             compare: item && item.compare,
             aliases: asList(item && item.aliases),
@@ -869,15 +960,6 @@ export default function GrammarReactAppPortal() {
     return topics.filter((topic) => isLevelMatch(topic, grammarLevel));
   }, [grammarLevel, topics]);
 
-  const groups = useMemo(() => {
-    const set = new Set();
-    for (const topic of topicsByLevel) {
-      const g = asText(topic.group);
-      if (g) set.add(g);
-    }
-    return [...set].sort((a, b) => groupTitle(a).localeCompare(groupTitle(b)));
-  }, [topicsByLevel]);
-
   const filteredTopics = useMemo(() => {
     const q = normalize(search);
     return topicsByLevel.filter((topic) => {
@@ -890,6 +972,7 @@ export default function GrammarReactAppPortal() {
         topic.subtitle,
         topic.hint,
         topic.group,
+        topic.subgroup,
         topic.kind,
         ...topic.levels,
         ...topic.aliases,
@@ -900,6 +983,84 @@ export default function GrammarReactAppPortal() {
       return hay.includes(q);
     });
   }, [groupFilter, search, topicsByLevel]);
+
+  const groupedTopics = useMemo(() => {
+    const map = {};
+    for (const topic of filteredTopics) {
+      const group = asText(topic && topic.group) || "other";
+      const subgroup = asText(topic && topic.subgroup) || "__default__";
+
+      if (!map[group]) {
+        map[group] = {
+          group,
+          title: groupTitle(group),
+          subgroups: {},
+        };
+      }
+
+      if (!map[group].subgroups[subgroup]) {
+        map[group].subgroups[subgroup] = {
+          key: subgroup,
+          title: subgroupTitle(group, subgroup),
+          items: [],
+        };
+      }
+
+      map[group].subgroups[subgroup].items.push(topic);
+    }
+
+    return Object.keys(map)
+      .sort((a, b) => groupTitle(a).localeCompare(groupTitle(b)))
+      .map((group) => {
+        const row = map[group];
+        const subgroups = Object.keys(row.subgroups)
+          .sort((a, b) => {
+            const ta = subgroupTitle(group, a);
+            const tb = subgroupTitle(group, b);
+            if (!ta && tb) return -1;
+            if (ta && !tb) return 1;
+            return ta.localeCompare(tb);
+          })
+          .map((key) => row.subgroups[key]);
+
+        return {
+          group,
+          title: row.title,
+          subgroups,
+        };
+      });
+  }, [filteredTopics]);
+
+  const customPickerGroups = useMemo(() => {
+    const map = {};
+    for (const topic of topicsByLevel) {
+      const group = asText(topic && topic.group) || "other";
+      if (!map[group]) map[group] = [];
+      map[group].push(topic);
+    }
+
+    return Object.keys(map)
+      .sort((a, b) => groupTitle(a).localeCompare(groupTitle(b)))
+      .map((group) => ({
+        group,
+        title: groupTitle(group),
+        items: map[group],
+      }));
+  }, [topicsByLevel]);
+
+  useEffect(() => {
+    const allowed = new Set(topicsByLevel.map((topic) => topic.id));
+    setCustomTopicIds((prev) => prev.filter((id) => allowed.has(id)));
+  }, [topicsByLevel]);
+
+  const scopeTopicIds = useMemo(() => {
+    if (practiceMode === "custom") return customTopicIds.slice();
+    return topicsByLevel.map((topic) => topic.id);
+  }, [customTopicIds, practiceMode, topicsByLevel]);
+
+  const scopeMistakesCount = useMemo(() => {
+    return scopeTopicIds.reduce((sum, id) => sum + asList(progressById[id] && progressById[id].mistakes).length, 0);
+  }, [progressById, scopeTopicIds]);
 
   const comparableTopics = useMemo(() => {
     return topicsByLevel.filter((topic) => String(topic.kind || "").toLowerCase() === "tense" && topic.compare !== false);
@@ -921,6 +1082,17 @@ export default function GrammarReactAppPortal() {
       setCompareB(comparableTopics.length > 1 ? comparableTopics[1].id : comparableTopics[0].id);
     }
   }, [compareA, compareB, comparableTopics]);
+
+  const bumpPracticeStats = (ok) => {
+    setPracticeStats((prev) => {
+      const next = {
+        attempts: Math.max(0, Number(prev && prev.attempts) || 0) + 1,
+        errors: Math.max(0, Number(prev && prev.errors) || 0) + (ok ? 0 : 1),
+      };
+      savePracticeStats(next);
+      return next;
+    });
+  };
 
   const resetPracticeState = () => {
     setCursor(0);
@@ -1033,6 +1205,7 @@ export default function GrammarReactAppPortal() {
     setPracticeFilterIds([]);
     sessionMistakesRef.current = new Set(asList(progressById[topicId] && progressById[topicId].mistakes).map(asText).filter(Boolean));
     setView("practice");
+    setPracticeStage("run");
     setPracticeTitle(asText(meta && meta.title) || topicId);
 
     const doc = await ensureDoc(topicId);
@@ -1047,7 +1220,7 @@ export default function GrammarReactAppPortal() {
     const progress = progressById[topicId] || loadProgress(topicId);
     const mistakes = [...new Set(asList(progress && progress.mistakes).map(asText).filter(Boolean))];
     if (!mistakes.length) {
-      setDocError("для этой темы пока нет сохраненных ошибок");
+      setDocError("Для этой темы пока нет сохраненных ошибок.");
       return;
     }
 
@@ -1059,6 +1232,7 @@ export default function GrammarReactAppPortal() {
     sessionMistakesRef.current = new Set(mistakes);
     setPracticeTitle(`mistakes: ${asText(meta && meta.title) || topicId}`);
     setView("practice");
+    setPracticeStage("run");
 
     const doc = await ensureDoc(topicId);
     if (!doc) return;
@@ -1171,6 +1345,7 @@ export default function GrammarReactAppPortal() {
       sessionMistakesRef.current = new Set();
       setPracticeTitle(`compare: ${labelA} vs ${labelB}`);
       setView("practice");
+      setPracticeStage("run");
       resetPracticeState();
     } finally {
       setCompareBusy(false);
@@ -1281,13 +1456,21 @@ export default function GrammarReactAppPortal() {
       sessionMistakesRef.current = new Set();
       setPracticeTitle(`daily • ${todayKey()}`);
       setView("practice");
+      setPracticeStage("run");
       resetPracticeState();
     } finally {
       setDailyBusy(false);
     }
   };
 
-  const startLibraryPractice = async (idsRaw, autoStart) => {
+  const startLibraryPractice = async (idsRaw, autoStart, options) => {
+    const cfg = options || {};
+    const synthId = asText(cfg.syntheticId) || SYNTH_LIBRARY_ID;
+    const titlePrefix = asText(cfg.titlePrefix) || "library practice";
+    const useShuffle = cfg.shuffle !== false;
+    const perKindLimit = Math.max(0, Number(cfg.perKindLimit) || 0);
+    const goal = normalizePracticeGoal(cfg.goal || "all_goals");
+
     const ids = asList(idsRaw)
       .map(asText)
       .filter(Boolean)
@@ -1299,12 +1482,16 @@ export default function GrammarReactAppPortal() {
     const docs = await Promise.all(ids.map((id) => ensureDoc(id)));
     const byKind = {};
 
+    let matchedExercises = 0;
+
     for (let i = 0; i < ids.length; i += 1) {
       const id = ids[i];
       const doc = docs[i];
       if (!doc) continue;
 
       for (const ex of asList(doc && doc.practice && doc.practice.exercises)) {
+        if (!exerciseMatchesGoal(ex, goal)) continue;
+        matchedExercises += 1;
         const kind = asText(ex && ex.kind) || "choice";
         if (!byKind[kind]) byKind[kind] = [];
         for (const item of asList(ex && ex.items)) {
@@ -1316,59 +1503,183 @@ export default function GrammarReactAppPortal() {
       }
     }
 
-    const exercises = Object.keys(byKind).map((kind) => ({
-      id: `library_${kind}`,
-      title: `library (${kind})`,
-      kind,
-      items: byKind[kind],
-    }));
+    const exercises = Object.keys(byKind).map((kind) => {
+      const rawItems = asList(byKind[kind]);
+      const items = useShuffle ? shuffleList(rawItems) : rawItems;
+      return {
+        id: `library_${kind}`,
+        title: `library (${kind})`,
+        kind,
+        items: perKindLimit > 0 ? items.slice(0, perKindLimit) : items,
+      };
+    });
 
-    if (!exercises.length) return;
+    if (!matchedExercises || !exercises.length) {
+      const label = practiceGoalLabel(goal);
+      setDocError(`Нет упражнений для цели: ${label}.`);
+      return false;
+    }
 
     const titleParts = ids.slice(0, 3).map((id) => asText(topicById.get(id) && topicById.get(id).title) || id);
     const title = ids.length > 3 ? `${titleParts.join(", ")} +${ids.length - 3}` : titleParts.join(", ");
 
     setTopicDocs((prev) => ({
       ...prev,
-      [SYNTH_LIBRARY_ID]: {
-        id: SYNTH_LIBRARY_ID,
+      [synthId]: {
+        id: synthId,
         title: "library",
         practice: { exercises },
       },
     }));
 
-    setSelectedId(SYNTH_LIBRARY_ID);
+    setSelectedId(synthId);
     setPracticeOriginTopicId("");
     setPracticeFilterIds([]);
     sessionMistakesRef.current = new Set();
-    setPracticeTitle(`library practice • ${title}`);
+    setPracticeTitle(`${titlePrefix} • ${title}`);
     setView("practice");
+    setPracticeStage("run");
     resetPracticeState();
 
     if (autoStart === false) {
       setChecked(false);
     }
+
+    return true;
   };
 
-  const addTopicToLibrary = (id) => {
-    const topicId = asText(id);
-    if (!topicId) return;
+  const startMixedPractice = async () => {
+    const ids = topicsByLevel.map((topic) => topic.id);
+    if (!ids.length) {
+      setDocError("Нет тем для mixed-режима на выбранном уровне.");
+      return;
+    }
+    setDocError("");
+    await startLibraryPractice(ids, true, {
+      syntheticId: SYNTH_LIBRARY_ID,
+      titlePrefix: `mixed${grammarLevel ? ` (${grammarLevel})` : ""} • ${practiceGoalLabel(practiceGoal)}`,
+      shuffle: true,
+      perKindLimit: 20,
+      goal: practiceGoal,
+    });
+  };
 
-    const meta = topicById.get(topicId);
-    if (!meta) return;
+  const startCustomPractice = async () => {
+    if (!customTopicIds.length) {
+      setDocError("Выберите хотя бы одну тему для custom-режима.");
+      return;
+    }
+    setDocError("");
+    await startLibraryPractice(customTopicIds, true, {
+      syntheticId: SYNTH_CUSTOM_ID,
+      titlePrefix: `custom • ${practiceGoalLabel(practiceGoal)}`,
+      shuffle: true,
+      goal: practiceGoal,
+    });
+  };
 
-    const lib = window.StudentHelperLibrary;
-    if (!lib) return;
+  const startScopeMistakesPractice = async () => {
+    const ids = asList(scopeTopicIds).filter((id) => topicById.has(id));
+    if (!ids.length) {
+      setDocError("Нет тем для запуска режима ошибок.");
+      return;
+    }
 
-    const payload = {
-      source: "tenses",
-      id: topicId,
-      title: asText(meta.title || meta.id),
-      subtitle: asText(meta.hint || meta.subtitle),
-    };
+    if (ids.length === 1) {
+      await startTopicMistakesPractice(ids[0]);
+      return;
+    }
 
-    if (typeof lib.quickAddWithPicker === "function") lib.quickAddWithPicker(payload);
-    else if (typeof lib.quickAdd === "function") lib.quickAdd(payload);
+    const byKind = {};
+    let total = 0;
+
+    for (const id of ids) {
+      const progress = progressById[id] || loadProgress(id);
+      const mistakes = [...new Set(asList(progress && progress.mistakes).map(asText).filter(Boolean))];
+      if (!mistakes.length) continue;
+
+      const doc = await ensureDoc(id);
+      if (!doc) continue;
+
+      const queueItems = buildQueue(doc, { onlyItemIds: mistakes });
+      for (const row of queueItems) {
+        const kind = asText(row && row.kind) || "choice";
+        if (!byKind[kind]) byKind[kind] = [];
+        byKind[kind].push({
+          ...(row && row.item ? row.item : {}),
+          sourceTenseId: asText(row && row.item && row.item.sourceTenseId) || id,
+        });
+        total += 1;
+      }
+    }
+
+    if (!total) {
+      setDocError("Для выбранного набора пока нет сохраненных ошибок.");
+      return;
+    }
+
+    const exercises = Object.keys(byKind).map((kind) => ({
+      id: `mistakes_${kind}`,
+      title: `mistakes (${kind})`,
+      kind,
+      items: shuffleList(asList(byKind[kind])),
+    }));
+
+    setTopicDocs((prev) => ({
+      ...prev,
+      [SYNTH_MISTAKES_ID]: {
+        id: SYNTH_MISTAKES_ID,
+        title: "mistakes",
+        practice: { exercises },
+      },
+    }));
+
+    setDocError("");
+    setSelectedId(SYNTH_MISTAKES_ID);
+    setPracticeOriginTopicId("");
+    setPracticeFilterIds([]);
+    sessionMistakesRef.current = new Set();
+    setPracticeTitle("mistakes");
+    setView("practice");
+    setPracticeStage("run");
+    resetPracticeState();
+  };
+
+  const clearScopeMistakes = () => {
+    const ids = asList(scopeTopicIds).filter((id) => topicById.has(id));
+    if (!ids.length) return;
+
+    setProgressById((map) => {
+      const nextMap = { ...map };
+      for (const id of ids) {
+        const prev = nextMap[id] || loadProgress(id);
+        const next = {
+          mastery: Number(prev.mastery) || 0,
+          best: (prev.best && typeof prev.best === "object") ? { ...prev.best } : {},
+          mistakes: [],
+        };
+        saveProgress(id, next);
+        nextMap[id] = next;
+      }
+      return nextMap;
+    });
+    sessionMistakesRef.current = new Set();
+  };
+
+  const resetScopeProgress = () => {
+    const ids = asList(scopeTopicIds).filter((id) => topicById.has(id));
+    if (!ids.length) return;
+
+    setProgressById((map) => {
+      const nextMap = { ...map };
+      for (const id of ids) {
+        const next = { mastery: 0, best: {}, mistakes: [] };
+        saveProgress(id, next);
+        nextMap[id] = next;
+      }
+      return nextMap;
+    });
+    sessionMistakesRef.current = new Set();
   };
 
   useEffect(() => {
@@ -1382,6 +1693,12 @@ export default function GrammarReactAppPortal() {
       localStorage.setItem(KEY_LAST_VIEW, view);
     } catch (_err) {}
   }, [view]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(KEY_SHOW_ANSWERS, showAnswersAfterEach ? "1" : "0");
+    } catch (_err) {}
+  }, [showAnswersAfterEach]);
 
   useEffect(() => {
     if (!selectedId || !topicById.has(selectedId)) return;
@@ -1455,6 +1772,7 @@ export default function GrammarReactAppPortal() {
     const result = evaluateAnswer(current, answerState);
     setResultState(result);
     setChecked(true);
+    bumpPracticeStats(!!(result && result.ok));
   };
 
   const nextCurrent = () => {
@@ -1478,361 +1796,43 @@ export default function GrammarReactAppPortal() {
     }
   };
 
-  const renderRuleBlock = (block, idx) => {
-    const type = asText(block && block.type);
-    const cardClass = "tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 sm:tw-p-5";
+  useEffect(() => {
+    if (view !== "practice" || practiceStage !== "run") return;
 
-    if (type === "heading") {
-      return (
-        <div key={`${idx}-heading`} className={cardClass}>
-          <h3 className="tw-m-0 tw-text-base tw-font-semibold tw-text-slate-900">{asText(block.text)}</h3>
-        </div>
-      );
-    }
+    const onKeyDown = (event) => {
+      if (!event) return;
+      const target = event.target;
+      const tag = String(target && target.tagName || "").toUpperCase();
+      const isEditable = tag === "TEXTAREA" || tag === "SELECT" || (tag === "INPUT" && String(target && target.type || "").toLowerCase() !== "checkbox");
 
-    if (type === "text") {
-      return (
-        <div key={`${idx}-text`} className={cardClass}>
-          <p className="tw-m-0 tw-text-sm tw-leading-relaxed tw-text-slate-700">{asText(block.text)}</p>
-        </div>
-      );
-    }
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setPracticeStage("setup");
+        return;
+      }
 
-    if (type === "highlight") {
-      return (
-        <div key={`${idx}-highlight`} className={`${cardClass} tw-bg-slate-50`}>
-          {asText(block.title) ? <p className="tw-m-0 tw-text-sm tw-font-semibold tw-text-slate-900">{asText(block.title)}</p> : null}
-          <ul className="tw-m-0 tw-list-disc tw-space-y-1.5 tw-pl-5 tw-text-sm tw-text-slate-700">
-            {asList(block.lines).map((line, lineIdx) => (
-              <li key={`${idx}-line-${lineIdx}`}>{asText(line)}</li>
-            ))}
-          </ul>
-        </div>
-      );
-    }
+      if (event.key !== "Enter") return;
+      if (isEditable) return;
 
-    if (type === "table") {
-      return (
-        <div key={`${idx}-table`} className={cardClass}>
-          {asText(block.caption) ? <p className="tw-m-0 tw-text-sm tw-font-semibold tw-text-slate-900">{asText(block.caption)}</p> : null}
-          <RuleTable block={block} />
-        </div>
-      );
-    }
+      event.preventDefault();
+      if (!checked) {
+        if (canCheckAnswer(current, answerState)) checkCurrent();
+        return;
+      }
 
-    if (type === "examples") {
-      return (
-        <div key={`${idx}-examples`} className={cardClass}>
-          <p className="tw-m-0 tw-text-sm tw-font-semibold tw-text-slate-900">Примеры</p>
-          <ul className="tw-m-0 tw-list-none tw-space-y-2 tw-p-0">
-            {asList(block.items).map((item, itemIdx) => (
-              <li key={`${idx}-example-${itemIdx}`} className="tw-rounded-xl tw-border tw-border-slate-200 tw-bg-slate-50 tw-p-3">
-                <p className="tw-m-0 tw-text-sm tw-font-medium tw-text-slate-900">{asText(item && item.en)}</p>
-                <p className="tw-m-0 tw-mt-1 tw-text-sm tw-text-slate-600">{asText(item && item.ru)}</p>
-              </li>
-            ))}
-          </ul>
-        </div>
-      );
-    }
+      if (!done) {
+        nextCurrent();
+        return;
+      }
 
-    if (type === "topicLinks") {
-      return (
-        <div key={`${idx}-links`} className={`${cardClass} tw-bg-slate-50`}>
-          {asText(block.title) ? <p className="tw-m-0 tw-text-sm tw-font-semibold tw-text-slate-900">{asText(block.title)}</p> : null}
-          {asText(block.note) ? <p className="tw-m-0 tw-text-sm tw-text-slate-600">{asText(block.note)}</p> : null}
-          <div className="tw-space-y-2">
-            {asList(block.items).map((item, itemIdx) => {
-              const linkedId = asText(item && item.id);
-              return (
-                <div key={`${idx}-topic-link-${itemIdx}`} className="tw-rounded-xl tw-border tw-border-slate-200 tw-bg-white tw-p-3">
-                  <p className="tw-m-0 tw-text-sm tw-font-semibold tw-text-slate-900">{asText(item && item.label) || linkedId || "Тема"}</p>
-                  {asText(item && item.note) ? <p className="tw-m-0 tw-mt-1 tw-text-sm tw-text-slate-600">{asText(item.note)}</p> : null}
-                  {linkedId ? (
-                    <button
-                      type="button"
-                      className="tw-mt-3 tw-inline-flex tw-items-center tw-rounded-lg tw-border tw-border-slate-300 tw-bg-white tw-px-3 tw-py-1.5 tw-text-xs tw-font-medium tw-text-slate-700 hover:tw-border-slate-500"
-                      onClick={() => openTopic(linkedId)}
-                    >
-                      Открыть тему
-                    </button>
-                  ) : null}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      );
-    }
+      restartPractice();
+    };
 
-    return (
-      <div key={`${idx}-unknown`} className={`${cardClass} tw-bg-slate-50`}>
-        <p className="tw-m-0 tw-text-sm tw-text-slate-600">Дополнительный материал недоступен в упрощенном режиме.</p>
-      </div>
-    );
-  };
-
-  const renderPracticeInput = () => {
-    if (!current) return null;
-    const item = current.item || {};
-    const kind = asText(current.kind);
-
-    if (kind === "choice") {
-      const selectedIndex = Number(answerState && answerState.selectedIndex);
-      const correctIndex = Number(item && item.correctIndex);
-      return (
-        <ul className="tw-m-0 tw-list-none tw-space-y-3 tw-p-0">
-          {asList(item.options).map((opt, idx) => {
-            const active = selectedIndex === idx;
-            const isCorrect = checked && idx === correctIndex;
-            const isWrong = checked && active && idx !== correctIndex;
-            const baseClass = "tw-w-full tw-rounded-xl tw-border tw-px-4 tw-py-3 tw-text-left tw-text-sm tw-font-medium tw-transition";
-            let stateClass = "tw-border-slate-200 tw-bg-white tw-text-slate-800 hover:tw-border-slate-400";
-
-            if (active && !checked) stateClass = "tw-border-sky-500 tw-bg-sky-50 tw-text-slate-900";
-            if (isCorrect) stateClass = "tw-border-emerald-400 tw-bg-emerald-50 tw-text-emerald-900";
-            if (isWrong) stateClass = "tw-border-rose-400 tw-bg-rose-50 tw-text-rose-900";
-
-            return (
-              <li key={`${current.key}-choice-${idx}`}>
-                <button
-                  type="button"
-                  disabled={checked}
-                  onClick={() => setAnswerState({ selectedIndex: idx })}
-                  className={`${baseClass} ${stateClass}`}
-                >
-                  {asText(opt)}
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-      );
-    }
-
-    if (kind === "multi") {
-      const expectedSet = new Set(asList(item.correctIndices).map((x) => Number(x)));
-      return (
-        <ul className="tw-m-0 tw-list-none tw-space-y-3 tw-p-0">
-          {asList(item.options).map((opt, idx) => {
-            const selected = !!(answerState.selected && answerState.selected[idx]);
-            const expected = expectedSet.has(idx);
-            const isCorrect = checked && selected && expected;
-            const isWrong = checked && selected && !expected;
-            const isMissed = checked && !selected && expected;
-            let stateClass = "tw-border-slate-200 tw-bg-white";
-            if (selected && !checked) stateClass = "tw-border-sky-500 tw-bg-sky-50";
-            if (isCorrect) stateClass = "tw-border-emerald-400 tw-bg-emerald-50";
-            if (isWrong) stateClass = "tw-border-rose-400 tw-bg-rose-50";
-            if (isMissed) stateClass = "tw-border-amber-400 tw-bg-amber-50";
-            return (
-              <li key={`${current.key}-multi-${idx}`}>
-                <label className={`tw-flex tw-items-start tw-gap-3 tw-rounded-xl tw-border tw-px-4 tw-py-3 tw-text-sm tw-text-slate-800 ${stateClass}`}>
-                  <input
-                    type="checkbox"
-                    disabled={checked}
-                    checked={selected}
-                    onChange={(e) => {
-                      setAnswerState((prev) => ({
-                        selected: {
-                          ...(prev && prev.selected ? prev.selected : {}),
-                          [idx]: !!e.target.checked,
-                        },
-                      }));
-                    }}
-                  />
-                  <span>{asText(opt)}</span>
-                </label>
-              </li>
-            );
-          })}
-        </ul>
-      );
-    }
-
-    if (kind === "input" || kind === "correction") {
-      let fieldClass = "tw-border-slate-300 focus:tw-border-sky-500";
-      if (checked && resultState && resultState.ok) fieldClass = "tw-border-emerald-500 tw-bg-emerald-50";
-      if (checked && resultState && !resultState.ok) fieldClass = "tw-border-rose-500 tw-bg-rose-50";
-      return (
-        <textarea
-          className={`tw-min-h-[120px] tw-w-full tw-rounded-xl tw-border tw-bg-white tw-px-4 tw-py-3 tw-text-sm tw-text-slate-900 tw-outline-none ${fieldClass}`}
-          disabled={checked}
-          value={asText(answerState.text)}
-          onChange={(e) => setAnswerState({ text: e.target.value })}
-          placeholder="Введите ответ"
-        />
-      );
-    }
-
-    if (kind === "multi_input") {
-      const inputs = asList(item.inputs);
-      const values = asList(answerState.values);
-      return (
-        <div className="tw-space-y-3">
-          {inputs.map((_, idx) => (
-            <div key={`${current.key}-multi-input-wrap-${idx}`} className="tw-space-y-1">
-              <p className="tw-m-0 tw-text-xs tw-font-medium tw-uppercase tw-tracking-[0.08em] tw-text-slate-500">Ответ {idx + 1}</p>
-              <input
-                key={`${current.key}-multi-input-${idx}`}
-                className={[
-                  "tw-w-full tw-rounded-xl tw-border tw-bg-white tw-px-4 tw-py-3 tw-text-sm tw-text-slate-900 tw-outline-none",
-                  checked
-                    ? (inputAccepted(values[idx], inputs[idx] && inputs[idx].accepted, inputs[idx] && inputs[idx].acceptedShort)
-                      ? "tw-border-emerald-500 tw-bg-emerald-50"
-                      : "tw-border-rose-500 tw-bg-rose-50")
-                    : "tw-border-slate-300 focus:tw-border-sky-500",
-                ].join(" ")}
-                disabled={checked}
-                value={asText(values[idx])}
-                onChange={(e) => {
-                  const next = values.slice();
-                  next[idx] = e.target.value;
-                  setAnswerState({ values: next });
-                }}
-                placeholder={`Ответ ${idx + 1}`}
-              />
-            </div>
-          ))}
-        </div>
-      );
-    }
-
-    if (kind === "inline_select") {
-      const segments = asList(item.segments);
-      const blanks = asList(item.blanks);
-      const values = asList(answerState.values);
-      return (
-        <div className="tw-space-y-4">
-          {asText(item.storyTitle) ? <p className="tw-m-0 tw-text-base tw-font-semibold tw-text-slate-900">{asText(item.storyTitle)}</p> : null}
-          <div className="tw-flex tw-flex-wrap tw-items-center tw-gap-2 tw-text-sm tw-leading-relaxed tw-text-slate-800">
-            {blanks.map((blank, idx) => (
-              <span key={`${current.key}-inline-${idx}`} className="tw-flex tw-items-center tw-gap-2">
-                <span>{asText(segments[idx])}</span>
-                <select
-                  className={[
-                    "tw-rounded-lg tw-border tw-bg-white tw-px-2.5 tw-py-1.5 tw-text-sm tw-outline-none",
-                    checked
-                      ? (Number(values[idx]) === Number(blank && blank.correctIndex)
-                        ? "tw-border-emerald-500 tw-bg-emerald-50"
-                        : "tw-border-rose-500 tw-bg-rose-50")
-                      : "tw-border-slate-300 focus:tw-border-sky-500",
-                  ].join(" ")}
-                  disabled={checked}
-                  value={Number.isFinite(Number(values[idx])) ? String(values[idx]) : ""}
-                  onChange={(e) => {
-                    const next = values.slice();
-                    const v = asText(e.target.value);
-                    next[idx] = v === "" ? -1 : Number(v);
-                    setAnswerState({ values: next });
-                  }}
-                >
-                  <option value="">...</option>
-                  {asList(blank && blank.options).map((opt, optIdx) => (
-                    <option key={`${current.key}-inline-opt-${idx}-${optIdx}`} value={String(optIdx)}>
-                      {asText(opt)}
-                    </option>
-                  ))}
-                </select>
-              </span>
-            ))}
-            <span>{asText(segments[blanks.length])}</span>
-          </div>
-        </div>
-      );
-    }
-
-    if (kind === "match") {
-      const pairs = asList(item.pairs);
-      const rights = [...new Set(pairs.map((pair) => asText(pair && pair.right)).filter(Boolean))];
-      const picks = (answerState && answerState.picks) || {};
-
-      return (
-        <div className="tw-space-y-3">
-          {pairs.map((pair, idx) => {
-            const left = asText(pair && pair.left);
-            const expected = asText(pair && pair.right);
-            const actual = asText(picks[left]);
-            const rowState = !checked
-              ? "tw-border-slate-200"
-              : (actual && actual === expected ? "tw-border-emerald-400 tw-bg-emerald-50" : "tw-border-rose-400 tw-bg-rose-50");
-            return (
-              <div key={`${current.key}-match-${idx}`} className={`tw-grid tw-gap-2 tw-rounded-xl tw-border tw-p-3 sm:tw-grid-cols-[minmax(180px,1fr)_minmax(220px,1fr)] ${rowState}`}>
-                <div className="tw-text-sm tw-font-medium tw-text-slate-900">{left}</div>
-                <select
-                  className="tw-rounded-lg tw-border tw-border-slate-300 tw-bg-white tw-px-3 tw-py-2 tw-text-sm tw-outline-none focus:tw-border-sky-500"
-                  disabled={checked}
-                  value={asText(picks[left])}
-                  onChange={(e) => {
-                    setAnswerState((prev) => ({
-                      picks: {
-                        ...(prev && prev.picks ? prev.picks : {}),
-                        [left]: e.target.value,
-                      },
-                    }));
-                  }}
-                >
-                  <option value="">...</option>
-                  {rights.map((right, rightIdx) => (
-                    <option key={`${current.key}-match-opt-${idx}-${rightIdx}`} value={right}>
-                      {right}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            );
-          })}
-        </div>
-      );
-    }
-
-    if (kind === "drag_sort") {
-      const bins = asList(item.bins);
-      const words = asList(item.words);
-      const picks = asList(answerState.picks);
-
-      return (
-        <div className="tw-space-y-3">
-          {words.map((word, idx) => (
-            <div
-              key={`${current.key}-drag-${idx}`}
-              className={[
-                "tw-grid tw-gap-2 tw-rounded-xl tw-border tw-p-3 sm:tw-grid-cols-[minmax(180px,1fr)_minmax(220px,1fr)]",
-                !checked
-                  ? "tw-border-slate-200"
-                  : (asText(picks[idx]) === asText(word && word.bin) ? "tw-border-emerald-400 tw-bg-emerald-50" : "tw-border-rose-400 tw-bg-rose-50"),
-              ].join(" ")}
-            >
-              <div className="tw-text-sm tw-font-medium tw-text-slate-900">{asText(word && word.text)}</div>
-              <select
-                className="tw-rounded-lg tw-border tw-border-slate-300 tw-bg-white tw-px-3 tw-py-2 tw-text-sm tw-outline-none focus:tw-border-sky-500"
-                disabled={checked}
-                value={asText(picks[idx])}
-                onChange={(e) => {
-                  const next = picks.slice();
-                  next[idx] = e.target.value;
-                  setAnswerState({ picks: next });
-                }}
-              >
-                <option value="">...</option>
-                {bins.map((bin, binIdx) => (
-                  <option key={`${current.key}-drag-bin-${idx}-${binIdx}`} value={asText(bin)}>
-                    {asText(bin)}
-                  </option>
-                ))}
-              </select>
-            </div>
-          ))}
-        </div>
-      );
-    }
-
-    return (
-      <div className="tw-rounded-xl tw-border tw-border-slate-200 tw-bg-slate-50 tw-p-4 tw-text-sm tw-text-slate-600">
-        Этот тип задания скоро появится в обновленном режиме практики.
-      </div>
-    );
-  };
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [answerState, checkCurrent, checked, current, done, nextCurrent, practiceStage, restartPractice, view]);
 
   if (!hostEl) return null;
 
@@ -1870,16 +1870,6 @@ export default function GrammarReactAppPortal() {
   const answeredCount = attempted + (checked ? 1 : 0);
   const liveScore = score + (checked && resultState && resultState.ok ? 1 : 0);
   const practiceProgressPercent = queue.length ? Math.round(((cursor + 1) / queue.length) * 100) : 0;
-
-  const groupedTopicsMap = {};
-  for (const topic of filteredTopics) {
-    const group = asText(topic && topic.group) || "other";
-    if (!groupedTopicsMap[group]) groupedTopicsMap[group] = [];
-    groupedTopicsMap[group].push(topic);
-  }
-  const groupedTopics = Object.keys(groupedTopicsMap)
-    .sort((a, b) => groupTitle(a).localeCompare(groupTitle(b)))
-    .map((group) => ({ group, items: groupedTopicsMap[group] }));
 
   const explanationLines = [];
   const markerLinesRaw = [];
@@ -1953,16 +1943,6 @@ export default function GrammarReactAppPortal() {
   const exampleItems = exampleItemsRaw.slice(0, 6);
   const compareItems = compareItemsRaw.slice(0, 4);
 
-  const topTabClass = (active) => [
-    "tw-rounded-lg tw-border tw-px-3 tw-py-2 tw-text-xs tw-font-medium tw-uppercase tw-tracking-[0.08em] tw-transition",
-    active ? "tw-border-slate-900 tw-bg-slate-900 tw-text-white" : "tw-border-slate-300 tw-bg-white tw-text-slate-700 hover:tw-border-slate-500",
-  ].join(" ");
-
-  const levelClass = (active) => [
-    "tw-rounded-lg tw-border tw-px-3 tw-py-1.5 tw-text-xs tw-font-medium tw-uppercase tw-tracking-[0.06em] tw-transition",
-    active ? "tw-border-slate-900 tw-bg-slate-900 tw-text-white" : "tw-border-slate-300 tw-bg-white tw-text-slate-700 hover:tw-border-slate-500",
-  ].join(" ");
-
   const primaryBtnClass = "tw-inline-flex tw-items-center tw-justify-center tw-rounded-xl tw-border tw-border-slate-900 tw-bg-slate-900 tw-px-4 tw-py-2.5 tw-text-sm tw-font-semibold tw-text-white tw-transition hover:tw-bg-slate-700 disabled:tw-cursor-not-allowed disabled:tw-opacity-50";
   const secondaryBtnClass = "tw-inline-flex tw-items-center tw-justify-center tw-rounded-xl tw-border tw-border-slate-300 tw-bg-white tw-px-4 tw-py-2.5 tw-text-sm tw-font-semibold tw-text-slate-700 tw-transition hover:tw-border-slate-500 disabled:tw-cursor-not-allowed disabled:tw-opacity-50";
 
@@ -1974,34 +1954,22 @@ export default function GrammarReactAppPortal() {
             <p className="tw-m-0 tw-text-lg tw-font-semibold tw-text-slate-900">Grammar</p>
             <p className="tw-m-0 tw-mt-1 tw-text-sm tw-text-slate-600">Четкие блоки, короткие шаги и фокус на действии.</p>
           </div>
-          <nav className="tw-flex tw-flex-wrap tw-gap-2" aria-label="Grammar views">
-            <button type="button" onClick={() => setView("home")} className={topTabClass(isHomeTab)}>Home</button>
-            <button
-              type="button"
-              onClick={() => {
-                setGroupFilter("all");
-                setView("list");
-              }}
-              className={topTabClass(isTopicsTab)}
-            >
-              Topics
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                const id = selectedId || asText(topicsByLevel[0] && topicsByLevel[0].id);
-                if (!id) {
-                  setView("list");
-                  return;
-                }
-                startTopicPractice(id);
-              }}
-              className={topTabClass(isPracticeTab)}
-              disabled={!topicsByLevel.length}
-            >
-              Practice
-            </button>
-          </nav>
+          <TopNav
+            isHomeTab={isHomeTab}
+            isTopicsTab={isTopicsTab}
+            isPracticeTab={isPracticeTab}
+            canOpenPractice={topicsByLevel.length > 0}
+            onOpenHome={() => setView("home")}
+            onOpenTopics={() => {
+              setGroupFilter("all");
+              setView("list");
+            }}
+            onOpenPractice={() => {
+              setDocError("");
+              setView("practice");
+              setPracticeStage("setup");
+            }}
+          />
         </header>
 
         {loadingIndex ? <p className="tw-m-0 tw-text-sm tw-text-slate-500">Загрузка грамматических тем...</p> : null}
@@ -2009,229 +1977,59 @@ export default function GrammarReactAppPortal() {
         {docError ? <p className="tw-m-0 tw-rounded-xl tw-border tw-border-rose-200 tw-bg-rose-50 tw-p-3 tw-text-sm tw-text-rose-700">{docError}</p> : null}
 
         {view === "home" ? (
-          <div className="tw-space-y-4">
-            <section className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 sm:tw-p-5">
-              <p className="tw-m-0 tw-text-sm tw-font-semibold tw-text-slate-900">Выберите уровень</p>
-              <div className="tw-mt-3 tw-flex tw-flex-wrap tw-gap-2">
-                <button type="button" onClick={() => persistGrammarLevel("")} className={levelClass(!grammarLevel)}>Все</button>
-                {LEVELS.map((level) => (
-                  <button key={`level-home-${level}`} type="button" onClick={() => persistGrammarLevel(level)} className={levelClass(grammarLevel === level)}>
-                    {level}
-                  </button>
-                ))}
-              </div>
-            </section>
-
-            <section className="tw-grid tw-gap-3 md:tw-grid-cols-3">
-              <button
-                type="button"
-                onClick={() => {
-                  resetConstructor();
-                  setView("constructor");
-                }}
-                className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 tw-text-left tw-transition hover:tw-border-slate-400"
-              >
-                <p className="tw-m-0 tw-text-base tw-font-semibold tw-text-slate-900">Конструктор</p>
-                <p className="tw-m-0 tw-mt-1 tw-text-sm tw-text-slate-600">Пошагово подобрать нужное правило.</p>
-              </button>
-              <button
-                type="button"
-                onClick={() => setView("compare")}
-                className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 tw-text-left tw-transition hover:tw-border-slate-400"
-              >
-                <p className="tw-m-0 tw-text-base tw-font-semibold tw-text-slate-900">Сравнить</p>
-                <p className="tw-m-0 tw-mt-1 tw-text-sm tw-text-slate-600">Аккуратно увидеть разницу между темами.</p>
-              </button>
-              <button
-                type="button"
-                onClick={() => setView("daily")}
-                className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 tw-text-left tw-transition hover:tw-border-slate-400"
-              >
-                <p className="tw-m-0 tw-text-base tw-font-semibold tw-text-slate-900">На сегодня</p>
-                <p className="tw-m-0 tw-mt-1 tw-text-sm tw-text-slate-600">Короткая ежедневная мини-сессия.</p>
-              </button>
-            </section>
-          </div>
+          <HomePanel
+            grammarLevel={grammarLevel}
+            levels={LEVELS}
+            onSelectLevel={persistGrammarLevel}
+            onOpenConstructor={() => {
+              resetConstructor();
+              setView("constructor");
+            }}
+            onOpenCompare={() => setView("compare")}
+            onOpenToday={() => setView("daily")}
+          />
         ) : null}
 
         {view === "list" ? (
-          <div className="tw-space-y-4">
-            <section className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 sm:tw-p-5">
-              <div className="tw-flex tw-flex-wrap tw-items-center tw-gap-2">
-                <p className="tw-m-0 tw-text-base tw-font-semibold tw-text-slate-900">Topics</p>
-                {grammarLevel ? <span className="tw-rounded-full tw-bg-slate-100 tw-px-2.5 tw-py-1 tw-text-xs tw-font-medium tw-text-slate-700">{grammarLevel}</span> : null}
-              </div>
-              <div className="tw-mt-3 tw-grid tw-gap-2 sm:tw-grid-cols-[220px_1fr_auto]">
-                <select
-                  className="tw-rounded-xl tw-border tw-border-slate-300 tw-bg-white tw-px-3 tw-py-2 tw-text-sm tw-outline-none focus:tw-border-sky-500"
-                  value={grammarLevel}
-                  onChange={(e) => persistGrammarLevel(e.target.value)}
-                >
-                  <option value="">Все уровни</option>
-                  {LEVELS.map((level) => (
-                    <option key={`level-list-${level}`} value={level}>{level}</option>
-                  ))}
-                </select>
-                <input
-                  className="tw-rounded-xl tw-border tw-border-slate-300 tw-bg-white tw-px-3 tw-py-2 tw-text-sm tw-outline-none focus:tw-border-sky-500"
-                  type="search"
-                  placeholder="Поиск темы..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
-                <button type="button" onClick={() => setSearch("")} className={secondaryBtnClass}>Очистить</button>
-              </div>
-            </section>
-
-            {!groupedTopics.length ? (
-              <div className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 tw-text-sm tw-text-slate-600">Темы не найдены для выбранного фильтра.</div>
-            ) : (
-              groupedTopics.map((groupRow) => (
-                <section key={`topic-group-${groupRow.group}`} className="tw-space-y-3">
-                  <p className="tw-m-0 tw-text-xs tw-font-semibold tw-uppercase tw-tracking-[0.08em] tw-text-slate-500">{groupTitle(groupRow.group)}</p>
-                  <div className="tw-grid tw-gap-3 lg:tw-grid-cols-2">
-                    {groupRow.items.map((topic) => {
-                      const mastery = Number(progressById[topic.id] && progressById[topic.id].mastery) || 0;
-                      return (
-                        <article key={`topic-row-${topic.id}`} className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 sm:tw-p-5">
-                          <div className="tw-flex tw-items-start tw-justify-between tw-gap-2">
-                            <div>
-                              <p className="tw-m-0 tw-text-base tw-font-semibold tw-text-slate-900">{topic.title || topic.id}</p>
-                              <p className="tw-m-0 tw-mt-1 tw-text-sm tw-text-slate-600">{topic.subtitle || topic.hint || "Краткое описание темы"}</p>
-                            </div>
-                            <span className="tw-rounded-full tw-bg-slate-100 tw-px-2.5 tw-py-1 tw-text-xs tw-font-medium tw-text-slate-700">{masteryLabel(mastery)}</span>
-                          </div>
-                          <div className="tw-mt-4 tw-flex tw-flex-wrap tw-gap-2">
-                            <button type="button" onClick={() => openTopic(topic.id)} className={primaryBtnClass}>Открыть правило</button>
-                            <button type="button" onClick={() => startTopicPractice(topic.id)} className={secondaryBtnClass}>Practice</button>
-                          </div>
-                        </article>
-                      );
-                    })}
-                  </div>
-                </section>
-              ))
-            )}
-          </div>
+          <TopicsView
+            grammarLevel={grammarLevel}
+            levels={LEVELS}
+            onSelectLevel={persistGrammarLevel}
+            search={search}
+            onSearchChange={setSearch}
+            onClearSearch={() => setSearch("")}
+            groupedTopics={groupedTopics}
+            progressById={progressById}
+            masteryLabel={masteryLabel}
+            onOpenTopic={openTopic}
+            onStartPractice={startTopicPractice}
+          />
         ) : null}
 
         {view === "detail" ? (
-          <div className="tw-space-y-4">
-            {!selectedMeta ? (
-              <div className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 tw-text-sm tw-text-slate-600">Выберите тему на вкладке Topics.</div>
-            ) : (
-              <>
-                <button type="button" onClick={() => setView("list")} className={secondaryBtnClass}>Назад к темам</button>
-
-                <section className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 sm:tw-p-5">
-                  <div className="tw-flex tw-flex-wrap tw-items-start tw-justify-between tw-gap-2">
-                    <div>
-                      <p className="tw-m-0 tw-text-xl tw-font-semibold tw-text-slate-900">{selectedMeta.title || selectedMeta.id}</p>
-                      <p className="tw-m-0 tw-mt-2 tw-text-sm tw-text-slate-600">{asText(selectedMeta.subtitle || selectedMeta.hint) || "Короткое объяснение темы."}</p>
-                    </div>
-                    {selectedProgress ? (
-                      <span className="tw-rounded-full tw-bg-slate-100 tw-px-2.5 tw-py-1 tw-text-xs tw-font-medium tw-text-slate-700">{masteryLabel(selectedProgress.mastery)}</span>
-                    ) : null}
-                  </div>
-                </section>
-
-                <div className="tw-grid tw-gap-3 md:tw-grid-cols-2">
-                  <section className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 sm:tw-p-5">
-                    <p className="tw-m-0 tw-text-sm tw-font-semibold tw-text-slate-900">Формула</p>
-                    {formulaLines.length ? (
-                      <ul className="tw-m-0 tw-mt-2 tw-list-disc tw-space-y-1.5 tw-pl-5 tw-text-sm tw-text-slate-700">
-                        {formulaLines.map((line, idx) => <li key={`formula-${idx}`}>{line}</li>)}
-                      </ul>
-                    ) : (
-                      <p className="tw-m-0 tw-mt-2 tw-text-sm tw-text-slate-500">Формула не указана.</p>
-                    )}
-                  </section>
-
-                  <section className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 sm:tw-p-5">
-                    <p className="tw-m-0 tw-text-sm tw-font-semibold tw-text-slate-900">Ключевые маркеры</p>
-                    {markerLines.length ? (
-                      <div className="tw-mt-2 tw-flex tw-flex-wrap tw-gap-2">
-                        {markerLines.map((line, idx) => (
-                          <span key={`marker-${idx}`} className="tw-rounded-full tw-bg-slate-100 tw-px-2.5 tw-py-1 tw-text-xs tw-font-medium tw-text-slate-700">{line}</span>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="tw-m-0 tw-mt-2 tw-text-sm tw-text-slate-500">Маркеров для этой темы пока нет.</p>
-                    )}
-                  </section>
-                </div>
-
-                <section className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 sm:tw-p-5">
-                  <p className="tw-m-0 tw-text-sm tw-font-semibold tw-text-slate-900">Кратко о правиле</p>
-                  <div className="tw-mt-2 tw-space-y-2">
-                    {explanationLines.map((line, idx) => (
-                      <p key={`explain-${idx}`} className="tw-m-0 tw-text-sm tw-leading-relaxed tw-text-slate-700">{line}</p>
-                    ))}
-                  </div>
-                </section>
-
-                {exampleItems.length ? (
-                  <section className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 sm:tw-p-5">
-                    <p className="tw-m-0 tw-text-sm tw-font-semibold tw-text-slate-900">Примеры</p>
-                    <ul className="tw-m-0 tw-mt-3 tw-list-none tw-space-y-2 tw-p-0">
-                      {exampleItems.map((item, idx) => (
-                        <li key={`example-${idx}`} className="tw-rounded-xl tw-border tw-border-slate-200 tw-bg-slate-50 tw-p-3">
-                          <p className="tw-m-0 tw-text-sm tw-font-medium tw-text-slate-900">{item.en}</p>
-                          <p className="tw-m-0 tw-mt-1 tw-text-sm tw-text-slate-600">{item.ru}</p>
-                        </li>
-                      ))}
-                    </ul>
-                  </section>
-                ) : null}
-
-                {compareItems.length || compareNote ? (
-                  <section className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 sm:tw-p-5">
-                    <p className="tw-m-0 tw-text-sm tw-font-semibold tw-text-slate-900">Сравнение и близкие темы</p>
-                    {compareNote ? <p className="tw-m-0 tw-mt-2 tw-text-sm tw-text-slate-700">{compareNote}</p> : null}
-                    {compareItems.length ? (
-                      <div className="tw-mt-3 tw-grid tw-gap-2 sm:tw-grid-cols-2">
-                        {compareItems.map((item, idx) => (
-                          <button
-                            key={`compare-item-${idx}`}
-                            type="button"
-                            onClick={() => {
-                              if (!item.id) return;
-                              openTopic(item.id);
-                            }}
-                            disabled={!item.id}
-                            className="tw-rounded-xl tw-border tw-border-slate-200 tw-bg-slate-50 tw-p-3 tw-text-left tw-transition enabled:hover:tw-border-slate-400 disabled:tw-opacity-60"
-                          >
-                            <p className="tw-m-0 tw-text-sm tw-font-semibold tw-text-slate-900">{item.label || "Тема"}</p>
-                            {item.note ? <p className="tw-m-0 tw-mt-1 tw-text-sm tw-text-slate-600">{item.note}</p> : null}
-                          </button>
-                        ))}
-                      </div>
-                    ) : null}
-                  </section>
-                ) : null}
-
-                <section className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 sm:tw-p-5">
-                  <div className="tw-flex tw-flex-wrap tw-gap-2">
-                    <button type="button" onClick={() => startTopicPractice(selectedMeta.id)} className={primaryBtnClass}>Practice this rule</button>
-                    <button type="button" onClick={() => setView("list")} className={secondaryBtnClass}>Back to Topics</button>
-                  </div>
-                </section>
-
-                {!selectedDoc ? (
-                  <div className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 tw-text-sm tw-text-slate-600">Загрузка полного материала...</div>
-                ) : (
-                  <section className="tw-space-y-3">
-                    {shownRuleBlocks.map((block, idx) => renderRuleBlock(block, idx))}
-                    {ruleBlocks.length > RULE_PREVIEW_LIMIT ? (
-                      <button type="button" onClick={() => setExpandedRule((v) => !v)} className={secondaryBtnClass}>
-                        {expandedRule ? "Свернуть материал" : `Показать все блоки (${ruleBlocks.length})`}
-                      </button>
-                    ) : null}
-                  </section>
-                )}
-              </>
-            )}
-          </div>
+          <RuleView
+            selectedMeta={selectedMeta}
+            selectedProgress={selectedProgress}
+            formulaLines={formulaLines}
+            markerLines={markerLines}
+            explanationLines={explanationLines}
+            exampleItems={exampleItems}
+            compareItems={compareItems}
+            compareNote={compareNote}
+            selectedDoc={selectedDoc}
+            shownRuleBlocks={shownRuleBlocks}
+            ruleBlocksCount={ruleBlocks.length}
+            expandedRule={expandedRule}
+            onToggleExpanded={() => setExpandedRule((v) => !v)}
+            onBackToTopics={() => setView("list")}
+            onStartPractice={() => {
+              if (!selectedMeta) return;
+              startTopicPractice(selectedMeta.id);
+            }}
+            onOpenTopic={openTopic}
+            masteryLabel={masteryLabel}
+            rulePreviewLimit={RULE_PREVIEW_LIMIT}
+          />
         ) : null}
 
         {view === "constructor" ? (
@@ -2428,78 +2226,73 @@ export default function GrammarReactAppPortal() {
         ) : null}
 
         {view === "practice" ? (
-          <div className="tw-space-y-4">
-            {!selectedId ? (
-              <div className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 tw-text-sm tw-text-slate-600">Сначала выберите тему в Topics.</div>
-            ) : !selectedDoc ? (
-              <div className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 tw-text-sm tw-text-slate-600">Подготовка практики...</div>
-            ) : !queue.length ? (
-              <div className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 tw-text-sm tw-text-slate-600">
-                {practiceMistakesMode ? "Для режима ошибок пока нет заданий." : "Для этой темы пока нет упражнений."}
-              </div>
-            ) : (
-              <>
-                <section className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 sm:tw-p-5">
-                  <div className="tw-flex tw-flex-wrap tw-items-center tw-justify-between tw-gap-2">
-                    <p className="tw-m-0 tw-text-base tw-font-semibold tw-text-slate-900">Practice · {practiceHeading || "Тренировка"}</p>
-                    <div className="tw-flex tw-flex-wrap tw-gap-2">
-                      <span className="tw-rounded-full tw-bg-slate-100 tw-px-2.5 tw-py-1 tw-text-xs tw-font-medium tw-text-slate-700">{cursor + 1} / {queue.length}</span>
-                      <span className="tw-rounded-full tw-bg-slate-100 tw-px-2.5 tw-py-1 tw-text-xs tw-font-medium tw-text-slate-700">Счет {liveScore} / {answeredCount}</span>
-                    </div>
-                  </div>
-                  <div className="tw-mt-3 tw-h-2 tw-w-full tw-overflow-hidden tw-rounded-full tw-bg-slate-200">
-                    <div className="tw-h-full tw-rounded-full tw-bg-slate-900 tw-transition-all" style={{ width: `${Math.max(4, practiceProgressPercent)}%` }} />
-                  </div>
-                </section>
-
-                <section className="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 sm:tw-p-6">
-                  {asText(current.item && current.item.instruction) ? (
-                    <p className="tw-m-0 tw-text-xs tw-font-semibold tw-uppercase tw-tracking-[0.08em] tw-text-slate-500">{asText(current.item.instruction)}</p>
-                  ) : null}
-                  {asText(current.item && current.item.prompt) ? (
-                    <p className="tw-m-0 tw-mt-3 tw-whitespace-pre-wrap tw-text-lg tw-font-semibold tw-leading-relaxed tw-text-slate-900">{asText(current.item.prompt)}</p>
-                  ) : null}
-
-                  <div className="tw-mt-5">{renderPracticeInput()}</div>
-                </section>
-
-                {checked && resultState ? (
-                  <section className={[
-                    "tw-rounded-2xl tw-border tw-p-4 sm:tw-p-5",
-                    resultState.ok ? "tw-border-emerald-300 tw-bg-emerald-50" : "tw-border-rose-300 tw-bg-rose-50",
-                  ].join(" ")}>
-                    <p className="tw-m-0 tw-text-sm tw-font-semibold tw-text-slate-900">{resultState.ok ? "Правильно" : "Есть ошибка"}</p>
-                    {resultState.expectedText ? <p className="tw-m-0 tw-mt-1 tw-text-sm tw-text-slate-700">Верный вариант: {resultState.expectedText}</p> : null}
-                    {resultState.explain ? <p className="tw-m-0 tw-mt-1 tw-text-sm tw-text-slate-700">{resultState.explain}</p> : null}
-                    {!resultState.ok && resultState.linkedTopicId ? (
-                      <button type="button" onClick={() => openTopic(resultState.linkedTopicId)} className="tw-mt-3 tw-inline-flex tw-items-center tw-rounded-lg tw-border tw-border-slate-300 tw-bg-white tw-px-3 tw-py-1.5 tw-text-xs tw-font-medium tw-text-slate-700 hover:tw-border-slate-500">
-                        Открыть нужное правило
-                      </button>
-                    ) : null}
-                  </section>
-                ) : null}
-
-                <section className="tw-flex tw-flex-wrap tw-gap-2">
-                  {!checked ? (
-                    <button type="button" onClick={checkCurrent} className={primaryBtnClass} disabled={!canCheckCurrent}>Проверить</button>
-                  ) : !done ? (
-                    <button type="button" onClick={nextCurrent} className={primaryBtnClass}>Дальше</button>
-                  ) : (
-                    <>
-                      <button type="button" onClick={restartPractice} className={primaryBtnClass}>Пройти заново</button>
-                      <button type="button" onClick={() => setView("list")} className={secondaryBtnClass}>К темам</button>
-                    </>
-                  )}
-
-                  {selectedMeta && selectedMistakesCount && !practiceMistakesMode ? (
-                    <button type="button" onClick={() => startTopicMistakesPractice(selectedMeta.id)} className={secondaryBtnClass}>
-                      Повторить ошибки ({selectedMistakesCount})
-                    </button>
-                  ) : null}
-                </section>
-              </>
+          <PracticeView
+            stage={practiceStage}
+            onBackHome={() => setView("home")}
+            onBackToSetup={() => setPracticeStage("setup")}
+            mode={practiceMode}
+            onModeChange={setPracticeMode}
+            goal={practiceGoal}
+            goalOptions={PRACTICE_GOAL_OPTIONS}
+            onGoalChange={(value) => setPracticeGoal(normalizePracticeGoal(value))}
+            showTopicPicker={showCustomPicker}
+            onToggleTopicPicker={() => setShowCustomPicker((v) => !v)}
+            customScopeIds={customTopicIds}
+            customScopeTotal={topicsByLevel.length}
+            customPickerGroups={customPickerGroups}
+            onToggleCustomTopic={(id) => {
+              const topicId = asText(id);
+              if (!topicId) return;
+              setCustomTopicIds((prev) => (prev.includes(topicId) ? prev.filter((x) => x !== topicId) : [...prev, topicId]));
+            }}
+            onClearCustomScope={() => setCustomTopicIds([])}
+            scopeMistakesCount={scopeMistakesCount}
+            onStartMixed={startMixedPractice}
+            onStartCustom={startCustomPractice}
+            onStartScopeMistakes={startScopeMistakesPractice}
+            onClearScopeMistakes={clearScopeMistakes}
+            onResetScopeProgress={resetScopeProgress}
+            showAnswersAfterEach={showAnswersAfterEach}
+            onToggleShowAnswers={setShowAnswersAfterEach}
+            practiceStats={practiceStats}
+            selectedId={selectedId}
+            selectedDoc={selectedDoc}
+            queue={queue}
+            practiceMistakesMode={practiceMistakesMode}
+            practiceHeading={practiceHeading}
+            cursor={cursor}
+            liveScore={liveScore}
+            answeredCount={answeredCount}
+            practiceProgressPercent={practiceProgressPercent}
+            current={current}
+            practiceInputNode={(
+              <PracticeInputRenderer
+                current={current}
+                answerState={answerState}
+                setAnswerState={setAnswerState}
+                checked={checked}
+                resultState={resultState}
+              />
             )}
-          </div>
+            checked={checked}
+            resultState={resultState}
+            done={done}
+            canCheckCurrent={canCheckCurrent}
+            onCheckCurrent={checkCurrent}
+            onNextCurrent={nextCurrent}
+            onRestartPractice={restartPractice}
+            onBackToTopics={(linkedId) => {
+              const id = asText(linkedId);
+              if (id) {
+                openTopic(id);
+                return;
+              }
+              setView("list");
+            }}
+            onRepeatTopicMistakes={startTopicMistakesPractice}
+            selectedMeta={selectedMeta}
+            selectedMistakesCount={selectedMistakesCount}
+          />
         ) : null}
       </div>
     </section>,

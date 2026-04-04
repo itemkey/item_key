@@ -22,6 +22,7 @@ Each item in `index.json`:
   "hint": "quick hint",
   "file": "presentSimple.json",
   "group": "present",
+  "subgroup": "verbs",
   "kind": "tense",
   "levels": ["A2-B1", "B1-B2"]
 }
@@ -35,7 +36,7 @@ Required for React app:
 
 Recommended:
 
-- `subtitle`, `hint`, `group`, `kind`, `levels`, `aliases`
+- `subtitle`, `hint`, `group`, `subgroup`, `kind`, `levels`, `aliases`
 
 Used by constructor and compare logic:
 
@@ -64,6 +65,8 @@ Used by constructor and compare logic:
 - `table` (`caption`, `columns[]`, `rows[][]`)
 - `examples` (`items[]` with `en`, `ru`)
 - `topicLinks` (`title`, `note`, `items[]` with `id`, `label`, `note`)
+- `image` (`src`, optional `title`, `note`, `alt`)
+- `imageGallery` (`title`, `note`, `items[]` with `src`, optional `alt`, `caption`)
 
 ### `practice.exercises` supported kinds
 
