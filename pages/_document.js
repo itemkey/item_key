@@ -33,9 +33,8 @@ const BODY_BY_ROUTE = {
     "data-ik-loading": "true",
   },
   "/crate/whisperer": {
-    className: "page page-crate ik-booting",
+    className: "page page-crate",
     "data-i18n-page": "whisperer",
-    "data-ik-loading": "true",
   },
 };
 

@@ -838,82 +838,95 @@
   <script src="../../assets/js/theme.js"></script>
   <script src="../../assets/js/main.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', function(){
-      if(window.IKLoading) window.IKLoading.done();
-      var backBtn = document.getElementById('ikBackBtn');
+    ;(function(){
+      var inited = false;
 
-      function safeBrowserBack(fallbackHref){
-        if(window.history.length <= 1){
-          window.location.href = fallbackHref;
-          return;
-        }
+      function init(){
+        if(inited) return;
+        inited = true;
 
-        var currentHref = window.location.href;
-        var navigated = false;
-        var markNavigated = function(){ navigated = true; };
+        if(window.IKLoading) window.IKLoading.done();
+        var backBtn = document.getElementById('ikBackBtn');
 
-        window.addEventListener('pagehide', markNavigated, { once: true });
-        window.addEventListener('popstate', markNavigated, { once: true });
-
-        window.history.back();
-
-        window.setTimeout(function(){
-          if(navigated) return;
-          if(window.location.href === currentHref){
+        function safeBrowserBack(fallbackHref){
+          if(window.history.length <= 1){
             window.location.href = fallbackHref;
+            return;
           }
-        }, 450);
-      }
 
-      function tryInternalBack(){
-        var notesModal = document.getElementById('notesModal');
-        if(notesModal && notesModal.classList.contains('is-open')){
-          var closeNotesModal = document.getElementById('closeNotesModal');
-          if(closeNotesModal){
-            closeNotesModal.click();
-          } else {
-            notesModal.classList.remove('is-open');
-          }
-          return true;
+          var currentHref = window.location.href;
+          var navigated = false;
+          var markNavigated = function(){ navigated = true; };
+
+          window.addEventListener('pagehide', markNavigated, { once: true });
+          window.addEventListener('popstate', markNavigated, { once: true });
+
+          window.history.back();
+
+          window.setTimeout(function(){
+            if(navigated) return;
+            if(window.location.href === currentHref){
+              window.location.href = fallbackHref;
+            }
+          }, 450);
         }
 
-        var followCard = document.getElementById('followCard');
-        if(followCard && followCard.classList.contains('is-full')){
-          var followFullBtn = document.getElementById('followFullBtn');
-          if(followFullBtn){
-            followFullBtn.click();
-          } else {
-            followCard.classList.remove('is-full');
+        function tryInternalBack(){
+          var notesModal = document.getElementById('notesModal');
+          if(notesModal && notesModal.classList.contains('is-open')){
+            var closeNotesModal = document.getElementById('closeNotesModal');
+            if(closeNotesModal){
+              closeNotesModal.click();
+            } else {
+              notesModal.classList.remove('is-open');
+            }
+            return true;
           }
-          return true;
+
+          var followCard = document.getElementById('followCard');
+          if(followCard && followCard.classList.contains('is-full')){
+            var followFullBtn = document.getElementById('followFullBtn');
+            if(followFullBtn){
+              followFullBtn.click();
+            } else {
+              followCard.classList.remove('is-full');
+            }
+            return true;
+          }
+
+          var sitePanel = document.getElementById('ikSiteSettingsPanel');
+          if(sitePanel && !sitePanel.hidden){
+            var closeSitePanel = document.getElementById('ikSiteSettingsClose');
+            if(closeSitePanel){
+              closeSitePanel.click();
+            } else {
+              sitePanel.hidden = true;
+            }
+            return true;
+          }
+ 
+          return false;
         }
 
-        var sitePanel = document.getElementById('ikSiteSettingsPanel');
-        if(sitePanel && !sitePanel.hidden){
-          var closeSitePanel = document.getElementById('ikSiteSettingsClose');
-          if(closeSitePanel){
-            closeSitePanel.click();
-          } else {
-            sitePanel.hidden = true;
-          }
-          return true;
+        if(backBtn){
+          backBtn.addEventListener('click', function(event){
+            event.preventDefault();
+            if(tryInternalBack()) return;
+            if(window.IKLoading && typeof window.IKLoading.leave === 'function'){
+              window.IKLoading.leave(function(){ safeBrowserBack('../../'); });
+            } else {
+              safeBrowserBack('../../');
+            }
+          });
         }
-
-        return false;
       }
 
-      if(backBtn){
-        backBtn.addEventListener('click', function(event){
-          event.preventDefault();
-          if(tryInternalBack()) return;
-          if(window.IKLoading && typeof window.IKLoading.leave === 'function'){
-            window.IKLoading.leave(function(){ safeBrowserBack('../../'); });
-          } else {
-            safeBrowserBack('../../');
-          }
-        });
+      if(document.readyState === 'loading'){
+        document.addEventListener('DOMContentLoaded', init, { once: true });
+      } else {
+        init();
       }
-    });
+    })();
   </script>
 
   <script>
