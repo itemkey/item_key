@@ -2589,6 +2589,7 @@ body.focus-mode .n-col-right{
     const ONOI_PRIVATE_PULL_EVERY_MS = 25000;
     const ONOI_PRIVATE_RPC_TIMEOUT_MS = 12000;
     const ONOI_SAVE_WATCHDOG_MS = 7000;
+    const ONOI_SUPA_TABLE_CACHE_PREFIX = 'onoi_notes_supa_table_v1__';
     const ONOI_BUILD_TAG = '20260308-6';
 
     (function ensureBuildTagInUrl(){
@@ -2597,7 +2598,10 @@ body.focus-mode .n-col-right{
         const cur = String(u.searchParams.get('v') || '').trim();
         if(cur === ONOI_BUILD_TAG) return;
         u.searchParams.set('v', ONOI_BUILD_TAG);
-        window.location.replace(u.toString());
+        const next = `${u.pathname}${u.search}${u.hash}`;
+        if(window.history && typeof window.history.replaceState === 'function'){
+          window.history.replaceState(null, '', next);
+        }
       }catch(_){ }
     })();
 
@@ -2777,6 +2781,25 @@ body.focus-mode .n-col-right{
       }catch(_){
         return false;
       }
+    }
+
+    function supaTableCacheKey(ownerId){
+      return ONOI_SUPA_TABLE_CACHE_PREFIX + String(ownerId || 'guest');
+    }
+
+    function getStoredSupaTable(ownerId){
+      try{
+        const raw = localStorage.getItem(supaTableCacheKey(ownerId));
+        const t = String(raw || '').trim();
+        if(t === ONOI_CLOUD_TABLE || t === ONOI_CLOUD_FALLBACK_TABLE) return t;
+      }catch(_){ }
+      return '';
+    }
+
+    function setStoredSupaTable(ownerId, table){
+      const t = String(table || '').trim();
+      if(t !== ONOI_CLOUD_TABLE && t !== ONOI_CLOUD_FALLBACK_TABLE) return;
+      try{ localStorage.setItem(supaTableCacheKey(ownerId), t); }catch(_){ }
     }
 
     function assetHash(input){
@@ -5192,22 +5215,10 @@ async function createNote(){
       }
     }
 
-    async function resolveSupaTable(){
-      if(!state.supa.client) return ONOI_CLOUD_TABLE;
-      try{
-        const t1 = await state.supa.client.from(ONOI_CLOUD_TABLE).select('id', { head:true, count:'exact' }).limit(1);
-        if(!t1.error) return ONOI_CLOUD_TABLE;
-        pushDiag('warn', 'resolveSupaTable', t1.error, { try: ONOI_CLOUD_TABLE });
-      }catch(e){
-        pushDiag('warn', 'resolveSupaTable', e, { try: ONOI_CLOUD_TABLE });
-      }
-      try{
-        const t2 = await state.supa.client.from(ONOI_CLOUD_FALLBACK_TABLE).select('id', { head:true, count:'exact' }).limit(1);
-        if(!t2.error) return ONOI_CLOUD_FALLBACK_TABLE;
-        pushDiag('warn', 'resolveSupaTable', t2.error, { try: ONOI_CLOUD_FALLBACK_TABLE });
-      }catch(e){
-        pushDiag('warn', 'resolveSupaTable', e, { try: ONOI_CLOUD_FALLBACK_TABLE });
-      }
+    async function resolveSupaTable(ownerId){
+      if(!ownerId) return ONOI_CLOUD_TABLE;
+      const cached = getStoredSupaTable(ownerId);
+      if(cached) return cached;
       return ONOI_CLOUD_TABLE;
     }
 
@@ -5248,13 +5259,17 @@ async function createNote(){
         .map((x) => String(x || '').trim())
         .filter(Boolean)
         .filter((x, i, arr) => arr.indexOf(x) === i);
-      const rows = [];
-      for(const table of tables){
-        const row = await supaReadSnapshotFromTable(table);
-        if(row && row.snap) rows.push(row);
-      }
+      const rowsRaw = await Promise.all(tables.map((table) => supaReadSnapshotFromTable(table)));
+      const rows = rowsRaw.filter((row) => row && row.snap);
       if(!rows.length) return null;
       rows.sort((a,b) => Number(a.updatedAt||0) - Number(b.updatedAt||0));
+
+      const newest = rows[rows.length - 1];
+      if(newest && newest.table && state.supa.userId){
+        state.supa.table = String(newest.table);
+        setStoredSupaTable(state.supa.userId, newest.table);
+      }
+
       let merged = null;
       for(const row of rows){
         if(!merged) merged = row.snap;
@@ -5278,9 +5293,7 @@ async function createNote(){
         .filter(Boolean)
         .filter((x, i, arr) => arr.indexOf(x) === i);
 
-      let ok = false;
-      let firstError = null;
-      for(const table of tables){
+      const results = await Promise.all(tables.map(async (table) => {
         try{
           const { error } = await withTimeout(
             state.supa.client
@@ -5290,12 +5303,24 @@ async function createNote(){
             `push:${table}`
           );
           if(error) throw error;
-          ok = true;
+          return { ok: true, table, error: null };
         }catch(e){
-          if(!firstError) firstError = e;
+          return { ok: false, table, error: e };
         }
+      }));
+
+      const okRows = results.filter((r) => r.ok);
+      if(okRows.length){
+        const winner = String(okRows[0].table || '').trim();
+        if(winner){
+          state.supa.table = winner;
+          setStoredSupaTable(state.supa.userId, winner);
+        }
+        return;
       }
-      if(!ok && firstError) throw firstError;
+
+      const firstError = results.find((r) => r.error);
+      if(firstError && firstError.error) throw firstError.error;
     }
 
     function scheduleSupaPushRetry(delayMs){
@@ -6201,18 +6226,23 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
       state.cloud.mode = 'off';
       saveCloudSettings();
 
-      // load all from idb
-      await reloadStateFromIdb('boot-init');
+      // Load IndexedDB and auth in parallel to reduce cold-start latency.
+      state.supa.client = getSupaClient();
+      const idbReloadPromise = reloadStateFromIdb('boot-init');
+      const userPromise = resolveSupaUser();
+
+      await idbReloadPromise;
       markBoot('idb-loaded', { cats: state.cats.length, notes: state.notes.length });
 
       // Resolve Supabase user and enforce per-account privacy
-      state.supa.client = getSupaClient();
-      const user = await resolveSupaUser();
+      const user = await userPromise;
       state.supa.userId = user ? user.id : null;
       state.supa.enabled = !!state.supa.userId;
       state.supa.email = String(user && user.email || '').trim().toLowerCase();
       state.supa.isAdmin = ['itemkeygithub@gmail.com', 'kravetznikita@gmail.com'].includes(state.supa.email);
-      state.supa.table = await resolveSupaTable();
+      state.supa.table = state.supa.enabled
+        ? await resolveSupaTable(state.supa.userId)
+        : ONOI_CLOUD_TABLE;
       markBoot('supa-resolved', { hasUser: !!state.supa.userId, table: state.supa.table });
 
       if(!state.supa.enabled){
@@ -6254,19 +6284,15 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
       setStoredOwner(state.supa.userId);
 
       // local backup fallback for this owner
+      let localSnap = null;
       if(state.cats.length === 0 && state.notes.length === 0){
-        const localSnap = loadLocalSnapshot(state.supa.userId);
-        if(localSnap){
-          try{
-            await importJSON(localSnap, { render:false });
-            markBoot('local-snapshot-restored', { cats: state.cats.length, notes: state.notes.length });
-          }catch(_){ }
-        }
+        localSnap = loadLocalSnapshot(state.supa.userId);
       }
 
       const localHadDataAtBoot = !!(state.notes.length > 0 || state.cats.length > 0);
       let remotePullOk = false;
       let remoteHadData = false;
+      let localSnapshotRestored = false;
 
       try{
         const remoteSnap = await supaPullSnapshot();
@@ -6275,10 +6301,23 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
           remoteHadData = !!(remoteSnap.notes.length > 0 || remoteSnap.cats.length > 0);
           await importJSON(remoteSnap, { render:false });
           markBoot('cloud-snapshot-restored', { cats: state.cats.length, notes: state.notes.length });
+        }else if(localSnap){
+          try{
+            await importJSON(localSnap, { render:false });
+            localSnapshotRestored = true;
+            markBoot('local-snapshot-restored', { cats: state.cats.length, notes: state.notes.length });
+          }catch(_){ }
         }
       }catch(e){
         pushDiag('error', 'supaPullSnapshot', e);
         setSync('bad', 'private err', errText(e));
+        if(localSnap){
+          try{
+            await importJSON(localSnap, { render:false });
+            localSnapshotRestored = true;
+            markBoot('local-snapshot-restored', { cats: state.cats.length, notes: state.notes.length });
+          }catch(_){ }
+        }
       }
 
       ensureDefaults();
@@ -6294,7 +6333,7 @@ imgBtn.addEventListener('click', () => { saveSelection(); imgFile.click(); });
 
       // ensure first snapshot exists in cloud
       const hasContentNow = !!(state.notes.length > 0 || state.cats.length > 1);
-      const shouldBootPush = !!(hasContentNow && (localHadDataAtBoot || remoteHadData || hasPendingSupaPush(state.supa.userId)));
+      const shouldBootPush = !!(hasContentNow && (localHadDataAtBoot || localSnapshotRestored || remoteHadData || hasPendingSupaPush(state.supa.userId)));
       if(shouldBootPush){
         try{
           markPendingSupaPush(state.supa.userId, true);

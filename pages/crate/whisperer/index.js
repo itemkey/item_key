@@ -1,4 +1,5 @@
 import Head from "next/head";
+import Script from "next/script";
 
 const THEME_BOOTSTRAP_SCRIPT = `
 (function() {
@@ -170,11 +171,11 @@ export default function WhispererPage() {
         </div>
       </div>
 
-      <script src="../../assets/js/theme.js" />
-      <script src="../../assets/js/main.js" />
-      <script src="./js/whisperer-nav.js" />
-      <script src="./js/whisperer-core.js" />
-      <script id="ik-site-settings-js" src="./js/ik-site-settings.js" />
+      <Script src="../../assets/js/theme.js" strategy="afterInteractive" />
+      <Script src="../../assets/js/main.js" strategy="afterInteractive" />
+      <Script src="./js/whisperer-nav.js" strategy="afterInteractive" />
+      <Script src="./js/whisperer-core.js" strategy="afterInteractive" />
+      <Script id="ik-site-settings-js" src="./js/ik-site-settings.js" strategy="afterInteractive" />
     </>
   );
 }

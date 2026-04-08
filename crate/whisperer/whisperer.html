@@ -1021,8 +1021,12 @@ const menuSpeakBtn = document.getElementById('menuSpeakBtn');
 
       // Voice lists
       let voices = [];
+      function asVoiceArray(value){
+        if(Array.isArray(value)) return value;
+        try{ return Array.from(value || []); }catch(e){ return []; }
+      }
       function getVoices(){
-        voices = window.speechSynthesis.getVoices() || [];
+        voices = asVoiceArray(window.speechSynthesis.getVoices());
         return voices;
       }
       function populateVoiceSelect(selectEl, langPrefix, lsKey){
@@ -1035,7 +1039,7 @@ const menuSpeakBtn = document.getElementById('menuSpeakBtn');
         auto.textContent = 'Auto';
         selectEl.appendChild(auto);
 
-        const list = (voices || []).filter(v => (v.lang || '').toLowerCase().startsWith(langPrefix));
+        const list = asVoiceArray(voices).filter(v => (v.lang || '').toLowerCase().startsWith(langPrefix));
         list.forEach(v => {
           const opt = document.createElement('option');
           opt.value = v.name;
@@ -1079,13 +1083,13 @@ const menuSpeakBtn = document.getElementById('menuSpeakBtn');
 
         const forced = selectEl && selectEl.value;
         if(forced && forced !== '__auto__'){
-          return (voices || []).find(v => v.name === forced) || null;
+          return asVoiceArray(voices).find(v => v.name === forced) || null;
         }
 
-        let list = (voices || []).filter(v => (v.lang || '').toLowerCase().startsWith(prefix));
+        let list = asVoiceArray(voices).filter(v => (v.lang || '').toLowerCase().startsWith(prefix));
         // If Belarusian voice is not available - fall back to Russian.
         if(isBe && !list.length){
-          list = (voices || []).filter(v => (v.lang || '').toLowerCase().startsWith('ru'));
+          list = asVoiceArray(voices).filter(v => (v.lang || '').toLowerCase().startsWith('ru'));
         }
 
         const def = list.find(v => v.default);
