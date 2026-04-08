@@ -1,4 +1,5 @@
 import Head from "next/head";
+import Script from "next/script";
 
 const THEME_BOOTSTRAP_SCRIPT = `
 (function() {
@@ -93,6 +94,38 @@ const RETURN_LINK_SCRIPT = `
 })();
 `;
 
+const LEGACY_BOOT_SCRIPT = `
+(function() {
+  if (window.__IK_USER_BOOT__) return;
+  window.__IK_USER_BOOT__ = true;
+
+  function loadScript(src) {
+    return new Promise(function(resolve, reject) {
+      var script = document.createElement("script");
+      script.src = src;
+      script.async = false;
+      script.onload = function() { resolve(); };
+      script.onerror = function() { reject(new Error("Failed to load " + src)); };
+      document.body.appendChild(script);
+    });
+  }
+
+  loadScript("assets/js/theme.js")
+    .then(function() {
+      return loadScript("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2");
+    })
+    .then(function() {
+      return loadScript("assets/js/supabase-client.js");
+    })
+    .then(function() {
+      return loadScript("assets/js/auth.js");
+    })
+    .catch(function(error) {
+      console.error("[item-user] legacy boot failed", error);
+    });
+})();
+`;
+
 export default function ItemUserPage() {
   return (
     <>
@@ -103,7 +136,7 @@ export default function ItemUserPage() {
         <link rel="stylesheet" href="assets/css/theme.css" />
       </Head>
 
-      <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP_SCRIPT }} />
+      <Script id="ik-theme-bootstrap" strategy="beforeInteractive" dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP_SCRIPT }} />
 
       <header className="topbar topbar--edge">
         <a className="toplink" href="index.html">
@@ -239,11 +272,8 @@ export default function ItemUserPage() {
         </section>
       </main>
 
-      <script dangerouslySetInnerHTML={{ __html: RETURN_LINK_SCRIPT }} />
-      <script src="assets/js/theme.js" />
-      <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" />
-      <script src="assets/js/supabase-client.js" />
-      <script src="assets/js/auth.js" />
+      <Script id="ik-return-link" strategy="afterInteractive" dangerouslySetInnerHTML={{ __html: RETURN_LINK_SCRIPT }} />
+      <Script id="ik-user-legacy-boot" strategy="afterInteractive" dangerouslySetInnerHTML={{ __html: LEGACY_BOOT_SCRIPT }} />
     </>
   );
 }

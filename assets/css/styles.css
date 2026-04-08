@@ -1,6 +1,6 @@
 @font-face {
   font-family: "Anticva";
-  src: url("../fonts/Anticva.ttf") format("truetype");
+  src: local("Times New Roman");
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
