@@ -139,9 +139,9 @@ document.addEventListener('DOMContentLoaded', function(){
       event.preventDefault();
       if(closeOpenModal()) return;
       if(window.IKLoading && typeof window.IKLoading.leave === 'function'){
-        window.IKLoading.leave(function(){ safeBrowserBack('../../'); });
+        window.IKLoading.leave(function(){ safeBrowserBack('/item_key/'); });
       } else {
-        safeBrowserBack('../../');
+        safeBrowserBack('/item_key/');
       }
     });
   }
@@ -163,7 +163,7 @@ export default function PlanningPage() {
 
       <header className="ik-site-nav" id="ikSiteNav">
         <button type="button" className="ik-site-nav__link" id="ikBackBtn" title="Вернуться назад">← Назад</button>
-        <a className="ik-site-nav__link" href="../../">Главное меню</a>
+        <a className="ik-site-nav__link" href="/item_key/">Главное меню</a>
       </header>
 
       <main className="center-stage" aria-label="центр планирования">

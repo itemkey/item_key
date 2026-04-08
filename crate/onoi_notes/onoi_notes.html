@@ -1995,7 +1995,7 @@ body.focus-mode .n-col-right{
 <body class="page page-crate onoi-booting" data-i18n-page="onoi_notes" data-ik-loading>
   <header class="ik-site-nav" id="ikSiteNav">
     <button type="button" class="ik-site-nav__link" id="ikBackBtn" title="Вернуться назад">← Назад</button>
-    <a class="ik-site-nav__link" href="../../">Главное меню</a>
+    <a class="ik-site-nav__link" href="/item_key/">Главное меню</a>
   </header>
 
   <main class="center-stage" aria-label="onoi_notes center">
@@ -2522,9 +2522,9 @@ body.focus-mode .n-col-right{
           event.preventDefault();
           if(tryInternalBack()) return;
           if(window.IKLoading && typeof window.IKLoading.leave === 'function'){
-            window.IKLoading.leave(function(){ safeBrowserBack('../../'); });
+            window.IKLoading.leave(function(){ safeBrowserBack('/item_key/'); });
           } else {
-            safeBrowserBack('../../');
+            safeBrowserBack('/item_key/');
           }
         });
       }

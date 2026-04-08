@@ -223,7 +223,7 @@
 <body class="page page-learning ik-booting" data-i18n-page="student_helper" data-ik-loading>
   <header class="ik-site-nav" id="ikSiteNav">
     <button type="button" class="ik-site-nav__link" id="ikBackBtn" title="Вернуться назад">← Назад</button>
-    <a class="ik-site-nav__link" href="../../">Главное меню</a>
+    <a class="ik-site-nav__link" href="/item_key/">Главное меню</a>
   </header>
 
   <div class="ik-hidden-ui" aria-hidden="true">
@@ -1056,9 +1056,9 @@
         backBtn.addEventListener('click', function(event){
           event.preventDefault();
           if(window.IKLoading && typeof window.IKLoading.leave === 'function'){
-            window.IKLoading.leave(function(){ safeBrowserBack('../../'); });
+            window.IKLoading.leave(function(){ safeBrowserBack('/item_key/'); });
           } else {
-            safeBrowserBack('../../');
+            safeBrowserBack('/item_key/');
           }
         });
       }
