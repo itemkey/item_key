@@ -62,6 +62,26 @@ body{
   overflow-x:hidden;
 }
 
+button,
+input,
+select,
+textarea,
+summary,
+.btn,
+[class*="card"],
+[class*="panel"],
+[class*="box"],
+[class*="tab"],
+[class*="chip"],
+[class*="badge"],
+[class*="pill"],
+[class*="splitter"],
+[class*="modal"],
+[class*="dialog"],
+[class*="popup"]{
+  border-radius: 0 !important;
+}
+
 img,
 video,
 canvas{
@@ -1634,7 +1654,7 @@ body.page-user .account-center::before{
 .friend-card--skeleton .friend-user-id,
 .friend-card--skeleton .friend-meta{
   color: transparent;
-  border-radius: 1px;
+  border-radius: 0;
 }
 
 .friend-card--skeleton .friend-name{ height: 16px; width: 58%; }

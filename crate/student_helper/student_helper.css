@@ -1840,7 +1840,7 @@ body.sh-selector-open{
   padding: 8px 10px;
   height: 42px;
   box-sizing: border-box;
-  border-radius: 8px;
+  border-radius: 0;
   border-width: 2px;
   text-transform: none;
   letter-spacing: 0;
@@ -1854,7 +1854,7 @@ body.sh-selector-open{
   gap: 6px;
   min-height: 42px;
   padding: 6px 12px;
-  border-radius: 8px;
+  border-radius: 0;
   border: 2px solid #000;
   background: #fff;
   font-size: 18px;

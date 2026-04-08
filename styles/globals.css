@@ -2,8 +2,44 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --ik-ui-radius: 0px;
+}
+
 html,
 body {
   margin: 0;
   padding: 0;
+}
+
+button,
+input,
+select,
+textarea,
+summary,
+.btn,
+[class*="card"],
+[class*="panel"],
+[class*="box"],
+[class*="tab"],
+[class*="chip"],
+[class*="badge"],
+[class*="pill"],
+[class*="splitter"],
+[class*="modal"],
+[class*="dialog"],
+[class*="popup"] {
+  border-radius: var(--ik-ui-radius) !important;
+}
+
+[class~="tw-rounded"],
+[class^="tw-rounded-"],
+[class*=" tw-rounded-"] {
+  border-radius: var(--ik-ui-radius) !important;
+}
+
+[class~="tw-rounded-full"],
+[class^="tw-rounded-full"],
+[class*=" tw-rounded-full"] {
+  border-radius: 9999px !important;
 }
