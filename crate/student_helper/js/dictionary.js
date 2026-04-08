@@ -646,10 +646,15 @@ function dictFilenameForSection(sectionName){
   // - user: published user dictionaries (rated)
   let dictSource = 'personal';
   let dictPersonalGuest = false;
-  const DICT_ADMIN_EMAILS = ['itemkeygithub@gmail.com', 'kravetznikita@gmail.com'];
   const dictRuntime = {
-    isAdmin: false,
-    refreshingAdmin: false
+    refreshingAdmin: false,
+    capabilities: {
+      canOpenAdminConsole: false,
+      canReviewPublishRequests: false,
+      canManageSystemDicts: false,
+      canManageUserDicts: false,
+      canSubmitPublishRequest: false,
+    },
   };
   let publicCatalog = { system: [], user: [] };
   let publicCounts = { system: new Map(), user: new Map() };
@@ -1793,6 +1798,112 @@ if(btnLearnCheckNext){ btnLearnCheckNext.textContent = 'далее'; btnLearnChe
     learnHandleWrong(learnCurrent, cfg);
   }
 
+  function buildLearnModel(){
+    const selected = String((elSectionLearn && elSectionLearn.value) || dictCurrentSection || '').trim();
+    const cfg = learnCfgFromUI();
+    const mcqState = (learnMcqState && typeof learnMcqState === 'object') ? learnMcqState : null;
+    const mcqOptions = mcqState && Array.isArray(mcqState.options)
+      ? mcqState.options.map((opt, idx)=>({
+          index: idx,
+          text: String(opt && (opt.display || opt.norm) || ''),
+          selected: Number(mcqState.selectedIdx) === idx,
+          correct: Number(mcqState.correctIdx) === idx,
+          locked: !!mcqState.locked,
+        }))
+      : [];
+
+    return {
+      source: dictSource,
+      selected,
+      currentType: String(learnCurrent && learnCurrent.type || ''),
+      progress: String(elLearnProgress && elLearnProgress.textContent || '0/0'),
+      prompt: String(elLearnPromptLabel && elLearnPromptLabel.textContent || ''),
+      flipped: !!(elLearnCard && elLearnCard.classList.contains('is-flipped')),
+      frontText: String(elLearnFront && elLearnFront.textContent || ''),
+      backText: String(elLearnBack && elLearnBack.textContent || ''),
+      frontLang: String(elLearnFrontLang && elLearnFrontLang.textContent || ''),
+      backLang: String(elLearnBackLang && elLearnBackLang.textContent || ''),
+      checkMode: String(learnCheckMode || 'check'),
+      checkLabel: String(btnLearnCheckNext && btnLearnCheckNext.textContent || 'check'),
+      giveUpLabel: String(btnLearnGiveUp && btnLearnGiveUp.textContent || 'сдаюсь'),
+      hintVisible: !!(btnLearnHint && btnLearnHint.style.display !== 'none'),
+      giveUpVisible: !!(btnLearnGiveUp && btnLearnGiveUp.style.display !== 'none'),
+      input: {
+        visible: !!(elLearnInput && elLearnInput.style.display !== 'none'),
+        value: String(elLearnInput && elLearnInput.value || ''),
+        disabled: !!(elLearnInput && elLearnInput.disabled),
+        placeholder: String(elLearnInput && elLearnInput.placeholder || ''),
+        isOk: !!(elLearnInput && elLearnInput.classList.contains('is-ok')),
+        isBad: !!(elLearnInput && elLearnInput.classList.contains('is-bad')),
+      },
+      mcq: {
+        visible: !!(elLearnMcqWrap && elLearnMcqWrap.style.display !== 'none'),
+        locked: !!(mcqState && mcqState.locked),
+        selectedIdx: mcqState ? Number(mcqState.selectedIdx) : -1,
+        correctIdx: mcqState ? Number(mcqState.correctIdx) : -1,
+        meta: String(elLearnMcqMeta && elLearnMcqMeta.textContent || ''),
+        options: mcqOptions,
+      },
+      feedback: {
+        state: String(elLearnFeedback && elLearnFeedback.dataset && elLearnFeedback.dataset.state || 'idle'),
+        stamp: String(elLearnStamp && elLearnStamp.textContent || ''),
+        line: String(elLearnLine && elLearnLine.textContent || ''),
+      },
+      settingsOpen: !!(elLearnSettings && elLearnSettings.style.display !== 'none'),
+      settings: {
+        source: String(cfg.source || 'new'),
+        portion: String(cfg.portion || '8'),
+        dir: String(cfg.dir || 'ru'),
+        goal: String(cfg.goal || 'fast'),
+        strict: String(cfg.strict || 'soft'),
+        typos: cfg.typos !== false,
+        acceptForms: cfg.acceptForms !== false,
+        ignoreTo: cfg.ignoreTo !== false,
+        ignoreArticles: cfg.ignoreArticles !== false,
+        hints: cfg.hints !== false,
+        introMode: String(cfg.introMode || 'card'),
+        introMcqCount: Number(cfg.introMcqCount) || 4,
+        introShowPos: !!cfg.introShowPos,
+      },
+      session: {
+        active: !!learnSession,
+        portion: Number(learnSession && learnSession.portion || 0),
+        doneTests: Number(learnSession && learnSession.doneTests || 0),
+        learnedCount: Number(learnSession && learnSession.learnedCount || 0),
+        queueSize: Number(learnSession && learnSession.queue && learnSession.queue.length || 0),
+      },
+    };
+  }
+
+  function buildLearnBridgePayload(){
+    return {
+      state: dictBridgeState(),
+      learn: buildLearnModel(),
+    };
+  }
+
+  async function bridgeLoadLearnSection(sectionValue){
+    const v = String(sectionValue || '').trim();
+    dictSetSubtab('learn');
+    if(!v){
+      if(elSectionLearn) elSectionLearn.value = '';
+      learnShow(null);
+      learnSetFeedback('idle', 'pick', 'выбери section');
+      return buildLearnBridgePayload();
+    }
+
+    await dictSelectSectionAndRun(v, ()=> learnStartSession(true), {
+      onLoading: learnShowLoading,
+      onError: (e)=>{
+        console.error(e);
+        learnShowLoading('ошибка загрузки');
+        learnSetFeedback('wrong', 'error', 'не удалось загрузить раздел');
+      }
+    });
+
+    return buildLearnBridgePayload();
+  }
+
 
 // UI
   const elDictDbStatus = document.getElementById('dictDbStatus');
@@ -2345,6 +2456,7 @@ let elLearnMcqButtons = null;
     }
 
     coachUpdateFromQuiz();
+    emitDictBridgeState();
   }
 
   function quizSetFeedback(state, stamp, line){
@@ -3501,18 +3613,51 @@ function handleMcqHotkeys(e){
     }
   }
 
-  function localCurrentUser(){
-    try{
-      const raw = localStorage.getItem('itemkey.currentUser');
-      return raw ? JSON.parse(raw) : null;
-    }catch(_){
-      return null;
-    }
+  function defaultDictCapabilities(){
+    return {
+      canOpenAdminConsole: false,
+      canReviewPublishRequests: false,
+      canManageSystemDicts: false,
+      canManageUserDicts: false,
+      canSubmitPublishRequest: false,
+    };
+  }
+
+  function normalizeDictCapabilities(raw){
+    const src = raw && typeof raw === 'object' ? raw : {};
+    return {
+      canOpenAdminConsole: src.can_open_admin_console === true || src.canOpenAdminConsole === true,
+      canReviewPublishRequests: src.can_review_publish_requests === true || src.canReviewPublishRequests === true,
+      canManageSystemDicts: src.can_manage_system_dicts === true || src.canManageSystemDicts === true,
+      canManageUserDicts: src.can_manage_user_dicts === true || src.canManageUserDicts === true,
+      canSubmitPublishRequest: src.can_submit_publish_request === true || src.canSubmitPublishRequest === true,
+    };
+  }
+
+  function sameDictCapabilities(a, b){
+    const aa = a || defaultDictCapabilities();
+    const bb = b || defaultDictCapabilities();
+    return aa.canOpenAdminConsole === bb.canOpenAdminConsole
+      && aa.canReviewPublishRequests === bb.canReviewPublishRequests
+      && aa.canManageSystemDicts === bb.canManageSystemDicts
+      && aa.canManageUserDicts === bb.canManageUserDicts
+      && aa.canSubmitPublishRequest === bb.canSubmitPublishRequest;
+  }
+
+  function getDictCapabilities(){
+    return dictRuntime.capabilities || defaultDictCapabilities();
+  }
+
+  function canManagePublicSource(sourceKey){
+    const caps = getDictCapabilities();
+    if(sourceKey === 'system') return !!caps.canManageSystemDicts;
+    if(sourceKey === 'user') return !!caps.canManageUserDicts;
+    return false;
   }
 
   function canEditCurrentSource(){
     if(dictSource === 'personal') return !dictPersonalGuest;
-    if(dictSource === 'system' || dictSource === 'user') return !!dictRuntime.isAdmin;
+    if(dictSource === 'system' || dictSource === 'user') return canManagePublicSource(dictSource);
     return false;
   }
 
@@ -3520,34 +3665,94 @@ function handleMcqHotkeys(e){
     return canEditCurrentSource();
   }
 
+  function dictCurrentSubtab(){
+    if(dictPanelCards && !dictPanelCards.hidden) return 'cards';
+    if(dictPanelQuiz && !dictPanelQuiz.hidden) return 'practice';
+    if(dictPanelLearn && !dictPanelLearn.hidden) return 'learn';
+    if(dictPanelView && !dictPanelView.hidden) return 'view';
+    if(dictPanelBuilder && !dictPanelBuilder.hidden) return 'builder';
+    return 'first-pick';
+  }
+
+  function dictBridgeState(){
+    const caps = getDictCapabilities();
+    return {
+      booted: !!window.__dictBooted,
+      source: dictSource,
+      currentSection: String(dictCurrentSection || ''),
+      personalGuest: !!dictPersonalGuest,
+      canEditCurrentSource: canEditCurrentSource(),
+      canUseBuilderForCurrentSource: canUseBuilderForCurrentSource(),
+      subtab: dictCurrentSubtab(),
+      counts: {
+        sections: Array.isArray(dictSections) ? dictSections.length : 0,
+        words: Array.isArray(dictWordsAll) ? dictWordsAll.length : 0,
+      },
+      capabilities: {
+        canOpenAdminConsole: !!(caps && caps.canOpenAdminConsole),
+        canReviewPublishRequests: !!(caps && caps.canReviewPublishRequests),
+        canManageSystemDicts: !!(caps && caps.canManageSystemDicts),
+        canManageUserDicts: !!(caps && caps.canManageUserDicts),
+        canSubmitPublishRequest: !!(caps && caps.canSubmitPublishRequest),
+      },
+    };
+  }
+
+  function emitDictBridgeState(){
+    try{
+      window.dispatchEvent(new CustomEvent('dict:state', { detail: dictBridgeState() }));
+    }catch(_){ }
+  }
+
+  async function fetchDictCapabilitiesFromCloud(client){
+    const fallback = defaultDictCapabilities();
+    if(!client || !client.auth || typeof client.auth.getUser !== 'function') return fallback;
+
+    let hasAuth = false;
+    try{
+      const out = await client.auth.getUser();
+      hasAuth = !!(out && out.data && out.data.user);
+    }catch(_){
+      hasAuth = false;
+    }
+    if(!hasAuth) return fallback;
+
+    fallback.canSubmitPublishRequest = true;
+
+    try{
+      const out = await client.rpc('ik_dictionary_capabilities');
+      if(out && out.error) throw out.error;
+      if(out && out.data && typeof out.data === 'object'){
+        const caps = normalizeDictCapabilities(out.data);
+        if(caps.canSubmitPublishRequest !== true) caps.canSubmitPublishRequest = true;
+        return caps;
+      }
+    }catch(_){ }
+
+    // Backward-compatible fallback for DBs without stage22.
+    try{
+      const out = await client.rpc('ik_can_open_admin_console');
+      const canOpen = !!(out && out.data === true);
+      return {
+        canOpenAdminConsole: canOpen,
+        canReviewPublishRequests: canOpen,
+        canManageSystemDicts: canOpen,
+        canManageUserDicts: canOpen,
+        canSubmitPublishRequest: true,
+      };
+    }catch(_){
+      return fallback;
+    }
+  }
+
   async function refreshDictAdminAccess(){
     if(dictRuntime.refreshingAdmin) return;
     dictRuntime.refreshingAdmin = true;
     try{
-      let isAdmin = false;
-      const localUser = localCurrentUser();
-      const localEmail = String(localUser && localUser.email || '').trim().toLowerCase();
-      if(localUser && localUser.isAdmin === true) isAdmin = true;
-      if(!isAdmin && localEmail && DICT_ADMIN_EMAILS.includes(localEmail)) isAdmin = true;
-
       const client = getSupaClient();
-      if(client && client.auth && typeof client.auth.getUser === 'function'){
-        try{
-          const out = await client.auth.getUser();
-          const cloudEmail = String(out && out.data && out.data.user && out.data.user.email || '').trim().toLowerCase();
-          if(cloudEmail && DICT_ADMIN_EMAILS.includes(cloudEmail)) isAdmin = true;
-        }catch(_){ }
-      }
-
-      if(!isAdmin && client){
-        try{
-          const out = await client.rpc('ik_can_open_admin_console');
-          if(out && out.data === true) isAdmin = true;
-        }catch(_){ }
-      }
-
-      const changed = dictRuntime.isAdmin !== isAdmin;
-      dictRuntime.isAdmin = isAdmin;
+      const nextCaps = await fetchDictCapabilitiesFromCloud(client);
+      const changed = !sameDictCapabilities(dictRuntime.capabilities, nextCaps);
+      dictRuntime.capabilities = nextCaps;
       if(changed){
         applyDictSourceAccess();
         if(!canUseBuilderForCurrentSource() && dictPanelBuilder && !dictPanelBuilder.hidden){
@@ -3558,6 +3763,7 @@ function handleMcqHotkeys(e){
           renderWordsUI();
         }
       }
+      emitDictBridgeState();
     }finally{
       dictRuntime.refreshingAdmin = false;
     }
@@ -3828,6 +4034,7 @@ function handleMcqHotkeys(e){
     }else{
       renderFirstPickUI();
     }
+    emitDictBridgeState();
   }
 
   function dictOpenConstructorFromPick(){
@@ -3836,6 +4043,7 @@ function handleMcqHotkeys(e){
     if(elDictSubtabsWrap) elDictSubtabsWrap.hidden = false;
     dictSetSubtab('builder');
     renderWordsUI();
+    emitDictBridgeState();
   }
 
   
@@ -3852,6 +4060,7 @@ function handleMcqHotkeys(e){
     if(elSectionLearn && elSectionLearn.value !== v) elSectionLearn.value = v;
     if(elSectionView && elSectionView.value !== v) elSectionView.value = v;
     if(elSectionBuilder && v !== 'All' && elSectionBuilder.value !== v) elSectionBuilder.value = v;
+    emitDictBridgeState();
   }
 
  async function dictEnterSection(sectionValue, startTab){
@@ -4100,6 +4309,7 @@ function handleMcqHotkeys(e){
             renderSectionsUI();
             dictShowFirstPick();
             applyDictSourceAccess();
+            emitDictBridgeState();
             return;
           }
         }catch(_){ }
@@ -4112,6 +4322,7 @@ function handleMcqHotkeys(e){
       renderSectionsUI();
       dictShowFirstPick();
       applyDictSourceAccess();
+      emitDictBridgeState();
       return;
     }
 
@@ -4125,6 +4336,7 @@ function handleMcqHotkeys(e){
       renderSectionsUI();
       dictShowFirstPick();
       applyDictSourceAccess();
+      emitDictBridgeState();
     }catch(e){
       console.error(e);
       // keep current source and show previous data if available
@@ -4229,47 +4441,75 @@ function handleMcqHotkeys(e){
     }
   }
 
-  function renderFirstPickUI(){
-    if(!elFirstPickList) return;
-    cancelFirstPickRender();
-
+  function buildFirstPickModel(queryText){
     if(dictSource === 'personal' && dictPersonalGuest){
-      elFirstPickList.innerHTML = '';
-      const li = document.createElement('li');
-      li.innerHTML = `<p class="ik-itemline"><b>войдите, чтобы видеть личные словари</b></p>`;
-      elFirstPickList.appendChild(li);
-      return;
+      return {
+        source: dictSource,
+        personalGuest: true,
+        query: '',
+        totalCount: 0,
+        items: [],
+        empty: true,
+        message: 'войдите, чтобы видеть личные словари',
+      };
     }
 
-    const q = String(elFirstPickSearch && elFirstPickSearch.value || '').trim().toLowerCase();
+    const q = String(queryText != null ? queryText : (elFirstPickSearch && elFirstPickSearch.value || ''))
+      .trim()
+      .toLowerCase();
 
     const totalCount = isPublicSource()
       ? Array.from((dictCounts && typeof dictCounts.values === 'function') ? dictCounts.values() : []).reduce((sum, n)=> sum + Number(n || 0), 0)
-      : dictWordsAll.length;
+      : Number(dictWordsAll && dictWordsAll.length || 0);
 
+    const countsMap = (dictCounts && typeof dictCounts.get === 'function') ? dictCounts : new Map();
     const items = [];
-    items.push({ sid:'All', name:'All (все разделы)', count: totalCount });
+    items.push({ sid: 'All', name: 'All (все разделы)', count: totalCount });
 
-    dictSections
+    (Array.isArray(dictSections) ? dictSections : [])
       .slice()
       .sort((a,b)=> a.name.localeCompare(b.name, 'ru'))
       .forEach((s)=>{
         const sid = String(s.id);
-        const count = dictCounts.get(Number(s.id)) || 0;
-        items.push({ sid, name:s.name, count });
+        const count = Number(countsMap.get(Number(s.id)) || 0);
+        items.push({ sid, name: s.name, count });
       });
 
-    const filtered = items.filter(it => !q || String(it.name).toLowerCase().includes(q));
+    const filtered = items.filter((it)=> !q || String(it.name).toLowerCase().includes(q));
+
+    return {
+      source: dictSource,
+      personalGuest: false,
+      query: q,
+      totalCount,
+      items: filtered,
+      empty: filtered.length === 0,
+      message: '',
+    };
+  }
+
+  function renderFirstPickUI(){
+    if(!elFirstPickList) return;
+    cancelFirstPickRender();
+
+    const model = buildFirstPickModel();
+    if(model.personalGuest){
+      elFirstPickList.innerHTML = '';
+      const li = document.createElement('li');
+      li.innerHTML = `<p class="ik-itemline"><b>${escapeHTML(model.message || 'войдите, чтобы видеть личные словари')}</b></p>`;
+      elFirstPickList.appendChild(li);
+      return;
+    }
 
     elFirstPickList.innerHTML = '';
-    if(!filtered.length){
+    if(!model.items.length){
       const li = document.createElement('li');
       li.innerHTML = `<p class="ik-itemline"><b>ничего не найдено</b></p>`;
       elFirstPickList.appendChild(li);
       return;
     }
 
-    renderFirstPickListChunked(filtered);
+    renderFirstPickListChunked(model.items);
   }
 
   function renderSectionsUI(){
@@ -4378,27 +4618,76 @@ function handleMcqHotkeys(e){
     return list;
   }
 
-  function renderViewUI(){
-    if(!elViewList || !elViewMeta || !elSectionView) return;
+  function buildViewModel(sectionValue, queryText){
+    const selected = String(
+      sectionValue != null
+        ? sectionValue
+        : ((elSectionView && elSectionView.value) || dictCurrentSection || '')
+    ).trim();
 
-    const selected = String((elSectionView && elSectionView.value) || dictCurrentSection || '').trim();
+    const q = String(queryText != null ? queryText : (elViewSearch && elViewSearch.value || ''))
+      .trim()
+      .toLowerCase();
+
     if(!selected){
-      renderViewMessage('выбери section', '0');
-      return;
+      return {
+        source: dictSource,
+        selected: '',
+        query: q,
+        totalAll: 0,
+        shown: 0,
+        items: [],
+        empty: true,
+        message: 'выбери section',
+        meta: '0',
+      };
     }
 
     const all = getViewSortedWords(selected);
-    const q = String(elViewSearch && elViewSearch.value || '').trim().toLowerCase();
     const filtered = q
       ? all.filter((w)=> String(w.en || '').toLowerCase().includes(q) || String(w.ru || '').toLowerCase().includes(q))
       : all;
 
     if(!filtered.length){
-      renderViewMessage('ничего не найдено', `показано 0 из ${all.length}`);
-      return;
+      return {
+        source: dictSource,
+        selected,
+        query: q,
+        totalAll: all.length,
+        shown: 0,
+        items: [],
+        empty: true,
+        message: 'ничего не найдено',
+        meta: `показано 0 из ${all.length}`,
+      };
     }
 
-    renderViewListChunked(filtered, all.length);
+    return {
+      source: dictSource,
+      selected,
+      query: q,
+      totalAll: all.length,
+      shown: filtered.length,
+      items: filtered.map((w)=>({
+        id: w && w.id != null ? w.id : null,
+        sectionId: w && w.sectionId != null ? w.sectionId : null,
+        en: String(w && w.en || ''),
+        ru: String(w && w.ru || ''),
+      })),
+      empty: false,
+      message: '',
+      meta: `показано ${filtered.length} из ${all.length}`,
+    };
+  }
+
+  function renderViewUI(){
+    if(!elViewList || !elViewMeta || !elSectionView) return;
+    const model = buildViewModel();
+    if(model.empty){
+      renderViewMessage(model.message, model.meta);
+      return;
+    }
+    renderViewListChunked(model.items, model.totalAll);
   }
 
   function createWordListItem(w){
@@ -4415,24 +4704,10 @@ function handleMcqHotkeys(e){
     btnDel.type = 'button';
     btnDel.textContent = 'удалить';
     btnDel.addEventListener('click', async ()=>{
-        try{
-          if(isPublicSource()){
-            dictWordsAll = dictWordsAll.filter((x)=> Number(x.id) !== Number(w.id));
-            invalidateViewCache();
-            const secId = Number(w.sectionId) || 0;
-            const prevCount = Number(publicCounts[dictSource].get(secId) || 0);
-            publicCounts[dictSource].set(secId, Math.max(0, prevCount - 1));
-            updateGlobalBadges();
-          }else{
-            await dictDeleteWord(dictDb, w.id);
-            await dictRefreshAll();
-        }
-        renderWordsUI();
-        renderViewUI();
-        dictResetCards();
-        dictResetQuiz();
+      try{
+        await dictBuilderDeleteWordAction(w && w.id);
       }catch(e){
-        alert(`Ошибка удаления: ${e.message || e}`);
+        alert(`Ошибка удаления: ${e && (e.message || e)}`);
       }
     });
 
@@ -4473,11 +4748,11 @@ function handleMcqHotkeys(e){
 
   function renderWordsUI(){
     cancelWordsRender();
-    if(isPublicSource() && !dictRuntime.isAdmin){
+    if(isPublicSource() && !canEditCurrentSource()){
       if(elSectionList) elSectionList.innerHTML = '';
       if(elWordList) elWordList.innerHTML = '';
       const li = document.createElement('li');
-      li.innerHTML = `<p class="ik-itemline"><b>read-only</b> <span class="ik-muted">конструктор доступен только администратору</span></p>`;
+      li.innerHTML = `<p class="ik-itemline"><b>read-only</b> <span class="ik-muted">нет прав на редактирование этого источника</span></p>`;
       if(elWordList) elWordList.appendChild(li);
       return;
     }
@@ -4507,7 +4782,7 @@ function handleMcqHotkeys(e){
   }
 
   async function savePublicBuilderSection(){
-    if(!isPublicSource() || !dictRuntime.isAdmin) return;
+    if(!isPublicSource() || !canManagePublicSource(dictSource)) return;
     const sid = Number(elSectionBuilder && elSectionBuilder.value || 0);
     if(!sid){
       alert('Сначала выбери словарь.');
@@ -4563,6 +4838,309 @@ function handleMcqHotkeys(e){
     }
   }
 
+  function buildBuilderModel(){
+    const editable = canEditCurrentSource();
+    const isPersonalEditable = dictSource === 'personal' && editable;
+    const isPublicAdminEditable = isPublicSource() && editable;
+
+    const selected = String((elSectionBuilder && elSectionBuilder.value) || dictCurrentSection || '').trim();
+    const sections = (Array.isArray(dictSections) ? dictSections : [])
+      .slice()
+      .sort((a,b)=> String(a && a.name || '').localeCompare(String(b && b.name || ''), 'ru'))
+      .map((s)=>{
+        const sid = Number(s && s.id || 0);
+        return {
+          sid: String(sid || ''),
+          name: String(s && s.name || ''),
+          count: Number((dictCounts && typeof dictCounts.get === 'function' && sid) ? (dictCounts.get(sid) || 0) : 0),
+        };
+      });
+
+    const words = selected
+      ? wordsForSelection(selected)
+        .slice()
+        .sort((a,b)=> String(a && a.en || '').localeCompare(String(b && b.en || ''), 'en'))
+        .map((w)=>({
+          id: w && w.id != null ? w.id : null,
+          sectionId: w && w.sectionId != null ? w.sectionId : null,
+          en: String(w && w.en || ''),
+          ru: String(w && w.ru || ''),
+        }))
+      : [];
+
+    let submitAction = 'none';
+    let submitLabel = '';
+    let submitTitle = '';
+    if(isPersonalEditable){
+      submitAction = 'moderation';
+      submitLabel = 'на модерацию';
+      submitTitle = 'Отправить текущий section на модерацию';
+    }else if(isPublicAdminEditable){
+      submitAction = 'save-cloud';
+      submitLabel = 'сохранить в cloud';
+      submitTitle = 'Сохранить изменения текущего словаря';
+    }
+
+    return {
+      source: dictSource,
+      selected,
+      editable,
+      canEditWords: editable,
+      canCreateSection: isPersonalEditable,
+      canDeleteSection: isPersonalEditable,
+      canImportExport: isPersonalEditable,
+      canSubmit: submitAction !== 'none',
+      submitAction,
+      submitLabel,
+      submitTitle,
+      readOnlyMessage: (isPublicSource() && !editable)
+        ? 'нет прав на редактирование этого источника'
+        : '',
+      sections,
+      words,
+      counts: {
+        sections: sections.length,
+        words: Number(dictWordsAll && dictWordsAll.length || 0),
+      },
+    };
+  }
+
+  function buildBuilderBridgePayload(){
+    return {
+      state: dictBridgeState(),
+      builder: buildBuilderModel(),
+    };
+  }
+
+  async function bridgeLoadBuilderSection(sectionValue){
+    const v = String(sectionValue != null ? sectionValue : (elSectionBuilder && elSectionBuilder.value) || '').trim();
+    dictSetSubtab('builder');
+
+    if(!v){
+      if(elSectionBuilder) elSectionBuilder.value = '';
+      renderWordsUI();
+      emitDictBridgeState();
+      return buildBuilderBridgePayload();
+    }
+
+    if(elSectionBuilder && elSectionBuilder.value !== v) elSectionBuilder.value = v;
+
+    if(isPublicSource()){
+      await dictSelectSectionAndRun(v, renderWordsUI, {
+        onLoading: renderWordsLoading,
+        onError: (e)=>{
+          console.error(e);
+          renderWordsLoading('ошибка загрузки');
+        }
+      });
+      emitDictBridgeState();
+      return buildBuilderBridgePayload();
+    }
+
+    dictSetCurrentSection(v);
+    renderWordsUI();
+    emitDictBridgeState();
+    return buildBuilderBridgePayload();
+  }
+
+  async function dictBuilderAddSectionAction(nameRaw){
+    if(dictSource !== 'personal'){
+      alert('Создание разделов доступно только в личных словарях.');
+      return { ok:false, reason:'forbidden_source' };
+    }
+    const name = String(nameRaw || '').trim();
+    if(!name){
+      alert('Название раздела пустое.');
+      return { ok:false, reason:'empty' };
+    }
+
+    const res = await dictAddSection(dictDb, name);
+    if(!res.ok && res.reason === 'duplicate'){
+      alert('Такой раздел уже есть.');
+      return res;
+    }
+
+    if(elNewSectionName) elNewSectionName.value = '';
+    await dictRefreshAll();
+    if(res.ok && elSectionBuilder) elSectionBuilder.value = String(res.id);
+    renderWordsUI();
+    dictResetCards();
+    dictResetQuiz();
+    if(dictTabBuilder && !dictTabBuilder.hidden) dictSetSubtab('builder');
+    notifyDictLocalChanged();
+    emitDictBridgeState();
+    return res;
+  }
+
+  async function dictBuilderDeleteSectionAction(sectionValue){
+    if(dictSource !== 'personal'){
+      alert('Удаление разделов доступно только в личных словарях.');
+      return { ok:false, reason:'forbidden_source' };
+    }
+
+    const sid = Number(sectionValue || (elSectionBuilder && elSectionBuilder.value) || 0);
+    if(!sid){
+      alert('Выбери раздел.');
+      return { ok:false, reason:'section_required' };
+    }
+
+    const name = getSectionNameById(sid);
+    if(!confirm(`Удалить раздел "${name}" и все слова внутри?`)){
+      return { ok:false, reason:'cancelled' };
+    }
+
+    await dictDeleteSection(dictDb, sid);
+    await dictRefreshAll();
+    renderWordsUI();
+    dictResetCards();
+    dictResetQuiz();
+    notifyDictLocalChanged();
+    emitDictBridgeState();
+    return { ok:true };
+  }
+
+  async function dictBuilderAddWordAction(sectionValue, enRaw, ruRaw){
+    const sid = Number(sectionValue || (elSectionBuilder && elSectionBuilder.value) || 0);
+    if(!sid){
+      alert('Сначала выбери раздел.');
+      return { ok:false, reason:'section_required' };
+    }
+
+    const en = String(enRaw || '').trim();
+    const ru = String(ruRaw || '').trim();
+    if(!en || !ru){
+      alert('Заполни EN и RU.');
+      return { ok:false, reason:'fields_required' };
+    }
+
+    if(isPublicSource()){
+      if(!canManagePublicSource(dictSource)){
+        alert('Недостаточно прав для редактирования этого источника.');
+        return { ok:false, reason:'forbidden' };
+      }
+
+      const key = `${sid}|${normEnCmp(en)}|${normRuCmp(ru)}`;
+      const hasDuplicate = dictWordsAll.some((w)=> `${Number(w.sectionId)}|${normEnCmp(w.en)}|${normRuCmp(w.ru)}` === key);
+      if(hasDuplicate){
+        alert('Такое слово уже есть (дубликат).');
+        return { ok:false, reason:'duplicate' };
+      }
+
+      dictWordsAll.push({
+        id: publicTempWordId,
+        sectionId: sid,
+        en,
+        ru,
+      });
+      invalidateViewCache();
+      publicTempWordId -= 1;
+      const prevCount = Number(publicCounts[dictSource].get(sid) || 0);
+      publicCounts[dictSource].set(sid, Math.max(0, prevCount + 1));
+      updateGlobalBadges();
+    }else{
+      const res = await dictAddWord(dictDb, sid, en, ru);
+      if(!res.ok && res.reason === 'duplicate'){
+        alert('Такое слово уже есть (дубликат).');
+        return res;
+      }
+      await dictRefreshAll();
+      notifyDictLocalChanged();
+    }
+
+    if(elEnInput) elEnInput.value = '';
+    if(elRuInput) elRuInput.value = '';
+    renderWordsUI();
+    renderViewUI();
+    dictResetCards();
+    dictResetQuiz();
+    emitDictBridgeState();
+    return { ok:true };
+  }
+
+  async function dictBuilderDeleteWordAction(wordId){
+    const idNum = Number(wordId || 0);
+    if(!idNum){
+      alert('Слово не найдено.');
+      return { ok:false, reason:'word_required' };
+    }
+
+    const row = dictWordsAll.find((w)=> Number(w.id) === idNum);
+    if(!row){
+      alert('Слово не найдено.');
+      return { ok:false, reason:'not_found' };
+    }
+
+    if(isPublicSource()){
+      if(!canManagePublicSource(dictSource)){
+        alert('Недостаточно прав для редактирования этого источника.');
+        return { ok:false, reason:'forbidden' };
+      }
+      dictWordsAll = dictWordsAll.filter((x)=> Number(x.id) !== idNum);
+      invalidateViewCache();
+      const secId = Number(row.sectionId) || 0;
+      const prevCount = Number(publicCounts[dictSource].get(secId) || 0);
+      publicCounts[dictSource].set(secId, Math.max(0, prevCount - 1));
+      updateGlobalBadges();
+    }else{
+      await dictDeleteWord(dictDb, idNum);
+      await dictRefreshAll();
+      notifyDictLocalChanged();
+    }
+
+    renderWordsUI();
+    renderViewUI();
+    dictResetCards();
+    dictResetQuiz();
+    emitDictBridgeState();
+    return { ok:true };
+  }
+
+  async function dictBuilderExportAction(sectionValue){
+    if(dictSource !== 'personal'){
+      alert('Экспорт доступен только для личных словарей.');
+      return { ok:false, reason:'forbidden_source' };
+    }
+    const v = String(sectionValue || '').trim();
+    if(v && elSectionBuilder && elSectionBuilder.value !== v) elSectionBuilder.value = v;
+    await dictExportSection();
+    emitDictBridgeState();
+    return { ok:true };
+  }
+
+  async function dictBuilderImportAction(file, replaceExisting){
+    if(dictSource !== 'personal'){
+      alert('Импорт доступен только для личных словарей.');
+      return { ok:false, reason:'forbidden_source' };
+    }
+    if(!file){
+      alert('Выбери файл для импорта.');
+      return { ok:false, reason:'file_required' };
+    }
+
+    await dictImportFromFile(file, !!replaceExisting);
+    await dictRefreshAll();
+    renderWordsUI();
+    dictResetCards();
+    dictResetQuiz();
+    alert('Импорт: ok');
+    notifyDictLocalChanged();
+    emitDictBridgeState();
+    return { ok:true };
+  }
+
+  async function dictBuilderSubmitAction(){
+    if(isPublicSource()){
+      if(!canManagePublicSource(dictSource)) return { ok:false, reason:'forbidden' };
+      await savePublicBuilderSection();
+      emitDictBridgeState();
+      return { ok:true, mode:'save-cloud' };
+    }
+
+    await submitCurrentSectionToModeration();
+    emitDictBridgeState();
+    return { ok:true, mode:'moderation' };
+  }
+
   function cardsSetFlipped(flipped){
     if(flipped){
       elFlipCard.classList.add('is-flipped');
@@ -4604,6 +5182,56 @@ function handleMcqHotkeys(e){
       && cardsPos >= 0
       && cardsPos >= (cardsHistory.length - 1);
     cardsSetDoneVisible(done);
+  }
+
+  function buildCardsModel(){
+    const selected = String((elSectionCards && elSectionCards.value) || dictCurrentSection || '').trim();
+    return {
+      source: dictSource,
+      selected,
+      frontPreference: String((elCardsFront && elCardsFront.value) || 'en'),
+      random: !!(elCardsRandom && elCardsRandom.checked),
+      flipped: !!(elFlipCard && elFlipCard.classList.contains('is-flipped')),
+      done: !!(elCardsDoneRow && !elCardsDoneRow.hidden),
+      meta: String(elCardsMeta && elCardsMeta.textContent || ''),
+      frontText: String(elCardFront && elCardFront.textContent || ''),
+      backText: String(elCardBack && elCardBack.textContent || ''),
+      frontLang: String(elCardFrontLang && elCardFrontLang.textContent || ''),
+      backLang: String(elCardBackLang && elCardBackLang.textContent || ''),
+      deckSize: Number(cardsDeck && cardsDeck.length || 0),
+      queueSize: Number(cardsQueue && cardsQueue.length || 0),
+      historySize: Number(cardsHistory && cardsHistory.length || 0),
+      historyPos: Number(cardsPos),
+    };
+  }
+
+  function buildCardsBridgePayload(){
+    return {
+      state: dictBridgeState(),
+      cards: buildCardsModel(),
+    };
+  }
+
+  async function bridgeLoadCardsSection(sectionValue){
+    const v = String(sectionValue || '').trim();
+    dictSetSubtab('cards');
+    if(!v){
+      if(elSectionCards) elSectionCards.value = '';
+      dictResetCards();
+      return buildCardsBridgePayload();
+    }
+
+    await dictSelectSectionAndRun(v, dictResetCards, {
+      onLoading: cardsShowLoading,
+      onError: (e)=>{
+        console.error(e);
+        cardsShowLoading('ошибка загрузки');
+        if(elCardFront) elCardFront.textContent = 'ошибка загрузки';
+        if(elCardBack) elCardBack.textContent = 'проверь соединение';
+      }
+    });
+
+    return buildCardsBridgePayload();
   }
 
   function cardsShow(item, frontLang){
@@ -5111,6 +5739,109 @@ function handleMcqHotkeys(e){
     quizLockAfterCheck(false);
   }
 
+  function buildPracticeModel(){
+    const selected = String((elSectionQuiz && elSectionQuiz.value) || dictCurrentSection || '').trim();
+    const cfg = cfgFromUI();
+    const mcqVisible = !!(elQuizMcqWrap && elQuizMcqWrap.style.display !== 'none');
+    const inputVisible = !!(elQuizInput && elQuizInput.style.display !== 'none');
+
+    const mcqState = quizMcqState && typeof quizMcqState === 'object' ? quizMcqState : null;
+    const mcqOptions = mcqState && Array.isArray(mcqState.options)
+      ? mcqState.options.map((opt, idx)=>({
+          index: idx,
+          text: String(opt && (opt.display || opt.norm) || ''),
+          selected: Number(mcqState.selectedIdx) === idx,
+          correct: Number(mcqState.correctIdx) === idx,
+          locked: !!mcqState.locked,
+        }))
+      : [];
+
+    return {
+      source: dictSource,
+      selected,
+      mode: String((elQuizMode && elQuizMode.value) || 'en'),
+      score: String(elQuizScore && elQuizScore.textContent || ''),
+      prompt: String(elQuizPromptLabel && elQuizPromptLabel.textContent || ''),
+      flipped: !!(elQuizCard && elQuizCard.classList.contains('is-flipped')),
+      frontText: String(elQuizFront && elQuizFront.textContent || ''),
+      backText: String(elQuizBack && elQuizBack.textContent || ''),
+      frontLang: String(elQuizFrontLang && elQuizFrontLang.textContent || ''),
+      backLang: String(elQuizBackLang && elQuizBackLang.textContent || ''),
+      checkMode: String(quizCheckMode || 'check'),
+      checkLabel: String(btnQuizCheckNext && btnQuizCheckNext.textContent || 'check'),
+      skipLabel: String(btnQuizSkip && btnQuizSkip.textContent || 'сдаюсь'),
+      hintVisible: !!(btnPracticeHint && btnPracticeHint.style.display !== 'none'),
+      input: {
+        visible: inputVisible,
+        value: String(elQuizInput && elQuizInput.value || ''),
+        disabled: !!(elQuizInput && elQuizInput.disabled),
+        placeholder: String(elQuizInput && elQuizInput.placeholder || ''),
+        isOk: !!(elQuizInput && elQuizInput.classList.contains('is-ok')),
+        isBad: !!(elQuizInput && elQuizInput.classList.contains('is-bad')),
+      },
+      mcq: {
+        visible: mcqVisible,
+        locked: !!(mcqState && mcqState.locked),
+        selectedIdx: mcqState ? Number(mcqState.selectedIdx) : -1,
+        correctIdx: mcqState ? Number(mcqState.correctIdx) : -1,
+        meta: String(elQuizMcqMeta && elQuizMcqMeta.textContent || ''),
+        options: mcqOptions,
+      },
+      fuzzyVisible: !!(elPracticeFuzzyActions && elPracticeFuzzyActions.style.display !== 'none'),
+      feedback: {
+        state: String(elQuizFeedback && elQuizFeedback.dataset && elQuizFeedback.dataset.state || 'idle'),
+        stamp: String(elQuizStamp && elQuizStamp.textContent || ''),
+        line: String(elQuizLine && elQuizLine.textContent || ''),
+      },
+      settingsOpen: !!(elPracticeSettings && elPracticeSettings.style.display !== 'none'),
+      settings: {
+        session: String(cfg.session || '20'),
+        typos: cfg.typos !== false,
+        ignoreTo: cfg.ignoreTo !== false,
+        ignoreArticles: cfg.ignoreArticles !== false,
+        taskMode: String(cfg.taskMode || 'mix'),
+        mixInputPct: Number(cfg.mixInputPct) || 60,
+        mcqCount: Number(cfg.mcqCount) || 4,
+        showPos: !!cfg.showPos,
+        softMcq: cfg.softMcq !== false,
+      },
+      stats: {
+        sessionTarget: Number(quizSessionTarget || 0),
+        total: Number(quizTotal || 0),
+        correct: Number(quizCorrect || 0),
+        seen: Number(quizSeen && quizSeen.size || 0),
+      },
+    };
+  }
+
+  function buildPracticeBridgePayload(){
+    return {
+      state: dictBridgeState(),
+      practice: buildPracticeModel(),
+    };
+  }
+
+  async function bridgeLoadPracticeSection(sectionValue){
+    const v = String(sectionValue || '').trim();
+    dictSetSubtab('practice');
+    if(!v){
+      if(elSectionQuiz) elSectionQuiz.value = '';
+      dictResetQuiz();
+      return buildPracticeBridgePayload();
+    }
+
+    await dictSelectSectionAndRun(v, dictResetQuiz, {
+      onLoading: quizShowLoading,
+      onError: (e)=>{
+        console.error(e);
+        quizShowLoading('ошибка загрузки');
+        quizSetFeedback('wrong', 'error', 'не удалось загрузить раздел');
+      }
+    });
+
+    return buildPracticeBridgePayload();
+  }
+
   async function dictRefreshAll(){
     dictSections = await dictGetAll(dictDb, DICT_STORE_SECTIONS);
     dictWordsAll = await dictGetAll(dictDb, DICT_STORE_WORDS);
@@ -5410,6 +6141,7 @@ async function dictSyncFromFolder(opts){
       quizShow(null);
       learnShow(null);
       quizSetFeedback('idle', 'pick', 'выбери section');
+      emitDictBridgeState();
     }catch(e){
       setAdminText(elDictDbStatus, 'failed');
       console.error(e);
@@ -5503,20 +6235,8 @@ async function dictSyncFromFolder(opts){
       dictShowFirstPick();
       return;
     }
-    dictSetSubtab('builder');
     const v = String((elSectionBuilder && elSectionBuilder.value) || dictCurrentSection || '').trim();
-    if(v) dictSetCurrentSection(v);
-    if(isPublicSource() && v){
-      dictSelectSectionAndRun(v, renderWordsUI, {
-        onLoading: renderWordsLoading,
-        onError: (e)=>{
-          console.error(e);
-          renderWordsLoading('ошибка загрузки');
-        }
-      }).catch(()=>{});
-      return;
-    }
-    renderWordsUI();
+    bridgeLoadBuilderSection(v).catch(()=>{});
   });
 
   if(btnCardsChooseSection) btnCardsChooseSection.addEventListener('click', dictShowFirstPick);
@@ -5534,11 +6254,7 @@ async function dictSyncFromFolder(opts){
     }, FIRST_PICK_SEARCH_DEBOUNCE_MS);
   });
   if(btnSubmitModeration) btnSubmitModeration.addEventListener('click', ()=>{
-    if(isPublicSource() && dictRuntime.isAdmin){
-      savePublicBuilderSection().catch(()=>{});
-      return;
-    }
-    submitCurrentSectionToModeration().catch(()=>{});
+    dictBuilderSubmitAction().catch(()=>{});
   });
 
   btnCardsPrev.addEventListener('click', cardsGoPrev);
@@ -5728,109 +6444,40 @@ async function dictSyncFromFolder(opts){
   }
 
   btnAddSection.addEventListener('click', async ()=>{
-    const name = (elNewSectionName.value || '').trim();
-    if(!name){
-      alert('Название раздела пустое.');
-      return;
-    }
     try{
-      const res = await dictAddSection(dictDb, name);
-      if(!res.ok && res.reason === 'duplicate'){
-        alert('Такой раздел уже есть.');
-        return;
-      }
-      elNewSectionName.value = '';
-      await dictRefreshAll();
-      if(res.ok) elSectionBuilder.value = String(res.id);
-      renderWordsUI();
-      dictResetCards();
-      dictResetQuiz();
-      dictSetSubtab('builder');
-      notifyDictLocalChanged();
+      await dictBuilderAddSectionAction(elNewSectionName && elNewSectionName.value);
     }catch(e){
-      alert(`Ошибка сохранения: ${e.message || e}`);
+      alert(`Ошибка сохранения: ${e && (e.message || e)}`);
     }
   });
 
   btnDeleteSection.addEventListener('click', async ()=>{
-    const sid = Number(elSectionBuilder.value || 0);
-    if(!sid){
-      alert('Выбери раздел.');
-      return;
-    }
-    const name = getSectionNameById(sid);
-    if(!confirm(`Удалить раздел "${name}" и все слова внутри?`)) return;
-
     try{
-      await dictDeleteSection(dictDb, sid);
-      await dictRefreshAll();
-      renderWordsUI();
-      dictResetCards();
-      dictResetQuiz();
-      notifyDictLocalChanged();
+      await dictBuilderDeleteSectionAction(elSectionBuilder && elSectionBuilder.value);
     }catch(e){
-      alert(`Ошибка удаления: ${e.message || e}`);
+      alert(`Ошибка удаления: ${e && (e.message || e)}`);
     }
   });
 
-  elSectionBuilder.addEventListener('change', renderWordsUI);
+  elSectionBuilder.addEventListener('change', ()=>{
+    bridgeLoadBuilderSection(elSectionBuilder && elSectionBuilder.value).catch(()=>{});
+  });
 
   btnAddWord.addEventListener('click', async ()=>{
-    const sid = Number(elSectionBuilder.value || 0);
-    if(!sid){
-      alert('Сначала выбери раздел.');
-      return;
-    }
-    const en = (elEnInput.value || '').trim();
-    const ru = (elRuInput.value || '').trim();
-    if(!en || !ru){
-      alert('Заполни EN и RU.');
-      return;
-    }
     try{
-      if(isPublicSource()){
-        if(!dictRuntime.isAdmin){
-          alert('Конструктор доступен только администратору.');
-          return;
-        }
-        const key = `${sid}|${normEnCmp(en)}|${normRuCmp(ru)}`;
-        const hasDuplicate = dictWordsAll.some((w)=> `${Number(w.sectionId)}|${normEnCmp(w.en)}|${normRuCmp(w.ru)}` === key);
-        if(hasDuplicate){
-          alert('Такое слово уже есть (дубликат).');
-          return;
-        }
-        dictWordsAll.push({
-          id: publicTempWordId,
-          sectionId: sid,
-          en,
-          ru
-        });
-        invalidateViewCache();
-        publicTempWordId -= 1;
-        const prevCount = Number(publicCounts[dictSource].get(sid) || 0);
-        publicCounts[dictSource].set(sid, Math.max(0, prevCount + 1));
-        updateGlobalBadges();
-      }else{
-        const res = await dictAddWord(dictDb, sid, en, ru);
-        if(!res.ok && res.reason === 'duplicate'){
-          alert('Такое слово уже есть (дубликат).');
-          return;
-        }
-        await dictRefreshAll();
-        notifyDictLocalChanged();
-      }
-      elEnInput.value = '';
-      elRuInput.value = '';
-      renderWordsUI();
-      renderViewUI();
-      dictResetCards();
-      dictResetQuiz();
+      await dictBuilderAddWordAction(
+        elSectionBuilder && elSectionBuilder.value,
+        elEnInput && elEnInput.value,
+        elRuInput && elRuInput.value,
+      );
     }catch(e){
-      alert(`Ошибка сохранения: ${e.message || e}`);
+      alert(`Ошибка сохранения: ${e && (e.message || e)}`);
     }
   });
 
-  btnDictExport.addEventListener('click', dictExportSection);
+  btnDictExport.addEventListener('click', ()=>{
+    dictBuilderExportAction(elSectionBuilder && elSectionBuilder.value).catch(()=>{});
+  });
 
   btnDictImport.addEventListener('click', ()=>{
     elDictFileImport.value = '';
@@ -5841,17 +6488,263 @@ async function dictSyncFromFolder(opts){
     const file = elDictFileImport.files && elDictFileImport.files[0];
     if(!file) return;
     try{
-      await dictImportFromFile(file, !!elDictImportReplace.checked);
-      await dictRefreshAll();
-      renderWordsUI();
-      dictResetCards();
-      dictResetQuiz();
-      alert('Импорт: ok');
-      notifyDictLocalChanged();
+      await dictBuilderImportAction(file, !!(elDictImportReplace && elDictImportReplace.checked));
     }catch(e){
-      alert(`Ошибка импорта: ${e.message || e}`);
+      alert(`Ошибка импорта: ${e && (e.message || e)}`);
     }
   });
+
+  function createDictBridge(){
+    return {
+      getState(){
+        return dictBridgeState();
+      },
+      async refreshCapabilities(){
+        await refreshDictAdminAccess();
+        return dictBridgeState();
+      },
+      async setSource(next){
+        await dictSetSource(next);
+        return dictBridgeState();
+      },
+      getCardsState(){
+        return buildCardsBridgePayload();
+      },
+      async loadCardsSection(sectionValue){
+        return bridgeLoadCardsSection(sectionValue);
+      },
+      cardsNext(){
+        cardsGoNext();
+        return buildCardsBridgePayload();
+      },
+      cardsPrev(){
+        cardsGoPrev();
+        return buildCardsBridgePayload();
+      },
+      cardsToggleFlip(){
+        cardsToggleFlip();
+        return buildCardsBridgePayload();
+      },
+      cardsRestart(){
+        dictResetCards();
+        return buildCardsBridgePayload();
+      },
+      setCardsFront(frontPref){
+        const next = String(frontPref || 'en').trim().toLowerCase();
+        if(elCardsFront && ['en','ru','mix'].includes(next)) elCardsFront.value = next;
+        dictResetCards();
+        return buildCardsBridgePayload();
+      },
+      setCardsRandom(randomMode){
+        if(elCardsRandom) elCardsRandom.checked = !!randomMode;
+        dictResetCards();
+        return buildCardsBridgePayload();
+      },
+      getPracticeState(){
+        return buildPracticeBridgePayload();
+      },
+      async loadPracticeSection(sectionValue){
+        return bridgeLoadPracticeSection(sectionValue);
+      },
+      setPracticeMode(modeValue){
+        const next = String(modeValue || 'en').trim().toLowerCase();
+        if(elQuizMode && ['en','ru','mix','weak'].includes(next)) elQuizMode.value = next;
+        dictResetQuiz();
+        return buildPracticeBridgePayload();
+      },
+      setPracticeConfig(nextCfg){
+        const cfg = nextCfg && typeof nextCfg === 'object' ? nextCfg : {};
+        if(elPracticeSession && cfg.session != null) elPracticeSession.value = String(cfg.session);
+        if(elPracticeTypos && cfg.typos != null) elPracticeTypos.checked = !!cfg.typos;
+        if(elPracticeIgnoreTo && cfg.ignoreTo != null) elPracticeIgnoreTo.checked = !!cfg.ignoreTo;
+        if(elPracticeIgnoreArticles && cfg.ignoreArticles != null) elPracticeIgnoreArticles.checked = !!cfg.ignoreArticles;
+        if(elPracticeTaskMode && cfg.taskMode != null) elPracticeTaskMode.value = String(cfg.taskMode);
+        if(elPracticeMixInputPct && cfg.mixInputPct != null) elPracticeMixInputPct.value = String(cfg.mixInputPct);
+        if(elPracticeMcqCount && cfg.mcqCount != null) elPracticeMcqCount.value = String(cfg.mcqCount);
+        if(elPracticeShowPos && cfg.showPos != null) elPracticeShowPos.checked = !!cfg.showPos;
+        if(elPracticeSoftMcq && cfg.softMcq != null) elPracticeSoftMcq.checked = !!cfg.softMcq;
+
+        const merged = cfgFromUI();
+        savePracticeCfg(merged);
+
+        if(elSectionQuiz && String(elSectionQuiz.value || '').trim()) dictResetQuiz();
+        return buildPracticeBridgePayload();
+      },
+      setPracticeAnswer(answerText){
+        if(elQuizInput) elQuizInput.value = String(answerText || '');
+        return buildPracticeBridgePayload();
+      },
+      practiceCheckOrNext(){
+        quizCheckOrNext();
+        return buildPracticeBridgePayload();
+      },
+      practiceSkip(){
+        quizSkip();
+        return buildPracticeBridgePayload();
+      },
+      practiceUseHint(){
+        practiceHint();
+        return buildPracticeBridgePayload();
+      },
+      practiceFuzzyResolve(accept){
+        practiceResolveFuzzy(accept === true);
+        return buildPracticeBridgePayload();
+      },
+      practiceMcqSelect(idx){
+        const n = Number(idx);
+        if(Number.isFinite(n) && n >= 0) quizMcqSelect(n);
+        return buildPracticeBridgePayload();
+      },
+      practiceToggleFlip(){
+        if(quizCheckMode === 'next' && elQuizCard){
+          const flipped = elQuizCard.classList.contains('is-flipped');
+          quizSetFlipped(!flipped);
+        }
+        return buildPracticeBridgePayload();
+      },
+      togglePracticeSettings(forceOpen){
+        if(elPracticeSettings){
+          const shown = elPracticeSettings.style.display !== 'none';
+          const nextShown = forceOpen === true ? true : (forceOpen === false ? false : !shown);
+          elPracticeSettings.style.display = nextShown ? 'block' : 'none';
+        }
+        return buildPracticeBridgePayload();
+      },
+      getLearnState(){
+        return buildLearnBridgePayload();
+      },
+      async loadLearnSection(sectionValue){
+        return bridgeLoadLearnSection(sectionValue);
+      },
+      startLearnSession(){
+        learnStartSession(true);
+        return buildLearnBridgePayload();
+      },
+      setLearnConfig(nextCfg){
+        const cfg = nextCfg && typeof nextCfg === 'object' ? nextCfg : {};
+        if(elLearnSource && cfg.source != null) elLearnSource.value = String(cfg.source);
+        if(elLearnPortion && cfg.portion != null) elLearnPortion.value = String(cfg.portion);
+        if(elLearnDir && cfg.dir != null) elLearnDir.value = String(cfg.dir);
+        if(elLearnGoal && cfg.goal != null) elLearnGoal.value = String(cfg.goal);
+        if(elLearnStrict && cfg.strict != null) elLearnStrict.value = String(cfg.strict);
+        if(elLearnTypos && cfg.typos != null) elLearnTypos.checked = !!cfg.typos;
+        if(elLearnForms && cfg.acceptForms != null) elLearnForms.checked = !!cfg.acceptForms;
+        if(elLearnIgnoreTo && cfg.ignoreTo != null) elLearnIgnoreTo.checked = !!cfg.ignoreTo;
+        if(elLearnIgnoreArticles && cfg.ignoreArticles != null) elLearnIgnoreArticles.checked = !!cfg.ignoreArticles;
+        if(elLearnHints && cfg.hints != null) elLearnHints.checked = !!cfg.hints;
+        if(elLearnIntroMode && cfg.introMode != null) elLearnIntroMode.value = String(cfg.introMode);
+        if(elLearnIntroMcqCount && cfg.introMcqCount != null) elLearnIntroMcqCount.value = String(cfg.introMcqCount);
+        if(elLearnIntroShowPos && cfg.introShowPos != null) elLearnIntroShowPos.checked = !!cfg.introShowPos;
+
+        const merged = learnCfgFromUI();
+        saveLearnCfg(merged);
+        applyLearnCfgToUI(merged);
+        return buildLearnBridgePayload();
+      },
+      toggleLearnSettings(forceOpen){
+        if(elLearnSettings){
+          const shown = elLearnSettings.style.display !== 'none';
+          const nextShown = forceOpen === true ? true : (forceOpen === false ? false : !shown);
+          elLearnSettings.style.display = nextShown ? 'block' : 'none';
+        }
+        return buildLearnBridgePayload();
+      },
+      setLearnAnswer(answerText){
+        if(elLearnInput) elLearnInput.value = String(answerText || '');
+        return buildLearnBridgePayload();
+      },
+      learnCheckOrNext(){
+        learnCheckOrNext();
+        return buildLearnBridgePayload();
+      },
+      learnHint(){
+        learnHint();
+        return buildLearnBridgePayload();
+      },
+      learnGiveUp(){
+        learnGiveUp();
+        return buildLearnBridgePayload();
+      },
+      learnIntroMcqSelect(idx){
+        const n = Number(idx);
+        if(Number.isFinite(n) && n >= 0) learnIntroMcqSelect(n);
+        return buildLearnBridgePayload();
+      },
+      learnToggleFlip(){
+        if(learnCheckMode === 'next' && elLearnCard){
+          const flipped = elLearnCard.classList.contains('is-flipped');
+          learnSetFlipped(!flipped);
+        }
+        return buildLearnBridgePayload();
+      },
+      getBuilderState(){
+        return buildBuilderBridgePayload();
+      },
+      async loadBuilderSection(sectionValue){
+        return bridgeLoadBuilderSection(sectionValue);
+      },
+      async builderAddSection(nameValue){
+        await dictBuilderAddSectionAction(nameValue);
+        return buildBuilderBridgePayload();
+      },
+      async builderDeleteSection(sectionValue){
+        await dictBuilderDeleteSectionAction(sectionValue);
+        return buildBuilderBridgePayload();
+      },
+      async builderAddWord(sectionValue, enValue, ruValue){
+        await dictBuilderAddWordAction(sectionValue, enValue, ruValue);
+        return buildBuilderBridgePayload();
+      },
+      async builderDeleteWord(wordId){
+        await dictBuilderDeleteWordAction(wordId);
+        return buildBuilderBridgePayload();
+      },
+      async builderSubmit(){
+        await dictBuilderSubmitAction();
+        return buildBuilderBridgePayload();
+      },
+      async builderExport(sectionValue){
+        await dictBuilderExportAction(sectionValue);
+        return buildBuilderBridgePayload();
+      },
+      async builderImport(file, replaceExisting){
+        await dictBuilderImportAction(file, replaceExisting);
+        return buildBuilderBridgePayload();
+      },
+      listFirstPick(query){
+        return buildFirstPickModel(query);
+      },
+      listView(sectionValue, query){
+        return buildViewModel(sectionValue, query);
+      },
+      async loadViewSection(sectionValue){
+        await dictLoadViewSection(sectionValue);
+        return {
+          state: dictBridgeState(),
+          view: buildViewModel(sectionValue, ''),
+        };
+      },
+      showFirstPick(){
+        dictShowFirstPick();
+        return dictBridgeState();
+      },
+      openConstructor(){
+        dictOpenConstructorFromPick();
+        return dictBridgeState();
+      },
+      async enterSection(sectionValue, startTab){
+        await dictEnterSection(sectionValue, startTab);
+        return dictBridgeState();
+      },
+      setSubtab(which){
+        dictSetSubtab(which);
+        return dictBridgeState();
+      }
+    };
+  }
+
+  window.IKDictionaryBridge = createDictBridge();
+  window.dictBridge = window.IKDictionaryBridge;
 
   window.dictBoot = dictBoot;
   window.dictCloudRefresh = async function(){
@@ -5861,6 +6754,7 @@ async function dictSyncFromFolder(opts){
     updateGlobalBadges();
     renderSectionsUI();
     renderWordsUI();
+    emitDictBridgeState();
   };
 
 

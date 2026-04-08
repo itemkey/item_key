@@ -2,6 +2,7 @@ import Head from "next/head";
 import fs from "node:fs";
 import path from "node:path";
 import GrammarReactAppPortal from "../../../components/student-helper/GrammarReactAppPortal";
+import DictionaryReactAppPortal from "../../../components/student-helper/DictionaryReactAppPortal";
 
 const THEME_BOOTSTRAP_SCRIPT = `
 (function() {
@@ -17,6 +18,7 @@ const THEME_BOOTSTRAP_SCRIPT = `
 `;
 
 const ROOT_FALLBACK_HTML = "<main style=\"padding:24px;font-family:ui-monospace, Menlo, Consolas, monospace;font-weight:700\">загрузка...</main>";
+const DICT_REACT_SHELL_DEFAULT = /^(1|true|yes|on)$/i.test(String(process.env.NEXT_PUBLIC_DICT_REACT_SHELL || ""));
 
 export default function StudentHelperPage({ studentHelperBodyHtml }) {
   const rootHtml = String(studentHelperBodyHtml || "").trim() || ROOT_FALLBACK_HTML;
@@ -35,6 +37,7 @@ export default function StudentHelperPage({ studentHelperBodyHtml }) {
 
       <div id="ik-student-helper-root" dangerouslySetInnerHTML={{ __html: rootHtml }} />
 
+      <DictionaryReactAppPortal defaultEnabled={DICT_REACT_SHELL_DEFAULT} />
       <GrammarReactAppPortal />
 
       <script defer src="../../assets/js/theme.js" />

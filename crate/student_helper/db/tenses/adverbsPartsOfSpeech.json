@@ -429,6 +429,11 @@
       "title": "Смежные правила раздела",
       "items": [
         {
+          "id": "adjectiveDegreesComparison",
+          "label": "Adjective Degrees of Comparison",
+          "note": "сравнение прилагательных: -er/-est, more/most, irregular формы и маркеры"
+        },
+        {
           "id": "stativeVerbs",
           "label": "Stative Verbs",
           "note": "смыслы глаголов состояния и ограничения с Continuous"

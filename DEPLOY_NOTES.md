@@ -19,6 +19,8 @@ Order for fresh environment:
 15. (Optional) Run `supabase/sql/stage12_seed_public_user_dictionaries.sql`
 16. (Optional, if stage12 was used) Run `supabase/sql/stage17_fix_memorize_spelling.sql`
 17. (Optional, force refresh Unit 24) Run `supabase/sql/stage20_force_update_destination_b1_unit24.sql`
+18. (Optional, seed Unit 27) Run `supabase/sql/stage21_seed_destination_b1_unit27.sql`
+19. Run `supabase/sql/stage22_dictionary_capabilities.sql` (dictionary role/capability split)
 
 After SQL:
 

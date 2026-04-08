@@ -141,6 +141,7 @@ function subgroupTitle(group, subgroup) {
   if (g === "parts_of_speech") {
     if (s === "nouns") return "Nouns";
     if (s === "verbs") return "Verbs";
+    if (s === "adjectives") return "Adjectives";
     if (s === "adverbs") return "Adverbs";
   }
 

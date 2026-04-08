@@ -1,0 +1,1083 @@
+{
+  "id": "adjectiveDegreesComparison",
+  "title": "Adjective Degrees of Comparison",
+  "subtitle": "positive/comparative/superlative: форма, маркеры, исключения и контекст",
+  "ruleBlocks": [
+    {
+      "type": "heading",
+      "text": "Degrees of Comparison: опора на смысл, а не на шаблон"
+    },
+    {
+      "type": "text",
+      "text": "Степени сравнения нужны не для механического добавления -er/-est, а для точной передачи контраста: одинаково, выше/ниже, максимум/минимум в группе. Сначала определяем задачу (equal / comparative / superlative), затем выбираем форму и маркер."
+    },
+    {
+      "type": "text",
+      "text": "В этой теме важно держать вместе три слоя: форма (какое окончание или more/most), окружение (than, as...as, by far, one of the), и лексические исключения (good/better/best, elder/older, further/farther)."
+    },
+    {
+      "type": "table",
+      "caption": "Формула степеней сравнения",
+      "columns": [
+        "Степень",
+        "Формула",
+        "Когда используем",
+        "Пример"
+      ],
+      "rows": [
+        [
+          "positive",
+          "as + adjective + as / not as(so) + adjective + as",
+          "равенство или неравенство без прямого превышения",
+          "This room is as bright as that one."
+        ],
+        [
+          "comparative",
+          "adjective-er + than / more + adjective + than",
+          "сравнение двух объектов",
+          "This task is easier than the previous one."
+        ],
+        [
+          "superlative",
+          "the adjective-est / the most + adjective",
+          "максимум/минимум в группе",
+          "It is the most practical option in the list."
+        ]
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Как выбрать модель: -er/-est или more/most"
+    },
+    {
+      "type": "table",
+      "caption": "Рабочая карта выбора формы",
+      "columns": [
+        "Тип adjective",
+        "Comparative",
+        "Superlative",
+        "Примеры"
+      ],
+      "rows": [
+        [
+          "короткие (обычно 1 слог)",
+          "-er + than",
+          "the -est",
+          "small -> smaller -> the smallest; long -> longer -> the longest"
+        ],
+        [
+          "2 слога на -y",
+          "-ier + than",
+          "the -iest",
+          "happy -> happier -> the happiest; easy -> easier -> the easiest"
+        ],
+        [
+          "2 слога на -ow/-er/-le",
+          "чаще -er (возможен more)",
+          "чаще -est (возможен most)",
+          "narrow -> narrower; simple -> simpler; clever -> cleverer"
+        ],
+        [
+          "длинные (2+ слога, обычно)",
+          "more + adjective + than",
+          "the most + adjective",
+          "more comfortable; the most expensive"
+        ],
+        [
+          "снижение степени",
+          "less + adjective + than",
+          "the least + adjective",
+          "less risky; the least noisy"
+        ]
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Орфография: -er/-est без ошибок",
+      "columns": [
+        "Случай",
+        "Правило",
+        "Пример"
+      ],
+      "rows": [
+        [
+          "CVC (краткая гласная + согласная)",
+          "удваиваем конечную согласную",
+          "big -> bigger -> biggest; hot -> hotter -> hottest"
+        ],
+        [
+          "конец на -y после согласной",
+          "y -> i",
+          "happy -> happier -> happiest; busy -> busier -> busiest"
+        ],
+        [
+          "конец на -e",
+          "добавляем только -r/-st",
+          "large -> larger -> largest; nice -> nicer -> nicest"
+        ]
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Маркеры базы и усиления",
+      "lines": [
+        "positive: very / really / quite / rather + adjective",
+        "equal comparison: as ... as, not as ... as, not so ... as",
+        "comparative intensifiers: much, far, a lot, a bit, a little",
+        "superlative context: of all, in the world/city/class, one of the, by far",
+        "result patterns: too + adjective + to; adjective + enough + to; so + adjective + that"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Irregular and special forms"
+    },
+    {
+      "type": "table",
+      "caption": "Irregular set: учим как готовые цепочки",
+      "columns": [
+        "Positive",
+        "Comparative",
+        "Superlative",
+        "Комментарий"
+      ],
+      "rows": [
+        ["good", "better", "the best", "оценка качества"],
+        ["bad/ill", "worse", "the worst", "отрицательная оценка"],
+        ["little (amount)", "less", "the least", "количество, не countable plural"],
+        ["much/many", "more", "the most", "объем/число"],
+        ["far", "farther/further", "the farthest/the furthest", "distance vs abstract extension"]
+      ]
+    },
+    {
+      "type": "table",
+      "caption": "Special meaning pairs",
+      "columns": [
+        "Форма",
+        "Где используется",
+        "Пример"
+      ],
+      "rows": [
+        [
+          "older",
+          "общий возраст, обычно с than",
+          "My brother is older than me."
+        ],
+        [
+          "elder",
+          "семейные отношения перед noun",
+          "my elder sister"
+        ],
+        [
+          "further",
+          "дополнительный/абстрактный смысл",
+          "further information"
+        ],
+        [
+          "farther",
+          "физическая дистанция",
+          "The station is farther than we thought."
+        ],
+        [
+          "nearest",
+          "ближайший по расстоянию",
+          "the nearest shop"
+        ],
+        [
+          "next",
+          "следующий по порядку",
+          "the next page"
+        ],
+        [
+          "latest",
+          "самый недавний по времени",
+          "the latest news"
+        ],
+        [
+          "last",
+          "последний в последовательности",
+          "the last chapter"
+        ]
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Markers around comparative and superlative"
+    },
+    {
+      "type": "table",
+      "caption": "Маркеры сравнительной и превосходной степени",
+      "columns": [
+        "Паттерн",
+        "Формула",
+        "Пример"
+      ],
+      "rows": [
+        [
+          "сравнение двух объектов",
+          "comparative + than",
+          "This route is safer than that one."
+        ],
+        [
+          "усиление comparative",
+          "much/far/a lot/a bit/a little + comparative",
+          "much better, a bit slower"
+        ],
+        [
+          "равенство",
+          "as + adjective + as",
+          "The task is as simple as it looks."
+        ],
+        [
+          "неравенство (мягкая форма)",
+          "not as/so + adjective + as",
+          "The room is not as bright as before."
+        ],
+        [
+          "рост/снижение тренда",
+          "the + comparative, the + comparative",
+          "The more we test, the fewer bugs remain."
+        ],
+        [
+          "максимум в группе",
+          "the + superlative + in/of",
+          "She is the most reliable person in the team."
+        ],
+        [
+          "внутри подгруппы",
+          "one of the + superlative + plural noun",
+          "It is one of the best courses online."
+        ],
+        [
+          "сильный акцент",
+          "by far + the superlative",
+          "This is by far the easiest method."
+        ],
+        [
+          "результат/следствие",
+          "so + adjective + that",
+          "It was so cold that we stayed inside."
+        ],
+        [
+          "избыточность / достаточность",
+          "too + adjective + to / adjective + enough + to",
+          "too heavy to lift / light enough to carry"
+        ]
+      ]
+    },
+    {
+      "type": "examples",
+      "items": [
+        {
+          "en": "This road is much narrower than the main highway.",
+          "ru": "Эта дорога намного уже, чем основное шоссе."
+        },
+        {
+          "en": "No room is as quiet as the library.",
+          "ru": "Ни одна комната не такая тихая, как библиотека."
+        },
+        {
+          "en": "She is one of the most creative engineers in our office.",
+          "ru": "Она одна из самых креативных инженеров в нашем офисе."
+        },
+        {
+          "en": "The earlier you start, the easier the task becomes.",
+          "ru": "Чем раньше начнешь, тем проще становится задача."
+        },
+        {
+          "en": "We need further information before signing the contract.",
+          "ru": "Нам нужна дополнительная информация перед подписанием контракта."
+        },
+        {
+          "en": "This backpack is light enough to carry all day.",
+          "ru": "Этот рюкзак достаточно легкий, чтобы носить его весь день."
+        }
+      ]
+    },
+    {
+      "type": "highlight",
+      "title": "Финальный алгоритм перед ответом",
+      "lines": [
+        "Шаг 1: определи задачу: equal, comparative или superlative.",
+        "Шаг 2: выбери модель формы: -er/-est или more/most (и проверь орфографию).",
+        "Шаг 3: поставь нужный маркер рядом: than, as...as, by far, one of the, in/of.",
+        "Шаг 4: проверь irregular и special пары: better, worse, less, elder/older, further/farther.",
+        "Шаг 5: отдельно проверь конструкции so...that, too...to, adjective + enough + to."
+      ]
+    },
+    {
+      "type": "topicLinks",
+      "title": "Смежные правила раздела",
+      "note": "Эта тема тесно связана с adverbs (comparison/intensifiers) и quantifiers (less/fewer/more).",
+      "items": [
+        {
+          "id": "adverbs",
+          "label": "Adverbs",
+          "note": "сравнение наречий, пары hard/hardly и маркеры степени"
+        },
+        {
+          "id": "nounQuantifiersCountability",
+          "label": "Noun Quantifiers and Countability",
+          "note": "fewer vs less и логика количества"
+        },
+        {
+          "id": "presentSimple",
+          "label": "Present Simple",
+          "note": "частые сравнения в фактах и общих утверждениях"
+        }
+      ]
+    }
+  ],
+  "practice": {
+    "exercises": [
+      {
+        "id": "meaning",
+        "title": "Choose the correct form (Set A)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "adc_m_1",
+            "instruction": "Выбери правильную форму",
+            "prompt": "Mount Everest is ___ than any other mountain on Earth.",
+            "options": ["high", "higher", "highest"],
+            "correctIndex": 1,
+            "explain": "than -> comparative"
+          },
+          {
+            "id": "adc_m_2",
+            "instruction": "Выбери правильную форму",
+            "prompt": "This is the ___ chapter in the whole book.",
+            "options": ["interesting", "more interesting", "most interesting"],
+            "correctIndex": 2,
+            "explain": "the + superlative"
+          },
+          {
+            "id": "adc_m_3",
+            "instruction": "Выбери правильную форму",
+            "prompt": "My street is ___ than yours at night.",
+            "options": ["quiet", "quieter", "the quietest"],
+            "correctIndex": 1,
+            "explain": "сравнение двух улиц -> comparative"
+          },
+          {
+            "id": "adc_m_4",
+            "instruction": "Выбери правильную форму",
+            "prompt": "She is one of the ___ designers in the company.",
+            "options": ["creative", "more creative", "most creative"],
+            "correctIndex": 2,
+            "explain": "one of the + superlative + plural noun"
+          },
+          {
+            "id": "adc_m_5",
+            "instruction": "Выбери правильную форму",
+            "prompt": "Today is ___ than yesterday, so let's walk home.",
+            "options": ["warm", "warmer", "warmest"],
+            "correctIndex": 1,
+            "explain": "than -> warmer"
+          },
+          {
+            "id": "adc_m_6",
+            "instruction": "Выбери правильную форму",
+            "prompt": "Of all the routes, this one is ___.",
+            "options": ["safe", "safer", "the safest"],
+            "correctIndex": 2,
+            "explain": "of all -> superlative"
+          },
+          {
+            "id": "adc_m_7",
+            "instruction": "Выбери правильную форму",
+            "prompt": "Your bag is ___ than mine.",
+            "options": ["heavy", "heavier", "more heavy"],
+            "correctIndex": 1,
+            "explain": "короткое adjective -> -er"
+          },
+          {
+            "id": "adc_m_8",
+            "instruction": "Выбери правильную форму",
+            "prompt": "That exercise is ___ than the previous one.",
+            "options": ["difficult", "difficulter", "more difficult"],
+            "correctIndex": 2,
+            "explain": "длинное adjective -> more + adjective"
+          },
+          {
+            "id": "adc_m_9",
+            "instruction": "Выбери правильную форму",
+            "prompt": "The Pacific is by far the ___ ocean on the planet.",
+            "options": ["large", "larger", "largest"],
+            "correctIndex": 2,
+            "explain": "by far the + superlative"
+          },
+          {
+            "id": "adc_m_10",
+            "instruction": "Выбери правильную форму",
+            "prompt": "This phone is ___ more expensive than that one.",
+            "options": ["much", "very", "most"],
+            "correctIndex": 0,
+            "explain": "усилитель comparative: much"
+          },
+          {
+            "id": "adc_m_11",
+            "instruction": "Выбери правильную форму",
+            "prompt": "Her second presentation was ___ better than the first.",
+            "options": ["a bit", "very", "most"],
+            "correctIndex": 0,
+            "explain": "a bit + comparative"
+          },
+          {
+            "id": "adc_m_12",
+            "instruction": "Выбери правильную форму",
+            "prompt": "The weather is not as cold ___ it was last week.",
+            "options": ["than", "as", "that"],
+            "correctIndex": 1,
+            "explain": "not as ... as"
+          },
+          {
+            "id": "adc_m_13",
+            "instruction": "Выбери правильную форму",
+            "prompt": "The ___ you practice, the better your pronunciation gets.",
+            "options": ["more", "most", "many"],
+            "correctIndex": 0,
+            "explain": "the more ..., the better ..."
+          },
+          {
+            "id": "adc_m_14",
+            "instruction": "Выбери правильную форму",
+            "prompt": "This is the ___ solution we have right now.",
+            "options": ["practical", "more practical", "most practical"],
+            "correctIndex": 2,
+            "explain": "the + most + adjective"
+          },
+          {
+            "id": "adc_m_15",
+            "instruction": "Выбери правильную форму",
+            "prompt": "My elder brother is two years ___ than me.",
+            "options": ["older", "elder", "oldest"],
+            "correctIndex": 0,
+            "explain": "с than используем older"
+          },
+          {
+            "id": "adc_m_16",
+            "instruction": "Выбери правильную форму",
+            "prompt": "We need ___ information before we make a final decision.",
+            "options": ["farther", "further", "farthest"],
+            "correctIndex": 1,
+            "explain": "further information = дополнительная информация"
+          },
+          {
+            "id": "adc_m_17",
+            "instruction": "Выбери правильную форму",
+            "prompt": "Tokyo is one of the ___ cities in the world.",
+            "options": ["busy", "busier", "busiest"],
+            "correctIndex": 2,
+            "explain": "one of the + superlative + plural noun"
+          },
+          {
+            "id": "adc_m_18",
+            "instruction": "Выбери правильную форму",
+            "prompt": "No classroom here is as ___ as Room 204.",
+            "options": ["bright", "brighter", "brightest"],
+            "correctIndex": 0,
+            "explain": "as + adjective + as"
+          }
+        ]
+      },
+      {
+        "id": "formula",
+        "title": "Fill in one form (Set B)",
+        "kind": "input",
+        "items": [
+          { "id": "adc_f_1", "instruction": "Вставь форму", "prompt": "My car is ___ (fast) than yours.", "accepted": ["faster"], "explain": "fast -> faster" },
+          { "id": "adc_f_2", "instruction": "Вставь форму", "prompt": "This puzzle is ___ (easy) than I thought.", "accepted": ["easier"], "explain": "easy -> easier" },
+          { "id": "adc_f_3", "instruction": "Вставь форму", "prompt": "She is the ___ (young) player on the team.", "accepted": ["youngest"], "explain": "the + youngest" },
+          { "id": "adc_f_4", "instruction": "Вставь форму", "prompt": "This chair is ___ (comfortable) than that one.", "accepted": ["more comfortable"], "explain": "длинное adjective -> more" },
+          { "id": "adc_f_5", "instruction": "Вставь форму", "prompt": "January is usually the ___ (cold) month here.", "accepted": ["coldest"], "explain": "the coldest" },
+          { "id": "adc_f_6", "instruction": "Вставь форму", "prompt": "Your answer is ___ (good) than mine.", "accepted": ["better"], "explain": "good -> better" },
+          { "id": "adc_f_7", "instruction": "Вставь форму", "prompt": "That was the ___ (bad) idea of the day.", "accepted": ["worst"], "explain": "bad -> worse -> worst" },
+          { "id": "adc_f_8", "instruction": "Вставь форму", "prompt": "I need ___ details about the plan. (far)", "accepted": ["further"], "explain": "further details/information" },
+          { "id": "adc_f_9", "instruction": "Вставь форму", "prompt": "This hill is ___ (steep) than it looks.", "accepted": ["steeper"], "explain": "steep -> steeper" },
+          { "id": "adc_f_10", "instruction": "Вставь форму", "prompt": "Your room is ___ (tidy) than yesterday.", "accepted": ["tidier"], "explain": "y -> i: tidier" },
+          { "id": "adc_f_11", "instruction": "Вставь форму", "prompt": "This is one of the ___ beaches in Europe. (beautiful)", "accepted": ["most beautiful"], "explain": "one of the most + adjective" },
+          { "id": "adc_f_12", "instruction": "Вставь форму", "prompt": "The test was ___ difficult than I expected. (little)", "accepted": ["less"], "explain": "less difficult" },
+          { "id": "adc_f_13", "instruction": "Вставь форму", "prompt": "Could you speak a bit ___? (slow)", "accepted": ["slower"], "explain": "a bit + comparative" },
+          { "id": "adc_f_14", "instruction": "Вставь форму", "prompt": "Her new laptop is ___ than her old one. (expensive)", "accepted": ["more expensive"], "explain": "more expensive" },
+          { "id": "adc_f_15", "instruction": "Вставь форму", "prompt": "This is by far the ___ moment of the day. (exciting)", "accepted": ["most exciting"], "explain": "by far the most" },
+          { "id": "adc_f_16", "instruction": "Вставь форму", "prompt": "Today I feel ___ than yesterday. (well)", "accepted": ["better"], "explain": "well -> better" },
+          { "id": "adc_f_17", "instruction": "Вставь форму", "prompt": "No city here is ___ than the capital. (large)", "accepted": ["larger"], "explain": "large -> larger" },
+          { "id": "adc_f_18", "instruction": "Вставь форму", "prompt": "This route is the ___ of all. (safe)", "accepted": ["safest"], "explain": "the safest" },
+          { "id": "adc_f_19", "instruction": "Вставь форму", "prompt": "That river is ___ than this one. (deep)", "accepted": ["deeper"], "explain": "deep -> deeper" },
+          { "id": "adc_f_20", "instruction": "Вставь форму", "prompt": "Your instructions are much ___ now. (clear)", "accepted": ["clearer"], "explain": "much + comparative" },
+          { "id": "adc_f_21", "instruction": "Вставь форму", "prompt": "It became ___, so we ordered a taxi. (late)", "accepted": ["later"], "explain": "late -> later" },
+          { "id": "adc_f_22", "instruction": "Вставь форму", "prompt": "Among all candidates, she is the ___ one. (suitable)", "accepted": ["most suitable"], "explain": "the most suitable" },
+          { "id": "adc_f_23", "instruction": "Вставь форму", "prompt": "The movie is ___ than the trailer suggested. (interesting)", "accepted": ["more interesting"], "explain": "more interesting" },
+          { "id": "adc_f_24", "instruction": "Вставь форму", "prompt": "Our office is now ___ to the station than before. (near)", "accepted": ["nearer"], "explain": "near -> nearer" },
+          { "id": "adc_f_25", "instruction": "Вставь форму", "prompt": "This is the ___ populated region in the country. (little)", "accepted": ["least"], "explain": "the least + adjective" },
+          { "id": "adc_f_26", "instruction": "Вставь форму", "prompt": "His joke was ___ than mine. (funny)", "accepted": ["funnier"], "explain": "funny -> funnier" }
+        ]
+      },
+      {
+        "id": "formula_2",
+        "goal": "formula",
+        "title": "Two blanks: form + marker (Set C)",
+        "kind": "multi_input",
+        "items": [
+          {
+            "id": "adc_f2_1",
+            "instruction": "Заполни оба пропуска",
+            "prompt": "This task is ___ difficult ___ the previous one.",
+            "inputs": [
+              { "accepted": ["more"] },
+              { "accepted": ["than"] }
+            ],
+            "explain": "more difficult than"
+          },
+          {
+            "id": "adc_f2_2",
+            "instruction": "Заполни оба пропуска",
+            "prompt": "My laptop is ___ as heavy ___ yours.",
+            "inputs": [
+              { "accepted": ["not"] },
+              { "accepted": ["as"] }
+            ],
+            "explain": "not as ... as"
+          },
+          {
+            "id": "adc_f2_3",
+            "instruction": "Заполни оба пропуска",
+            "prompt": "He is by ___ the ___ experienced engineer here.",
+            "inputs": [
+              { "accepted": ["far"] },
+              { "accepted": ["most"] }
+            ],
+            "explain": "by far the most"
+          },
+          {
+            "id": "adc_f2_4",
+            "instruction": "Заполни оба пропуска",
+            "prompt": "The ___ we revise, the ___ mistakes we make.",
+            "inputs": [
+              { "accepted": ["more"] },
+              { "accepted": ["fewer", "less"] }
+            ],
+            "explain": "the more ..., the fewer ..."
+          },
+          {
+            "id": "adc_f2_5",
+            "instruction": "Заполни оба пропуска",
+            "prompt": "This jacket is ___ warm ___ to wear in winter.",
+            "inputs": [
+              { "accepted": ["not"] },
+              { "accepted": ["enough"] }
+            ],
+            "explain": "not warm enough to ..."
+          },
+          {
+            "id": "adc_f2_6",
+            "instruction": "Заполни оба пропуска",
+            "prompt": "That bag is ___ heavy ___ carry all day.",
+            "inputs": [
+              { "accepted": ["too"] },
+              { "accepted": ["to"] }
+            ],
+            "explain": "too + adjective + to"
+          },
+          {
+            "id": "adc_f2_7",
+            "instruction": "Заполни оба пропуска",
+            "prompt": "Your second draft is a bit ___ ___ the first one.",
+            "inputs": [
+              { "accepted": ["better"] },
+              { "accepted": ["than"] }
+            ],
+            "explain": "a bit better than"
+          },
+          {
+            "id": "adc_f2_8",
+            "instruction": "Заполни оба пропуска",
+            "prompt": "No mountain in Europe is ___ high ___ Mont Blanc.",
+            "inputs": [
+              { "accepted": ["as"] },
+              { "accepted": ["as"] }
+            ],
+            "explain": "as ... as"
+          },
+          {
+            "id": "adc_f2_9",
+            "instruction": "Заполни оба пропуска",
+            "prompt": "For technical details we need ___ information, not ___ measurements.",
+            "inputs": [
+              { "accepted": ["further"] },
+              { "accepted": ["farther"] }
+            ],
+            "explain": "further information vs farther distance"
+          },
+          {
+            "id": "adc_f2_10",
+            "instruction": "Заполни оба пропуска",
+            "prompt": "It was ___ cold ___ we had to cancel the trip.",
+            "inputs": [
+              { "accepted": ["so"] },
+              { "accepted": ["that"] }
+            ],
+            "explain": "so ... that"
+          }
+        ]
+      },
+      {
+        "id": "compare",
+        "goal": "compare",
+        "title": "Irregulars and special pairs (Set D)",
+        "kind": "choice",
+        "items": [
+          {
+            "id": "adc_cmp_1",
+            "instruction": "Выбери форму",
+            "prompt": "good -> ___ -> the best",
+            "options": ["better", "gooder", "more good"],
+            "correctIndex": 0,
+            "explain": "irregular: good -> better"
+          },
+          {
+            "id": "adc_cmp_2",
+            "instruction": "Выбери форму",
+            "prompt": "bad -> ___ -> the worst",
+            "options": ["badder", "worse", "more bad"],
+            "correctIndex": 1,
+            "explain": "irregular: bad -> worse"
+          },
+          {
+            "id": "adc_cmp_3",
+            "instruction": "Выбери форму",
+            "prompt": "little (amount) -> ___ -> the least",
+            "options": ["less", "littler", "fewer"],
+            "correctIndex": 0,
+            "explain": "little -> less"
+          },
+          {
+            "id": "adc_cmp_4",
+            "instruction": "Выбери форму",
+            "prompt": "much/many -> ___ -> the most",
+            "options": ["more", "mucher", "manyer"],
+            "correctIndex": 0,
+            "explain": "much/many -> more"
+          },
+          {
+            "id": "adc_cmp_5",
+            "instruction": "Выбери форму",
+            "prompt": "For physical distance, modern English accepts:",
+            "options": ["farther or further", "only farther", "only further"],
+            "correctIndex": 0,
+            "explain": "оба варианта допустимы"
+          },
+          {
+            "id": "adc_cmp_6",
+            "instruction": "Выбери форму",
+            "prompt": "For abstract ideas (information, discussion) we usually prefer:",
+            "options": ["farther", "further", "farthest"],
+            "correctIndex": 1,
+            "explain": "further information"
+          },
+          {
+            "id": "adc_cmp_7",
+            "instruction": "Выбери форму",
+            "prompt": "my ___ sister (family relation)",
+            "options": ["older", "elder", "oldest"],
+            "correctIndex": 1,
+            "explain": "elder + family noun"
+          },
+          {
+            "id": "adc_cmp_8",
+            "instruction": "Выбери форму",
+            "prompt": "She is three years ___ than me.",
+            "options": ["elder", "older", "oldest"],
+            "correctIndex": 1,
+            "explain": "with than -> older"
+          },
+          {
+            "id": "adc_cmp_9",
+            "instruction": "Выбери форму",
+            "prompt": "the ___ shop (distance)",
+            "options": ["next", "nearest", "latest"],
+            "correctIndex": 1,
+            "explain": "nearest = distance"
+          },
+          {
+            "id": "adc_cmp_10",
+            "instruction": "Выбери форму",
+            "prompt": "the ___ page (order in sequence)",
+            "options": ["nearest", "next", "nearer"],
+            "correctIndex": 1,
+            "explain": "next = following by order"
+          },
+          {
+            "id": "adc_cmp_11",
+            "instruction": "Выбери форму",
+            "prompt": "the ___ news (time)",
+            "options": ["last", "latest", "later"],
+            "correctIndex": 1,
+            "explain": "latest = most recent"
+          },
+          {
+            "id": "adc_cmp_12",
+            "instruction": "Выбери форму",
+            "prompt": "the ___ chapter in the book (order)",
+            "options": ["latest", "last", "later"],
+            "correctIndex": 1,
+            "explain": "last = final in order"
+          },
+          {
+            "id": "adc_cmp_13",
+            "instruction": "Выбери форму",
+            "prompt": "Preferred comparative for simple:",
+            "options": ["simpler", "more simple", "simpleder"],
+            "correctIndex": 0,
+            "explain": "в учебной норме обычно simpler"
+          },
+          {
+            "id": "adc_cmp_14",
+            "instruction": "Выбери форму",
+            "prompt": "Most common superlative for narrow:",
+            "options": ["the narrowest", "the most narrow", "the narrower"],
+            "correctIndex": 0,
+            "explain": "узкая форма с -est наиболее частотна"
+          },
+          {
+            "id": "adc_cmp_15",
+            "instruction": "Выбери формулу",
+            "prompt": "Correct pattern: equal comparison",
+            "options": ["as + adjective + as", "so + adjective + than", "more + adjective + as"],
+            "correctIndex": 0,
+            "explain": "равенство: as ... as"
+          },
+          {
+            "id": "adc_cmp_16",
+            "instruction": "Выбери формулу",
+            "prompt": "Correct emphasis with superlative:",
+            "options": ["by far the best", "very the best", "most best"],
+            "correctIndex": 0,
+            "explain": "by far + the superlative"
+          }
+        ]
+      },
+      {
+        "id": "markers",
+        "goal": "markers",
+        "title": "Insert one word (Set E)",
+        "kind": "input",
+        "items": [
+          { "id": "adc_mark_1", "instruction": "Вставь одно слово", "prompt": "My brother is taller ___ me.", "accepted": ["than"], "explain": "comparative + than" },
+          { "id": "adc_mark_2", "instruction": "Вставь одно слово", "prompt": "This task is not as easy ___ it looks.", "accepted": ["as"], "explain": "not as ... as" },
+          { "id": "adc_mark_3", "instruction": "Вставь одно слово", "prompt": "The ___ I read, the more I understand.", "accepted": ["more"], "explain": "the more ..., the more ..." },
+          { "id": "adc_mark_4", "instruction": "Вставь одно слово", "prompt": "This box is too heavy ___ carry.", "accepted": ["to"], "explain": "too + adjective + to" },
+          { "id": "adc_mark_5", "instruction": "Вставь одно слово", "prompt": "The soup is warm enough ___ eat.", "accepted": ["to"], "explain": "adjective + enough + to" },
+          { "id": "adc_mark_6", "instruction": "Вставь одно слово", "prompt": "He is by ___ the best player in our team.", "accepted": ["far"], "explain": "by far" },
+          { "id": "adc_mark_7", "instruction": "Вставь одно слово", "prompt": "This is one of the ___ difficult exams this term.", "accepted": ["most"], "explain": "one of the most" },
+          { "id": "adc_mark_8", "instruction": "Вставь одно слово", "prompt": "It was ___ cold that we stayed home.", "accepted": ["so"], "explain": "so + adjective + that" },
+          { "id": "adc_mark_9", "instruction": "Вставь одно слово", "prompt": "It was ___ a cold day that schools closed early.", "accepted": ["such"], "explain": "such + noun phrase" },
+          { "id": "adc_mark_10", "instruction": "Вставь одно слово", "prompt": "This is the oldest building ___ the city.", "accepted": ["in"], "explain": "superlative + in + place" },
+          { "id": "adc_mark_11", "instruction": "Вставь одно слово", "prompt": "She is the kindest person ___ all.", "accepted": ["of"], "explain": "superlative + of all" },
+          { "id": "adc_mark_12", "instruction": "Вставь одно слово", "prompt": "No animal here is as fast ___ a cheetah.", "accepted": ["as"], "explain": "as ... as" },
+          { "id": "adc_mark_13", "instruction": "Вставь одно слово", "prompt": "Your answer is much better ___ mine.", "accepted": ["than"], "explain": "better than" },
+          { "id": "adc_mark_14", "instruction": "Вставь одно слово", "prompt": "He is not experienced enough ___ lead the team.", "accepted": ["to"], "explain": "enough + to" },
+          { "id": "adc_mark_15", "instruction": "Вставь одно слово", "prompt": "Could you speak a little ___ slowly?",
+            "accepted": ["more"], "explain": "a little more slowly" },
+          { "id": "adc_mark_16", "instruction": "Вставь одно слово", "prompt": "The weather is getting colder and ___.", "accepted": ["colder"], "explain": "comparative and comparative" },
+          { "id": "adc_mark_17", "instruction": "Вставь одно слово", "prompt": "The more you train, the ___ you get.", "accepted": ["better"], "explain": "the more..., the better..." },
+          { "id": "adc_mark_18", "instruction": "Вставь одно слово", "prompt": "This room is bigger ___ that one but smaller than the hall.", "accepted": ["than"], "explain": "bigger than" },
+          { "id": "adc_mark_19", "instruction": "Вставь одно слово", "prompt": "She is ___ intelligent that she solves problems quickly.", "accepted": ["so"], "explain": "so + adjective + that" },
+          { "id": "adc_mark_20", "instruction": "Вставь одно слово", "prompt": "The dessert is sweet enough ___ children, but not too sweet for adults.", "accepted": ["for"], "explain": "enough for + noun" }
+        ]
+      },
+      {
+        "id": "mistakes",
+        "goal": "mistakes",
+        "title": "Fix mistakes where needed (Set F)",
+        "kind": "correction",
+        "items": [
+          {
+            "id": "adc_err_1",
+            "instruction": "Исправь ошибку. Если все верно - напиши '-'",
+            "prompt": "Mount Everest is the most highest mountain in the world.",
+            "accepted": ["Mount Everest is the highest mountain in the world."],
+            "acceptedShort": ["the highest mountain"],
+            "explain": "most + -est не сочетаются"
+          },
+          {
+            "id": "adc_err_2",
+            "instruction": "Исправь ошибку. Если все верно - напиши '-'",
+            "prompt": "This exercise is more easier than the previous one.",
+            "accepted": ["This exercise is easier than the previous one."],
+            "acceptedShort": ["easier than"],
+            "explain": "more + -er не сочетаются"
+          },
+          {
+            "id": "adc_err_3",
+            "instruction": "Исправь ошибку. Если все верно - напиши '-'",
+            "prompt": "She is one of the most smartest students in class.",
+            "accepted": ["She is one of the smartest students in class."],
+            "acceptedShort": ["one of the smartest"],
+            "explain": "one of the + superlative"
+          },
+          {
+            "id": "adc_err_4",
+            "instruction": "Исправь ошибку. Если все верно - напиши '-'",
+            "prompt": "Your car is much faster than mine.",
+            "accepted": ["-"],
+            "acceptedShort": ["-"],
+            "explain": "Предложение корректно."
+          },
+          {
+            "id": "adc_err_5",
+            "instruction": "Исправь ошибку. Если все верно - напиши '-'",
+            "prompt": "This room is too cold enough for children.",
+            "accepted": ["This room is too cold for children."],
+            "acceptedShort": ["too cold for"],
+            "explain": "too и enough вместе в одной позиции не ставим"
+          },
+          {
+            "id": "adc_err_6",
+            "instruction": "Исправь ошибку. Если все верно - напиши '-'",
+            "prompt": "He is elder than me.",
+            "accepted": ["He is older than me."],
+            "acceptedShort": ["older than"],
+            "explain": "с than используем older"
+          },
+          {
+            "id": "adc_err_7",
+            "instruction": "Исправь ошибку. Если все верно - напиши '-'",
+            "prompt": "My elder sister lives in London.",
+            "accepted": ["-"],
+            "acceptedShort": ["-"],
+            "explain": "elder sister - корректно"
+          },
+          {
+            "id": "adc_err_8",
+            "instruction": "Исправь ошибку. Если все верно - напиши '-'",
+            "prompt": "The weather today is more better, so let's walk.",
+            "accepted": ["The weather today is better, so let's walk."],
+            "acceptedShort": ["is better"],
+            "explain": "better уже comparative"
+          },
+          {
+            "id": "adc_err_9",
+            "instruction": "Исправь ошибку. Если все верно - напиши '-'",
+            "prompt": "This is by far most interesting topic today.",
+            "accepted": ["This is by far the most interesting topic today."],
+            "acceptedShort": ["by far the most"],
+            "explain": "нужен артикль the"
+          },
+          {
+            "id": "adc_err_10",
+            "instruction": "Исправь ошибку. Если все верно - напиши '-'",
+            "prompt": "No city in our country is as bigger as this one.",
+            "accepted": ["No city in our country is as big as this one."],
+            "acceptedShort": ["as big as"],
+            "explain": "as ... as + base adjective"
+          },
+          {
+            "id": "adc_err_11",
+            "instruction": "Исправь ошибку. Если все верно - напиши '-'",
+            "prompt": "The further station to us is Central Station.",
+            "accepted": ["The nearest station to us is Central Station."],
+            "acceptedShort": ["nearest station"],
+            "explain": "distance -> nearest"
+          },
+          {
+            "id": "adc_err_12",
+            "instruction": "Исправь ошибку. Если все верно - напиши '-'",
+            "prompt": "I need farther information about your project.",
+            "accepted": ["I need further information about your project."],
+            "acceptedShort": ["further information"],
+            "explain": "abstract meaning -> further"
+          },
+          {
+            "id": "adc_err_13",
+            "instruction": "Исправь ошибку. Если все верно - напиши '-'",
+            "prompt": "The most latest update fixed the bug.",
+            "accepted": ["The latest update fixed the bug."],
+            "acceptedShort": ["the latest update"],
+            "explain": "latest уже superlative"
+          },
+          {
+            "id": "adc_err_14",
+            "instruction": "Исправь ошибку. Если все верно - напиши '-'",
+            "prompt": "The more carefully you plan, the less mistakes you make.",
+            "accepted": ["The more carefully you plan, the fewer mistakes you make."],
+            "acceptedShort": ["the fewer mistakes"],
+            "explain": "countable plural -> fewer"
+          },
+          {
+            "id": "adc_err_15",
+            "instruction": "Исправь ошибку. Если все верно - напиши '-'",
+            "prompt": "This bag is enough light to carry all day.",
+            "accepted": ["This bag is light enough to carry all day."],
+            "acceptedShort": ["light enough"],
+            "explain": "enough ставим после adjective"
+          },
+          {
+            "id": "adc_err_16",
+            "instruction": "Исправь ошибку. Если все верно - напиши '-'",
+            "prompt": "Their second offer was a little more worse than the first one.",
+            "accepted": ["Their second offer was a little worse than the first one."],
+            "acceptedShort": ["a little worse"],
+            "explain": "more + worse не сочетаются"
+          }
+        ]
+      },
+      {
+        "id": "story_cloze",
+        "goal": "story_cloze",
+        "title": "Mini stories with dropdowns (Set G)",
+        "kind": "inline_select",
+        "items": [
+          {
+            "id": "adc_story_1",
+            "instruction": "Выбери правильные варианты",
+            "prompt": "Travel diary: mountain weekend",
+            "storyTitle": "Travel diary: mountain weekend",
+            "segments": [
+              "When we reached the mountain village, the air felt ",
+              " than in the city, and the night was the ",
+              " we had that month. Our guide said the ",
+              " we climbed, the ",
+              " the path became. By the end, everyone agreed it was one of the ",
+              " trips in our lives, even though it was ",
+              " than we expected."
+            ],
+            "blanks": [
+              { "options": ["fresh", "fresher", "freshest"], "correctIndex": 1 },
+              { "options": ["cold", "colder", "coldest"], "correctIndex": 2 },
+              { "options": ["higher", "high", "highest"], "correctIndex": 0 },
+              { "options": ["more difficult", "difficult", "most difficult"], "correctIndex": 0 },
+              { "options": ["exciting", "more exciting", "most exciting"], "correctIndex": 2 },
+              { "options": ["tiring", "more tiring", "most tiring"], "correctIndex": 1 }
+            ],
+            "explain": "Смешение comparative, superlative и the ... the ..."
+          },
+          {
+            "id": "adc_story_2",
+            "instruction": "Выбери правильные варианты",
+            "prompt": "Tech report: device trends",
+            "storyTitle": "Tech report: device trends",
+            "segments": [
+              "Modern phones are ",
+              " more powerful than devices from a decade ago. In many tasks they are ",
+              " as fast as old laptops, and some models are by ",
+              " the most efficient in their price range. The ",
+              " competition gets, the ",
+              " prices become for users."
+            ],
+            "blanks": [
+              { "options": ["much", "very", "most"], "correctIndex": 0 },
+              { "options": ["almost", "too", "so"], "correctIndex": 0 },
+              { "options": ["far", "long", "wide"], "correctIndex": 0 },
+              { "options": ["more intense", "most intense", "intense"], "correctIndex": 0 },
+              { "options": ["lower", "lowest", "low"], "correctIndex": 0 }
+            ],
+            "explain": "Markers: much, almost as ... as, by far, the ... the ..."
+          },
+          {
+            "id": "adc_story_3",
+            "instruction": "Выбери правильные варианты",
+            "prompt": "Office move: first impressions",
+            "storyTitle": "Office move: first impressions",
+            "segments": [
+              "Our new office is not as ",
+              " as the old one, but it is much ",
+              " to public transport. The meeting rooms are big ",
+              " for team sessions, and the cafeteria is one of the ",
+              " spaces in the building. Overall, the move was ",
+              " than we first imagined."
+            ],
+            "blanks": [
+              { "options": ["noisy", "noisier", "noisiest"], "correctIndex": 0 },
+              { "options": ["near", "nearer", "nearest"], "correctIndex": 1 },
+              { "options": ["too", "enough", "as"], "correctIndex": 1 },
+              { "options": ["comfortable", "more comfortable", "most comfortable"], "correctIndex": 2 },
+              { "options": ["smooth", "smoother", "smoothest"], "correctIndex": 1 }
+            ],
+            "explain": "not as ... as, much + comparative, enough, one of the most"
+          }
+        ]
+      },
+      {
+        "id": "irregular_match",
+        "goal": "compare",
+        "title": "Match core pairs (Set H)",
+        "kind": "match",
+        "items": [
+          {
+            "id": "adc_match_1",
+            "instruction": "Соотнеси слова и формы",
+            "prompt": "Irregular comparative forms",
+            "pairs": [
+              { "left": "good", "right": "better" },
+              { "left": "bad", "right": "worse" },
+              { "left": "little (amount)", "right": "less" },
+              { "left": "much/many", "right": "more" },
+              { "left": "far (abstract idea)", "right": "further" }
+            ],
+            "explain": "Irregular forms учим как отдельный мини-набор."
+          },
+          {
+            "id": "adc_match_2",
+            "instruction": "Соотнеси форму и контекст",
+            "prompt": "Special usage pairs",
+            "pairs": [
+              { "left": "elder", "right": "before family noun" },
+              { "left": "older", "right": "with than / general age" },
+              { "left": "nearest", "right": "distance" },
+              { "left": "next", "right": "order" },
+              { "left": "latest", "right": "most recent in time" },
+              { "left": "last", "right": "final in sequence" }
+            ],
+            "explain": "old/near/late пары различаются по смыслу, а не только по форме."
+          }
+        ]
+      },
+      {
+        "id": "sort_patterns",
+        "goal": "formula",
+        "title": "Classify forms and markers (Set I)",
+        "kind": "drag_sort",
+        "items": [
+          {
+            "id": "adc_drag_1",
+            "instruction": "Распредели элементы по корзинам",
+            "prompt": "Form families",
+            "bins": ["positive", "comparative", "superlative"],
+            "words": [
+              { "text": "small", "bin": "positive" },
+              { "text": "smaller", "bin": "comparative" },
+              { "text": "the smallest", "bin": "superlative" },
+              { "text": "comfortable", "bin": "positive" },
+              { "text": "more comfortable", "bin": "comparative" },
+              { "text": "the most comfortable", "bin": "superlative" },
+              { "text": "good", "bin": "positive" },
+              { "text": "better", "bin": "comparative" },
+              { "text": "the best", "bin": "superlative" }
+            ],
+            "explain": "Классифицируй по степени, а не по длине слова."
+          },
+          {
+            "id": "adc_drag_2",
+            "instruction": "Распредели маркеры",
+            "prompt": "Marker groups",
+            "bins": ["comparative marker", "superlative marker", "equal marker"],
+            "words": [
+              { "text": "than", "bin": "comparative marker" },
+              { "text": "much", "bin": "comparative marker" },
+              { "text": "a bit", "bin": "comparative marker" },
+              { "text": "one of the", "bin": "superlative marker" },
+              { "text": "by far", "bin": "superlative marker" },
+              { "text": "in the world", "bin": "superlative marker" },
+              { "text": "as ... as", "bin": "equal marker" },
+              { "text": "not as ... as", "bin": "equal marker" },
+              { "text": "so ... as (negative)", "bin": "equal marker" }
+            ],
+            "explain": "Маркеры помогают проверить форму за одну секунду."
+          }
+        ]
+      }
+    ]
+  }
+}

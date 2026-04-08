@@ -454,6 +454,28 @@
     "levels": ["A2-B1", "B1-B2", "B2-C1"]
   },
   {
+    "id": "adjectiveDegreesComparison",
+    "title": "Adjective Degrees of Comparison",
+    "subtitle": "positive/comparative/superlative: формы, маркеры, исключения и ловушки",
+    "hint": "-er/-est • more/most • irregular forms • as...as • by far",
+    "aliases": [
+      "степени сравнения прилагательных",
+      "comparative",
+      "superlative",
+      "-er -est",
+      "more most",
+      "as as",
+      "one of the",
+      "by far"
+    ],
+    "file": "adjectiveDegreesComparison.json",
+    "group": "parts_of_speech",
+    "subgroup": "adjectives",
+    "kind": "structure",
+    "compare": false,
+    "levels": ["A2-B1", "B1-B2", "B2-C1"]
+  },
+  {
     "id": "adverbs",
     "title": "Adverbs",
     "subtitle": "adjective vs adverb: форма, ловушки, позиция, сравнение",
