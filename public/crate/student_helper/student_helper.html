@@ -1,32 +1,1756 @@
 <!doctype html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta http-equiv="refresh" content="0;url=./" />
-  <title>Redirecting...</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Student Helper</title>
+
   <script>
-    (function(){
+    (function() {
+      var key = "ik_site_theme_v1";
+      var stored = null;
+      try { stored = localStorage.getItem(key); } catch (e) {}
+      var theme = (stored === "dark" || stored === "light")
+        ? stored
+        : ((window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) ? "dark" : "light");
+      document.documentElement.setAttribute("data-theme", theme);
+      document.documentElement.style.colorScheme = theme;
+    })();
+  </script>
+
+  <script>
+    (function() {
       var search = String(window.location.search || "");
       if (/(^|[?&])legacy=1(?:&|$)/i.test(search)) return;
+
       var path = String(window.location.pathname || "");
-      if (!/\/crate\/student_helper\/(?:student_helper\.html|index\.html)?\/?$/i.test(path)) return;
-      var targetPath = path.replace(/(?:student_helper|index)\.html\/?$/i, "");
+      if (!/\/crate\/student_helper\/(?:student_helper\.html)?\/?$/i.test(path)) return;
+
+      var targetPath = path.replace(/student_helper\.html\/?$/i, "");
       if (targetPath.charAt(0) !== "/") targetPath = "/" + targetPath;
-      if(!targetPath) targetPath = "./";
-      if(targetPath.charAt(targetPath.length - 1) !== "/") targetPath += "/";
+      if (!targetPath) targetPath = "./";
+      if (targetPath.charAt(targetPath.length - 1) !== "/") targetPath += "/";
+
       var cleanSearch = search
         .replace(/[?&]legacy=1(?=&|$)/gi, "")
         .replace(/^&/, "?")
         .replace(/[?&]$/, "");
+
       var target = targetPath + cleanSearch + String(window.location.hash || "");
       var current = path + search + String(window.location.hash || "");
       if (target === current) return;
       window.location.replace(target);
     })();
   </script>
+
+  <!-- Match main site look -->
+  <link rel="stylesheet" href="../../assets/css/styles.css" />
+
+  <link rel="stylesheet" href="./student_helper.css?v=20260402-11" />
+
+<style id="ik-site-nav-css">
+.ik-site-nav, .ik-site-nav *{ box-sizing: border-box; }
+
+.ik-site-nav{
+  position: relative;
+  z-index: 50;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px 14px;
+  margin: 0 0 18px;
+  background: #fff;
+  border-bottom: 1px solid rgba(0,0,0,.14);
+}
+
+.ik-site-nav__link{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  padding: 10px 16px;
+  border: 1px solid rgba(0,0,0,.14);
+  background: #fff;
+  color: rgba(0,0,0,.86);
+  text-decoration: none;
+  font-size: 11px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.ik-site-nav__link:hover{ border-color: rgba(0,0,0,.25); }
+
+.ik-site-nav__link#ikBackBtn{ margin-right: auto; }
+.ik-site-nav__link[href]{ margin-left: auto; margin-right: auto; }
+
+.ik-site-nav__actions{
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ik-hidden-ui{
+  display: none !important;
+}
+
+@media (max-width: 520px){
+  .ik-site-nav{ padding: 14px 12px; margin-bottom: 14px; }
+  .ik-site-nav__link{ padding: 10px 12px; letter-spacing: 3px; }
+}
+</style>
+
+<style id="ik-site-settings-css">
+.ik-floating-settings{
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 100100;
+}
+.ik-gear-btn{
+  appearance: none;
+  border: 1px solid rgba(0,0,0,.14);
+  background: #fff;
+  color: rgba(0,0,0,.86);
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  display: inline-grid;
+  place-items: center;
+  cursor: pointer;
+  border-radius: 0;
+  transition: transform .18s ease, border-color .18s ease, opacity .18s ease;
+  box-shadow: none;
+}
+.ik-gear-btn:hover{
+  transform: translateY(-1px);
+  border-color: rgba(0,0,0,.28);
+  opacity: .98;
+}
+.ik-gear-btn:focus-visible{
+  outline: 2px solid rgba(0,0,0,.55);
+  outline-offset: 2px;
+}
+.ik-gear-btn svg{
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+.ik-settings-panel{
+  position: fixed;
+  top: 68px;
+  right: 16px;
+  z-index: 100101;
+  width: min(320px, calc(100vw - 28px));
+  border: 1px solid rgba(0,0,0,.18);
+  background: rgba(255,255,255,.98);
+  box-shadow: 0 10px 32px rgba(0,0,0,.10);
+  padding: 14px;
+  border-radius: 0;
+}
+.ik-settings-panel[hidden]{ display: none !important; }
+.ik-settings-panel__head{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.ik-settings-panel__title{
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+}
+.ik-settings-panel__close{
+  appearance: none;
+  border: 1px solid rgba(0,0,0,.14);
+  background: #fff;
+  color: rgba(0,0,0,.86);
+  padding: 8px 10px;
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 0;
+}
+.ik-settings-group{ display: grid; gap: 10px; }
+.ik-settings-label{
+  font-size: 10px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: rgba(0,0,0,.58);
+}
+.ik-lang-switch{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.ik-lang-option{
+  border: 1px solid rgba(0,0,0,.14);
+  background: rgba(255,255,255,.92);
+  min-height: 42px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+.ik-lang-option input{ margin: 0; }
+.ik-lang-option.is-active{
+  border-color: rgba(0,0,0,.34);
+  background: rgba(0,0,0,.03);
+}
+@media (max-width: 640px){
+  .ik-floating-settings{ top: 12px; right: 12px; }
+  .ik-site-nav__actions{ right: 12px; }
+  .ik-settings-panel{ top: 62px; right: 12px; width: min(320px, calc(100vw - 24px)); }
+}
+</style>
+
+<link rel="stylesheet" href="../../assets/css/theme.css" />
+
 </head>
-<body>
-  <p>Redirecting to <a href="./">the new Student Helper page</a>...</p>
+
+<body class="page page-learning ik-booting" data-i18n-page="student_helper" data-ik-loading>
+  <header class="ik-site-nav" id="ikSiteNav">
+    <button type="button" class="ik-site-nav__link" id="ikBackBtn" title="Вернуться назад">← Назад</button>
+    <a class="ik-site-nav__link" href="/item_key/">Главное меню</a>
+  </header>
+
+  <div class="ik-hidden-ui" aria-hidden="true">
+    <button class="ik-btn" id="shHomeBtn" type="button" title="Главное меню">меню</button>
+    <span class="ik-pill" title="Локальная база IndexedDB (в браузере)">
+      <span>db</span>
+      <span id="dbStatus" class="ik-muted">...</span>
+    </span>
+  </div>
+
+  <main class="learn-stage" aria-label="Student Helper">
+    <div class="learn-wrap" data-ik-stage="content">
+
+      <section id="shLobby" class="ik-card sh-lobby" data-ik-stage="hero" aria-label="Главное меню">
+        <div class="ik-inner">
+          <p class="ik-title">student helper</p>
+          <p class="ik-sub">выбери раздел, чтобы начать</p>
+
+          <div class="sh-grid" role="list">
+            <button class="sh-tile" id="shGoDict" type="button" role="listitem" aria-label="Открыть dictionary">
+              <div class="sh-tile__head">dictionary</div>
+              <div class="sh-tile__body">карточки, practice, learn, constructor</div>
+              <div class="sh-tile__foot">перейти</div>
+            </button>
+
+            <button class="sh-tile" id="shGoGrammar" type="button" role="listitem" aria-label="Открыть grammar">
+              <div class="sh-tile__head">grammar</div>
+              <div class="sh-tile__body">грамматика: времена + структуры + практика</div>
+              <div class="sh-tile__foot">перейти</div>
+            </button>
+
+<button class="sh-tile" id="shGoWT" type="button" role="listitem" aria-label="Открыть word transformation">
+              <div class="sh-tile__head">word transformation</div>
+              <div class="sh-tile__body">practice и constructor для word forms</div>
+              <div class="sh-tile__foot">перейти</div>
+            </button>
+          </div>
+
+          <div class="ik-divider"></div>
+
+          <div class="ik-row sh-lobby-row">
+            <button class="ik-btn" id="shContinue" type="button" hidden>продолжить</button>
+            <span class="ik-spacer" aria-hidden="true"></span>
+            <p class="ik-footnote sh-lobby-note">можно вернуться сюда кнопкой "меню" сверху</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="shApp" class="ik-card" data-ik-stage="content" aria-label="Меню обучения" hidden>
+        <div class="ik-inner">
+          <p class="ik-title">обучение</p>
+
+          <div class="ik-tabs" role="tablist" aria-label="Разделы">
+            <button class="ik-tab" id="tab-library" role="tab" aria-selected="false" aria-controls="panel-library" type="button">библиотека</button>
+            <button class="ik-tab" id="tab-dict" role="tab" aria-selected="false" aria-controls="panel-dict" type="button">dictionary</button>
+            <button class="ik-tab" id="tab-struct" role="tab" aria-selected="false" aria-controls="panel-struct" type="button" hidden>structure</button>
+            <button class="ik-tab" id="tab-tenses" role="tab" aria-selected="false" aria-controls="panel-tenses" type="button">grammar</button>
+<button class="ik-tab" id="tab-wt" role="tab" aria-selected="true" aria-controls="panel-wt" type="button">word transformation</button>
+          </div>
+
+          <div id="panel-library" role="tabpanel" aria-labelledby="tab-library" hidden>
+            <div class="ik-row">
+              <span class="ik-badge" id="libraryCountBadge">library: 0</span>
+              <span class="ik-spacer" aria-hidden="true"></span>
+              <span class="ik-pill" title="Библиотека хранится в браузере (localStorage)">
+                <span>library</span>
+                <span id="libraryStatus" class="ik-muted">ready</span>
+              </span>
+            </div>
+
+            <div class="ik-divider"></div>
+
+            <section class="ik-ex" aria-label="Библиотека пользователя">
+              <p class="ik-title">библиотека пользователя</p>
+              <p class="ik-sub">создавай свои категории и добавляй туда нужные правила из grammar / structure / word transformation</p>
+
+              <div class="sh-library-layout">
+                <aside class="sh-library-categories" aria-label="Категории библиотеки">
+                  <div class="ik-row">
+                    <input class="ik-input" id="libraryNewCategoryInput" type="text" autocomplete="off" spellcheck="false" placeholder="новая категория" />
+                    <button class="ik-btn" id="libraryAddCategoryBtn" type="button">создать</button>
+                  </div>
+
+                  <div class="ik-row" style="margin-top:8px;">
+                    <button class="ik-btn" id="libraryRenameCategoryBtn" type="button">переименовать</button>
+                    <button class="ik-btn" id="libraryDeleteCategoryBtn" type="button">удалить</button>
+                  </div>
+
+                  <ul class="ik-list" id="libraryCategoryList" aria-label="Список категорий"></ul>
+                  <p class="ik-footnote">подсказка: в любом разделе нажми «в библиотеку», чтобы быстро сохранить правило</p>
+                </aside>
+
+                <section class="sh-library-items" aria-label="Элементы категории">
+                  <div class="ik-row">
+                    <p class="ik-title" id="libraryActiveCategoryTitle">категория: —</p>
+                    <span class="ik-spacer" aria-hidden="true"></span>
+                    <input class="ik-input" id="libraryItemSearchInput" type="search" autocomplete="off" spellcheck="false" placeholder="поиск внутри категории" />
+                  </div>
+
+                  <div class="ik-row" style="margin-top:8px;">
+                    <button class="ik-btn ik-btn--black" id="libraryStartCategoryPracticeBtn" type="button">практика по категории</button>
+                    <button class="ik-btn" id="libraryClearCategoryBtn" type="button">очистить категорию</button>
+                  </div>
+
+                  <ul class="ik-list" id="libraryItemList" aria-label="Элементы библиотеки"></ul>
+                  <p class="ik-footnote" id="libraryEmptyHint">в категории пока ничего нет</p>
+                </section>
+              </div>
+            </section>
+          </div>
+
+          <div id="panel-dict" role="tabpanel" aria-labelledby="tab-dict" hidden>
+            <div class="ik-row">
+              <span class="ik-badge" id="dictCountBadge">words: 0</span>
+              <span class="ik-badge ik-admin-indicator" id="dictSeedBadge" title="Автозагрузка json при пустой базе">json: ...</span>
+              <span class="ik-badge ik-admin-indicator" id="dictDbNameLine">db: ...</span>
+              <span class="ik-spacer" aria-hidden="true"></span>
+              <span class="ik-pill ik-admin-indicator" title="Локальная база IndexedDB (в браузере)">
+                <span>dict db</span>
+                <span id="dictDbStatus" class="ik-muted">...</span>
+              </span>
+            </div>
+
+            <div class="ik-divider"></div>
+
+            <section class="ik-ex" id="dictFirstPick" aria-label="Выбор раздела">
+              <p class="ik-title">dictionary</p>
+              <p class="ik-sub">выбери раздел чтобы начать</p>
+
+              <div class="ik-row" style="margin-top:8px;">
+                <input class="ik-input" id="dictFirstPickSearch" type="text" placeholder="поиск..." />
+                <span class="ik-spacer" aria-hidden="true"></span>
+                <button class="ik-btn" id="dictFirstPickOpenConstructor" type="button" title="Открыть constructor">constructor</button>
+              </div>
+
+              <div class="ik-divider"></div>
+
+              <ul class="ik-list" id="dictFirstPickList" aria-label="Список разделов"></ul>
+
+              <p class="ik-footnote">подсказка: позже можно сменить раздел через кнопку "разделы" в cards</p>
+            </section>
+
+            <div id="dictSubtabsWrap" hidden>
+            <div class="ik-tabs" role="tablist" aria-label="Режимы dictionary">
+              <button class="ik-btn" id="dictCardsChooseSection" type="button" title="Выбрать раздел">разделы</button>
+              <button class="ik-tab" id="dict-tab-view" role="tab" aria-selected="false" aria-controls="dict-panel-view" type="button">просмотр</button>
+              <button class="ik-tab" id="dict-tab-cards" role="tab" aria-selected="true" aria-controls="dict-panel-cards" type="button">cards</button>
+              <button class="ik-tab" id="dict-tab-learn" role="tab" aria-selected="false" aria-controls="dict-panel-learn" type="button">learn</button>
+              <button class="ik-tab" id="dict-tab-quiz" role="tab" aria-selected="false" aria-controls="dict-panel-quiz" type="button">practice</button>
+<button class="ik-tab" id="dict-tab-builder" role="tab" aria-selected="false" aria-controls="dict-panel-builder" type="button">constructor</button>
+            </div>
+
+            <!-- CARDS -->
+            <div id="dict-panel-cards" role="tabpanel" aria-labelledby="dict-tab-cards">
+              <section class="ik-ex" aria-label="Карточки">
+                <p class="ik-title">карточки</p>
+
+                <div class="ik-row">
+                  <button class="ik-btn" id="dictCardsPrev" type="button" title="Предыдущая карточка">назад</button>
+                  <button class="ik-btn ik-btn--black" id="dictCardsNext" type="button" title="Следующая карточка">далее</button>
+
+                  <label class="ik-label">
+                    <input type="checkbox" id="dictCardsRandom" checked />
+                    random
+                  </label>
+
+                  <label class="ik-label" for="dictCardsFront">front</label>
+                  <select class="ik-select" id="dictCardsFront" style="min-width: 180px;">
+                    <option value="en">англ</option>
+                    <option value="ru">рус</option>
+                    <option value="mix">mix</option>
+                  </select>
+
+                  <span class="ik-spacer" aria-hidden="true"></span>
+
+                  <label class="ik-label" for="dictSectionCards">section</label>
+                  <select class="ik-select" id="dictSectionCards" style="min-width: 260px;"></select>
+                </div>
+
+                <div class="ik-divider"></div>
+
+                <p class="ik-prompt">нажми на карточку чтобы перевернуть</p>
+
+                <div class="ik-flip-stage" aria-label="Flashcard">
+                  <div class="ik-flip-card" id="dictFlipCard" tabindex="0" role="button" aria-pressed="false">
+                    <div class="ik-flip-inner">
+                      <div class="ik-flip-face ik-flip-front">
+                        <p class="ik-word" id="dictCardFront">...</p>
+                        <p class="ik-sub ik-muted" id="dictCardFrontLang">...</p>
+                      </div>
+                      <div class="ik-flip-face ik-flip-back">
+                        <p class="ik-word" id="dictCardBack">...</p>
+                        <p class="ik-sub ik-muted" id="dictCardBackLang">...</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <p class="ik-footnote" id="dictCardsMeta">...</p>
+                <div class="ik-row" id="dictCardsDoneRow" style="display:none; justify-content:center; gap:10px; margin-top:8px;" hidden>
+                  <span class="ik-footnote">вы просмотрели все слова</span>
+                  <button class="ik-btn ik-btn--black" id="dictCardsRestart" type="button">еще раз</button>
+                </div>
+              </section>
+            </div>
+
+            <!-- PRACTICE -->
+            <div id="dict-panel-quiz" role="tabpanel" aria-labelledby="dict-tab-quiz" hidden>
+              <section class="ik-ex" aria-label="Практика">
+                <p class="ik-title">практика</p>
+
+                <div class="ik-row">
+                  <label class="ik-label" for="dictQuizMode">направление</label>
+                  <select class="ik-select" id="dictQuizMode" style="min-width: 180px;">
+                    <option value="en">EN -> RU</option><option value="ru">RU -> EN</option><option value="mix">mix</option><option value="weak">по слабым</option></select>
+
+                  <span class="ik-badge" id="dictQuizScore">0/0</span>
+
+                  <button class="ik-btn" id="dictPracticeSettingsBtn" type="button" title="Настройки practice">⚙</button>
+
+                  <span class="ik-spacer" aria-hidden="true"></span>
+
+                  <label class="ik-label" for="dictSectionQuiz">section</label>
+                  <select class="ik-select" id="dictSectionQuiz" style="min-width: 260px;"></select>
+                  <button class="ik-btn" id="dictQuizChooseSection" type="button" title="Выбрать раздел">разделы</button>
+                </div>
+
+                <div id="dictPracticeSettings" style="display:none; margin: 10px 0 6px 0;">
+  <div class="ik-row" style="gap:12px; flex-wrap:wrap;">
+    <label class="ik-label" for="dictPracticeSession">сессия</label>
+    <select class="ik-select" id="dictPracticeSession" style="min-width: 120px;">
+      <option value="10">10</option>
+      <option value="20" selected>20</option>
+      <option value="50">50</option>
+      <option value="all">all</option>
+    </select>
+    <label class="ik-label" style="display:flex; align-items:center; gap:8px;">
+      <input type="checkbox" id="dictPracticeTypos" checked />
+      опечатки
+    </label>
+    <label class="ik-label" style="display:flex; align-items:center; gap:8px;">
+      <input type="checkbox" id="dictPracticeIgnoreTo" checked />
+      "to" не обяз.
+    </label>
+    <label class="ik-label" style="display:flex; align-items:center; gap:8px;">
+      <input type="checkbox" id="dictPracticeIgnoreArticles" checked />
+      артикли не обяз.
+    </label>
+  </div>
+  <p class="ik-footnote" style="margin-top:6px;">настройки сохраняются в браузере</p>
+</div>
+
+<div class="ik-divider"></div>
+
+                <p class="ik-prompt" id="dictQuizPromptLabel">переведи</p>
+
+                <div class="ik-flip-stage" aria-label="Quiz card">
+                  <div class="ik-flip-card" id="dictQuizCard" tabindex="0" role="button" aria-pressed="false" title="Нажми чтобы посмотреть ответ (после проверки)">
+                    <div class="ik-flip-inner">
+                      <div class="ik-flip-face ik-flip-front">
+                        <p class="ik-word" id="dictQuizFront">...</p>
+                        <p class="ik-sub ik-muted" id="dictQuizFrontLang">...</p>
+                      </div>
+                      <div class="ik-flip-face ik-flip-back">
+                        <p class="ik-word" id="dictQuizBack">...</p>
+                        <p class="ik-sub ik-muted" id="dictQuizBackLang">...</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="ik-row" style="margin-top:12px;">
+                  <input class="ik-input" id="dictQuizInput" type="text" autocomplete="off" spellcheck="false" placeholder="Ответ" />
+                  <button class="ik-btn ik-btn--black" id="dictQuizCheckNext" type="button" title="Check (Enter)">check</button>
+                  <button class="ik-btn" id="dictPracticeHint" type="button" title="Подсказка">hint</button>
+                  <button class="ik-btn" id="dictQuizSkip" type="button" title="Показать ответ (считается ошибкой)">сдаюсь</button>
+                </div>
+
+                <div class="ik-divider"></div>
+
+                <div class="ik-feedback" id="dictQuizFeedback" data-state="idle" aria-live="polite">
+                  <div class="ik-feedback__stamp" id="dictQuizStamp">ready</div>
+                  
+                <div class="ik-row" id="dictPracticeFuzzyActions" style="display:none; justify-content:center; gap:10px; margin-top:10px;">
+                  <button class="ik-btn ik-btn--black" id="dictPracticeFuzzyAccept" type="button">засчитать</button>
+                  <button class="ik-btn" id="dictPracticeFuzzyReject" type="button">не засчитывать</button>
+                </div>
+<p class="ik-feedback__line" id="dictQuizLine">введи перевод и нажми check</p>
+                </div>
+
+                <p class="ik-footnote">правило: после проверки переписать нельзя - только далее. неверные слова вернутся позже.</p>
+              </section>
+            </div>
+
+            
+            <!-- LEARN -->
+            <div id="dict-panel-learn" role="tabpanel" aria-labelledby="dict-tab-learn" hidden>
+              <section class="ik-ex" aria-label="Заучивание">
+                <p class="ik-title">заучивание</p>
+
+                <div class="ik-row">
+                  <span class="ik-badge" id="dictLearnProgress">0/0</span>
+
+                  <button class="ik-btn" id="dictLearnSettingsBtn" type="button" title="Настройки learn">⚙</button>
+
+                  <span class="ik-spacer" aria-hidden="true"></span>
+
+                  <label class="ik-label" for="dictSectionLearn">section</label>
+                  <select class="ik-select" id="dictSectionLearn" style="min-width: 260px;"></select>
+                  <button class="ik-btn" id="dictLearnChooseSection" type="button" title="Выбрать раздел">разделы</button>
+                </div>
+
+                <div id="dictLearnSettings" style="display:none; margin: 10px 0 6px 0;">
+                  <div class="ik-row" style="gap:12px; flex-wrap:wrap;">
+                    <label class="ik-label" for="dictLearnSource">источник</label>
+                    <select class="ik-select" id="dictLearnSource" style="min-width: 180px;">
+                      <option value="new" selected>новые</option>
+                      <option value="due">пора повторить</option>
+                      <option value="weak">слабые</option>
+                      <option value="all">все</option>
+                    </select>
+
+                    <label class="ik-label" for="dictLearnPortion">порция</label>
+                    <select class="ik-select" id="dictLearnPortion" style="min-width: 120px;">
+                      <option value="5">5</option>
+                      <option value="8" selected>8</option>
+                      <option value="10">10</option>
+                      <option value="12">12</option>
+                    </select>
+
+                    <label class="ik-label" for="dictLearnDir">направление</label>
+                    <select class="ik-select" id="dictLearnDir" style="min-width: 180px;">
+                      <option value="ru" selected>RU -> EN</option>
+                      <option value="en">EN -> RU</option>
+                      <option value="mix">mix</option>
+                      <option value="weak">по слабым</option>
+                    </select>
+
+                    <label class="ik-label" for="dictLearnGoal">цель</label>
+                    <select class="ik-select" id="dictLearnGoal" style="min-width: 180px;">
+                      <option value="fast" selected>быстро запомнить</option>
+                      <option value="long">закрепить надолго</option>
+                    </select>
+
+                    <label class="ik-label" for="dictLearnStrict">строгость</label>
+                    <select class="ik-select" id="dictLearnStrict" style="min-width: 140px;">
+                      <option value="soft" selected>мягко</option>
+                      <option value="strict">строго</option>
+                    </select>
+
+                    <label class="ik-label" style="display:flex; align-items:center; gap:8px;">
+                      <input type="checkbox" id="dictLearnTypos" checked />
+                      опечатки
+                    </label>
+
+                    <label class="ik-label" style="display:flex; align-items:center; gap:8px;">
+                      <input type="checkbox" id="dictLearnForms" checked />
+                      формы (EN)
+                    </label>
+
+                    <label class="ik-label" style="display:flex; align-items:center; gap:8px;">
+                      <input type="checkbox" id="dictLearnIgnoreTo" checked />
+                      "to" не обяз.
+                    </label>
+
+                    <label class="ik-label" style="display:flex; align-items:center; gap:8px;">
+                      <input type="checkbox" id="dictLearnIgnoreArticles" checked />
+                      артикли не обяз.
+                    </label>
+
+                    <label class="ik-label" style="display:flex; align-items:center; gap:8px;">
+                      <input type="checkbox" id="dictLearnHints" checked />
+                      подсказки
+                    </label>
+
+                    <button class="ik-btn ik-btn--black" id="dictLearnRestart" type="button" title="Начать заново">start</button>
+                  </div>
+                  <p class="ik-footnote" style="margin-top:6px;">заучивание: быстрый показ -> ввод -> умные повторы</p>
+                </div>
+
+                <div class="ik-divider"></div>
+
+                <p class="ik-prompt" id="dictLearnPromptLabel">...</p>
+
+                <div class="ik-flip-stage" aria-label="Learn card">
+                  <div class="ik-flip-card" id="dictLearnCard" tabindex="0" role="button" aria-pressed="false" title="Нажми чтобы перевернуть (после проверки)">
+                    <div class="ik-flip-inner">
+                      <div class="ik-flip-face ik-flip-front">
+                        <p class="ik-word" id="dictLearnFront">...</p>
+                        <p class="ik-sub ik-muted" id="dictLearnFrontLang">...</p>
+                      </div>
+                      <div class="ik-flip-face ik-flip-back">
+                        <p class="ik-word" id="dictLearnBack">...</p>
+                        <p class="ik-sub ik-muted" id="dictLearnBackLang">...</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="ik-row" id="dictLearnAnswerRow" style="margin-top:12px;">
+                  <input class="ik-input" id="dictLearnInput" type="text" autocomplete="off" spellcheck="false" placeholder="Введите перевод..." />
+                  <button class="ik-btn ik-btn--black" id="dictLearnCheckNext" type="button" title="Check (Enter)">check</button>
+                  <button class="ik-btn" id="dictLearnHint" type="button" title="Подсказка">hint</button>
+                  <button class="ik-btn" id="dictLearnGiveUp" type="button" title="Показать ответ (считается ошибкой)">сдаюсь</button>
+                </div>
+
+                <div class="ik-divider"></div>
+
+                <div class="ik-feedback" id="dictLearnFeedback" data-state="idle" aria-live="polite">
+                  <div class="ik-feedback__stamp" id="dictLearnStamp">ready</div>
+                  <p class="ik-feedback__line" id="dictLearnLine">нажми start или выбери section</p>
+                </div>
+
+                <p class="ik-footnote">слово считается выученным в сессии, если 2 раза подряд ответил верно без подсказок и между ответами было хотя бы 10 заданий.</p>
+              </section>
+            </div>
+
+            <!-- VIEW -->
+            <div id="dict-panel-view" role="tabpanel" aria-labelledby="dict-tab-view" hidden>
+              <section class="ik-ex" aria-label="Просмотр словаря">
+                <p class="ik-title">просмотр слов</p>
+
+                <div class="ik-row">
+                  <label class="ik-label" for="dictSectionView">section</label>
+                  <select class="ik-select" id="dictSectionView" style="min-width: 260px;"></select>
+                  <span class="ik-spacer" aria-hidden="true"></span>
+                  <span class="ik-badge" id="dictViewMeta">0</span>
+                </div>
+
+                <div class="ik-divider"></div>
+
+                <div class="dict-view-wrap">
+                  <div class="dict-view-sticky">
+                    <input class="ik-input" id="dictViewSearch" type="text" autocomplete="off" spellcheck="false" placeholder="поиск по EN/RU..." />
+                  </div>
+                  <ul class="ik-list dict-view-list" id="dictViewList" aria-label="Просмотр слов"></ul>
+                </div>
+              </section>
+            </div>
+
+<!-- BUILDER -->
+            <div id="dict-panel-builder" role="tabpanel" aria-labelledby="dict-tab-builder" hidden>
+              <section class="ik-ex" aria-label="Конструктор dictionary">
+                <p class="ik-title">разделы</p>
+
+                <div class="ik-row">
+                  <input class="ik-input" id="dictNewSectionName" type="text" placeholder="название раздела" />
+                  <button class="ik-btn ik-btn--black" id="dictAddSection" type="button">создать</button>
+                </div>
+
+                <div class="ik-divider"></div>
+
+                <div class="ik-row">
+                  <label class="ik-label" for="dictBuilderSection">section</label>
+                  <select class="ik-select" id="dictBuilderSection" style="min-width: 260px;"></select>
+                  <button class="ik-btn" id="dictDeleteSection" type="button" title="Удалит раздел и все слова внутри">удалить раздел</button>
+                  <button class="ik-btn" id="dictSubmitModeration" type="button" title="Отправить текущий section на модерацию">на модерацию</button>
+
+                  <span class="ik-spacer" aria-hidden="true"></span>
+
+                  <button class="ik-btn ik-btn--black" id="dictExportDb" type="button" title="Скачать json со всеми разделами">save db</button>
+                  <button class="ik-btn" id="dictImportDb" type="button" title="Загрузить json">load db</button>
+
+                  <label class="ik-label" style="display:flex; align-items:center; gap:8px;">
+                    <input type="checkbox" id="dictImportReplace" />
+                    replace
+                  </label>
+
+                  <input type="file" id="dictFileImport" accept=".json,application/json" hidden />
+                </div>
+
+                <div class="ik-divider"></div>
+
+                <p class="ik-title">слова</p>
+                <div class="ik-row">
+                  <input class="ik-input" id="dictEnInput" type="text" placeholder="word/phrase (EN)" />
+                  <input class="ik-input" id="dictRuInput" type="text" placeholder="перевод (RU)" />
+                  <button class="ik-btn ik-btn--black" id="dictAddWord" type="button">сохранить</button>
+                </div>
+
+                <div class="ik-divider"></div>
+
+                <p class="ik-sub">список разделов</p>
+                <ul class="ik-list" id="dictSectionList" aria-label="Список разделов"></ul>
+
+                <div class="ik-divider"></div>
+
+                <p class="ik-sub">слова в разделе</p>
+                <ul class="ik-list" id="dictWordList" aria-label="Список слов"></ul>
+              </section>
+            </div>
+
+            </div>
+
+          </div>
+
+          
+          <div id="panel-struct" role="tabpanel" aria-labelledby="tab-struct" hidden>
+            <div class="ik-row">
+              <span class="ik-badge" id="structCountBadge">structures: 0</span>
+              <span class="ik-spacer" aria-hidden="true"></span>
+              <span class="ik-pill" title="Прогресс хранится в браузере (localStorage)">
+                <span>structure</span>
+                <span id="structStatus" class="ik-muted">ready</span>
+              </span>
+            </div>
+
+            <div class="ik-divider"></div>
+
+            <!-- LIST -->
+            <section class="ik-ex" id="structListView" aria-label="Structure list">
+              <p class="ik-title">structure</p>
+              <p class="ik-sub">выбери грамматическую тему</p>
+
+              <ul class="ik-list" id="structList" aria-label="Список структур"></ul>
+
+              <p class="ik-footnote">структуры - это мини-курсы: правило + практика + прогресс</p>
+            </section>
+
+            <!-- DETAIL -->
+            <section class="ik-ex" id="structDetailView" aria-label="Structure detail" hidden>
+              <div class="ik-row">
+                <button class="ik-btn" id="structBackToList" type="button">назад</button>
+                <span class="ik-spacer" aria-hidden="true"></span>
+                <span class="ik-badge" id="structMasteryBadge">mastery 0/5</span>
+              </div>
+
+              <div class="ik-divider"></div>
+
+              <div class="ik-row" style="align-items:flex-end;">
+                <div>
+                  <p class="ik-title" id="structTitle">...</p>
+                  <p class="ik-sub" id="structSubtitle">...</p>
+                </div>
+                <span class="ik-spacer" aria-hidden="true"></span>
+                <button class="ik-btn" id="structAddToLibraryBtn" type="button">в библиотеку</button>
+                <button class="ik-btn ik-btn--black" id="structStartPracticeTop" type="button">start practice</button>
+              </div>
+
+              <div class="ik-divider"></div>
+
+              <div class="ik-tabs" role="tablist" aria-label="Structure tabs">
+                <button class="ik-tab" id="struct-tab-rule" role="tab" aria-selected="true" aria-controls="struct-panel-rule" type="button">rule</button>
+                <button class="ik-tab" id="struct-tab-practice" role="tab" aria-selected="false" aria-controls="struct-panel-practice" type="button">practice</button>
+              </div>
+
+              <!-- RULE -->
+              <div id="struct-panel-rule" role="tabpanel" aria-labelledby="struct-tab-rule">
+                <div id="structRuleBody" class="sh-struct-rule" aria-label="Rule content"></div>
+              </div>
+
+              <!-- PRACTICE -->
+              <div id="struct-panel-practice" role="tabpanel" aria-labelledby="struct-tab-practice" hidden>
+                <div id="structPracticeBody" class="sh-struct-practice" aria-label="Practice content"></div>
+              </div>
+            </section>
+          </div>
+
+
+          <div id="panel-tenses" role="tabpanel" aria-labelledby="tab-tenses" hidden>
+            <section class="ik-ex" aria-label="Grammar React app">
+              <p class="ik-title">grammar</p>
+              <p class="ik-sub">next/react/tailwind grammar runtime</p>
+            </section>
+          </div>
+
+<div id="panel-wt" role="tabpanel" aria-labelledby="tab-wt">
+            <div class="ik-row">
+              <label class="ik-label" for="transformType" id="transformTypeLabel" hidden>тип</label>
+              <select class="ik-select" id="transformType" style="min-width: 260px;" hidden>
+                <option value="noun_to_adj">образование прилагательного</option>
+                <option value="in_un_prefix">приставки in- или un-</option>
+                <option value="noun_to_verb">образование глагола</option>
+                <option value="word_to_noun">образование существительного</option>
+              </select>
+
+              <span class="ik-badge" id="taskCountBadge">tasks: 0</span>
+              <span class="ik-badge ik-admin-indicator" id="seedBadge" title="Автозагрузка из json при пустой базе">json: ...</span>
+            </div>
+
+            <p class="ik-footnote ik-admin-indicator" id="dbNameLine">...</p>
+
+            <div class="ik-divider"></div>
+
+            <p class="ik-title">словообразование</p>
+            <p class="ik-sub">два режима: смешанный или пользовательский</p>
+
+            <div class="sh-practice-mode" id="wtModeSwitch" role="group" aria-label="Режим word transformation">
+              <button class="ik-btn ik-btn--black" id="wtModeMixedBtn" type="button">смешанный</button>
+              <button class="ik-btn" id="wtModeCustomBtn" type="button">пользовательский</button>
+            </div>
+
+            <p class="ik-sub" id="wtModeHint">смешанный: все типы словообразования</p>
+
+            <div id="wtCustomTypePicker" class="sh-custom-picker" hidden>
+              <p class="sh-custom-picker__title" id="wtCustomTypeTitle">пользовательский: выбери типы словообразования</p>
+              <p class="sh-custom-picker__sub" id="wtCustomTypeHint">собери свой набор типов: можно выбрать один или несколько</p>
+              <div class="sh-custom-picker__actions">
+                <button class="ik-btn" id="wtCustomTypeSelectAllBtn" type="button">выбрать все</button>
+                <button class="ik-btn" id="wtCustomTypeClearAllBtn" type="button">снять все</button>
+              </div>
+              <div class="sh-custom-picker__grid" id="wtCustomTypeGrid" aria-label="Custom word transformation types"></div>
+            </div>
+
+            <div class="ik-divider"></div>
+
+            <div class="ik-tabs" role="tablist" aria-label="Режимы word transformation">
+              <button class="ik-tab" id="subtab-rule" role="tab" aria-selected="true" aria-controls="panel-rule" type="button">правило</button>
+              <button class="ik-tab" id="subtab-practice" role="tab" aria-selected="false" aria-controls="panel-practice" type="button">practice</button>
+              <button class="ik-tab" id="subtab-text" role="tab" aria-selected="false" aria-controls="panel-text" type="button">в тексте</button>
+              <button class="ik-tab" id="subtab-builder" role="tab" aria-selected="false" aria-controls="panel-builder" type="button">constructor</button>
+            </div>
+
+            <!-- RULE -->
+            <div id="panel-rule" role="tabpanel" aria-labelledby="subtab-rule">
+              <section class="ik-ex" aria-label="Правило">
+                <p class="ik-title">правило</p>
+                <div class="ik-row" style="margin-top:8px; margin-bottom:8px;">
+                  <button class="ik-btn" id="wtAddRuleToLibraryBtn" type="button">в библиотеку</button>
+                </div>
+                <div class="ik-rule is-open" id="rulePanel" aria-label="Rule" aria-hidden="false">
+                  <p class="ik-sub" id="ruleTitle">rule</p>
+                  <div id="ruleBody"></div>
+                </div>
+              </section>
+            </div>
+
+            <!-- PRACTICE -->
+            <div id="panel-practice" role="tabpanel" aria-labelledby="subtab-practice" hidden>
+              <section class="ik-ex" aria-label="Практика">
+                <p class="ik-title">практика</p>
+
+                <div class="ik-row">
+                  <button class="ik-btn" id="btnPrev" type="button" title="Предыдущий вопрос">назад</button>
+                  <button class="ik-btn ik-btn--black" id="btnNext" type="button" title="Следующий вопрос">далее</button>
+
+                  <label class="ik-label">
+                    <input type="checkbox" id="randomOrder" checked />
+                    random
+                  </label>
+
+                  <span class="ik-spacer" aria-hidden="true"></span>
+
+                  <label class="ik-label" for="practiceCategory">category</label>
+                  <select class="ik-select" id="practiceCategory" style="min-width: 180px;">
+                    <option value="All">All</option>
+                    <option value="Suffixes">Suffixes</option>
+                    <option value="Prefixes">Prefixes</option>
+                  </select>
+
+                  <span class="ik-badge" id="qBadge">q: 0</span>
+                  <span class="ik-badge" id="sessionScore">0/0</span>
+                </div>
+
+                <p class="ik-prompt" id="promptLabel">Образуй нужную форму слова</p>
+
+                <div class="ik-wordbar">
+                  <p class="ik-word" id="promptEn">...</p>
+                  <button class="ik-btn" id="btnReveal" type="button" title="Перевод (t)">перевод</button>
+                </div>
+
+                <p class="ik-ru" id="promptRu" hidden>...</p>
+
+                <div class="ik-row" style="margin-top:12px;">
+                  <input class="ik-input" id="answerInput" type="text" autocomplete="off" spellcheck="false" placeholder="Ответ (EN)" />
+                  <button class="ik-btn ik-btn--black" id="btnCheckNext" type="button" title="Check (Enter)">check</button>
+                  <button class="ik-btn" id="btnShowAnswer" type="button" title="Показать правильный ответ">ответ</button>
+                </div>
+
+                <div class="ik-row" id="inUnPrefixPicker" style="margin-top:8px;" hidden>
+                  <span class="ik-label">выбери приставку</span>
+                  <button class="ik-btn" id="btnPrefixIn" type="button">in-</button>
+                  <button class="ik-btn" id="btnPrefixUn" type="button">un-</button>
+                </div>
+
+                <div class="ik-divider"></div>
+
+                <div class="ik-feedback" id="feedbackBox" data-state="idle" aria-live="polite">
+                  <div class="ik-feedback__stamp" id="feedbackStamp">ready</div>
+                  <p class="ik-feedback__line" id="feedbackLine">введи ответ и нажми check</p>
+                </div>
+              </section>
+            </div>
+
+            <!-- IN TEXT -->
+            <div id="panel-text" role="tabpanel" aria-labelledby="subtab-text" hidden>
+              <section class="ik-ex" aria-label="В тексте">
+                <p class="ik-title">в тексте</p>
+
+                <div class="ik-row">
+                  <button class="ik-btn" id="btnTextPrev" type="button" title="Предыдущий вопрос">назад</button>
+                  <button class="ik-btn ik-btn--black" id="btnTextNext" type="button" title="Следующий вопрос">далее</button>
+
+                  <label class="ik-label">
+                    <input type="checkbox" id="textRandomOrder" checked />
+                    случайно
+                  </label>
+
+                  <span class="ik-spacer" aria-hidden="true"></span>
+
+                  <label class="ik-label" for="textCategory">категория</label>
+                  <select class="ik-select" id="textCategory" style="min-width: 180px;">
+                    <option value="All">All</option>
+                    <option value="Suffixes">Suffixes</option>
+                    <option value="Prefixes">Prefixes</option>
+                  </select>
+
+                  <span class="ik-badge" id="textQBadge">q: 0</span>
+                  <span class="ik-badge" id="textSessionScore">0/0</span>
+                </div>
+
+                <div class="ik-divider"></div>
+
+                <p class="ik-prompt" id="textPromptLabel">вставь подходящую форму слова в текст</p>
+                <p class="ik-sentence" id="textSentenceEn">...</p>
+
+                <div class="ik-row" style="margin-top:8px;">
+                  <button class="ik-btn" id="btnTextReveal" type="button" title="Перевод предложения">перевод</button>
+                </div>
+
+                <p class="ik-ru" id="textSentenceRu" hidden>...</p>
+
+                <div class="ik-row" style="margin-top:12px;">
+                  <input class="ik-input" id="textAnswerInput" type="text" autocomplete="off" spellcheck="false" placeholder="Ответ (EN)" />
+                  <button class="ik-btn ik-btn--black" id="btnTextCheckNext" type="button" title="Check (Enter)">check</button>
+                  <button class="ik-btn" id="btnTextShowAnswer" type="button" title="Показать правильный ответ">ответ</button>
+                </div>
+
+                <div class="ik-feedback" id="textFeedbackBox" data-state="idle" aria-live="polite" style="margin-top:12px;">
+                  <div class="ik-feedback__stamp" id="textFeedbackStamp">ready</div>
+                  <p class="ik-feedback__line" id="textFeedbackLine">введи ответ и нажми check</p>
+                </div>
+              </section>
+            </div>
+
+            <!-- BUILDER -->
+            <div id="panel-builder" role="tabpanel" aria-labelledby="subtab-builder" hidden>
+              <section class="ik-ex" aria-label="Конструктор">
+                <p class="ik-title">конструктор</p>
+
+                <div class="ik-row">
+                  <label class="ik-label" for="viewCategory">view</label>
+                  <select class="ik-select" id="viewCategory" style="min-width: 180px;">
+                    <option value="All">All</option>
+                    <option value="Suffixes">Suffixes</option>
+                    <option value="Prefixes">Prefixes</option>
+                  </select>
+
+                  <label class="ik-label" for="addCategory">add</label>
+                  <select class="ik-select" id="addCategory" style="min-width: 180px;">
+                    <option value="Suffixes">Suffixes</option>
+                    <option value="Prefixes">Prefixes</option>
+                  </select>
+                </div>
+
+                <div class="ik-row">
+                  <input class="ik-input" id="inEnWord" type="text" placeholder="word (EN)" />
+                  <input class="ik-input" id="inEnAnswer" type="text" placeholder="answer (EN)" />
+                </div>
+                <div class="ik-row">
+                  <input class="ik-input" id="inRuWord" type="text" placeholder="слово (RU)" />
+                  <input class="ik-input" id="inRuAnswer" type="text" placeholder="ответ (RU)" />
+                </div>
+
+                <div class="ik-row" style="margin-top:10px;">
+                  <button class="ik-btn ik-btn--black" id="btnAddTask" type="button">сохранить</button>
+                  <button class="ik-btn" id="btnResetFromJson" type="button" title="Загрузит наборы из json для текущего типа">восстановить из json</button>
+                </div>
+
+                <div class="ik-divider"></div>
+
+                <div class="ik-row">
+                  <button class="ik-btn ik-btn--black" id="btnExportDb" type="button" title="Скачать json (view category)">save db</button>
+                  <button class="ik-btn" id="btnImportDb" type="button" title="Загрузить json">load db</button>
+
+                  <label class="ik-label" style="display:flex; align-items:center; gap:8px;">
+                    <input type="checkbox" id="importReplace" />
+                    replace
+                  </label>
+
+                  <input type="file" id="fileImport" accept=".json,application/json" hidden />
+                </div>
+
+                <div class="ik-divider"></div>
+
+                <p class="ik-sub">задания</p>
+                <ul class="ik-list" id="taskList" aria-label="Список заданий"></ul>
+              </section>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <script src="../../assets/js/theme.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../../assets/js/supabase-client.js"></script>
+  <script src="./js/tabs.js?v=20260331-03"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function(){
+      var backBtn = document.getElementById('ikBackBtn');
+
+      function safeBrowserBack(fallbackHref){
+        if(window.history.length <= 1){
+          window.location.href = fallbackHref;
+          return;
+        }
+
+        var currentHref = window.location.href;
+        var navigated = false;
+        var markNavigated = function(){ navigated = true; };
+
+        window.addEventListener('pagehide', markNavigated, { once: true });
+        window.addEventListener('popstate', markNavigated, { once: true });
+
+        window.history.back();
+
+        window.setTimeout(function(){
+          if(navigated) return;
+          if(window.location.href === currentHref){
+            window.location.href = fallbackHref;
+          }
+        }, 450);
+      }
+
+      if(backBtn){
+        backBtn.addEventListener('click', function(event){
+          event.preventDefault();
+          if(window.IKLoading && typeof window.IKLoading.leave === 'function'){
+            window.IKLoading.leave(function(){ safeBrowserBack('/item_key/'); });
+          } else {
+            safeBrowserBack('/item_key/');
+          }
+        });
+      }
+    });
+  </script>
+  <script src="./js/lobby.js?v=20260331-03"></script>
+  <script src="./js/library.js?v=20260331-03"></script>
+  <script src="./js/structure_data.js"></script>
+  <script src="./js/structure.js?v=20260331-01"></script>
+  <script src="./js/word_transformation.js?v=20260331-02"></script>
+  <script src="./js/dictionary.js" onerror="window.IKAdminLog && window.IKAdminLog('error','student_helper','dictionary.js failed to load')"></script>
+  <script>
+    (function(){
+      var log = window.IKAdminLog || function(){};
+      var bootIfReady = function(){
+        if(typeof window.dictBoot === 'function' && !window.__dictBooted) window.dictBoot();
+      };
+
+      log('log','student_helper', 'dict tag after: ' + typeof window.dictBoot);
+      if(typeof window.dictBoot === 'function'){
+        bootIfReady();
+        return;
+      }
+
+      fetch('./js/dictionary.js', { cache: 'no-store' })
+        .then(function(r){
+          if(!r.ok) throw new Error('fetch status ' + r.status);
+          return r.text();
+        })
+        .then(function(code){
+          try{
+            (0, eval)(code);
+            log('log','student_helper', 'dict eval ok: ' + typeof window.dictBoot);
+            bootIfReady();
+          }catch(e){
+            log('error','student_helper', 'dict eval failed: ' + (e && (e.message || e)));
+          }
+        })
+        .catch(function(e){
+          log('error','student_helper', 'dict fetch failed: ' + (e && (e.message || e)));
+        });
+    })();
+  </script>
+  <script src="./js/dictionary_cloud.js"></script>
+  <script src="./js/progress_cloud.js"></script>
+  <script src="./js/backup_restore.js"></script>
+  <script src="./js/enter_next.js"></script>
+
+<script id="ik-site-settings-js">
+(() => {
+  const STORAGE_KEY = 'ik_site_lang_v1';
+  const DEFAULT_LANG = 'ru';
+  const PAGE = document.body?.dataset?.i18nPage || '';
+
+  function normalize(text) {
+    return String(text || '').replace(/\s+/g, ' ').trim();
+  }
+
+  const TITLES = {
+    index: { ru: 'Item Key - Главное меню', en: 'Item Key - Main menu' },
+    'item-crate': { ru: 'Item Key - Заметки', en: 'Item Key - Notes' },
+    onoi_notes: { ru: 'Item Key - Заметки', en: 'Item Key - Notes' },
+    planning: { ru: 'Item Key - Планирование', en: 'Item Key - Planning' },
+    student_helper: { ru: 'Учебный центр', en: 'Study Center' },
+    whisperer: { ru: 'Item Key - Озвучка', en: 'Item Key - Whisperer' }
+  };
+
+  const TEXT_PAIRS = [
+    ['Главное меню', 'Main menu'],
+    ['Учебный Центр', 'Study Center'],
+    ['Учебный центр', 'Study Center'],
+    ['учебный центр', 'study center'],
+    ['Настройки', 'Settings'],
+    ['настройки', 'settings'],
+    ['Настройки сайта', 'Site settings'],
+    ['Язык сайта', 'Site language'],
+    ['Русский', 'Russian'],
+    ['Английский', 'English'],
+    ['Белорусский', 'Belarusian'],
+    ['выбери раздел, чтобы начать', 'choose a section to start'],
+    ['выбери раздел чтобы начать', 'choose a section to start'],
+    ['продолжить', 'continue'],
+    ['обучение', 'learning'],
+    ['словарь', 'dictionary'],
+    ['грамматика', 'grammar'],
+    ['структура', 'structure'],
+    ['времена', 'tenses'],
+    ['grammar hub', 'grammar hub'],
+    ['один раздел: времена + грамматические структуры', 'one section: tenses + grammar structures'],
+    ['быстрый поиск по грамматике', 'quick grammar search'],
+    ['начни вводить: will, passive, conditionals, future...', 'start typing: will, passive, conditionals, future...'],
+    ['ничего не найдено', 'nothing found'],
+    ['другой уровень', 'different level'],
+    ['очистить', 'clear'],
+    ['Поиск по grammar', 'Search grammar'],
+    ['Результаты поиска grammar', 'Grammar search results'],
+    ['конструктор по грамматике', 'grammar constructor'],
+    ['простые вопросы в 2-4 шага -> 1 главный вариант + 2 альтернативы', 'simple questions in 2-4 steps -> 1 main option + 2 alternatives'],
+    ['запустить конструктор', 'start constructor'],
+    ['выбери смысл, а мы подскажем лучшую тему', 'choose meaning and we suggest the best topic'],
+    ['твоя фраза (необязательно)', 'your sentence (optional)'],
+    ['например: я хочу домой', 'for example: I want to go home'],
+    ['чем точнее пример, тем точнее рекомендация', 'the more precise your example is, the better recommendation you get'],
+    ['карта грамматики', 'grammar map'],
+    ['все темы по уровню: теория + правила + формулы', 'all level topics: theory + rules + formulas'],
+    ['все темы по уровню', 'all level topics'],
+    ['общая практика', 'general practice'],
+    ['уровень обучения', 'study level'],
+    ['не выбран', 'not selected'],
+    ['выбери уровень один раз - он сохранится', 'choose a level once - it will be saved'],
+    ['сменить позже', 'change later'],
+    ['уровень сохранен', 'level saved'],
+    ['выбери уровень', 'choose a level'],
+    ['грамматика: времена + структуры + практика', 'grammar: tenses + structures + practice'],
+    ['active tenses - времена', 'active tenses'],
+    ['present - настоящее', 'present'],
+    ['past - прошлое', 'past'],
+    ['future - будущее', 'future'],
+    ['universal - общие структуры', 'universal'],
+    ['выбери тему', 'choose a topic'],
+    ['выбери цель и тему (или mixed/custom)', 'choose goal and topic (or mixed/custom)'],
+    ['тема', 'topic'],
+    ['подкатегория', 'subcategory'],
+    ['все подкатегории', 'all subcategories'],
+    ['минимальный список (без перегруза)', 'minimal list (no overload)'],
+    ['кратко', 'short'],
+    ['полно', 'full'],
+    ['назад к вопросу', 'back to question'],
+    ['сбросить', 'reset'],
+    ['главный вариант', 'main option'],
+    ['альтернативы', 'alternatives'],
+    ['открыть правило', 'open rule'],
+    ['сразу к упражнениям', 'go to practice now'],
+    ['начать заново', 'start again'],
+    ['тема выше/ниже текущего уровня, но по смыслу самая точная.', 'this topic is above/below your current level but is the most accurate by meaning.'],
+    ['Не удалось подобрать тему. Попробуй начать заново.', 'Could not pick a topic. Try again from start.'],
+    ['упражнения', 'practice'],
+    ['смешанные упражнения', 'mixed practice'],
+    ['пользовательские упражнения', 'custom practice'],
+    ['два режима: смешанные упражнения или пользовательские упражнения', 'two modes: mixed practice or custom practice'],
+    ['смешанные упражнения: автоматический микс тем по твоему уровню', 'mixed practice: automatic mix of topics by your level'],
+    ['пользовательские упражнения: выбери правила и времена', 'custom practice: choose grammar rules and tenses'],
+    ['Смешанные упражнения: все темы по уровню', 'Mixed practice: all level topics'],
+    ['Пользовательские упражнения (Custom)', 'Custom practice'],
+    ['набор по выбранным темам', 'set by selected topics'],
+    ['упражнения по теме', 'topic practice'],
+    ['упражнения по грамматике', 'grammar practice'],
+    ['пользовательские упражнения: выбери темы', 'custom practice: choose topics'],
+    ['отметь хотя бы одну тему', 'choose at least one topic'],
+    ['выбрать все', 'select all'],
+    ['снять все', 'clear all'],
+    ['выбери минимум одну тему, чтобы начать', 'choose at least one topic to start'],
+    ['Нет заданий: выбери темы', 'No tasks: choose topics'],
+    ['Для этого уровня пока нет тем в выбранной категории.', 'No topics for this level in this category yet.'],
+    ['словообразование', 'word transformation'],
+    ['конструктор', 'constructor'],
+    ['карточки', 'cards'],
+    ['практика', 'practice'],
+    ['заучивание', 'learn'],
+    ['разделы', 'sections'],
+    ['назад', 'back'],
+    ['далее', 'next'],
+    ['вы просмотрели все слова', 'you viewed all words'],
+    ['еще раз', 'again'],
+    ['англ', 'EN'],
+    ['рус', 'RU'],
+    ['сдаюсь', 'give up'],
+    ['засчитать', 'accept'],
+    ['не засчитывать', 'reject'],
+    ['настройки сохраняются в браузере', 'settings are saved in the browser'],
+    ['нажми на карточку чтобы перевернуть', 'tap the card to flip it'],
+    ['переведи', 'translate'],
+    ['введи перевод и нажми check', 'enter the translation and press check'],
+    ['введи ответ и нажми check', 'enter the answer and press check'],
+    ['источник', 'source'],
+    ['новые', 'new'],
+    ['пора повторить', 'due for review'],
+    ['слабые', 'weak'],
+    ['все', 'all'],
+    ['порция', 'batch'],
+    ['направление', 'direction'],
+    ['цель', 'goal'],
+    ['быстро запомнить', 'memorize fast'],
+    ['закрепить надолго', 'retain longer'],
+    ['строгость', 'strictness'],
+    ['мягко', 'soft'],
+    ['строго', 'strict'],
+    ['опечатки', 'typos'],
+    ['формы (EN)', 'forms (EN)'],
+    ['подсказки', 'hints'],
+    ['создать', 'create'],
+    ['удалить раздел', 'delete section'],
+    ['сохранить', 'save'],
+    ['слова', 'words'],
+    ['выбери грамматическую тему', 'choose a grammar topic'],
+    ['подсказка: позже можно сменить раздел через кнопку "разделы" в карточках', 'tip: later you can change the section via the "sections" button in cards'],
+    ['по слабым', 'weak only'],
+    ['"to" не обяз.', '"to" optional'],
+    ['артикли не обяз.', 'articles optional'],
+    ['нажми start или выбери section', 'press start or choose a section'],
+    ['выбери цель и режим (смешанные или пользовательские упражнения)', 'choose a goal and a mode (mixed or custom practice)'],
+    ['восстановить из json', 'restore from JSON'],
+    ['в тексте', 'in text'],
+    ['вставь подходящую форму слова в текст', 'insert the correct word form into the text'],
+    ['два режима: смешанный или пользовательский', 'two modes: mixed or custom'],
+    ['смешанный', 'mixed'],
+    ['пользовательский', 'custom'],
+    ['смешанный: все типы словообразования', 'mixed: all word transformation types'],
+    ['пользовательский: выбери типы словообразования', 'custom: choose word transformation types'],
+    ['собери свой набор типов: можно выбрать один или несколько', 'build your own set: choose one or multiple types'],
+    ['выбери минимум один тип в пользовательском режиме', 'choose at least one type in custom mode'],
+    ['Не выбрано', 'Not selected'],
+    ['случайно', 'random'],
+    ['лицевая сторона', 'front'],
+    ['смешанно', 'mix'],
+    ['раздел', 'section'],
+    ['русский -> английский', 'Russian -> English'],
+    ['английский -> русский', 'English -> Russian'],
+    ['только слабые', 'weak only'],
+    ['сессия', 'session'],
+    ['"to" не обязателен', '"to" optional'],
+    ['артикли не обязательны', 'articles optional'],
+    ['готово', 'ready'],
+    ['правило: после проверки переписать нельзя - только далее. неверные слова вернутся позже.', 'rule: after checking, you cannot edit the answer - only move on. wrong words will return later.'],
+    ['умные повторы', 'smart review'],
+    ['слово считается выученным в сессии, если 2 раза подряд ответил верно без подсказок и между ответами было хотя бы 10 заданий.', 'a word is counted as learned in the session if you answer it correctly twice in a row without hints, with at least 10 tasks between the answers.'],
+    ['сохранить JSON', 'save JSON'],
+    ['загрузить JSON', 'load JSON'],
+    ['заменить', 'replace'],
+    ['структуры - это мини-курсы: правило + практика + прогресс', 'structures are mini-courses: rule + practice + progress'],
+    ['освоение', 'mastery'],
+    ['начать практику', 'start practice'],
+    ['правило', 'rule'],
+    ['выбери режим', 'choose mode'],
+    ['сравнение', 'comparison'],
+    ['10 случайных заданий на сегодня', '10 random tasks for today'],
+    ['простое настоящее + длительное настоящее - быстрый старт', 'Present Simple + Present Continuous - quick start'],
+    ['выбери любые 2 времени', 'pick any 2 tenses'],
+    ['мини-тренировка (10)', 'mini training (10)'],
+    ['мини (5)', 'mini (5)'],
+    ['ежедневная мини-сессия', 'daily mini-session'],
+    ['начать ежедневную (10)', 'start daily (10)'],
+    ['новый набор', 'new set'],
+    ['выбери время', 'choose a tense'],
+    ['перейти к упражнениям', 'go to practice'],
+    ['упражнения по временам', 'tense practice'],
+    ['выбери цель и режим (смешанные или пользовательские упражнения)', 'choose a goal and a mode (mixed or custom practice)'],
+    ['время', 'tense'],
+    ['повторить ошибки', 'retry mistakes'],
+    ['очистить ошибки', 'clear mistakes'],
+    ['сбросить прогресс', 'reset progress'],
+    ['показывать ответы после каждого', 'show answers after each'],
+    ['Enter - проверить/далее • Esc - выйти в меню', 'Enter - check/next • Esc - go to menu'],
+    ['тип', 'type'],
+    ['образование прилагательного', 'Adjective Formation'],
+    ['приставки in- или un-', 'in- or un- prefixes'],
+    ['образование глагола', 'Verb Formation'],
+    ['образование существительного', 'Noun Formation'],
+    ['прилагательное', 'Adjective'],
+    ['категория', 'category'],
+    ['все категории', 'All'],
+    ['суффиксы', 'Suffixes'],
+    ['приставки', 'Prefixes'],
+    ['вопрос', 'q'],
+    ['Образуй нужную форму слова', 'Build the needed word form'],
+    ['перевод', 'translation'],
+    ['ответ', 'answer'],
+    ['просмотр', 'view'],
+    ['добавить', 'add'],
+    ['восстановить из JSON', 'restore from JSON'],
+    ['задания', 'tasks'],
+    ['пре-альфа', 'pre-alpha'],
+    ['Student Helper', 'Student Helper'],
+    ['Учебный помощник', 'Student Helper'],
+    ['Flashcard', 'Flashcard'],
+    ['Quiz card', 'Quiz card'],
+    ['Learn card', 'Learn card'],
+    ['Structure list', 'Structure list'],
+    ['Structure detail', 'Structure detail'],
+    ['Structure tabs', 'Structure tabs'],
+    ['Rule content', 'Rule content'],
+    ['Practice content', 'Practice content'],
+    ['Tenses home', 'Tenses home'],
+    ['Tenses compare', 'Tenses compare'],
+    ['Tenses daily', 'Tenses daily'],
+    ['Tenses list', 'Tenses list'],
+    ['Tense detail', 'Tense detail'],
+    ['Theory content', 'Theory content'],
+    ['Tenses practice', 'Tenses practice']
+  ];
+
+  const PLACEHOLDER_PAIRS = [
+    ['поиск...', 'search...'],
+    ['поиск темы, формулы, категории...', 'search topic, formula, category...'],
+    ['Ответ', 'Answer'],
+    ['Введите перевод...', 'Enter translation...'],
+    ['название раздела', 'section name'],
+    ['перевод (RU)', 'translation (RU)'],
+    ['слово/фраза (EN)', 'word/phrase (EN)'],
+    ['Ответ (EN)', 'Answer (EN)'],
+    ['слово (EN)', 'word (EN)'],
+    ['ответ (EN)', 'answer (EN)'],
+    ['слово (RU)', 'word (RU)'],
+    ['ответ (RU)', 'answer (RU)']
+  ];
+
+  function buildMaps(pairs) {
+    const ruToEn = Object.create(null);
+    const enToRu = Object.create(null);
+    pairs.forEach(([ru, en]) => {
+      ruToEn[normalize(ru)] = en;
+      enToRu[normalize(en)] = ru;
+    });
+    return { ruToEn, enToRu };
+  }
+
+  const textMaps = buildMaps(TEXT_PAIRS);
+  const placeholderMaps = buildMaps(PLACEHOLDER_PAIRS);
+  const TEXTS_RU_TO_EN = textMaps.ruToEn;
+  const TEXTS_EN_TO_RU = textMaps.enToRu;
+  const PLACEHOLDERS_RU_TO_EN = placeholderMaps.ruToEn;
+  const PLACEHOLDERS_EN_TO_RU = placeholderMaps.enToRu;
+
+  const ALIASES_RU_TO_EN = {
+    'dictionary': 'dictionary',
+    'structure': 'structure',
+    'tenses': 'tenses',
+    'word transformation': 'word transformation',
+    'practice и constructor для word forms': 'practice and constructor for word forms',
+    'практика и constructor для word forms': 'practice and constructor for word forms',
+    'карточки, practice, learn, constructor': 'flashcards, practice, learn, constructor',
+    'ready': 'ready',
+    'save json': 'save JSON',
+    'load json': 'load JSON',
+    'compare': 'compare',
+    'daily': 'daily',
+    'start': 'start',
+    'check': 'check',
+    'hint': 'hint',
+    'open': 'open',
+    'mini training (10)': 'mini training (10)',
+    'mini (5)': 'mini (5)',
+    'daily mini-session': 'daily mini-session',
+    'start daily (10)': 'start daily (10)',
+    'new set': 'new set',
+    'retry mistakes': 'retry mistakes',
+    'clear mistakes': 'clear mistakes',
+    'reset progress': 'reset progress',
+    'show answers after each': 'show answers after each',
+    'view': 'view',
+    'add': 'add',
+    'replace': 'replace'
+  };
+
+  const ALIASES_EN_TO_RU = {
+    'dictionary': 'словарь',
+    'structure': 'структура',
+    'tenses': 'времена',
+    'word transformation': 'словообразование',
+    'practice and constructor for word forms': 'практика и конструктор для форм слов',
+    'flashcards, practice, learn, constructor': 'карточки, практика, заучивание, конструктор',
+    'ready': 'готово',
+    'save json': 'сохранить JSON',
+    'save JSON': 'сохранить JSON',
+    'load json': 'загрузить JSON',
+    'load JSON': 'загрузить JSON',
+    'random': 'случайно',
+    'front': 'лицевая сторона',
+    'mix': 'смешанно',
+    'mixed': 'смешанно',
+    'section': 'раздел',
+    'check': 'проверить',
+    'hint': 'подсказка',
+    'open': 'открыть',
+    'start': 'старт',
+    'compare': 'сравнить',
+    'daily': 'на сегодня',
+    'mini training (10)': 'мини-тренировка (10)',
+    'mini (5)': 'мини (5)',
+    'daily mini-session': 'ежедневная мини-сессия',
+    'start daily (10)': 'начать ежедневную (10)',
+    'new set': 'новый набор',
+    'retry mistakes': 'повторить ошибки',
+    'clear mistakes': 'очистить ошибки',
+    'reset progress': 'сбросить прогресс',
+    'show answers after each': 'показывать ответы после каждого',
+    'view': 'просмотр',
+    'add': 'добавить',
+    'replace': 'заменить'
+  };
+
+  const SELECTOR_RULES = {
+    student_helper: [
+      { selector: '#shLobby .ik-title', text: { ru: 'Учебный центр', en: 'Study Center' } },
+      { selector: '#shLobby .ik-sub', text: { ru: 'выбери раздел, чтобы начать', en: 'choose a section to start' } },
+      { selector: '#shContinue', text: { ru: 'продолжить', en: 'continue' } }
+    ]
+  };
+
+  const SKIP_SELECTOR = [
+    '#ikSiteSettingsPanel',
+    '[contenteditable="true"]',
+    '.ik-word',
+    '#dictCardFront', '#dictCardBack', '#dictQuizFront', '#dictQuizBack', '#dictLearnFront', '#dictLearnBack',
+    '#promptEn', '#promptRu', '#textSentenceEn', '#textSentenceRu',
+    '#dictSectionCards', '#dictSectionQuiz', '#dictSectionLearn', '#dictBuilderSection',
+    '#dictSectionList', '#dictWordList', '#dictFirstPickList', '#structList', '#tensesList',
+    '#tensesCompareA', '#tensesCompareB', '#tensesTenseSelect', '#viewCategory', '#taskList'
+  ].join(',');
+
+  function translateDynamic(text, lang) {
+    const key = normalize(text);
+    const rules = [
+      { ru: /^слов:\s*(\d+)$/i, en: /^words:\s*(\d+)$/i, toRu: (m) => `слов: ${m[1]}`, toEn: (m) => `words: ${m[1]}` },
+      { ru: /^структур:\s*(\d+)$/i, en: /^structures:\s*(\d+)$/i, toRu: (m) => `структур: ${m[1]}`, toEn: (m) => `structures: ${m[1]}` },
+      { ru: /^врем[её]н:\s*(\d+)$/i, en: /^tenses:\s*(\d+)$/i, toRu: (m) => `времён: ${m[1]}`, toEn: (m) => `tenses: ${m[1]}` },
+      { ru: /^грамматика:\s*(\d+)$/i, en: /^grammar:\s*(\d+)$/i, toRu: (m) => `грамматика: ${m[1]}`, toEn: (m) => `grammar: ${m[1]}` },
+      { ru: /^задани[йя]:\s*(\d+)$/i, en: /^tasks:\s*(\d+)$/i, toRu: (m) => `заданий: ${m[1]}`, toEn: (m) => `tasks: ${m[1]}` },
+      { ru: /^задани[йя]:\s*(\d+)\s*-\s*ошибк[аи]:\s*(\d+)$/i, en: /^tasks:\s*(\d+)\s*-\s*mistakes:\s*(\d+)$/i, toRu: (m) => `заданий: ${m[1]} - ошибки: ${m[2]}`, toEn: (m) => `tasks: ${m[1]} - mistakes: ${m[2]}` },
+      { ru: /^вопр\.?[:]?\s*(\d+)$/i, en: /^q:\s*(\d+)$/i, toRu: (m) => `вопр.: ${m[1]}`, toEn: (m) => `q: ${m[1]}` },
+      { ru: /^освоение\s+(\d+\/\d+)$/i, en: /^mastery\s+(\d+\/\d+)$/i, toRu: (m) => `освоение ${m[1]}`, toEn: (m) => `mastery ${m[1]}` },
+      { ru: /^выбрано:\s*(\d+)\s*из\s*(\d+)$/i, en: /^selected:\s*(\d+)\s*of\s*(\d+)$/i, toRu: (m) => `выбрано: ${m[1]} из ${m[2]}`, toEn: (m) => `selected: ${m[1]} of ${m[2]}` },
+      { ru: /^Пользовательское\s*\((\d+)\s*тем\.?\)$/i, en: /^Custom\s*\((\d+)\s*topics\)$/i, toRu: (m) => `Пользовательское (${m[1]} тем.)`, toEn: (m) => `Custom (${m[1]} topics)` },
+      { ru: /^совпадение:\s*(.+)$/i, en: /^match:\s*(.+)$/i, toRu: (m) => `совпадение: ${m[1]}`, toEn: (m) => `match: ${m[1]}` },
+      { ru: /^найдено:\s*(.+)$/i, en: /^found:\s*(.+)$/i, toRu: (m) => `найдено: ${m[1]}`, toEn: (m) => `found: ${m[1]}` }
+    ];
+
+    for (const rule of rules) {
+      if (lang === 'en') {
+        const match = key.match(rule.ru);
+        if (match) return rule.toEn(match);
+      } else {
+        const match = key.match(rule.en);
+        if (match) return rule.toRu(match);
+      }
+    }
+    return text;
+  }
+
+  function translateViaMaps(text, lang, ruToEn, enToRu, aliasRuToEn, aliasEnToRu) {
+    const key = normalize(text);
+    if (!key) return text;
+    if (lang === 'en') {
+      const alias = Object.prototype.hasOwnProperty.call(aliasRuToEn, key) ? aliasRuToEn[key] : undefined;
+      return ruToEn[key] || alias || translateDynamic(key, 'en') || text;
+    }
+    const alias = Object.prototype.hasOwnProperty.call(aliasEnToRu, key) ? aliasEnToRu[key] : undefined;
+    return enToRu[key] || alias || translateDynamic(key, 'ru') || text;
+  }
+
+  function translateText(text, lang) {
+    return translateViaMaps(text, lang, TEXTS_RU_TO_EN, TEXTS_EN_TO_RU, ALIASES_RU_TO_EN, ALIASES_EN_TO_RU);
+  }
+
+  function translatePlaceholder(text, lang) {
+    return translateViaMaps(text, lang, PLACEHOLDERS_RU_TO_EN, PLACEHOLDERS_EN_TO_RU, ALIASES_RU_TO_EN, ALIASES_EN_TO_RU);
+  }
+
+  function getLang() {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      return saved === 'en' ? 'en' : DEFAULT_LANG;
+    } catch (e) {
+      return DEFAULT_LANG;
+    }
+  }
+
+  function saveLang(lang) {
+    try {
+      localStorage.setItem(STORAGE_KEY, lang === 'en' ? 'en' : 'ru');
+    } catch (e) {}
+  }
+
+  function setPanelState(lang) {
+    const ru = document.getElementById('ikLangRu');
+    const en = document.getElementById('ikLangEn');
+    if (ru) ru.checked = lang === 'ru';
+    if (en) en.checked = lang === 'en';
+    document.querySelectorAll('.ik-lang-option').forEach((label) => {
+      const input = label.querySelector('input');
+      label.classList.toggle('is-active', !!input?.checked);
+    });
+    const gear = document.getElementById('ikGlobalSettingsBtn');
+    if (gear) {
+      const label = lang === 'en' ? 'Site settings' : 'Настройки сайта';
+      gear.setAttribute('aria-label', label);
+      gear.setAttribute('title', label);
+    }
+  }
+
+  function applySelectorRules(lang) {
+    const rules = SELECTOR_RULES[PAGE] || [];
+    rules.forEach((rule) => {
+      document.querySelectorAll(rule.selector).forEach((el) => {
+        if (rule.text) el.textContent = rule.text[lang];
+        if (rule.placeholder && 'placeholder' in el) el.placeholder = rule.placeholder[lang];
+      });
+    });
+  }
+
+  function shouldSkipElement(el) {
+    if (!el || !(el instanceof Element)) return true;
+    if (el.closest(SKIP_SELECTOR)) return true;
+    const tag = el.tagName;
+    return tag === 'SCRIPT' || tag === 'STYLE' || tag === 'TEXTAREA';
+  }
+
+  function applyTextNodeTranslations(lang) {
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+      acceptNode(node) {
+        const parent = node.parentElement;
+        if (!parent || shouldSkipElement(parent)) return NodeFilter.FILTER_REJECT;
+        if (!normalize(node.nodeValue)) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+
+    const nodes = [];
+    let current;
+    while ((current = walker.nextNode())) nodes.push(current);
+
+    nodes.forEach((node) => {
+      const match = String(node.nodeValue || '').match(/^(\s*)([\s\S]*?)(\s*)$/);
+      if (!match) return;
+      const translated = translateText(match[2], lang);
+      if (translated !== normalize(match[2])) {
+        node.nodeValue = `${match[1]}${translated}${match[3]}`;
+      }
+    });
+  }
+
+  function applyAttributeTranslations(lang) {
+    ['placeholder', 'title', 'aria-label'].forEach((attr) => {
+      document.querySelectorAll(`[${attr}]`).forEach((el) => {
+        const current = el.getAttribute(attr);
+        if (!current) return;
+        const translated = attr === 'placeholder' ? translatePlaceholder(current, lang) : translateText(current, lang);
+        if (translated !== current) el.setAttribute(attr, translated);
+      });
+    });
+
+    document.querySelectorAll('input[type="button"][value], input[type="submit"][value], input[type="reset"][value]').forEach((el) => {
+      const current = el.value;
+      const translated = translateText(current, lang);
+      if (translated !== current) el.value = translated;
+    });
+  }
+
+  let isApplying = false;
+
+  function applyLanguage(lang) {
+    if (isApplying) return;
+    isApplying = true;
+    const next = lang === 'en' ? 'en' : 'ru';
+    document.documentElement.lang = next;
+    if (TITLES[PAGE]) document.title = TITLES[PAGE][next];
+
+    const titleEl = document.getElementById('ikSiteSettingsTitle');
+    const closeEl = document.getElementById('ikSiteSettingsClose');
+    const labelEl = document.getElementById('ikSiteLangLabel');
+    const ruEl = document.getElementById('ikLangRuText');
+    const enEl = document.getElementById('ikLangEnText');
+
+    if (titleEl) titleEl.textContent = next === 'en' ? 'Settings' : 'Настройки';
+    if (closeEl) closeEl.textContent = next === 'en' ? 'Close' : 'Закрыть';
+    if (labelEl) labelEl.textContent = next === 'en' ? 'Site language' : 'Язык сайта';
+    if (ruEl) ruEl.textContent = next === 'en' ? 'Russian' : 'Русский';
+    if (enEl) enEl.textContent = next === 'en' ? 'English' : 'Английский';
+
+    applySelectorRules(next);
+    applyTextNodeTranslations(next);
+    applyAttributeTranslations(next);
+    setPanelState(next);
+    isApplying = false;
+  }
+
+  function setLang(lang) {
+    const next = lang === 'en' ? 'en' : 'ru';
+    saveLang(next);
+    applyLanguage(next);
+    document.dispatchEvent(new CustomEvent('ik:languagechange', { detail: { lang: next } }));
+  }
+
+  function buildGearButton() {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.id = 'ikGlobalSettingsBtn';
+    btn.className = 'ik-gear-btn';
+    btn.setAttribute('aria-label', 'Настройки сайта');
+    btn.setAttribute('title', 'Настройки сайта');
+    btn.innerHTML = `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+        <path d="M12 8.4A3.6 3.6 0 1 0 12 15.6A3.6 3.6 0 1 0 12 8.4Z"/>
+        <path d="M19.4 15a1 1 0 0 0 .2 1.1l.1.1a1.2 1.2 0 0 1 0 1.7l-1.6 1.6a1.2 1.2 0 0 1-1.7 0l-.1-.1a1 1 0 0 0-1.1-.2 1 1 0 0 0-.6.9V20a1.2 1.2 0 0 1-1.2 1.2h-2.3A1.2 1.2 0 0 1 9.9 20v-.2a1 1 0 0 0-.6-.9 1 1 0 0 0-1.1.2l-.1.1a1.2 1.2 0 0 1-1.7 0l-1.6-1.6a1.2 1.2 0 0 1 0-1.7l.1-.1a1 1 0 0 0 .2-1.1 1 1 0 0 0-.9-.6H4A1.2 1.2 0 0 1 2.8 13v-2.3A1.2 1.2 0 0 1 4 9.5h.2a1 1 0 0 0 .9-.6 1 1 0 0 0-.2-1.1l-.1-.1a1.2 1.2 0 0 1 0-1.7l1.6-1.6a1.2 1.2 0 0 1 1.7 0l.1.1a1 1 0 0 0 1.1.2 1 1 0 0 0 .6-.9V4A1.2 1.2 0 0 1 11.1 2.8h2.3A1.2 1.2 0 0 1 14.6 4v.2a1 1 0 0 0 .6.9 1 1 0 0 0 1.1-.2l.1-.1a1.2 1.2 0 0 1 1.7 0l1.6 1.6a1.2 1.2 0 0 1 0 1.7l-.1.1a1 1 0 0 0-.2 1.1 1 1 0 0 0 .9.6h.2A1.2 1.2 0 0 1 21.2 10.7V13A1.2 1.2 0 0 1 20 14.2h-.2a1 1 0 0 0-.4.8Z"/>
+      </svg>
+    `;
+    return btn;
+  }
+
+  function buildPanel() {
+    const panel = document.createElement('div');
+    panel.id = 'ikSiteSettingsPanel';
+    panel.className = 'ik-settings-panel';
+    panel.hidden = true;
+    panel.innerHTML = `
+      <div class="ik-settings-panel__head">
+        <p class="ik-settings-panel__title" id="ikSiteSettingsTitle">Настройки</p>
+        <button type="button" class="ik-settings-panel__close" id="ikSiteSettingsClose">Закрыть</button>
+      </div>
+      <div class="ik-settings-group">
+        <div class="ik-settings-label" id="ikSiteLangLabel">Язык сайта</div>
+        <div class="ik-lang-switch">
+          <label class="ik-lang-option" for="ikLangRu">
+            <input type="radio" name="ikSiteLang" id="ikLangRu" value="ru" />
+            <span id="ikLangRuText">Русский</span>
+          </label>
+          <label class="ik-lang-option" for="ikLangEn">
+            <input type="radio" name="ikSiteLang" id="ikLangEn" value="en" />
+            <span id="ikLangEnText">Английский</span>
+          </label>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(panel);
+    return panel;
+  }
+
+  function initSettingsUI() {
+    if (document.getElementById('ikGlobalSettingsBtn')) return;
+
+    const gearBtn = buildGearButton();
+    const panel = buildPanel();
+    const closeBtn = panel.querySelector('#ikSiteSettingsClose');
+    const header = document.querySelector('.ik-site-nav');
+
+    if (header) {
+      let actions = header.querySelector('.ik-site-nav__actions');
+      if (!actions) {
+        actions = document.createElement('div');
+        actions.className = 'ik-site-nav__actions';
+        header.appendChild(actions);
+      }
+      actions.appendChild(gearBtn);
+    } else {
+      const floating = document.createElement('div');
+      floating.className = 'ik-floating-settings';
+      floating.appendChild(gearBtn);
+      document.body.appendChild(floating);
+    }
+
+    const openPanel = () => { panel.hidden = false; };
+    const closePanel = () => { panel.hidden = true; };
+
+    gearBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      panel.hidden ? openPanel() : closePanel();
+    });
+    closeBtn.addEventListener('click', closePanel);
+    panel.addEventListener('click', (e) => e.stopPropagation());
+    document.addEventListener('click', () => { if (!panel.hidden) closePanel(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !panel.hidden) closePanel(); });
+    panel.querySelectorAll('input[name="ikSiteLang"]').forEach((input) => {
+      input.addEventListener('change', () => setLang(input.value));
+    });
+  }
+
+  function initObserver() {
+    let queued = false;
+    const observer = new MutationObserver(() => {
+      if (queued || isApplying) return;
+      queued = true;
+      requestAnimationFrame(() => {
+        queued = false;
+        applyLanguage(getLang());
+      });
+    });
+    observer.observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['title', 'aria-label', 'placeholder', 'value'] });
+  }
+
+  window.IKSiteLang = {
+    get: getLang,
+    set: setLang,
+    apply: () => applyLanguage(getLang())
+  };
+
+  document.addEventListener('DOMContentLoaded', () => {
+    initSettingsUI();
+    applyLanguage(getLang());
+    initObserver();
+  });
+})();
+</script>
+
 </body>
 </html>

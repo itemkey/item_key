@@ -3,34 +3,19 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta http-equiv="refresh" content="0;url=./" />
   <title>Redirecting...</title>
   <script>
     (function(){
-      var search = String(window.location.search || "");
-      if (/(^|[?&])legacy=1(?:&|$)/i.test(search)) return;
-
-      var path = String(window.location.pathname || "");
-      if (!/\/crate\/student_helper\/(?:student_helper\.html|index\.html)?\/?$/i.test(path)) return;
-
-      var targetPath = path.replace(/(?:student_helper|index)\.html\/?$/i, "");
-      if (targetPath.charAt(0) !== "/") targetPath = "/" + targetPath;
-      if (!targetPath) targetPath = "./";
-      if (targetPath.charAt(targetPath.length - 1) !== "/") targetPath += "/";
-
-      var cleanSearch = search
-        .replace(/[?&]legacy=1(?=&|$)/gi, "")
-        .replace(/^&/, "?")
-        .replace(/[?&]$/, "");
-
-      var target = targetPath + cleanSearch + String(window.location.hash || "");
-      var current = path + search + String(window.location.hash || "");
-      if (target === current) return;
+      var hash = String(window.location.hash || "");
+      var params = new URLSearchParams(String(window.location.search || "").replace(/^\?/, ""));
+      if (!params.has("legacy")) params.set("legacy", "1");
+      var query = params.toString();
+      var target = "./student_helper.html" + (query ? "?" + query : "?legacy=1") + hash;
       window.location.replace(target);
     })();
   </script>
 </head>
 <body>
-  <p>Redirecting to <a href="./">the new Student Helper page</a>...</p>
+  <p>Redirecting to <a href="./student_helper.html?legacy=1">Student Helper</a>...</p>
 </body>
 </html>
