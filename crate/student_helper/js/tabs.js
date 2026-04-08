@@ -8,11 +8,15 @@
   const tabTenses = document.getElementById('tab-tenses');
   const tabWT     = document.getElementById('tab-wt');
 
+  const isNextRuntimePage = !!document.getElementById('__NEXT_DATA__');
+
   const panelLibrary = document.getElementById('panel-library');
   const panelDict   = document.getElementById('panel-dict');
   const panelStruct = document.getElementById('panel-struct');
   const panelTenses = document.getElementById('panel-tenses');
   const panelWT     = document.getElementById('panel-wt');
+
+  const useLegacyGrammarFallback = !isNextRuntimePage && !!tabTenses && !!panelStruct && !!panelTenses;
 
   function setMainTab(which){
     const w =
@@ -24,14 +28,16 @@
 
     if (tabLibrary) tabLibrary.setAttribute('aria-selected', String(w === 'library'));
     if (tabDict)   tabDict.setAttribute('aria-selected', String(w === 'dict'));
-    if (tabStruct) tabStruct.setAttribute('aria-selected', String(w === 'struct'));
+    if (tabStruct) tabStruct.setAttribute('aria-selected', String(w === 'struct' && !useLegacyGrammarFallback));
     if (tabTenses) tabTenses.setAttribute('aria-selected', String(w === 'tenses'));
     if (tabWT)     tabWT.setAttribute('aria-selected', String(w === 'wt'));
 
+    const showStructPanel = (w === 'struct') || (useLegacyGrammarFallback && w === 'tenses');
+
     if (panelLibrary) panelLibrary.hidden = (w !== 'library');
     if (panelDict)   panelDict.hidden   = (w !== 'dict');
-    if (panelStruct) panelStruct.hidden = (w !== 'struct');
-    if (panelTenses) panelTenses.hidden = (w !== 'tenses');
+    if (panelStruct) panelStruct.hidden = !showStructPanel;
+    if (panelTenses) panelTenses.hidden = useLegacyGrammarFallback ? true : (w !== 'tenses');
     if (panelWT)     panelWT.hidden     = (w !== 'wt');
 
     try{
@@ -41,7 +47,7 @@
 
   function getMainTab(){
     if (panelLibrary && !panelLibrary.hidden) return 'library';
-    if (panelStruct && !panelStruct.hidden) return 'struct';
+    if (panelStruct && !panelStruct.hidden) return useLegacyGrammarFallback ? 'tenses' : 'struct';
     if (panelTenses && !panelTenses.hidden) return 'tenses';
     if (panelWT && !panelWT.hidden) return 'wt';
     return 'dict';
