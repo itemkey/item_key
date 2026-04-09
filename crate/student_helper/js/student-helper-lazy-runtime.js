@@ -3,7 +3,6 @@
   const loadingGroups = new Map();
   const loadingScripts = new Map();
   let commonWarmupQueued = false;
-  let progressCloudWarmupQueued = false;
 
   const TRUE_SET = new Set(["1", "true", "yes", "on"]);
   const FALSE_SET = new Set(["0", "false", "no", "off"]);
@@ -100,8 +99,8 @@
     if(loadingGroups.has(name)) return loadingGroups.get(name);
 
     const promise = (async () => {
-      await loader();
-      loadedGroups.add(name);
+      const result = await loader();
+      if(result !== false) loadedGroups.add(name);
     })();
 
     const tracked = promise.finally(() => {
@@ -118,6 +117,25 @@
     });
   }
 
+  async function ensureSupabaseReady(timeoutMs){
+    const wait = Math.max(1200, Number(timeoutMs) || 4200);
+    let timer = 0;
+
+    const timeoutPromise = new Promise((resolve) => {
+      timer = window.setTimeout(() => resolve(false), wait);
+    });
+
+    try {
+      const ready = await Promise.race([
+        ensureSupabase().then(() => true).catch(() => false),
+        timeoutPromise
+      ]);
+      return !!ready;
+    } finally {
+      if(timer) window.clearTimeout(timer);
+    }
+  }
+
   function ensureLibrary(){
     return onceGroup("library", () => ensureScript("./js/library.js?v=20260331-03"));
   }
@@ -131,26 +149,41 @@
 
   function ensureDictionary(){
     return onceGroup("dictionary", async () => {
-      await ensureSupabase();
       await ensureScripts([
         "./js/dictionary.js",
-        "./js/student-helper-dict-fallback.js",
-        "./js/dictionary_cloud.js"
+        "./js/student-helper-dict-fallback.js"
       ]);
+
+      ensureSupabase().catch(() => {});
+      ensureDictionaryCloud().catch(() => {});
+      ensureProgressCloud().catch(() => {});
+    });
+  }
+
+  function ensureDictionaryCloud(){
+    return onceGroup("dictionary-cloud", async () => {
+      const ready = await ensureSupabaseReady(4500);
+      if(!ready) return false;
+      await ensureScript("./js/dictionary_cloud.js");
+      return true;
     });
   }
 
   function ensureWt(){
     return onceGroup("wt", async () => {
-      await ensureSupabase();
       await ensureScript("./js/word_transformation.js?v=20260331-02");
+
+      ensureSupabase().catch(() => {});
+      ensureProgressCloud().catch(() => {});
     });
   }
 
   function ensureProgressCloud(){
     return onceGroup("progress-cloud", async () => {
-      await ensureSupabase();
+      const ready = await ensureSupabaseReady(4500);
+      if(!ready) return false;
       await ensureScript("./js/progress_cloud.js");
+      return true;
     });
   }
 
@@ -171,14 +204,6 @@
     scheduleIdle(() => {
       ensureCommonEnhancers().catch(() => {});
     }, 1400);
-  }
-
-  function queueProgressCloudWarmup(){
-    if(progressCloudWarmupQueued) return;
-    progressCloudWarmupQueued = true;
-    scheduleIdle(() => {
-      ensureProgressCloud().catch(() => {});
-    }, 2200);
   }
 
   function normalizeRoute(raw){
@@ -245,20 +270,49 @@
     if(!route || route === "menu") return;
 
     queueCommonWarmup();
-    queueProgressCloudWarmup();
-    ensureLibrary().catch(() => {});
 
     if(route === "grammar"){
+      ensureLibrary().catch(() => {});
       ensureGrammarLegacy().catch(() => {});
       return;
     }
     if(route === "dict"){
-      ensureDictionary().catch(() => {});
+      showDictionaryLoading();
+      ensureDictionary().catch((err) => {
+        showDictionaryLoadError(err);
+      });
+      return;
+    }
+    if(route === "library"){
+      ensureLibrary().catch(() => {});
+      ensureProgressCloud().catch(() => {});
       return;
     }
     if(route === "wt"){
+      ensureLibrary().catch(() => {});
       ensureWt().catch(() => {});
     }
+  }
+
+  function showDictionaryLoading(){
+    const list = document.getElementById("dictFirstPickList");
+    if (list && list.children.length === 0) {
+      list.innerHTML = "<li class=\"ik-muted\" data-dict-lazy-state=\"loading\">загрузка словаря...</li>";
+    }
+
+    const status = document.getElementById("dictDbStatus");
+    if (status) {
+      const text = String(status.textContent || "").trim();
+      if (!text || text === "...") status.textContent = "loading...";
+    }
+  }
+
+  function showDictionaryLoadError(err){
+    const list = document.getElementById("dictFirstPickList");
+    if (list && list.children.length === 0) {
+      list.innerHTML = "<li class=\"ik-muted\" data-dict-lazy-state=\"error\">не удалось загрузить словарь, обнови страницу</li>";
+    }
+    try { console.error(err); } catch (_e) { }
   }
 
   document.addEventListener("sh:route", (event) => {

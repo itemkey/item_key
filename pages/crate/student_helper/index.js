@@ -140,7 +140,7 @@ export default function StudentHelperPage({ studentHelperBodyHtml }) {
       <script defer src="../../assets/js/theme.js" />
       <script defer src="./js/tabs.js?v=20260331-03" />
       <script defer src="./js/student-helper-back-nav.js?v=20260409-01" />
-      <script defer src="./js/student-helper-lazy-runtime.js?v=20260409-01" />
+      <script defer src="./js/student-helper-lazy-runtime.js?v=20260409-02" />
       <script defer src="./js/lobby.js?v=20260331-03" />
     </>
   );
