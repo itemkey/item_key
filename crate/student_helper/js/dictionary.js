@@ -1,9 +1,14 @@
 // Dictionary (sections + words)
   // -----------------------------
+  const DICT_DB_PREFIX = 'student_helper_db__';
   const DICT_DB_VERSION = 1;
   const DICT_STORE_SECTIONS = 'sections';
   const DICT_STORE_WORDS = 'words';
   const DICT_REASK_GAP = 3;
+
+  function normalize(s){ return String(s || '').trim().toLowerCase(); }
+  function idbSupported(){ return typeof indexedDB !== 'undefined'; }
+  function dbNameFor(type){ return `${DICT_DB_PREFIX}${String(type || '').trim()}`; }
 
   function dictDbName(){ return dbNameFor('dictionary'); }
 
@@ -572,10 +577,12 @@ function _guessSiteRoots(){
   const roots = [];
   const origin = window.location && window.location.origin ? window.location.origin : '';
   const path = window.location && window.location.pathname ? window.location.pathname : '/';
-  const baseDir = String(path || '/').replace(/[^/]*$/, '');
+  const pathAsDir = String(path || '/').endsWith('/') ? String(path || '/') : `${String(path || '/')}/`;
+  const baseDir = String(pathAsDir || '/').replace(/[^/]+\/$/, '/');
 
   if(origin){
     roots.push(origin + '/');
+    if(pathAsDir) roots.push(origin + pathAsDir);
     if(baseDir) roots.push(origin + baseDir);
     const parts = String(path || '').split('/').filter(Boolean);
     const repoIdx = parts.indexOf('item_key');
@@ -603,7 +610,7 @@ async function fetchJson(relPath){
   let lastErr = null;
   for(const url of urls){
     try{
-      const res = await fetch(url, { cache: 'no-store' });
+      const res = await fetch(url, { cache: 'force-cache' });
       if(!res.ok){
         lastErr = new Error(`HTTP ${res.status}`);
         continue;

@@ -992,10 +992,16 @@ function _guessSiteRoots(){
   const roots = [];
   try{
     const origin = location.origin;
+    const pathname = String(location.pathname || '/');
+    const pathAsDir = pathname.endsWith('/') ? pathname : `${pathname}/`;
+    const parentDir = pathAsDir.replace(/[^/]+\/$/, '/');
+
     roots.push(origin + '/');
+    roots.push(origin + pathAsDir);
+    if(parentDir) roots.push(origin + parentDir);
 
     // GitHub Pages project site: https://user.github.io/<repo>/
-    const parts = location.pathname.split('/').filter(Boolean);
+    const parts = pathname.split('/').filter(Boolean);
     if(location.hostname.endsWith('github.io') && parts.length >= 1){
       roots.push(origin + '/' + parts[0] + '/');
     }
@@ -1028,7 +1034,7 @@ async function fetchJson(relPath){
 
   for(const url of urls){
     try{
-      const resp = await fetch(url, { cache:'no-store' });
+      const resp = await fetch(url, { cache:'force-cache' });
       if(!resp.ok){
         lastErr = new Error(`HTTP ${resp.status}`);
         continue;
@@ -2209,11 +2215,12 @@ async function fetchJson(relPath){
   async function refreshTasks(){
     const all = await getAllTasks(db);
     tasksAll = all
-      .filter(t => t.type === 'noun_to_adj')
       .map(t => ({
         ...t,
+        type: normTransformType(t && t.type || TRANSFORM_TYPE_N2A),
         category: normCategory(t.category || 'Suffixes')
       }))
+      .filter((t) => t.type === TRANSFORM_TYPE_N2A)
       .sort((a,b)=> (a.en_noun || '').localeCompare((b.en_noun || ''), 'en'));
 
     updateCountBadge();

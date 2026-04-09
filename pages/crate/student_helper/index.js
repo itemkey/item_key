@@ -138,10 +138,22 @@ export default function StudentHelperPage({ studentHelperBodyHtml }) {
       {mountGrammarReact ? <GrammarReactAppPortal /> : null}
 
       <script defer src="../../assets/js/theme.js" />
+      <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" />
+      <script defer src="../../assets/js/supabase-client.js" />
       <script defer src="./js/tabs.js?v=20260331-03" />
       <script defer src="./js/student-helper-back-nav.js?v=20260409-01" />
-      <script defer src="./js/student-helper-lazy-runtime.js?v=20260409-02" />
       <script defer src="./js/lobby.js?v=20260331-03" />
+      <script defer src="./js/library.js?v=20260331-03" />
+      <script defer src="./js/structure_data.js" />
+      <script defer src="./js/structure.js?v=20260331-01" />
+      <script defer src="./js/word_transformation.js?v=20260409-03" />
+      <script defer src="./js/dictionary.js?v=20260409-03" />
+      <script defer src="./js/student-helper-dict-fallback.js" />
+      <script defer src="./js/dictionary_cloud.js" />
+      <script defer src="./js/progress_cloud.js" />
+      <script defer src="./js/backup_restore.js" />
+      <script defer src="./js/enter_next.js" />
+      <script defer id="ik-site-settings-js" src="./js/ik-site-settings.js" />
     </>
   );
 }
