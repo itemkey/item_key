@@ -1751,15 +1751,32 @@
 
   function initObserver() {
     let queued = false;
-    const observer = new MutationObserver(() => {
+    let lastApplyAt = 0;
+    let activeLang = getLang();
+
+    const queueApply = () => {
       if (queued || isApplying) return;
+      if (activeLang === DEFAULT_LANG) return;
       queued = true;
       requestAnimationFrame(() => {
         queued = false;
-        applyLanguage(getLang());
+        const now = Date.now();
+        if (now - lastApplyAt < 160) return;
+        lastApplyAt = now;
+        applyLanguage(activeLang);
       });
+    };
+
+    const observer = new MutationObserver(() => {
+      queueApply();
     });
-    observer.observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['title', 'aria-label', 'placeholder', 'value'] });
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    document.addEventListener('ik:languagechange', (event) => {
+      const detail = event && event.detail ? event.detail : {};
+      activeLang = detail.lang === 'en' ? 'en' : 'ru';
+      queueApply();
+    });
   }
 
   window.IKSiteLang = {
@@ -1768,11 +1785,17 @@
     apply: () => applyLanguage(getLang())
   };
 
-  document.addEventListener('DOMContentLoaded', () => {
+  function bootSettings(){
     initSettingsUI();
     applyLanguage(getLang());
     initObserver();
-  });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bootSettings, { once: true });
+  } else {
+    bootSettings();
+  }
 })();
 </script>
 

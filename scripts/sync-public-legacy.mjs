@@ -203,6 +203,8 @@ function extractStudentHelperAssets() {
       }
     }
   }
+
+  copyFileIfExists(path.join("crate", "student_helper", "js", "student-helper-lazy-runtime.js"));
 }
 
 function studentHelperRedirectHtml() {

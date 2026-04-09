@@ -992,7 +992,7 @@ export default function GrammarReactAppPortal() {
       setLoadingIndex(true);
       setIndexError("");
       try {
-        const res = await fetch(INDEX_PATH, { cache: "no-cache" });
+        const res = await fetch(INDEX_PATH, { cache: "force-cache" });
         if (!res.ok) throw new Error(`grammar index load failed (${res.status})`);
         const json = await res.json();
         const list = asList(json)
@@ -1059,7 +1059,7 @@ export default function GrammarReactAppPortal() {
 
     setDocError("");
     try {
-      const res = await fetch(`${DB_DIR}${meta.file}`, { cache: "no-cache" });
+      const res = await fetch(`${DB_DIR}${meta.file}`, { cache: "force-cache" });
       if (!res.ok) throw new Error(`topic load failed (${res.status})`);
       const doc = await res.json();
       setTopicDocs((prev) => ({ ...prev, [id]: doc }));
