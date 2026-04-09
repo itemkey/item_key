@@ -2,6 +2,19 @@ function normalizeBasePath(value) {
   const raw = String(value || "").trim();
   if (!raw) return "";
 
+  const lowered = raw.toLowerCase();
+  if (
+    lowered === "/"
+    || lowered === "."
+    || lowered === "false"
+    || lowered === "0"
+    || lowered === "none"
+    || lowered === "null"
+    || lowered === "off"
+  ) {
+    return "";
+  }
+
   const normalizedSlashes = raw.replace(/\\/g, "/");
   const looksLikeWindowsPath = /^[A-Za-z]:\//.test(normalizedSlashes);
   const baseSource = looksLikeWindowsPath
@@ -12,7 +25,9 @@ function normalizeBasePath(value) {
   return clean ? `/${clean}` : "";
 }
 
-const basePath = normalizeBasePath(process.env.NEXT_BASE_PATH);
+const hasExplicitBasePath = Object.prototype.hasOwnProperty.call(process.env, "NEXT_BASE_PATH");
+const defaultBasePath = process.env.NODE_ENV === "production" ? "/item_key" : "";
+const basePath = normalizeBasePath(hasExplicitBasePath ? process.env.NEXT_BASE_PATH : defaultBasePath);
 const withBasePath = !!basePath;
 const isDev = process.env.NODE_ENV !== "production";
 

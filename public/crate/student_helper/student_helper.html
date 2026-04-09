@@ -1028,40 +1028,64 @@
   <script>
     document.addEventListener('DOMContentLoaded', function(){
       var backBtn = document.getElementById('ikBackBtn');
+      if(!backBtn) return;
 
-      function safeBrowserBack(fallbackHref){
+      if(document.body){
+        document.body.classList.remove('ik-page-leaving');
+      }
+
+      function getFallbackHref(){
+        var menuLink = document.querySelector('#ikSiteNav a.ik-site-nav__link[href]');
+        var href = menuLink ? String(menuLink.getAttribute('href') || '').trim() : '';
+        return href || '/item_key/';
+      }
+
+      function goWithLeave(href){
+        if(window.IKLoading && typeof window.IKLoading.leave === 'function'){
+          window.IKLoading.leave(function(){ window.location.href = href; });
+          return;
+        }
+        window.location.href = href;
+      }
+
+      function safeBrowserBack(){
+        var fallbackHref = getFallbackHref();
+
         if(window.history.length <= 1){
-          window.location.href = fallbackHref;
+          goWithLeave(fallbackHref);
           return;
         }
 
         var currentHref = window.location.href;
         var navigated = false;
-        var markNavigated = function(){ navigated = true; };
+        var markNavigated = function(){
+          navigated = true;
+          if(document.body){
+            document.body.classList.remove('ik-page-leaving');
+          }
+        };
 
         window.addEventListener('pagehide', markNavigated, { once: true });
+        window.addEventListener('beforeunload', markNavigated, { once: true });
         window.addEventListener('popstate', markNavigated, { once: true });
 
         window.history.back();
 
         window.setTimeout(function(){
+          if(document.body){
+            document.body.classList.remove('ik-page-leaving');
+          }
           if(navigated) return;
           if(window.location.href === currentHref){
-            window.location.href = fallbackHref;
+            goWithLeave(fallbackHref);
           }
-        }, 450);
+        }, 520);
       }
 
-      if(backBtn){
-        backBtn.addEventListener('click', function(event){
-          event.preventDefault();
-          if(window.IKLoading && typeof window.IKLoading.leave === 'function'){
-            window.IKLoading.leave(function(){ safeBrowserBack('/item_key/'); });
-          } else {
-            safeBrowserBack('/item_key/');
-          }
-        });
-      }
+      backBtn.addEventListener('click', function(event){
+        event.preventDefault();
+        safeBrowserBack();
+      });
     });
   </script>
   <script src="./js/lobby.js?v=20260331-03"></script>

@@ -44,7 +44,7 @@ export default function StudentHelperPage({ studentHelperBodyHtml }) {
       <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" />
       <script defer src="../../assets/js/supabase-client.js" />
       <script defer src="./js/tabs.js?v=20260331-03" />
-      <script defer src="./js/student-helper-back-nav.js" />
+      <script defer src="./js/student-helper-back-nav.js?v=20260409-01" />
       <script defer src="./js/lobby.js?v=20260331-03" />
       <script defer src="./js/library.js?v=20260331-03" />
       <script defer src="./js/structure_data.js" />

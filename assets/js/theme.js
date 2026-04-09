@@ -194,6 +194,27 @@
       run();
       return;
     }
+
+    let didUnload = false;
+    const markDidUnload = () => {
+      didUnload = true;
+      cleanupUnloadHooks();
+    };
+    const cleanupUnloadHooks = () => {
+      window.removeEventListener("pagehide", markDidUnload);
+      window.removeEventListener("beforeunload", markDidUnload);
+    };
+
+    window.addEventListener("pagehide", markDidUnload, { once: true });
+    window.addEventListener("beforeunload", markDidUnload, { once: true });
+
+    window.setTimeout(() => {
+      if (didUnload) return;
+      cleanupUnloadHooks();
+      pageLeaving = false;
+      if (document.body) document.body.classList.remove("ik-page-leaving");
+    }, delay + 900);
+
     window.setTimeout(run, delay);
   }
 
