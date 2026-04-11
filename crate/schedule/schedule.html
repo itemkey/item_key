@@ -26,7 +26,7 @@
 <body class="page page-schedule ik-booting" data-ik-loading>
   <header class="ik-site-nav" id="ikSiteNav">
     <button type="button" class="ik-site-nav__link" id="ikBackBtn" title="Вернуться назад">← Назад</button>
-    <a class="ik-site-nav__link" href="/item_key/">Главное меню</a>
+    <a class="ik-site-nav__link" href="../../index.html">Главное меню</a>
   </header>
 
   <main class="center-stage" aria-label="центр расписания">
@@ -103,9 +103,9 @@
         backBtn.addEventListener('click', function (event) {
           event.preventDefault();
           if (window.IKLoading && typeof window.IKLoading.leave === 'function') {
-            window.IKLoading.leave(function () { safeBrowserBack('/item_key/item-crate/'); });
+            window.IKLoading.leave(function () { safeBrowserBack('../../item-crate/'); });
           } else {
-            safeBrowserBack('/item_key/item-crate/');
+            safeBrowserBack('../../item-crate/');
           }
         });
       }

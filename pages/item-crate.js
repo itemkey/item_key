@@ -1,4 +1,5 @@
 import Head from "next/head";
+import Script from "next/script";
 
 const THEME_BOOTSTRAP_SCRIPT = `
 (function() {
@@ -585,9 +586,9 @@ export default function ItemCratePage() {
       </main>
 
       <script dangerouslySetInnerHTML={{ __html: SETTINGS_SCRIPT }} />
-      <script src="assets/js/theme.js" />
+      <Script src="assets/js/theme.js" strategy="afterInteractive" />
       <script dangerouslySetInnerHTML={{ __html: DONE_SCRIPT }} />
-      <script src="assets/js/main.js" />
+      <Script src="assets/js/main.js" strategy="afterInteractive" />
     </>
   );
 }

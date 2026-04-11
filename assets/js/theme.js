@@ -8,7 +8,7 @@
   const SUPABASE_SDK_SRC = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
   const ACCOUNT_LINK_STYLE_ID = "ikAccountLinksStyle";
   const LOADING_ATTR = "data-ik-loading";
-  const LOADING_MIN_MS = 320;
+  const LOADING_MIN_MS = 90;
 
   const scriptRef = (() => {
     const direct = document.currentScript;
@@ -154,7 +154,7 @@
       loadingFallbackTimer = window.setTimeout(() => {
         doneLoading();
       }, 5000);
-    }, 120);
+    }, 40);
   }
 
   function doneLoading() {
@@ -186,7 +186,7 @@
   }
 
   function leaveWith(action, delayMs) {
-    const delay = Math.max(0, Number(delayMs) || 170);
+    const delay = Math.max(0, Number(delayMs) || 90);
     const run = () => {
       try { action(); } catch (_) {}
     };
@@ -225,6 +225,7 @@
 
   function shouldInterceptLink(anchor, event) {
     if (!anchor) return false;
+    if (anchor.getAttribute("data-ik-leave") !== "true") return false;
     if (anchor.hasAttribute("download") || anchor.hasAttribute("data-no-transition")) return false;
     if (anchor.target && anchor.target !== "_self") return false;
     if (event && (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)) return false;
@@ -273,7 +274,7 @@
       const anchor = event.target && event.target.closest ? event.target.closest("a[href]") : null;
       if (!shouldInterceptLink(anchor, event)) return;
       event.preventDefault();
-      gotoWithLeave(anchor.href, 170);
+      gotoWithLeave(anchor.href, 90);
     }, true);
   }
 
@@ -518,6 +519,9 @@
 
   async function computeAdmin() {
     let email = getLocalUserEmail();
+    if (!email) return false;
+    if (ADMIN_EMAILS.includes(email)) return true;
+    if (!document.querySelector(PANEL_SELECTOR)) return false;
     try {
       await ensureSupabaseClientReady();
       if (window.IKSupabase && typeof window.IKSupabase.getClient === "function") {
@@ -529,9 +533,6 @@
         }
       }
     } catch {}
-    const emergency = ADMIN_EMAILS.includes(email);
-    if (emergency) return true;
-
     // Prefer role-based access when available
     try {
       await ensureSupabaseClientReady();

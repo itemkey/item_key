@@ -223,7 +223,7 @@
 <body class="page page-learning ik-booting" data-i18n-page="student_helper" data-ik-loading>
   <header class="ik-site-nav" id="ikSiteNav">
     <button type="button" class="ik-site-nav__link" id="ikBackBtn" title="Вернуться назад">← Назад</button>
-    <a class="ik-site-nav__link" href="/item_key/">Главное меню</a>
+    <a class="ik-site-nav__link" href="../../index.html">Главное меню</a>
   </header>
 
   <div class="ik-hidden-ui" aria-hidden="true">
@@ -1037,7 +1037,7 @@
       function getFallbackHref(){
         var menuLink = document.querySelector('#ikSiteNav a.ik-site-nav__link[href]');
         var href = menuLink ? String(menuLink.getAttribute('href') || '').trim() : '';
-        return href || '/item_key/';
+        return href || '../../index.html';
       }
 
       function goWithLeave(href){
@@ -1092,8 +1092,8 @@
   <script src="./js/library.js?v=20260331-03"></script>
   <script src="./js/structure_data.js"></script>
   <script src="./js/structure.js?v=20260331-01"></script>
-  <script src="./js/word_transformation.js?v=20260331-02"></script>
-  <script src="./js/dictionary.js" onerror="window.IKAdminLog && window.IKAdminLog('error','student_helper','dictionary.js failed to load')"></script>
+  <script src="./js/word_transformation.js?v=20260410-05"></script>
+  <script src="./js/dictionary.js?v=20260410-05" onerror="window.IKAdminLog && window.IKAdminLog('error','student_helper','dictionary.js failed to load')"></script>
   <script>
     (function(){
       var log = window.IKAdminLog || function(){};
@@ -1107,7 +1107,7 @@
         return;
       }
 
-      fetch('./js/dictionary.js', { cache: 'no-store' })
+      fetch('./js/dictionary.js?v=20260410-05', { cache: 'no-store' })
         .then(function(r){
           if(!r.ok) throw new Error('fetch status ' + r.status);
           return r.text();

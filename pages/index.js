@@ -1,10 +1,12 @@
 import Head from "next/head";
+import Script from "next/script";
 
 const HASH_REDIRECT_SCRIPT = `
 (function() {
   try {
     if (location.hash && /access_token=/.test(location.hash)) {
-      var repoPath = "/item_key/";
+      var path = String(location.pathname || "/").toLowerCase();
+      var repoPath = path.indexOf("/item_key/") === 0 ? "/item_key/" : "/";
       if (location.pathname === "/" || location.pathname === repoPath || /\\/index\\.html$/i.test(location.pathname)) {
         location.replace(repoPath + "item-user/" + location.hash);
       }
@@ -70,10 +72,10 @@ export default function HomePage() {
         </div>
       </main>
 
-      <script src="assets/js/theme.js" />
-      <script src="assets/js/main.js" />
-      <script src="./index-intro.js" />
-      <script id="ik-site-settings-js" src="./js/ik-site-settings-index.js" />
+      <Script src="assets/js/theme.js" strategy="afterInteractive" />
+      <Script src="assets/js/main.js" strategy="afterInteractive" />
+      <Script src="./index-intro.js" strategy="lazyOnload" />
+      <Script id="ik-site-settings-js" src="./js/ik-site-settings-index.js" strategy="afterInteractive" />
     </>
   );
 }

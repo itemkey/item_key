@@ -1362,14 +1362,14 @@ async function fetchJson(relPath){
   const btnTextShowAnswer = document.getElementById('btnTextShowAnswer');
   const btnWtAddToLibrary = document.getElementById('wtAddRuleToLibraryBtn');
 
-  const adminStatus = {};
-  function setAdminText(el, text, label){
+  const wtAdminStatus = {};
+  function setWtAdminText(el, text, label){
     if(el) el.textContent = text;
     const key = label || (el && el.id) || '';
     if(key && window.IKAdminLog){
       const next = String(text || '');
-      if(adminStatus[key] !== next){
-        adminStatus[key] = next;
+      if(wtAdminStatus[key] !== next){
+        wtAdminStatus[key] = next;
         window.IKAdminLog('log', 'student_helper', `${key}: ${next}`);
       }
     }
@@ -2330,8 +2330,8 @@ async function fetchJson(relPath){
       await preloadSeedTextTemplates();
       enforceBuilderAccess();
 
-      setAdminText(elDbStatus, 'opening...');
-      setAdminText(elDbNameLine, `db: ${dbNameFor('noun_to_adj')}`);
+      setWtAdminText(elDbStatus, 'opening...');
+      setWtAdminText(elDbNameLine, `db: ${dbNameFor('noun_to_adj')}`);
 
       let localDb = null;
       try{
@@ -2340,10 +2340,10 @@ async function fetchJson(relPath){
         wtRuntime.source = 'local';
         const report = await autoLoadIfEmpty('noun_to_adj');
         if(report.loaded){
-          setAdminText(elSeedBadge, 'json: loaded');
+          setWtAdminText(elSeedBadge, 'json: loaded');
           elSeedBadge.title = report.okFiles.join(', ');
         }else{
-          setAdminText(elSeedBadge, report.reason === 'not_empty' ? 'json: skip' : 'json: fail');
+          setWtAdminText(elSeedBadge, report.reason === 'not_empty' ? 'json: skip' : 'json: fail');
           elSeedBadge.title = report.reason === 'not_empty'
             ? 'Данные уже есть'
             : 'Автозагрузка не сработала. Если это file://, нажми load db';
@@ -2377,19 +2377,19 @@ async function fetchJson(relPath){
             if(cloudCount > 0){
               db = cloud;
               wtRuntime.source = 'cloud';
-              setAdminText(elDbNameLine, `db: ${WT_TABLE}`);
-              setAdminText(elSeedBadge, wtRuntime.isAdmin ? 'cloud: admin' : 'cloud: read');
+              setWtAdminText(elDbNameLine, `db: ${WT_TABLE}`);
+              setWtAdminText(elSeedBadge, wtRuntime.isAdmin ? 'cloud: admin' : 'cloud: read');
               elSeedBadge.title = wtRuntime.isAdmin
                 ? 'Источник: Supabase (admin read/write)'
                 : 'Источник: Supabase (read-only)';
             }
           }else{
-            setAdminText(elSeedBadge, 'cloud: off');
+            setWtAdminText(elSeedBadge, 'cloud: off');
             elSeedBadge.title = `Таблица ${WT_TABLE} пока не создана. Используется локальная база.`;
           }
         }catch(cloudError){
           console.warn('WT cloud init skipped:', cloudError);
-          setAdminText(elSeedBadge, 'cloud: off');
+          setWtAdminText(elSeedBadge, 'cloud: off');
           elSeedBadge.title = `Cloud fallback: ${cloudError && (cloudError.message || cloudError)}`;
         }
       }
@@ -2398,12 +2398,12 @@ async function fetchJson(relPath){
         const seed = await loadSeedTasksFromJson('noun_to_adj');
         db = memoryDb('noun_to_adj', seed);
         wtRuntime.source = 'memory';
-        setAdminText(elDbNameLine, 'db: memory-seed');
-        setAdminText(elSeedBadge, 'seed: memory');
+        setWtAdminText(elDbNameLine, 'db: memory-seed');
+        setWtAdminText(elSeedBadge, 'seed: memory');
         elSeedBadge.title = 'IndexedDB/Supabase недоступны. Показаны задания из локальных JSON файлов.';
       }
 
-      setAdminText(elDbStatus, 'ok');
+      setWtAdminText(elDbStatus, 'ok');
 
       await refreshTasks();
       if(!tasksAll.length){
@@ -2412,8 +2412,8 @@ async function fetchJson(relPath){
           if(localList.length){
             db = localDb;
             wtRuntime.source = 'local';
-            setAdminText(elDbNameLine, `db: ${dbNameFor('noun_to_adj')}`);
-            setAdminText(elSeedBadge, 'cloud: empty/local');
+            setWtAdminText(elDbNameLine, `db: ${dbNameFor('noun_to_adj')}`);
+            setWtAdminText(elSeedBadge, 'cloud: empty/local');
             elSeedBadge.title = 'В облаке пока нет корректных задач. Показана локальная база браузера.';
             await refreshTasks();
           }
@@ -2425,8 +2425,8 @@ async function fetchJson(relPath){
         if(seed.length){
           db = memoryDb('noun_to_adj', seed);
           wtRuntime.source = 'memory';
-          setAdminText(elDbNameLine, 'db: memory-seed');
-          setAdminText(elSeedBadge, 'seed: memory');
+          setWtAdminText(elDbNameLine, 'db: memory-seed');
+          setWtAdminText(elSeedBadge, 'seed: memory');
           elSeedBadge.title = 'Показаны задания из JSON, потому что локальная/облачная база пустая.';
           await refreshTasks();
         }
@@ -2462,7 +2462,7 @@ async function fetchJson(relPath){
         });
       }
     }catch(e){
-      setAdminText(elDbStatus, 'failed');
+      setWtAdminText(elDbStatus, 'failed');
       setFeedback('idle', 'fail', `Ошибка запуска: ${e && (e.message || e)}`);
       console.error(e);
     }
@@ -2698,7 +2698,7 @@ if(e.key.toLowerCase() === 't'){
       resetTextSession();
       goTextNext();
 
-      setAdminText(elSeedBadge, 'json: loaded');
+      setWtAdminText(elSeedBadge, 'json: loaded');
       elSeedBadge.title = loadedFiles.join(', ');
       setFeedback('idle', 'reset', 'ok');
     }catch(e){

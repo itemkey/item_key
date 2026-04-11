@@ -26,7 +26,7 @@ function normalizeBasePath(value) {
 }
 
 const hasExplicitBasePath = Object.prototype.hasOwnProperty.call(process.env, "NEXT_BASE_PATH");
-const defaultBasePath = process.env.NODE_ENV === "production" ? "/item_key" : "";
+const defaultBasePath = "";
 const basePath = normalizeBasePath(hasExplicitBasePath ? process.env.NEXT_BASE_PATH : defaultBasePath);
 const withBasePath = !!basePath;
 const isDev = process.env.NODE_ENV !== "production";

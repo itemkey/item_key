@@ -634,7 +634,7 @@ function WhispererReactApp() {
       window.history.back();
       return;
     }
-    window.location.href = "/item_key/";
+    window.location.href = "../../index.html";
   }, []);
 
   const handleBack = useCallback(
@@ -954,7 +954,7 @@ function WhispererReactApp() {
             </button>
 
             <a
-              href="/item_key/"
+              href="../../index.html"
               className={`tw-inline-flex tw-min-h-11 tw-items-center tw-justify-center tw-border tw-px-4 tw-text-xs tw-font-semibold tw-uppercase tw-tracking-[0.28em] ${
                 isDark
                   ? "tw-border-slate-600 tw-bg-slate-900 hover:tw-border-slate-400"

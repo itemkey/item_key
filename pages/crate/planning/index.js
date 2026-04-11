@@ -102,6 +102,12 @@ document.addEventListener('DOMContentLoaded', function(){
     return true;
   }
 
+  function getFallbackHref(){
+    var menuLink = document.querySelector('#ikSiteNav a.ik-site-nav__link[href]');
+    var href = menuLink ? String(menuLink.getAttribute('href') || '').trim() : '';
+    return href || '../../index.html';
+  }
+
   if(viewSelect){
     var hashView = readViewFromHash();
     if(hashView && hashView !== viewSelect.value){
@@ -138,10 +144,11 @@ document.addEventListener('DOMContentLoaded', function(){
     backBtn.addEventListener('click', function(event){
       event.preventDefault();
       if(closeOpenModal()) return;
+      var fallbackHref = getFallbackHref();
       if(window.IKLoading && typeof window.IKLoading.leave === 'function'){
-        window.IKLoading.leave(function(){ safeBrowserBack('/item_key/'); });
+        window.IKLoading.leave(function(){ safeBrowserBack(fallbackHref); });
       } else {
-        safeBrowserBack('/item_key/');
+        safeBrowserBack(fallbackHref);
       }
     });
   }
@@ -163,7 +170,7 @@ export default function PlanningPage() {
 
       <header className="ik-site-nav" id="ikSiteNav">
         <button type="button" className="ik-site-nav__link" id="ikBackBtn" title="Вернуться назад">← Назад</button>
-        <a className="ik-site-nav__link" href="/item_key/">Главное меню</a>
+        <a className="ik-site-nav__link" href="../../index.html">Главное меню</a>
       </header>
 
       <main className="center-stage" aria-label="центр планирования">
@@ -249,12 +256,12 @@ export default function PlanningPage() {
 
       <div className="toast-stack" id="toasts" aria-live="polite" />
 
-      <script src="../../assets/js/theme.js" />
-      <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" />
-      <script src="../../assets/js/supabase-client.js" />
+      <script defer src="../../assets/js/theme.js" />
+      <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" />
+      <script defer src="../../assets/js/supabase-client.js" />
       <script type="module" dangerouslySetInnerHTML={{ __html: PLANNING_BOOT_SCRIPT }} />
       <script dangerouslySetInnerHTML={{ __html: NAV_SCRIPT }} />
-      <script id="ik-site-settings-js" src="./js/ik-site-settings.js" />
+      <script defer id="ik-site-settings-js" src="./js/ik-site-settings.js" />
     </>
   );
 }

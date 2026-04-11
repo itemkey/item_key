@@ -719,6 +719,15 @@ function dictFilenameForSection(sectionName){
   function safeJsonParse(s, fb){
     try{ return JSON.parse(s); }catch(_){ return fb; }
   }
+
+  function dictEscapeHTML(str){
+    return String(str || '')
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
+  }
   function loadPracticeCfg(){
     const def = {
       session:'20',
@@ -1084,12 +1093,19 @@ function dictFilenameForSection(sectionName){
     if(typeof elLearnIntroShowPos !== 'undefined' && elLearnIntroShowPos) elLearnIntroShowPos.checked = !!cfg.introShowPos;
   }
 
+  function dictPulse(el, cls){
+    if(!el || !cls) return;
+    el.classList.remove(cls);
+    void el.offsetWidth;
+    el.classList.add(cls);
+  }
+
   function learnSetFeedback(state, stamp, line){
     if(!elLearnFeedback) return;
     elLearnFeedback.dataset.state = state || 'idle';
     if(elLearnStamp) elLearnStamp.textContent = stamp || 'info';
     if(elLearnLine) elLearnLine.textContent = line || '';
-    pulse(elLearnFeedback, 'ik-pop');
+    dictPulse(elLearnFeedback, 'ik-pop');
   }
   function learnUpdateProgress(){
     if(!elLearnProgress){
@@ -1518,7 +1534,7 @@ if(elLearnInput){
   }else{
     elLearnInput.classList.remove('is-ok');
     elLearnInput.classList.add('is-bad');
-    pulse(elLearnInput, 'ik-shake');
+      dictPulse(elLearnInput, 'ik-shake');
   }
   elLearnInput.disabled = true;
 }
@@ -1678,7 +1694,7 @@ if(btnLearnCheckNext){ btnLearnCheckNext.textContent = 'далее'; btnLearnChe
           return;
         }
         learnSetFeedback('idle', 'pick', 'выбери вариант или нажми не знаю');
-        if(elLearnCard) pulse(elLearnCard, 'ik-shake');
+        if(elLearnCard) dictPulse(elLearnCard, 'ik-shake');
         return;
       }
 
@@ -1696,7 +1712,7 @@ if(btnLearnCheckNext){ btnLearnCheckNext.textContent = 'далее'; btnLearnChe
     const raw = (elLearnInput && elLearnInput.value) ? elLearnInput.value : '';
     if(!String(raw).trim()){
       learnSetFeedback('idle', 'type', 'введи ответ');
-      if(elLearnInput) pulse(elLearnInput, 'ik-shake');
+      if(elLearnInput) dictPulse(elLearnInput, 'ik-shake');
       return;
     }
 
@@ -1720,7 +1736,7 @@ if(btnLearnCheckNext){ btnLearnCheckNext.textContent = 'далее'; btnLearnChe
         if(elLearnInput){
           elLearnInput.classList.remove('is-ok');
           elLearnInput.classList.add('is-bad');
-          pulse(elLearnInput, 'ik-shake');
+          dictPulse(elLearnInput, 'ik-shake');
         }
         return;
       }
@@ -1737,7 +1753,7 @@ if(btnLearnCheckNext){ btnLearnCheckNext.textContent = 'далее'; btnLearnChe
       if(elLearnInput){
         elLearnInput.classList.remove('is-ok');
         elLearnInput.classList.add('is-bad');
-        pulse(elLearnInput, 'ik-shake');
+        dictPulse(elLearnInput, 'ik-shake');
       }
       return;
     }
@@ -1918,14 +1934,14 @@ if(btnLearnCheckNext){ btnLearnCheckNext.textContent = 'далее'; btnLearnChe
   const elDictDbNameLine = document.getElementById('dictDbNameLine');
   const elDictCountBadge = document.getElementById('dictCountBadge');
 
-  const adminStatus = {};
-  function setAdminText(el, text, label){
+  const dictAdminStatus = {};
+  function setDictAdminText(el, text, label){
     if(el) el.textContent = text;
     const key = label || (el && el.id) || '';
     if(key && window.IKAdminLog){
       const next = String(text || '');
-      if(adminStatus[key] !== next){
-        adminStatus[key] = next;
+      if(dictAdminStatus[key] !== next){
+        dictAdminStatus[key] = next;
         window.IKAdminLog('log', 'student_helper', `${key}: ${next}`);
       }
     }
@@ -2065,7 +2081,7 @@ if(btnLearnCheckNext){ btnLearnCheckNext.textContent = 'далее'; btnLearnChe
     for(; index < firstEnd; index += 1){
       const w = filtered[index];
       const li = document.createElement('li');
-      li.innerHTML = `<p class="ik-itemline"><b>${escapeHTML(w.en)}</b> - ${escapeHTML(w.ru)}</p>`;
+      li.innerHTML = `<p class="ik-itemline"><b>${dictEscapeHTML(w.en)}</b> - ${dictEscapeHTML(w.ru)}</p>`;
       firstFrag.appendChild(li);
     }
     elViewList.replaceChildren(firstFrag);
@@ -2084,7 +2100,7 @@ if(btnLearnCheckNext){ btnLearnCheckNext.textContent = 'далее'; btnLearnChe
       for(; index < end; index += 1){
         const w = filtered[index];
         const li = document.createElement('li');
-        li.innerHTML = `<p class="ik-itemline"><b>${escapeHTML(w.en)}</b> - ${escapeHTML(w.ru)}</p>`;
+        li.innerHTML = `<p class="ik-itemline"><b>${dictEscapeHTML(w.en)}</b> - ${dictEscapeHTML(w.ru)}</p>`;
         frag.appendChild(li);
       }
 
@@ -2190,7 +2206,7 @@ if(btnLearnCheckNext){ btnLearnCheckNext.textContent = 'далее'; btnLearnChe
     cancelWordsRender();
     elWordList.innerHTML = '';
     const li = document.createElement('li');
-    li.innerHTML = `<p class="ik-itemline"><b>${escapeHTML(text || 'загрузка...')}</b></p>`;
+    li.innerHTML = `<p class="ik-itemline"><b>${dictEscapeHTML(text || 'загрузка...')}</b></p>`;
     elWordList.appendChild(li);
   }
 
@@ -2207,7 +2223,7 @@ if(btnLearnCheckNext){ btnLearnCheckNext.textContent = 'далее'; btnLearnChe
     li.className = 'is-clickable';
 
     const left = document.createElement('div');
-    left.innerHTML = `<p class="ik-itemline"><b>${escapeHTML(it.name)}</b> <span class="ik-muted">(${it.count})</span></p>`;
+    left.innerHTML = `<p class="ik-itemline"><b>${dictEscapeHTML(it.name)}</b> <span class="ik-muted">(${it.count})</span></p>`;
 
     const right = document.createElement('div');
     right.className = 'ik-mini';
@@ -2470,7 +2486,7 @@ let elLearnMcqButtons = null;
     elQuizFeedback.dataset.state = state || 'idle';
     elQuizStamp.textContent = stamp || 'info';
     elQuizLine.textContent = line || '';
-    pulse(elQuizFeedback, 'ik-pop');
+    dictPulse(elQuizFeedback, 'ik-pop');
   }
 
   function uiLang(){
@@ -3599,7 +3615,7 @@ function handleMcqHotkeys(e){
   }
 
   function updateGlobalBadges(){
-    setAdminText(elDictDbNameLine, `db: ${dictDbName()}`);
+    setDictAdminText(elDictDbNameLine, `db: ${dictDbName()}`);
     elDictCountBadge.textContent = `words: ${dictWordsAll.length}`;
   }
 
@@ -4503,7 +4519,7 @@ function handleMcqHotkeys(e){
     if(model.personalGuest){
       elFirstPickList.innerHTML = '';
       const li = document.createElement('li');
-      li.innerHTML = `<p class="ik-itemline"><b>${escapeHTML(model.message || 'войдите, чтобы видеть личные словари')}</b></p>`;
+      li.innerHTML = `<p class="ik-itemline"><b>${dictEscapeHTML(model.message || 'войдите, чтобы видеть личные словари')}</b></p>`;
       elFirstPickList.appendChild(li);
       return;
     }
@@ -4582,7 +4598,7 @@ function handleMcqHotkeys(e){
         const li = document.createElement('li');
 
         const left = document.createElement('div');
-        left.innerHTML = `<p class="ik-itemline"><b>${escapeHTML(s.name)}</b> <span class="ik-muted">(${count})</span></p>`;
+        left.innerHTML = `<p class="ik-itemline"><b>${dictEscapeHTML(s.name)}</b> <span class="ik-muted">(${count})</span></p>`;
 
         const right = document.createElement('div');
         right.className = 'ik-mini';
@@ -4701,7 +4717,7 @@ function handleMcqHotkeys(e){
     const li = document.createElement('li');
 
     const left = document.createElement('div');
-    left.innerHTML = `<p class="ik-itemline"><b>${escapeHTML(w.en)}</b> - ${escapeHTML(w.ru)}</p>`;
+    left.innerHTML = `<p class="ik-itemline"><b>${dictEscapeHTML(w.en)}</b> - ${dictEscapeHTML(w.ru)}</p>`;
 
     const right = document.createElement('div');
     right.className = 'ik-mini';
@@ -5577,7 +5593,7 @@ function handleMcqHotkeys(e){
     if(isCorrect) elQuizInput.classList.add('is-ok');
     else{
       elQuizInput.classList.add('is-bad');
-      pulse(elQuizInput, 'ik-shake');
+      dictPulse(elQuizInput, 'ik-shake');
     }
     elQuizInput.disabled = true;
     quizFillBackAnswer(quizCurrent, quizAskLang, cfgFromUI());
@@ -5666,7 +5682,7 @@ function handleMcqHotkeys(e){
     if(quizTaskKind === 'mcq'){
       if(!quizMcqState || quizMcqState.selectedIdx == null || quizMcqState.selectedIdx < 0){
         quizSetFeedback('idle', 'choose', 'выбери вариант');
-        if(elQuizMcqWrap) pulse(elQuizMcqWrap, 'ik-shake');
+        if(elQuizMcqWrap) dictPulse(elQuizMcqWrap, 'ik-shake');
         return;
       }
       // normally we are already in next mode
@@ -5677,7 +5693,7 @@ function handleMcqHotkeys(e){
     const raw = elQuizInput.value || '';
     if(!String(raw).trim()){
       quizSetFeedback('idle', 'type', 'введи ответ');
-      pulse(elQuizInput, 'ik-shake');
+      dictPulse(elQuizInput, 'ik-shake');
       return;
     }
 
@@ -6121,13 +6137,13 @@ async function dictSyncFromFolder(opts){
     window.__dictBooted = true;
     try{
       if(window.IKAdminLog) window.IKAdminLog('log', 'student_helper', 'dict: boot');
-      setAdminText(elDictDbStatus, 'opening...');
+      setDictAdminText(elDictDbStatus, 'opening...');
       dictDb = await dictOpenDB();
-      setAdminText(elDictDbStatus, 'ok');
+      setDictAdminText(elDictDbStatus, 'ok');
 
       // Seed from repo JSON is disabled.
       // Default content lives on Supabase as public dictionaries (system/user).
-      setAdminText(elDictSeedBadge, 'json: off');
+      setDictAdminText(elDictSeedBadge, 'json: off');
       if(elDictSeedBadge) elDictSeedBadge.title = 'Локальный seed из /db/dictionary отключен. Используй вкладки "системные" / "пользовательские".';
 
       await dictRefreshAll();
@@ -6150,7 +6166,7 @@ async function dictSyncFromFolder(opts){
       quizSetFeedback('idle', 'pick', 'выбери section');
       emitDictBridgeState();
     }catch(e){
-      setAdminText(elDictDbStatus, 'failed');
+      setDictAdminText(elDictDbStatus, 'failed');
       console.error(e);
       if(window.IKAdminLog) window.IKAdminLog('error', 'student_helper', `dict boot failed: ${e && (e.message || e)}`);
     }finally{

@@ -150,7 +150,7 @@
   function ensureDictionary(){
     return onceGroup("dictionary", async () => {
       await ensureScripts([
-        "./js/dictionary.js",
+        "./js/dictionary.js?v=20260410-05",
         "./js/student-helper-dict-fallback.js"
       ]);
 
@@ -171,7 +171,7 @@
 
   function ensureWt(){
     return onceGroup("wt", async () => {
-      await ensureScript("./js/word_transformation.js?v=20260331-02");
+      await ensureScript("./js/word_transformation.js?v=20260410-05");
 
       ensureSupabase().catch(() => {});
       ensureProgressCloud().catch(() => {});

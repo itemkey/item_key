@@ -44,9 +44,9 @@ document.addEventListener('DOMContentLoaded', function () {
     backBtn.addEventListener('click', function (event) {
       event.preventDefault();
       if (window.IKLoading && typeof window.IKLoading.leave === 'function') {
-        window.IKLoading.leave(function () { safeBrowserBack('/item_key/item-crate/'); });
+        window.IKLoading.leave(function () { safeBrowserBack('../../item-crate/'); });
       } else {
-        safeBrowserBack('/item_key/item-crate/');
+        safeBrowserBack('../../item-crate/');
       }
     });
   }
@@ -69,7 +69,7 @@ export default function SchedulePage() {
 
       <header className="ik-site-nav" id="ikSiteNav">
         <button type="button" className="ik-site-nav__link" id="ikBackBtn" title="Вернуться назад">← Назад</button>
-        <a className="ik-site-nav__link" href="/item_key/">Главное меню</a>
+        <a className="ik-site-nav__link" href="../../index.html">Главное меню</a>
       </header>
 
       <main className="center-stage" aria-label="центр расписания">
@@ -110,9 +110,9 @@ export default function SchedulePage() {
 
       <div className="toast-stack" id="toasts" aria-live="polite" />
 
-      <script src="../../assets/js/theme.js" />
-      <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" />
-      <script src="../../assets/js/supabase-client.js" />
+      <script defer src="../../assets/js/theme.js" />
+      <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" />
+      <script defer src="../../assets/js/supabase-client.js" />
       <script type="module" src="./schedule.js" />
       <script dangerouslySetInnerHTML={{ __html: BACK_SCRIPT }} />
     </>
